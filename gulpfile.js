@@ -7,6 +7,7 @@ var runSequence = require('run-sequence');
 
 var mainFiles = [
   'src/lfr.js',
+  'src/structs/Trie.js',
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
   'src/net/AjaxTransport.js'

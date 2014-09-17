@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports.EventEmitter = require('./src/EventEmitter');
+module.exports.EventEmitter = require('./build/EventEmitter');

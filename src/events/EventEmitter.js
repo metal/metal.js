@@ -5,7 +5,9 @@
    * EventEmitter utility.
    * @constructor
    */
-  lfr.EventEmitter = function() {};
+  lfr.EventEmitter = function() {
+    this.listenersTree_ = new lfr.Trie();
+  };
 
   /**
    * Holds event listeners that trigger for all event types.
@@ -15,11 +17,18 @@
   lfr.EventEmitter.prototype.all_ = null;
 
   /**
-   * Holds event listeners scoped by event type.
-   * @type {Array}
+   * The delimiter being used for namespaces.
+   * @type {string}
    * @private
    */
-  lfr.EventEmitter.prototype.events_ = null;
+  lfr.EventEmitter.prototype.delimiter_ = '.';
+
+  /**
+   * Holds event listeners scoped by event type.
+   * @type {Trie}
+   * @private
+   */
+  lfr.EventEmitter.prototype.listenersTree_ = null;
 
   /**
    * The maximum number of listeners allowed for each event type. If the number
@@ -39,26 +48,23 @@
     if (typeof listener !== 'function') {
       throw new TypeError('Listener must be a function');
     }
-    if (!this.events_) {
-      this.events_ = {};
-    }
 
     this.emit('newListener', event, listener);
 
-    if (!this.events_[event]) {
-      this.events_[event] = [];
-    }
+    var listeners = this.listenersTree_.setKeyValue(
+      this.splitNamespaces(event),
+      [listener],
+      this.mergeListenerArrays_
+    );
 
-    this.events_[event].push(listener);
-
-    if (this.events_[event].length > this.maxListeners_ && !this.events_[event].warned) {
+    if (listeners.length > this.maxListeners_ && !listeners.warned) {
       console.warning(
         'Possible EventEmitter memory leak detected. %d listeners added ' +
         'for event %s. Use emitter.setMaxListeners() to increase limit.',
-        this.events_[event].length,
+        listeners.length,
         event
       );
-      this.events_[event].warned = true;
+      listeners.warned = true;
     }
 
     return this;
@@ -88,12 +94,20 @@
   };
 
   /**
+   * Gets the delimiter to be used by namespaces.
+   * @return {string}
+   */
+  lfr.EventEmitter.prototype.getDelimiter = function() {
+    return this.delimiter_;
+  };
+
+  /**
    * Returns an array of listeners for the specified event.
    * @param {string} event
    * @return {Array} Array of listeners.
    */
   lfr.EventEmitter.prototype.listeners = function(event) {
-    return this.events_ && this.events_[event];
+    return this.listenersTree_.getKeyValue(this.splitNamespaces(event));
   };
 
   /**
@@ -133,6 +147,19 @@
   };
 
   /**
+   * Merges two objects that contain event listeners.
+   * @param  {!Object} arr1
+   * @param  {!Object} arr2
+   * @return {!Object}
+   */
+  lfr.EventEmitter.prototype.mergeListenerArrays_ = function(arr1, arr2) {
+    for (var i = 0; i < arr2.length; i++) {
+      arr1.push(arr2[i]);
+    }
+    return arr1;
+  };
+
+  /**
    * Remove a listener from the listener array for the specified event.
    * Caution: changes array indices in the listener array behind the listener.
    * @param {string} event
@@ -142,9 +169,6 @@
   lfr.EventEmitter.prototype.off = function(event, listener) {
     if (typeof listener !== 'function') {
       throw new TypeError('Listener must be a function');
-    }
-    if (!this.events_) {
-      return this;
     }
 
     var listeners = this.listeners(event);
@@ -224,13 +248,10 @@
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.removeAllListeners = function(opt_event) {
-    if (!this.events_) {
-      return this;
-    }
     if (opt_event) {
-      delete this.events_[opt_event];
+      this.listenersTree_.setKeyValue(this.splitNamespaces(opt_event), []);
     } else {
-      delete this.events_;
+      this.listenersTree_.clear();
       delete this.all_;
     }
     return this;
@@ -246,6 +267,16 @@
   lfr.EventEmitter.prototype.removeListener = lfr.EventEmitter.prototype.off;
 
   /**
+   * Sets the delimiter to be used by namespaces.
+   * @param {string} delimiter
+   * @return {!Object} Returns emitter, so calls can be chained.
+   */
+  lfr.EventEmitter.prototype.setDelimiter = function(delimiter) {
+    this.delimiter_ = delimiter;
+    return this;
+  };
+
+  /**
    * By default EventEmitters will print a warning if more than 10 listeners
    * are added for a particular event. This is a useful default which helps
    * finding memory leaks. Obviously not all Emitters should be limited to 10.
@@ -256,6 +287,14 @@
   lfr.EventEmitter.prototype.setMaxListeners = function(max) {
     this.maxListeners_ = max;
     return this;
+  };
+
+  /**
+   * Splits the event, using the current delimiter.
+   * @return {!Array}
+   */
+  lfr.EventEmitter.prototype.splitNamespaces = function(event) {
+    return typeof event === 'string' ? event.split(this.delimiter) : event;
   };
 
 }());

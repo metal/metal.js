@@ -14,6 +14,20 @@ module.exports = {
     done();
   },
 
+  testNamespaceEvent: function(test) {
+    var listener = createStub();
+
+    this.emitter.on('namespaced.event.1', listener);
+
+    this.emitter.emit('namespaced');
+    test.strictEqual(0, listener.called);
+
+    this.emitter.emit('namespaced.event.1');
+    test.strictEqual(1, listener.called);
+
+    test.done();
+  },
+
   testOnce: function(test) {
     var listener = createStub();
 

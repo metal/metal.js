@@ -57,7 +57,8 @@ gulp.task('lint', function() {
 });
 
 gulp.task('test', function() {
-  return gulp.src(['test/*.js']).pipe(plugins.nodeunit());
+  return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
+    .pipe(plugins.nodeunit());
 });
 
 gulp.task('watch', ['build'], function() {

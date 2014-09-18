@@ -1,6 +1,6 @@
 'use strict';
 
-var lfr = require('./fixture/sandbox.js');
+var lfr = require('../fixture/sandbox.js');
 
 module.exports = {
   setUp: function(done) {

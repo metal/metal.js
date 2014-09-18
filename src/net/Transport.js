@@ -21,6 +21,19 @@
   lfr.inherits(lfr.Transport, lfr.EventEmitter);
 
   /**
+   * Returns lfr.Transport singleton.
+   * @param {string} uri
+   * @return {lfr.Transport} Single instance of lfr.Transport.
+   * @static
+   */
+  lfr.Transport.getSingleton = function(uri) {
+    if (lfr.Transport.instance_) {
+      return lfr.Transport.instance_;
+    }
+    return (lfr.Transport.instance_ = new lfr.Transport(uri));
+  };
+
+  /**
    * Holds the transport state, it supports the available states: '',
    * 'opening', 'open' and 'closed'.
    * @type {string}
@@ -42,11 +55,11 @@
   lfr.Transport.prototype.close = lfr.abstractMethod;
 
   /**
-   * Decodes a packet received on data.
-   * @param {string} data
-   * @return {string}
+   * Decodes a data chunk received.
+   * @param {*=} data
+   * @return {?}
    */
-  lfr.Transport.prototype.decodePacket = lfr.abstractMethod;
+  lfr.Transport.prototype.decodeData = lfr.identityFunction;
 
   /**
    * Gets the transport state value.
@@ -78,8 +91,8 @@
    * @protected
    */
   lfr.Transport.prototype.onDataHandler_ = function(event) {
-    this.emit('packet', {
-      data: this.decodePacket(event.data)
+    this.emit('data', {
+      data: this.decodeData(event.data)
     });
   };
 
@@ -98,12 +111,12 @@
   lfr.Transport.prototype.open = lfr.abstractMethod;
 
   /**
-   * Sends packets.
-   * @param {Array} packets
+   * Sends packet.
+   * @param {*} packet
    */
-  lfr.Transport.prototype.send = function(packets) {
+  lfr.Transport.prototype.send = function(packet) {
     if (this.state === 'open') {
-      this.write(packets);
+      this.write(packet);
     } else {
       throw new Error('Transport not open');
     }
@@ -127,7 +140,7 @@
 
   /**
    * Writes data to the transport.
-   * @param {string} packets
+   * @param {*} packet
    * @chainable
    */
   lfr.Transport.prototype.write = lfr.abstractMethod;
@@ -148,13 +161,14 @@
    */
 
   /**
-   * Emits when open is called.
-   * @event open
+   * Emits when a message is received. Relevant when data event handles
+   * multiple chunks of data.
+   * @event message
    */
 
   /**
-   * Emits when a packet is decoded on data.
-   * @event packet
+   * Emits when open is called.
+   * @event open
    */
 
 }());

@@ -11,7 +11,7 @@ var mainFiles = [
   'src/structs/WildcardTrie.js',
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
-  'src/net/AjaxTransport.js'
+  'src/net/XhrTransport.js'
 ];
 
 gulp.task('build', ['clean'], function() {

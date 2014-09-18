@@ -5,7 +5,7 @@
   /**
    * XhrTransport utility.
    * @constructor
-   * @extends {lfr.Transport}
+   * @extends {lfr.BaseTransport}
    */
   lfr.XhrTransport = function(uri) {
     lfr.XhrTransport.base(this, 'constructor', uri);

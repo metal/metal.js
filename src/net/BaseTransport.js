@@ -4,7 +4,7 @@
   /**
    * BaseTransport utility.
    * @constructor
-   * @extends {lfr.EventEmitter}
+   * @extends {lfr.Transport}
    */
   lfr.BaseTransport = function(uri) {
     lfr.BaseTransport.base(this, 'constructor');

@@ -60,7 +60,7 @@ gulp.task('lint', function() {
 
 gulp.task('test', function() {
   return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
-    .pipe(plugins.nodeunit());
+    .pipe(plugins.mocha());
 });
 
 gulp.task('watch', ['build'], function() {

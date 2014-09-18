@@ -1,16 +1,15 @@
 'use strict';
 
-var lfr = require('../fixture/sandbox.js');
+var assert = require('assert');
+require('../fixture/sandbox.js');
 
-module.exports = {
-  testValue: function(test) {
+describe('WildcardTrie', function() {
+  it('should set the value from the constructor', function() {
     var trie = new lfr.WildcardTrie('myValue');
-    test.strictEqual('myValue', trie.getValue());
+    assert.strictEqual('myValue', trie.getValue());
+  });
 
-    test.done();
-  },
-
-  testGetWithWildcard: function(test) {
+  it('should get values for wildcard keys', function() {
     var trie = new lfr.WildcardTrie('myValue');
 
     trie.setKeyValue(['some', 'event'], 'value-some.event');
@@ -19,15 +18,13 @@ module.exports = {
     trie.setKeyValue(['some', 'people', 'go', 'to', 'the', 'event'], 'value-some.people.go.to.the.event');
     trie.setKeyValue(['some', 'one', 'went', 'to', 'spain', 'again'], 'value-some.one.went.to.spain.again');
 
-    test.deepEqual(['value-some.event'], trie.getKeyValue(['some', 'event']));
-    test.deepEqual(['value-some.other.event'], trie.getKeyValue(['some', 'other', 'event']));
-    test.deepEqual(['value-some.event'], trie.getKeyValue(['some', '*']));
-    test.deepEqual(['value-some.other.event'], trie.getKeyValue(['some', '*', 'event']));
+    assert.deepEqual(['value-some.event'], trie.getKeyValue(['some', 'event']));
+    assert.deepEqual(['value-some.other.event'], trie.getKeyValue(['some', 'other', 'event']));
+    assert.deepEqual(['value-some.event'], trie.getKeyValue(['some', '*']));
+    assert.deepEqual(['value-some.other.event'], trie.getKeyValue(['some', '*', 'event']));
+  });
 
-    test.done();
-  },
-
-  testSetWithWildcard: function(test) {
+  it('should set values with wildcard keys', function() {
     var trie = new lfr.WildcardTrie();
 
     trie.setKeyValue(['some', 'event'], 'value-some.event');
@@ -35,19 +32,17 @@ module.exports = {
     trie.setKeyValue(['some', 'other', 'event', 'i', 'went', 'to'], 'value-some.other.event.i.went.to');
     trie.setKeyValue(['some', '*', 'event'], 'value-some.*.event');
 
-    test.deepEqual(
+    assert.deepEqual(
       [
         'value-some.other.event',
         'value-some.*.event'
       ],
       trie.getKeyValue(['some', 'other', 'event'])
     );
-    test.deepEqual(['value-some.event'], trie.getKeyValue(['*', 'event']));
+    assert.deepEqual(['value-some.event'], trie.getKeyValue(['*', 'event']));
+  });
 
-    test.done();
-  },
-
-  testStringKeys: function(test) {
+  it('should work with string keys', function() {
     var trie = new lfr.WildcardTrie();
 
     trie.setKeyValue('ab', 'value-ab');
@@ -55,10 +50,8 @@ module.exports = {
     trie.setKeyValue('acbd', 'value-acbd');
     trie.setKeyValue('*cb', 'value-*cb');
 
-    test.deepEqual(['value-ab'], trie.getKeyValue('ab'));
-    test.deepEqual(['value-acb', 'value-*cb'], trie.getKeyValue('acb'));
-    test.deepEqual(['value-acb', 'value-*cb'], trie.getKeyValue('a*b'));
-
-    test.done();
-  }
-};
+    assert.deepEqual(['value-ab'], trie.getKeyValue('ab'));
+    assert.deepEqual(['value-acb', 'value-*cb'], trie.getKeyValue('acb'));
+    assert.deepEqual(['value-acb', 'value-*cb'], trie.getKeyValue('a*b'));
+  });
+});

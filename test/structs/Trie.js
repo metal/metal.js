@@ -1,94 +1,88 @@
 'use strict';
 
-var lfr = require('../fixture/sandbox.js');
+var assert = require('assert');
+require('../fixture/sandbox.js');
 
-module.exports = {
-  testNormalizeKey: function(test) {
+describe('Trie', function() {
+  it('should normalize keys', function() {
     var trie = new lfr.Trie();
 
-    test.deepEqual(['a', '@', 'b', '2'], trie.normalizeKey('a@b2'));
-    test.deepEqual(['1', '2'], trie.normalizeKey(['1', '2']));
+    assert.deepEqual(['a', '@', 'b', '2'], trie.normalizeKey('a@b2'));
+    assert.deepEqual(['1', '2'], trie.normalizeKey(['1', '2']));
+  });
 
-    test.done();
-  },
-
-  testValue: function(test) {
+  it('should set and get value', function() {
     var trie = new lfr.Trie();
 
-    test.ok(!trie.getValue());
+    assert.ok(!trie.getValue());
 
     trie.setValue('a');
-    test.strictEqual('a', trie.getValue());
+    assert.strictEqual('a', trie.getValue());
+  });
 
-    test.done();
-  },
+  it('should set and get value through constructor', function() {
+    var trie = new lfr.Trie('a');
+    assert.strictEqual('a', trie.getValue());
+  });
 
-  testChildren: function(test) {
+  it('should set and get children', function() {
     var child1 = new lfr.Trie();
     var child2 = new lfr.Trie();
     var trie = new lfr.Trie();
 
-    test.ok(!trie.getChild('1'));
-    test.ok(!trie.getChild('2'));
+    assert.ok(!trie.getChild('1'));
+    assert.ok(!trie.getChild('2'));
 
     trie.setChild('1', child1);
     trie.setChild('2', child2);
 
-    test.strictEqual(child1, trie.getChild('1'));
-    test.strictEqual(child2, trie.getChild('2'));
-    test.ok(!trie.getChild('3'));
+    assert.strictEqual(child1, trie.getChild('1'));
+    assert.strictEqual(child2, trie.getChild('2'));
+    assert.ok(!trie.getChild('3'));
+  });
 
-    test.done();
-  },
-
-  testSetKeyValue: function(test) {
+  it('should set values for string keys', function() {
     var trie = new lfr.Trie();
 
     trie.setKeyValue('abc', 'abcValue');
-    test.ok(trie.getChild('a'));
-    test.ok(trie.getChild('a').getChild('b'));
-    test.ok(trie.getChild('a').getChild('b').getChild('c'));
-    test.strictEqual('abcValue', trie.getChild('a').getChild('b').getChild('c').getValue());
+    assert.ok(trie.getChild('a'));
+    assert.ok(trie.getChild('a').getChild('b'));
+    assert.ok(trie.getChild('a').getChild('b').getChild('c'));
+    assert.strictEqual('abcValue', trie.getChild('a').getChild('b').getChild('c').getValue());
 
     trie.setKeyValue('az', 'azValue');
-    test.ok(trie.getChild('a').getChild('z'));
-    test.strictEqual('azValue', trie.getChild('a').getChild('z').getValue());
+    assert.ok(trie.getChild('a').getChild('z'));
+    assert.strictEqual('azValue', trie.getChild('a').getChild('z').getValue());
 
     trie.setKeyValue('cba', 'cbaValue');
-    test.ok(trie.getChild('c'));
-    test.ok(trie.getChild('c').getChild('b'));
-    test.ok(trie.getChild('c').getChild('b').getChild('a'));
-    test.strictEqual('cbaValue', trie.getChild('c').getChild('b').getChild('a').getValue());
+    assert.ok(trie.getChild('c'));
+    assert.ok(trie.getChild('c').getChild('b'));
+    assert.ok(trie.getChild('c').getChild('b').getChild('a'));
+    assert.strictEqual('cbaValue', trie.getChild('c').getChild('b').getChild('a').getValue());
+  });
 
-    test.done();
-  },
-
-  testSetKeyValueArray: function(test) {
+  it('should set values for array keys', function() {
     var trie = new lfr.Trie();
 
     trie.setKeyValue(['abc', 'def'], '1');
     trie.setKeyValue(['abc', 'z'], '2');
 
-    test.ok(trie.getChild('abc').getChild('def'));
-    test.ok(!trie.getChild('a'));
-    test.strictEqual('1', trie.getChild('abc').getChild('def').getValue());
-    test.strictEqual('2', trie.getChild('abc').getChild('z').getValue());
+    assert.ok(trie.getChild('abc').getChild('def'));
+    assert.ok(!trie.getChild('a'));
+    assert.strictEqual('1', trie.getChild('abc').getChild('def').getValue());
+    assert.strictEqual('2', trie.getChild('abc').getChild('z').getValue());
+  });
 
-    test.done();
-  },
-
-  testSetKeyValueNoMerge: function(test) {
+  it('should override existing values', function() {
     var trie = new lfr.Trie();
 
     trie.setKeyValue('abc', ['1']);
     trie.setKeyValue('abc', ['2']);
 
-    test.deepEqual(['2'], trie.getChild('a').getChild('b').getChild('c').getValue());
+    assert.deepEqual(['2'], trie.getChild('a').getChild('b').getChild('c').getValue());
+  });
 
-    test.done();
-  },
-
-  testSetKeyValueMerge: function(test) {
+  it('should merge existing values', function() {
     var trie = new lfr.Trie();
     var mergeFn = function(value1, value2) {
       return value1.concat(value2);
@@ -97,12 +91,10 @@ module.exports = {
     trie.setKeyValue('abc', ['1'], mergeFn);
     trie.setKeyValue('abc', ['2'], mergeFn);
 
-    test.deepEqual(['1', '2'], trie.getChild('a').getChild('b').getChild('c').getValue());
+    assert.deepEqual(['1', '2'], trie.getChild('a').getChild('b').getChild('c').getValue());
+  });
 
-    test.done();
-  },
-
-  testGetKeyValue: function(test) {
+  it('should get values for string keys', function() {
     var trie = new lfr.Trie();
 
     trie.setKeyValue('', 'Value');
@@ -110,16 +102,26 @@ module.exports = {
     trie.setKeyValue('az', 'azValue');
     trie.setKeyValue('cba', 'cbaValue');
 
-    test.strictEqual('Value', trie.getKeyValue(''));
-    test.strictEqual('abcValue', trie.getKeyValue('abc'));
-    test.strictEqual('azValue', trie.getKeyValue('az'));
-    test.strictEqual('cbaValue', trie.getKeyValue('cba'));
-    test.ok(!trie.getKeyValue('abcd'));
+    assert.strictEqual('Value', trie.getKeyValue(''));
+    assert.strictEqual('abcValue', trie.getKeyValue('abc'));
+    assert.strictEqual('azValue', trie.getKeyValue('az'));
+    assert.strictEqual('cbaValue', trie.getKeyValue('cba'));
+    assert.ok(!trie.getKeyValue('abcd'));
+  });
 
-    test.done();
-  },
+  it('should get values for array keys', function() {
+    var trie = new lfr.Trie();
 
-  testClear: function(test) {
+
+    trie.setKeyValue(['abc', 'def'], '1');
+    trie.setKeyValue(['abc', 'z'], '2');
+
+    assert.strictEqual('1', trie.getKeyValue(['abc', 'def']));
+    assert.strictEqual('2', trie.getKeyValue(['abc', 'z']));
+    assert.ok(!trie.getKeyValue(['a']));
+  });
+
+  it('should clear the trie', function() {
     var trie = new lfr.Trie();
 
     trie.setKeyValue('abc', 'abcValue');
@@ -127,9 +129,7 @@ module.exports = {
 
     trie.clear();
 
-    test.ok(!trie.getKeyValue('abc'));
-    test.ok(!trie.getKeyValue('az'));
-
-    test.done();
-  }
-};
+    assert.ok(!trie.getKeyValue('abc'));
+    assert.ok(!trie.getKeyValue('az'));
+  });
+});

@@ -1,8 +1,7 @@
 'use strict';
 
-var nodeunit = require('nodeunit');
-
-if (typeof exports === 'object') {
-  var context = nodeunit.utils.sandbox(['./build/lfr.js'], {console: console});
-  module.exports = context.lfr;
-}
+global.lfr = {};
+require('../../src/lfr.js');
+require('../../src/structs/Trie.js');
+require('../../src/structs/WildcardTrie.js');
+require('../../src/events/EventEmitter.js');

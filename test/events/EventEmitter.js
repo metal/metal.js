@@ -1,34 +1,30 @@
 'use strict';
 
-var lfr = require('../fixture/sandbox.js');
+var assert = require('assert');
+require('../fixture/sandbox.js');
 
-module.exports = {
-  setUp: function(done) {
+describe('EventEmitter', function() {
+  beforeEach(function() {
     this.emitter = new lfr.EventEmitter();
+  });
 
-    done();
-  },
-
-  tearDown: function(done) {
+  afterEach(function() {
     this.emitter.removeAllListeners();
-    done();
-  },
+  });
 
-  testNamespaceEvent: function(test) {
+  it('should work with namespaced events', function() {
     var listener = createStub();
 
     this.emitter.on('namespaced.event.1', listener);
 
     this.emitter.emit('namespaced');
-    test.strictEqual(0, listener.called);
+    assert.strictEqual(0, listener.called);
 
     this.emitter.emit('namespaced.event.1');
-    test.strictEqual(1, listener.called);
+    assert.strictEqual(1, listener.called);
+  });
 
-    test.done();
-  },
-
-  testNamespaceWildcardEvent: function(test) {
+  it('should work with namespaced events with wildcards', function() {
     var listener1 = createStub();
     var listener2 = createStub();
     var listener3 = createStub();
@@ -40,103 +36,91 @@ module.exports = {
     this.emitter.on('namespaced.*.1', listener4);
 
     this.emitter.emit('namespaced.event.1');
-    test.strictEqual(1, listener1.called);
-    test.strictEqual(0, listener2.called);
-    test.strictEqual(1, listener3.called);
-    test.strictEqual(1, listener4.called);
+    assert.strictEqual(1, listener1.called);
+    assert.strictEqual(0, listener2.called);
+    assert.strictEqual(1, listener3.called);
+    assert.strictEqual(1, listener4.called);
 
     this.emitter.emit('namespaced.string.1');
-    test.strictEqual(1, listener1.called);
-    test.strictEqual(0, listener2.called);
-    test.strictEqual(1, listener3.called);
-    test.strictEqual(2, listener4.called);
+    assert.strictEqual(1, listener1.called);
+    assert.strictEqual(0, listener2.called);
+    assert.strictEqual(1, listener3.called);
+    assert.strictEqual(2, listener4.called);
 
     this.emitter.emit('*.event.*');
-    test.strictEqual(2, listener1.called);
-    test.strictEqual(1, listener2.called);
-    test.strictEqual(2, listener3.called);
-    test.strictEqual(3, listener4.called);
+    assert.strictEqual(2, listener1.called);
+    assert.strictEqual(1, listener2.called);
+    assert.strictEqual(2, listener3.called);
+    assert.strictEqual(3, listener4.called);
+  });
 
-    test.done();
-  },
-
-  testOnce: function(test) {
+  it('should listen to event a single time through `once`', function() {
     var listener = createStub();
 
     this.emitter.once('event', listener);
-    test.strictEqual(0, listener.called);
+    assert.strictEqual(0, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(1, listener.called);
+    assert.strictEqual(1, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(1, listener.called);
+    assert.strictEqual(1, listener.called);
+  });
 
-    test.done();
-  },
-
-  testMany: function(test) {
+  it('should listen to event a fixed number of times through `many`', function() {
     var listener = createStub();
 
     this.emitter.many('event', 2, listener);
-    test.strictEqual(0, listener.called);
+    assert.strictEqual(0, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(1, listener.called);
+    assert.strictEqual(1, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(2, listener.called);
+    assert.strictEqual(2, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(2, listener.called);
+    assert.strictEqual(2, listener.called);
+  });
 
-    test.done();
-  },
-
-  testOff: function(test) {
+  it('should detach events', function() {
     var listener = createStub();
 
     this.emitter.on('event', listener);
-    test.strictEqual(0, listener.called);
+    assert.strictEqual(0, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(1, listener.called);
+    assert.strictEqual(1, listener.called);
 
     this.emitter.emit('event');
-    test.strictEqual(2, listener.called);
+    assert.strictEqual(2, listener.called);
 
     this.emitter.off('event', listener);
     this.emitter.emit('event');
-    test.strictEqual(2, listener.called);
+    assert.strictEqual(2, listener.called);
+  });
 
-    test.done();
-  },
-
-  testOffOnce: function(test) {
+  it('should detach events listened through `once`', function() {
     var listener = createStub();
 
     this.emitter.once('event', listener);
     this.emitter.off('event', listener);
     this.emitter.emit('event');
 
-    test.strictEqual(0, listener.called);
+    assert.strictEqual(0, listener.called);
+  });
 
-    test.done();
-  },
-
-  testOffMany: function(test) {
+  it('should detach events listened through `many`', function() {
     var listener = createStub();
 
     this.emitter.many('event', 2, listener);
     this.emitter.off('event', listener);
     this.emitter.emit('event');
 
-    test.strictEqual(0, listener.called);
+    assert.strictEqual(0, listener.called);
+  });
 
-    test.done();
-  },
-
-  testRemoveAllListeners: function(test) {
+  it('should remove all listeners', function() {
     var listener1 = createStub();
     var listener2 = createStub();
 
@@ -147,13 +131,11 @@ module.exports = {
     this.emitter.emit('event1');
     this.emitter.emit('event2');
 
-    test.strictEqual(0, listener1.called);
-    test.strictEqual(0, listener2.called);
+    assert.strictEqual(0, listener1.called);
+    assert.strictEqual(0, listener2.called);
+  });
 
-    test.done();
-  },
-
-  testRemoveAllListenersOfType: function(test) {
+  it('should remove all listeners of the given type', function() {
     var listener1 = createStub();
     var listener2 = createStub();
 
@@ -162,15 +144,13 @@ module.exports = {
 
     this.emitter.removeAllListeners('event1');
     this.emitter.emit('event1');
-    test.strictEqual(0, listener1.called);
+    assert.strictEqual(0, listener1.called);
 
     this.emitter.emit('event2');
-    test.strictEqual(1, listener2.called);
+    assert.strictEqual(1, listener2.called);
+  });
 
-    test.done();
-  },
-
-  testMaxListeners: function(test) {
+  it('should warn when max number of listeners is reached', function() {
     var originalWarningFn = console.warning;
     console.warning = createStub();
 
@@ -178,23 +158,21 @@ module.exports = {
     this.emitter.on('event', createStub());
     this.emitter.on('event', createStub());
     this.emitter.on('event1', createStub());
-    test.strictEqual(0, console.warning.called, 'Should not warn before max');
+    assert.strictEqual(0, console.warning.called, 'Should not warn before max');
 
     this.emitter.on('event', createStub());
-    test.strictEqual(1, console.warning.called, 'Max listeners reached for event');
+    assert.strictEqual(1, console.warning.called, 'Max listeners reached for event');
 
     this.emitter.on('event', createStub());
-    test.strictEqual(1, console.warning.called, 'Should not warn twice for same type');
+    assert.strictEqual(1, console.warning.called, 'Should not warn twice for same type');
 
     this.emitter.on('event1', createStub());
     this.emitter.on('event1', createStub());
-    test.strictEqual(2, console.warning.called, 'Max listeners reached for event1');
+    assert.strictEqual(2, console.warning.called, 'Max listeners reached for event1');
 
     console.warning = originalWarningFn;
-
-    test.done();
-  }
-};
+  });
+});
 
 function createStub() {
   var stub = function() {

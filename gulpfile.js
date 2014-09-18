@@ -18,7 +18,6 @@ gulp.task('build-raw', function() {
   return gulp.src(mainFiles)
     .pipe(plugins.concat('lfr.js'))
     .pipe(banner())
-    .pipe(plugins.stripDebug())
     .pipe(gulp.dest('build'));
 });
 
@@ -29,7 +28,6 @@ gulp.task('build-min', function() {
     }))
     .pipe(plugins.concat('lfr-min.js'))
     .pipe(banner())
-    .pipe(plugins.stripDebug())
     .pipe(gulp.dest('build'));
 });
 

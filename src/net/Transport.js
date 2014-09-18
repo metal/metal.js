@@ -27,10 +27,10 @@
    * @static
    */
   lfr.Transport.getSingleton = function(uri) {
-    if (lfr.Transport.instance_) {
-      return lfr.Transport.instance_;
-    }
-    return (lfr.Transport.instance_ = new lfr.Transport(uri));
+      if (lfr.Transport.instance_) {
+        return lfr.Transport.instance_;
+      }
+      return (lfr.Transport.instance_ = new lfr.Transport(uri));
   };
 
   /**
@@ -83,7 +83,6 @@
    */
   lfr.Transport.prototype.onCloseHandler_ = function() {
     this.state = 'closed';
-    this.writable = false;
   };
 
   /**

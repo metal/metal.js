@@ -10,7 +10,7 @@
   lfr.XhrTransport = function(uri) {
     lfr.XhrTransport.base(this, 'constructor', uri);
   };
-  lfr.inherits(lfr.XhrTransport, lfr.Transport);
+  lfr.inherits(lfr.XhrTransport, lfr.BaseTransport);
 
   /**
    * Holds default http headers to set on request.

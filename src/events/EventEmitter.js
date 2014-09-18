@@ -127,12 +127,15 @@
       return;
     }
 
-    self.on(event, function handlerInternal() {
+    function handlerInternal() {
       if (--amount === 0) {
         self.removeListener(event, handlerInternal);
       }
       listener.apply(this, arguments);
-    });
+    }
+    handlerInternal.origin = listener;
+
+    self.on(event, handlerInternal);
 
     return this;
   };
@@ -154,11 +157,13 @@
 
     var listeners = this.listeners(event);
     if (Array.isArray(listeners)) {
-      var i = listeners.indexOf(listener);
-      if (i < 0) {
-        return this;
+      for (var i = 0; i < listeners.length; i++) {
+        if (listeners[i] === listener ||
+            (listeners[i].origin && listeners[i].origin === listener)) {
+          listeners.splice(i, 1);
+          break;
+        }
       }
-      listeners.splice(i, 1);
     }
 
     return this;

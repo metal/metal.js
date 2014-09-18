@@ -14,6 +14,21 @@ module.exports = {
     done();
   },
 
+  testOnce: function(test) {
+    var listener = createStub();
+
+    this.emitter.once('event', listener);
+    test.strictEqual(0, listener.called);
+
+    this.emitter.emit('event');
+    test.strictEqual(1, listener.called);
+
+    this.emitter.emit('event');
+    test.strictEqual(1, listener.called);
+
+    test.done();
+  },
+
   testMany: function(test) {
     var listener = createStub();
 
@@ -62,6 +77,30 @@ module.exports = {
     this.emitter.off('event', listener);
     this.emitter.emit('event');
     test.strictEqual(2, listener.called);
+
+    test.done();
+  },
+
+  testOffOnce: function(test) {
+    var listener = createStub();
+
+    this.emitter.once('event', listener);
+    this.emitter.off('event', listener);
+    this.emitter.emit('event');
+
+    test.strictEqual(0, listener.called);
+
+    test.done();
+  },
+
+  testOffMany: function(test) {
+    var listener = createStub();
+
+    this.emitter.many('event', 2, listener);
+    this.emitter.off('event', listener);
+    this.emitter.emit('event');
+
+    test.strictEqual(0, listener.called);
 
     test.done();
   },

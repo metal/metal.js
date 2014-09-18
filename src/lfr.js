@@ -10,6 +10,62 @@
   root.lfr = root.lfr || {};
 
   /**
+   * When defining a class Foo with an abstract method bar(), you can do:
+   * Foo.prototype.bar = lfr.abstractMethod
+   *
+   * Now if a subclass of Foo fails to override bar(), an error will be thrown
+   * when bar() is invoked.
+   *
+   * @type {!Function}
+   * @throws {Error} when invoked to indicate the method should be overridden.
+   */
+  lfr.abstractMethod = function() {
+    throw Error('Unimplemented abstract method');
+  };
+
+  /**
+   * Creates a new function that, when called, has its this keyword set to the
+   * provided value, with a given sequence of arguments preceding any provided
+   * when the new function is called.
+   *
+   * Usage: <pre>var fn = bind(myFunction, myObj, 'arg1', 'arg2');
+   * fn('arg3', 'arg4');</pre>
+   *
+   * @param {function} fn A function to partially apply.
+   * @param {!Object} context Specifies the object which this should point to
+   *     when the function is run.
+   * @param {...*} var_args Additional arguments that are partially applied to
+   *     the function.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   */
+  lfr.bind = function(fn, context) {
+    if (!fn) {
+      throw new Error();
+    }
+
+    if (Function.prototype.bind) {
+      var bind = fn.call.apply(fn.bind, arguments);
+      return function() {
+        return bind.apply(null, arguments);
+      };
+    }
+
+    if (arguments.length > 2) {
+      var args = Array.prototype.slice.call(arguments, 2);
+      return function() {
+        var newArgs = Array.prototype.slice.call(arguments);
+        Array.prototype.unshift.apply(newArgs, args);
+        return fn.apply(context, newArgs);
+      };
+    } else {
+      return function() {
+        return fn.apply(context, arguments);
+      };
+    }
+  };
+
+  /**
    * Inherits the prototype methods from one constructor into another.
    *
    * Usage:
@@ -55,5 +111,20 @@
       return parentCtor.prototype[methodName].apply(me, args);
     };
   };
+
+  /**
+   * Returns true if the specified value is not undefined.
+   * @param {?} val Variable to test.
+   * @return {boolean} Whether variable is defined.
+   */
+  lfr.isDef = function(val) {
+    return val !== undefined;
+  };
+
+  /**
+   * Null function used for default values of callbacks, etc.
+   * @return {void} Nothing.
+   */
+  lfr.nullFunction = function() {};
 
 }(this));

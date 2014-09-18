@@ -56,6 +56,10 @@ gulp.task('lint', function() {
     .pipe(plugins.jshint.reporter(require('jshint-stylish')));
 });
 
+gulp.task('test', function() {
+  return gulp.src(['test/*.js']).pipe(plugins.nodeunit());
+});
+
 gulp.task('watch', ['build'], function() {
   gulp.watch('src/**/*', ['build']);
 });

@@ -55,8 +55,8 @@
     if (this.events_[event].length > this.maxListeners_ && !this.events_[event].warned) {
       console.error(
         'warning: possible EventEmitter memory leak detected. %d ' +
-          'listeners added for event %s. Use emitter.setMaxListeners() to increase ' +
-          'limit.',
+        'listeners added for event %s. Use emitter.setMaxListeners() to increase ' +
+        'limit.',
         this.events_[event].length,
         event
       );
@@ -159,7 +159,7 @@
     if (Array.isArray(listeners)) {
       for (var i = 0; i < listeners.length; i++) {
         if (listeners[i] === listener ||
-            (listeners[i].origin && listeners[i].origin === listener)) {
+          (listeners[i].origin && listeners[i].origin === listener)) {
           listeners.splice(i, 1);
           break;
         }

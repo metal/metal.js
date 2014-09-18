@@ -114,7 +114,7 @@
    * Sets the transport state value.
    * @param {string} state
    */
-  lfr.lfr.Transport.prototype.setState = function(state) {
+  lfr.Transport.prototype.setState = function(state) {
     this.state = state;
   };
 

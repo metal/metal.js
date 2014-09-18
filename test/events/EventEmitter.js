@@ -187,26 +187,26 @@ module.exports = {
   },
 
   testMaxListeners: function(test) {
-    var originalErrorFn = console.error;
-    console.error = createStub();
+    var originalWarningFn = console.warning;
+    console.warning = createStub();
 
     this.emitter.setMaxListeners(2);
     this.emitter.on('event', createStub());
     this.emitter.on('event', createStub());
     this.emitter.on('event1', createStub());
-    test.strictEqual(0, console.error.called, 'Should not warn before max');
+    test.strictEqual(0, console.warning.called, 'Should not warn before max');
 
     this.emitter.on('event', createStub());
-    test.strictEqual(1, console.error.called, 'Max listeners reached for event');
+    test.strictEqual(1, console.warning.called, 'Max listeners reached for event');
 
     this.emitter.on('event', createStub());
-    test.strictEqual(1, console.error.called, 'Should not warn twice for same type');
+    test.strictEqual(1, console.warning.called, 'Should not warn twice for same type');
 
     this.emitter.on('event1', createStub());
     this.emitter.on('event1', createStub());
-    test.strictEqual(2, console.error.called, 'Max listeners reached for event1');
+    test.strictEqual(2, console.warning.called, 'Max listeners reached for event1');
 
-    console.error = originalErrorFn;
+    console.warning = originalWarningFn;
 
     test.done();
   }

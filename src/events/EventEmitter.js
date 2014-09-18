@@ -52,10 +52,9 @@
     this.events_[event].push(listener);
 
     if (this.events_[event].length > this.maxListeners_ && !this.events_[event].warned) {
-      console.error(
-        'warning: possible EventEmitter memory leak detected. %d ' +
-        'listeners added for event %s. Use emitter.setMaxListeners() to increase ' +
-        'limit.',
+      console.warning(
+        'Possible EventEmitter memory leak detected. %d listeners added ' +
+        'for event %s. Use emitter.setMaxListeners() to increase limit.',
         this.events_[event].length,
         event
       );

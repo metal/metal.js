@@ -89,7 +89,6 @@
    */
   lfr.Transport.prototype.onOpenHandler_ = function() {
     this.state = 'open';
-    this.writable = true;
   };
 
   /**

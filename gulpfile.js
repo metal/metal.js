@@ -7,7 +7,8 @@ var runSequence = require('run-sequence');
 
 var mainFiles = [
   'src/lfr.js',
-  'src/events/EventEmitter.js'
+  'src/events/EventEmitter.js',
+  'src/net/Transport.js',
 ];
 
 gulp.task('build', ['clean'], function() {

@@ -113,6 +113,15 @@
   };
 
   /**
+   * The identity function. Returns its first argument.
+   * @param {*=} opt_returnValue The single value that will be returned.
+   * @return {?} The first argument.
+   */
+  lfr.identityFunction = function(opt_returnValue) {
+    return opt_returnValue;
+  };
+
+  /**
    * Returns true if the specified value is not undefined.
    * @param {?} val Variable to test.
    * @return {boolean} Whether variable is defined.

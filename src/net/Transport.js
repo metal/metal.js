@@ -21,6 +21,20 @@
   lfr.inherits(lfr.Transport, lfr.EventEmitter);
 
   /**
+   * Returns lfr.Transport singleton.
+   * @param {string} uri
+   * @return {lfr.Transport} Single instance of lfr.Transport.
+   * @static
+   */
+  lfr.Transport.getSingleton = function(uri) {
+      if (lfr.Transport.instance_) {
+        return lfr.Transport.instance_;
+      }
+
+      return (lfr.Transport.instance_ = new lfr.Transport(uri));
+  };
+
+  /**
    * Holds the transport state, it supports the available states: '',
    * 'opening', 'open' and 'closed'.
    * @type {string}
@@ -70,7 +84,6 @@
    */
   lfr.Transport.prototype.onCloseHandler_ = function() {
     this.state = 'closed';
-    this.writable = false;
   };
 
   /**

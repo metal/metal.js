@@ -45,7 +45,7 @@
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.addListener = function(event, listener) {
-    if (typeof listener !== 'function') {
+    if (!lfr.isFunction(listener)) {
       throw new TypeError('Listener must be a function');
     }
 
@@ -174,7 +174,7 @@
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.off = function(event, listener) {
-    if (typeof listener !== 'function') {
+    if (!lfr.isFunction(listener)) {
       throw new TypeError('Listener must be a function');
     }
 
@@ -198,7 +198,7 @@
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.offAny = function(listener) {
-    if (typeof listener !== 'function') {
+    if (!lfr.isFunction(listener)) {
       throw new TypeError('Listener must be a function');
     }
     if (!this.all_) {
@@ -224,7 +224,7 @@
 
   /**
    * Adds a listener that will be fired when any event type is emitted.
-   * @param  {!Function} listener [description]
+   * @param {!Function} listener [description]
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.onAny = function(listener) {
@@ -275,7 +275,7 @@
 
   /**
    * Searches the listener tree for the given event.
-   * @param  {string} event
+   * @param {string} event
    * @return {!Array.<Array>} An array of listener arrays returned by the tree.
    * @protected
    */
@@ -308,10 +308,11 @@
 
   /**
    * Splits the event, using the current delimiter.
+   * @param {string} event
    * @return {!Array}
    */
   lfr.EventEmitter.prototype.splitNamespaces = function(event) {
-    return typeof event === 'string' ? event.split(this.getDelimiter()) : event;
+    return lfr.isString(event) ? event.split(this.getDelimiter()) : event;
   };
 
 }());

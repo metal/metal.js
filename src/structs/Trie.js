@@ -2,8 +2,9 @@
   'use strict';
 
   /**
-   * Trie data structure. It's useful for quickly storing and finding information
-   * related to strings and their prefixes. See http://en.wikipedia.org/wiki/Trie.
+   * Trie data structure. It's useful for quickly storing and finding
+   * information related to strings and their prefixes. See
+   * http://en.wikipedia.org/wiki/Trie.
    * @constructor
    */
   lfr.Trie = function(value) {
@@ -14,14 +15,14 @@
   /**
    * The list of children for this tree.
    * @type {Object.<string, Trie>}
-   * @private
+   * @protected
    */
   lfr.Trie.prototype.children_ = null;
 
   /**
    * The value associated with this tree.
    * @type {*}
-   * @private
+   * @protected
    */
   lfr.Trie.prototype.value_ = null;
 
@@ -35,7 +36,7 @@
 
   /**
    * Creates a new trie node.
-   * @return {Trie}
+   * @return {lfr.Trie}
    */
   lfr.Trie.prototype.createNewTrieNode = function() {
     return new lfr.Trie();
@@ -43,8 +44,9 @@
 
   /**
    * Gets the child node for the given key part.
-   * @param {string} keyPart String that can directly access a child of this Trie.
-   * @return {Trie}
+   * @param {string} keyPart String that can directly access a child of this
+   *   Trie.
+   * @return {lfr.Trie}
    */
   lfr.Trie.prototype.getChild = function(keyPart) {
     return this.children_[keyPart];
@@ -84,13 +86,14 @@
    * @return {!Array} The normalized key.
    */
   lfr.Trie.prototype.normalizeKey = function(key) {
-    return typeof key === 'string' ? key.split('') : key;
+    return lfr.isString(key) ? key.split('') : key;
   };
 
   /**
    * Sets the child node for the given key part.
-   * @param {string} keyPart String that can directly access a child of this Trie.
-   * @param {Trie} child
+   * @param {string} keyPart String that can directly access a child of this
+   *   Trie.
+   * @param {lfr.Trie} child
    */
   lfr.Trie.prototype.setChild = function(keyPart, child) {
     this.children_[keyPart] = child;
@@ -98,12 +101,13 @@
 
   /**
    * Sets the given key/value pair in the tree. If the key already exists and
-   * `mergeFn` is given, the result of its call will be set as the value instead.
+   * `mergeFn` is given, the result of its call will be set as the value
+   * instead.
    * @param {!(Array|string)} key The key to set the value at.
    * @param {*} value The value to set.
-   * @param {function(*, *)=} opt_mergeFn Function to be called if the key already
-   *     exists. It will be called with the old and the new values, and the key will
-   *     be set to its return value.
+   * @param {function(*, *)=} opt_mergeFn Function to be called if the key
+   *   already exists. It will be called with the old and the new values, and
+   *   the key will be set to its return value.
    */
   lfr.Trie.prototype.setKeyValue = function(key, value, opt_mergeFn) {
     var child;

@@ -122,6 +122,24 @@
   };
 
   /**
+   * Returns true if the specified value is a function.
+   * @param {?} val Variable to test.
+   * @return {boolean} Whether variable is a function.
+   */
+  lfr.isFunction = function(val) {
+    return typeof val === 'function';
+  };
+
+  /**
+   * Returns true if value is a string.
+   * @param {*} val
+   * @return {Boolean}
+   */
+  lfr.isString = function(val) {
+    return typeof val === 'string';
+  };
+
+  /**
    * Null function used for default values of callbacks, etc.
    * @return {void} Nothing.
    */

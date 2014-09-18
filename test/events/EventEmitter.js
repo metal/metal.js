@@ -28,6 +28,38 @@ module.exports = {
     test.done();
   },
 
+  testNamespaceWildcardEvent: function(test) {
+    var listener1 = createStub();
+    var listener2 = createStub();
+    var listener3 = createStub();
+    var listener4 = createStub();
+
+    this.emitter.on('namespaced.event.1', listener1);
+    this.emitter.on('namespaced.event.2', listener2);
+    this.emitter.on('namespaced.event.*', listener3);
+    this.emitter.on('namespaced.*.1', listener4);
+
+    this.emitter.emit('namespaced.event.1');
+    test.strictEqual(1, listener1.called);
+    test.strictEqual(0, listener2.called);
+    test.strictEqual(1, listener3.called);
+    test.strictEqual(1, listener4.called);
+
+    this.emitter.emit('namespaced.string.1');
+    test.strictEqual(1, listener1.called);
+    test.strictEqual(0, listener2.called);
+    test.strictEqual(1, listener3.called);
+    test.strictEqual(2, listener4.called);
+
+    this.emitter.emit('*.event.*');
+    test.strictEqual(2, listener1.called);
+    test.strictEqual(1, listener2.called);
+    test.strictEqual(2, listener3.called);
+    test.strictEqual(3, listener4.called);
+
+    test.done();
+  },
+
   testOnce: function(test) {
     var listener = createStub();
 

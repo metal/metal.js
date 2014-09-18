@@ -6,7 +6,7 @@
    * @constructor
    */
   lfr.EventEmitter = function() {
-    this.listenersTree_ = new lfr.Trie();
+    this.listenersTree_ = new lfr.WildcardTrie();
   };
 
   /**
@@ -107,7 +107,14 @@
    * @return {Array} Array of listeners.
    */
   lfr.EventEmitter.prototype.listeners = function(event) {
-    return this.listenersTree_.getKeyValue(this.splitNamespaces(event));
+    var listenerArrays = this.searchListenerTree_(event);
+    var listeners = [];
+
+    for (var i = 0; i < listenerArrays.length; i++) {
+      listeners = listeners.concat(listenerArrays[i]);
+    }
+
+    return listeners;
   };
 
   /**
@@ -171,12 +178,12 @@
       throw new TypeError('Listener must be a function');
     }
 
-    var listeners = this.listeners(event);
-    if (Array.isArray(listeners)) {
-      for (var i = 0; i < listeners.length; i++) {
-        if (listeners[i] === listener ||
-          (listeners[i].origin && listeners[i].origin === listener)) {
-          listeners.splice(i, 1);
+    var listenerArrays = this.searchListenerTree_(event);
+    for (var i = 0; i < listenerArrays.length; i++) {
+      for (var j = 0; j < listenerArrays[i].length; j++) {
+        if (listenerArrays[i][j] === listener ||
+          (listenerArrays[i][j].origin && listenerArrays[i][j].origin === listener)) {
+          listenerArrays[i].splice(j, 1);
           break;
         }
       }
@@ -267,6 +274,16 @@
   lfr.EventEmitter.prototype.removeListener = lfr.EventEmitter.prototype.off;
 
   /**
+   * Searches the listener tree for the given event.
+   * @param  {string} event
+   * @return {!Array.<Array>} An array of listener arrays returned by the tree.
+   * @protected
+   */
+  lfr.EventEmitter.prototype.searchListenerTree_ = function(event) {
+    return this.listenersTree_.getKeyValue(this.splitNamespaces(event));
+  };
+
+  /**
    * Sets the delimiter to be used by namespaces.
    * @param {string} delimiter
    * @return {!Object} Returns emitter, so calls can be chained.
@@ -294,7 +311,7 @@
    * @return {!Array}
    */
   lfr.EventEmitter.prototype.splitNamespaces = function(event) {
-    return typeof event === 'string' ? event.split(this.delimiter) : event;
+    return typeof event === 'string' ? event.split(this.getDelimiter()) : event;
   };
 
 }());

@@ -1,10 +1,10 @@
 'use strict';
 
-var EventEmitter = require('../build/EventEmitter');
+var lfr = require('./fixture/sandbox.js');
 
 module.exports = {
   setUp: function(done) {
-    this.emitter = new EventEmitter();
+    this.emitter = new lfr.EventEmitter();
 
     done();
   },

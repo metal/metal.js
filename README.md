@@ -1,2 +1,2 @@
-liferay-emitter
+liferay-core
 ===============

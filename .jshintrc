@@ -6,6 +6,9 @@
   "esnext": true,
   "evil": false,
   "forin": false,
+  "globals": {
+    "lfr": true
+  },
   "immed": true,
   "indent": 2,
   "lastsemic": false,

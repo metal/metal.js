@@ -1,6 +1,6 @@
 'use strict';
 
-var lfr = require('./fixture/sandbox.js');
+var lfr = require('../fixture/sandbox.js');
 
 module.exports = {
   setUp: function(done) {
@@ -12,6 +12,21 @@ module.exports = {
   tearDown: function(done) {
     this.emitter.removeAllListeners();
     done();
+  },
+
+  testOnce: function(test) {
+    var listener = createStub();
+
+    this.emitter.once('event', listener);
+    test.strictEqual(0, listener.called);
+
+    this.emitter.emit('event');
+    test.strictEqual(1, listener.called);
+
+    this.emitter.emit('event');
+    test.strictEqual(1, listener.called);
+
+    test.done();
   },
 
   testMany: function(test) {
@@ -62,6 +77,30 @@ module.exports = {
     this.emitter.off('event', listener);
     this.emitter.emit('event');
     test.strictEqual(2, listener.called);
+
+    test.done();
+  },
+
+  testOffOnce: function(test) {
+    var listener = createStub();
+
+    this.emitter.once('event', listener);
+    this.emitter.off('event', listener);
+    this.emitter.emit('event');
+
+    test.strictEqual(0, listener.called);
+
+    test.done();
+  },
+
+  testOffMany: function(test) {
+    var listener = createStub();
+
+    this.emitter.many('event', 2, listener);
+    this.emitter.off('event', listener);
+    this.emitter.emit('event');
+
+    test.strictEqual(0, listener.called);
 
     test.done();
   },

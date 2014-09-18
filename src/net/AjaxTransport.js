@@ -79,9 +79,6 @@
         self.emit('data', {
           data: xhr.responseText
         });
-        // AjaxTransport do not support persistent connections, waits nextTick
-        // then auto-close it.
-        setTimeout(lfr.bind(self.close, self), 0);
         return;
       }
       xhr.onerror();

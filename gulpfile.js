@@ -9,6 +9,7 @@ var mainFiles = [
   'src/lfr.js',
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
+  'src/net/AjaxTransport.js'
 ];
 
 gulp.task('build', ['clean'], function() {

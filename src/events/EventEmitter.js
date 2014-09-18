@@ -5,22 +5,21 @@
    * EventEmitter utility.
    * @constructor
    */
-  function EventEmitter() {
-  }
+  lfr.EventEmitter = function() {};
 
   /**
    * Holds event listeners that trigger for all event types.
    * @type {Array}
    * @private
    */
-  EventEmitter.prototype.all_ = null;
+  lfr.EventEmitter.prototype.all_ = null;
 
   /**
    * Holds event listeners scoped by event type.
    * @type {Array}
    * @private
    */
-  EventEmitter.prototype.events_ = null;
+  lfr.EventEmitter.prototype.events_ = null;
 
   /**
    * The maximum number of listeners allowed for each event type. If the number
@@ -28,7 +27,7 @@
    * @type {number}
    * @private
    */
-  EventEmitter.prototype.maxListeners_ = 10;
+  lfr.EventEmitter.prototype.maxListeners_ = 10;
 
   /**
    * Adds a listener to the end of the listeners array for the specified event.
@@ -36,7 +35,7 @@
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.addListener = function(event, listener) {
+  lfr.EventEmitter.prototype.addListener = function(event, listener) {
     if (typeof listener !== 'function') {
       throw new TypeError('Listener must be a function');
     }
@@ -67,18 +66,12 @@
   };
 
   /**
-   * Removes all event handlers when destroyed.
-   * TODO(eduardo)
-   */
-  EventEmitter.prototype.destroy = function() {};
-
-  /**
    * Execute each of the listeners in order with the supplied arguments.
    * @param {string} event
    * @param {*} opt_args [arg1], [arg2], [...]
    * @return {boolean} Returns true if event had listeners, false otherwise.
    */
-  EventEmitter.prototype.emit = function(event) {
+  lfr.EventEmitter.prototype.emit = function(event) {
     var args = Array.prototype.slice.call(arguments, 1);
     var listened = false;
     var listeners = this.listeners(event);
@@ -100,7 +93,7 @@
    * @param {string} event
    * @return {Array} Array of listeners.
    */
-  EventEmitter.prototype.listeners = function(event) {
+  lfr.EventEmitter.prototype.listeners = function(event) {
     return this.events_ && this.events_[event];
   };
 
@@ -108,7 +101,7 @@
    * Returns an array of listeners that fire on any event.
    * @return {Array} Array of listeners.
    */
-  EventEmitter.prototype.listenersAny = function() {
+  lfr.EventEmitter.prototype.listenersAny = function() {
     return this.all_;
   };
 
@@ -120,7 +113,7 @@
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.many = function(event, amount, listener) {
+  lfr.EventEmitter.prototype.many = function(event, amount, listener) {
     var self = this;
 
     if (amount <= 0) {
@@ -131,7 +124,7 @@
       if (--amount === 0) {
         self.removeListener(event, handlerInternal);
       }
-      listener.apply(this, arguments);
+      listener.apply(self, arguments);
     }
     handlerInternal.origin = listener;
 
@@ -147,7 +140,7 @@
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.off = function(event, listener) {
+  lfr.EventEmitter.prototype.off = function(event, listener) {
     if (typeof listener !== 'function') {
       throw new TypeError('Listener must be a function');
     }
@@ -174,7 +167,7 @@
    * @param {!Function} listener [description]
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.offAny = function(listener) {
+  lfr.EventEmitter.prototype.offAny = function(listener) {
     if (typeof listener !== 'function') {
       throw new TypeError('Listener must be a function');
     }
@@ -197,14 +190,14 @@
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+  lfr.EventEmitter.prototype.on = lfr.EventEmitter.prototype.addListener;
 
   /**
    * Adds a listener that will be fired when any event type is emitted.
    * @param  {!Function} listener [description]
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.onAny = function(listener) {
+  lfr.EventEmitter.prototype.onAny = function(listener) {
     if (!this.all_) {
       this.all_ = [];
     }
@@ -220,7 +213,7 @@
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.once = function(event, listener) {
+  lfr.EventEmitter.prototype.once = function(event, listener) {
     return this.many(event, 1, listener);
   };
 
@@ -231,7 +224,7 @@
    * @param {string} event
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.removeAllListeners = function(opt_event) {
+  lfr.EventEmitter.prototype.removeAllListeners = function(opt_event) {
     if (!this.events_) {
       return this;
     }
@@ -251,7 +244,7 @@
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
+  lfr.EventEmitter.prototype.removeListener = lfr.EventEmitter.prototype.off;
 
   /**
    * By default EventEmitters will print a warning if more than 10 listeners
@@ -261,11 +254,9 @@
    * @param {number} max The maximum number of listeners.
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  EventEmitter.prototype.setMaxListeners = function(max) {
+  lfr.EventEmitter.prototype.setMaxListeners = function(max) {
     this.maxListeners_ = max;
     return this;
   };
-
-  lfr.EventEmitter = EventEmitter;
 
 }());

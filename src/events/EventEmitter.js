@@ -91,10 +91,8 @@
     }
 
     for (var i = 0; i < listeners.length; i++) {
-      if (listeners[i]) {
-        listeners[i].apply(this, args);
-        listened = true;
-      }
+      listeners[i].apply(this, args);
+      listened = true;
     }
 
     return listened;

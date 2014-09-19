@@ -10,15 +10,15 @@
    * @param {Object=} opt_config optional Configuration object
    */
   lfr.Storage = function(storageRef, opt_config) {
-    this._storageRef = storageRef;
+    this.storageRef_ = storageRef;
 
     // Create a queue in order to keep the messages in safe
-    this._queue = [];
+    this.queue_ = [];
 
     // Attach listener to dataAdded event to track adding messages to the queue and start sending them.
-    this.on('dataAdded', this._processQueue, this);
+    this.on('dataAdded', this.processQueue_, this);
 
-    this.on('dataReceived', this._onDataReceived, this);
+    this.on('dataReceived', this.onDataReceived_, this);
   };
   lfr.inherits(lfr.Storage, lfr.EventEmitter);
 
@@ -60,7 +60,7 @@
 
     // Generate an messageId, it will be sent to server, so messages won't be duplicated there
     // and we will be able to recognize the messages exchanged with the server
-    var messageId = this._generateId();
+    var messageId = this.generateId_();
 
     // Construct the message object, we will store this to the queue
     var message = {
@@ -69,7 +69,7 @@
     };
 
     // Store the object to the queue as the last element
-    this._queue.push({
+    this.queue_.push({
       callback: opt_callback,
       messageId: messageId,
       message: message,
@@ -90,7 +90,7 @@
   lfr.Storage.prototype._generateId = function() {
     var now = Date.now ? Date.now() : new Date().getTime();
 
-    var randomNum = this._getRandomNumber();
+    var randomNum = this.getRandomNumber_();
 
     return '-' + now + '-' + String(randomNum).replace('.', '') + '-';
   };
@@ -117,15 +117,15 @@
   lfr.Storage.prototype.onDataReceived_ = function(event) {
     var value = event.val;
 
-    for (var i = 0; i < this._queue.length; ++i) {
-      var queueMessage = this._queue[i];
+    for (var i = 0; i < this.queue_.length; ++i) {
+      var queueMessage = this.queue_[i];
 
       // Check if current message in the queue has the same messageId as those which came from the server.
       if (queueMessage.messageId === value.messageId) {
 
         // If the status is sent, remove it from the queue and emit an event
         if (value.status === lfr.Storage.STATUS_SENT) {
-          this._queue.splice(i, 1);
+          this.queue_.splice(i, 1);
 
           this.emit('messageReceived', queueMessage.message);
         } else {
@@ -156,10 +156,10 @@
     // In this case we have to cancel the timeout, process the queue and start it again,
     // if there are still messages.
 
-    clearTimeout(this._processQueue);
+    clearTimeout(this.processQueueHandler_);
 
-    for (var i = 0; i < this._queue.length; ++i) {
-      var queueMessage = this._queue[i];
+    for (var i = 0; i < this.queue_.length; ++i) {
+      var queueMessage = this.queue_[i];
 
       // We will send messages which are pending or failed, but with network failure error only
       if (status.code === lfr.Transport.STATUS_PENDING ||
@@ -173,8 +173,8 @@
       }
     }
 
-    if (this._queue.length) {
-      this._processQueue = setTimeout(this._processQueue, 500);
+    if (this.queue_.length) {
+      this.processQueueHandler_ = setTimeout(this.processQueue_, 500);
     }
   };
 }());

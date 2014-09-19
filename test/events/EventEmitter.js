@@ -93,21 +93,6 @@ module.exports = {
     test.done();
   },
 
-  testOnAny: function(test) {
-    var listener = createStub();
-
-    this.emitter.onAny(listener);
-    test.strictEqual(0, listener.called);
-
-    this.emitter.emit('event1');
-    test.strictEqual(1, listener.called);
-
-    this.emitter.emit('event2');
-    test.strictEqual(2, listener.called);
-
-    test.done();
-  },
-
   testOff: function(test) {
     var listener = createStub();
 
@@ -151,34 +136,12 @@ module.exports = {
     test.done();
   },
 
-  testOffAny: function(test) {
-    var listener = createStub();
-
-    this.emitter.onAny(listener);
-    test.strictEqual(0, listener.called);
-
-    this.emitter.emit('event1');
-    test.strictEqual(1, listener.called);
-
-    this.emitter.emit('event2');
-    test.strictEqual(2, listener.called);
-
-    this.emitter.offAny(listener);
-    this.emitter.emit('event1');
-    this.emitter.emit('event2');
-    test.strictEqual(2, listener.called);
-
-    test.done();
-  },
-
   testRemoveAllListeners: function(test) {
     var listener1 = createStub();
     var listener2 = createStub();
-    var listenerAll = createStub();
 
     this.emitter.on('event1', listener1);
     this.emitter.on('event2', listener2);
-    this.emitter.onAny(listenerAll);
 
     this.emitter.removeAllListeners();
     this.emitter.emit('event1');
@@ -186,7 +149,6 @@ module.exports = {
 
     test.strictEqual(0, listener1.called);
     test.strictEqual(0, listener2.called);
-    test.strictEqual(0, listenerAll.called);
 
     test.done();
   },
@@ -194,40 +156,16 @@ module.exports = {
   testRemoveAllListenersOfType: function(test) {
     var listener1 = createStub();
     var listener2 = createStub();
-    var listenerAll = createStub();
 
     this.emitter.on('event1', listener1);
     this.emitter.on('event2', listener2);
-    this.emitter.onAny(listenerAll);
 
     this.emitter.removeAllListeners('event1');
     this.emitter.emit('event1');
     test.strictEqual(0, listener1.called);
-    test.strictEqual(1, listenerAll.called);
 
     this.emitter.emit('event2');
     test.strictEqual(1, listener2.called);
-    test.strictEqual(2, listenerAll.called);
-
-    test.done();
-  },
-
-  testListenersAny: function(test) {
-    var listener1 = createStub();
-    var listener2 = createStub();
-    var listenerAll1 = createStub();
-    var listenerAll2 = createStub();
-
-    this.emitter.on('event1', listener1);
-    this.emitter.on('event2', listener2);
-    this.emitter.onAny(listenerAll1);
-    this.emitter.onAny(listenerAll2);
-
-    var anyListeners = this.emitter.listenersAny();
-    test.ok(anyListeners);
-    test.strictEqual(2, anyListeners.length);
-    test.strictEqual(anyListeners[0], listenerAll1);
-    test.strictEqual(anyListeners[1], listenerAll2);
 
     test.done();
   },

@@ -10,23 +10,16 @@
   };
 
   /**
-   * Holds event listeners that trigger for all event types.
-   * @type {Array}
-   * @private
-   */
-  lfr.EventEmitter.prototype.all_ = null;
-
-  /**
    * The delimiter being used for namespaces.
    * @type {string}
-   * @private
+   * @protected
    */
   lfr.EventEmitter.prototype.delimiter_ = '.';
 
   /**
    * Holds event listeners scoped by event type.
    * @type {Trie}
-   * @private
+   * @protected
    */
   lfr.EventEmitter.prototype.listenersTree_ = null;
 
@@ -34,7 +27,7 @@
    * The maximum number of listeners allowed for each event type. If the number
    * becomes higher than the max, a warning will be issued.
    * @type {number}
-   * @private
+   * @protected
    */
   lfr.EventEmitter.prototype.maxListeners_ = 10;
 
@@ -52,7 +45,7 @@
     this.emit('newListener', event, listener);
 
     var listeners = this.listenersTree_.setKeyValue(
-      this.splitNamespaces(event),
+      this.splitNamespaces_(event),
       [listener],
       this.mergeListenerArrays_
     );
@@ -80,7 +73,6 @@
     var args = Array.prototype.slice.call(arguments, 1);
     var listened = false;
     var listeners = this.listeners(event);
-    listeners = listeners ? listeners.concat(this.all_) : this.all_;
 
     if (listeners) {
       for (var i = 0; i < listeners.length; i++) {
@@ -118,18 +110,12 @@
   };
 
   /**
-   * Returns an array of listeners that fire on any event.
-   * @return {Array} Array of listeners.
-   */
-  lfr.EventEmitter.prototype.listenersAny = function() {
-    return this.all_;
-  };
-
-  /**
-   * Adds a one time listener for the event. This listener is invoked only the
-   * next time the event is fired, after which it is removed.
+   * Adds a listener that will be invoked a fixed number of times for the
+   * event. After the event is triggered the specified amount of times, the
+   * listener is removed.
    * @param {string} event
-   * @param {number} amount The amount of times this event should be listened to.
+   * @param {number} amount The amount of times this event should be listened
+   * to.
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
@@ -193,48 +179,12 @@
   };
 
   /**
-   * Removes a listener that would be fired when any event type is emitted.
-   * @param {!Function} listener [description]
-   * @return {!Object} Returns emitter, so calls can be chained.
-   */
-  lfr.EventEmitter.prototype.offAny = function(listener) {
-    if (!lfr.isFunction(listener)) {
-      throw new TypeError('Listener must be a function');
-    }
-    if (!this.all_) {
-      return this;
-    }
-
-    var i = this.all_.indexOf(listener);
-    if (i < 0) {
-      return this;
-    }
-    this.all_.splice(i, 1);
-
-    return this;
-  };
-
-  /**
    * Adds a listener to the end of the listeners array for the specified event.
    * @param {string} event
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.on = lfr.EventEmitter.prototype.addListener;
-
-  /**
-   * Adds a listener that will be fired when any event type is emitted.
-   * @param {!Function} listener [description]
-   * @return {!Object} Returns emitter, so calls can be chained.
-   */
-  lfr.EventEmitter.prototype.onAny = function(listener) {
-    if (!this.all_) {
-      this.all_ = [];
-    }
-
-    this.all_.push(listener);
-    return this;
-  };
 
   /**
    * Adds a one time listener for the event. This listener is invoked only the
@@ -256,10 +206,9 @@
    */
   lfr.EventEmitter.prototype.removeAllListeners = function(opt_event) {
     if (opt_event) {
-      this.listenersTree_.setKeyValue(this.splitNamespaces(opt_event), []);
+      this.listenersTree_.setKeyValue(this.splitNamespaces_(opt_event), []);
     } else {
       this.listenersTree_.clear();
-      delete this.all_;
     }
     return this;
   };
@@ -280,7 +229,7 @@
    * @protected
    */
   lfr.EventEmitter.prototype.searchListenerTree_ = function(event) {
-    return this.listenersTree_.getKeyValue(this.splitNamespaces(event));
+    return this.listenersTree_.getKeyValue(this.splitNamespaces_(event));
   };
 
   /**
@@ -310,8 +259,9 @@
    * Splits the event, using the current delimiter.
    * @param {string} event
    * @return {!Array}
+   * @protected
    */
-  lfr.EventEmitter.prototype.splitNamespaces = function(event) {
+  lfr.EventEmitter.prototype.splitNamespaces_ = function(event) {
     return lfr.isString(event) ? event.split(this.getDelimiter()) : event;
   };
 

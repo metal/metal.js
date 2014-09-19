@@ -151,26 +151,26 @@ describe('EventEmitter', function() {
   });
 
   it('should warn when max number of listeners is reached', function() {
-    var originalWarningFn = console.warning;
-    console.warning = createStub();
+    var originalWarningFn = console.warn;
+    console.warn = createStub();
 
     this.emitter.setMaxListeners(2);
     this.emitter.on('event', createStub());
     this.emitter.on('event', createStub());
     this.emitter.on('event1', createStub());
-    assert.strictEqual(0, console.warning.called, 'Should not warn before max');
+    assert.strictEqual(0, console.warn.called, 'Should not warn before max');
 
     this.emitter.on('event', createStub());
-    assert.strictEqual(1, console.warning.called, 'Max listeners reached for event');
+    assert.strictEqual(1, console.warn.called, 'Max listeners reached for event');
 
     this.emitter.on('event', createStub());
-    assert.strictEqual(1, console.warning.called, 'Should not warn twice for same type');
+    assert.strictEqual(1, console.warn.called, 'Should not warn twice for same type');
 
     this.emitter.on('event1', createStub());
     this.emitter.on('event1', createStub());
-    assert.strictEqual(2, console.warning.called, 'Max listeners reached for event1');
+    assert.strictEqual(2, console.warn.called, 'Max listeners reached for event1');
 
-    console.warning = originalWarningFn;
+    console.warn = originalWarningFn;
   });
 });
 

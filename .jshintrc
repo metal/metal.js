@@ -8,7 +8,15 @@
   "evil": false,
   "forin": false,
   "globals": {
-    "lfr": true
+    "after": true,
+    "afterEach": true,
+    "assert": true,
+    "before": true,
+    "beforeEach": true,
+    "describe": true,
+    "it": true,
+    "lfr": true,
+    "mocha": true
   },
   "immed": true,
   "indent": 2,

@@ -35,7 +35,7 @@
    * Adds a listener to the end of the listeners array for the specified event.
    * @param {string} event
    * @param {!Function} listener
-   * @return {!Object} Returns emitter, so calls can be chained.
+   * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.addListener = function(event, listener) {
     if (!lfr.isFunction(listener)) {
@@ -60,7 +60,7 @@
       listeners.warned = true;
     }
 
-    return this;
+    return new lfr.EventHandle(this, event, listener);
   };
 
   /**
@@ -74,14 +74,13 @@
     var listened = false;
     var listeners = this.listeners(event);
 
-    if (listeners) {
-      for (var i = 0; i < listeners.length; i++) {
-        if (listeners[i]) {
-          listeners[i].apply(this, args);
-          listened = true;
-        }
+    for (var i = 0; i < listeners.length; i++) {
+      if (listeners[i]) {
+        listeners[i].apply(this, args);
+        listened = true;
       }
     }
+
     return listened;
   };
 
@@ -117,7 +116,7 @@
    * @param {number} amount The amount of times this event should be listened
    * to.
    * @param {!Function} listener
-   * @return {!Object} Returns emitter, so calls can be chained.
+   * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.many = function(event, amount, listener) {
     var self = this;
@@ -134,9 +133,7 @@
     }
     handlerInternal.origin = listener;
 
-    self.on(event, handlerInternal);
-
-    return this;
+    return self.on(event, handlerInternal);
   };
 
   /**
@@ -182,7 +179,7 @@
    * Adds a listener to the end of the listeners array for the specified event.
    * @param {string} event
    * @param {!Function} listener
-   * @return {!Object} Returns emitter, so calls can be chained.
+   * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.on = lfr.EventEmitter.prototype.addListener;
 
@@ -191,7 +188,7 @@
    * next time the event is fired, after which it is removed.
    * @param {string} event
    * @param {!Function} listener
-   * @return {!Object} Returns emitter, so calls can be chained.
+   * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.once = function(event, listener) {
     return this.many(event, 1, listener);

@@ -9,6 +9,8 @@ var mainFiles = [
   'src/lfr.js',
   'src/structs/Trie.js',
   'src/structs/WildcardTrie.js',
+  'src/events/EventHandle.js',
+  'src/events/EventHandler.js',
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
   'src/net/XhrTransport.js'
@@ -61,6 +63,17 @@ gulp.task('lint', function() {
 gulp.task('test', function() {
   return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
     .pipe(plugins.mocha());
+});
+
+gulp.task('cover', function() {
+  return gulp.src(['src/**/*.js'])
+    .pipe(plugins.istanbul());
+});
+
+gulp.task('test-coverage', ['cover'], function() {
+  return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
+    .pipe(plugins.mocha())
+    .pipe(plugins.istanbul.writeReports());
 });
 
 gulp.task('watch', ['build'], function() {

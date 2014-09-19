@@ -112,7 +112,6 @@ describe('Trie', function() {
   it('should get values for array keys', function() {
     var trie = new lfr.Trie();
 
-
     trie.setKeyValue(['abc', 'def'], '1');
     trie.setKeyValue(['abc', 'z'], '2');
 

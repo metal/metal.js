@@ -11,7 +11,7 @@
    * @template T
    */
   lfr.array.remove = function(arr, obj) {
-    var i = Array.indexOf(arr, obj);
+    var i = arr.indexOf(obj);
     var rv;
     if ( (rv = i >= 0) ) {
       lfr.array.removeAt(arr, i);
@@ -26,7 +26,7 @@
    * @return {boolean} True if an element was removed.
    */
   lfr.array.removeAt = function(arr, i) {
-    if (arr.length !== null) {
+    if (!lfr.isDef(arr.length)) {
       throw new TypeError('The value is not a valid array like object.');
     }
     return Array.prototype.splice.call(arr, i, 1).length === 1;

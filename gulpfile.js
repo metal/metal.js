@@ -9,6 +9,7 @@ var mainFiles = [
   'src/lfr.js',
   'src/structs/Trie.js',
   'src/structs/WildcardTrie.js',
+  'src/events/EventHandle.js',
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
   'src/net/XhrTransport.js'

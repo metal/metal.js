@@ -41,16 +41,32 @@
   lfr.EventEmitter.prototype.shouldUseFacade_ = false;
 
   /**
-   * Adds a listener to the end of the listeners array for the specified event.
-   * @param {string} event
+   * Adds a listener to the end of the listeners array for the specified events.
+   * @param {!(Array|string)} events
    * @param {!Function} listener
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
-  lfr.EventEmitter.prototype.addListener = function(event, listener) {
+  lfr.EventEmitter.prototype.addListener = function(events, listener) {
     if (!lfr.isFunction(listener)) {
       throw new TypeError('Listener must be a function');
     }
 
+    events = lfr.isString(events) ? [events] : events;
+    for (var i = 0; i < events.length; i++) {
+      this.addSingleListener_(events[i], listener);
+    }
+
+    return new lfr.EventHandle(this, events, listener);
+  };
+
+  /**
+   * Adds a listener to the end of the listeners array for a single event.
+   * @param {string} event
+   * @param {!Function} listener
+   * @return {!lfr.EventHandle} Can be used to remove the listener.
+   * @protected
+   */
+  lfr.EventEmitter.prototype.addSingleListener_ = function(event, listener) {
     this.emit('newListener', event, listener);
 
     var listeners = this.listenersTree_.setKeyValue(
@@ -68,8 +84,6 @@
       );
       listeners.warned = true;
     }
-
-    return new lfr.EventHandle(this, event, listener);
   };
 
   /**
@@ -134,6 +148,29 @@
 
   /**
    * Adds a listener that will be invoked a fixed number of times for the
+   * events. After each event is triggered the specified amount of times, the
+   * listener is removed for it.
+   * @param {!(Array|string)} events
+   * @param {number} amount The amount of times this event should be listened
+   * to.
+   * @param {!Function} listener
+   * @return {!lfr.EventHandle} Can be used to remove the listener.
+   */
+  lfr.EventEmitter.prototype.many = function(events, amount, listener) {
+    if (amount <= 0) {
+      return;
+    }
+
+    events = lfr.isString(events) ? [events] : events;
+    for (var i = 0; i < events.length; i++) {
+      this.many_(events[i], amount, listener);
+    }
+
+    return new lfr.EventHandle(this, events, listener);
+  };
+
+  /**
+   * Adds a listener that will be invoked a fixed number of times for a single
    * event. After the event is triggered the specified amount of times, the
    * listener is removed.
    * @param {string} event
@@ -142,12 +179,8 @@
    * @param {!Function} listener
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
-  lfr.EventEmitter.prototype.many = function(event, amount, listener) {
+  lfr.EventEmitter.prototype.many_ = function(event, amount, listener) {
     var self = this;
-
-    if (amount <= 0) {
-      return;
-    }
 
     function handlerInternal() {
       if (--amount === 0) {
@@ -157,7 +190,7 @@
     }
     handlerInternal.origin = listener;
 
-    return self.on(event, handlerInternal);
+    self.on(event, handlerInternal);
   };
 
   /**
@@ -174,24 +207,23 @@
   };
 
   /**
-   * Remove a listener from the listener array for the specified event.
+   * Removes a listener for the specified events.
    * Caution: changes array indices in the listener array behind the listener.
-   * @param {string} event
+   * @param {!(Array|string)} events
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  lfr.EventEmitter.prototype.off = function(event, listener) {
+  lfr.EventEmitter.prototype.off = function(events, listener) {
     if (!lfr.isFunction(listener)) {
       throw new TypeError('Listener must be a function');
     }
 
-    var listenerArrays = this.searchListenerTree_(event);
+    var listenerArrays = this.searchListenerTree_(events);
     for (var i = 0; i < listenerArrays.length; i++) {
-      for (var j = 0; j < listenerArrays[i].length; j++) {
+      for (var j = listenerArrays[i].length - 1; j >= 0; j--) {
         if (listenerArrays[i][j] === listener ||
           (listenerArrays[i][j].origin && listenerArrays[i][j].origin === listener)) {
           listenerArrays[i].splice(j, 1);
-          break;
         }
       }
     }
@@ -200,57 +232,71 @@
   };
 
   /**
-   * Adds a listener to the end of the listeners array for the specified event.
-   * @param {string} event
+   * Adds a listener to the end of the listeners array for the specified events.
+   * @param {!(Array|string)} events
    * @param {!Function} listener
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.on = lfr.EventEmitter.prototype.addListener;
 
   /**
-   * Adds a one time listener for the event. This listener is invoked only the
-   * next time the event is fired, after which it is removed.
-   * @param {string} event
+   * Adds a one time listener for the events. This listener is invoked only the
+   * next time each event is fired, after which it is removed.
+   * @param {!(Array|string)} events
    * @param {!Function} listener
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
-  lfr.EventEmitter.prototype.once = function(event, listener) {
-    return this.many(event, 1, listener);
+  lfr.EventEmitter.prototype.once = function(events, listener) {
+    return this.many(events, 1, listener);
   };
 
   /**
-   * Removes all listeners, or those of the specified event. It's not a good
+   * Removes all listeners, or those of the specified events. It's not a good
    * idea to remove listeners that were added elsewhere in the code,
    * especially when it's on an emitter that you didn't create.
-   * @param {string} event
+   * @param {(Array|string)=} opt_events
    * @return {!Object} Returns emitter, so calls can be chained.
    */
-  lfr.EventEmitter.prototype.removeAllListeners = function(opt_event) {
-    if (opt_event) {
-      this.listenersTree_.setKeyValue(this.splitNamespaces_(opt_event), []);
-    } else {
+  lfr.EventEmitter.prototype.removeAllListeners = function(opt_events) {
+    if (!opt_events) {
       this.listenersTree_.clear();
+      return this;
     }
+
+    opt_events = lfr.isString(opt_events) ? [opt_events] : opt_events;
+    for (var i = 0; i < opt_events.length; i++) {
+      this.listenersTree_.setKeyValue(this.splitNamespaces_(opt_events[i]), []);
+    }
+
     return this;
   };
 
   /**
-   * Remove a listener from the listener array for the specified event.
+   * Removes a listener for the specified events.
    * Caution: changes array indices in the listener array behind the listener.
-   * @param {string} event
+   * @param {!(Array|string)} events
    * @param {!Function} listener
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.removeListener = lfr.EventEmitter.prototype.off;
 
   /**
-   * Searches the listener tree for the given event.
-   * @param {string} event
+   * Searches the listener tree for the given events.
+   * @param {!(Array|string)} events
    * @return {!Array.<Array>} An array of listener arrays returned by the tree.
    * @protected
    */
-  lfr.EventEmitter.prototype.searchListenerTree_ = function(event) {
-    return this.listenersTree_.getKeyValue(this.splitNamespaces_(event));
+  lfr.EventEmitter.prototype.searchListenerTree_ = function(events) {
+    var values = [];
+
+    events = lfr.isString(events) ? [events] : events;
+    for (var i = 0; i < events.length; i++) {
+      values = values.concat(
+        this.listenersTree_.getKeyValue(this.splitNamespaces_(events[i]))
+      );
+    }
+
+    return values;
   };
 
   /**
@@ -295,7 +341,7 @@
    * @protected
    */
   lfr.EventEmitter.prototype.splitNamespaces_ = function(event) {
-    return lfr.isString(event) ? event.split(this.getDelimiter()) : event;
+    return event.split(this.getDelimiter());
   };
 
 }());

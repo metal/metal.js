@@ -9,6 +9,8 @@
    */
   lfr.XhrTransport = function(uri) {
     lfr.XhrTransport.base(this, 'constructor', uri);
+
+    this.sendInstances_ = [];
   };
   lfr.inherits(lfr.XhrTransport, lfr.BaseTransport);
 
@@ -18,7 +20,6 @@
    * @default {
    *   'X-Requested-With': 'XMLHttpRequest'
    * }
-   * @protected
    */
   lfr.XhrTransport.prototype.httpHeaders = {
     'X-Requested-With': 'XMLHttpRequest'
@@ -28,7 +29,6 @@
    * Holds default http method to set on request.
    * @type {string}
    * @default GET
-   * @protected
    */
   lfr.XhrTransport.prototype.httpMethod = 'GET';
 
@@ -36,6 +36,7 @@
    * Holds the XMLHttpRequest sent objects.
    * @type {Array.<XMLHttpRequest>}
    * @default null
+   * @protected
    */
   lfr.XhrTransport.prototype.sendInstances_ = null;
 
@@ -50,7 +51,7 @@
     xhr.onload = function() {
       if (xhr.status === 200) {
         var payload = {
-          data: xhr.responseText
+          data: self.decodeData(xhr.responseText)
         };
         self.emit('data', payload);
         self.emit('message', payload);
@@ -86,6 +87,7 @@
     }
     this.sendInstances_ = [];
     this.emit('close');
+    return this;
   };
 
   /**
@@ -114,6 +116,7 @@
       return;
     }
     this.emit('open');
+    return this;
   };
 
   /**

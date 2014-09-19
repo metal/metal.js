@@ -2,8 +2,7 @@
   'use strict';
 
   /**
-   * Transport utility.
-   * @interface
+   * Provides a convenient API for data transport.
    * @constructor
    * @extends {lfr.EventEmitter}
    */
@@ -11,6 +10,14 @@
     lfr.Transport.base(this, 'constructor');
   };
   lfr.inherits(lfr.Transport, lfr.EventEmitter);
+
+  /**
+   * Holds the transport state, it supports the available states: '',
+   * 'opening', 'open' and 'closed'.
+   * @type {string}
+   * @default ''
+   */
+  lfr.Transport.prototype.state = '';
 
   /**
    * Closes the transport.
@@ -26,6 +33,14 @@
   lfr.Transport.prototype.decodeData = lfr.identityFunction;
 
   /**
+   * Gets the transport state value.
+   * @return {string}
+   */
+  lfr.Transport.prototype.getState = function() {
+    return this.state;
+  };
+
+  /**
    * Opens the transport.
    * @chainable
    */
@@ -35,7 +50,21 @@
    * Sends packet.
    * @param {*} packet
    */
-  lfr.Transport.prototype.send = lfr.abstractMethod;
+  lfr.Transport.prototype.send = function(packet) {
+    if (this.state === 'open') {
+      this.write(packet);
+    } else {
+      throw new Error('Transport not open');
+    }
+  };
+
+  /**
+   * Sets the transport state value.
+   * @param {string} state
+   */
+  lfr.Transport.prototype.setState = function(state) {
+    this.state = state;
+  };
 
   /**
    * Writes data to the transport.

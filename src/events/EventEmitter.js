@@ -74,14 +74,13 @@
     var listened = false;
     var listeners = this.listeners(event);
 
-    if (listeners) {
-      for (var i = 0; i < listeners.length; i++) {
-        if (listeners[i]) {
-          listeners[i].apply(this, args);
-          listened = true;
-        }
+    for (var i = 0; i < listeners.length; i++) {
+      if (listeners[i]) {
+        listeners[i].apply(this, args);
+        listened = true;
       }
     }
+
     return listened;
   };
 

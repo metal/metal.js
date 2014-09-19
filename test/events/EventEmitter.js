@@ -142,6 +142,19 @@ describe('EventEmitter', function() {
     assert.strictEqual(0, listener2.callCount);
   });
 
+  it('should detach events via return value', function() {
+    var listener = sinon.stub();
+    var listener2 = sinon.stub();
+
+    this.emitter.on('event', listener);
+    var handle = this.emitter.on('event', listener2);
+
+    handle.removeListener();
+    this.emitter.emit('event');
+    assert.strictEqual(1, listener.callCount);
+    assert.strictEqual(0, listener2.callCount);
+  });
+
   it('should detach events listened through `once`', function() {
     var listener = sinon.stub();
 
@@ -152,11 +165,31 @@ describe('EventEmitter', function() {
     assert.strictEqual(0, listener.callCount);
   });
 
+  it('should detach events listened through `once` via return value', function() {
+    var listener = sinon.stub();
+
+    var handle = this.emitter.once('event', listener);
+    handle.removeListener();
+    this.emitter.emit('event');
+
+    assert.strictEqual(0, listener.callCount);
+  });
+
   it('should detach events listened through `many`', function() {
     var listener = sinon.stub();
 
     this.emitter.many('event', 2, listener);
     this.emitter.off('event', listener);
+    this.emitter.emit('event');
+
+    assert.strictEqual(0, listener.callCount);
+  });
+
+  it('should detach events listened through `many` via return value', function() {
+    var listener = sinon.stub();
+
+    var handle = this.emitter.many('event', 2, listener);
+    handle.removeListener();
     this.emitter.emit('event');
 
     assert.strictEqual(0, listener.callCount);

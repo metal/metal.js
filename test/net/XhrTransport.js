@@ -87,6 +87,27 @@ describe('XhrTransport', function() {
     }, 0);
   });
 
+  it('should handle successful send data without http headers', function(done) {
+    global.XMLHttpRequest = createFakeXMLHttpRequest(200, 'data');
+
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.setHttpHeaders(null);
+    var listener1 = sinon.stub();
+    var listener2 = sinon.stub();
+    transport.on('data', listener1);
+    transport.on('message', listener2);
+    transport.open();
+    transport.send('body');
+
+    var pendingXhr = global.XMLHttpRequest.requests[0];
+    setTimeout(function() {
+      assert.strictEqual('body', pendingXhr.body, 'Should set request body');
+      assert.strictEqual(listener1.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of data event');
+      assert.strictEqual(listener2.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of message event');
+      done();
+    }, 0);
+  });
+
   it('should handle failing send data', function(done) {
     global.XMLHttpRequest = createFakeXMLHttpRequest(404);
 

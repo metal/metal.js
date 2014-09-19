@@ -65,6 +65,17 @@ gulp.task('test', function() {
     .pipe(plugins.mocha());
 });
 
+gulp.task('cover', function() {
+  return gulp.src(['src/**/*.js'])
+    .pipe(plugins.istanbul());
+});
+
+gulp.task('test-coverage', ['cover'], function() {
+  return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
+    .pipe(plugins.mocha())
+    .pipe(plugins.istanbul.writeReports());
+});
+
 gulp.task('watch', ['build'], function() {
   gulp.watch('src/**/*', ['build']);
 });

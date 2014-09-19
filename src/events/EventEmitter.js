@@ -32,6 +32,15 @@
   lfr.EventEmitter.prototype.maxListeners_ = 10;
 
   /**
+   * Configuration option which determines if an event facade should be sent
+   * as a param of listeners when emitting events. If set to true, the facade
+   * will be passed as the first argument of the listener.
+   * @type {boolean}
+   * @protected
+   */
+  lfr.EventEmitter.prototype.shouldUseFacade_ = false;
+
+  /**
    * Adds a listener to the end of the listeners array for the specified event.
    * @param {string} event
    * @param {!Function} listener
@@ -74,6 +83,13 @@
     var listened = false;
     var listeners = this.listeners(event);
 
+    if (this.getShouldUseFacade()) {
+      var facade = {
+        type: event
+      };
+      args = [facade].concat(args);
+    }
+
     for (var i = 0; i < listeners.length; i++) {
       if (listeners[i]) {
         listeners[i].apply(this, args);
@@ -90,6 +106,16 @@
    */
   lfr.EventEmitter.prototype.getDelimiter = function() {
     return this.delimiter_;
+  };
+
+  /**
+   * Gets the configuration option which determines if an event facade should
+   * be sent as a param of listeners when emitting events. If set to true, the
+   * facade will be passed as the first argument of the listener.
+   * @return {boolean}
+   */
+  lfr.EventEmitter.prototype.getShouldUseFacade = function() {
+    return this.shouldUseFacade_;
   };
 
   /**
@@ -249,6 +275,18 @@
    */
   lfr.EventEmitter.prototype.setMaxListeners = function(max) {
     this.maxListeners_ = max;
+    return this;
+  };
+
+  /**
+   * Sets the configuration option which determines if an event facade should
+   * be sent as a param of listeners when emitting events. If set to true, the
+   * facade will be passed as the first argument of the listener.
+   * @param {boolean} shouldUseFacade
+   * @return {!Object} Returns emitter, so calls can be chained.
+   */
+  lfr.EventEmitter.prototype.setShouldUseFacade = function(shouldUseFacade) {
+    this.shouldUseFacade_ = shouldUseFacade;
     return this;
   };
 

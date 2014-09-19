@@ -265,4 +265,28 @@ describe('EventEmitter', function() {
       TypeError
     );
   });
+
+  it('should pass requested arguments to listener on emit', function() {
+    var listener = sinon.stub();
+
+    this.emitter.on('event', listener);
+    this.emitter.emit('event', 'arg1', 2);
+
+    sinon.assert.calledWithExactly(listener, 'arg1', 2);
+  });
+
+  it('should pass facade as first argument when requested', function() {
+    var listener = sinon.stub();
+
+    this.emitter.setShouldUseFacade(true);
+    this.emitter.on('event', listener);
+    this.emitter.emit('event', 'arg1', 2);
+
+    sinon.assert.calledWithExactly(
+      listener,
+      sinon.match({ type: 'event' }),
+      'arg1',
+      2
+    );
+  });
 });

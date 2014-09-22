@@ -156,6 +156,19 @@ describe('XhrTransport', function() {
     transport.close();
     assert.ok(pendingXhr.aborted);
   });
+
+  it('should abort requests when disposed', function() {
+    global.XMLHttpRequest = createFakeXMLHttpRequest(200);
+
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+    transport.send();
+
+    var pendingXhr = global.XMLHttpRequest.requests[0];
+    assert.ok(!pendingXhr.aborted);
+    transport.dispose();
+    assert.ok(pendingXhr.aborted);
+  });
 });
 
 function createFakeXMLHttpRequest(status, responseText) {
@@ -169,14 +182,15 @@ function createFakeXMLHttpRequest(status, responseText) {
   };
   FakeXMLHttpRequest.prototype.abort = function() {
     this.aborted = true;
+    clearTimeout(this.timer);
   };
   FakeXMLHttpRequest.prototype.open = lfr.nullFunction;
   FakeXMLHttpRequest.prototype.send = function(body) {
     this.body = body;
     if (this.status === 200 || this.status === 304) {
-      setTimeout(this.onload, 0);
+      this.timer = setTimeout(this.onload, 0);
     } else {
-      setTimeout(this.onerror, 0);
+      this.timer = setTimeout(this.onerror, 0);
     }
   };
   FakeXMLHttpRequest.prototype.setRequestHeader = function(header, value) {

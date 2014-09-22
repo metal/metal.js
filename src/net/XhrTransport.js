@@ -91,6 +91,16 @@
   };
 
   /**
+   * Disposes of this instance's object references.
+   * @override
+   */
+  lfr.XhrTransport.prototype.disposeInternal = function() {
+    this.close();
+
+    lfr.XhrTransport.superClass_.disposeInternal.apply(this, arguments);
+  };
+
+  /**
    * Gets the http headers.
    * @return {Object}
    */

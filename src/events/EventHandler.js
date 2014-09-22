@@ -9,6 +9,7 @@
   lfr.EventHandler = function() {
     this.eventHandles_ = [];
   };
+  lfr.inherits(lfr.EventHandler, lfr.Disposable);
 
   /**
    * An array that holds the added event handles, so the listeners can be
@@ -27,6 +28,14 @@
     for (var i = 0; i < arguments.length; i++) {
       this.eventHandles_.push(arguments[i]);
     }
+  };
+
+  /**
+   * Disposes of this instance's object references.
+   * @override
+   */
+  lfr.EventHandler.prototype.disposeInternal = function() {
+    delete this.eventHandles_;
   };
 
   /**

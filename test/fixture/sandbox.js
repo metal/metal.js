@@ -3,6 +3,7 @@
 global.lfr = {};
 require('../../src/lfr.js');
 require('../../src/array/array.js');
+require('../../src/disposable/Disposable.js');
 require('../../src/structs/Trie.js');
 require('../../src/structs/WildcardTrie.js');
 require('../../src/events/EventHandle.js');

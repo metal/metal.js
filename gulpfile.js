@@ -8,6 +8,7 @@ var runSequence = require('run-sequence');
 var mainFiles = [
   'src/lfr.js',
   'src/array/array.js',
+  'src/disposable/Disposable.js',
   'src/structs/Trie.js',
   'src/structs/WildcardTrie.js',
   'src/events/EventHandle.js',

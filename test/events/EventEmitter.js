@@ -10,7 +10,7 @@ describe('EventEmitter', function() {
   });
 
   afterEach(function() {
-    this.emitter.removeAllListeners();
+    this.emitter.dispose();
   });
 
   it('should emit and listen to events', function() {
@@ -476,5 +476,13 @@ describe('EventEmitter', function() {
       'arg1',
       2
     );
+  });
+
+  it('should dispose the listeners tree on dispose', function() {
+    var tree = this.emitter.listenersTree_;
+
+    this.emitter.dispose();
+    assert.ok(tree.isDisposed());
+    assert.ok(!this.emitter.listenersTree_);
   });
 });

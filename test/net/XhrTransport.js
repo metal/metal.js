@@ -46,8 +46,8 @@ describe('XhrTransport', function() {
     // Waits connection to open asynchronously
     assert.strictEqual(0, stubOpenListener.callCount);
     setTimeout(function() {
-      assert.strictEqual(2, console.warn.callCount, 'Should warn when open');
       assert.strictEqual(1, stubOpenListener.callCount, 'Should not emit open twice');
+      assert.strictEqual(2, console.warn.callCount, 'Should warn when open');
 
       console.warn = originalWarningFn;
       done();
@@ -105,11 +105,13 @@ describe('XhrTransport', function() {
     }, 0);
   });
 
-  it('should handle successful send data', function(done) {
+  it('should handle successful send message and receive data', function(done) {
     global.XMLHttpRequest = createFakeXMLHttpRequest(200, 'data');
 
     var transport = new lfr.XhrTransport('http://liferay.com');
+    var stubMessageListener = sinon.stub();
     var stubDataListener = sinon.stub();
+    transport.on('message', stubMessageListener);
     transport.on('data', stubDataListener);
     transport.open();
     // Waits connection to open asynchronously
@@ -118,6 +120,7 @@ describe('XhrTransport', function() {
       // Waits connection to send asynchronously
       setTimeout(function() {
         assert.strictEqual('body', global.XMLHttpRequest.requests[0].body, 'Should set request body');
+        assert.strictEqual(stubMessageListener.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of data event');
         assert.strictEqual(stubDataListener.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of data event');
         done();
       }, 0);

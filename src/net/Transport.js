@@ -134,12 +134,12 @@
   lfr.Transport.prototype.open = lfr.abstractMethod;
 
   /**
-   * Sends packet.
-   * @param {*} packet
+   * Sends message.
+   * @param {*} message
    */
-  lfr.Transport.prototype.send = function(packet) {
+  lfr.Transport.prototype.send = function(message) {
     if (this.isOpen()) {
-      this.write(packet);
+      this.write(message);
     } else {
       throw new Error('Transport not open');
     }
@@ -163,7 +163,7 @@
 
   /**
    * Writes data to the transport.
-   * @param {*} packet
+   * @param {*} message
    * @chainable
    */
   lfr.Transport.prototype.write = lfr.abstractMethod;
@@ -181,6 +181,11 @@
   /**
    * Emits when error is called.
    * @event error
+   */
+
+  /**
+   * Emits when the message event is sent.
+   * @event message
    */
 
   /**

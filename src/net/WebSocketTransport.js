@@ -113,8 +113,8 @@
   /**
    * @inheritDoc
    */
-  lfr.WebSocketTransport.prototype.write = function(packet) {
-    this.socket.send(packet);
+  lfr.WebSocketTransport.prototype.write = function(message) {
+    this.socket.send(message);
   };
 
 }());

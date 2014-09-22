@@ -55,6 +55,7 @@
         var payload = {
           data: self.decodeData(xhr.responseText)
         };
+        self.emit('message', payload);
         self.emit('data', payload);
         lfr.array.remove(self.sendInstances_, xhr);
         return;
@@ -153,10 +154,10 @@
   /**
    * @inheritDoc
    */
-  lfr.XhrTransport.prototype.write = function(packet) {
+  lfr.XhrTransport.prototype.write = function(message) {
     var xhr = this.createXhr_();
     this.sendInstances_.push(xhr);
-    xhr.send(packet);
+    xhr.send(message);
   };
 
 }());

@@ -9,7 +9,7 @@
    * @constructor
    */
   lfr.Storage = function(mechanism) {
-    this.mechanism = mechanism;
+    this.mechanism_ = mechanism;
   };
 
   /**
@@ -22,18 +22,18 @@
 
   /**
    * The mechanism used to persist key-value pairs.
-   * @protected {lfr.StorageMechanism}
    * @type {lfr.StorageMechanism}
    * @default null
+   * @protected
    */
-  lfr.Storage.prototype.mechanism = null;
+  lfr.Storage.prototype.mechanism_ = null;
 
   /**
    * Gets the underlying storage mechanism.
    * @return {lfr.StorageMechanism}
    */
   lfr.Storage.prototype.getMechanism = function() {
-    return this.mechanism;
+    return this.mechanism_;
   };
 
   /**
@@ -43,10 +43,10 @@
    */
   lfr.storage.Storage.prototype.set = function(key, value) {
     if (!lfr.isDef(value)) {
-      this.mechanism.remove(key);
+      this.mechanism_.remove(key);
       return;
     }
-    this.mechanism.set(key, lfr.json.serialize(value));
+    this.mechanism_.set(key, lfr.json.serialize(value));
   };
 
   /**
@@ -54,7 +54,7 @@
    * @param {lfr.StorageMechanism} mechanism
    */
   lfr.Storage.prototype.setMechanism = function(mechanism) {
-    this.mechanism = mechanism;
+    this.mechanism_ = mechanism;
   };
 
   /**
@@ -65,7 +65,7 @@
   lfr.storage.Storage.prototype.get = function(key) {
     var json;
     try {
-      json = this.mechanism.get(key);
+      json = this.mechanism_.get(key);
     } catch (e) {
       return undefined;
     }
@@ -84,7 +84,7 @@
    * @param {string} key The key to remove.
    */
   lfr.storage.Storage.prototype.remove = function(key) {
-    this.mechanism.remove(key);
+    this.mechanism_.remove(key);
   };
 
 }());

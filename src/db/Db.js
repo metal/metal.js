@@ -20,6 +20,15 @@
   lfr.inherits(lfr.Db, lfr.EventEmitter);
 
   /**
+   * The mechanism used for storing, retrieving, updating and removing data
+   * from database.
+   * @type {lfr.DbMechanism}
+   * @default null
+   * @protected
+   */
+  lfr.Db.prototype.mechanism_ = null;
+
+  /**
    * Adds new entries to database.
    * @param {!(Object|string)} data Data object which should be stored to the
    *   database.
@@ -86,9 +95,10 @@
   lfr.Db.prototype.onDataAdd_ = function(err, data, opt_callback) {
     if (err) {
       this.emit('error', err);
-    }
-    else {
-      this.emit('add', { data: data});
+    } else {
+      this.emit('add', {
+        data: data
+      });
     }
 
     if (opt_callback) {
@@ -111,9 +121,10 @@
   lfr.Db.prototype.onDataFind_ = function(err, data, opt_callback) {
     if (err) {
       this.emit('error', err);
-    }
-    else {
-      this.emit('find', { data: data});
+    } else {
+      this.emit('find', {
+        data: data
+      });
     }
 
     if (opt_callback) {
@@ -136,9 +147,10 @@
   lfr.Db.prototype.onDataRemove_ = function(err, data, opt_callback) {
     if (err) {
       this.emit('error', err);
-    }
-    else {
-      this.emit('remove', { data: data});
+    } else {
+      this.emit('remove', {
+        data: data
+      });
     }
 
     if (opt_callback) {
@@ -161,9 +173,10 @@
   lfr.Db.prototype.onDataUpdate_ = function(err, data, opt_callback) {
     if (err) {
       this.emit('error', err);
-    }
-    else {
-      this.emit('update', { data: data});
+    } else {
+      this.emit('update', {
+        data: data
+      });
     }
 
     if (opt_callback) {

@@ -4,10 +4,10 @@ var assert = require('assert');
 require('../fixture/sandbox.js');
 
 describe('DB', function() {
-  it('should have mechanism specified', function() {
+  it('should throw error when mechanism is not specified', function() {
     assert.throws(function() {
       new lfr.Db();
-    }, Error, 'Should throw error if mechanism is not specified');
+    }, Error);
 
     assert.doesNotThrow(function() {
       var FakeMechanism = createFakeMechanism();
@@ -27,7 +27,7 @@ describe('DB', function() {
       age: 25
     });
 
-    db.add(null, function(err, data) {
+    db.add(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
@@ -35,11 +35,11 @@ describe('DB', function() {
       name: 'Johan',
       age: 25
     }, function(err, data) {
-      assert.strictEqual(err, null, 'Should not return error');
-      assert.ok(data, null, 'Should return some data');
+        assert.strictEqual(err, null, 'Should not return error');
+        assert.ok(data, null, 'Should return some data');
 
-      done();
-    });
+        done();
+      });
   });
 
   it('should handle querying data from the database', function(done) {
@@ -53,7 +53,7 @@ describe('DB', function() {
       age: 25
     });
 
-    db.find(null, function(err, data) {
+    db.find(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
@@ -61,11 +61,11 @@ describe('DB', function() {
       name: 'Johan',
       age: 25
     }, function(err, data) {
-      assert.strictEqual(err, null, 'Should not return error');
-      assert.ok(data, null, 'Should return some data');
+        assert.strictEqual(err, null, 'Should not return error');
+        assert.ok(data, null, 'Should return some data');
 
-      done();
-    });
+        done();
+      });
   });
 
   it('should handle removing data from the database', function(done) {
@@ -79,7 +79,7 @@ describe('DB', function() {
       age: 25
     });
 
-    db.remove(null, function(err, data) {
+    db.remove(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
@@ -87,11 +87,11 @@ describe('DB', function() {
       name: 'Johan',
       age: 25
     }, function(err, data) {
-      assert.strictEqual(err, null, 'Should not return error');
-      assert.ok(data, null, 'Should return some data');
+        assert.strictEqual(err, null, 'Should not return error');
+        assert.ok(data, null, 'Should return some data');
 
-      done();
-    });
+        done();
+      });
   });
 
   it('should handle updating data into the database', function(done) {
@@ -105,7 +105,7 @@ describe('DB', function() {
       age: 25
     });
 
-    db.update(null, function(err, data) {
+    db.update(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
@@ -113,37 +113,32 @@ describe('DB', function() {
       name: 'Johan',
       age: 25
     }, function(err, data) {
-      assert.strictEqual(err, null, 'Should not return error');
-      assert.ok(data, null, 'Should return some data');
+        assert.strictEqual(err, null, 'Should not return error');
+        assert.ok(data, null, 'Should return some data');
 
-      done();
-    });
+        done();
+      });
   });
 
-  function createFakeMechanism(uri) {
+  function createFakeMechanism() {
     var FakeMechanism = function(uri) {
       this.uri_ = uri;
     };
 
-    var mechanismImpl = function(data, callback, config) {
+    var mechanismImpl = function(data, callback) {
       setTimeout(function() {
         if (data) {
           callback(null, 'Success');
-        }
-        else {
+        } else {
           callback(new Error('There is no data provided'), 'Failure');
         }
       }, 10);
     };
 
     FakeMechanism.prototype.add = mechanismImpl;
-
     FakeMechanism.prototype.find = mechanismImpl;
-
     FakeMechanism.prototype.remove = mechanismImpl;
-
     FakeMechanism.prototype.update = mechanismImpl;
-
     return FakeMechanism;
   }
 

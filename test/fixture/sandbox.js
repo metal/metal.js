@@ -12,4 +12,4 @@ require('../../src/events/EventEmitter.js');
 require('../../src/net/Transport.js');
 require('../../src/net/XhrTransport.js');
 require('../../src/net/WebSocketTransport.js');
-require('../../src/db/DB.js');
+require('../../src/db/Db.js');

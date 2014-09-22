@@ -17,7 +17,8 @@ var mainFiles = [
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
   'src/net/XhrTransport.js',
-  'src/net/WebSocketTransport.js'
+  'src/net/WebSocketTransport.js',
+  'src/db/Db.js'
 ];
 
 gulp.task('build', ['clean'], function() {

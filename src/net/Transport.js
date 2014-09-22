@@ -75,6 +75,17 @@
   lfr.Transport.prototype.decodeData = lfr.identityFunction;
 
   /**
+   * @inheritDoc
+   * @override
+   */
+  lfr.Transport.prototype.disposeInternal = function() {
+    this.close();
+    this.once('close', function() {
+      lfr.Transport.base(this, 'disposeInternal');
+    });
+  };
+
+  /**
    * Gets the transport state value.
    * @return {string}
    */

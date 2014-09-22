@@ -32,6 +32,14 @@
   lfr.EventEmitter.prototype.maxListeners_ = 10;
 
   /**
+   * The id that will be assigned to the next listener added to this event
+   * emitter.
+   * @type {number}
+   * @protected
+   */
+  lfr.EventEmitter.prototype.nextId_ = 1;
+
+  /**
    * Configuration option which determines if an event facade should be sent
    * as a param of listeners when emitting events. If set to true, the facade
    * will be passed as the first argument of the listener.
@@ -63,15 +71,21 @@
    * Adds a listener to the end of the listeners array for a single event.
    * @param {string} event
    * @param {!Function} listener
+   * @param {Function=} opt_origin The original function that was added as a
+   * listener, if there is any.
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    * @protected
    */
-  lfr.EventEmitter.prototype.addSingleListener_ = function(event, listener) {
+  lfr.EventEmitter.prototype.addSingleListener_ = function(event, listener, opt_origin) {
     this.emit('newListener', event, listener);
 
     var listeners = this.listenersTree_.setKeyValue(
       this.splitNamespaces_(event),
-      [listener],
+      [{
+        fn: listener,
+        id: this.nextId_++,
+        origin: opt_origin
+      }],
       this.mergeListenerArrays_
     );
 
@@ -136,14 +150,28 @@
    * @return {Array} Array of listeners.
    */
   lfr.EventEmitter.prototype.listeners = function(event) {
+    var concatCount = 0;
     var listenerArrays = this.searchListenerTree_(event);
     var listeners = [];
 
     for (var i = 0; i < listenerArrays.length; i++) {
-      listeners = listeners.concat(listenerArrays[i]);
+      if (listenerArrays[i].length) {
+        concatCount++;
+        listeners = listeners.concat(listenerArrays[i]);
+      }
     }
 
-    return listeners;
+    if (concatCount > 1) {
+      // If there was more than one result, we should reorder the listeners,
+      // since we joined them without taking the order into account.
+      listeners.sort(function(obj1, obj2) {
+        return obj1.id - obj2.id;
+      });
+    }
+
+    return listeners.map(function(listener) {
+      return listener.fn;
+    });
   };
 
   /**
@@ -188,9 +216,8 @@
       }
       listener.apply(self, arguments);
     }
-    handlerInternal.origin = listener;
 
-    self.on(event, handlerInternal);
+    self.addSingleListener_(event, handlerInternal, listener);
   };
 
   /**
@@ -221,7 +248,7 @@
     var listenerArrays = this.searchListenerTree_(events);
     for (var i = 0; i < listenerArrays.length; i++) {
       for (var j = listenerArrays[i].length - 1; j >= 0; j--) {
-        if (listenerArrays[i][j] === listener ||
+        if (listenerArrays[i][j].fn === listener ||
           (listenerArrays[i][j].origin && listenerArrays[i][j].origin === listener)) {
           listenerArrays[i].splice(j, 1);
         }

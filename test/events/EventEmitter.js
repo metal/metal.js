@@ -196,6 +196,22 @@ describe('EventEmitter', function() {
     assert.strictEqual(0, listener.callCount);
   });
 
+  it('should run listeners in the order they were added', function() {
+    var order = '';
+    var listener1 = function() {
+      order += '1';
+    };
+    var listener2 = function() {
+      order += '2';
+    };
+
+    this.emitter.on('event.*', listener1);
+    this.emitter.on('event.1', listener2);
+    this.emitter.emit('event.1');
+
+    assert.strictEqual(order, '12');
+  });
+
   it('should detach events', function() {
     var listener = sinon.stub();
     var listener2 = sinon.stub();

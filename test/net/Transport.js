@@ -9,25 +9,25 @@ describe('Transport', function() {
     assert.strictEqual('', transport.getState());
   });
 
-  it('should not send packet when not open', function() {
+  it('should throw error when a message is sent before open', function() {
     var transport = new lfr.Transport('');
     assert.throws(function() {
       transport.send(null);
-    }, Error, 'Should throw error when transport is not open');
+    }, Error);
   });
 
-  it('should not send packet from abstract transport', function() {
+  it('should throw error when a message is sent from abstract transport', function() {
     var transport = new lfr.Transport('');
     transport.setState('open');
     assert.throws(function() {
       transport.send(null);
-    }, Error, 'Should throw unimplemented abstract method error');
+    }, Error);
   });
 
-  it('should transport uri be specified', function() {
+  it('should throw error when uri is not specified', function() {
     assert.throws(function() {
       new lfr.Transport();
-    }, Error, 'Should throw transport uri not specified');
+    }, Error);
 
     assert.doesNotThrow(function() {
       new lfr.Transport('');

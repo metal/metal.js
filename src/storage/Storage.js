@@ -16,6 +16,7 @@
    * Invalid value error thrown by the storage.
    * @type {string}
    * @const
+   * @static
    */
   lfr.Storage.INVALID_VALUE = 'Storage: Invalid value was encountered';
 

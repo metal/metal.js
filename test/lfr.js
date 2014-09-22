@@ -8,7 +8,7 @@ describe('lfr', function() {
   describe('Abstract Method', function() {
     it('should throw errors for calling abstract methods', function() {
       assert.throws(function() {
-        lfr.abstractMethod()
+        lfr.abstractMethod();
       }, Error);
     });
   });
@@ -133,7 +133,7 @@ describe('lfr', function() {
       };
       lfr.inherits(TestClass, TestSuperClass);
 
-      var obj = new TestClass();
+      new TestClass();
 
       assert.ok(called);
     });

@@ -205,17 +205,19 @@ describe('XhrTransport', function() {
     }, 0);
   });
 
-  it('should abort requests when disposed', function() {
+  it('should abort requests when disposed', function(done) {
     global.XMLHttpRequest = createFakeXMLHttpRequest(200);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
-    transport.send();
-
-    var pendingXhr = global.XMLHttpRequest.requests[0];
-    assert.ok(!pendingXhr.aborted);
-    transport.dispose();
-    assert.ok(pendingXhr.aborted);
+    transport.on('open', function() {
+      transport.send();
+      assert.ok(!global.XMLHttpRequest.requests[0].aborted);
+      // Should abort xhr synchronously
+      transport.dispose();
+      assert.ok(global.XMLHttpRequest.requests[0].aborted);
+      done();
+    });
   });
 });
 

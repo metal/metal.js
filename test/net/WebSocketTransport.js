@@ -144,6 +144,18 @@ describe('WebSocketTransport', function() {
       }, 0);
     }, 0);
   });
+
+  it('should abort requests when disposed', function(done) {
+    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    transport.open();
+    transport.on('open', function() {
+      transport.send();
+      transport.dispose();
+      transport.on('close', function() {
+        done();
+      });
+    });
+  });
 });
 
 function createFakeSocketIO() {

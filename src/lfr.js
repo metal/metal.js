@@ -154,4 +154,38 @@
    */
   lfr.nullFunction = function() {};
 
+  /**
+   * Creates a new function that, when called, has its this keyword set to the
+   * provided value, with a given sequence of arguments following any provided
+   * when the new function is called.
+   *
+   * Usage: <pre>var fn = rbind(myFunction, myObj, 'arg1', 'arg2');
+   * fn('arg3', 'arg4');</pre>
+   *
+   * @param {function} fn A function to partially apply.
+   * @param {!Object} context Specifies the object which this should point to
+   *     when the function is run.
+   * @param {...*} var_args Additional arguments that are partially applied to
+   *     the function.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   */
+  lfr.rbind = function(fn, context) {
+    if (!fn) {
+      throw new Error();
+    }
+
+    if (arguments.length > 2) {
+      var args = Array.prototype.slice.call(arguments, 2);
+      return function() {
+        var newArgs = Array.prototype.slice.call(arguments);
+        return fn.apply(context, Array.prototype.concat.apply(newArgs, args));
+      };
+    } else {
+      return function() {
+        return fn.apply(context, arguments);
+      };
+    }
+  };
+
 }(this));

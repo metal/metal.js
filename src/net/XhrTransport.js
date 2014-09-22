@@ -20,8 +20,9 @@
    * @default {
    *   'X-Requested-With': 'XMLHttpRequest'
    * }
+   * @protected
    */
-  lfr.XhrTransport.prototype.httpHeaders = {
+  lfr.XhrTransport.prototype.httpHeaders_ = {
     'X-Requested-With': 'XMLHttpRequest'
   };
 
@@ -29,8 +30,9 @@
    * Holds default http method to set on request.
    * @type {string}
    * @default GET
+   * @protected
    */
-  lfr.XhrTransport.prototype.httpMethod = 'GET';
+  lfr.XhrTransport.prototype.httpMethod_ = 'GET';
 
   /**
    * Holds the XMLHttpRequest sent objects.
@@ -54,7 +56,6 @@
           data: self.decodeData(xhr.responseText)
         };
         self.emit('data', payload);
-        self.emit('message', payload);
         lfr.array.remove(self.sendInstances_, xhr);
         return;
       }
@@ -82,11 +83,18 @@
    * @inheritDoc
    */
   lfr.XhrTransport.prototype.close = function() {
+    var self = this;
+
     for (var i = 0; i < this.sendInstances_.length; i++) {
       this.sendInstances_[i].abort();
     }
     this.sendInstances_ = [];
-    this.emit('close');
+
+    // TODO(eduardo): replace with nextTick.
+    setTimeout(function() {
+      self.emit('close');
+    }, 0);
+
     return this;
   };
 
@@ -95,7 +103,7 @@
    * @return {Object}
    */
   lfr.XhrTransport.prototype.getHttpHeaders = function() {
-    return this.httpHeaders;
+    return this.httpHeaders_;
   };
 
   /**
@@ -103,19 +111,26 @@
    * @return {string}
    */
   lfr.XhrTransport.prototype.getHttpMethod = function() {
-    return this.httpMethod;
+    return this.httpMethod_;
   };
 
   /**
    * @inheritDoc
    */
   lfr.XhrTransport.prototype.open = function() {
-    var state = this.getState();
-    if (state === 'opening' || state === 'open') {
+    var self = this;
+
+    if (this.isOpen()) {
       console.warn('Transport is already open');
       return;
     }
-    this.emit('open');
+
+    this.emit('opening');
+    // TODO(eduardo): replace with nextTick.
+    setTimeout(function() {
+      self.emit('open');
+    }, 0);
+
     return this;
   };
 
@@ -124,7 +139,7 @@
    * @param {Object} httpHeaders
    */
   lfr.XhrTransport.prototype.setHttpHeaders = function(httpHeaders) {
-    this.httpHeaders = httpHeaders;
+    this.httpHeaders_ = httpHeaders;
   };
 
   /**
@@ -132,16 +147,16 @@
    * @param {string} httpMethod
    */
   lfr.XhrTransport.prototype.setHttpMethod = function(httpMethod) {
-    this.httpMethod = httpMethod;
+    this.httpMethod_ = httpMethod;
   };
 
   /**
    * @inheritDoc
    */
-  lfr.XhrTransport.prototype.write = function(data) {
+  lfr.XhrTransport.prototype.write = function(packet) {
     var xhr = this.createXhr_();
     this.sendInstances_.push(xhr);
-    xhr.send(data);
+    xhr.send(packet);
   };
 
 }());

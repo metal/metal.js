@@ -42,4 +42,15 @@ describe('EventHandler', function() {
     assert.strictEqual(3, listener1.callCount);
     assert.strictEqual(3, listener2.callCount);
   });
+
+  it('should clear listeners on dispose', function() {
+    var emitter = new lfr.EventEmitter();
+    var handler = new lfr.EventHandler();
+    var listener = sinon.stub();
+
+    handler.add(emitter.on('event', listener));
+    handler.dispose();
+
+    assert.ok(!handler.eventHandles_);
+  });
 });

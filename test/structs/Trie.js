@@ -131,4 +131,26 @@ describe('Trie', function() {
     assert.ok(!trie.getKeyValue('abc'));
     assert.ok(!trie.getKeyValue('az'));
   });
+
+  it('should dispose children on dispose', function() {
+    var trie = new lfr.Trie([]);
+
+    trie.setKeyValue('ab', 'abValue');
+    trie.setKeyValue('cd', 'cdValue');
+
+    var childA = trie.getChild('a');
+    var childC = trie.getChild('c');
+
+    trie.dispose();
+    assert.ok(childA.isDisposed());
+    assert.ok(childC.isDisposed());
+    assert.ok(!trie.children_);
+  });
+
+  it('should clear value on dispose', function() {
+    var trie = new lfr.Trie([]);
+
+    trie.dispose();
+    assert.ok(!trie.getValue());
+  });
 });

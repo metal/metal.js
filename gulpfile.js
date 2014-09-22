@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var merge = require('merge-stream');
 var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
@@ -50,13 +51,19 @@ gulp.task('clean', function() {
 });
 
 gulp.task('format', function() {
-  return gulp.src(['src/**/*.js'])
+  var src = gulp.src(['src/**/*.js'])
     .pipe(plugins.esformatter())
     .pipe(gulp.dest('src'));
+
+  var test = gulp.src(['test/**/*.js'])
+    .pipe(plugins.esformatter())
+    .pipe(gulp.dest('test'));
+
+    return merge(src, test);
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['src/**/*.js'])
+  return gulp.src(['src/**/*.js', 'test/**/*.js'])
     .pipe(plugins.jshint())
     .pipe(plugins.jshint.reporter(require('jshint-stylish')));
 });

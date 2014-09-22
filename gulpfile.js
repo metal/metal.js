@@ -67,15 +67,19 @@ gulp.task('test', function() {
     .pipe(plugins.mocha());
 });
 
-gulp.task('cover', function() {
+gulp.task('test-cover', function() {
   return gulp.src(['src/**/*.js'])
     .pipe(plugins.istanbul());
 });
 
-gulp.task('test-coverage', ['cover'], function() {
+gulp.task('test-coverage', ['test-cover'], function() {
   return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
     .pipe(plugins.mocha())
     .pipe(plugins.istanbul.writeReports());
+});
+
+gulp.task('test-watch', function() {
+  gulp.watch('src/**/*.js', ['test']);
 });
 
 gulp.task('watch', ['build'], function() {

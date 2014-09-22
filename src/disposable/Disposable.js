@@ -32,7 +32,7 @@
    * disposing logic (like clearing references and calling `dispose` on other
    * disposables).
    */
-  lfr.Disposable.prototype.disposeInternal = function() {};
+  lfr.Disposable.prototype.disposeInternal = lfr.nullFunction;
 
   /**
    * Checks if this instance has already been disposed.

@@ -7,12 +7,9 @@ require('./fixture/sandbox.js');
 describe('lfr', function() {
   describe('Abstract Method', function() {
     it('should throw errors for calling abstract methods', function() {
-      assert.throws(
-        function() {
-          lfr.abstractMethod()
-        },
-        Error
-      );
+      assert.throws(function() {
+        lfr.abstractMethod()
+      }, Error);
     });
   });
 
@@ -68,12 +65,9 @@ describe('lfr', function() {
     });
 
     it('should throw errors when binding with no function', function() {
-      assert.throws(
-        function() {
-          lfr.bind();
-        },
-        Error
-      );
+      assert.throws(function() {
+        lfr.bind();
+      }, Error);
     });
   });
 
@@ -149,7 +143,9 @@ describe('lfr', function() {
     it('should return the first arg passed to identity function', function() {
       assert.strictEqual(1, lfr.identityFunction(1));
 
-      var obj = {a: 2};
+      var obj = {
+        a: 2
+      };
       assert.strictEqual(obj, lfr.identityFunction(obj));
     });
   });

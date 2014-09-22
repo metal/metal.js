@@ -93,7 +93,7 @@
    */
   lfr.EventEmitter.prototype.disposeInternal = function() {
     this.listenersTree_.dispose();
-    delete this.listenersTree_;
+    this.listenersTree_ = null;
   };
 
   /**

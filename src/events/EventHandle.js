@@ -45,8 +45,8 @@
    * @override
    */
   lfr.EventHandle.prototype.disposeInternal = function() {
-    delete this.emitter_;
-    delete this.listener_;
+    this.emitter_ = null;
+    this.listener_ = null;
   };
 
   /**

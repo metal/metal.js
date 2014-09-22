@@ -8,6 +8,7 @@
   lfr.EventEmitter = function() {
     this.listenersTree_ = new lfr.WildcardTrie();
   };
+  lfr.inherits(lfr.EventEmitter, lfr.Disposable);
 
   /**
    * The delimiter being used for namespaces.
@@ -84,6 +85,15 @@
       );
       listeners.warned = true;
     }
+  };
+
+  /**
+   * Disposes of this instance's object references.
+   * @override
+   */
+  lfr.EventEmitter.prototype.disposeInternal = function() {
+    this.listenersTree_.dispose();
+    delete this.listenersTree_;
   };
 
   /**

@@ -11,6 +11,7 @@
     this.value_ = value;
     this.children_ = {};
   };
+  lfr.inherits(lfr.Trie, lfr.Disposable);
 
   /**
    * The list of children for this tree.
@@ -40,6 +41,21 @@
    */
   lfr.Trie.prototype.createNewTrieNode = function() {
     return new lfr.Trie();
+  };
+
+  /**
+   * Disposes of this instance's object references.
+   * @override
+   */
+  lfr.Trie.prototype.disposeInternal = function() {
+    for (var k in this.children_) {
+      if (this.children_.hasOwnProperty(k)) {
+        this.children_[k].dispose();
+      }
+    }
+
+    delete this.children_;
+    delete this.value_;
   };
 
   /**

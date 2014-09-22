@@ -20,4 +20,23 @@ describe('EventHandle', function() {
     emitter.emit('event2');
     assert.strictEqual(1, listener.callCount);
   });
+
+  it('should not throw error when removing listener on disposed emitter', function() {
+    var emitter = new lfr.EventEmitter();
+    var listener = sinon.stub();
+    var handle = new lfr.EventHandle(emitter, 'event', listener);
+
+    emitter.dispose();
+    handle.removeListener();
+  });
+
+  it('should delete emitter and listener references when disposed', function() {
+    var emitter = new lfr.EventEmitter();
+    var listener = sinon.stub();
+    var handle = new lfr.EventHandle(emitter, 'event', listener);
+
+    handle.dispose();
+    assert.ok(!handle.emitter_);
+    assert.ok(!handle.listener_);
+  });
 });

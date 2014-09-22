@@ -9,5 +9,4 @@ require('../../src/events/EventHandle.js');
 require('../../src/events/EventHandler.js');
 require('../../src/events/EventEmitter.js');
 require('../../src/net/Transport.js');
-require('../../src/net/BaseTransport.js');
 require('../../src/net/XhrTransport.js');

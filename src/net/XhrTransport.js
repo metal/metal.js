@@ -3,16 +3,16 @@
   'use strict';
 
   /**
-   * XhrTransport utility.
+   * Provides XMLHttpRequest implementation for transport.
    * @constructor
-   * @extends {lfr.BaseTransport}
+   * @extends {lfr.Transport}
    */
   lfr.XhrTransport = function(uri) {
     lfr.XhrTransport.base(this, 'constructor', uri);
 
     this.sendInstances_ = [];
   };
-  lfr.inherits(lfr.XhrTransport, lfr.BaseTransport);
+  lfr.inherits(lfr.XhrTransport, lfr.Transport);
 
   /**
    * Holds default http headers to set on request.

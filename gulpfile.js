@@ -14,7 +14,6 @@ var mainFiles = [
   'src/events/EventHandler.js',
   'src/events/EventEmitter.js',
   'src/net/Transport.js',
-  'src/net/BaseTransport.js',
   'src/net/XhrTransport.js',
 ];
 

@@ -439,19 +439,13 @@ describe('EventEmitter', function() {
   it('should only allow functions as listeners', function() {
     var self = this;
 
-    assert.throws(
-      function() {
-        self.emitter.addListener('event', {});
-      },
-      TypeError
-    );
+    assert.throws(function() {
+      self.emitter.addListener('event', {});
+    }, TypeError);
 
-    assert.throws(
-      function() {
-        self.emitter.off('event', {});
-      },
-      TypeError
-    );
+    assert.throws(function() {
+      self.emitter.off('event', {});
+    }, TypeError);
   });
 
   it('should pass requested arguments to listener on emit', function() {
@@ -472,7 +466,9 @@ describe('EventEmitter', function() {
 
     sinon.assert.calledWithExactly(
       listener,
-      sinon.match({ type: 'event' }),
+      sinon.match({
+        type: 'event'
+      }),
       'arg1',
       2
     );

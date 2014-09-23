@@ -29,19 +29,6 @@
   lfr.Db.prototype.mechanism_ = null;
 
   /**
-   * Adds new entries to database.
-   * @param {!(Object|string)} data Data object which should be stored to the
-   *   database.
-   * @param {function} opt_callback Callback function which will be called as
-   *   soon as data is being added to the database.
-   * @param {Object} opt_config Optional configuration object with metadata
-   * about add operation.
-   */
-  lfr.Db.prototype.add = function(data, opt_callback, opt_config) {
-    this.mechanism_.add(data, lfr.rbind(this.onDataAdd_, this, opt_callback), opt_config);
-  };
-
-  /**
    * Retrieves existing entries from database.
    * @param {!(Object|string)} data Specifies the data query which should be
    *   used in order to retrieve data from the database.
@@ -50,8 +37,8 @@
    * @param {Object} opt_config Optional configuration object with metadata
    *   about the query.
    */
-  lfr.Db.prototype.find = function(data, opt_callback, opt_config) {
-    this.mechanism_.find(data, lfr.rbind(this.onDataFind_, this, opt_callback), opt_config);
+  lfr.Db.prototype.get = function(data, opt_callback, opt_config) {
+    this.mechanism_.get(data, lfr.rbind(this.onDataGet_, this, opt_callback), opt_config);
   };
 
   /**
@@ -61,10 +48,23 @@
    * @param {[type]} opt_callback Optional callback function which will be
    *   called as soon as data is removed from the database.
    * @param {[type]} opt_config Optional configuration object with metadata
-   *   about remove operation.
+   *   about delete operation.
    */
-  lfr.Db.prototype.remove = function(data, opt_callback, opt_config) {
-    this.mechanism_.remove(data, lfr.rbind(this.onDataRemove_, this, opt_callback), opt_config);
+  lfr.Db.prototype.delete = function(data, opt_callback, opt_config) {
+    this.mechanism_.delete(data, lfr.rbind(this.onDataDelete_, this, opt_callback), opt_config);
+  };
+
+  /**
+   * Stores new entries to database.
+   * @param {!(Object|string)} data Data object which should be stored to the
+   *   database.
+   * @param {function} opt_callback Callback function which will be called as
+   *   soon as data is being added to the database.
+   * @param {Object} opt_config Optional configuration object with metadata
+   * about post operation.
+   */
+  lfr.Db.prototype.post = function(data, opt_callback, opt_config) {
+    this.mechanism_.post(data, lfr.rbind(this.onDataPost_, this, opt_callback), opt_config);
   };
 
   /**
@@ -74,36 +74,10 @@
    * @param {[type]} opt_callback Optional callback function which will be
    *   called as soon as data is updated into the database.
    * @param {[type]} opt_config Optional configuration object with metadata
-   *   about update operation.
+   *   about put operation.
    */
-  lfr.Db.prototype.update = function(data, opt_callback, opt_config) {
-    this.mechanism_.update(data, lfr.rbind(this.onDataUpdate_, this, opt_callback), opt_config);
-  };
-
-  /**
-   * Called when data is being added to database. In case of error, emits
-   * `error` event with an instance of Error object as payload. In case of
-   * success, emits `add` event with the returned data as payload. If
-   * provided, user specified callback will be called in both cases with an
-   * instance of Error as first argument, and the returned data from the `add`
-   * operation as second one.
-   * @param {Error} err If available, contains the error of add operation
-   * @param {*} data The returned result from add operation
-   * @param {function} opt_callback Optional callback as specified from the
-   *   user.
-   */
-  lfr.Db.prototype.onDataAdd_ = function(err, data, opt_callback) {
-    if (err) {
-      this.emit('error', err);
-    } else {
-      this.emit('add', {
-        data: data
-      });
-    }
-
-    if (opt_callback) {
-      opt_callback(err, data);
-    }
+  lfr.Db.prototype.put = function(data, opt_callback, opt_config) {
+    this.mechanism_.put(data, lfr.rbind(this.onDataUpdate_, this, opt_callback), opt_config);
   };
 
   /**
@@ -118,7 +92,7 @@
    * @param {function} opt_callback Optional callback as specified from the
    *   user.
    */
-  lfr.Db.prototype.onDataFind_ = function(err, data, opt_callback) {
+  lfr.Db.prototype.onDataGet_ = function(err, data, opt_callback) {
     if (err) {
       this.emit('error', err);
     } else {
@@ -144,11 +118,37 @@
    * @param {function} opt_callback Optional callback as specified from the
    *   user.
    */
-  lfr.Db.prototype.onDataRemove_ = function(err, data, opt_callback) {
+  lfr.Db.prototype.onDataDelete_ = function(err, data, opt_callback) {
     if (err) {
       this.emit('error', err);
     } else {
       this.emit('remove', {
+        data: data
+      });
+    }
+
+    if (opt_callback) {
+      opt_callback(err, data);
+    }
+  };
+
+  /**
+   * Called when data is being stored to database. In case of error, emits
+   * `error` event with an instance of Error object as payload. In case of
+   * success, emits `add` event with the returned data as payload. If
+   * provided, user specified callback will be called in both cases with an
+   * instance of Error as first argument, and the returned data from the `add`
+   * operation as second one.
+   * @param {Error} err If available, contains the error of add operation
+   * @param {*} data The returned result from add operation
+   * @param {function} opt_callback Optional callback as specified from the
+   *   user.
+   */
+  lfr.Db.prototype.onDataPost_ = function(err, data, opt_callback) {
+    if (err) {
+      this.emit('error', err);
+    } else {
+      this.emit('add', {
         data: data
       });
     }

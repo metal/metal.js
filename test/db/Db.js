@@ -3,7 +3,7 @@
 var assert = require('assert');
 require('../fixture/sandbox.js');
 
-describe('DB', function() {
+describe('Db', function() {
   it('should throw error when mechanism is not specified', function() {
     assert.throws(function() {
       new lfr.Db();

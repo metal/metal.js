@@ -5,6 +5,12 @@ var sinon = require('sinon');
 require('../fixture/sandbox.js');
 
 describe('XhrTransport', function() {
+  it('should set uri', function() {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.setUri('http://liferay.com/data');
+    assert.strictEqual('http://liferay.com/data', transport.getUri(), 'Should set uri');
+  });
+
   it('should set http method', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.setHttpMethod('POST');

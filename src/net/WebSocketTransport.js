@@ -45,7 +45,7 @@
    */
   lfr.WebSocketTransport.prototype.onSocketData_ = function(data) {
     this.emit('data', {
-      data: data
+      data: this.decodeData(data)
     });
   };
 

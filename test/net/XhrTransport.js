@@ -105,22 +105,32 @@ describe('XhrTransport', function() {
     }, 0);
   });
 
-  it('should handle successful send message and receive data', function(done) {
+  it('should handle successful send message', function(done) {
+    global.XMLHttpRequest = createFakeXMLHttpRequest(200, 'message');
+
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+    transport.on('open', function() {
+      transport.on('message', function(event) {
+        assert.strictEqual('message', event.data, 'Should set request message');
+        done();
+      });
+      transport.send('message');
+    });
+  });
+
+  it('should handle successful receive data', function(done) {
     global.XMLHttpRequest = createFakeXMLHttpRequest(200, 'data');
 
     var transport = new lfr.XhrTransport('http://liferay.com');
-    var stubMessageListener = sinon.stub();
     var stubDataListener = sinon.stub();
-    transport.on('message', stubMessageListener);
     transport.on('data', stubDataListener);
     transport.open();
     // Waits connection to open asynchronously
     setTimeout(function() {
-      transport.send('body');
+      transport.send();
       // Waits connection to send asynchronously
       setTimeout(function() {
-        assert.strictEqual('body', global.XMLHttpRequest.requests[0].body, 'Should set request body');
-        assert.strictEqual(stubMessageListener.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of data event');
         assert.strictEqual(stubDataListener.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of data event');
         done();
       }, 0);

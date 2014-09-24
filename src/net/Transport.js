@@ -13,6 +13,7 @@
     if (!lfr.isDef(uri)) {
       throw new Error('Transport uri not specified');
     }
+    this.uri_ = uri;
     this.on('close', lfr.bind(this.onCloseHandler_, this));
     this.on('open', lfr.bind(this.onOpenHandler_, this));
     this.on('opening', lfr.bind(this.onOpeningHandler_, this));

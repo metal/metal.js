@@ -15,6 +15,17 @@ describe('WebSocketTransport', function() {
     };
   });
 
+  it('should set uri', function() {
+    var transport = new lfr.WebSocketTransport('');
+    transport.setUri('http://liferay.com');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri');
+  });
+
+  it('should set uri from constructor', function() {
+    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
+  });
+
   it('should throw error when Socket.IO not found', function() {
     var transport = new lfr.WebSocketTransport('http://liferay.com');
     global.io = null;

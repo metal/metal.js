@@ -4,6 +4,17 @@ var assert = require('assert');
 require('../fixture/sandbox.js');
 
 describe('Transport', function() {
+  it('should set uri', function() {
+    var transport = new lfr.Transport('');
+    transport.setUri('http://liferay.com');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri');
+  });
+
+  it('should set uri from constructor', function() {
+    var transport = new lfr.Transport('http://liferay.com');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
+  });
+
   it('should default state be empty', function() {
     var transport = new lfr.Transport('');
     assert.strictEqual('', transport.getState());

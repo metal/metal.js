@@ -52,10 +52,9 @@
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
       if (xhr.status === 200) {
-        var payload = {
+        self.emit('data', {
           data: self.decodeData(xhr.responseText)
-        };
-        self.emit('data', payload);
+        });
         lfr.array.remove(self.sendInstances_, xhr);
         return;
       }
@@ -83,19 +82,23 @@
    * @inheritDoc
    */
   lfr.XhrTransport.prototype.close = function() {
-    var self = this;
-
     for (var i = 0; i < this.sendInstances_.length; i++) {
       this.sendInstances_[i].abort();
     }
     this.sendInstances_ = [];
-
-    // TODO(eduardo): replace with nextTick.
-    setTimeout(function() {
-      self.emit('close');
-    }, 0);
-
+    this.emitAsync_('close');
     return this;
+  };
+
+  /**
+   * TODO(eduardo): replace with lfr.nextTick when available.
+   */
+  lfr.XhrTransport.prototype.emitAsync_ = function(event, data) {
+    var self = this;
+    clearTimeout(this.timer_);
+    this.timer_ = setTimeout(function() {
+      self.emit(event, data);
+    }, 0);
   };
 
   /**
@@ -118,19 +121,12 @@
    * @inheritDoc
    */
   lfr.XhrTransport.prototype.open = function() {
-    var self = this;
-
     if (this.isOpen()) {
       console.warn('Transport is already open');
       return;
     }
-
     this.emit('opening');
-    // TODO(eduardo): replace with nextTick.
-    setTimeout(function() {
-      self.emit('open');
-    }, 0);
-
+    this.emitAsync_('open');
     return this;
   };
 
@@ -156,11 +152,9 @@
   lfr.XhrTransport.prototype.write = function(message) {
     var xhr = this.createXhr_();
     this.sendInstances_.push(xhr);
-
-    this.emit('message', {
+    this.emitAsync_('message', {
       data: message
     });
-
     xhr.send(message);
   };
 

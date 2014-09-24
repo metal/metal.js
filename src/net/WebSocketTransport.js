@@ -97,7 +97,7 @@
       if (!io) {
         throw new Error('Socket.IO client not found');
       }
-      this.socket = io();
+      this.socket = io(this.getUri());
       this.socket.on('connect', lfr.bind(this.onSocketConnect_, this));
       this.socket.on('disconnect', lfr.bind(this.onSocketDisconnect_, this));
       this.socket.on('error', lfr.bind(this.onSocketError_, this));

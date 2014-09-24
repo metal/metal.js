@@ -6,9 +6,14 @@ require('../fixture/sandbox.js');
 
 describe('XhrTransport', function() {
   it('should set uri', function() {
+    var transport = new lfr.XhrTransport('');
+    transport.setUri('http://liferay.com');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri');
+  });
+
+  it('should set uri from constructor', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
-    transport.setUri('http://liferay.com/data');
-    assert.strictEqual('http://liferay.com/data', transport.getUri(), 'Should set uri');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
   });
 
   it('should set http method', function() {

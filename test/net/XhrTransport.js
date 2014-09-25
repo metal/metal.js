@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var sinon = require('sinon');
+var createFakeXMLHttpRequest = require('../fixture/FakeXMLHttpRequest');
 require('../fixture/sandbox.js');
 
 describe('XhrTransport', function() {
@@ -227,32 +228,3 @@ describe('XhrTransport', function() {
     });
   });
 });
-
-function createFakeXMLHttpRequest(status, responseText) {
-  var FakeXMLHttpRequest = function() {
-    this.aborted = false;
-    this.body = null;
-    this.headers = {};
-    this.responseText = responseText;
-    this.status = status;
-    FakeXMLHttpRequest.requests.push(this);
-  };
-  FakeXMLHttpRequest.prototype.abort = function() {
-    this.aborted = true;
-    clearTimeout(this.timer);
-  };
-  FakeXMLHttpRequest.prototype.open = lfr.nullFunction;
-  FakeXMLHttpRequest.prototype.send = function(body) {
-    this.body = body;
-    if (this.status === 200 || this.status === 304) {
-      this.timer = setTimeout(this.onload, 0);
-    } else {
-      this.timer = setTimeout(this.onerror, 0);
-    }
-  };
-  FakeXMLHttpRequest.prototype.setRequestHeader = function(header, value) {
-    this.headers[header] = value;
-  };
-  FakeXMLHttpRequest.requests = [];
-  return FakeXMLHttpRequest;
-}

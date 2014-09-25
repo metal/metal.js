@@ -13,3 +13,5 @@ require('../../src/net/Transport.js');
 require('../../src/net/XhrTransport.js');
 require('../../src/net/WebSocketTransport.js');
 require('../../src/db/Db.js');
+require('../../src/db/DbMechanism.js');
+require('../../src/db/HttpDbMechanism.js');

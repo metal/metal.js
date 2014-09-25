@@ -16,22 +16,22 @@ describe('Db', function() {
     });
   });
 
-  it('should handle adding data to the database', function(done) {
+  it('should handle storing data to the database', function(done) {
     var FakeMechanism = createFakeMechanism();
 
     var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
 
     // Add coverage for optional callback
-    db.add({
+    db.post({
       name: 'Johan',
       age: 25
     });
 
-    db.add(null, function(err) {
+    db.post(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
-    db.add({
+    db.post({
       name: 'Johan',
       age: 25
     }, function(err, data) {
@@ -48,16 +48,16 @@ describe('Db', function() {
     var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
 
     // Add coverage for optional callback
-    db.find({
+    db.get({
       name: 'Johan',
       age: 25
     });
 
-    db.find(null, function(err) {
+    db.get(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
-    db.find({
+    db.get({
       name: 'Johan',
       age: 25
     }, function(err, data) {
@@ -74,16 +74,16 @@ describe('Db', function() {
     var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
 
     // Add coverage for optional callback
-    db.remove({
+    db.delete({
       name: 'Johan',
       age: 25
     });
 
-    db.remove(null, function(err) {
+    db.delete(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
-    db.remove({
+    db.delete({
       name: 'Johan',
       age: 25
     }, function(err, data) {
@@ -100,16 +100,16 @@ describe('Db', function() {
     var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
 
     // Add coverage for optional callback
-    db.update({
+    db.put({
       name: 'Johan',
       age: 25
     });
 
-    db.update(null, function(err) {
+    db.put(null, function(err) {
       assert.strictEqual(true, err instanceof Error);
     });
 
-    db.update({
+    db.put({
       name: 'Johan',
       age: 25
     }, function(err, data) {
@@ -135,10 +135,10 @@ describe('Db', function() {
       }, 10);
     };
 
-    FakeMechanism.prototype.add = mechanismImpl;
-    FakeMechanism.prototype.find = mechanismImpl;
-    FakeMechanism.prototype.remove = mechanismImpl;
-    FakeMechanism.prototype.update = mechanismImpl;
+    FakeMechanism.prototype.delete = mechanismImpl;
+    FakeMechanism.prototype.get = mechanismImpl;
+    FakeMechanism.prototype.post = mechanismImpl;
+    FakeMechanism.prototype.put = mechanismImpl;
     return FakeMechanism;
   }
 

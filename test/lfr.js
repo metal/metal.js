@@ -190,4 +190,33 @@ describe('lfr', function() {
       assert.strictEqual(undefined, lfr.nullFunction());
     });
   });
+
+  describe('RBind', function() {
+    it('should add additionally supplied parameters to the end of the arguments the function is executed with', function() {
+      var TestClass = function() {};
+      TestClass.prototype.method = function(param1, param2) {
+        this.innerVar = 1;
+
+        assert.strictEqual(param1, 'param1');
+        assert.strictEqual(param2, 'param2');
+      };
+
+      TestClass.prototype.method2 = function() {
+        assert.strictEqual(1, arguments.length);
+      };
+
+      var obj = new TestClass();
+      lfr.rbind(obj.method, obj, 'param2')('param1');
+
+      assert.strictEqual(1, obj.innerVar);
+
+      lfr.rbind(obj.method2, obj)('param1');
+    });
+
+    it('should throw errors when rbinding with no function', function() {
+      assert.throws(function() {
+        lfr.rbind();
+      }, Error);
+    });
+  });
 });

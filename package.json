@@ -19,6 +19,7 @@
   "keywords": [],
   "devDependencies": {
     "gulp": "^3.8.6",
+    "gulp-complexity": "^0.3.0",
     "gulp-concat": "^2.2.0",
     "gulp-esformatter": "^1.0.0",
     "gulp-header": "^1.0.2",

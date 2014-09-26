@@ -71,7 +71,18 @@ gulp.task('lint', function() {
     .pipe(plugins.jshint.reporter(require('jshint-stylish')));
 });
 
-gulp.task('test', function() {
+gulp.task('test', function(done) {
+  return runSequence('test-unit', 'test-complexity', done);
+});
+
+gulp.task('test-complexity', function() {
+  return gulp.src(['src/**/*.js', 'test/**/*.js'])
+    .pipe(plugins.complexity({
+      halstead: [12, 15, 20]
+    }));
+});
+
+gulp.task('test-unit', function() {
   return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
     .pipe(plugins.mocha());
 });
@@ -88,7 +99,7 @@ gulp.task('test-coverage', ['test-cover'], function() {
 });
 
 gulp.task('test-watch', function() {
-  gulp.watch('src/**/*.js', ['test']);
+  gulp.watch('src/**/*.js', ['test-unit']);
 });
 
 gulp.task('watch', ['build'], function() {

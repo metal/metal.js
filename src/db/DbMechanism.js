@@ -27,9 +27,9 @@
   lfr.DbMechanism.prototype.uri_ = '';
 
   /**
-   * Retrieves data from database.
-   * @param {!(Object|string|number)} value The value which will be used to retrieve data from
-   *   the database.
+   * Deletes data from database.
+   * @param {!(Object|string|number)} value The value which will be used to
+   *   retrieve data from the database.
    * @param {Function=} opt_callback optional Callback function which will be
    *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
@@ -69,8 +69,8 @@
 
   /**
    * Retrieves data from database.
-   * @param {!(Object|string|number)} value The value which will be used to retrieve data from
-   *   the database.
+   * @param {!(Object|string|number)} value The value which will be used to
+   *   retrieve data from the database.
    * @param {Function=} opt_callback optional Callback function which will be
    *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the

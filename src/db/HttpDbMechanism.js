@@ -11,39 +11,14 @@
   lfr.HttpDbMechanism = function(uri) {
     lfr.HttpDbMechanism.base(this, 'constructor', uri);
 
-    this.queue_ = [];
-
+    this.pendingRequests_ = [];
+    // TODO: Researches how it behaves with XhrTransport as well.
     this.transport_ = new lfr.WebSocketTransport(uri).open();
-
-    // Attach listener to addToQueue event in order to track start sending messages immediately.
-    this.on('addToQueue', lfr.bind(this.sendMessages_, this));
-
-    // Attach listener to data event in order to track receiving data from the Transport.
-    this.transport_.on('data', lfr.bind(this.onData_, this));
-
-    // Subscribe to transport open event in order to process the message queue immediately once
-    // the connection to the server has been re-established.
-    this.transport_.on('open', lfr.bind(this.sendMessages_, this));
+    this.transport_.on('data', lfr.bind(this.onReceiveData_, this));
+    this.transport_.on('open', lfr.bind(this.maybeRetryRequestData_, this));
+    this.on('request', lfr.bind(this.maybeRetryRequestData_, this));
   };
   lfr.inherits(lfr.HttpDbMechanism, lfr.DbMechanism);
-
-  /**
-   * The returned handler of an established timeout for resending failed or
-   * pending messages in the queue.
-   * @type {Object|Number}
-   * @default null
-   * @protected
-   */
-  lfr.HttpDbMechanism.prototype.resendMessagesHandler_ = null;
-
-  /**
-   * Timeout in milliseconds, which provides the time which have to pass
-   * between two attempts of resending pending messages.
-   * @type {number}
-   * @default 500 (milliseconds)
-   * @protected
-   */
-  lfr.HttpDbMechanism.prototype.resendMessagesTimeout_ = 500;
 
   /**
    * Holds POST method value.
@@ -78,36 +53,85 @@
   lfr.HttpDbMechanism.METHOD_PUT = 'PUT';
 
   /**
-   * Holds the maximum value of generated random number.
+   * Holds pending status of a request.
    * @type {number}
    * @const
    * @static
    */
-  lfr.HttpDbMechanism.RANDOM_NUM_MAX = 100000;
+  lfr.HttpDbMechanism.STATUS_PENDING = 1;
 
   /**
-   * Holds the minimum value of generated random number.
+   * Holds sent status of a request.
    * @type {number}
    * @const
    * @static
    */
-  lfr.HttpDbMechanism.RANDOM_NUM_MIN = 1;
+  lfr.HttpDbMechanism.STATUS_SENT = 0;
 
   /**
-   * Holds pending status of a message.
-   * @type {number}
-   * @const
-   * @static
+   * Holds pending requests.
+   * @type {Array}
+   * @default null
+   * @protected
    */
-  lfr.HttpDbMechanism.MESSAGE_STATUS_PENDING = 1;
+  lfr.HttpDbMechanism.prototype.pendingRequests_ = null;
 
   /**
-   * Holds sent status of a message.
+   * Timeout in milliseconds, which provides the time which have to pass
+   * between two attempts of resending pending requests.
    * @type {number}
-   * @const
-   * @static
+   * @default 500 (milliseconds)
+   * @protected
    */
-  lfr.HttpDbMechanism.MESSAGE_STATUS_SENT = 0;
+  lfr.HttpDbMechanism.prototype.retryDelayMs_ = 500;
+
+  /**
+   * The returned handler of an established timeout for resending failed or
+   * pending requests in the queue.
+   * @type {number}
+   * @default null
+   * @protected
+   */
+  lfr.HttpDbMechanism.prototype.retryTimeoutHandler_ = null;
+
+  /**
+   * Holds a transport-based cross-browser/cross-device bi-directional
+   * communication layer.
+   * @type {lfr.Transport}
+   * @default null
+   * @protected
+   */
+  lfr.HttpDbMechanism.prototype.transport_ = null;
+
+  /**
+   * Creates a request data based on method and provided user data.
+   * @protected
+   * @param {!string} method The action method.
+   * @param {!*} value The value which should be stored to
+   *   the database.
+   * @param {Function=} opt_callback optional Callback function which will be
+   *   invoked once the data is stored to the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
+   * @return {Object} The created pending request data.
+   */
+  lfr.HttpDbMechanism.prototype.createRequestData_ = function(method, data, opt_callback, opt_config) {
+    var nextRid = ((Math.random() * 1e9) >>> 0);
+    return {
+      callback: opt_callback,
+      message: {
+        _method: method,
+        config: opt_config,
+        data: data,
+        messageId: nextRid,
+        namespace: this.transport_.socket.nsp
+      },
+      messageId: nextRid,
+      status: {
+        code: lfr.HttpDbMechanism.STATUS_PENDING
+      }
+    };
+  };
 
   /**
    * Deletes data from database.
@@ -117,14 +141,12 @@
    *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
-   * @return {Object} The constructed and stored to the queue message.
+   * @return {Object} The constructed and stored to the pending request queue.
    */
   lfr.HttpDbMechanism.prototype.delete = function(data, opt_callback, opt_config) {
-    var queueMessage = this.createMessage_(lfr.HttpDbMechanism.METHOD_DELETE, data, opt_callback, opt_config);
-
-    this.addMessageToQueue_(queueMessage);
-
-    return queueMessage;
+    var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_DELETE, data, opt_callback, opt_config);
+    this.queueRequestData_(requestData);
+    return requestData;
   };
 
   /**
@@ -135,14 +157,12 @@
    *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
-   * @return {Object} The constructed and stored to the queue message.
+   * @return {Object} The constructed and stored to the pending request queue.
    */
   lfr.HttpDbMechanism.prototype.get = function(value, opt_callback, opt_config) {
-    var queueMessage = this.createMessage_(lfr.HttpDbMechanism.METHOD_GET, value, opt_callback, opt_config);
-
-    this.addMessageToQueue_(queueMessage);
-
-    return queueMessage;
+    var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_GET, value, opt_callback, opt_config);
+    this.queueRequestData_(requestData);
+    return requestData;
   };
 
   /**
@@ -153,14 +173,12 @@
    *   invoked once the data is stored to the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
-   * @return {Object} The constructed and stored to the queue message.
+   * @return {Object} The constructed and stored to the pending request queue.
    */
   lfr.HttpDbMechanism.prototype.post = function(data, opt_callback, opt_config) {
-    var queueMessage = this.createMessage_(lfr.HttpDbMechanism.METHOD_POST, data, opt_callback, opt_config);
-
-    this.addMessageToQueue_(queueMessage);
-
-    return queueMessage;
+    var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_POST, data, opt_callback, opt_config);
+    this.queueRequestData_(requestData);
+    return requestData;
   };
 
   /**
@@ -170,62 +188,12 @@
    *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
-   * @return {Object} The constructed and stored to the queue message.
+   * @return {Object} The constructed and stored to the pending request queue.
    */
   lfr.HttpDbMechanism.prototype.put = function(data, opt_callback, opt_config) {
-    var queueMessage = this.createMessage_(lfr.HttpDbMechanism.METHOD_PUT, data, opt_callback, opt_config);
-
-    this.addMessageToQueue_(queueMessage);
-
-    return queueMessage;
-  };
-
-  /**
-   * Adds a message to the queue.
-   * @protected
-   * @param {Object} queueMessage
-   */
-  lfr.HttpDbMechanism.prototype.addMessageToQueue_ = function(queueMessage) {
-    // Store the object to the queue as the last element
-    this.queue_.push(queueMessage);
-
-    // Emit an event that data has been added to the queue.
-    this.emit('addToQueue', queueMessage);
-  };
-
-  /**
-   * Creates a message based on method and provided user data.
-   * @protected
-   * @param {!string} method The action method.
-   * @param {!*} value The value which should be stored to
-   *   the database.
-   * @param {Function=} opt_callback optional Callback function which will be
-   *   invoked once the data is stored to the database.
-   * @param {Object=} opt_config optional Data payload to be provided to the
-   *   database.
-   * @return {Object} The created queue message.
-   */
-  lfr.HttpDbMechanism.prototype.createMessage_ = function(method, data, opt_callback, opt_config) {
-    // Generate a messageId, it will be sent to server, so messages won't be duplicated there
-    // and we will be able to recognize the messages exchanged with the server
-    var messageId = this.generateId_();
-
-    var queueMessage = {
-      callback: opt_callback,
-      message: {
-        _method: method,
-        config: opt_config,
-        data: data,
-        messageId: messageId,
-        serviceName: this.transport_.socket.nsp
-      },
-      messageId: messageId,
-      status: {
-        code: lfr.HttpDbMechanism.MESSAGE_STATUS_PENDING
-      }
-    };
-
-    return queueMessage;
+    var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_PUT, data, opt_callback, opt_config);
+    this.queueRequestData_(requestData);
+    return requestData;
   };
 
   /**
@@ -238,38 +206,11 @@
   };
 
   /**
-   * Gets the resend messages timeout value.
+   * Gets the retry timeout value.
    * @return {number}
    */
-  lfr.HttpDbMechanism.prototype.getResendMessagesTimeout_ = function() {
-    return this.resendMessagesTimeout_;
-  };
-
-  /**
-   * Generates Id using the current time and randomly generated number.
-   * @protected
-   * @return {string} The generated Id.
-   */
-  lfr.HttpDbMechanism.prototype.generateId_ = function() {
-    var randomNum = this.generateRandomNumber_();
-
-    return '-' + Date.now() + '-' + String(randomNum).replace('.', '') + '-';
-  };
-
-  /**
-   * Generates random number using minimum and maximum range.
-   * @protected
-   * @param {number=} opt_min optional The min value.
-   * @see {@link lfr.HttpDbMechanism.RANDOM_NUM_MIN}
-   * @param {number=} opt_max optional The max number.
-   * @see {@link lfr.HttpDbMechanism.RANDOM_NUM_MAX}
-   * @return {Number} The generated number.
-   */
-  lfr.HttpDbMechanism.prototype.generateRandomNumber_ = function(opt_min, opt_max) {
-    var min = opt_min || lfr.HttpDbMechanism.RANDOM_NUM_MIN;
-    var max = opt_max || lfr.HttpDbMechanism.RANDOM_NUM_MAX;
-
-    return Math.random() * (max - min) + min;
+  lfr.HttpDbMechanism.prototype.getRetryDelayMs = function() {
+    return this.retryDelayMs_;
   };
 
   /**
@@ -277,84 +218,82 @@
    * @protected
    * @param {Object} event EventFacade object
    */
-  lfr.HttpDbMechanism.prototype.onData_ = function(event) {
+  lfr.HttpDbMechanism.prototype.onReceiveData_ = function(event) {
     var data = event.data;
 
-    for (var i = 0; i < this.queue_.length; ++i) {
-      var queueMessage = this.queue_[i];
-
+    for (var i = 0; i < this.pendingRequests_.length; ++i) {
+      var requestData = this.pendingRequests_[i];
       // Check if current message in the queue has the same messageId as those which came from the server.
-      if (queueMessage.messageId === data.messageId) {
-        // Remove the message from the queue
-        this.queue_.splice(i, 1);
+      if (requestData.messageId === data.messageId) {
+        this.pendingRequests_.splice(i, 1);
 
         var payload = {
-          config: queueMessage.message.config,
-          data: queueMessage.message.data,
-          messageId: queueMessage.messageId,
+          config: requestData.message.config,
+          data: requestData.message.data,
+          messageId: requestData.messageId,
           status: data.status
         };
 
         this.emit('data', payload);
 
-        if (lfr.isFunction(queueMessage.callback)) {
-          queueMessage.callback(payload);
+        if (lfr.isFunction(requestData.callback)) {
+          requestData.callback(payload);
         }
       }
     }
   };
 
   /**
-   * Processes the queue and sends all pending messages.
+   * Processes the pending requests and sends all pending messages.
    * @protected
    */
-  lfr.HttpDbMechanism.prototype.sendMessages_ = function() {
-    // We clear here the timeout because there are two ways to invoke this function:
-    // 1. As result of firing addToQueue event.
-    // 2. As result of timeout.
-    //
-    // There could be situation like this:
-    // - dataAdded has been emitted, so this function will be invoked
-    // - however, previously this function has started already a timeout and it will be
-    // invoked in some time.
-    //
-    // In this case we have to cancel the timeout, process the queue and start it again,
-    // if there are still messages.
+  lfr.HttpDbMechanism.prototype.maybeRetryRequestData_ = function() {
+    clearTimeout(this.retryTimeoutHandler_);
 
-    clearTimeout(this.resendMessagesHandler_);
-
-    // If there is an transport error, try to send the messages again in some timeout.
-
-    if (!this.transport_.isOpen() && this.queue_.length) {
-      this.resendMessagesHandler_ = setTimeout(lfr.bind(this.sendMessages_, this), this.getResendMessagesTimeout_());
-
+    if (!this.pendingRequests_.length) {
       return;
     }
 
-    // Process the queue and send all pending messages.
-    for (var i = 0; i < this.queue_.length; ++i) {
-      var queueMessage = this.queue_[i];
+    if (!this.transport_.isOpen()) {
+      this.retryTimeoutHandler_ = setTimeout(lfr.bind(this.maybeRetryRequestData_, this), this.getRetryDelayMs());
+      return;
+    }
 
-      var status = queueMessage.status;
-
-      if (status.code === lfr.HttpDbMechanism.MESSAGE_STATUS_PENDING) {
-        var userMessage = queueMessage.message;
-
-        this.transport_.send(userMessage);
-
-        // Change the status code of the queue message to sent
-        queueMessage.status.code = lfr.HttpDbMechanism.MESSAGE_STATUS_SENT;
+    for (var i = 0; i < this.pendingRequests_.length; ++i) {
+      var requestData = this.pendingRequests_[i];
+      if (requestData.status.code === lfr.HttpDbMechanism.STATUS_PENDING) {
+        this.transport_.send(requestData.message);
+        // TODO: Updates status code to send when message is confirmed to be sent.
+        requestData.status.code = lfr.HttpDbMechanism.STATUS_SENT;
       }
     }
   };
 
   /**
-   * Sets the value of the timeout on which pending messages will be resend.
-   * @param {number} resendMessagesTimeout The timeout for resending the
-   *   pending messages.
+   * Adds a message to the pending queue.
+   * @protected
+   * @param {Object} requestData
    */
-  lfr.HttpDbMechanism.prototype.setResendMessagesTimeout = function(resendMessagesTimeout) {
-    this.resendMessagesTimeout_ = resendMessagesTimeout;
+  lfr.HttpDbMechanism.prototype.queueRequestData_ = function(requestData) {
+    this.pendingRequests_.push(requestData);
+    this.emit('request', requestData);
+  };
+
+  /**
+   * Sets the value of the timeout on which pending messages will be resend.
+   * @param {number} retryDelayMs The timeout for resending the
+   *   pending requests.
+   */
+  lfr.HttpDbMechanism.prototype.setRetryDelayMs = function(retryDelayMs) {
+    this.retryDelayMs_ = retryDelayMs;
+  };
+
+  /**
+   * Sets the transport used to send pending requests to the server.
+   * @param {lfr.Transport} transport
+   */
+  lfr.HttpDbMechanism.prototype.setTransport = function(transport) {
+    this.transport_ = transport;
   };
 
 }());

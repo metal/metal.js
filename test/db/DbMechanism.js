@@ -15,16 +15,13 @@ describe('DbMechanism', function() {
   });
 
   it('should retrieve the specified uri', function() {
-    var dbMechanism = new lfr.DbMechanism('localhost/test');
-
-    assert.strictEqual('localhost/test', dbMechanism.getUri());
+    var mechanism = new lfr.DbMechanism('localhost/test');
+    assert.strictEqual('localhost/test', mechanism.getUri());
   });
 
   it('should retrieve the same uri if changed via uri setter', function() {
-    var dbMechanism = new lfr.DbMechanism('localhost/test');
-
-    dbMechanism.setUri('localhost/test123');
-
-    assert.strictEqual('localhost/test123', dbMechanism.getUri());
+    var mechanism = new lfr.DbMechanism('localhost/test');
+    mechanism.setUri('localhost/test123');
+    assert.strictEqual('localhost/test123', mechanism.getUri());
   });
 });

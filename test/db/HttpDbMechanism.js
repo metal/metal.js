@@ -25,81 +25,88 @@ describe('HttpDbMechanism', function() {
     });
   });
 
-  it('should add message to the queue on post', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+  it('should set transport', function() {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    var xhrTransport = new lfr.XhrTransport('');
+    mechanism.setTransport(xhrTransport);
+    assert.strictEqual(xhrTransport, mechanism.getTransport());
+  });
 
-    httpDbMechanism.once('addToQueue', function() {
+  it('should add message to the pending request queue on post', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+
+    mechanism.once('request', function() {
       done();
     });
 
-    httpDbMechanism.post({
+    mechanism.post({
       name: 'Pedro',
       age: 23
     });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should add message to the queue on put', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+  it('should add message to the pending request queue on put', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    httpDbMechanism.once('addToQueue', function() {
+    mechanism.once('request', function() {
       done();
     });
 
-    httpDbMechanism.put({
+    mechanism.put({
       name: 'Pedro',
       age: 24
     });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should add message to the queue on delete', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+  it('should add message to the pending request queue on delete', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    httpDbMechanism.once('addToQueue', function() {
+    mechanism.once('request', function() {
       done();
     });
 
-    httpDbMechanism.delete({
+    mechanism.delete({
       name: 'Pedro'
     });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should add message to the queue on get', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+  it('should add message to the pending request queue on get', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    httpDbMechanism.once('addToQueue', function() {
+    mechanism.once('request', function() {
       done();
     });
 
-    httpDbMechanism.get({
+    mechanism.get({
       name: 'Pedro'
     });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should remove message from the queue on data arriving', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+  it('should remove message from the pending request queue on data arriving', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    var queueMessage = httpDbMechanism.post({
+    var queueMessage = mechanism.post({
       name: 'Pedro',
       age: 25
     });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
 
-    httpDbMechanism.on('data', function(event) {
+    mechanism.on('data', function(event) {
       assert.strictEqual(event.messageId, queueMessage.messageId);
 
       done();
     });
 
-    httpDbMechanism.getTransport().emit('data', {
+    mechanism.getTransport().emit('data', {
       data: {
         messageId: queueMessage.messageId,
         status: {
@@ -109,17 +116,17 @@ describe('HttpDbMechanism', function() {
     });
   });
 
-  it('should not remove messages from queue in case of message ID mismatch', function() {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+  it('should not remove messages from pending request queue in case of message ID mismatch', function() {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    httpDbMechanism.post({
+    mechanism.post({
       name: 'Pedro',
       age: 25
     });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
 
-    httpDbMechanism.getTransport().emit('data', {
+    mechanism.getTransport().emit('data', {
       data: {
         messageId: 'Invalid message Id',
         status: {
@@ -129,22 +136,22 @@ describe('HttpDbMechanism', function() {
     });
 
     // Because of non matching Id, the queue should have still one item
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
   it('should call callback function if provided once server returns response', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    var queueMessage = httpDbMechanism.post({
+    var queueMessage = mechanism.post({
       name: 'Pedro',
       age: 25
     }, function() {
         done();
       });
 
-    assert.strictEqual(1, httpDbMechanism.queue_.length);
+    assert.strictEqual(1, mechanism.pendingRequests_.length);
 
-    httpDbMechanism.getTransport().emit('data', {
+    mechanism.getTransport().emit('data', {
       data: {
         messageId: queueMessage.messageId,
         status: {
@@ -155,41 +162,36 @@ describe('HttpDbMechanism', function() {
   });
 
   it('should try to resend messages if connection is lost', function(done) {
-    var httpDbMechanism = new lfr.HttpDbMechanism('liferay.com');
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    mechanism.setRetryDelayMs(5);
 
-    httpDbMechanism.getTransport().close();
-
-    httpDbMechanism.setResendMessagesTimeout(50);
-
-    var queueMessage;
-
-    // Transport will be closed asynchronously, setTimeout is needed here
-    setTimeout(function() {
-      queueMessage = httpDbMechanism.post({
+    var transport = mechanism.getTransport();
+    transport.close();
+    transport.on('close', function() {
+      var queueMessage = mechanism.post({
         name: 'Pedro',
         age: 25
       });
 
-      assert.strictEqual(1, httpDbMechanism.queue_.length);
+      assert.strictEqual(1, mechanism.pendingRequests_.length);
 
       // Since transport is closed, queue will be processed on given timeout
       // and if transport is opened, pending messages will be resend.
-      assert.ok(httpDbMechanism.resendMessagesHandler_);
-
-      var i = 0;
+      assert.ok(mechanism.retryTimeoutHandler_);
 
       // Transport is closed, so several interactions will pass but the messages in the
       // queue won't be send.
+      var i = 0;
       var handler = setInterval(function() {
         // Assert the queue still has one item
-        assert.strictEqual(1, httpDbMechanism.queue_.length);
+        assert.strictEqual(1, mechanism.pendingRequests_.length);
 
         // On third iteration open the transport
         if (++i === 3) {
-          httpDbMechanism.getTransport().open();
+          mechanism.getTransport().open();
 
           // Simulate returned response from the server
-          httpDbMechanism.getTransport().emit('data', {
+          mechanism.getTransport().emit('data', {
             data: {
               messageId: queueMessage.messageId,
               status: {
@@ -197,18 +199,28 @@ describe('HttpDbMechanism', function() {
               }
             }
           });
-
           clearInterval(handler);
-
           // Assert the queue has been processed.
           setTimeout(function() {
-            assert.strictEqual(0, httpDbMechanism.queue_.length);
-
+            assert.strictEqual(0, mechanism.pendingRequests_.length);
             done();
-          }, 100);
+          }, 10);
         }
-      }, 20);
-    }, 0);
+      }, 0);
+    });
+  });
+
+  it('should not fail when request with transport closed', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    var transport = mechanism.getTransport();
+    transport.close();
+    transport.on('close', function() {
+      mechanism.on('request', function() {
+        assert.strictEqual(0, mechanism.pendingRequests_.length);
+        done();
+      });
+      mechanism.emit('request');
+    });
   });
 
 });

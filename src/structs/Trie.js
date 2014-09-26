@@ -32,7 +32,7 @@
    */
   lfr.Trie.prototype.clear = function() {
     this.children_ = {};
-    delete this.value_;
+    this.value_ = null;
   };
 
   /**
@@ -54,8 +54,8 @@
       }
     }
 
-    delete this.children_;
-    delete this.value_;
+    this.children_ = null;
+    this.value_ = null;
   };
 
   /**

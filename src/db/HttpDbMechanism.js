@@ -225,7 +225,7 @@
       var requestData = this.pendingRequests_[i];
       // Check if current message in the queue has the same messageId as those which came from the server.
       if (requestData.messageId === data.messageId) {
-        this.pendingRequests_.splice(i, 1);
+        lfr.array.removeAt(this.pendingRequests_, i);
 
         var payload = {
           config: requestData.message.config,

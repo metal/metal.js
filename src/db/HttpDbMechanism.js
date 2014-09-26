@@ -214,36 +214,6 @@
   };
 
   /**
-   * Event listener to `data` event.
-   * @protected
-   * @param {Object} event EventFacade object
-   */
-  lfr.HttpDbMechanism.prototype.onReceiveData_ = function(event) {
-    var data = event.data;
-
-    for (var i = 0; i < this.pendingRequests_.length; ++i) {
-      var requestData = this.pendingRequests_[i];
-      // Check if current message in the queue has the same messageId as those which came from the server.
-      if (requestData.messageId === data.messageId) {
-        lfr.array.removeAt(this.pendingRequests_, i);
-
-        var payload = {
-          config: requestData.message.config,
-          data: requestData.message.data,
-          messageId: requestData.messageId,
-          status: data.status
-        };
-
-        this.emit('data', payload);
-
-        if (lfr.isFunction(requestData.callback)) {
-          requestData.callback(payload);
-        }
-      }
-    }
-  };
-
-  /**
    * Processes the pending requests and sends all pending messages.
    * @protected
    */
@@ -259,6 +229,52 @@
       return;
     }
 
+    this.processPendingRequests_();
+  };
+
+  /**
+   * Event listener to `data` event.
+   * @protected
+   * @param {Object} event EventFacade object
+   */
+  lfr.HttpDbMechanism.prototype.onReceiveData_ = function(event) {
+    var data = event.data;
+
+    for (var i = 0; i < this.pendingRequests_.length; ++i) {
+      var requestData = this.pendingRequests_[i];
+      if (requestData.messageId === data.messageId) {
+        lfr.array.removeAt(this.pendingRequests_, i);
+        this.processReceivedData_(requestData, data.status);
+      }
+    }
+  };
+
+  /**
+   * Processes received request data.
+   * @param {Object} requestData
+   * @param {Object} status
+   * @protected
+   */
+  lfr.HttpDbMechanism.prototype.processReceivedData_ = function(requestData, status) {
+    var payload = {
+      config: requestData.message.config,
+      data: requestData.message.data,
+      messageId: requestData.messageId,
+      status: status
+    };
+
+    this.emit('data', payload);
+
+    if (lfr.isFunction(requestData.callback)) {
+      requestData.callback(payload);
+    }
+  };
+
+  /**
+   * Processes pending requests.
+   * @protected
+   */
+  lfr.HttpDbMechanism.prototype.processPendingRequests_ = function() {
     for (var i = 0; i < this.pendingRequests_.length; ++i) {
       var requestData = this.pendingRequests_[i];
       if (requestData.status.code === lfr.HttpDbMechanism.STATUS_PENDING) {

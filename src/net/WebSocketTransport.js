@@ -30,6 +30,25 @@
   };
 
   /**
+   * Makes a Socket.IO instance.
+   * @return {Socket.IO}
+   * @protected
+   */
+  lfr.WebSocketTransport.prototype.createSocket_ = function() {
+    /*global io*/
+    if (!io) {
+      throw new Error('Socket.IO client not found');
+    }
+    var socket = io(this.getUri());
+    socket.on('connect', lfr.bind(this.onSocketConnect_, this));
+    socket.on('disconnect', lfr.bind(this.onSocketDisconnect_, this));
+    socket.on('error', lfr.bind(this.onSocketError_, this));
+    socket.on('data', lfr.bind(this.onSocketData_, this));
+    socket.on('message', lfr.bind(this.onSocketMessage_, this));
+    return socket;
+  };
+
+  /**
    * Event handle for socket connect event. Fires transport open event.
    * @param {?Object} event
    * @protected
@@ -92,17 +111,8 @@
 
     this.emit('opening');
 
-    /*global io*/
     if (!this.socket) {
-      if (!io) {
-        throw new Error('Socket.IO client not found');
-      }
-      this.socket = io(this.getUri());
-      this.socket.on('connect', lfr.bind(this.onSocketConnect_, this));
-      this.socket.on('disconnect', lfr.bind(this.onSocketDisconnect_, this));
-      this.socket.on('error', lfr.bind(this.onSocketError_, this));
-      this.socket.on('data', lfr.bind(this.onSocketData_, this));
-      this.socket.on('message', lfr.bind(this.onSocketMessage_, this));
+      this.socket = this.createSocket_();
     }
 
     this.socket.open();

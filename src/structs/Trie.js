@@ -49,9 +49,7 @@
    */
   lfr.Trie.prototype.disposeInternal = function() {
     for (var k in this.children_) {
-      if (this.children_.hasOwnProperty(k)) {
-        this.children_[k].dispose();
-      }
+      this.children_[k].dispose();
     }
 
     this.children_ = null;
@@ -59,13 +57,44 @@
   };
 
   /**
+   * Finds the node that represents the given key on this tree.
+   * @param {!(Array|string)} key The key to set the value at.
+   * @param {boolean} createIfMissing Flag indicating if nodes that don't yet
+   *   exist in the searched path should be created.
+   * @return {!Trie}
+   */
+  lfr.Trie.prototype.findKeyNode_ = function(key, createIfMissing) {
+    var node = this;
+
+    key = this.normalizeKey(key);
+
+    for (var i = 0; i < key.length; i++) {
+      node = node.getChild(key[i], createIfMissing);
+      if (!node) {
+        return null;
+      }
+    }
+
+    return node;
+  };
+
+  /**
    * Gets the child node for the given key part.
    * @param {string} keyPart String that can directly access a child of this
    *   Trie.
+   * @param {boolean} createIfMissing Flag indicating if the child should be
+   *   created if it doesn't exist.
    * @return {lfr.Trie}
    */
-  lfr.Trie.prototype.getChild = function(keyPart) {
-    return this.children_[keyPart];
+  lfr.Trie.prototype.getChild = function(keyPart, createIfMissing) {
+    var child = this.children_[keyPart];
+
+    if (createIfMissing && !child) {
+      child = this.createNewTrieNode();
+      this.setChild(keyPart, child);
+    }
+
+    return child;
   };
 
   /**
@@ -74,18 +103,9 @@
    * @return {*}
    */
   lfr.Trie.prototype.getKeyValue = function(key) {
-    var node = this;
+    var node = this.findKeyNode_(key);
 
-    key = this.normalizeKey(key);
-
-    for (var i = 0; i < key.length; i++) {
-      node = node.getChild(key[i]);
-      if (!node) {
-        return null;
-      }
-    }
-
-    return node.getValue();
+    return node ? node.getValue() : null;
   };
 
   /**
@@ -126,20 +146,7 @@
    *   the key will be set to its return value.
    */
   lfr.Trie.prototype.setKeyValue = function(key, value, opt_mergeFn) {
-    var child;
-    var node = this;
-
-    key = this.normalizeKey(key);
-
-    for (var i = 0; i < key.length; i++) {
-      child = node.getChild(key[i]);
-      if (!child) {
-        child = this.createNewTrieNode();
-        node.setChild(key[i], child);
-      }
-
-      node = child;
-    }
+    var node = this.findKeyNode_(key, true);
 
     if (node.getValue() && opt_mergeFn) {
       value = opt_mergeFn(node.getValue(), value);

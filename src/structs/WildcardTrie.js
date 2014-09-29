@@ -28,28 +28,55 @@
   };
 
   /**
+   * Gets all the children that match any of the given list of key parts.
+   * @param {!Array} keyParts
+   * @return {!Array}
+   * @protected
+   */
+  lfr.WildcardTrie.prototype.getChildrenMatchingKeyParts_ = function(keyParts) {
+    var matchingChildren = [];
+
+    for (var i = 0; i < keyParts.length; i++) {
+      var child = this.getChild(keyParts[i]);
+      if (child) {
+        matchingChildren.push(child);
+      }
+    }
+
+    return matchingChildren;
+  };
+
+  /**
    * Gets the value for the given key in the tree.
    * @param {!(Array|string)} key
    * @return {!Array}
    * @override
    */
   lfr.WildcardTrie.prototype.getKeyValue = function(key) {
-    var values = [];
-
     key = this.normalizeKey(key);
+
     var nextKey = key.concat();
     var keyPart = nextKey.shift();
 
     if (!keyPart) {
-      if (this.getValue()) {
-        values.push(this.getValue());
-      }
-    } else {
-      var matchingChildren = this.getMatchingChildren_(keyPart);
+      return this.getValue() ? [this.getValue()] : [];
+    }
 
-      for (var i = 0; i < matchingChildren.length; i++) {
-        values = values.concat(matchingChildren[i].getKeyValue(nextKey));
-      }
+    return this.getKeyValueForChildren_(nextKey, keyPart);
+  };
+
+  /**
+   * Gets the values of a key on the children that match the given key part.
+   * @param  {!Array} key
+   * @param  {string} keyPart
+   * @return {!Array}
+   */
+  lfr.WildcardTrie.prototype.getKeyValueForChildren_ = function(key, keyPart) {
+    var values = [];
+
+    var children = this.getMatchingChildren_(keyPart);
+    for (var i = 0; i < children.length; i++) {
+      values = values.concat(children[i].getKeyValue(key));
     }
 
     return values;
@@ -64,19 +91,11 @@
     var matchingChildren = [];
 
     if (keyPart === lfr.WildcardTrie.TOKEN_SKIP_SINGLE) {
-      for (var k in this.children_) {
-        if (this.children_.hasOwnProperty(k)) {
-          matchingChildren.push(this.children_[k]);
-        }
-      }
+      matchingChildren = this.getAllChildren();
     } else {
-      var matchingKeyParts = [keyPart, lfr.WildcardTrie.TOKEN_SKIP_SINGLE];
-      for (var i = 0; i < matchingKeyParts.length; i++) {
-        var child = this.getChild(matchingKeyParts[i]);
-        if (child) {
-          matchingChildren.push(child);
-        }
-      }
+      matchingChildren = this.getChildrenMatchingKeyParts_(
+        [keyPart, lfr.WildcardTrie.TOKEN_SKIP_SINGLE]
+      );
     }
 
     return matchingChildren;

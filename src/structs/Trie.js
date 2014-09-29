@@ -79,6 +79,20 @@
   };
 
   /**
+   * Returns an array with all the child nodes for this trie.
+   * @return {!Array}
+   */
+  lfr.Trie.prototype.getAllChildren = function() {
+    var allChildren = [];
+
+    for (var k in this.children_) {
+      allChildren.push(this.children_[k]);
+    }
+
+    return allChildren;
+  };
+
+  /**
    * Gets the child node for the given key part.
    * @param {string} keyPart String that can directly access a child of this
    *   Trie.

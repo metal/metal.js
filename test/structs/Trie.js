@@ -41,6 +41,20 @@ describe('Trie', function() {
     assert.ok(!trie.getChild('3'));
   });
 
+  it('should get all children', function() {
+    var child1 = new lfr.Trie();
+    var child2 = new lfr.Trie();
+    var trie = new lfr.Trie();
+
+    trie.setChild('1', child1);
+    trie.setChild('2', child2);
+
+    var children = trie.getAllChildren();
+    assert.strictEqual(2, children.length);
+    assert.strictEqual(child1, children[0]);
+    assert.strictEqual(child2, children[1]);
+  });
+
   it('should set values for string keys', function() {
     var trie = new lfr.Trie();
 

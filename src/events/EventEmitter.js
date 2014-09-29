@@ -56,11 +56,9 @@
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.addListener = function(events, listener) {
-    if (!lfr.isFunction(listener)) {
-      throw new TypeError('Listener must be a function');
-    }
+    this.validateListener_(listener);
 
-    events = lfr.isString(events) ? [events] : events;
+    events = this.normalizeEvents_(events);
     for (var i = 0; i < events.length; i++) {
       this.addSingleListener_(events[i], listener);
     }
@@ -99,6 +97,17 @@
       );
       listeners.warned = true;
     }
+  };
+
+  /**
+   * Comparison function between listener objects.
+   * @param {!Object} listener1
+   * @param {!Object} listener2
+   * @return {Number} The difference between the ids of the objects.
+   * @protected
+   */
+  lfr.EventEmitter.prototype.compareListenerObjs_ = function(obj1, obj2) {
+      return obj1.id - obj2.id;
   };
 
   /**
@@ -160,23 +169,17 @@
    * @return {Array} Array of listeners.
    */
   lfr.EventEmitter.prototype.listeners = function(event) {
-    var concatCount = 0;
     var listenerArrays = this.searchListenerTree_(event);
     var listeners = [];
 
     for (var i = 0; i < listenerArrays.length; i++) {
-      if (listenerArrays[i].length) {
-        concatCount++;
-        listeners = listeners.concat(listenerArrays[i]);
-      }
+      listeners = listeners.concat(listenerArrays[i]);
     }
 
-    if (concatCount > 1) {
+    if (listenerArrays.length > 1) {
       // If there was more than one result, we should reorder the listeners,
       // since we joined them without taking the order into account.
-      listeners.sort(function(obj1, obj2) {
-        return obj1.id - obj2.id;
-      });
+      listeners.sort(this.compareListenerObjs_);
     }
 
     return listeners.map(function(listener) {
@@ -195,11 +198,7 @@
    * @return {!lfr.EventHandle} Can be used to remove the listener.
    */
   lfr.EventEmitter.prototype.many = function(events, amount, listener) {
-    if (amount <= 0) {
-      return;
-    }
-
-    events = lfr.isString(events) ? [events] : events;
+    events = this.normalizeEvents_(events);
     for (var i = 0; i < events.length; i++) {
       this.many_(events[i], amount, listener);
     }
@@ -215,10 +214,14 @@
    * @param {number} amount The amount of times this event should be listened
    * to.
    * @param {!Function} listener
-   * @return {!lfr.EventHandle} Can be used to remove the listener.
+   * @protected
    */
   lfr.EventEmitter.prototype.many_ = function(event, amount, listener) {
     var self = this;
+
+    if (amount <= 0) {
+      return;
+    }
 
     function handlerInternal() {
       if (--amount === 0) {
@@ -231,16 +234,40 @@
   };
 
   /**
+   * Checks if a listener object matches the given listener function. To match,
+   * it needs to either point to that listener or have it as its origin.
+   * @param {!Object} listenerObj
+   * @param {!Function} listener
+   * @return {boolean}
+   * @protected
+   */
+  lfr.EventEmitter.prototype.matchesListener_ = function(listenerObj, listener) {
+    return listenerObj.fn === listener ||
+      (listenerObj.origin && listenerObj.origin === listener);
+  };
+
+  /**
    * Merges two objects that contain event listeners.
    * @param  {!Object} arr1
    * @param  {!Object} arr2
    * @return {!Object}
+   * @protected
    */
   lfr.EventEmitter.prototype.mergeListenerArrays_ = function(arr1, arr2) {
     for (var i = 0; i < arr2.length; i++) {
       arr1.push(arr2[i]);
     }
     return arr1;
+  };
+
+  /**
+   * Converts the parameter to an array if only one event is given.
+   * @param  {!(Array|string)} events
+   * @return {!Array}
+   * @protected
+   */
+  lfr.EventEmitter.prototype.normalizeEvents_ = function(events) {
+    return lfr.isString(events) ? [events] : events;
   };
 
   /**
@@ -251,18 +278,11 @@
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   lfr.EventEmitter.prototype.off = function(events, listener) {
-    if (!lfr.isFunction(listener)) {
-      throw new TypeError('Listener must be a function');
-    }
+    this.validateListener_(listener);
 
     var listenerArrays = this.searchListenerTree_(events);
     for (var i = 0; i < listenerArrays.length; i++) {
-      for (var j = listenerArrays[i].length - 1; j >= 0; j--) {
-        if (listenerArrays[i][j].fn === listener ||
-          (listenerArrays[i][j].origin && listenerArrays[i][j].origin === listener)) {
-          listenerArrays[i].splice(j, 1);
-        }
-      }
+      this.removeMatchingListenerObjs_(listenerArrays[i], listener);
     }
 
     return this;
@@ -300,9 +320,19 @@
       return this;
     }
 
-    opt_events = lfr.isString(opt_events) ? [opt_events] : opt_events;
-    for (var i = 0; i < opt_events.length; i++) {
-      this.listenersTree_.setKeyValue(this.splitNamespaces_(opt_events[i]), []);
+    return this.removeAllListenersForEvents_(opt_events);
+  };
+
+  /**
+   * Removes all listeners for the specified events.
+   * @param  {!(Array|string)} events
+   * @return {!Object} Returns emitter, so calls can be chained.
+   * @protected
+   */
+  lfr.EventEmitter.prototype.removeAllListenersForEvents_ = function(events) {
+    events = this.normalizeEvents_(events);
+    for (var i = 0; i < events.length; i++) {
+      this.listenersTree_.setKeyValue(this.splitNamespaces_(events[i]), []);
     }
 
     return this;
@@ -318,6 +348,21 @@
   lfr.EventEmitter.prototype.removeListener = lfr.EventEmitter.prototype.off;
 
   /**
+   * Removes all listener objects from the given array that match the given
+   * listener function.
+   * @param {!Array.<Object>} listenerObjects
+   * @param {!Function} listener
+   * @protected
+   */
+  lfr.EventEmitter.prototype.removeMatchingListenerObjs_ = function(listenerObjects, listener) {
+    for (var i = listenerObjects.length - 1; i >= 0; i--) {
+      if (this.matchesListener_(listenerObjects[i], listener)) {
+        listenerObjects.splice(i, 1);
+      }
+    }
+  };
+
+  /**
    * Searches the listener tree for the given events.
    * @param {!(Array|string)} events
    * @return {!Array.<Array>} An array of listener arrays returned by the tree.
@@ -326,7 +371,7 @@
   lfr.EventEmitter.prototype.searchListenerTree_ = function(events) {
     var values = [];
 
-    events = lfr.isString(events) ? [events] : events;
+    events = this.normalizeEvents_(events);
     for (var i = 0; i < events.length; i++) {
       values = values.concat(
         this.listenersTree_.getKeyValue(this.splitNamespaces_(events[i]))
@@ -381,4 +426,14 @@
     return event.split(this.getDelimiter());
   };
 
+  /**
+   * Checks if the given listener is valid, throwing an exception when it's not.
+   * @param  {*} listener
+   * @protected
+   */
+  lfr.EventEmitter.prototype.validateListener_ = function(listener) {
+    if (!lfr.isFunction(listener)) {
+      throw new TypeError('Listener must be a function');
+    }
+  };
 }());

@@ -45,20 +45,13 @@ describe('Trie', function() {
     var trie = new lfr.Trie();
 
     trie.setKeyValue('abc', 'abcValue');
-    assert.ok(trie.getChild('a'));
-    assert.ok(trie.getChild('a').getChild('b'));
-    assert.ok(trie.getChild('a').getChild('b').getChild('c'));
-    assert.strictEqual('abcValue', trie.getChild('a').getChild('b').getChild('c').getValue());
+    assert.strictEqual('abcValue', trie.getKeyValue('abc'));
 
     trie.setKeyValue('az', 'azValue');
-    assert.ok(trie.getChild('a').getChild('z'));
-    assert.strictEqual('azValue', trie.getChild('a').getChild('z').getValue());
+    assert.strictEqual('azValue', trie.getKeyValue('az'));
 
     trie.setKeyValue('cba', 'cbaValue');
-    assert.ok(trie.getChild('c'));
-    assert.ok(trie.getChild('c').getChild('b'));
-    assert.ok(trie.getChild('c').getChild('b').getChild('a'));
-    assert.strictEqual('cbaValue', trie.getChild('c').getChild('b').getChild('a').getValue());
+    assert.strictEqual('cbaValue', trie.getKeyValue('cba'));
   });
 
   it('should set values for array keys', function() {
@@ -68,9 +61,9 @@ describe('Trie', function() {
     trie.setKeyValue(['abc', 'z'], '2');
 
     assert.ok(trie.getChild('abc').getChild('def'));
-    assert.ok(!trie.getChild('a'));
-    assert.strictEqual('1', trie.getChild('abc').getChild('def').getValue());
-    assert.strictEqual('2', trie.getChild('abc').getChild('z').getValue());
+    assert.ok(!trie.getKeyValue('a'));
+    assert.strictEqual('1', trie.getKeyValue(['abc', 'def']));
+    assert.strictEqual('2', trie.getKeyValue(['abc', 'z']));
   });
 
   it('should override existing values', function() {
@@ -79,7 +72,7 @@ describe('Trie', function() {
     trie.setKeyValue('abc', ['1']);
     trie.setKeyValue('abc', ['2']);
 
-    assert.deepEqual(['2'], trie.getChild('a').getChild('b').getChild('c').getValue());
+    assert.deepEqual(['2'], trie.getKeyValue('abc'));
   });
 
   it('should merge existing values', function() {
@@ -91,33 +84,7 @@ describe('Trie', function() {
     trie.setKeyValue('abc', ['1'], mergeFn);
     trie.setKeyValue('abc', ['2'], mergeFn);
 
-    assert.deepEqual(['1', '2'], trie.getChild('a').getChild('b').getChild('c').getValue());
-  });
-
-  it('should get values for string keys', function() {
-    var trie = new lfr.Trie();
-
-    trie.setKeyValue('', 'Value');
-    trie.setKeyValue('abc', 'abcValue');
-    trie.setKeyValue('az', 'azValue');
-    trie.setKeyValue('cba', 'cbaValue');
-
-    assert.strictEqual('Value', trie.getKeyValue(''));
-    assert.strictEqual('abcValue', trie.getKeyValue('abc'));
-    assert.strictEqual('azValue', trie.getKeyValue('az'));
-    assert.strictEqual('cbaValue', trie.getKeyValue('cba'));
-    assert.ok(!trie.getKeyValue('abcd'));
-  });
-
-  it('should get values for array keys', function() {
-    var trie = new lfr.Trie();
-
-    trie.setKeyValue(['abc', 'def'], '1');
-    trie.setKeyValue(['abc', 'z'], '2');
-
-    assert.strictEqual('1', trie.getKeyValue(['abc', 'def']));
-    assert.strictEqual('2', trie.getKeyValue(['abc', 'z']));
-    assert.ok(!trie.getKeyValue(['a']));
+    assert.deepEqual(['1', '2'], trie.getKeyValue('abc'));
   });
 
   it('should clear the trie', function() {

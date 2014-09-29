@@ -18,7 +18,9 @@ var mainFiles = [
   'src/net/Transport.js',
   'src/net/XhrTransport.js',
   'src/net/WebSocketTransport.js',
-  'src/db/Db.js'
+  'src/db/Db.js',
+  'src/db/DbMechanism.js',
+  'src/db/HttpDbMechanism.js'
 ];
 
 gulp.task('build', ['clean'], function() {

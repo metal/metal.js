@@ -140,6 +140,17 @@
   };
 
   /**
+     * Returns true if the specified value is an object. This includes arrays
+     * and functions.
+     * @param {?} val Variable to test.
+     * @return {boolean} Whether variable is an object.
+     */
+  lfr.isObject = function(val) {
+    var type = typeof val;
+    return type === 'object' && val !== null || type === 'function';
+  };
+
+  /**
    * Returns true if value is a string.
    * @param {*} val
    * @return {Boolean}

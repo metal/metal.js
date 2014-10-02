@@ -19,28 +19,15 @@
   lfr.inherits(lfr.DbMechanism, lfr.EventEmitter);
 
   /**
-   * Holds pending status of a request.
-   * @type {number}
+   * Holds status of a request message .
+   * @type {Object}
    * @const
    * @static
    */
-  lfr.DbMechanism.STATUS_PENDING = 0;
-
-  /**
-   * Holds sent status of a request.
-   * @type {number}
-   * @const
-   * @static
-   */
-  lfr.DbMechanism.STATUS_SENT = 1;
-
-  /**
-   * Holds received status of a request.
-   * @type {number}
-   * @const
-   * @static
-   */
-  lfr.DbMechanism.STATUS_RECEIVED = 2;
+  lfr.DbMechanism.MessageStatus = {
+    PENDING: 0,
+    SENT: 1
+  };
 
   /**
    * Holds the db mechanism uri.
@@ -52,23 +39,21 @@
 
   /**
    * Deletes data from database.
-   * @param {!(Object|string|number)} value The value which will be used to
+   * @param {*=} message The value which will be used to
    *   retrieve data from the database.
-   * @param {Function=} opt_callback optional Callback function which will be
-   *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
+   * @return {Promise}
    */
   lfr.DbMechanism.prototype.delete = lfr.abstractMethod;
 
   /**
    * Retrieves data from database.
-   * @param {!(Object|string|number)} value The value which will be used to retrieve data from
+   * @param {*=} message The value which will be used to retrieve data from
    *   the database.
-   * @param {Function=} opt_callback optional Callback function which will be
-   *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
+   * @return {Promise}
    */
   lfr.DbMechanism.prototype.get = lfr.abstractMethod;
 
@@ -82,23 +67,19 @@
 
   /**
    * Stores data to database.
-   * @param {!(Object|string|number)} value The value which should be stored to
+   * @param {*=} message The value which should be stored to
    *   the database.
-   * @param {Function=} opt_callback optional Callback function which will be
-   *   invoked once the data is stored to the database.
-   * @param {Object=} opt_config optional Data payload to be provided to the
-   *   database.
+   * @return {Promise}
    */
   lfr.DbMechanism.prototype.post = lfr.abstractMethod;
 
   /**
    * Retrieves data from database.
-   * @param {!(Object|string|number)} value The value which will be used to
+   * @param {*=} message The value which will be used to
    *   retrieve data from the database.
-   * @param {Function=} opt_callback optional Callback function which will be
-   *   invoked once the data is retrieved from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
    *   database.
+   * @return {Promise}
    */
   lfr.DbMechanism.prototype.put = lfr.abstractMethod;
 

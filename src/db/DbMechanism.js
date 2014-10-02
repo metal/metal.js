@@ -19,6 +19,30 @@
   lfr.inherits(lfr.DbMechanism, lfr.EventEmitter);
 
   /**
+   * Holds pending status of a request.
+   * @type {number}
+   * @const
+   * @static
+   */
+  lfr.DbMechanism.STATUS_PENDING = 0;
+
+  /**
+   * Holds sent status of a request.
+   * @type {number}
+   * @const
+   * @static
+   */
+  lfr.DbMechanism.STATUS_SENT = 1;
+
+  /**
+   * Holds received status of a request.
+   * @type {number}
+   * @const
+   * @static
+   */
+  lfr.DbMechanism.STATUS_RECEIVED = 2;
+
+  /**
    * Holds the db mechanism uri.
    * @type {string}
    * @default ''

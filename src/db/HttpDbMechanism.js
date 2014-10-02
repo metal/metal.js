@@ -53,22 +53,6 @@
   lfr.HttpDbMechanism.METHOD_PUT = 'PUT';
 
   /**
-   * Holds pending status of a request.
-   * @type {number}
-   * @const
-   * @static
-   */
-  lfr.HttpDbMechanism.STATUS_PENDING = 1;
-
-  /**
-   * Holds sent status of a request.
-   * @type {number}
-   * @const
-   * @static
-   */
-  lfr.HttpDbMechanism.STATUS_SENT = 0;
-
-  /**
    * Holds pending requests.
    * @type {Array}
    * @default null

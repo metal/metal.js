@@ -32,22 +32,60 @@ describe('HttpDbMechanism', function() {
     assert.strictEqual(xhrTransport, mechanism.getTransport());
   });
 
-  it('should add message to the pending request queue on post', function(done) {
+  it('should send post message', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
-
-    mechanism.once('request', function() {
+    mechanism.on('request', function(requestData) {
+      assert.strictEqual(Math.PI, requestData.message.data);
+      assert.strictEqual(lfr.DbMechanism.STATUS_SENT, requestData.status);
+      assert.strictEqual(lfr.HttpDbMechanism.METHOD_POST, requestData.message._method);
       done();
     });
-
-    mechanism.post({
-      name: 'Pedro',
-      age: 23
-    });
-
-    assert.strictEqual(1, mechanism.pendingRequests_.length);
+    mechanism.post(Math.PI);
   });
 
-  it('should add message to the pending request queue on put', function(done) {
+  it('should send put message', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    mechanism.on('request', function(requestData) {
+      assert.strictEqual(Math.PI, requestData.message.data);
+      assert.strictEqual(lfr.DbMechanism.STATUS_SENT, requestData.status);
+      assert.strictEqual(lfr.HttpDbMechanism.METHOD_PUT, requestData.message._method);
+      done();
+    });
+    mechanism.put(Math.PI);
+  });
+
+  it('should send get message', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    mechanism.on('request', function(requestData) {
+      assert.strictEqual(Math.PI, requestData.message.data);
+      assert.strictEqual(lfr.DbMechanism.STATUS_SENT, requestData.status);
+      assert.strictEqual(lfr.HttpDbMechanism.METHOD_GET, requestData.message._method);
+      done();
+    });
+    mechanism.get(Math.PI);
+  });
+
+  it('should send delete message', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    mechanism.on('request', function(requestData) {
+      assert.strictEqual(Math.PI, requestData.message.data);
+      assert.strictEqual(lfr.DbMechanism.STATUS_SENT, requestData.status);
+      assert.strictEqual(lfr.HttpDbMechanism.METHOD_DELETE, requestData.message._method);
+      done();
+    });
+    mechanism.delete(Math.PI);
+  });
+
+  it('should add message to the queue', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    mechanism.on('request', function() {
+      assert.strictEqual(1, mechanism.pendingRequests_.length);
+      done();
+    });
+    mechanism.post(Math.PI);
+  });
+
+  it('should add message to the queue on put', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
     mechanism.once('request', function() {
@@ -62,7 +100,7 @@ describe('HttpDbMechanism', function() {
     assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should add message to the pending request queue on delete', function(done) {
+  it('should add message to the queue on delete', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
     mechanism.once('request', function() {
@@ -76,7 +114,7 @@ describe('HttpDbMechanism', function() {
     assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should add message to the pending request queue on get', function(done) {
+  it('should add message to the queue on get', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
     mechanism.once('request', function() {
@@ -90,7 +128,7 @@ describe('HttpDbMechanism', function() {
     assert.strictEqual(1, mechanism.pendingRequests_.length);
   });
 
-  it('should remove message from the pending request queue on data arriving', function(done) {
+  it('should remove message from the queue on data arriving', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
     var queueMessage = mechanism.post({
@@ -100,23 +138,20 @@ describe('HttpDbMechanism', function() {
 
     assert.strictEqual(1, mechanism.pendingRequests_.length);
 
-    mechanism.on('data', function(event) {
-      assert.strictEqual(event.messageId, queueMessage.messageId);
+    mechanism.on('data', function(data) {
+      assert.strictEqual(data.id, queueMessage.message.id);
+      assert.strictEqual(data.status, lfr.DbMechanism.STATUS_RECEIVED);
 
       done();
     });
 
     mechanism.getTransport().emit('data', {
-      data: {
-        messageId: queueMessage.messageId,
-        status: {
-          code: 0
-        }
-      }
+      id: queueMessage.message.id,
+      status: lfr.DbMechanism.STATUS_RECEIVED
     });
   });
 
-  it('should not remove messages from pending request queue in case of message ID mismatch', function() {
+  it('should not remove messages from queue in case of message ID mismatch', function() {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
     mechanism.post({
@@ -127,12 +162,8 @@ describe('HttpDbMechanism', function() {
     assert.strictEqual(1, mechanism.pendingRequests_.length);
 
     mechanism.getTransport().emit('data', {
-      data: {
-        messageId: 'Invalid message Id',
-        status: {
-          code: 0
-        }
-      }
+      id: 'Invalid message Id',
+      status: lfr.DbMechanism.STATUS_RECEIVED
     });
 
     // Because of non matching Id, the queue should have still one item
@@ -142,22 +173,22 @@ describe('HttpDbMechanism', function() {
   it('should call callback function if provided once server returns response', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
 
-    var queueMessage = mechanism.post({
-      name: 'Pedro',
-      age: 25
-    }, function() {
+    var queueMessage = mechanism.post(
+      {
+        name: 'Pedro',
+        age: 25
+      }, function(data) {
+        assert.strictEqual(data.id, queueMessage.message.id);
+        assert.strictEqual(data.status, lfr.DbMechanism.STATUS_RECEIVED);
         done();
-      });
+      }
+    );
 
     assert.strictEqual(1, mechanism.pendingRequests_.length);
 
     mechanism.getTransport().emit('data', {
-      data: {
-        messageId: queueMessage.messageId,
-        status: {
-          code: 0
-        }
-      }
+      id: queueMessage.message.id,
+      status: lfr.DbMechanism.STATUS_RECEIVED
     });
   });
 
@@ -192,13 +223,10 @@ describe('HttpDbMechanism', function() {
 
           // Simulate returned response from the server
           mechanism.getTransport().emit('data', {
-            data: {
-              messageId: queueMessage.messageId,
-              status: {
-                code: 0
-              }
-            }
+            id: queueMessage.message.id,
+            status: lfr.DbMechanism.STATUS_RECEIVED
           });
+
           clearInterval(handler);
           // Assert the queue has been processed.
           setTimeout(function() {
@@ -216,11 +244,24 @@ describe('HttpDbMechanism', function() {
     transport.close();
     transport.on('close', function() {
       mechanism.on('request', function() {
-        assert.strictEqual(0, mechanism.pendingRequests_.length);
+        assert.strictEqual(1, mechanism.pendingRequests_.length);
         done();
       });
       mechanism.emit('request');
     });
+  });
+
+  it('should be able to change request data', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    var transport = mechanism.getTransport();
+    mechanism.on('request', function(requestData) {
+      requestData.message.pivot = 1;
+    });
+    transport.on('message', function(message) {
+      assert.strictEqual(1, message.pivot);
+      done();
+    });
+    mechanism.get();
   });
 
 });

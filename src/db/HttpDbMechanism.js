@@ -12,11 +12,12 @@
     lfr.HttpDbMechanism.base(this, 'constructor', uri);
 
     this.pendingRequests_ = [];
-    // TODO: Researches how it behaves with XhrTransport as well.
     this.transport_ = new lfr.WebSocketTransport(uri).open();
-    this.transport_.on('data', lfr.bind(this.onReceiveData_, this));
-    this.transport_.on('open', lfr.bind(this.maybeRetryRequestData_, this));
-    this.on('request', lfr.bind(this.maybeRetryRequestData_, this));
+
+    this.on('request', lfr.bind(this.onMechanismRequestData_, this));
+    this.transport_.on('data', lfr.bind(this.onTransportReceiveData_, this));
+    this.transport_.on('error', lfr.bind(this.onTransportError_, this));
+    this.transport_.on('open', lfr.bind(this.onTransportOpen_, this));
   };
   lfr.inherits(lfr.HttpDbMechanism, lfr.DbMechanism);
 
@@ -102,18 +103,14 @@
   lfr.HttpDbMechanism.prototype.createRequestData_ = function(method, data, opt_callback, opt_config) {
     var nextRid = ((Math.random() * 1e9) >>> 0);
     return {
-      callback: opt_callback,
+      status: lfr.DbMechanism.STATUS_PENDING,
       message: {
         _method: method,
+        id: nextRid,
         config: opt_config,
-        data: data,
-        messageId: nextRid,
-        namespace: this.transport_.socket.nsp
+        data: data
       },
-      messageId: nextRid,
-      status: {
-        code: lfr.HttpDbMechanism.STATUS_PENDING
-      }
+      callback: opt_callback
     };
   };
 
@@ -129,7 +126,7 @@
    */
   lfr.HttpDbMechanism.prototype.delete = function(data, opt_callback, opt_config) {
     var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_DELETE, data, opt_callback, opt_config);
-    this.queueRequestData_(requestData);
+    this.emit('request', requestData);
     return requestData;
   };
 
@@ -145,7 +142,7 @@
    */
   lfr.HttpDbMechanism.prototype.get = function(value, opt_callback, opt_config) {
     var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_GET, value, opt_callback, opt_config);
-    this.queueRequestData_(requestData);
+    this.emit('request', requestData);
     return requestData;
   };
 
@@ -161,7 +158,7 @@
    */
   lfr.HttpDbMechanism.prototype.post = function(data, opt_callback, opt_config) {
     var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_POST, data, opt_callback, opt_config);
-    this.queueRequestData_(requestData);
+    this.emit('request', requestData);
     return requestData;
   };
 
@@ -176,7 +173,7 @@
    */
   lfr.HttpDbMechanism.prototype.put = function(data, opt_callback, opt_config) {
     var requestData = this.createRequestData_(lfr.HttpDbMechanism.METHOD_PUT, data, opt_callback, opt_config);
-    this.queueRequestData_(requestData);
+    this.emit('request', requestData);
     return requestData;
   };
 
@@ -201,7 +198,7 @@
    * Processes the pending requests and sends all pending messages.
    * @protected
    */
-  lfr.HttpDbMechanism.prototype.maybeRetryRequestData_ = function() {
+  lfr.HttpDbMechanism.prototype.maybeRequestData_ = function() {
     clearTimeout(this.retryTimeoutHandler_);
 
     if (!this.pendingRequests_.length) {
@@ -209,48 +206,68 @@
     }
 
     if (!this.transport_.isOpen()) {
-      this.retryTimeoutHandler_ = setTimeout(lfr.bind(this.maybeRetryRequestData_, this), this.getRetryDelayMs());
+      this.retryTimeoutHandler_ = setTimeout(lfr.bind(this.maybeRequestData_, this), this.getRetryDelayMs());
       return;
     }
-
+    console.log('maybeRequestData_');
     this.processPendingRequests_();
   };
 
   /**
-   * Event listener to `data` event.
+   * Event listener to mechanism `request` event.
    * @protected
-   * @param {Object} event EventFacade object
+   * @param {*} data
    */
-  lfr.HttpDbMechanism.prototype.onReceiveData_ = function(event) {
-    var data = event.data;
+  lfr.HttpDbMechanism.prototype.onMechanismRequestData_ = function(requestData) {
+    this.pendingRequests_.push(requestData);
+    this.maybeRequestData_();
+  };
 
+  /**
+   * Event listener to transport `error` event.
+   * @protected
+   * @param {Error} err
+   */
+  lfr.HttpDbMechanism.prototype.onTransportError_ = function() {
+    for (var i = 0; i < this.pendingRequests_.length; ++i) {
+      this.pendingRequests_[i].status = lfr.DbMechanism.STATUS_PENDING;
+    }
+  };
+
+  /**
+   * Event listener to transport `open` event.
+   * @protected
+   */
+  lfr.HttpDbMechanism.prototype.onTransportOpen_ = function() {
+    this.maybeRequestData_();
+  };
+
+  /**
+   * Event listener to transport `data` event.
+   * @protected
+   * @param {*} data
+   */
+  lfr.HttpDbMechanism.prototype.onTransportReceiveData_ = function(data) {
     for (var i = 0; i < this.pendingRequests_.length; ++i) {
       var requestData = this.pendingRequests_[i];
-      if (requestData.messageId === data.messageId) {
+      if (requestData.message.id === data.id) {
+        this.processReceivedData_(requestData, data);
         lfr.array.removeAt(this.pendingRequests_, i);
-        this.processReceivedData_(requestData, data.status);
       }
     }
   };
 
   /**
    * Processes received request data.
-   * @param {Object} requestData
+   * @param {Object} data
    * @param {Object} status
    * @protected
    */
-  lfr.HttpDbMechanism.prototype.processReceivedData_ = function(requestData, status) {
-    var payload = {
-      config: requestData.message.config,
-      data: requestData.message.data,
-      messageId: requestData.messageId,
-      status: status
-    };
-
-    this.emit('data', payload);
-
+  lfr.HttpDbMechanism.prototype.processReceivedData_ = function(requestData, data) {
+    requestData.status = lfr.DbMechanism.STATUS_RECEIVED;
+    this.emit('data', data);
     if (lfr.isFunction(requestData.callback)) {
-      requestData.callback(payload);
+      requestData.callback(data);
     }
   };
 
@@ -261,22 +278,11 @@
   lfr.HttpDbMechanism.prototype.processPendingRequests_ = function() {
     for (var i = 0; i < this.pendingRequests_.length; ++i) {
       var requestData = this.pendingRequests_[i];
-      if (requestData.status.code === lfr.HttpDbMechanism.STATUS_PENDING) {
+      if (requestData.status === lfr.DbMechanism.STATUS_PENDING) {
+        requestData.status = lfr.DbMechanism.STATUS_SENT;
         this.transport_.send(requestData.message);
-        // TODO: Updates status code to send when message is confirmed to be sent.
-        requestData.status.code = lfr.HttpDbMechanism.STATUS_SENT;
       }
     }
-  };
-
-  /**
-   * Adds a message to the pending queue.
-   * @protected
-   * @param {Object} requestData
-   */
-  lfr.HttpDbMechanism.prototype.queueRequestData_ = function(requestData) {
-    this.pendingRequests_.push(requestData);
-    this.emit('request', requestData);
   };
 
   /**

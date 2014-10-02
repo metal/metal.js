@@ -179,7 +179,8 @@
       var args = Array.prototype.slice.call(arguments, 2);
       return function() {
         var newArgs = Array.prototype.slice.call(arguments);
-        return fn.apply(context, Array.prototype.concat.apply(newArgs, args));
+        Array.prototype.push.apply(newArgs, args);
+        return fn.apply(context, newArgs);
       };
     } else {
       return function() {

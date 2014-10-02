@@ -14,7 +14,6 @@ function createFakeXMLHttpRequest(status, responseText) {
 
   FakeXMLHttpRequest.prototype.abort = function() {
     this.aborted = true;
-    clearTimeout(this.timer);
   };
 
   FakeXMLHttpRequest.prototype.open = lfr.nullFunction;
@@ -23,9 +22,9 @@ function createFakeXMLHttpRequest(status, responseText) {
     this.body = body;
 
     if (this.status === 200 || this.status === 304) {
-      this.timer = setTimeout(this.onload, 0);
+      process.nextTick(this.onload);
     } else {
-      this.timer = setTimeout(this.onerror, 0);
+      process.nextTick(this.onerror);
     }
   };
 

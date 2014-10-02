@@ -23,6 +23,9 @@ function createFakeSocketIO() {
     var self = this;
     self.timer = setTimeout(function() {
       self.emit('message', message);
+      self.timer = setTimeout(function() {
+        self.emit('data', message);
+      }, 10);
     }, 0);
   };
   return FakeSocketIO;

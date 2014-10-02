@@ -100,7 +100,7 @@ describe('HttpDbMechanism', function() {
   it('should cancel pending messages when transport emits error', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
     var db = new lfr.Db(mechanism);
-    db.post(Math.PI).thenCatch(function(reason) {
+    db.post(Math.PI).thenCatch(function() {
       done();
     });
     mechanism.getTransport().emit('error', new Error('Number not known in this galaxy'));

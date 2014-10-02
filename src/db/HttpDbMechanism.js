@@ -108,16 +108,10 @@
    * @protected
    */
   lfr.HttpDbMechanism.prototype.findPendingRequestById_ = function(id) {
-    var index = -1;
     for (var i = 0; i < this.pendingRequests_.length; ++i) {
-      var req = this.pendingRequests_[i];
-      if (id === req.message.id) {
-        index = i;
-        break;
+      if (id === this.pendingRequests_[i].message.id) {
+        return this.pendingRequests_[i];
       }
-    }
-    if (index > -1) {
-      return this.pendingRequests_[i];
     }
     return null;
   };

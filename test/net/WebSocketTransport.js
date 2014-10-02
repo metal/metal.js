@@ -105,8 +105,8 @@ describe('WebSocketTransport', function() {
     var transport = new lfr.WebSocketTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
-      transport.on('message', function(event) {
-        assert.strictEqual('message', event.data, 'Should set request message');
+      transport.on('message', function(data) {
+        assert.strictEqual('message', data, 'Should set request message');
         done();
       });
       transport.send('message');
@@ -120,7 +120,7 @@ describe('WebSocketTransport', function() {
     transport.open();
     transport.on('open', function() {
       transport.socket.on('data', function() {
-        assert.strictEqual('data', stubData.getCall(0).args[0].data, 'Should receive emitted data');
+        assert.strictEqual('data', stubData.getCall(0).args[0], 'Should receive emitted data');
         done();
       });
       transport.socket.emit('data', 'data');

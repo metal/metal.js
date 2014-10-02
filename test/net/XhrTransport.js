@@ -123,15 +123,15 @@ describe('XhrTransport', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
-      transport.on('message', function(event) {
-        assert.strictEqual('message', event.data, 'Should set request message');
+      transport.on('message', function(data) {
+        assert.strictEqual('message', data, 'Should set request message');
         done();
       });
       transport.send('message');
     });
   });
 
-  it('should handle successful receive data', function(done) {
+  it('should handle successful received data', function(done) {
     var transport = new lfr.XhrTransport('http://liferay.com');
     var stubData = sinon.stub();
     transport.on('data', stubData);
@@ -139,7 +139,7 @@ describe('XhrTransport', function() {
     transport.on('open', function() {
       transport.send();
       transport.on('data', function() {
-        assert.strictEqual(stubData.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of data event');
+        assert.strictEqual(stubData.getCall(0).args[0], 'data', 'Should use responseText as data');
         done();
       });
     });
@@ -154,7 +154,7 @@ describe('XhrTransport', function() {
     transport.on('open', function() {
       transport.send();
       transport.on('data', function() {
-        assert.strictEqual(stubData.getCall(0).args[0].data, 'data', 'Should use responseText as event.data of packet event');
+        assert.strictEqual(stubData.getCall(0).args[0], 'data', 'Should use responseText as data');
         done();
       });
     });

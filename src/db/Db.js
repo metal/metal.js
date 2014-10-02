@@ -96,9 +96,7 @@
     if (err) {
       this.emit('error', err);
     } else {
-      this.emit('find', {
-        data: data
-      });
+      this.emit('find', data);
     }
 
     if (opt_callback) {
@@ -122,9 +120,7 @@
     if (err) {
       this.emit('error', err);
     } else {
-      this.emit('remove', {
-        data: data
-      });
+      this.emit('remove', data);
     }
 
     if (opt_callback) {
@@ -148,9 +144,7 @@
     if (err) {
       this.emit('error', err);
     } else {
-      this.emit('add', {
-        data: data
-      });
+      this.emit('add', data);
     }
 
     if (opt_callback) {
@@ -174,9 +168,7 @@
     if (err) {
       this.emit('error', err);
     } else {
-      this.emit('update', {
-        data: data
-      });
+      this.emit('update', data);
     }
 
     if (opt_callback) {

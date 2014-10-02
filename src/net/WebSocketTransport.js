@@ -63,9 +63,7 @@
    * @protected
    */
   lfr.WebSocketTransport.prototype.onSocketData_ = function(data) {
-    this.emit('data', {
-      data: this.decodeData(data)
-    });
+    this.emit('data', this.decodeData(data));
   };
 
   /**
@@ -95,9 +93,7 @@
    * @protected
    */
   lfr.WebSocketTransport.prototype.onSocketMessage_ = function(message) {
-    this.emit('message', {
-      data: message
-    });
+    this.emit('message', message);
   };
 
   /**

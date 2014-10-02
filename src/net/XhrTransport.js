@@ -52,9 +52,7 @@
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
       if (xhr.status === 200) {
-        self.emit('data', {
-          data: self.decodeData(xhr.responseText)
-        });
+        self.emit('data', self.decodeData(xhr.responseText));
         lfr.array.remove(self.sendInstances_, xhr);
         return;
       }
@@ -152,9 +150,7 @@
   lfr.XhrTransport.prototype.write = function(message) {
     var xhr = this.createXhr_();
     this.sendInstances_.push(xhr);
-    this.emitAsync_('message', {
-      data: message
-    });
+    this.emitAsync_('message', message);
     xhr.send(message);
   };
 

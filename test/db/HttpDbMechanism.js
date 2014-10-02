@@ -101,7 +101,6 @@ describe('HttpDbMechanism', function() {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
     var db = new lfr.Db(mechanism);
     db.post(Math.PI).thenCatch(function(reason) {
-      console.log(reason);
       done();
     });
     mechanism.getTransport().emit('error', new Error('Number not known in this galaxy'));

@@ -91,7 +91,7 @@ gulp.task('test-unit', function() {
 });
 
 gulp.task('test-cover', function() {
-  return gulp.src(['src/**/*.js'])
+  return gulp.src(['src/**/*.js', '!src/promise/Promise.js'])
     .pipe(plugins.istanbul());
 });
 

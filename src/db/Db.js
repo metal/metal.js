@@ -47,6 +47,18 @@
   };
 
   /**
+   * Removes entries from database.
+   * @param {!*} data Message object to the message, which should be removed
+   *   from the database.
+   * @param {Object=} opt_config Optional configuration object with metadata
+   *   about delete operation.
+   * @return {Promise}
+   */
+  lfr.Db.prototype.delete = function(data, opt_config) {
+    return this.dispatchDeferredMechanismAction_(this.mechanism_.delete, data, opt_config);
+  };
+
+  /**
    * Dispatches mechanism action with timeout support.
    * @param {!Function} handler
    * @param {!*} data Message object to the message.
@@ -76,17 +88,6 @@
     return this.timeoutMs_;
   };
 
-  /**
-   * Removes entries from database.
-   * @param {!*} data Message object to the message, which should be removed
-   *   from the database.
-   * @param {Object=} opt_config Optional configuration object with metadata
-   *   about delete operation.
-   * @return {Promise}
-   */
-  lfr.Db.prototype.delete = function(data, opt_config) {
-    return this.dispatchDeferredMechanismAction_(this.mechanism_.delete, data, opt_config);
-  };
   /**
    * Stores new entries to database.
    * @param {!*} data Data object which should be stored to the database.

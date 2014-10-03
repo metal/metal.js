@@ -16,6 +16,13 @@ describe('Db', function() {
     });
   });
 
+  it('should set timeout', function() {
+    var FakeMechanism = createFakeMechanism();
+    var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
+    db.setTimeoutMs(0);
+    assert.strictEqual(0, db.getTimeoutMs());
+  });
+
   it('should post message', function(done) {
     var FakeMechanism = createFakeMechanism();
     var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
@@ -52,12 +59,30 @@ describe('Db', function() {
     });
   });
 
+  it('should timeout action', function(done) {
+    var FakeMechanism = createFakeMechanism();
+    var db = new lfr.Db(new FakeMechanism('cloud.liferay.com/myApp/user'));
+    db.setTimeoutMs(0);
+    db.get(Math.PI)
+      .thenCatch(function(reason) {
+        assert.ok(reason instanceof Error);
+        done();
+      })
+      .then(function() {
+        assert.fail('Deferred should be cancelled with timeout error');
+      });
+  });
+
   function createFakeMechanism() {
     var FakeMechanism = function(uri) {
       this.uri_ = uri;
     };
     var defer = function(data) {
-      return lfr.Promise.resolve(data);
+      return new lfr.Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(data);
+          }, 10);
+        });
     };
     FakeMechanism.prototype.delete = defer;
     FakeMechanism.prototype.get = defer;

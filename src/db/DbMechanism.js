@@ -38,7 +38,7 @@
   lfr.DbMechanism.prototype.uri_ = '';
 
   /**
-   * Deletes data from database.
+   * Sends message with DELETE http verb.
    * @param {*=} message The value which will be used to
    *   retrieve data from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
@@ -48,7 +48,7 @@
   lfr.DbMechanism.prototype.delete = lfr.abstractMethod;
 
   /**
-   * Retrieves data from database.
+   * Sends message with GET http verb.
    * @param {*=} message The value which will be used to retrieve data from
    *   the database.
    * @param {Object=} opt_config optional Data payload to be provided to the
@@ -56,6 +56,17 @@
    * @return {Promise}
    */
   lfr.DbMechanism.prototype.get = lfr.abstractMethod;
+
+  /**
+   * Sends message with HEAD http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
+   * @return {Promise}
+   */
+  lfr.DbMechanism.prototype.head = lfr.abstractMethod;
+
 
   /**
    * Gets the db mechanism uri.
@@ -66,7 +77,17 @@
   };
 
   /**
-   * Stores data to database.
+   * Sends message with PATCH http verb.
+   * @param {*=} message The value which will be used to patch data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
+   * @return {Promise}
+   */
+  lfr.DbMechanism.prototype.patch = lfr.abstractMethod;
+
+  /**
+   * Sends message with POST http verb.
    * @param {*=} message The value which should be stored to
    *   the database.
    * @return {Promise}
@@ -74,7 +95,7 @@
   lfr.DbMechanism.prototype.post = lfr.abstractMethod;
 
   /**
-   * Retrieves data from database.
+   * Sends message with PUT http verb.
    * @param {*=} message The value which will be used to
    *   retrieve data from the database.
    * @param {Object=} opt_config optional Data payload to be provided to the

@@ -33,6 +33,30 @@ describe('HttpDbMechanism', function() {
     assert.strictEqual(xhrTransport, mechanism.getTransport());
   });
 
+  it('should head message', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    var db = new lfr.Db(mechanism);
+    var config = {};
+    db.head(Math.PI, config).then(function(data) {
+      assert.strictEqual(data.config, config);
+      assert.strictEqual(data.data, Math.PI);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.HEAD);
+      done();
+    });
+  });
+
+  it('should patch message', function(done) {
+    var mechanism = new lfr.HttpDbMechanism('liferay.com');
+    var db = new lfr.Db(mechanism);
+    var config = {};
+    db.patch(Math.PI, config).then(function(data) {
+      assert.strictEqual(data.config, config);
+      assert.strictEqual(data.data, Math.PI);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.PATCH);
+      done();
+    });
+  });
+
   it('should post message', function(done) {
     var mechanism = new lfr.HttpDbMechanism('liferay.com');
     var db = new lfr.Db(mechanism);
@@ -40,7 +64,7 @@ describe('HttpDbMechanism', function() {
     db.post(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
       assert.strictEqual(data.data, Math.PI);
-      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpMethods.POST);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.POST);
       done();
     });
   });
@@ -52,7 +76,7 @@ describe('HttpDbMechanism', function() {
     db.put(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
       assert.strictEqual(data.data, Math.PI);
-      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpMethods.PUT);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.PUT);
       done();
     });
   });
@@ -64,7 +88,7 @@ describe('HttpDbMechanism', function() {
     db.get(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
       assert.strictEqual(data.data, Math.PI);
-      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpMethods.GET);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.GET);
       done();
     });
   });
@@ -76,7 +100,7 @@ describe('HttpDbMechanism', function() {
     db.delete(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
       assert.strictEqual(data.data, Math.PI);
-      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpMethods.DELETE);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.DELETE);
       done();
     });
   });
@@ -86,7 +110,7 @@ describe('HttpDbMechanism', function() {
     var db = new lfr.Db(mechanism);
     db.post(Math.PI).then(function(data) {
       assert.strictEqual(data.data, Math.PI);
-      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpMethods.POST);
+      assert.strictEqual(data._method, lfr.HttpDbMechanism.HttpVerbs.POST);
       done();
     });
     assert.strictEqual(mechanism.pendingRequests_[0].status, lfr.DbMechanism.MessageStatus.SENT);

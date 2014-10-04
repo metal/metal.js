@@ -37,9 +37,11 @@
   lfr.Db.prototype.timeoutMs_ = 30000;
 
   /**
-   * Retrieves existing entries from database.
-   * @param {!*} data Specifies the data query which should be used in order
-   *   to retrieve data from the database.
+   * Sends message with GET http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
    * @return {Promise}
    */
   lfr.Db.prototype.get = function(data, opt_config) {
@@ -47,11 +49,23 @@
   };
 
   /**
-   * Removes entries from database.
-   * @param {!*} data Message object to the message, which should be removed
-   *   from the database.
-   * @param {Object=} opt_config Optional configuration object with metadata
-   *   about delete operation.
+   * Sends message with HEAD http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
+   * @return {Promise}
+   */
+  lfr.Db.prototype.head = function(data, opt_config) {
+    return this.dispatchDeferredMechanismAction_(this.mechanism_.head, data, opt_config);
+  };
+
+  /**
+   * Sends message with DELETE http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
    * @return {Promise}
    */
   lfr.Db.prototype.delete = function(data, opt_config) {
@@ -89,10 +103,23 @@
   };
 
   /**
-   * Stores new entries to database.
-   * @param {!*} data Data object which should be stored to the database.
-   * @param {Object} opt_config Optional configuration object with metadata
-   *   about post operation.
+   * Sends message with PATCH http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
+   * @return {Promise}
+   */
+  lfr.Db.prototype.patch = function(data, opt_config) {
+    return this.dispatchDeferredMechanismAction_(this.mechanism_.patch, data, opt_config);
+  };
+
+  /**
+   * Sends message with POST http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
    * @return {Promise}
    */
   lfr.Db.prototype.post = function(data, opt_config) {
@@ -100,11 +127,11 @@
   };
 
   /**
-   * Updates existing entries into the database.
-   * @param {!*} data Message object to the message, which should be updated
-   *   into the database.
-   * @param {Object} opt_config Optional configuration object with metadata
-   *   about put operation.
+   * Sends message with PUT http verb.
+   * @param {*=} message The value which will be used to send data from
+   *   the database.
+   * @param {Object=} opt_config optional Data payload to be provided to the
+   *   database.
    * @return {Promise}
    */
   lfr.Db.prototype.put = function(data, opt_config) {

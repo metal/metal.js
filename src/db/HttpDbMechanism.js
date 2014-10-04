@@ -26,9 +26,11 @@
    * @const
    * @static
    */
-  lfr.HttpDbMechanism.HttpMethods = {
+  lfr.HttpDbMechanism.HttpVerbs = {
     DELETE: 'DELETE',
     GET: 'GET',
+    HEAD: 'HEAD',
+    PATCH: 'PATCH',
     POST: 'POST',
     PUT: 'PUT'
   };
@@ -89,15 +91,10 @@
   };
 
   /**
-   * Deletes data from database.
-   * @param {!*} data The value which will be used to delete data from
-   *   the database.
-   * @param {Object=} opt_config optional Data payload to be provided to the
-   *   database.
-   * @return {Promise}
+   * @inheritDoc
    */
   lfr.HttpDbMechanism.prototype.delete = function(data, opt_config) {
-    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpMethods.DELETE, data, opt_config);
+    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpVerbs.DELETE, data, opt_config);
   };
 
   /**
@@ -117,38 +114,38 @@
   };
 
   /**
-   * Retrieves data from database.
-   * @param {!*} value The value which will be used to retrieve data from
-   *   the database.
-   * @param {Object=} opt_config optional Data payload to be provided to the
-   *   database.
-   * @return {Promise}
+   * @inheritDoc
    */
   lfr.HttpDbMechanism.prototype.get = function(value, opt_config) {
-    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpMethods.GET, value, opt_config);
+    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpVerbs.GET, value, opt_config);
   };
 
   /**
-   * Stores data to database.
-   * @param {!*} data The value which should be stored to
-   *   the database.
-   * @param {Object=} opt_config optional Data payload to be provided to the
-   *   database.
-   * @return {Promise}
+   * @inheritDoc
+   */
+  lfr.HttpDbMechanism.prototype.head = function(data, opt_config) {
+    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpVerbs.HEAD, data, opt_config);
+  };
+
+  /**
+   * @inheritDoc
+   */
+  lfr.HttpDbMechanism.prototype.patch = function(data, opt_config) {
+    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpVerbs.PATCH, data, opt_config);
+  };
+
+  /**
+   * @inheritDoc
    */
   lfr.HttpDbMechanism.prototype.post = function(data, opt_config) {
-    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpMethods.POST, data, opt_config);
+    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpVerbs.POST, data, opt_config);
   };
 
   /**
-   * Updates already existing data in database.
-   * @param {!*} data The data which have to be updated into the the database.
-   * @param {Object=} opt_config optional Data payload to be provided to the
-   *   database.
-   * @return {Promise}
+   * @inheritDoc
    */
   lfr.HttpDbMechanism.prototype.put = function(data, opt_config) {
-    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpMethods.PUT, data, opt_config);
+    return this.createDeferredRequest_(lfr.HttpDbMechanism.HttpVerbs.PUT, data, opt_config);
   };
 
   /**

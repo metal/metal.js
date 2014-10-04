@@ -19,9 +19,8 @@ var mainFiles = [
   'src/net/Transport.js',
   'src/net/XhrTransport.js',
   'src/net/WebSocketTransport.js',
-  'src/db/Db.js',
-  'src/db/DbMechanism.js',
-  'src/db/HttpDbMechanism.js'
+  'src/webchannel/WebChannel.js',
+  'src/webchannel/WebChannelTransport.js'
 ];
 
 gulp.task('build', ['clean'], function() {
@@ -79,7 +78,7 @@ gulp.task('test', function(done) {
 });
 
 gulp.task('test-complexity', function() {
-  return gulp.src(['src/**/*.js', 'test/**/*.js'])
+  return gulp.src(['src/**/*.js', 'test/**/*.js', '!src/promise/Promise.js'])
     .pipe(plugins.complexity({
       halstead: [12, 15, 20]
     }));

@@ -13,7 +13,7 @@
 
     if (!opt_transport) {
       if (!window.location) {
-        throw new Error('WebChannelTransport cannot resolve transport from url, try lfr.WebChannelTransport(new lfr.Transport(uri))');
+        throw new Error('WebChannelTransport cannot resolve transport uri, try lfr.WebChannelTransport(new lfr.Transport(uri))');
       }
       opt_transport = new lfr.WebSocketTransport(window.location.origin + window.location.pathname);
     }

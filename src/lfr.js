@@ -24,7 +24,7 @@
   };
 
   /**
-   * Creates a new function that, when called, has its this keyword set to the
+   * Creates a new function that, when called, has its keyword set to the
    * provided value, with a given sequence of arguments preceding any provided
    * when the new function is called.
    *
@@ -39,29 +39,93 @@
    * @return {!Function} A partially-applied form of the function bind() was
    *     invoked as a method of.
    */
-  lfr.bind = function(fn, context) {
+  lfr.bind = function(fn) {
     if (!fn) {
       throw new Error();
     }
 
     if (Function.prototype.bind) {
-      var bind = fn.call.apply(fn.bind, arguments);
-      return function() {
-        return bind.apply(null, arguments);
-      };
-    }
-
-    if (arguments.length > 2) {
-      var args = Array.prototype.slice.call(arguments, 2);
-      return function() {
-        var newArgs = Array.prototype.slice.call(arguments);
-        Array.prototype.unshift.apply(newArgs, args);
-        return fn.apply(context, newArgs);
-      };
+      return lfr.bindWithNative_.apply(lfr, arguments);
     } else {
-      return function() {
-        return fn.apply(context, arguments);
-      };
+      return lfr.bindWithoutNative_.apply(lfr, arguments);
+    }
+  };
+
+  /**
+   * Same as `lfr.bind`, but receives the arguments for the function as a single
+   * param.
+   * @param {function} fn A function to partially apply.
+   * @param {!Object} context Specifies the object which this should point to
+   *     when the function is run.
+   * @param {...*} var_args Additional arguments that are partially applied to
+   *     the function.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   * @protected
+   */
+  lfr.bindWithArgs_ = function(fn, context) {
+    var args = Array.prototype.slice.call(arguments, 2);
+
+    return function() {
+      var newArgs = Array.prototype.slice.call(arguments);
+      Array.prototype.unshift.apply(newArgs, args);
+      return fn.apply(context, newArgs);
+    };
+  };
+
+  /**
+   * Same as `lfr.bind`, but uses the native javascript `bind` function instead
+   * of reimplementing it.
+   *
+   * @param {function} fn A function to partially apply.
+   * @param {!Object} context Specifies the object which this should point to
+   *     when the function is run.
+   * @param {...*} var_args Additional arguments that are partially applied to
+   *     the function.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   * @protected
+   */
+  lfr.bindWithNative_ = function(fn) {
+    var bind = fn.call.apply(fn.bind, arguments);
+    return function() {
+      return bind.apply(null, arguments);
+    };
+  };
+
+  /**
+   * Same as `lfr.bind`, but it can't receive any arguments for the function.
+   * @param {function} fn A function to partially apply.
+   * @param {!Object} context Specifies the object which this should point to
+   *     when the function is run.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   * @protected
+   */
+  lfr.bindWithoutArgs_ = function(fn, context) {
+    return function() {
+      return fn.apply(context, arguments);
+    };
+  };
+
+  /**
+   * Same as `lfr.bind`, but doesn't try to use the native javascript `bind`
+   * function.
+   *
+   * @param {function} fn A function to partially apply.
+   * @param {!Object} context Specifies the object which this should point to
+   *     when the function is run.
+   * @param {...*} var_args Additional arguments that are partially applied to
+   *     the function.
+   * @return {!Function} A partially-applied form of the function bind() was
+   *     invoked as a method of.
+   * @protected
+   */
+  lfr.bindWithoutNative_ = function(fn, context) {
+    if (arguments.length > 2) {
+      return lfr.bindWithArgs_.apply(lfr, arguments);
+    } else {
+      return lfr.bindWithoutArgs_(fn, context);
     }
   };
 

@@ -13,17 +13,13 @@
 
     if (!opt_transport) {
       if (!window.location) {
-        throw new Error('WebChannelTransport cannot resolve transport uri, try lfr.WebChannelTransport(new lfr.Transport(uri))');
+        throw new Error('WebChannelTransport cannot resolve transport uri');
       }
       opt_transport = new lfr.WebSocketTransport(window.location.origin + window.location.pathname);
     }
 
     this.pendingRequests_ = [];
     this.setTransport(opt_transport);
-
-    if (!opt_transport.isOpen()) {
-      opt_transport.open();
-    }
   };
   lfr.inherits(lfr.WebChannelTransport, lfr.Disposable);
 
@@ -232,7 +228,7 @@
     if (this.transport_) {
       this.transport_.dispose();
     }
-    this.transport_ = transport;
+    this.transport_ = transport.open();
     this.transport_.on('close', lfr.bind(this.onTransportClose_, this));
     this.transport_.on('data', lfr.bind(this.onTransportReceiveData_, this));
     this.transport_.on('error', lfr.bind(this.onTransportError_, this));

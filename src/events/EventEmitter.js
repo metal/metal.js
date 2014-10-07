@@ -107,7 +107,7 @@
    * @protected
    */
   lfr.EventEmitter.prototype.compareListenerObjs_ = function(obj1, obj2) {
-      return obj1.id - obj2.id;
+    return obj1.id - obj2.id;
   };
 
   /**

@@ -19,13 +19,13 @@
     }
 
     this.pendingRequests_ = [];
-    this.transport_ = opt_transport.open();
-    this.transport_.on('close', lfr.bind(this.onTransportClose_, this));
-    this.transport_.on('data', lfr.bind(this.onTransportReceiveData_, this));
-    this.transport_.on('error', lfr.bind(this.onTransportError_, this));
-    this.transport_.on('open', lfr.bind(this.onTransportOpen_, this));
+    this.setTransport(opt_transport);
+
+    if (!opt_transport.isOpen()) {
+      opt_transport.open();
+    }
   };
-  lfr.inherits(lfr.WebChannelTransport, lfr.EventEmitter);
+  lfr.inherits(lfr.WebChannelTransport, lfr.Disposable);
 
   /**
    * Holds pending requests.
@@ -229,7 +229,14 @@
    * @param {lfr.Transport} transport
    */
   lfr.WebChannelTransport.prototype.setTransport = function(transport) {
+    if (this.transport_) {
+      this.transport_.dispose();
+    }
     this.transport_ = transport;
+    this.transport_.on('close', lfr.bind(this.onTransportClose_, this));
+    this.transport_.on('data', lfr.bind(this.onTransportReceiveData_, this));
+    this.transport_.on('error', lfr.bind(this.onTransportError_, this));
+    this.transport_.on('open', lfr.bind(this.onTransportOpen_, this));
   };
 
 }());

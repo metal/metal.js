@@ -45,6 +45,14 @@ describe('WebChannelTransport', function() {
     assert.strictEqual(transport, channelTransport.getTransport());
   });
 
+  it('should open transport from constructor', function(done) {
+    var transport = new lfr.WebSocketTransport('uri').open();
+    transport.once('open', function() {
+      new lfr.WebChannelTransport(transport);
+      done();
+    });
+  });
+
   it('should head message', function(done) {
     var channel = new lfr.WebChannel();
     var config = {};

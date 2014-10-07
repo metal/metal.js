@@ -88,6 +88,14 @@
   };
 
   /**
+   * @inheritDoc
+   */
+  lfr.WebChannelTransport.prototype.disposeInternal = function() {
+    this.transport_.dispose();
+    this.transport_ = null;
+  };
+
+  /**
    * Finds a pending request by id.
    * @param {number} id Message random id.
    * @return {?Object} Returns pending request object, returns null if not

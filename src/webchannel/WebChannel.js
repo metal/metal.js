@@ -65,6 +65,14 @@
   lfr.WebChannel.prototype.timeoutMs_ = 30000;
 
   /**
+   * @inheritDoc
+   */
+  lfr.WebChannel.prototype.disposeInternal = function() {
+    this.webChannelTransport_.dispose();
+    this.webChannelTransport_ = null;
+  };
+
+  /**
    * Sends message with GET http verb.
    * @param {*=} message The value which will be used to send as request data.
    * @param {Object=} opt_config Optional message payload.

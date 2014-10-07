@@ -118,6 +118,12 @@ describe('WebChannel', function() {
       });
   });
 
+  it('should dispose web channel', function() {
+    var channel = new lfr.WebChannel();
+    channel.dispose();
+    assert.ok(!channel.getWebChannelTransport());
+  });
+
   function createFakeWebChannelTransport() {
     var FakeWebChannelTransport = function() {};
     var defer = function(data) {

@@ -167,4 +167,10 @@ describe('WebChannelTransport', function() {
     });
   });
 
+  it('should dispose web channel transport', function() {
+    var channel = new lfr.WebChannelTransport();
+    channel.dispose();
+    assert.ok(!channel.getTransport());
+  });
+
 });

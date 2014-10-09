@@ -26,24 +26,11 @@
    * @const
    * @static
    */
-  lfr.Transport.STATE_CLOSED = 'closed';
-
-  /**
-   * Holds the open state value.
-   * @type {string}
-   * @const
-   * @static
-   */
-  lfr.Transport.STATE_OPEN = 'open';
-
-  /**
-   * Holds the opening state value.
-   * @type {string}
-   * @const
-   * @static
-   */
-  lfr.Transport.STATE_OPENING = 'opening';
-
+  lfr.Transport.State = {
+    CLOSED: 'closed',
+    OPEN: 'open',
+    OPENING: 'opening'
+  };
 
   /**
    * Holds the transport state, it supports the available states: '',
@@ -108,8 +95,8 @@
    */
   lfr.Transport.prototype.isOpen = function() {
     switch (this.state_) {
-      case lfr.Transport.STATE_OPENING:
-      case lfr.Transport.STATE_OPEN:
+      case lfr.Transport.State.OPENING:
+      case lfr.Transport.State.OPEN:
         return true;
     }
     return false;
@@ -120,7 +107,7 @@
    * @protected
    */
   lfr.Transport.prototype.onCloseHandler_ = function() {
-    this.state_ = lfr.Transport.STATE_CLOSED;
+    this.state_ = lfr.Transport.State.CLOSED;
   };
 
   /**
@@ -128,7 +115,7 @@
    * @protected
    */
   lfr.Transport.prototype.onOpenHandler_ = function() {
-    this.state_ = lfr.Transport.STATE_OPEN;
+    this.state_ = lfr.Transport.State.OPEN;
   };
 
   /**
@@ -136,7 +123,7 @@
    * @protected
    */
   lfr.Transport.prototype.onOpeningHandler_ = function() {
-    this.state_ = lfr.Transport.STATE_OPENING;
+    this.state_ = lfr.Transport.State.OPENING;
   };
 
   /**

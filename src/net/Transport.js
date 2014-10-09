@@ -21,8 +21,8 @@
   lfr.inherits(lfr.Transport, lfr.EventEmitter);
 
   /**
-   * Holds the closed state value.
-   * @type {string}
+   * Holds the transport state values.
+   * @type {Object}
    * @const
    * @static
    */

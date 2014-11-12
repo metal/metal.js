@@ -11,6 +11,7 @@ require('../../src/structs/WildcardTrie.js');
 require('../../src/events/EventHandle.js');
 require('../../src/events/EventHandler.js');
 require('../../src/events/EventEmitter.js');
+require('../../src/attribute/Attribute.js');
 require('../../src/net/Transport.js');
 require('../../src/net/XhrTransport.js');
 require('../../src/net/WebSocketTransport.js');

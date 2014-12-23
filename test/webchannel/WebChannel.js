@@ -3,63 +3,77 @@
 var assert = require('assert');
 var sinon = require('sinon');
 var createFakeSocketIO = require('../fixture/FakeSocketIO');
+var FakeTransport = require('../fixture/FakeTransport');
 require('../fixture/sandbox.js');
 
 describe('WebChannel', function() {
-  before(function() {
-    global.FakeSocketIO = createFakeSocketIO();
-  });
-
   beforeEach(function() {
-    global.io = function() {
-      return new global.FakeSocketIO();
-    };
     global.window.location = {
       origin: 'http://localhost',
       pathname: '/pathname'
     };
   });
 
+  describe('default transport', function() {
+    before(function() {
+      var FakeSocketIO = createFakeSocketIO();
+      global.io = function() {
+        return new FakeSocketIO();
+      };
+    });
+
+    after(function() {
+      global.io = null;
+    });
+
+    it('should not throw error when transport is not specified', function() {
+      assert.doesNotThrow(function() {
+        new lfr.WebChannel();
+      });
+    });
+
+    it('should default to web socket when transport is not specified', function() {
+      var channel = new lfr.WebChannel();
+      var transport = channel.getTransport();
+      assert.ok(transport instanceof lfr.WebSocketTransport);
+      assert.strictEqual('http://localhost/pathname', transport.getUri());
+    });
+
+    it('should throw error when web channel cannot resolve transport uri from window location', function() {
+      global.window.location = null;
+      assert.throws(function() {
+        new lfr.WebChannel();
+      });
+    });
+  });
+
   it('should not throw error when transport is specified', function() {
     assert.doesNotThrow(function() {
-      new lfr.WebChannel(new lfr.WebSocketTransport(''));
+      new lfr.WebChannel(new FakeTransport(''));
     }, Error);
   });
 
-  it('should not throw error when transport is not specified', function() {
-    assert.doesNotThrow(function() {
-      new lfr.WebChannel();
-    });
-  });
-
-  it('should throw error when web channel cannot resolve transport uri from window location', function() {
-    global.window.location = null;
-    assert.throws(function() {
-      new lfr.WebChannel();
-    });
-  });
-
   it('should retrieve the specified transport', function() {
-    var transport = new lfr.WebSocketTransport('uri');
+    var transport = new FakeTransport('uri');
     var channel = new lfr.WebChannel(transport);
     assert.strictEqual(transport, channel.getTransport());
   });
 
   it('should retrieve the same transport if changed via setter', function() {
-    var transport = new lfr.WebSocketTransport('uri');
-    var channel = new lfr.WebChannel();
+    var transport = new FakeTransport('uri');
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.setTransport(transport);
     assert.strictEqual(transport, channel.getTransport());
   });
 
   it('should set timeout', function() {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.setTimeoutMs(0);
     assert.strictEqual(0, channel.getTimeoutMs());
   });
 
   it('should head message', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     var config = {};
     channel.head(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
@@ -70,7 +84,7 @@ describe('WebChannel', function() {
   });
 
   it('should patch message', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     var config = {};
     channel.patch(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
@@ -81,7 +95,7 @@ describe('WebChannel', function() {
   });
 
   it('should post message', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     var config = {};
     channel.post(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
@@ -92,7 +106,7 @@ describe('WebChannel', function() {
   });
 
   it('should put message', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     var config = {};
     channel.put(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
@@ -103,7 +117,7 @@ describe('WebChannel', function() {
   });
 
   it('should get message', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     var config = {};
     channel.get(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
@@ -114,7 +128,7 @@ describe('WebChannel', function() {
   });
 
   it('should delete message', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     var config = {};
     channel.delete(Math.PI, config).then(function(data) {
       assert.strictEqual(data.config, config);
@@ -125,7 +139,7 @@ describe('WebChannel', function() {
   });
 
   it('should timeout action', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.setTimeoutMs(0);
     channel.get(Math.PI)
       .thenCatch(function(reason) {
@@ -138,7 +152,7 @@ describe('WebChannel', function() {
   });
 
   it('should send pending messages when transport reopens', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.post(Math.PI).then(function(data) {
       assert.strictEqual(data.data, Math.PI);
       assert.strictEqual(data._method, lfr.WebChannel.HttpVerbs.POST);
@@ -153,7 +167,7 @@ describe('WebChannel', function() {
   });
 
   it('should cancel pending messages when transport emits error', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.post(Math.PI).thenCatch(function() {
       done();
     });
@@ -164,7 +178,7 @@ describe('WebChannel', function() {
     var originalWarningFn = console.warn;
     console.warn = sinon.stub();
 
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.getTransport().on('data', function() {
       assert.strictEqual(1, console.warn.callCount);
 
@@ -176,7 +190,7 @@ describe('WebChannel', function() {
   });
 
   it('should not remove message from queue when mismatch message id arrives', function(done) {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.get().then(function() {
       done();
     });
@@ -189,7 +203,7 @@ describe('WebChannel', function() {
   });
 
   it('should dispose web channel', function() {
-    var channel = new lfr.WebChannel();
+    var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.dispose();
     assert.ok(!channel.getTransport());
   });

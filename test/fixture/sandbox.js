@@ -15,4 +15,3 @@ require('../../src/net/Transport.js');
 require('../../src/net/XhrTransport.js');
 require('../../src/net/WebSocketTransport.js');
 require('../../src/webchannel/WebChannel.js');
-require('../../src/webchannel/WebChannelTransport.js');

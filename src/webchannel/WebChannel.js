@@ -87,9 +87,12 @@
     var self = this;
     var nextRid = ((Math.random() * 1e9) >>> 0);
     var message = {
+      // TODO(maira): Do we really need this id?
       id: nextRid,
+      // TODO(maira): Change this to be a opt_transport_config.
       config: opt_config,
       data: data,
+      // TODO(maira): Remove.
       _method: method
     };
 

@@ -163,6 +163,10 @@
   /**
    * Writes data to the transport.
    * @param {*} message
+   * @param {*} opt_config Relevant if the transport needs information such as
+   *     HTTP method, headers and parameters.
+   * @param {*} opt_success
+   * @param {*} opt_error
    * @chainable
    */
   lfr.Transport.prototype.write = lfr.abstractMethod;

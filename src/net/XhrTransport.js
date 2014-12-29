@@ -31,6 +31,7 @@
    * @type {string}
    * @default GET
    * @protected
+   * TODO(maira): Change default http method to POST.
    */
   lfr.XhrTransport.prototype.httpMethod_ = 'GET';
 
@@ -66,6 +67,7 @@
       });
       lfr.array.remove(self.sendInstances_, xhr);
     };
+    // TODO(maira): Sets http method from opt_config.
     xhr.open(self.getHttpMethod(), this.getUri(), true);
     var headers = self.getHttpHeaders();
     if (headers) {
@@ -146,9 +148,10 @@
 
   /**
    * @inheritDoc
+   * TODO(maira): Updates to the new interface.
    */
-  lfr.XhrTransport.prototype.write = function(message) {
-    var xhr = this.createXhr_();
+  lfr.XhrTransport.prototype.write = function(message, opt_config, opt_success, opt_error) {
+    var xhr = this.createXhr_( /* opt_config, opt_success, opt_error */ );
     this.sendInstances_.push(xhr);
     this.emitAsync_('message', message);
     xhr.send(message);

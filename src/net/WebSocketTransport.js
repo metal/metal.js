@@ -118,8 +118,9 @@
 
   /**
    * @inheritDoc
+   * TODO(maira): Updates to the new interface.
    */
-  lfr.WebSocketTransport.prototype.write = function(message) {
+  lfr.WebSocketTransport.prototype.write = function(message, opt_config, opt_success, opt_error) {
     this.socket.send(message);
   };
 

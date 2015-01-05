@@ -30,6 +30,14 @@
   lfr.Attribute.prototype.attrsInfo_ = null;
 
   /**
+   * Object with information about the batch event that is currently scheduled, or
+   * null if none is.
+   * @type {Object}
+   * @protected
+   */
+  lfr.Attribute.prototype.scheduledBatchData_ = null;
+
+  /**
    * Adds the given attribute.
    * @param {string} name The name of the new attribute.
    * @param {Object.<string, *>=} config The configuration object for the new attribute.
@@ -37,6 +45,8 @@
    *   precedence than the default value specified in this attribute's configuration.
    */
   lfr.Attribute.prototype.addAttr = function(name, config, initialValue) {
+    this.assertValidAttrName_(name);
+
     this.attrsInfo_[name] = {
       config: config || {},
       initialValue: initialValue,
@@ -63,6 +73,18 @@
 
     for (var i = 0; i < names.length; i++) {
       this.addAttr(names[i], configs[names[i]], initialValues[names[i]]);
+    }
+  };
+
+  /**
+   * Checks that the given name is a valid attribute name. If it's not, an error
+   * will be thrown.
+   * @param {string} name The name to be validated.
+   * @throws {Error}
+   */
+  lfr.Attribute.prototype.assertValidAttrName_ = function(name) {
+    if (name === 'attrs') {
+      throw new Error('It\'s not allowed to create an attribute with the name "attrs".');
     }
   };
 
@@ -116,6 +138,24 @@
   };
 
   /**
+   * @inheritDoc
+   */
+  lfr.Attribute.prototype.disposeInternal = function() {
+    this.attrsInfo_ = null;
+    this.scheduledBatchData_ = null;
+  };
+
+  /**
+   * Emits the attribute change batch event.
+   * @protected
+   */
+  lfr.Attribute.prototype.emitBatchEvent_ = function() {
+    var data = this.scheduledBatchData_;
+    this.scheduledBatchData_ = null;
+    this.emit('attrsChanged', data);
+  };
+
+  /**
    * Returns an object that maps all attribute names to their values.
    * @return {Object.<string, *>}
    */
@@ -151,15 +191,14 @@
    * @protected
    */
   lfr.Attribute.prototype.informChange_ = function(name, prevVal) {
-    var info = this.attrsInfo_[name];
-    var value = this[name];
-
-    if (info.state !== lfr.Attribute.States.INITIALIZING && prevVal !== value) {
-      this.emit(name + 'Change', {
+    if (this.shouldInformChange_(name, prevVal)) {
+      var data = {
         attrName: name,
-        newVal: value,
+        newVal: this[name],
         prevVal: prevVal
-      });
+      };
+      this.emit(name + 'Changed', data);
+      this.scheduleBatchEvent_(data);
     }
   };
 
@@ -179,6 +218,27 @@
     info.state = lfr.Attribute.States.INITIALIZED;
 
     this.setInitialValue_(name);
+  };
+
+  /**
+   * Schedules an attribute change batch event to be emitted asynchronously.
+   * @param {!Object} attrChangeData Information about an attribute's update.
+   * @protected
+   */
+  lfr.Attribute.prototype.scheduleBatchEvent_ = function(attrChangeData) {
+    if (!this.scheduledBatchData_) {
+      setTimeout(lfr.bind(this.emitBatchEvent_, this), 0);
+      this.scheduledBatchData_ = {
+        changes: {}
+      };
+    }
+
+    var name = attrChangeData.attrName;
+    if (this.scheduledBatchData_.changes[name]) {
+      this.scheduledBatchData_.changes[name].newVal = attrChangeData.newVal;
+    } else {
+      this.scheduledBatchData_.changes[name] = attrChangeData;
+    }
   };
 
   /**
@@ -233,6 +293,23 @@
       this[name] = info.initialValue;
       info.initialValue = undefined;
     }
+  };
+
+  /**
+   * Checks if we should inform about an attributes update. Updates are ignored
+   * during attribute initialization. Otherwise, updates to primitive values
+   * are only informed when the new value is different from the previous
+   * one. Updates to objects (which includes functions and arrays) are always
+   * informed outside initialization though, since we can't be sure if all of
+   * the internal data has stayed the same.
+   * @param {string} name The name of the attribute.
+   * @param {*} prevVal The previous value of the attribute.
+   * @return {Boolean}
+   */
+  lfr.Attribute.prototype.shouldInformChange_ = function(name, prevVal) {
+    var info = this.attrsInfo_[name];
+    return (info.state !== lfr.Attribute.States.INITIALIZING) &&
+      (lfr.isObject(prevVal) || prevVal !== this[name]);
   };
 
   /**

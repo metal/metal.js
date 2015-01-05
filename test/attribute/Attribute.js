@@ -27,6 +27,16 @@ describe('Attribute', function() {
     assert.strictEqual('attr2', attrNames[1]);
   });
 
+  it('should not allow adding attribute with invalid name', function() {
+    var attr = new lfr.Attribute();
+
+    assert.throws(function() {
+      attr.addAttrs({
+        attrs: {}
+      });
+    });
+  });
+
   it('should set and get attribute values', function() {
     var attr = new lfr.Attribute();
     attr.addAttrs({
@@ -245,33 +255,75 @@ describe('Attribute', function() {
 
   it('should emit event when attribute changes', function() {
     var attr = createAttributeInstance();
-
     var listener = sinon.stub();
-    attr.on('attr1Change', listener);
+    attr.on('attr1Changed', listener);
 
     attr.attr1 = 2;
     assert.strictEqual(1, listener.callCount);
-
-    attr.attr1 = 2;
-    attr.attr2 = -2;
-    attr.attr2 = 1;
-    assert.strictEqual(1, listener.callCount);
-
-    attr.attr1 = 3;
-    assert.strictEqual(2, listener.callCount);
+    assert.strictEqual('attr1', listener.args[0][0].attrName);
+    assert.strictEqual(1, listener.args[0][0].prevVal);
+    assert.strictEqual(2, listener.args[0][0].newVal);
   });
 
-  it('should provide correct data to the attribute change event', function() {
+  it('should not emit events when attribute doesn\'t change', function() {
     var attr = createAttributeInstance();
+    var listener = sinon.stub();
+    attr.on('attr1Changed', listener);
+
+    attr.attr1 = attr.attr1;
+    assert.strictEqual(0, listener.callCount);
+  });
+
+  it('should emit events when attribute doesn\'t change if value is an object', function() {
+    var attr = createAttributeInstance();
+    attr.attr1 = {};
 
     var listener = sinon.stub();
-    attr.on('attr1Change', listener);
+    attr.on('attr1Changed', listener);
 
-    attr.attr1 = 2;
-    var eventData = listener.args[0][0];
-    assert.strictEqual('attr1', eventData.attrName);
-    assert.strictEqual(1, eventData.prevVal);
-    assert.strictEqual(2, eventData.newVal);
+    attr.attr1 = attr.attr1;
+    assert.strictEqual(1, listener.callCount);
+  });
+
+  it('should emit events when attribute doesn\'t change if value is an array', function() {
+    var attr = createAttributeInstance();
+    attr.attr1 = [];
+
+    var listener = sinon.stub();
+    attr.on('attr1Changed', listener);
+
+    attr.attr1 = attr.attr1;
+    assert.strictEqual(1, listener.callCount);
+  });
+
+  it('should emit events when attribute doesn\'t change if value is a function', function() {
+    var attr = createAttributeInstance();
+    attr.attr1 = function() {};
+
+    var listener = sinon.stub();
+    attr.on('attr1Changed', listener);
+
+    attr.attr1 = attr.attr1;
+    assert.strictEqual(1, listener.callCount);
+  });
+
+  it('should emit a batch event with all attribute changes for the cycle', function(done) {
+    var attr = createAttributeInstance();
+
+    attr.on('attrsChanged', function(data) {
+      assert.strictEqual(2, Object.keys(data.changes).length);
+      assert.strictEqual(1, data.changes.attr1.prevVal);
+      assert.strictEqual(12, data.changes.attr1.newVal);
+      assert.strictEqual(2, data.changes.attr2.prevVal);
+      assert.strictEqual(21, data.changes.attr2.newVal);
+      done();
+    });
+
+    attr.attr1 = 10;
+    attr.attr1 = 11;
+    attr.attr2 = 20;
+    attr.attr1 = 12;
+    attr.attr2 = 21;
   });
 
   it('should get all attribute values', function() {
@@ -294,6 +346,14 @@ describe('Attribute', function() {
 
     assert.strictEqual(10, attr.attr1);
     assert.strictEqual(20, attr.attr2);
+  });
+
+  it('should not allow getting attribute data after disposed', function() {
+    var attr = createAttributeInstance();
+    attr.dispose();
+    assert.throws(function() {
+      attr.getAttrs();
+    });
   });
 });
 

@@ -13,6 +13,16 @@
   lfr.inherits(lfr.WebSocketTransport, lfr.Transport);
 
   /**
+   * If the requests should be RESTful or not. RESTful requests are always sent as
+   * JSON data, with the method as one of the params, and the original data to be
+   * sent accessible through the `data` key.
+   * @type {boolean}
+   * @default false
+   * @protected
+   */
+  lfr.WebSocketTransport.prototype.restful_ = false;
+
+  /**
    * Holds the underlying socket mechanism. Default mechanism uses Socket.IO.
    * @type {Socket.IO}
    * @default null
@@ -117,11 +127,30 @@
   };
 
   /**
-   * @inheritDoc
-   * TODO(maira): Updates to the new interface.
+   * Sets this transport to be RESTful or not.
+   * @param {boolean} restful
    */
-  lfr.WebSocketTransport.prototype.write = function(message, opt_config, opt_success, opt_error) {
-    this.socket.send(message);
+  lfr.WebSocketTransport.prototype.setRestful = function(restful) {
+    this.restful_ = restful;
+  };
+
+  /**
+   * @inheritDoc
+   */
+  lfr.WebSocketTransport.prototype.write = function(message, opt_config, opt_success) {
+    if (this.restful_) {
+      message = {
+        data: message,
+        method: opt_config ? opt_config.method : 'POST'
+      };
+    }
+
+    var self = this;
+    this.socket.send(message, function(response) {
+      if (opt_success) {
+        opt_success(self.decodeData(response));
+      }
+    });
   };
 
 }());

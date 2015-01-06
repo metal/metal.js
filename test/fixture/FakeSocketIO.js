@@ -19,12 +19,14 @@ function createFakeSocketIO() {
       self.emit('connect');
     }, 0);
   };
-  FakeSocketIO.prototype.send = function(message) {
+  FakeSocketIO.prototype.send = function(message, callback) {
     var self = this;
     self.timer = setTimeout(function() {
       self.emit('message', message);
       self.timer = setTimeout(function() {
-        self.emit('data', message);
+        if (callback) {
+          callback(message);
+        }
       }, 10);
     }, 0);
   };

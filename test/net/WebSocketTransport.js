@@ -113,6 +113,36 @@ describe('WebSocketTransport', function() {
     });
   });
 
+  it('should handle successful restful send message', function(done) {
+    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    transport.setRestful(true);
+    transport.open();
+    transport.on('open', function() {
+      transport.on('message', function(data) {
+        assert.strictEqual('POST', data.method);
+        assert.strictEqual('message', data.data);
+        done();
+      });
+      transport.send('message');
+    });
+  });
+
+  it('should handle successful restful send message with method', function(done) {
+    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    transport.setRestful(true);
+    transport.open();
+    transport.on('open', function() {
+      transport.on('message', function(data) {
+        assert.strictEqual('GET', data.method);
+        assert.strictEqual('message', data.data);
+        done();
+      });
+      transport.send('message', {
+        method: 'GET'
+      });
+    });
+  });
+
   it('should handle successful receive data', function(done) {
     var transport = new lfr.WebSocketTransport('http://liferay.com');
     var stubData = sinon.stub();
@@ -127,13 +157,23 @@ describe('WebSocketTransport', function() {
     });
   });
 
+  it('should handle successful response data', function(done) {
+    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    transport.open();
+    transport.on('open', function() {
+      transport.send('message', {}, function(data) {
+        assert.strictEqual('message', data);
+        done();
+      });
+    });
+  });
+
   it('should handle failing send data', function(done) {
     var transport = new lfr.WebSocketTransport('http://liferay.com');
     var stubError = sinon.stub();
     transport.on('error', stubError);
     transport.open();
     transport.on('open', function() {
-      transport.send();
       transport.socket.on('error', function() {
         var error = stubError.getCall(0).args[0].error;
         assert.ok(error instanceof Error);

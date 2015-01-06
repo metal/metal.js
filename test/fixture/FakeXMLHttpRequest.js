@@ -16,7 +16,9 @@ function createFakeXMLHttpRequest(status, responseText) {
     this.aborted = true;
   };
 
-  FakeXMLHttpRequest.prototype.open = lfr.nullFunction;
+  FakeXMLHttpRequest.prototype.open = function(method) {
+    this.method = method;
+  };
 
   FakeXMLHttpRequest.prototype.send = function(body) {
     this.body = body;

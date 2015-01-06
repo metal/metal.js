@@ -21,21 +21,6 @@ describe('XhrTransport', function() {
     assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
   });
 
-  it('should set http method', function() {
-    var transport = new lfr.XhrTransport('http://liferay.com');
-    transport.setHttpMethod('POST');
-    assert.strictEqual('POST', transport.getHttpMethod(), 'Should warn when open');
-  });
-
-  it('should set http headers', function() {
-    var transport = new lfr.XhrTransport('http://liferay.com');
-    var headers = {
-      foo: 1
-    };
-    transport.setHttpHeaders(headers);
-    assert.strictEqual(headers, transport.getHttpHeaders(), 'Should set http headers');
-  });
-
   it('should connection open', function(done) {
     var transport = new lfr.XhrTransport('http://liferay.com');
     var stubOpen = sinon.stub();
@@ -133,28 +118,61 @@ describe('XhrTransport', function() {
 
   it('should handle successful received data', function(done) {
     var transport = new lfr.XhrTransport('http://liferay.com');
-    var stubData = sinon.stub();
-    transport.on('data', stubData);
     transport.open();
     transport.on('open', function() {
-      transport.send();
-      transport.on('data', function() {
-        assert.strictEqual(stubData.getCall(0).args[0], 'data', 'Should use responseText as data');
+      transport.send({}, {}, function(data) {
+        assert.strictEqual('data', data, 'Should use responseText as data');
         done();
       });
     });
   });
 
-  it('should handle successful send data without http headers', function(done) {
+  it('should send request using the default method', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
-    transport.setHttpHeaders(null);
-    var stubData = sinon.stub();
-    transport.on('data', stubData);
+    transport.open();
+    transport.send('message');
+    assert.strictEqual(1, XMLHttpRequest.requests.length);
+
+    var request = XMLHttpRequest.requests[0];
+    assert.strictEqual('POST', request.method);
+  });
+
+  it('should send request using the requested method', function() {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+    transport.send('message', {
+      method: 'GET'
+    });
+    assert.strictEqual(1, XMLHttpRequest.requests.length);
+
+    var request = XMLHttpRequest.requests[0];
+    assert.strictEqual('GET', request.method);
+  });
+
+  it('should send request using the requested headers', function() {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+    transport.send('message', {
+      headers: {
+        header1: 'header1Value'
+      }
+    });
+    assert.strictEqual(1, XMLHttpRequest.requests.length);
+
+    var request = XMLHttpRequest.requests[0];
+    assert.strictEqual('header1Value', request.headers.header1);
+  });
+
+  it('should not run success handler for failures', function(done) {
+    global.XMLHttpRequest = createFakeXMLHttpRequest(404);
+
+    var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
-      transport.send();
-      transport.on('data', function() {
-        assert.strictEqual(stubData.getCall(0).args[0], 'data', 'Should use responseText as data');
+      var successFn = sinon.stub();
+      transport.send({}, {}, successFn);
+      process.nextTick(function() {
+        assert.strictEqual(0, successFn.callCount);
         done();
       });
     });
@@ -164,14 +182,10 @@ describe('XhrTransport', function() {
     global.XMLHttpRequest = createFakeXMLHttpRequest(404);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
-    var stubError = sinon.stub();
-    transport.on('error', stubError);
-
     transport.open();
     transport.on('open', function() {
-      transport.send();
-      transport.on('error', function() {
-        var error = stubError.getCall(0).args[0].error;
+      transport.send({}, {}, null, function(response) {
+        var error = response.error;
         assert.ok(error instanceof Error);
         assert.ok(error.xhr instanceof global.XMLHttpRequest);
         done();
@@ -183,14 +197,10 @@ describe('XhrTransport', function() {
     global.XMLHttpRequest = createFakeXMLHttpRequest(304);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
-    var stubError = sinon.stub();
-    transport.on('error', stubError);
-
     transport.open();
     transport.on('open', function() {
-      transport.send();
-      transport.on('error', function() {
-        var error = stubError.getCall(0).args[0].error;
+      transport.send({}, {}, null, function(response) {
+        var error = response.error;
         assert.ok(error instanceof Error);
         assert.ok(error.xhr instanceof global.XMLHttpRequest);
         done();

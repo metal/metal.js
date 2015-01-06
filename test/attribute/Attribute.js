@@ -348,6 +348,27 @@ describe('Attribute', function() {
     assert.strictEqual(20, attr.attr2);
   });
 
+  it('should not run setter, validator or events for removed attributes', function() {
+    var attr = new lfr.Attribute();
+    attr.addAttr('attr1', {
+      setter: function(val) {
+        return val + 10;
+      },
+      validator: function(val) {
+        return val > 0;
+      }
+    });
+    var listener = sinon.stub();
+    attr.on('attr1Changed', listener);
+
+    attr.removeAttr('attr1');
+    assert.strictEqual(undefined, attr.attr1);
+
+    attr.attr1 = -100;
+    assert.strictEqual(-100, attr.attr1);
+    assert.strictEqual(0, listener.callCount);
+  });
+
   it('should not allow getting attribute data after disposed', function() {
     var attr = createAttributeInstance();
     attr.dispose();

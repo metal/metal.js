@@ -54,6 +54,7 @@
     };
 
     Object.defineProperty(this, name, {
+      configurable: true,
       get: lfr.bind(this.getAttrValue_, this, name),
       set: lfr.bind(this.setAttrValue_, this, name)
     });
@@ -218,6 +219,15 @@
     info.state = lfr.Attribute.States.INITIALIZED;
 
     this.setInitialValue_(name);
+  };
+
+  /**
+   * Removes the requested attribute.
+   * @param {string} name The name of the attribute.
+   */
+  lfr.Attribute.prototype.removeAttr = function(name) {
+    this.attrsInfo_[name] = null;
+    delete this[name];
   };
 
   /**

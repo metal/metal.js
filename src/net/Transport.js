@@ -135,10 +135,16 @@
   /**
    * Sends message.
    * @param {*} message
+   * @param {*} opt_config Relevant if the transport needs information such as
+   *     HTTP method, headers and parameters.
+   * @param {*} opt_success Function to be called when the request receives a
+   *   success response.
+   * @param {*} opt_error Function to be called when the request receives an error
+   *   response.
    */
-  lfr.Transport.prototype.send = function(message) {
+  lfr.Transport.prototype.send = function(message, opt_config, opt_success, opt_error) {
     if (this.isOpen()) {
-      this.write(message);
+      this.write(message, opt_config, opt_success, opt_error);
     } else {
       throw new Error('Transport not open');
     }
@@ -162,11 +168,13 @@
 
   /**
    * Writes data to the transport.
-   * @param {*} message
+   * @param {*} message The data that will be sent through the transport.
    * @param {*} opt_config Relevant if the transport needs information such as
    *     HTTP method, headers and parameters.
-   * @param {*} opt_success
-   * @param {*} opt_error
+   * @param {*} opt_success Function to be called when the request receives a
+   *   success response.
+   * @param {*} opt_error Function to be called when the request receives an error
+   *   response.
    * @chainable
    */
   lfr.Transport.prototype.write = lfr.abstractMethod;
@@ -177,12 +185,12 @@
    */
 
   /**
-   * Emits when the data is fully received form the connection.
+   * Emits when data is received from the connection.
    * @event data
    */
 
   /**
-   * Emits when error is called.
+   * Emits when an error is received from the connection.
    * @event error
    */
 

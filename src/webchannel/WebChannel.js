@@ -85,30 +85,28 @@
    */
   lfr.WebChannel.prototype.createDeferredRequest_ = function(method, data, opt_config) {
     var self = this;
-    var nextRid = ((Math.random() * 1e9) >>> 0);
-    var message = {
-      // TODO(maira): Do we really need this id?
-      id: nextRid,
-      // TODO(maira): Change this to be a opt_transport_config.
-      config: opt_config,
-      data: data,
-      // TODO(maira): Remove.
-      _method: method
-    };
+
+    var config = opt_config ? opt_config : {};
+    var request;
 
     var def = new lfr.Promise(function(resolve, reject) {
-      self.pendingRequests_.push({
-        message: message,
+      config.method = method;
+
+      request = {
+        config: config,
+        message: data,
         reject: reject,
         resolve: resolve,
         status: lfr.WebChannel.MessageStatus.PENDING
-      });
+      };
+
+      self.pendingRequests_.push(request);
       self.processPendingRequests_();
     });
 
     // Removes itself from pending requests when it's done.
     def.thenAlways(function() {
-      lfr.array.removeAt(self.pendingRequests_, self.findPendingRequestById_(message.id));
+      lfr.array.remove(self.pendingRequests_, request);
     });
 
     this.startRequestTimer_(def);
@@ -134,22 +132,6 @@
 
     this.transport_.dispose();
     this.transport_ = null;
-  };
-
-  /**
-   * Finds a pending request by id.
-   * @param {number} id Message random id.
-   * @return {?Object} Returns pending request object, returns null if not
-   *   found.
-   * @protected
-   */
-  lfr.WebChannel.prototype.findPendingRequestById_ = function(id) {
-    for (var i = 0; i < this.pendingRequests_.length; ++i) {
-      if (id === this.pendingRequests_[i].message.id) {
-        return this.pendingRequests_[i];
-      }
-    }
-    return null;
   };
 
   /**
@@ -218,22 +200,6 @@
   };
 
   /**
-   * Event listener to transport `data` event.
-   * @protected
-   * @param {*} data
-   */
-  lfr.WebChannel.prototype.onTransportReceiveData_ = function(data) {
-    if (!data) {
-      console.warn('Malformed data arrived');
-      return;
-    }
-    var pendingRequest = this.findPendingRequestById_(data.id);
-    if (pendingRequest) {
-      pendingRequest.resolve(data);
-    }
-  };
-
-  /**
    * Sends message with PATCH http verb.
    * @param {*=} message The value which will be used to send as request data.
    * @param {Object=} opt_config Optional message payload.
@@ -262,7 +228,12 @@
       var pendingRequest = this.pendingRequests_[i];
       if (pendingRequest.status === lfr.WebChannel.MessageStatus.PENDING) {
         pendingRequest.status = lfr.WebChannel.MessageStatus.SENT;
-        this.transport_.send(pendingRequest.message);
+        this.transport_.send(
+          pendingRequest.message,
+          pendingRequest.config,
+          pendingRequest.resolve,
+          pendingRequest.reject
+        );
       }
     }
   };
@@ -295,7 +266,6 @@
     }
     this.transport_ = transport.open();
     this.transport_.on('close', lfr.bind(this.onTransportClose_, this));
-    this.transport_.on('data', lfr.bind(this.onTransportReceiveData_, this));
     this.transport_.on('error', lfr.bind(this.onTransportError_, this));
     this.transport_.on('open', lfr.bind(this.onTransportOpen_, this));
   };

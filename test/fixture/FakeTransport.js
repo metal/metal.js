@@ -16,18 +16,16 @@ FakeTransport.prototype.open = function() {
   return this;
 };
 
-FakeTransport.prototype.write = function(message) {
-  emitAsync(this, 'data', message, 10);
+FakeTransport.prototype.write = function(message, opt_config, opt_success) {
+  setTimeout(function() {
+    opt_success(message);
+  }, 10);
 };
 
-function emitAsync(emitter, eventName, data, delay) {
-  if (!delay) {
-    delay = 0;
-  }
-
+function emitAsync(emitter, eventName, data) {
   setTimeout(function() {
     emitter.emit(eventName, data);
-  }, delay);
+  }, 0);
 }
 
 module.exports = FakeTransport;

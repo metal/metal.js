@@ -59,13 +59,6 @@ describe('WebChannel', function() {
     assert.strictEqual(transport, channel.getTransport());
   });
 
-  it('should retrieve the same transport if changed via setter', function() {
-    var transport = new FakeTransport('uri');
-    var channel = new lfr.WebChannel(new FakeTransport('uri'));
-    channel.setTransport(transport);
-    assert.strictEqual(transport, channel.getTransport());
-  });
-
   it('should set timeout', function() {
     var channel = new lfr.WebChannel(new FakeTransport('uri'));
     channel.setTimeoutMs(0);

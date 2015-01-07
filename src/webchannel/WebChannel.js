@@ -21,7 +21,7 @@
     }
 
     this.pendingRequests_ = [];
-    this.setTransport(opt_transport);
+    this.setTransport_(opt_transport);
   };
   lfr.inherits(lfr.WebChannel, lfr.EventEmitter);
 
@@ -259,11 +259,9 @@
   /**
    * Sets the transport used to send pending requests to the server.
    * @param {lfr.Transport} transport
+   * @protected
    */
-  lfr.WebChannel.prototype.setTransport = function(transport) {
-    if (this.transport_) {
-      this.transport_.dispose();
-    }
+  lfr.WebChannel.prototype.setTransport_ = function(transport) {
     this.transport_ = transport.open();
     this.transport_.on('close', lfr.bind(this.onTransportClose_, this));
     this.transport_.on('error', lfr.bind(this.onTransportError_, this));

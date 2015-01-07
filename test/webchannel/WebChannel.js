@@ -36,7 +36,7 @@ describe('WebChannel', function() {
       var channel = new lfr.WebChannel();
       var transport = channel.getTransport();
       assert.ok(transport instanceof lfr.WebSocketTransport);
-      assert.strictEqual('http://localhost/pathname', transport.getUri());
+      assert.strictEqual('http://localhost/pathname', transport.getBaseUri());
     });
 
     it('should throw error when web channel cannot resolve transport uri from window location', function() {

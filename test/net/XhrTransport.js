@@ -10,15 +10,9 @@ describe('XhrTransport', function() {
     global.XMLHttpRequest = createFakeXMLHttpRequest(200, 'data');
   });
 
-  it('should set uri', function() {
-    var transport = new lfr.XhrTransport('');
-    transport.setUri('http://liferay.com');
-    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri');
-  });
-
   it('should set uri from constructor', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
-    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
+    assert.strictEqual('http://liferay.com', transport.getBaseUri(), 'Should set uri from constructor');
   });
 
   it('should connection open', function(done) {

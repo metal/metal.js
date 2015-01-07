@@ -140,7 +140,7 @@
     if (opt_method) {
       method = opt_method;
     }
-    xhr.open(method, this.getUri(), true);
+    xhr.open(method, this.getBaseUri(), true);
   };
 
   /**

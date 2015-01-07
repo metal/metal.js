@@ -7,13 +7,13 @@
    * @param {string} uri
    * @extends {lfr.EventEmitter}
    */
-  lfr.Transport = function(uri) {
+  lfr.Transport = function(baseUri) {
     lfr.Transport.base(this, 'constructor');
 
-    if (!lfr.isDef(uri)) {
-      throw new Error('Transport uri not specified');
+    if (!lfr.isDef(baseUri)) {
+      throw new Error('Transport base uri not specified');
     }
-    this.uri_ = uri;
+    this.baseUri_ = baseUri;
     this.on('close', lfr.bind(this.onCloseHandler_, this));
     this.on('open', lfr.bind(this.onOpenHandler_, this));
     this.on('opening', lfr.bind(this.onOpeningHandler_, this));
@@ -33,6 +33,14 @@
   };
 
   /**
+   * Holds the transport uri.
+   * @type {string}
+   * @default ''
+   * @protected
+   */
+  lfr.Transport.prototype.baseUri_ = '';
+
+  /**
    * Holds the transport state, it supports the available states: '',
    * 'opening', 'open' and 'closed'.
    * @type {string}
@@ -40,14 +48,6 @@
    * @protected
    */
   lfr.Transport.prototype.state_ = '';
-
-  /**
-   * Holds the transport uri.
-   * @type {string}
-   * @default ''
-   * @protected
-   */
-  lfr.Transport.prototype.uri_ = '';
 
   /**
    * Closes the transport.
@@ -74,19 +74,19 @@
   };
 
   /**
+   * Gets the transport uri.
+   * @return {string}
+   */
+  lfr.Transport.prototype.getBaseUri = function() {
+    return this.baseUri_;
+  };
+
+  /**
    * Gets the transport state value.
    * @return {string}
    */
   lfr.Transport.prototype.getState = function() {
     return this.state_;
-  };
-
-  /**
-   * Gets the transport uri.
-   * @return {string}
-   */
-  lfr.Transport.prototype.getUri = function() {
-    return this.uri_;
   };
 
   /**
@@ -156,14 +156,6 @@
    */
   lfr.Transport.prototype.setState = function(state) {
     this.state_ = state;
-  };
-
-  /**
-   * Sets the transport uri.
-   * @return {string}
-   */
-  lfr.Transport.prototype.setUri = function(uri) {
-    this.uri_ = uri;
   };
 
   /**

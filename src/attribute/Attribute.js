@@ -309,7 +309,7 @@
   lfr.Attribute.prototype.shouldInformChange_ = function(name, prevVal) {
     var info = this.attrsInfo_[name];
     return (info.state !== lfr.Attribute.States.INITIALIZING) &&
-      (lfr.isObject(prevVal) || prevVal !== this[name]);
+    (lfr.isObject(prevVal) || prevVal !== this[name]);
   };
 
   /**

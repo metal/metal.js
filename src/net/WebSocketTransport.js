@@ -7,8 +7,8 @@
    * @constructor
    * @extends {lfr.Transport}
    */
-  lfr.WebSocketTransport = function(baseUri) {
-    lfr.WebSocketTransport.base(this, 'constructor', baseUri);
+  lfr.WebSocketTransport = function(uri) {
+    lfr.WebSocketTransport.base(this, 'constructor', uri);
   };
   lfr.inherits(lfr.WebSocketTransport, lfr.Transport);
 
@@ -49,7 +49,7 @@
     if (!io) {
       throw new Error('Socket.IO client not found');
     }
-    var socket = io(this.getBaseUri());
+    var socket = io(this.getUri());
     socket.on('connect', lfr.bind(this.onSocketConnect_, this));
     socket.on('disconnect', lfr.bind(this.onSocketDisconnect_, this));
     socket.on('error', lfr.bind(this.onSocketError_, this));

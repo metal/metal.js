@@ -6,7 +6,7 @@ require('../fixture/sandbox.js');
 describe('Transport', function() {
   it('should set uri from constructor', function() {
     var transport = new lfr.Transport('http://liferay.com');
-    assert.strictEqual('http://liferay.com', transport.getBaseUri(), 'Should set uri from constructor');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
   });
 
   it('should default state be empty', function() {

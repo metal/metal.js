@@ -18,7 +18,7 @@ describe('WebSocketTransport', function() {
 
   it('should set uri from constructor', function() {
     var transport = new lfr.WebSocketTransport('http://liferay.com');
-    assert.strictEqual('http://liferay.com', transport.getBaseUri(), 'Should set uri from constructor');
+    assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
   });
 
   it('should throw error when Socket.IO not found', function() {

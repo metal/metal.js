@@ -44,7 +44,7 @@
    * @return {XMLHttpRequest}
    * @protected
    */
-  lfr.Transport.prototype.createXhr_ = function(config, successFn, errorFn) {
+  lfr.XhrTransport.prototype.createXhr_ = function(config, successFn, errorFn) {
     if (!config) {
       config = {};
     }

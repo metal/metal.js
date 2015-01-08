@@ -71,8 +71,7 @@
    * @param {string} event
    * @param {!Function} listener
    * @param {Function=} opt_origin The original function that was added as a
-   * listener, if there is any.
-   * @return {!lfr.EventHandle} Can be used to remove the listener.
+   *   listener, if there is any.
    * @protected
    */
   lfr.EventEmitter.prototype.addSingleListener_ = function(event, listener, opt_origin) {

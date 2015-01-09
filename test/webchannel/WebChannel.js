@@ -163,10 +163,22 @@ describe('WebChannel', function() {
     });
   });
 
-  it('should dispose web channel', function() {
+  it('should emit events from transport', function() {
+    var transport = new FakeTransport('uri');
+    var channel = new lfr.WebChannel(transport);
+
+    var listener = sinon.stub();
+    channel.on('event1', listener);
+    transport.emit('event1');
+    assert.strictEqual(1, listener.callCount);
+  });
+
+  it('should dispose web channel', function(done) {
     var channel = new lfr.WebChannel(new FakeTransport('uri'));
+    channel.getTransport().once('close', function() {
+      done();
+    });
     channel.dispose();
-    assert.ok(!channel.getTransport());
   });
 });
 

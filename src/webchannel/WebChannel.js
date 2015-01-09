@@ -60,6 +60,15 @@
   lfr.WebChannel.prototype.pendingRequests_ = null;
 
   /**
+   * EventEmitterProxy instance that proxies events from the transport to this
+   * web channel.
+   * @type {EventEmitterProxy}
+   * @default null
+   * @protected
+   */
+  lfr.WebChannel.prototype.proxy_ = null;
+
+  /**
    * Timeout for performed database action in milliseconds.
    * @type {number}
    * @default 30000
@@ -128,10 +137,16 @@
    * @inheritDoc
    */
   lfr.WebChannel.prototype.disposeInternal = function() {
-    lfr.WebChannel.base(this, 'disposeInternal');
+    var self = this;
+    this.transport_.once('close', function() {
+      self.transport_ = null;
 
+      self.proxy_.dispose();
+      self.proxy_ = null;
+
+      lfr.WebChannel.base(self, 'disposeInternal');
+    });
     this.transport_.dispose();
-    this.transport_ = null;
   };
 
   /**
@@ -262,10 +277,13 @@
    * @protected
    */
   lfr.WebChannel.prototype.setTransport_ = function(transport) {
-    this.transport_ = transport.open();
+    this.proxy_ = new lfr.EventEmitterProxy(transport, this);
+
+    this.transport_ = transport;
     this.transport_.on('close', lfr.bind(this.onTransportClose_, this));
     this.transport_.on('error', lfr.bind(this.onTransportError_, this));
     this.transport_.on('open', lfr.bind(this.onTransportOpen_, this));
+    this.transport_.open();
   };
 
   /**

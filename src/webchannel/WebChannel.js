@@ -66,7 +66,7 @@
    * @default null
    * @protected
    */
-  lfr.WebChannel.prototype.proxy_ = null;
+  lfr.WebChannel.prototype.eventEmitterProxy_ = null;
 
   /**
    * Timeout for performed database action in milliseconds.
@@ -141,8 +141,8 @@
     this.transport_.once('close', function() {
       self.transport_ = null;
 
-      self.proxy_.dispose();
-      self.proxy_ = null;
+      self.eventEmitterProxy_.dispose();
+      self.eventEmitterProxy_ = null;
 
       lfr.WebChannel.base(self, 'disposeInternal');
     });
@@ -277,7 +277,7 @@
    * @protected
    */
   lfr.WebChannel.prototype.setTransport_ = function(transport) {
-    this.proxy_ = new lfr.EventEmitterProxy(transport, this);
+    this.eventEmitterProxy_ = new lfr.EventEmitterProxy(transport, this);
 
     this.transport_ = transport;
     this.transport_.on('close', lfr.bind(this.onTransportClose_, this));

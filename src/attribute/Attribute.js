@@ -237,17 +237,18 @@
    */
   lfr.Attribute.prototype.scheduleBatchEvent_ = function(attrChangeData) {
     if (!this.scheduledBatchData_) {
-      setTimeout(lfr.bind(this.emitBatchEvent_, this), 0);
+      lfr.async.nextTick(this.emitBatchEvent_, this);
       this.scheduledBatchData_ = {
         changes: {}
       };
     }
 
     var name = attrChangeData.attrName;
-    if (this.scheduledBatchData_.changes[name]) {
-      this.scheduledBatchData_.changes[name].newVal = attrChangeData.newVal;
+    var changes = this.scheduledBatchData_.changes;
+    if (changes[name]) {
+      changes[name].newVal = attrChangeData.newVal;
     } else {
-      this.scheduledBatchData_.changes[name] = attrChangeData;
+      changes[name] = attrChangeData;
     }
   };
 

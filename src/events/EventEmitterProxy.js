@@ -7,16 +7,27 @@
    * the second one.
    * @param {lfr.EventEmitter} originEmitter
    * @param {lfr.EventEmitter} targetEmitter
+   * @param {Object} opt_blacklist Optional blacklist of events that should not be
+   *   proxied.
    * @constructor
    */
-  lfr.EventEmitterProxy = function(originEmitter, targetEmitter) {
+  lfr.EventEmitterProxy = function(originEmitter, targetEmitter, opt_blacklist) {
     this.originEmitter_ = originEmitter;
     this.targetEmitter_ = targetEmitter;
+    this.blacklist_ = opt_blacklist || {};
     this.proxiedEvents_ = {};
 
     this.startProxy_();
   };
   lfr.inherits(lfr.EventEmitterProxy, lfr.Disposable);
+
+  /**
+   * Map of events that should not be proxied.
+   * @type {Object}
+   * @default null
+   * @protected
+   */
+  lfr.EventEmitterProxy.prototype.blacklist_ = null;
 
   /**
    * The origin emitter. This emitter's events will be proxied through the
@@ -62,7 +73,7 @@
    * @param {string} event
    */
   lfr.EventEmitterProxy.prototype.proxyEvent_ = function(event) {
-    if (this.proxiedEvents_[event]) {
+    if (this.proxiedEvents_[event] || this.blacklist_[event]) {
       return;
     }
 

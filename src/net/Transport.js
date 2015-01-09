@@ -33,6 +33,50 @@
   };
 
   /**
+   * Map of all the main transport events.
+   * @type {!Object}
+   * @const
+   * @static
+   */
+  lfr.Transport.TRANSPORT_EVENTS = {
+    /**
+     * Emits when the transport has closed.
+     * @event close
+     */
+    close: true,
+
+    /**
+     * Emits when data is received from the connection.
+     * @event data
+     */
+    data: true,
+
+    /**
+     * Emits when an error is received from the connection.
+     * @event error
+     */
+    error: true,
+
+    /**
+     * Emits when the message event is sent.
+     * @event message
+     */
+    message: true,
+
+    /**
+     * Emits when the transport has opened.
+     * @event open
+     */
+    open: true,
+
+    /**
+     * Emits when the transport has started opening (when `open` is called).
+     * @event opening
+     */
+    opening: true
+  };
+
+  /**
    * Holds the transport uri.
    * @type {string}
    * @default ''
@@ -67,10 +111,10 @@
    * @override
    */
   lfr.Transport.prototype.disposeInternal = function() {
-    this.close();
     this.once('close', function() {
       lfr.Transport.base(this, 'disposeInternal');
     });
+    this.close();
   };
 
   /**
@@ -170,30 +214,4 @@
    * @chainable
    */
   lfr.Transport.prototype.write = lfr.abstractMethod;
-
-  /**
-   * Emits when close is called.
-   * @event close
-   */
-
-  /**
-   * Emits when data is received from the connection.
-   * @event data
-   */
-
-  /**
-   * Emits when an error is received from the connection.
-   * @event error
-   */
-
-  /**
-   * Emits when the message event is sent.
-   * @event message
-   */
-
-  /**
-   * Emits when open is called.
-   * @event open
-   */
-
 }());

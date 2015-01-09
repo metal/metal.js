@@ -19,6 +19,20 @@ describe('EventEmitterProxy', function() {
     assert.strictEqual(2, listener.args[0][1]);
   });
 
+  it('should not proxy blacklisted event', function() {
+    var emitter1 = new lfr.EventEmitter();
+    var emitter2 = new lfr.EventEmitter();
+    new lfr.EventEmitterProxy(emitter1, emitter2, {
+      event1: true
+    });
+
+    var listener = sinon.stub();
+    emitter2.on('event1', listener);
+    emitter1.emit('event1', 1, 2);
+
+    assert.strictEqual(0, listener.callCount);
+  });
+
   it('should only emit proxied event once per listener', function() {
     var emitter1 = new lfr.EventEmitter();
     var emitter2 = new lfr.EventEmitter();

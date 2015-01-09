@@ -13,6 +13,15 @@
   lfr.inherits(lfr.WebSocketTransport, lfr.Transport);
 
   /**
+   * EventEmitterProxy instance that proxies events from the socket to this
+   * transport.
+   * @type {EventEmitterProxy}
+   * @default null
+   * @protected
+   */
+  lfr.WebSocketTransport.prototype.proxy_ = null;
+
+  /**
    * If the requests should be RESTful or not. RESTful requests are always sent as
    * JSON data, with the method as one of the params, and the original data to be
    * sent accessible through the `data` key.
@@ -56,6 +65,18 @@
     socket.on('data', lfr.bind(this.onSocketData_, this));
     socket.on('message', lfr.bind(this.onSocketMessage_, this));
     return socket;
+  };
+
+  /**
+   * @inheritDoc
+   */
+  lfr.WebSocketTransport.prototype.disposeInternal = function() {
+    var self = this;
+    this.once('close', function() {
+      self.proxy_.dispose();
+      self.proxy_ = null;
+    });
+    lfr.WebSocketTransport.base(self, 'disposeInternal');
   };
 
   /**
@@ -119,6 +140,7 @@
 
     if (!this.socket) {
       this.socket = this.createSocket_();
+      this.proxy_ = new lfr.EventEmitterProxy(this.socket, this, lfr.Transport.TRANSPORT_EVENTS);
     }
 
     this.socket.open();

@@ -190,4 +190,19 @@ describe('WebSocketTransport', function() {
       });
     });
   });
+
+  it('should listen to socket events', function() {
+    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    transport.open();
+
+    var listener = sinon.stub();
+    transport.on('chat message', listener);
+    transport.on('chat message', listener);
+
+    var data = {};
+    transport.socket.emit('chat message', data);
+    assert.strictEqual(2, listener.callCount);
+    assert.strictEqual(data, listener.args[0][0]);
+    assert.strictEqual(data, listener.args[1][0]);
+  });
 });

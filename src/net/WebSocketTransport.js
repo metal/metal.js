@@ -20,7 +20,7 @@
    * @default null
    * @protected
    */
-  lfr.WebSocketTransport.prototype.proxy_ = null;
+  lfr.WebSocketTransport.prototype.eventEmitterProxy_ = null;
 
   /**
    * If the requests should be RESTful or not. RESTful requests are always sent as
@@ -97,8 +97,8 @@
    */
   lfr.WebSocketTransport.prototype.disposeInternal = function() {
     this.once('close', function() {
-      this.proxy_.dispose();
-      this.proxy_ = null;
+      this.eventEmitterProxy_.dispose();
+      this.eventEmitterProxy_ = null;
 
       this.removeSocketListeners_();
       this.socket = null;
@@ -167,7 +167,7 @@
 
     if (!this.socket) {
       this.socket = this.createSocket_();
-      this.proxy_ = new lfr.EventEmitterProxy(this.socket, this, lfr.Transport.TRANSPORT_EVENTS);
+      this.eventEmitterProxy_ = new lfr.EventEmitterProxy(this.socket, this, lfr.Transport.TRANSPORT_EVENTS);
     }
 
     this.socket.open();

@@ -14,11 +14,21 @@
       throw new Error('Transport uri not specified');
     }
     this.uri_ = uri;
+    this.defaultConfig_ = this.constructor.INITIAL_DEFAULT_CONFIG;
+
     this.on('close', lfr.bind(this.onCloseHandler_, this));
     this.on('open', lfr.bind(this.onOpenHandler_, this));
     this.on('opening', lfr.bind(this.onOpeningHandler_, this));
   };
   lfr.inherits(lfr.Transport, lfr.EventEmitter);
+
+  /**
+   * Holds the initial default config that should be used for this transport.
+   * @type {Object}
+   * @const
+   * @static
+   */
+  lfr.Transport.INITIAL_DEFAULT_CONFIG = {};
 
   /**
    * Holds the transport state values.
@@ -77,6 +87,15 @@
   };
 
   /**
+   * Holds the default configuration for this transport. Configuration options
+   * passed for a request override these defaults.
+   * @type {Object}
+   * @default null
+   * @protected
+   */
+  lfr.Transport.prototype.defaultConfig_ = null;
+
+  /**
    * Holds the transport uri.
    * @type {string}
    * @default ''
@@ -107,6 +126,14 @@
   lfr.Transport.prototype.decodeData = lfr.identityFunction;
 
   /**
+   * Gets this transport's default configuration.
+   * @return {Object}
+   */
+  lfr.Transport.prototype.getDefaultConfig = function() {
+    return this.defaultConfig_;
+  };
+
+  /**
    * @inheritDoc
    * @override
    */
@@ -115,6 +142,34 @@
       lfr.Transport.base(this, 'disposeInternal');
     });
     this.close();
+  };
+
+  /**
+   * Fills the value of the specified option with its default value when necessary.
+   * @param {string} name
+   * @param {!Object} options
+   * @param {!Object} defaultOptions
+   * @return {*}
+   */
+  lfr.Transport.prototype.fillWithDefault_ = function(name, options, defaultOptions) {
+    if (!options.hasOwnProperty(name)) {
+      options[name] = defaultOptions[name];
+    } else if (lfr.isObject(options[name]) && lfr.isObject(defaultOptions[name])) {
+      this.fillWithDefaults_(options[name], defaultOptions[name]);
+    }
+  };
+
+  /**
+   * Fills the given options object with the appropriate default values when
+   * necessary.
+   * @param {!Object} options The object that should receive default option values.
+   * @param {!Object} defaultOptions An object with default option values.
+   * @protected
+   */
+  lfr.Transport.prototype.fillWithDefaults_ = function(options, defaultOptions) {
+    for (var key in defaultOptions) {
+      this.fillWithDefault_(key, options, defaultOptions);
+    }
   };
 
   /**
@@ -144,6 +199,20 @@
         return true;
     }
     return false;
+  };
+
+  /**
+   * Normalizes the given config, using default values when they are missing.
+   * @param {Object} config
+   * @return {!Object}
+   * @protected
+   */
+  lfr.Transport.prototype.normalizeConfig_ = function(config) {
+    if (!config) {
+      config = {};
+    }
+    this.fillWithDefaults_(config, this.defaultConfig_);
+    return config;
   };
 
   /**
@@ -179,19 +248,27 @@
   /**
    * Sends message.
    * @param {*} message
-   * @param {*} opt_config Relevant if the transport needs information such as
-   *     HTTP method, headers and parameters.
-   * @param {*} opt_success Function to be called when the request receives a
-   *   success response.
-   * @param {*} opt_error Function to be called when the request receives an error
-   *   response.
+   * @param {Object} opt_config Relevant if the transport needs information such as
+   *   HTTP method, headers and parameters.
+   * @param {function(*)} opt_success Function to be called when the request receives
+   *   a success response.
+   * @param {function(*)} opt_error Function to be called when the request receives
+   *   an error response.
    */
   lfr.Transport.prototype.send = function(message, opt_config, opt_success, opt_error) {
     if (this.isOpen()) {
-      this.write(message, opt_config, opt_success, opt_error);
+      this.write(message, this.normalizeConfig_(opt_config), opt_success, opt_error);
     } else {
       throw new Error('Transport not open');
     }
+  };
+
+  /**
+   * Sets this transport's default configuration.
+   * @param {Object} defaultConfig
+   */
+  lfr.Transport.prototype.setDefaultConfig = function(defaultConfig) {
+    this.defaultConfig_ = defaultConfig;
   };
 
   /**
@@ -205,12 +282,12 @@
   /**
    * Writes data to the transport.
    * @param {*} message The data that will be sent through the transport.
-   * @param {*} opt_config Relevant if the transport needs information such as
-   *     HTTP method, headers and parameters.
-   * @param {*} opt_success Function to be called when the request receives a
-   *   success response.
-   * @param {*} opt_error Function to be called when the request receives an error
-   *   response.
+   * @param {!Object} config Relevant if the transport needs information such as
+   *   HTTP method, headers and parameters.
+   * @param {function(*)} opt_success Function to be called when the request receives
+   *   a success response.
+   * @param {function(*)} opt_error Function to be called when the request receives
+   *   an error response.
    * @chainable
    */
   lfr.Transport.prototype.write = lfr.abstractMethod;

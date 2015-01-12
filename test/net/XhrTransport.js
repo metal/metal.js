@@ -143,6 +143,16 @@ describe('XhrTransport', function() {
     assert.strictEqual('GET', request.method);
   });
 
+  it('should send request using the default headers', function() {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+    transport.send('message');
+    assert.strictEqual(1, XMLHttpRequest.requests.length);
+
+    var request = XMLHttpRequest.requests[0];
+    assert.strictEqual('XMLHttpRequest', request.headers['X-Requested-With']);
+  });
+
   it('should send request using the requested headers', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();

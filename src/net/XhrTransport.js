@@ -24,7 +24,19 @@
     headers: {
       'X-Requested-With': 'XMLHttpRequest'
     },
-    method: 'POST'
+    method: 'POST',
+    responseType: 'html'
+  };
+
+  /**
+   * Holds all the valid values for the `responseType` configuration option.
+   * @type {Object}
+   * @const
+   * @static
+   */
+  lfr.XhrTransport.ResponseTypes = {
+    HTML: 'html',
+    JSON: 'json'
   };
 
   /**
@@ -45,7 +57,7 @@
    */
   lfr.XhrTransport.prototype.createXhr_ = function(config, successFn, errorFn) {
     var xhr = new XMLHttpRequest();
-    xhr.onload = lfr.bind(this.onXhrLoad_, this, xhr, successFn);
+    xhr.onload = lfr.bind(this.onXhrLoad_, this, xhr, config, successFn);
     xhr.onerror = lfr.bind(this.onXhrError_, this, xhr, errorFn);
     this.openXhr_(xhr, config.method);
     this.setXhrHttpHeaders_(xhr, config.headers);
@@ -63,6 +75,22 @@
     this.sendInstances_ = [];
     this.emitAsync_('close');
     return this;
+  };
+
+  /**
+   * Decodes a data chunk received.
+   * @param {*} data
+   * @param {!Object} config
+   * @return {*}
+   * @override
+   * @protected
+   */
+  lfr.XhrTransport.prototype.decodeData = function(data, config) {
+    if (config.responseType === lfr.XhrTransport.ResponseTypes.JSON) {
+      return JSON.parse(data);
+    } else {
+      return data;
+    }
   };
 
   /**
@@ -96,14 +124,15 @@
   /**
    * Fired when an xhr's `load` event is triggered.
    * @param {!XMLHttpRequest} xhr The xhr request that triggered the event.
+   * @param {!Object} config
    * @param {function(!Object)} opt_success Function that will be called if the
    *   request is successful.
    * @protected
    */
-  lfr.XhrTransport.prototype.onXhrLoad_ = function(xhr, opt_success) {
+  lfr.XhrTransport.prototype.onXhrLoad_ = function(xhr, config, opt_success) {
     if (xhr.status === 200) {
       if (opt_success) {
-        opt_success(this.decodeData(xhr.responseText));
+        opt_success(this.decodeData(xhr.responseText, config));
       }
       lfr.array.remove(this.sendInstances_, xhr);
     } else {

@@ -78,6 +78,21 @@
   };
 
   /**
+   * Encodes a data chunk to be sent.
+   * @param {*} data
+   * @param {!Object} config
+   * @return {*}
+   * @protected
+   */
+  lfr.XhrTransport.prototype.encodeData = function(data, config) {
+    if (config.headers['Content-Type'] === 'application/json') {
+      return JSON.stringify(data);
+    } else {
+      return data;
+    }
+  };
+
+  /**
    * Decodes a data chunk received.
    * @param {*} data
    * @param {!Object} config
@@ -181,6 +196,8 @@
   lfr.XhrTransport.prototype.write = function(message, config, opt_success, opt_error) {
     var xhr = this.createXhr_(config, opt_success, opt_error);
     this.sendInstances_.push(xhr);
+
+    message = this.encodeData(message, config);
     this.emitAsync_('message', message);
     xhr.send(message);
   };

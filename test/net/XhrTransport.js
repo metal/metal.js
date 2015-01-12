@@ -167,6 +167,25 @@ describe('XhrTransport', function() {
     assert.strictEqual('header1Value', request.headers.header1);
   });
 
+  it('should send request data in json format', function(done) {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+
+    var data = {
+      a: 1,
+      b: 2
+    };
+    transport.on('message', function(message) {
+      assert.strictEqual('{"a":1,"b":2}', message);
+      done();
+    });
+    transport.send(data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  });
+
   it('should receive response in json format', function(done) {
     global.XMLHttpRequest = createFakeXMLHttpRequest(200, '{"a":1,"b":2}');
     var transport = new lfr.XhrTransport('http://liferay.com');

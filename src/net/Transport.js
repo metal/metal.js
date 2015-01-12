@@ -126,6 +126,13 @@
   lfr.Transport.prototype.decodeData = lfr.identityFunction;
 
   /**
+   * Encodes a data chunk to be sent.
+   * @param {*=} data
+   * @return {?}
+   */
+  lfr.Transport.prototype.encodeData = lfr.identityFunction;
+
+  /**
    * Gets this transport's default configuration.
    * @return {Object}
    */

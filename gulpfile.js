@@ -8,6 +8,7 @@ var runSequence = require('run-sequence');
 
 var mainFiles = [
   'src/lfr.js',
+  'src/object/object.js',
   'src/array/array.js',
   'src/promise/Promise.js',
   'src/disposable/Disposable.js',

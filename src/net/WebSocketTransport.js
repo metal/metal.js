@@ -14,6 +14,16 @@
   lfr.inherits(lfr.WebSocketTransport, lfr.Transport);
 
   /**
+   * Holds the initial default config that should be used for this transport.
+   * @type {Object}
+   * @const
+   * @static
+   */
+  lfr.WebSocketTransport.INITIAL_DEFAULT_CONFIG = {
+    method: 'POST'
+  };
+
+  /**
    * EventEmitterProxy instance that proxies events from the socket to this
    * transport.
    * @type {EventEmitterProxy}
@@ -211,11 +221,11 @@
   /**
    * @inheritDoc
    */
-  lfr.WebSocketTransport.prototype.write = function(message, opt_config, opt_success) {
+  lfr.WebSocketTransport.prototype.write = function(message, config, opt_success) {
     if (this.restful_) {
       message = {
         data: message,
-        method: opt_config ? opt_config.method : 'POST'
+        method: config.method
       };
     }
 

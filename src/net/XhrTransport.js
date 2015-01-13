@@ -15,18 +15,29 @@
   lfr.inherits(lfr.XhrTransport, lfr.Transport);
 
   /**
-   * Holds default http headers to set on request.
+   * Holds the initial default config that should be used for this transport.
    * @type {Object}
+   * @const
+   * @static
    */
-  lfr.XhrTransport.DEFAULT_HTTP_HEADERS = {
-    'X-Requested-With': 'XMLHttpRequest'
+  lfr.XhrTransport.INITIAL_DEFAULT_CONFIG = {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    method: 'POST',
+    responseType: 'html'
   };
 
   /**
-   * Holds default http method to set on request.
-   * @type {string}
+   * Holds all the valid values for the `responseType` configuration option.
+   * @type {Object}
+   * @const
+   * @static
    */
-  lfr.XhrTransport.DEFAULT_METHOD = 'POST';
+  lfr.XhrTransport.ResponseTypes = {
+    HTML: 'html',
+    JSON: 'json'
+  };
 
   /**
    * Holds the XMLHttpRequest sent objects.
@@ -38,19 +49,15 @@
 
   /**
    * Makes a XMLHttpRequest instance already open.
-   * @param {Object} config
+   * @param {!Object} config
    * @param {function(!Object)} successFn
    * @param {function(!Object)} errorFn
    * @return {XMLHttpRequest}
    * @protected
    */
   lfr.XhrTransport.prototype.createXhr_ = function(config, successFn, errorFn) {
-    if (!config) {
-      config = {};
-    }
-
     var xhr = new XMLHttpRequest();
-    xhr.onload = lfr.bind(this.onXhrLoad_, this, xhr, successFn);
+    xhr.onload = lfr.bind(this.onXhrLoad_, this, xhr, config, successFn);
     xhr.onerror = lfr.bind(this.onXhrError_, this, xhr, errorFn);
     this.openXhr_(xhr, config.method);
     this.setXhrHttpHeaders_(xhr, config.headers);
@@ -68,6 +75,37 @@
     this.sendInstances_ = [];
     this.emitAsync_('close');
     return this;
+  };
+
+  /**
+   * Encodes a data chunk to be sent.
+   * @param {*} data
+   * @param {!Object} config
+   * @return {*}
+   * @protected
+   */
+  lfr.XhrTransport.prototype.encodeData = function(data, config) {
+    if (config.headers['Content-Type'] === 'application/json') {
+      return JSON.stringify(data);
+    } else {
+      return data;
+    }
+  };
+
+  /**
+   * Decodes a data chunk received.
+   * @param {*} data
+   * @param {!Object} config
+   * @return {*}
+   * @override
+   * @protected
+   */
+  lfr.XhrTransport.prototype.decodeData = function(data, config) {
+    if (config.responseType === lfr.XhrTransport.ResponseTypes.JSON) {
+      return JSON.parse(data);
+    } else {
+      return data;
+    }
   };
 
   /**
@@ -101,14 +139,15 @@
   /**
    * Fired when an xhr's `load` event is triggered.
    * @param {!XMLHttpRequest} xhr The xhr request that triggered the event.
+   * @param {!Object} config
    * @param {function(!Object)} opt_success Function that will be called if the
    *   request is successful.
    * @protected
    */
-  lfr.XhrTransport.prototype.onXhrLoad_ = function(xhr, opt_success) {
+  lfr.XhrTransport.prototype.onXhrLoad_ = function(xhr, config, opt_success) {
     if (xhr.status === 200) {
       if (opt_success) {
-        opt_success(this.decodeData(xhr.responseText));
+        opt_success(this.decodeData(xhr.responseText, config));
       }
       lfr.array.remove(this.sendInstances_, xhr);
     } else {
@@ -132,28 +171,20 @@
   /**
    * Opens the given xhr request.
    * @param {!XMLHttpRequest} xhr The xhr request to open.
-   * @param {string=} opt_method Optional method to override the default.
+   * @param {string} method Optional method to override the default.
    * @protected
    */
-  lfr.XhrTransport.prototype.openXhr_ = function(xhr, opt_method) {
-    var method = lfr.XhrTransport.DEFAULT_METHOD;
-    if (opt_method) {
-      method = opt_method;
-    }
+  lfr.XhrTransport.prototype.openXhr_ = function(xhr, method) {
     xhr.open(method, this.getUri(), true);
   };
 
   /**
    * Sets the http headers of the given xhr request.
    * @param {!XMLHttpRequest} xhr The xhr request to set the headers for.
-   * @param {Object} opt_headers Optional headers to override the default.
+   * @param {!Object} headers Optional headers to override the default.
    * @protected
    */
-  lfr.XhrTransport.prototype.setXhrHttpHeaders_ = function(xhr, opt_headers) {
-    var headers = lfr.XhrTransport.DEFAULT_HTTP_HEADERS;
-    if (opt_headers) {
-      headers = opt_headers;
-    }
+  lfr.XhrTransport.prototype.setXhrHttpHeaders_ = function(xhr, headers) {
     for (var i in headers) {
       xhr.setRequestHeader(i, headers[i]);
     }
@@ -162,9 +193,11 @@
   /**
    * @inheritDoc
    */
-  lfr.XhrTransport.prototype.write = function(message, opt_config, opt_success, opt_error) {
-    var xhr = this.createXhr_(opt_config, opt_success, opt_error);
+  lfr.XhrTransport.prototype.write = function(message, config, opt_success, opt_error) {
+    var xhr = this.createXhr_(config, opt_success, opt_error);
     this.sendInstances_.push(xhr);
+
+    message = this.encodeData(message, config);
     this.emitAsync_('message', message);
     xhr.send(message);
   };

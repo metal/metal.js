@@ -143,6 +143,16 @@ describe('XhrTransport', function() {
     assert.strictEqual('GET', request.method);
   });
 
+  it('should send request using the default headers', function() {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+    transport.send('message');
+    assert.strictEqual(1, XMLHttpRequest.requests.length);
+
+    var request = XMLHttpRequest.requests[0];
+    assert.strictEqual('XMLHttpRequest', request.headers['X-Requested-With']);
+  });
+
   it('should send request using the requested headers', function() {
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
@@ -155,6 +165,41 @@ describe('XhrTransport', function() {
 
     var request = XMLHttpRequest.requests[0];
     assert.strictEqual('header1Value', request.headers.header1);
+  });
+
+  it('should send request data in json format', function(done) {
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+
+    var data = {
+      a: 1,
+      b: 2
+    };
+    transport.on('message', function(message) {
+      assert.strictEqual('{"a":1,"b":2}', message);
+      done();
+    });
+    transport.send(data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  });
+
+  it('should receive response in json format', function(done) {
+    global.XMLHttpRequest = createFakeXMLHttpRequest(200, '{"a":1,"b":2}');
+    var transport = new lfr.XhrTransport('http://liferay.com');
+    transport.open();
+
+    var config = {
+      responseType: lfr.XhrTransport.ResponseTypes.JSON
+    };
+    transport.send('message', config, function(data) {
+      assert.strictEqual('object', typeof data);
+      assert.strictEqual(1, data.a);
+      assert.strictEqual(2, data.b);
+      done();
+    });
   });
 
   it('should not run success handler for failures', function(done) {

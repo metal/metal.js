@@ -114,8 +114,8 @@ describe('Transport', function() {
     var config = transport.write.args[0][1];
     assert.strictEqual(1, config.config1);
     assert.strictEqual('10', config.config2.binary);
-    assert.strictEqual(2, config.config2.number);
-    assert.strictEqual('two', config.config2.string);
+    assert.strictEqual(undefined, config.config2.number);
+    assert.strictEqual(undefined, config.config2.string);
     assert.strictEqual(-3, config.config3);
     assert.strictEqual(4, config.config4);
   });

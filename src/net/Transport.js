@@ -24,11 +24,11 @@
 
   /**
    * Holds the initial default config that should be used for this transport.
-   * @type {Object}
+   * @type null
    * @const
    * @static
    */
-  lfr.Transport.INITIAL_DEFAULT_CONFIG = {};
+  lfr.Transport.INITIAL_DEFAULT_CONFIG = null;
 
   /**
    * Holds the transport state values.
@@ -152,34 +152,6 @@
   };
 
   /**
-   * Fills the value of the specified option with its default value when necessary.
-   * @param {string} name
-   * @param {!Object} options
-   * @param {!Object} defaultOptions
-   * @return {*}
-   */
-  lfr.Transport.prototype.fillWithDefault_ = function(name, options, defaultOptions) {
-    if (!options.hasOwnProperty(name)) {
-      options[name] = defaultOptions[name];
-    } else if (lfr.isObject(options[name]) && lfr.isObject(defaultOptions[name])) {
-      this.fillWithDefaults_(options[name], defaultOptions[name]);
-    }
-  };
-
-  /**
-   * Fills the given options object with the appropriate default values when
-   * necessary.
-   * @param {!Object} options The object that should receive default option values.
-   * @param {!Object} defaultOptions An object with default option values.
-   * @protected
-   */
-  lfr.Transport.prototype.fillWithDefaults_ = function(options, defaultOptions) {
-    for (var key in defaultOptions) {
-      this.fillWithDefault_(key, options, defaultOptions);
-    }
-  };
-
-  /**
    * Gets the transport uri.
    * @return {string}
    */
@@ -206,20 +178,6 @@
         return true;
     }
     return false;
-  };
-
-  /**
-   * Normalizes the given config, using default values when they are missing.
-   * @param {Object} config
-   * @return {!Object}
-   * @protected
-   */
-  lfr.Transport.prototype.normalizeConfig_ = function(config) {
-    if (!config) {
-      config = {};
-    }
-    this.fillWithDefaults_(config, this.defaultConfig_);
-    return config;
   };
 
   /**
@@ -264,7 +222,7 @@
    */
   lfr.Transport.prototype.send = function(message, opt_config, opt_success, opt_error) {
     if (this.isOpen()) {
-      this.write(message, this.normalizeConfig_(opt_config), opt_success, opt_error);
+      this.write(message, lfr.object.mixin({}, this.defaultConfig_, opt_config), opt_success, opt_error);
     } else {
       throw new Error('Transport not open');
     }

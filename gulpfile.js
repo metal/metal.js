@@ -79,7 +79,7 @@ gulp.task('test', function(done) {
 });
 
 gulp.task('test-complexity', function() {
-  return gulp.src(['src/**/*.js', '!src/promise/Promise.js', 'test/**/*.js'])
+  return gulp.src(['src/**/*.js', '!src/promise/Promise.js', 'test/**/*.js', '!test/fixture/sandbox.js'])
     .pipe(plugins.complexity({
       halstead: [12, 15, 20]
     }));

@@ -52,14 +52,6 @@
   };
 
   /**
-   * Holds pending requests.
-   * @type {Array}
-   * @default null
-   * @protected
-   */
-  lfr.WebChannel.prototype.pendingRequests_ = null;
-
-  /**
    * EventEmitterProxy instance that proxies events from the transport to this
    * web channel.
    * @type {EventEmitterProxy}
@@ -67,6 +59,14 @@
    * @protected
    */
   lfr.WebChannel.prototype.eventEmitterProxy_ = null;
+
+  /**
+   * Holds pending requests.
+   * @type {Array}
+   * @default null
+   * @protected
+   */
+  lfr.WebChannel.prototype.pendingRequests_ = null;
 
   /**
    * Timeout for performed database action in milliseconds.

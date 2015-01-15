@@ -19,7 +19,8 @@
   lfr.Attribute.States = {
     UNINITIALIZED: 0,
     INITIALIZING: 1,
-    INITIALIZED: 2
+    INITIALIZING_DEFAULT: 2,
+    INITIALIZED: 3
   };
 
   /**
@@ -215,10 +216,13 @@
     }
 
     info.state = lfr.Attribute.States.INITIALIZING;
-    this.setDefaultValue_(name);
+    this.setInitialValue_(name);
+    if (!info.written) {
+      info.state = lfr.Attribute.States.INITIALIZING_DEFAULT;
+      this.setDefaultValue_(name);
+    }
     info.state = lfr.Attribute.States.INITIALIZED;
 
-    this.setInitialValue_(name);
   };
 
   /**
@@ -280,6 +284,7 @@
     var info = this.attrsInfo_[name];
     var prevVal = this[name];
     info.value = this.callSetter_(name, value);
+    info.written = true;
     this.informChange_(name, prevVal);
   };
 
@@ -319,7 +324,7 @@
    */
   lfr.Attribute.prototype.shouldInformChange_ = function(name, prevVal) {
     var info = this.attrsInfo_[name];
-    return (info.state !== lfr.Attribute.States.INITIALIZING) &&
+    return (info.state === lfr.Attribute.States.INITIALIZED) &&
     (lfr.isObject(prevVal) || prevVal !== this[name]);
   };
 
@@ -333,7 +338,7 @@
   lfr.Attribute.prototype.validateAttrValue_ = function(name, value) {
     var info = this.attrsInfo_[name];
 
-    return info.state === lfr.Attribute.States.INITIALIZING ||
+    return info.state === lfr.Attribute.States.INITIALIZING_DEFAULT ||
       this.callValidator_(name, value);
   };
 }());

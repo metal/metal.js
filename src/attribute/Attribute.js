@@ -2,7 +2,10 @@
   'use strict';
 
   /**
-   * Attribute utility.
+   * Attribute adds support for having object properties that can be watched for
+   * changes, as well as configured with validators, setters and other options.
+   * See the `addAttr` method for a complete list of available attribute
+   * configuration options.
    * @constructor
    */
   lfr.Attribute = function() {
@@ -42,6 +45,18 @@
    * Adds the given attribute.
    * @param {string} name The name of the new attribute.
    * @param {Object.<string, *>=} config The configuration object for the new attribute.
+   *   This object can have the following keys:
+   *   initOnly - Ignores writes to the attribute after it's been initialized. That is,
+   *   allows writes only when adding the attribute for the first time.
+   *   setter - Function for normalizing new attribute values. It receives the new value
+   *   that was set, and returns the value that should be stored.
+   *   validator - Function that validates new attribute values. When it returns false,
+   *   the new value is ignored.
+   *   value - The default value for this attribute. Note that setting this to an object
+   *   will cause all attribute instances to use the same reference to the object. To
+   *   have each attribute instance use a different reference, use the `valueFn` option
+   *   instead.
+   *   valueFn - A function that returns the default value for this attribute.
    * @param {*} initialValue The initial value of the new attribute. This value has higher
    *   precedence than the default value specified in this attribute's configuration.
    */

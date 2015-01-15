@@ -307,8 +307,13 @@
    * @return {*}
    */
   lfr.Attribute.prototype.setDefaultValue_ = function(name) {
-    var info = this.attrsInfo_[name];
-    this[name] = this.callFunction_(info.config.value);
+    var config = this.attrsInfo_[name].config;
+
+    if (config.value) {
+      this[name] = config.value;
+    } else {
+      this[name] = this.callFunction_(config.valueFn);
+    }
   };
 
   /**

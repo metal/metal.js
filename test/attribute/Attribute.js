@@ -61,6 +61,30 @@ describe('Attribute', function() {
     assert.strictEqual(2, attr.attr2);
   });
 
+  it('should set default attribute value with raw value', function() {
+    var attr = new lfr.Attribute();
+    attr.addAttrs({
+      attr1: {
+        value: 1
+      }
+    });
+
+    assert.strictEqual(1, attr.attr1);
+  });
+
+  it('should set default attribute value from function', function() {
+    var attr = new lfr.Attribute();
+    attr.addAttrs({
+      attr1: {
+        valueFn: function() {
+          return 1;
+        }
+      }
+    });
+
+    assert.strictEqual(1, attr.attr1);
+  });
+
   it('should set default attribute value from function name', function() {
     var attr = new lfr.Attribute();
     attr.returns1 = function() {
@@ -68,14 +92,14 @@ describe('Attribute', function() {
     };
     attr.addAttrs({
       attr1: {
-        value: 'returns1'
+        valueFn: 'returns1'
       }
     });
 
     assert.strictEqual(1, attr.attr1);
   });
 
-  it('should ignore invalid value function', function() {
+  it('should ignore invalid valueFn function', function() {
     var attr = new lfr.Attribute();
     attr.addAttrs({
       attr1: {
@@ -91,14 +115,10 @@ describe('Attribute', function() {
     attr.addAttrs(
       {
         attr1: {
-          value: function() {
-            return 1;
-          }
+          value: 1
         },
         attr2: {
-          value: function() {
-            return 2;
-          }
+          value: 2
         }
       },
       {
@@ -124,7 +144,7 @@ describe('Attribute', function() {
     var valueFn = sinon.stub().returns(2);
     attr.addAttrs({
       attr1: {
-        value: valueFn
+        valueFn: valueFn
       }
     });
 
@@ -141,9 +161,7 @@ describe('Attribute', function() {
         validator: function(val) {
           return val > 0;
         },
-        value: function() {
-          return 1;
-        }
+        value: 1
       }
     });
 
@@ -162,9 +180,7 @@ describe('Attribute', function() {
     attr.addAttrs({
       attr1: {
         validator: 'isPositive',
-        value: function() {
-          return 1;
-        }
+        value: 1
       }
     });
 
@@ -183,9 +199,7 @@ describe('Attribute', function() {
           validator: function(val) {
             return val > 0;
           },
-          value: function() {
-            return 1;
-          }
+          value: 1
         }
       },
       {
@@ -203,9 +217,7 @@ describe('Attribute', function() {
         validator: function(val) {
           return val > 0;
         },
-        value: function() {
-          return -1;
-        }
+        value: -1
       }
     });
 
@@ -217,9 +229,7 @@ describe('Attribute', function() {
     attr.addAttrs({
       attr1: {
         setter: Math.abs,
-        value: function() {
-          return -1;
-        }
+        value: -1
       }
     });
 
@@ -238,9 +248,7 @@ describe('Attribute', function() {
     attr.addAttrs({
       attr1: {
         setter: 'makePositive',
-        value: function() {
-          return -1;
-        }
+        value: -1
       }
     });
 
@@ -259,9 +267,7 @@ describe('Attribute', function() {
       {
         attr1: {
           initOnly: true,
-          value: function() {
-            return 1;
-          }
+          value: 1
         }
       },
       {
@@ -277,9 +283,7 @@ describe('Attribute', function() {
     attr.addAttrs({
       attr1: {
         initOnly: true,
-        value: function() {
-          return 1;
-        }
+        value: 1
       }
     });
 
@@ -416,14 +420,10 @@ function createAttributeInstance() {
   var attr = new lfr.Attribute();
   attr.addAttrs({
     attr1: {
-      value: function() {
-        return 1;
-      }
+      value: 1
     },
     attr2: {
-      value: function() {
-        return 2;
-      }
+      value: 2
     }
   });
 

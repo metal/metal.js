@@ -91,6 +91,19 @@
   };
 
   /**
+   * Checks if the it's allowed to write on the requested attribute.
+   * @param {string} name The name of the attribute.
+   * @return {Boolean}
+   * @protected
+   */
+  lfr.Attribute.prototype.canWrite_ = function(name) {
+    this.initAttr_(name);
+
+    var info = this.attrsInfo_[name];
+    return !info.config.initOnly || info.state !== lfr.Attribute.States.INITIALIZED;
+  };
+
+  /**
    * Calls the requested function, running the appropriate code for when it's
    * passed as an actual function object or just the function's name.
    * @param {!Function|string} fn Function, or name of the function to run.
@@ -277,7 +290,7 @@
    * @protected
    */
   lfr.Attribute.prototype.setAttrValue_ = function(name, value) {
-    if (!this.validateAttrValue_(name, value)) {
+    if (!this.canWrite_(name) || !this.validateAttrValue_(name, value)) {
       return;
     }
 

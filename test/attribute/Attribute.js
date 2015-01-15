@@ -253,6 +253,40 @@ describe('Attribute', function() {
     assert.strictEqual(3, attr.attr1);
   });
 
+  it('should allow changing an initOnly with initial value', function() {
+    var attr = new lfr.Attribute();
+    attr.addAttrs(
+      {
+        attr1: {
+          initOnly: true,
+          value: function() {
+            return 1;
+          }
+        }
+      },
+      {
+        attr1: 2
+      }
+    );
+
+    assert.strictEqual(2, attr.attr1);
+  });
+
+  it('should not allow changing an initOnly attribute after initialized', function() {
+    var attr = new lfr.Attribute();
+    attr.addAttrs({
+      attr1: {
+        initOnly: true,
+        value: function() {
+          return 1;
+        }
+      }
+    });
+
+    attr.attr1 = 2;
+    assert.strictEqual(1, attr.attr1);
+  });
+
   it('should emit event when attribute changes', function() {
     var attr = createAttributeInstance();
     var listener = sinon.stub();

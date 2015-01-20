@@ -4,6 +4,44 @@
   lfr.dom = lfr.dom || {};
 
   /**
+   * Check if an element matches a given selector.
+   * @param {Element} element
+   * @param {string} selector
+   * @return {boolean}
+   */
+  lfr.dom.match = function(element, selector) {
+    if (!element || element.nodeType !== 1) {
+      return false;
+    }
+
+    var p = Element.prototype;
+    var m = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector;
+    if (m) {
+      return m.call(element, selector);
+    }
+
+    return lfr.dom.matchFallback_(element, selector);
+  };
+
+  /**
+   * Check if an element matches a given selector, using an internal implementation
+   * instead of calling existing javascript functions.
+   * @param {Element} element
+   * @param {string} selector
+   * @return {boolean}
+   * @protected
+   */
+  lfr.dom.matchFallback_ = function(element, selector) {
+    var nodes = document.querySelectorAll(selector, element.parentNode);
+    for (var i = 0; i < nodes.length; ++i) {
+      if (nodes[i] === element) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  /**
    * Listens to the specified event on the given DOM element. This function normalizes
    * DOM event payloads and functions so they'll work the same way on all supported
    * browsers.

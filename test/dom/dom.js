@@ -81,9 +81,9 @@ describe('dom', function() {
       var element = {
         removeChild: sinon.stub()
       };
-      // Stub element.firstChild property to return for the first, second and
-      // third and calls <div></div>, <div></div> and null, respectively.
-      var children = ['<div>0</div>', '<div>1</div>', null];
+      // Stub element.firstChild property to return for the first, second, third
+      // and fourth calls <div></div>, <div></div>, null and null, respectively.
+      var children = ['<div>0</div>', '<div>1</div>', null, null];
       var firstChildCallCount = 0;
       Object.defineProperty(element, 'firstChild', {
         get: function() {
@@ -94,6 +94,7 @@ describe('dom', function() {
       lfr.dom.removeChildren(element);
       assert.strictEqual('<div>0</div>', element.removeChild.args[0][0]);
       assert.strictEqual('<div>1</div>', element.removeChild.args[1][0]);
+      assert.strictEqual(null, element.firstChild);
     });
   });
 

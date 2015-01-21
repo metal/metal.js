@@ -4,6 +4,52 @@
   lfr.dom = lfr.dom || {};
 
   /**
+   * Listens to the specified event on the given DOM element, but only calls the
+   * callback with the event when it triggered by elements that match the given
+   * selector.
+   * @param {!Element} element The container DOM element to listen to the event on.
+   * @param {string} eventName The name of the event to listen to.
+   * @param {string} selector The selector that matches the child elements that
+   *   the event should be triggered for.
+   * @param {!function(!Object)} callback Function to be called when the event is
+   *   triggered. It will receive the normalized event object.
+   * @return {!lfr.DomEventHandle} Can be used to remove the listener.
+   */
+  lfr.dom.delegate = function(element, eventName, selector, callback) {
+    return lfr.dom.on(
+      element,
+      eventName,
+      lfr.bind(lfr.dom.handleDelegateEvent_, null, selector, callback)
+    );
+  };
+
+  /**
+   * This is called when an event is triggered by a delegate listener (see
+   * `lfr.dom.delegate` for more details).
+   * @param {string} selector The selector that matches the child elements that
+   *   the event should be triggered for.
+   * @param {!function(!Object)} callback Function to be called when the event is
+   *   triggered. It will receive the normalized event object.
+   * @param {!Event} event The event payload.
+   * @return {boolean} False if at least one of the triggered callbacks returns false,
+   *   or true otherwise.
+   */
+  lfr.dom.handleDelegateEvent_ = function(selector, callback, event) {
+    var currentElement = event.target;
+    var returnValue = true;
+
+    while (currentElement && !event.stopped) {
+      if (lfr.dom.match(currentElement, selector)) {
+        event.delegateTarget = currentElement;
+        returnValue &= callback(event);
+      }
+      currentElement = currentElement.parentNode;
+    }
+
+    return returnValue;
+  };
+
+  /**
    * Check if an element matches a given selector.
    * @param {Element} element
    * @param {string} selector

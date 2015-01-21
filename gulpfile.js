@@ -14,6 +14,7 @@ var mainFiles = [
   'src/disposable/Disposable.js',
   'src/structs/Trie.js',
   'src/structs/WildcardTrie.js',
+  'src/events/Event.js',
   'src/events/EventHandle.js',
   'src/events/DomEventHandle.js',
   'src/events/EventHandler.js',

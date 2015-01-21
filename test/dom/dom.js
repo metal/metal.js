@@ -48,6 +48,104 @@ describe('dom', function() {
     });
   });
 
+  describe('delegate', function() {
+    beforeEach(function() {
+      Element.prototype.nodeType = 1;
+      Element.prototype.matches = function(selector) {
+        return selector === '.' + this.className;
+      };
+    });
+
+    function createElements(classNames) {
+      var elements = [];
+      for (var i = 0; i < classNames.length; i++) {
+        elements.push(new Element());
+        elements[i].className = classNames[i];
+        elements[i].parentNode = elements[i - 1];
+        elements[i].addEventListener = sinon.stub();
+      }
+      return elements;
+    }
+
+    it('should only listen to delegate event on container', function() {
+      var elements = createElements(['nomatch', 'match', 'nomatch', 'match']);
+
+      var listener = sinon.stub();
+      lfr.dom.delegate(elements[0], 'myEvent', '.match', listener);
+      assert.strictEqual(1, elements[0].addEventListener.callCount);
+      assert.strictEqual(0, elements[1].addEventListener.callCount);
+      assert.strictEqual(0, elements[2].addEventListener.callCount);
+      assert.strictEqual(0, elements[3].addEventListener.callCount);
+    });
+
+    it('should trigger delegate listener for matched elements', function() {
+      var elements = createElements(['nomatch', 'match', 'nomatch', 'match']);
+
+      var listenerTargets = [];
+      var listener = function(event) {
+        listenerTargets.push(event.delegateTarget);
+      };
+      lfr.dom.delegate(elements[0], 'myEvent', '.match', listener);
+
+      elements[0].addEventListener.args[0][1]({
+        target: elements[3]
+      });
+      assert.strictEqual(2, listenerTargets.length);
+      assert.strictEqual(elements[3], listenerTargets[0]);
+      assert.strictEqual(elements[1], listenerTargets[1]);
+    });
+
+    it('should only trigger delegate event starting from initial target', function() {
+      var elements = createElements(['nomatch', 'match', 'nomatch', 'match']);
+
+      var listenerTargets = [];
+      var listener = function(event) {
+        listenerTargets.push(event.delegateTarget);
+      };
+      lfr.dom.delegate(elements[0], 'myEvent', '.match', listener);
+
+      elements[0].addEventListener.args[0][1]({
+        target: elements[2]
+      });
+      assert.strictEqual(1, listenerTargets.length);
+      assert.strictEqual(elements[1], listenerTargets[0]);
+    });
+
+    it('should stop triggering event if stopPropagation is called', function() {
+      var elements = createElements(['nomatch', 'match', 'nomatch', 'match']);
+
+      var listenerTargets = [];
+      var listener = function(event) {
+        listenerTargets.push(event.delegateTarget);
+        event.stopPropagation();
+      };
+      lfr.dom.delegate(elements[0], 'myEvent', '.match', listener);
+
+      var sentEvent = new Event();
+      sentEvent.target = elements[3];
+      elements[0].addEventListener.args[0][1](sentEvent);
+      assert.strictEqual(1, listenerTargets.length);
+      assert.strictEqual(elements[3], listenerTargets[0]);
+    });
+
+    it('should stop triggering event if stopImmediatePropagation is called', function() {
+      var elements = createElements(['nomatch', 'match', 'nomatch', 'match']);
+
+      var listenerTargets = [];
+      var listener = function(event) {
+        listenerTargets.push(event.delegateTarget);
+        event.stopImmediatePropagation();
+      };
+      lfr.dom.delegate(elements[0], 'myEvent', '.match', listener);
+
+      var sentEvent = new Event();
+      sentEvent.target = elements[3];
+      elements[0].addEventListener.args[0][1](sentEvent);
+      assert.strictEqual(1, listenerTargets.length);
+      assert.strictEqual(elements[3], listenerTargets[0]);
+    });
+  });
+
   describe('match', function() {
     it('should return false if no element is given', function() {
       assert.ok(!lfr.dom.match());

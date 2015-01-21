@@ -2,6 +2,10 @@
 
 global.lfr = {};
 global.window = {};
+global.Event = function() {};
+Event.prototype.stopPropagation = function() {};
+Event.prototype.stopImmediatePropagation = function() {};
+
 require('../../src/lfr.js');
 require('../../src/object/object.js');
 require('../../src/array/array.js');
@@ -9,6 +13,7 @@ require('../../src/promise/Promise.js');
 require('../../src/disposable/Disposable.js');
 require('../../src/structs/Trie.js');
 require('../../src/structs/WildcardTrie.js');
+require('../../src/events/Event.js');
 require('../../src/events/EventHandle.js');
 require('../../src/events/DomEventHandle.js');
 require('../../src/events/EventHandler.js');

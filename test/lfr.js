@@ -183,6 +183,46 @@ describe('lfr', function() {
 
       assert.ok(lfr.isString(''));
     });
+
+    it('should check if var is boolean', function() {
+      assert.ok(lfr.isBoolean(true));
+      assert.ok(lfr.isBoolean(false));
+      assert.ok(lfr.isBoolean(Boolean(true)));
+      assert.ok(lfr.isBoolean(Boolean(false)));
+
+      assert.ok(!lfr.isBoolean(undefined));
+      assert.ok(!lfr.isBoolean(null));
+      assert.ok(!lfr.isBoolean(''));
+      assert.ok(!lfr.isBoolean(0));
+
+      assert.ok(!lfr.isBoolean(1));
+      assert.ok(!lfr.isBoolean('foo'));
+    });
+
+    it('should check if var is element', function() {
+      assert.ok(lfr.isElement({
+        nodeType: 1
+      }));
+      assert.ok(!lfr.isElement({}));
+      assert.ok(!lfr.isElement(null));
+      assert.ok(!lfr.isElement(true));
+    });
+
+    it('should check if var is null', function() {
+      assert.ok(lfr.isNull(null));
+      assert.ok(!lfr.isNull(false));
+      assert.ok(!lfr.isNull(undefined));
+      assert.ok(!lfr.isNull(''));
+      assert.ok(!lfr.isNull(0));
+    });
+
+    it('should check if var is defined and not null', function() {
+      assert.ok(lfr.isDefAndNotNull(false));
+      assert.ok(lfr.isDefAndNotNull(''));
+      assert.ok(lfr.isDefAndNotNull(0));
+      assert.ok(!lfr.isDefAndNotNull(null));
+      assert.ok(!lfr.isDefAndNotNull(undefined));
+    });
   });
 
   describe('Null Function', function() {

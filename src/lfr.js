@@ -186,12 +186,39 @@
   };
 
   /**
+   * Returns true if the specified value is a boolean.
+   * @param {?} val Variable to test.
+   * @return {boolean} Whether variable is boolean.
+   */
+  lfr.isBoolean = function(val) {
+    return typeof val === 'boolean';
+  };
+
+  /**
    * Returns true if the specified value is not undefined.
    * @param {?} val Variable to test.
    * @return {boolean} Whether variable is defined.
    */
   lfr.isDef = function(val) {
     return val !== undefined;
+  };
+
+  /**
+   * Returns true if value is not undefined or null.
+   * @param {*} val
+   * @return {Boolean}
+   */
+  lfr.isDefAndNotNull = function(val) {
+    return lfr.isDef(val) && !lfr.isNull(val);
+  };
+
+  /**
+   * Returns true if value is a dom element.
+   * @param {*} val
+   * @return {Boolean}
+   */
+  lfr.isElement = function(val) {
+    return val && typeof val === 'object' && val.nodeType === 1;
   };
 
   /**
@@ -204,11 +231,20 @@
   };
 
   /**
-     * Returns true if the specified value is an object. This includes arrays
-     * and functions.
-     * @param {?} val Variable to test.
-     * @return {boolean} Whether variable is an object.
-     */
+   * Returns true if value is null.
+   * @param {*} val
+   * @return {Boolean}
+   */
+  lfr.isNull = function(val) {
+    return val === null;
+  };
+
+  /**
+   * Returns true if the specified value is an object. This includes arrays
+   * and functions.
+   * @param {?} val Variable to test.
+   * @return {boolean} Whether variable is an object.
+   */
   lfr.isObject = function(val) {
     var type = typeof val;
     return type === 'object' && val !== null || type === 'function';

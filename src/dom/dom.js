@@ -145,6 +145,17 @@
   };
 
   /**
+   * Removes all the child nodes on a DOM node.
+   * @param {Node} node Node to remove children from.
+   */
+  lfr.dom.removeChildren = function(node) {
+    var child;
+    while ((child = node.firstChild)) {
+      node.removeChild(child);
+    }
+  };
+
+  /**
    * The function that replaces `stopImmediatePropagation_` for events.
    * @protected
    */
@@ -161,4 +172,5 @@
     Event.prototype.stopPropagation.call(this);
     this.stopped = true;
   };
+
 }());

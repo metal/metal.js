@@ -16,6 +16,68 @@ describe('dom', function() {
     delete global.Element;
   });
 
+  describe('manipulation', function() {
+    it('should append element to parent element', function() {
+      var parent = {
+        appendChild: sinon.stub()
+      };
+      var child = {};
+
+      lfr.dom.append(parent, child);
+      assert.strictEqual(1, parent.appendChild.callCount);
+      assert.strictEqual(child, parent.appendChild.args[0][0]);
+    });
+
+    it('should append string as document fragment to parent element', function() {
+      var parent = {
+        appendChild: sinon.stub()
+      };
+      var docFragment = {};
+      sinon.stub(lfr.dom, 'buildFragment').returns(docFragment);
+
+      lfr.dom.append(parent, '<div></div>');
+      assert.strictEqual(1, lfr.dom.buildFragment.callCount);
+      assert.strictEqual('<div></div>', lfr.dom.buildFragment.args[0][0]);
+      assert.strictEqual(1, parent.appendChild.callCount);
+      assert.strictEqual(docFragment, parent.appendChild.args[0][0]);
+      lfr.dom.buildFragment.restore();
+    });
+
+    it('should create document fragment from string', function() {
+      var element = {
+        removeChild: sinon.stub()
+      };
+      // Stub element.firstChild property to return for the first, second, third
+      // and fourth calls <br>, <div></div>, <div></div> and null, respectively.
+      var children = ['<br>', '<div></div>', '<div></div>', null];
+      var firstChildCallCount = 0;
+      Object.defineProperty(element, 'firstChild', {
+        get: function() {
+          return children[firstChildCallCount++];
+        }
+      });
+      document.createElement = sinon.stub().returns(element);
+
+      var docFragment = {
+        appendChild: sinon.stub()
+      };
+      document.createDocumentFragment = sinon.stub().returns(docFragment);
+
+      var createdDocFragment = lfr.dom.buildFragment('<div></div>');
+      assert.strictEqual(docFragment, createdDocFragment);
+      // Creates temp element
+      assert.strictEqual(1, document.createElement.callCount);
+      // Removes firstChild <br> pad from created element
+      assert.strictEqual(1, element.removeChild.callCount);
+      assert.strictEqual('<br>', element.removeChild.args[0][0]);
+      // Creates new fragment to append nodes from the string fragment
+      assert.strictEqual(1, document.createDocumentFragment.callCount);
+      // Asserts remaining element.firstChild was appended to the new fragment
+      assert.strictEqual(4, firstChildCallCount);
+      assert.strictEqual('<div></div>', docFragment.appendChild.args[0][0]);
+    });
+  });
+
   describe('on', function() {
     beforeEach(function() {
       Element.prototype.addEventListener = sinon.stub();

@@ -4,6 +4,37 @@
   lfr.dom = lfr.dom || {};
 
   /**
+   * Appends a child node with text or other nodes to a parent node. If
+   * child is a HTML string it will be automatically converted to a document
+   * fragment before appending it to the parent.
+   * @param {!Node} parent The node to append nodes to.
+   * @param {!Node|String} child The thing to append to the parent.
+   */
+  lfr.dom.append = function(parent, child) {
+    if (lfr.isString(child)) {
+      child = lfr.dom.buildFragment(child);
+    }
+    return parent.appendChild(child);
+  };
+
+  /**
+   * Helper for converting a HTML string into a document fragment.
+   * @param {string} htmlString The HTML string to convert.
+   * @return {!Node} The resulting document fragment.
+   */
+  lfr.dom.buildFragment = function(htmlString) {
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = '<br>' + htmlString;
+    tempDiv.removeChild(tempDiv.firstChild);
+
+    var fragment = document.createDocumentFragment();
+    while (tempDiv.firstChild) {
+      fragment.appendChild(tempDiv.firstChild);
+    }
+    return fragment;
+  };
+
+  /**
    * Listens to the specified event on the given DOM element, but only calls the
    * callback with the event when it triggered by elements that match the given
    * selector.

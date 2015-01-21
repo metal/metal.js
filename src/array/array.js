@@ -4,6 +4,24 @@
   lfr.array = lfr.array || {};
 
   /**
+   * Transforms the input nested array to become flat.
+   * @param {Array.<*|Array.<*>>} arr Nested array to flatten.
+   * @param {Array.<*>} opt_output Optional output array.
+   * @return {Array.<*>} Flat array.
+   */
+  lfr.array.flatten = function(arr, opt_output) {
+    var output = opt_output || [];
+    for (var i = 0; i < arr.length; i++) {
+      if (Array.isArray(arr[i])) {
+        lfr.array.flatten(arr[i], output);
+      } else {
+        output.push(arr[i]);
+      }
+    }
+    return output;
+  };
+
+  /**
    * Removes the first occurrence of a particular value from an array.
    * @param {Array.<T>} arr Array from which to remove value.
    * @param {T} obj Object to remove.

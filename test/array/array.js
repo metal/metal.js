@@ -38,4 +38,11 @@ describe('array', function() {
     lfr.array.removeAt(arr, 6);
     assert.deepEqual([1, 2, 3, 4, 5], arr);
   });
+
+  it('should flatten the array', function() {
+    var arr = [1, [2, [3, [4, [5]]]]];
+
+    assert.deepEqual([1, 2, 3, 4, 5], lfr.array.flatten(arr));
+    assert.deepEqual([1, [2, [3, [4, [5]]]]], arr);
+  });
 });

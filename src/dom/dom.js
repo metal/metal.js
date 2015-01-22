@@ -175,6 +175,16 @@
   };
 
   /**
+   * Checks if the given element supports the given event type.
+   * @param {!Element} element The DOM element to check.
+   * @param {string} eventName The name of the event to check.
+   * @return {boolean}
+   */
+  lfr.dom.supportsEvent = function(element, eventName) {
+    return 'on' + eventName in element;
+  };
+
+  /**
    * Converts the given argument to a DOM element. Strings are assumed to
    * be selectors, and so a matched element will be returned. If the arg
    * is already a DOM element it will be the return value.

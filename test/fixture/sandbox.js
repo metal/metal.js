@@ -6,6 +6,7 @@ global.window = {};
 require('../../src/lfr.js');
 require('../../src/object/object.js');
 require('../../src/array/array.js');
+require('../../src/string/string.js');
 require('../../src/promise/Promise.js');
 require('../../src/disposable/Disposable.js');
 require('../../src/structs/Trie.js');

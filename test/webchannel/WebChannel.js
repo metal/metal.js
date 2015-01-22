@@ -8,6 +8,7 @@ require('../fixture/sandbox.js');
 
 describe('WebChannel', function() {
   beforeEach(function() {
+    global.window = {};
     global.window.location = {
       origin: 'http://localhost',
       pathname: '/pathname'

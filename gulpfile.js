@@ -26,6 +26,7 @@ var mainFiles = [
   'src/net/XhrTransport.js',
   'src/net/WebSocketTransport.js',
   'src/webchannel/WebChannel.js',
+  'src/component/Component.js'
 ];
 
 gulp.task('build', ['clean'], function() {

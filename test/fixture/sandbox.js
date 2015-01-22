@@ -22,3 +22,7 @@ require('../../src/net/Transport.js');
 require('../../src/net/XhrTransport.js');
 require('../../src/net/WebSocketTransport.js');
 require('../../src/webchannel/WebChannel.js');
+require('../../src/component/Component.js');
+
+global.window = null;
+global.Event = null;

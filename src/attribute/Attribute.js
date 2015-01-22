@@ -8,10 +8,10 @@
    * configuration options.
    * @constructor
    */
-  lfr.Attribute = function() {
+  lfr.Attribute = function(opt_config) {
     lfr.Attribute.base(this, 'constructor');
-
     this.attrsInfo_ = {};
+    this.addAttrsFromStaticHint_(opt_config);
   };
   lfr.inherits(lfr.Attribute, lfr.EventEmitter);
 
@@ -91,6 +91,23 @@
     for (var i = 0; i < names.length; i++) {
       this.addAttr(names[i], configs[names[i]], initialValues[names[i]]);
     }
+  };
+
+  /**
+   * Adds attributes from super classes static hint `MyClass.ATTRS = {};`.
+   * @param {!Object.<string, !Object>} configs An object that maps the names
+   *     of all the attributes to be added to their configuration objects.
+   * @protected
+   */
+  lfr.Attribute.prototype.addAttrsFromStaticHint_ = function(config) {
+    if (!this.constructor.ATTRS_CACHE) {
+      var attrs = lfr.collectSuperClassesPropertyValue(this, 'ATTRS');
+      while (attrs.length) {
+        this.constructor.ATTRS_CACHE = lfr.object.mixin(
+          this.constructor.ATTRS_CACHE || {}, attrs.pop());
+      }
+    }
+    this.addAttrs(this.constructor.ATTRS_CACHE, config);
   };
 
   /**

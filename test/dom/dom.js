@@ -8,6 +8,7 @@ describe('dom', function() {
   beforeEach(function() {
     global.document = {};
     global.Element = function() {};
+    global.Event = function() {};
   });
 
   after(function() {
@@ -54,6 +55,9 @@ describe('dom', function() {
       Element.prototype.matches = function(selector) {
         return selector === '.' + this.className;
       };
+
+      Event.prototype.stopPropagation = sinon.stub();
+      Event.prototype.stopImmediatePropagation = sinon.stub();
     });
 
     function createElements(classNames) {

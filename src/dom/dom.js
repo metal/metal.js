@@ -35,6 +35,8 @@
    *   or true otherwise.
    */
   lfr.dom.handleDelegateEvent_ = function(selector, callback, event) {
+    lfr.dom.normalizeDelegateEvent_(event);
+
     var currentElement = event.target;
     var returnValue = true;
 
@@ -88,6 +90,15 @@
   };
 
   /**
+   * Normalizes the event payload for delegate listeners.
+   * @param {!Event} event
+   */
+  lfr.dom.normalizeDelegateEvent_ = function(event) {
+    event.stopPropagation = lfr.dom.stopPropagation_;
+    event.stopImmediatePropagation = lfr.dom.stopImmediatePropagation_;
+  };
+
+  /**
    * Listens to the specified event on the given DOM element. This function normalizes
    * DOM event payloads and functions so they'll work the same way on all supported
    * browsers.
@@ -100,5 +111,23 @@
   lfr.dom.on = function(element, eventName, callback) {
     element.addEventListener(eventName, callback);
     return new lfr.DomEventHandle(element, eventName, callback);
+  };
+
+  /**
+   * The function that replaces `stopImmediatePropagation_` for events.
+   * @protected
+   */
+  lfr.dom.stopImmediatePropagation_ = function() {
+    Event.prototype.stopImmediatePropagation.call(this);
+    this.stopped = true;
+  };
+
+  /**
+   * The function that replaces `stopPropagation` for events.
+   * @protected
+   */
+  lfr.dom.stopPropagation_ = function() {
+    Event.prototype.stopPropagation.call(this);
+    this.stopped = true;
   };
 }());

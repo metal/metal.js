@@ -148,6 +148,19 @@ describe('lfr', function() {
 
       assert.ok(called);
     });
+
+    it('should collect superclass properties', function() {
+      var TestSuperClass = function() {};
+      TestSuperClass.FOO = 1;
+
+      var TestClass = function() {
+        TestClass.base(this, 'constructor');
+      };
+      lfr.inherits(TestClass, TestSuperClass);
+      TestClass.FOO = 0;
+
+      assert.deepEqual([0, 1], lfr.collectSuperClassesPropertyValue(new TestClass(), 'FOO'));
+    });
   });
 
   describe('Identity Function', function() {

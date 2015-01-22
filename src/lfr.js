@@ -144,6 +144,22 @@
   };
 
   /**
+   * Loops instance super classes collecting its properties values. If
+   * property is not available on the super class `undefined` will be
+   * collected as value for the class hierarchy posigion. Must be used with
+   * classes created using `lfr.inherits`.
+   * @param {Object} instance Class instance.
+   * @param {String} propertyName Property name to be collected.
+   * @return {Array.<?Object>} Array of collected values.
+   */
+  lfr.collectSuperClassesPropertyValue = function(instance, propertyName) {
+    var propertyValues = [];
+    do {
+      propertyValues.push(instance.constructor[propertyName]);
+    } while ((instance = instance.constructor.superClass_));
+    return propertyValues;
+  };
+
   /**
    * Gets an unique id. If `opt_object` argument is passed, the object is
    * mutated with an unique id. Consecutive calls with the same object

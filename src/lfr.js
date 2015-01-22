@@ -10,6 +10,20 @@
   root.lfr = root.lfr || {};
 
   /**
+   * Unique id property prefix.
+   * @type {String}
+   * @protected
+   */
+  lfr.UID_PROPERTY = 'lfr_' + ((Math.random() * 1e9) >>> 0);
+
+  /**
+   * Counter for unique id.
+   * @type {Number}
+   * @private
+   */
+  lfr.uniqueIdCounter_ = 1;
+
+  /**
    * When defining a class Foo with an abstract method bar(), you can do:
    * Foo.prototype.bar = lfr.abstractMethod
    *
@@ -127,6 +141,24 @@
     } else {
       return lfr.bindWithoutArgs_(fn, context);
     }
+  };
+
+  /**
+  /**
+   * Gets an unique id. If `opt_object` argument is passed, the object is
+   * mutated with an unique id. Consecutive calls with the same object
+   * reference won't mutate the object again, instead the current object uid
+   * returns. See {@link lfr.UID_PROPERTY}.
+   * @type {opt_object} Optional object to be mutated with the uid. If not
+   *     specified this method only returns the uid.
+   * @throws {Error} when invoked to indicate the method should be overridden.
+   */
+  lfr.getUid = function(opt_object) {
+    if (opt_object) {
+      return opt_object[lfr.UID_PROPERTY] ||
+        (opt_object[lfr.UID_PROPERTY] = lfr.uniqueIdCounter_++);
+    }
+    return lfr.uniqueIdCounter_++;
   };
 
   /**

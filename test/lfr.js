@@ -5,6 +5,17 @@ var sinon = require('sinon');
 require('./fixture/sandbox.js');
 
 describe('lfr', function() {
+  describe('Uid', function() {
+    it('should always generate unique id', function() {
+      assert.notStrictEqual(lfr.getUid(), lfr.getUid());
+    });
+
+    it('should mutate object with unique id', function() {
+      var obj = {};
+      assert.strictEqual(lfr.getUid(obj), lfr.getUid(obj));
+    });
+  });
+
   describe('Abstract Method', function() {
     it('should throw errors for calling abstract methods', function() {
       assert.throws(function() {

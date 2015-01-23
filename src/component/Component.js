@@ -206,12 +206,14 @@
    * automatically appended to the component element.
    * @param {string} surfaceId The surface id to be registered.
    * @param {Object=} opt_config Optional surface configuration.
+   * @chainable
    */
   lfr.Component.prototype.addSurface = function(surfaceId, opt_config) {
     this.surfaces_[surfaceId] = opt_config || {
       cacheState: lfr.Component.Cache.NOT_INITIALIZED
     };
     this.cacheSurfaceRenderAttrs_(surfaceId);
+    return this;
   };
 
   /**
@@ -219,11 +221,13 @@
    * automatically appended to the component element.
    * @param {!Object.<string, Object=>} configs An object that maps the names
    *     of all the surfaces to be added to their configuration objects.
+   * @chainable
    */
   lfr.Component.prototype.addSurfaces = function(configs) {
     for (var surfaceId in configs) {
       this.addSurface(surfaceId, configs[surfaceId]);
     }
+    return this;
   };
 
   /**
@@ -255,11 +259,13 @@
    *     to be rendered before an existing element in the DOM, e.g.
    *     `component.render(null, existingElement)`.
    * @protected
+   * @chainable
    */
   lfr.Component.prototype.attach = function(opt_parentElement, opt_siblingElement) {
     this.renderElement_(opt_parentElement, opt_siblingElement);
     this.inDocument = true;
     this.attached();
+    return this;
   };
 
   /**
@@ -328,11 +334,13 @@
    * removed from the DOM and any other action to be performed must be
    * implemented in this method, such as, unbinding DOM events. A component
    * can be detached multiple times.
+   * @chainable
    */
   lfr.Component.prototype.detach = function() {
     this.element.parentNode.removeChild(this.element);
     this.inDocument = false;
     this.detached();
+    return this;
   };
 
   /**
@@ -377,6 +385,7 @@
    *   render surfaces - All surfaces content are rendered.
    *   attribute synchronization - All synchronization methods are called.
    *   attach - Attach Lifecycle is called.
+   * @chainable
    */
   lfr.Component.prototype.decorate = function() {
     if (this.inDocument) {
@@ -389,6 +398,7 @@
     this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_CACHE);
 
     this.attach();
+    return this;
   };
 
   /**
@@ -540,6 +550,7 @@
   /**
    * Unregisters a surface and removes its element from the DOM.
    * @param {string} surfaceId The surface id.
+   * @chainable
    */
   lfr.Component.prototype.removeSurface = function(surfaceId) {
     var el = this.getSurfaceElement(surfaceId);
@@ -547,6 +558,7 @@
       el.parentNode.removeChild(el);
     }
     delete this.surfaces_[surfaceId];
+    return this;
   };
 
   /**
@@ -566,6 +578,7 @@
    *     to render the component before it. Relevant when the component needs
    *     to be rendered before an existing element in the DOM, e.g.
    *     `component.render(null, existingElement)`.
+   * @chainable
    */
   lfr.Component.prototype.render = function(opt_parentElement, opt_siblingElement) {
     if (this.inDocument) {
@@ -578,6 +591,7 @@
     this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_CACHE);
 
     this.attach(opt_parentElement, opt_siblingElement);
+    return this;
   };
 
   /**

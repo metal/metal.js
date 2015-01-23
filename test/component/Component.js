@@ -128,6 +128,18 @@ describe('Component', function() {
       assert.strictEqual('span', custom.element.tagName.toLowerCase());
     });
 
+    it('should return component instance from lifecycle methods', function() {
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+
+      assert.strictEqual(custom, custom.render());
+      assert.strictEqual(custom, custom.detach());
+      assert.strictEqual(custom, custom.decorate());
+
+      custom.detach();
+      assert.strictEqual(custom, custom.attach());
+    });
+
     it('should dispose component', function() {
       var CustomComponent = createCustomComponentClass();
       var custom = new CustomComponent();
@@ -571,6 +583,15 @@ describe('Component', function() {
       assert.ok(lfr.dom.append.firstCall.args[0].id.indexOf('-bottom') > 0);
 
       lfr.dom.append.restore();
+    });
+
+    it('should return component instance from surface methods', function() {
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+
+      assert.strictEqual(custom, custom.addSurface('header'));
+      assert.strictEqual(custom, custom.addSurfaces({}));
+      assert.strictEqual(custom, custom.removeSurface('header'));
     });
   });
 });

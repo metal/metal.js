@@ -249,7 +249,7 @@ describe('Component', function() {
       };
 
       var child = new ChildComponent();
-      assert.deepEqual(['header', 'bottom', 'content'], Object.keys(child.surfaces));
+      assert.deepEqual(['header', 'bottom', 'content'], Object.keys(child.getSurfaces()));
 
       // Adds test coverage for skipping surfaces aggregation
       new ChildComponent();
@@ -262,7 +262,7 @@ describe('Component', function() {
       custom.addSurface('header', headerSurfaceConfig);
       custom.addSurface('bottom');
       assert.strictEqual(headerSurfaceConfig, custom.getSurface('header'));
-      assert.deepEqual(['header', 'bottom'], Object.keys(custom.surfaces));
+      assert.deepEqual(['header', 'bottom'], Object.keys(custom.getSurfaces()));
       assert.strictEqual(null, custom.getSurface('unknown'));
     });
 

@@ -161,8 +161,8 @@
    * @protected
    */
   lfr.dom.stopImmediatePropagation_ = function() {
-    Event.prototype.stopImmediatePropagation.call(this);
     this.stopped = true;
+    Event.prototype.stopImmediatePropagation.call(this);
   };
 
   /**
@@ -170,8 +170,8 @@
    * @protected
    */
   lfr.dom.stopPropagation_ = function() {
-    Event.prototype.stopPropagation.call(this);
     this.stopped = true;
+    Event.prototype.stopPropagation.call(this);
   };
 
   /**
@@ -189,5 +189,20 @@
     } else {
       return null;
     }
+  };
+
+  /**
+   * Triggers the specified event on the given element.
+   * NOTE: This should mostly be used for testing, not on real code.
+   * @param {!Element} element The node that should trigger the event.
+   * @param {string} eventName The name of the event to be triggred.
+   * @param {Object=} opt_eventObj An object with data that should be on the
+   *   triggered event's payload.
+   */
+  lfr.dom.triggerEvent = function(element, eventName, opt_eventObj) {
+    var eventObj = document.createEvent('HTMLEvents');
+    eventObj.initEvent(eventName, true, true);
+    lfr.object.mixin(eventObj, opt_eventObj);
+    element.dispatchEvent(eventObj);
   };
 }());

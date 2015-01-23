@@ -624,7 +624,7 @@
    */
   lfr.Component.prototype.syncElementClasses = function(newVal, prevVal) {
     var classList = this.element.classList;
-    var classesToAdd = lfr.Component.ELEMENT_CLASSES;
+    var classesToAdd = this.constructor.ELEMENT_CLASSES || lfr.Component.ELEMENT_CLASSES;
     if (newVal) {
       classesToAdd = classesToAdd.concat(newVal);
     }

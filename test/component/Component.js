@@ -190,6 +190,15 @@ describe('Component', function() {
       assert.deepEqual(['component', 'foo', 'bar'], Element.prototype.classList.add.args[0]);
     });
 
+    it('should overwrite default component elementClasses from static hint', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ELEMENT_CLASSES = ['overwritten'];
+
+      var custom = new CustomComponent();
+      custom.render();
+      assert.strictEqual('overwritten', Element.prototype.classList.add.args[0][0]);
+    });
+
     it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.ATTRS = {

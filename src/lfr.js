@@ -146,7 +146,7 @@
   /**
    * Loops instance super classes collecting its properties values. If
    * property is not available on the super class `undefined` will be
-   * collected as value for the class hierarchy posigion. Must be used with
+   * collected as value for the class hierarchy position. Must be used with
    * classes created using `lfr.inherits`.
    * @param {Object} instance Class instance.
    * @param {String} propertyName Property name to be collected.

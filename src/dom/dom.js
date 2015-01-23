@@ -7,9 +7,9 @@
    * Appends a child node with text or other nodes to a parent node. If
    * child is a HTML string it will be automatically converted to a document
    * fragment before appending it to the parent.
-   * @param {!Node} parent The node to append nodes to.
-   * @param {!Node|String} child The thing to append to the parent.
-   * @return {!Node} The appended child.
+   * @param {!Element} parent The node to append nodes to.
+   * @param {!Element|String} child The thing to append to the parent.
+   * @return {!Element} The appended child.
    */
   lfr.dom.append = function(parent, child) {
     if (lfr.isString(child)) {
@@ -21,7 +21,7 @@
   /**
    * Helper for converting a HTML string into a document fragment.
    * @param {string} htmlString The HTML string to convert.
-   * @return {!Node} The resulting document fragment.
+   * @return {!Element} The resulting document fragment.
    */
   lfr.dom.buildFragment = function(htmlString) {
     var tempDiv = document.createElement('div');
@@ -147,7 +147,7 @@
 
   /**
    * Removes all the child nodes on a DOM node.
-   * @param {Node} node Node to remove children from.
+   * @param {Element} node Element to remove children from.
    */
   lfr.dom.removeChildren = function(node) {
     var child;
@@ -174,4 +174,20 @@
     this.stopped = true;
   };
 
+  /**
+   * Converts the given argument to a DOM element. Strings are assumed to
+   * be selectors, and so a matched element will be returned. If the arg
+   * is already a DOM element it will be the return value.
+   * @param {string|Element} selectorOrElement
+   * @return {Element} The converted element, or null if none was found.
+   */
+  lfr.dom.toElement = function(selectorOrElement) {
+    if (lfr.isElement(selectorOrElement)) {
+      return selectorOrElement;
+    } else if (lfr.isString(selectorOrElement)) {
+      return document.querySelector(selectorOrElement);
+    } else {
+      return null;
+    }
+  };
 }());

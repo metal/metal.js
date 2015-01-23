@@ -168,6 +168,20 @@ describe('Component', function() {
       assert.strictEqual(element, custom.element);
     });
 
+    it('should set component element attr from selector', function() {
+      var CustomComponent = createCustomComponentClass();
+
+      var element = document.createElement('div');
+      element.className = 'myClass';
+      document.body.appendChild(element);
+
+      var custom = new CustomComponent({
+        element: '.myClass'
+      });
+      custom.render();
+      assert.strictEqual(element, custom.element);
+    });
+
     it('should set component element id from id attr', function() {
       var CustomComponent = createCustomComponentClass();
 
@@ -233,6 +247,74 @@ describe('Component', function() {
         sinon.assert.callCount(CustomComponent.prototype.syncFoo, 2);
         assert.strictEqual(20, CustomComponent.prototype.syncFoo.args[1][0]);
       });
+    });
+  });
+
+  describe('Render', function() {
+    it('should render component on body if no parent is specified', function() {
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+      custom.render();
+
+      assert.strictEqual(document.body, custom.element.parentNode);
+    });
+
+    it('should render component on requested parent', function() {
+      var container = document.createElement('div');
+      document.body.appendChild(container);
+
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+      custom.render(container);
+
+      assert.strictEqual(container, custom.element.parentNode);
+    });
+
+    it('should render component on requested parent selector', function() {
+      var container = document.createElement('div');
+      container.className = 'myContainer';
+      document.body.appendChild(container);
+
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+      custom.render('.myContainer');
+
+      assert.strictEqual(container, custom.element.parentNode);
+    });
+
+    it('should render component on requested parent at specified position', function() {
+      var container = document.createElement('div');
+      var sibling1 = document.createElement('div');
+      var sibling2 = document.createElement('div');
+      container.appendChild(sibling1);
+      container.appendChild(sibling2);
+      document.body.appendChild(container);
+
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+      custom.render(container, sibling2);
+
+      assert.strictEqual(container, custom.element.parentNode);
+      assert.strictEqual(custom.element, sibling1.nextSibling);
+      assert.strictEqual(sibling2, custom.element.nextSibling);
+    });
+
+    it('should render component according to specified sibling selector', function() {
+      var container = document.createElement('div');
+      var sibling1 = document.createElement('div');
+      var sibling2 = document.createElement('div');
+      sibling2.className = 'mySibling';
+      container.appendChild(sibling1);
+      container.appendChild(sibling2);
+      document.body.appendChild(container);
+
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+      custom.render(container, '.mySibling');
+
+      assert.strictEqual(container, custom.element.parentNode);
+      assert.strictEqual(custom.element, sibling1.nextSibling);
+      assert.strictEqual(sibling2, custom.element.nextSibling);
     });
   });
 

@@ -16,6 +16,10 @@ describe('Component', function() {
     };
   });
 
+  afterEach(function() {
+    document.body.innerHTML = '';
+  });
+
   describe('Lifecycle', function() {
     it('should test component render lifecycle', function() {
       var CustomComponent = createCustomComponentClass();
@@ -276,9 +280,20 @@ describe('Component', function() {
       assert.strictEqual('span', custom.getSurfaceElement('header').tagName.toLowerCase());
     });
 
-    it('should query from component element dom or create surface element when requested', function() {
+    it('should create surface element if it hasn\'t been created before', function() {
       var CustomComponent = createCustomComponentClass();
+      CustomComponent.SURFACES = {
+        header: {}
+      };
 
+      var custom = new CustomComponent();
+      var surface = custom.getSurfaceElement('header');
+
+      assert.ok(surface);
+      assert.strictEqual(surface, custom.getSurfaceElement('header'));
+    });
+
+    it('should get surface element from the document when it exists', function() {
       var element = document.createElement('div');
       element.id = 'custom';
       var surface = document.createElement('div');
@@ -286,18 +301,38 @@ describe('Component', function() {
       element.appendChild(surface);
       document.body.appendChild(element);
 
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.SURFACES = {
+        header: {}
+      };
       var custom = new CustomComponent({
         element: element
       });
-      CustomComponent.prototype.renderInternal = function() {
-        // Creates surface element and appends to component element
-        this.element.appendChild(this.getSurfaceElement('bottom'));
+
+      assert.strictEqual(surface, custom.getSurfaceElement('header'));
+    });
+
+    it('should get surface element from element even if not on the document', function() {
+      var surface = document.createElement('div');
+      surface.id = 'custom-header';
+
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.SURFACES = {
+        header: {}
       };
-      custom.addSurface('header');
-      custom.addSurface('bottom');
+      CustomComponent.prototype.renderInternal = function() {
+        this.element.appendChild(surface);
+      };
+      CustomComponent.prototype.getSurfaceContent = function() {
+        return 'Header';
+      };
+      var custom = new CustomComponent({
+        id: 'custom'
+      });
       custom.render();
-      assert.strictEqual(document.getElementById('custom-header'), custom.getSurfaceElement('header'));
-      assert.strictEqual(document.getElementById('custom-bottom'), custom.getSurfaceElement('bottom'));
+
+      assert.strictEqual(surface, custom.getSurfaceElement('header'));
+      assert.strictEqual('Header', custom.getSurfaceElement('header').innerHTML);
     });
 
     it('should return null when element is requested for unknown surface', function() {
@@ -349,7 +384,7 @@ describe('Component', function() {
       assert.strictEqual('<span>bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
     });
 
-    it('should render surface content when surface render attrs changes', function(done) {
+    it('should render surface content when surface render attrs change', function(done) {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.prototype.renderInternal = function() {
         this.element.appendChild(this.getSurfaceElement('header'));

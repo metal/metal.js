@@ -64,6 +64,7 @@
      */
     element: {
       initOnly: true,
+      setter: 'setterElementFn_',
       validator: 'validatorElementFn_',
       valueFn: 'valueElementFn_'
     },
@@ -247,11 +248,11 @@
    * appended to the DOM and any other action to be performed must be
    * implemented in this method, such as, binding DOM events. A component can
    * be re-attached multiple times.
-   * @param {Element=} opt_parentElement Optional parent element to render the
-   *     component.
-   * @param {Element=} opt_siblingElement Optional sibling element to render
-   *     the component before it. Relevant when the component needs to be
-   *     rendered before an existing element in the DOM, e.g.
+   * @param {(string|Element)=} opt_parentElement Optional parent element
+   *     to render the component.
+   * @param {(string|Element)=} opt_siblingElement Optional sibling element
+   *     to render the component before it. Relevant when the component needs
+   *     to be rendered before an existing element in the DOM, e.g.
    *     `component.render(null, existingElement)`.
    * @protected
    */
@@ -559,11 +560,11 @@
    *   attribute synchronization - All synchronization methods are called.
    *   attach - Attach Lifecycle is called.
    *
-   * @param {Element=} opt_parentElement Optional parent element to render the
-   *     component.
-   * @param {Element=} opt_siblingElement Optional sibling element to render
-   *     the component before it. Relevant when the component needs to be
-   *     rendered before an existing element in the DOM, e.g.
+   * @param {(string|Element)=} opt_parentElement Optional parent element
+   *     to render the component.
+   * @param {(string|Element)=} opt_siblingElement Optional sibling element
+   *     to render the component before it. Relevant when the component needs
+   *     to be rendered before an existing element in the DOM, e.g.
    *     `component.render(null, existingElement)`.
    */
   lfr.Component.prototype.render = function(opt_parentElement, opt_siblingElement) {
@@ -581,18 +582,19 @@
 
   /**
    * Renders the component element into the DOM.
-   * @param {Element=} opt_parentElement Optional parent element to render the
-   *     component.
-   * @param {Element=} opt_siblingElement Optional sibling element to render
-   *     the component before it. Relevant when the component needs to be
-   *     rendered before an existing element in the DOM, e.g.
+   * @param {(string|Element)=} opt_parentElement Optional parent element
+   *     to render the component.
+   * @param {(string|Element)=} opt_siblingElement Optional sibling element
+   *     to render the component before it. Relevant when the component needs
+   *     to be rendered before an existing element in the DOM, e.g.
    *     `component.render(null, existingElement)`.
    * @protected
    */
   lfr.Component.prototype.renderElement_ = function(opt_parentElement, opt_siblingElement) {
     this.element.id = this.id;
     if (opt_siblingElement || !this.element.parentNode) {
-      (opt_parentElement || document.body).insertBefore(this.element, opt_siblingElement || null);
+      var parent = lfr.dom.toElement(opt_parentElement) || document.body;
+      parent.insertBefore(this.element, lfr.dom.toElement(opt_siblingElement));
     }
   };
 
@@ -653,6 +655,16 @@
   };
 
   /**
+   * Setter logic for element attribute.
+   * @param {string|Element} val
+   * @return {Element}
+   * @protected
+   */
+  lfr.Component.prototype.setterElementFn_ = function(val) {
+    return lfr.dom.toElement(val);
+  };
+
+  /**
    * Attribute synchronization logic for elementClasses attribute.
    * @param {Array.<string>} newVal
    * @param {Array.<string>} prevVal
@@ -669,12 +681,12 @@
 
   /**
    * Validator logic for element attribute.
-   * @param {Element} val
+   * @param {string|Element} val
    * @return {Boolean} True if val is a valid element.
    * @protected
    */
   lfr.Component.prototype.validatorElementFn_ = function(val) {
-    return lfr.isElement(val);
+    return lfr.isElement(val) || lfr.isString(val);
   };
 
   /**

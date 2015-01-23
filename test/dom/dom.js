@@ -313,4 +313,27 @@ describe('dom', function() {
       assert.strictEqual(2, document.querySelectorAll.callCount);
     });
   });
+
+  describe('toElement', function() {
+    it('should return the element itself if one is given for conversion', function() {
+      var element = new Element();
+      element.nodeType = 1;
+
+      assert.strictEqual(element, lfr.dom.toElement(element));
+    });
+
+    it('should return matching element if selector is given', function() {
+      var element = new Element();
+      document.querySelector = sinon.stub().returns(element);
+
+      assert.strictEqual(element, lfr.dom.toElement('.mySelector'));
+    });
+
+    it('should return null if invalid param is given', function() {
+      assert.strictEqual(null, lfr.dom.toElement({}));
+      assert.strictEqual(null, lfr.dom.toElement([]));
+      assert.strictEqual(null, lfr.dom.toElement(1));
+      assert.strictEqual(null, lfr.dom.toElement(null));
+    });
+  });
 });

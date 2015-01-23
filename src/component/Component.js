@@ -406,7 +406,10 @@
   };
 
   /**
-   * @param  {[type]} changes [description]
+   * Fires attributes synchronization changes for attributes registered on
+   * `ATTRS_SYNC` static hint.
+   * @param {Object.<string, Object>} changes Object containing the attribute
+   *     name as key and an object with newVal and prevVal as value.
    * @protected
    */
   lfr.Component.prototype.fireAttrsChanges_ = function(changes) {
@@ -418,10 +421,10 @@
   };
 
   /**
-   * [fireAttrChange_ description]
-   * @param  {[type]} attr       [description]
-   * @param  {[type]} opt_change [description]
-   * @return {[type]}            [description]
+   * Fires attribute synchronization change for the attribute.
+   * @param {Object.<string, Object>} change Object containing newVal and
+   *     prevVal keys.
+   * @protected
    */
   lfr.Component.prototype.fireAttrChange_ = function(attr, opt_change) {
     var fn = this['sync' + attr.charAt(0).toUpperCase() + attr.slice(1)];
@@ -437,8 +440,25 @@
   };
 
   /**
-   * @param  {[type]} surfaceId [description]
-   * @return {[type]}           [description]
+   * Gets surfaces that got modified by the specified attributes changes.
+   * @param {Object.<string, Object>} changes Object containing the attribute
+   *     name as key and an object with newVal and prevVal as value.
+   * @return {Object.<string, boolean>} Object containing modified surface ids
+   *     as key and true as value.
+   */
+  lfr.Component.prototype.getModifiedSurfacesFromChanges_ = function(changes) {
+    var surfaces = [];
+    for (var attr in changes) {
+      surfaces.push(this.surfacesRenderAttrs_[attr]);
+    }
+    return lfr.object.mixin.apply(null, surfaces);
+  };
+
+  /**
+   * Gets surface configuration object. If surface is not registered returns
+   * null.
+   * @param {surfaceId} surfaceId The surface id.
+   * @return {?Object} The surface configuration object.
    */
   lfr.Component.prototype.getSurface = function(surfaceId) {
     return this.surfaces[surfaceId] || null;
@@ -451,8 +471,13 @@
   lfr.Component.prototype.getSurfaceContent = lfr.nullFunction;
 
   /**
-   * @param  {[type]} surfaceId [description]
-   * @return {[type]}           [description]
+   * Queries from the document or creates an element for the surface. Surface
+   * elements have its surface id namespaced to the component id, e.g. for a
+   * component with id `gallery` and a surface with id `pictures` the surface
+   * element will be represented by the id `gallery-pictures`. Surface
+   * elements must also be appended to the component element.
+   * @param {String} surfaceId The surface id.
+   * @return {Element} The surface element or null if surface not registered.
    */
   lfr.Component.prototype.getSurfaceElement = function(surfaceId) {
     var surface = this.getSurface(surfaceId);
@@ -466,25 +491,23 @@
   };
 
   /**
-   * @param  {[type]} event [description]
+   * Handles attributes batch changes. Responsible for surface mutations and
+   * attributes synchronization.
+   * @param {Event} event
    * @protected
    */
   lfr.Component.prototype.handleAttributesChanges_ = function(event) {
-    var changes = event.changes;
     if (this.inDocument) {
-      var renderGroup = [];
-      for (var attr in changes) {
-        renderGroup.push(this.surfacesRenderAttrs_[attr]);
-      }
-      var surfaceIds = lfr.object.mixin.apply(null, renderGroup);
-      this.renderSurfacesContentIfModified_(surfaceIds);
+      this.renderSurfacesContentIfModified_(
+        this.getModifiedSurfacesFromChanges_(event.changes)
+      );
     }
-
-    this.fireAttrsChanges_(changes);
+    this.fireAttrsChanges_(event.changes);
   };
 
   /**
-   * @return {[type]} [description]
+   * Makes an unique id for the component.
+   * @return {String} Unique id.
    * @protected
    */
   lfr.Component.prototype.makeId_ = function() {
@@ -502,8 +525,8 @@
   };
 
   /**
-   * @param  {[type]} surfaceId [description]
-   * @return {[type]}           [description]
+   * Unregisters a surface and removes its element from the DOM.
+   * @param {String} surfaceId The surface id.
    */
   lfr.Component.prototype.removeSurface = function(surfaceId) {
     var el = this.getSurfaceElement(surfaceId);

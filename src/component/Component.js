@@ -3,13 +3,13 @@
 
   /**
    * Component collects common behaviors to be followed by UI components, such
-   * as component Lifecycle, bounding box element creation, CSS classes
-   * management, events encapsulation and surfaces management. Surfaces are an
-   * area of the component that can have information rendered into it. An
-   * component manages multiple surfaces. Surfaces are only rendered when its
-   * content was modified, representing render performance gains. For each
-   * surface render attributes can be associated, when the render context of a
-   * surface gets modified component Lifecycle re-paints the modified surface
+   * as Lifecycle, bounding box element creation, CSS classes management,
+   * events encapsulation and surfaces support. Surfaces are an area of the
+   * component that can have information rendered into it. An component
+   * manages multiple surfaces. Surfaces are only rendered when its content is
+   * modified, representing render performance gains. For each surface, render
+   * attributes could be associated, when the render context of a surface gets
+   * modified the component Lifecycle re-paints the modified surface
    * automatically.
    *
    * Example:

@@ -180,14 +180,20 @@ describe('Component', function() {
       assert.strictEqual(element, custom.element);
     });
 
-    it('should set component elementClasses attr', function() {
+    it('should set component elementClasses attr', function(done) {
       var CustomComponent = createCustomComponentClass();
 
       var custom = new CustomComponent({
         elementClasses: ['foo', 'bar']
       });
       custom.render();
+
       assert.deepEqual(['component', 'foo', 'bar'], Element.prototype.classList.add.args[0]);
+      custom.elementClasses = ['other'];
+      lfr.async.nextTick(function() {
+        assert.deepEqual(['component', 'other'], Element.prototype.classList.add.args[1]);
+        done();
+      });
     });
 
     it('should overwrite default component elementClasses from static hint', function() {

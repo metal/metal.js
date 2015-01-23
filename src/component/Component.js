@@ -171,7 +171,7 @@
    * @default null
    * @protected
    */
-  lfr.Component.prototype.surfaces = null;
+  lfr.Component.prototype.surfaces_ = null;
 
   /**
    * Adds attributes synchronization from super classes static hint.
@@ -207,7 +207,7 @@
    * @param {Object=} opt_config Optional surface configuration.
    */
   lfr.Component.prototype.addSurface = function(surfaceId, opt_config) {
-    this.surfaces[surfaceId] = opt_config || {
+    this.surfaces_[surfaceId] = opt_config || {
       cacheState: lfr.Component.Cache.NOT_INITIALIZED
     };
     this.cacheSurfaceRenderAttrs_(surfaceId);
@@ -237,7 +237,7 @@
           this.constructor.SURFACES_CACHE || {}, surfaces.pop());
       }
     }
-    this.surfaces = {};
+    this.surfaces_ = {};
     this.surfacesRenderAttrs_ = {};
     this.addSurfaces(this.constructor.SURFACES_CACHE);
   };
@@ -400,7 +400,7 @@
    */
   lfr.Component.prototype.disposeInternal = function() {
     this.detach();
-    this.surfaces = null;
+    this.surfaces_ = null;
     this.surfacesRenderAttrs_ = null;
     lfr.Component.base(this, 'disposeInternal');
   };
@@ -461,7 +461,7 @@
    * @return {?Object} The surface configuration object.
    */
   lfr.Component.prototype.getSurface = function(surfaceId) {
-    return this.surfaces[surfaceId] || null;
+    return this.surfaces_[surfaceId] || null;
   };
 
   /**
@@ -488,6 +488,14 @@
       surface.element = document.getElementById(this.makeSurfaceId_(surfaceId)) || this.createSurfaceElement_(surfaceId);
     }
     return surface.element;
+  };
+
+  /**
+   * A map of surface ids to the respective surface object.
+   * @return {!Object}
+   */
+  lfr.Component.prototype.getSurfaces = function() {
+    return this.surfaces_;
   };
 
   /**
@@ -533,7 +541,7 @@
     if (el && el.parentNode) {
       el.parentNode.removeChild(el);
     }
-    delete this.surfaces[surfaceId];
+    delete this.surfaces_[surfaceId];
   };
 
   /**
@@ -622,7 +630,7 @@
    * @protected
    */
   lfr.Component.prototype.renderSurfacesContent_ = function() {
-    for (var surfaceId in this.surfaces) {
+    for (var surfaceId in this.surfaces_) {
       this.clearSurfaceCache_(surfaceId);
       this.renderSurfaceContent(surfaceId, this.getSurfaceContent(surfaceId));
     }

@@ -555,8 +555,8 @@
    * @protected
    */
   lfr.Component.prototype.renderElement_ = function(opt_parentElement, opt_siblingElement) {
+    this.element.id = this.id;
     if (opt_siblingElement || !this.element.parentNode) {
-      this.element.id = this.id;
       (opt_parentElement || document.body).insertBefore(this.element, opt_siblingElement || null);
     }
   };

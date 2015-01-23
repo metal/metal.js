@@ -176,7 +176,7 @@ describe('Component', function() {
         id: 'customId'
       });
       custom.render();
-      assert.strictEqual('customId', custom.id);
+      assert.strictEqual('customId', element.id);
       assert.strictEqual(element, custom.element);
     });
 

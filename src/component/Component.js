@@ -310,14 +310,15 @@
 
   /**
    * Creates the surface element with its id namespaced to the component id.
-   * @param {string} surfaceId The surface id of the element to be created.
+   * @param {string} surfaceElementId The id of the element for the surface to be
+   *   created.
    * @return {Element} The surface element.
    * @protected
    */
-  lfr.Component.prototype.createSurfaceElement_ = function(surfaceId) {
+  lfr.Component.prototype.createSurfaceElement_ = function(surfaceElementId) {
     var el = document.createElement(
       this.constructor.SURFACE_TAG_NAME || lfr.Component.SURFACE_TAG_NAME);
-    el.id = this.makeSurfaceId_(surfaceId);
+    el.id = surfaceElementId;
     return el;
   };
 
@@ -485,7 +486,10 @@
       return null;
     }
     if (!surface.element) {
-      surface.element = document.getElementById(this.makeSurfaceId_(surfaceId)) || this.createSurfaceElement_(surfaceId);
+      var surfaceElementId = this.makeSurfaceId_(surfaceId);
+      surface.element = document.getElementById(surfaceElementId) ||
+      this.element.querySelector('#' + surfaceElementId) ||
+      this.createSurfaceElement_(surfaceElementId);
     }
     return surface.element;
   };

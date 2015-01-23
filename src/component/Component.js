@@ -5,7 +5,7 @@
    * Component collects common behaviors to be followed by UI components, such
    * as Lifecycle, bounding box element creation, CSS classes management,
    * events encapsulation and surfaces support. Surfaces are an area of the
-   * component that can have information rendered into it. An component
+   * component that can have information rendered into it. A component
    * manages multiple surfaces. Surfaces are only rendered when its content is
    * modified, representing render performance gains. For each surface, render
    * attributes could be associated, when the render context of a surface gets
@@ -78,7 +78,7 @@
 
     /**
      * Component element id. If not specified will be generated.
-     * @type {String}
+     * @type {string}
      * @initOnly
      */
     id: {
@@ -113,7 +113,7 @@
    * Element tag name is a string that specifies the type of element to be
    * created. The nodeName of the created element is initialized with the
    * value of tag name.
-   * @type {String}
+   * @type {string}
    * @default div
    * @protected
    * @static
@@ -124,7 +124,7 @@
    * Surface tag name is a string that specifies the type of element to be
    * created for the surfaces. The nodeName of the created element is
    * initialized with the value of tag name.
-   * @type {String}
+   * @type {string}
    * @default div
    * @protected
    * @static
@@ -133,7 +133,7 @@
 
   /**
    * Cache states for the component.
-   * @enum {String}
+   * @enum {string}
    */
   lfr.Component.Cache = {
     /**
@@ -149,7 +149,7 @@
 
   /**
    * Errors thrown by the component.
-   * @enum {String}
+   * @enum {string}
    */
   lfr.Component.Error = {
     /**
@@ -203,7 +203,7 @@
   /**
    * Registers a surface to the component. Surface elements are not
    * automatically appended to the component element.
-   * @param {String} surfaceId The surface id to be registered.
+   * @param {string} surfaceId The surface id to be registered.
    * @param {Object=} opt_config Optional surface configuration.
    */
   lfr.Component.prototype.addSurface = function(surfaceId, opt_config) {
@@ -274,7 +274,7 @@
    * Caches surface render attributes into a O(k) flat map representation.
    * Relevant for performance to calculate the surfaces group that were
    * modified by attributes mutation.
-   * @param {String} surfaceId The surface id to be cached into the flat map.
+   * @param {string} surfaceId The surface id to be cached into the flat map.
    * @protected
    */
   lfr.Component.prototype.cacheSurfaceRenderAttrs_ = function(surfaceId) {
@@ -287,7 +287,7 @@
 
   /**
    * Clears the surface content cache.
-   * @param {String} surfaceId The surface id to be removed from the cache.
+   * @param {string} surfaceId The surface id to be removed from the cache.
    * @protected
    */
   lfr.Component.prototype.clearSurfaceCache_ = function(surfaceId) {
@@ -310,7 +310,7 @@
 
   /**
    * Creates the surface element with its id namespaced to the component id.
-   * @param {String} surfaceId The surface id of the element to be created.
+   * @param {string} surfaceId The surface id of the element to be created.
    * @return {Element} The surface element.
    * @protected
    */
@@ -457,7 +457,7 @@
   /**
    * Gets surface configuration object. If surface is not registered returns
    * null.
-   * @param {surfaceId} surfaceId The surface id.
+   * @param {string} surfaceId The surface id.
    * @return {?Object} The surface configuration object.
    */
   lfr.Component.prototype.getSurface = function(surfaceId) {
@@ -465,8 +465,8 @@
   };
 
   /**
-   * @param  {[type]} surfaceId [description]
-   * @return {[type]}           [description]
+   * @param {string} surfaceId The surface id.
+   * @return {Object|string} The content to be rendered.
    */
   lfr.Component.prototype.getSurfaceContent = lfr.nullFunction;
 
@@ -476,7 +476,7 @@
    * component with id `gallery` and a surface with id `pictures` the surface
    * element will be represented by the id `gallery-pictures`. Surface
    * elements must also be appended to the component element.
-   * @param {String} surfaceId The surface id.
+   * @param {string} surfaceId The surface id.
    * @return {Element} The surface element or null if surface not registered.
    */
   lfr.Component.prototype.getSurfaceElement = function(surfaceId) {
@@ -507,7 +507,7 @@
 
   /**
    * Makes an unique id for the component.
-   * @return {String} Unique id.
+   * @return {string} Unique id.
    * @protected
    */
   lfr.Component.prototype.makeId_ = function() {
@@ -516,8 +516,8 @@
 
   /**
    * Makes the id for the surface scoped by the component.
-   * @param {String} surfaceId The surface id.
-   * @return {String}
+   * @param {string} surfaceId The surface id.
+   * @return {string}
    * @protected
    */
   lfr.Component.prototype.makeSurfaceId_ = function(surfaceId) {
@@ -526,7 +526,7 @@
 
   /**
    * Unregisters a surface and removes its element from the DOM.
-   * @param {String} surfaceId The surface id.
+   * @param {string} surfaceId The surface id.
    */
   lfr.Component.prototype.removeSurface = function(surfaceId) {
     var el = this.getSurfaceElement(surfaceId);
@@ -597,8 +597,8 @@
    * different, the surfaces re-renders. It's not recommended to use this
    * method directly since surface content can be provided by
    * `getSurfaceContent(surfaceId)`.
-   * @param {String} surfaceId The surface id.
-   * @param {Object|String} content The content to be rendered.
+   * @param {string} surfaceId The surface id.
+   * @param {Object|string} content The content to be rendered.
    */
   lfr.Component.prototype.renderSurfaceContent = function(surfaceId, content) {
     if (lfr.isDefAndNotNull(content)) {
@@ -630,7 +630,7 @@
 
   /**
    * Renders surfaces contents if they differ from current state.
-   * @param {Object.<String, Object=>} surfaces Object map where the key is
+   * @param {Object.<string, Object=>} surfaces Object map where the key is
    *     the surface id and value the optional surface configuration.
    * @protected
    */
@@ -677,7 +677,7 @@
 
   /**
    * Validator logic for id attribute.
-   * @param {String} val
+   * @param {string} val
    * @return {Boolean} True if val is a valid id.
    * @protected
    */
@@ -687,23 +687,20 @@
 
   /**
    * Provides the default value for element attribute.
-   * @param {Element} opt_element
    * @return {Element} The element.
    * @protected
    */
-  lfr.Component.prototype.valueElementFn_ = function(opt_element) {
-    return opt_element ||
-      document.createElement(this.constructor.ELEMENT_TAG_NAME || lfr.Component.ELEMENT_TAG_NAME);
+  lfr.Component.prototype.valueElementFn_ = function() {
+    return document.createElement(this.constructor.ELEMENT_TAG_NAME || lfr.Component.ELEMENT_TAG_NAME);
   };
 
   /**
    * Provides the default value for id attribute.
-   * @param {String} val
-   * @return {String} The id.
+   * @return {string} The id.
    * @protected
    */
-  lfr.Component.prototype.valueIdFn_ = function(opt_id) {
-    return opt_id || this.element.id || this.makeId_();
+  lfr.Component.prototype.valueIdFn_ = function() {
+    return this.element.id || this.makeId_();
   };
 
 }());

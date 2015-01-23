@@ -9,6 +9,7 @@
    * fragment before appending it to the parent.
    * @param {!Node} parent The node to append nodes to.
    * @param {!Node|String} child The thing to append to the parent.
+   * @return {!Node} The appended child.
    */
   lfr.dom.append = function(parent, child) {
     if (lfr.isString(child)) {

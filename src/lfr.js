@@ -144,19 +144,20 @@
   };
 
   /**
-   * Loops instance super classes collecting its properties values. If
+   * Loops constructor super classes collecting its properties values. If
    * property is not available on the super class `undefined` will be
    * collected as value for the class hierarchy position. Must be used with
    * classes created using `lfr.inherits`.
-   * @param {Object} instance Class instance.
-   * @param {String} propertyName Property name to be collected.
-   * @return {Array.<?Object>} Array of collected values.
+   * @param {!function()} constructor Class constructor.
+   * @param {string} propertyName Property name to be collected.
+   * @return {Array.<*>} Array of collected values.
    */
-  lfr.collectSuperClassesPropertyValue = function(instance, propertyName) {
-    var propertyValues = [];
-    do {
-      propertyValues.push(instance.constructor[propertyName]);
-    } while ((instance = instance.constructor.superClass_));
+  lfr.collectSuperClassesProperty = function(constructor, propertyName) {
+    var propertyValues = [constructor[propertyName]];
+    while (constructor.superClass_) {
+      constructor = constructor.superClass_.constructor;
+      propertyValues.push(constructor[propertyName]);
+    }
     return propertyValues;
   };
 
@@ -305,6 +306,32 @@
    */
   lfr.isString = function(val) {
     return typeof val === 'string';
+  };
+
+  /**
+   * Merges the values of a static property a class with the values of that
+   * property for all its super classes, and stores it as a new static
+   * property of that class. If the static property already existed, it won't
+   * be recalculated.
+   * @param {!function()} constructor Class constructor.
+   * @param {string} propertyName Property name to be collected.
+   * @param {function(*, *):*=} opt_mergeFn Function that receives an array filled
+   *   with the values of the property for the current class and all its super classes.
+   *   Should return the merged value to be stored on the current class.
+   * @return {*} The value of the merged property.
+   */
+  lfr.mergeSuperClassesProperty = function(constructor, propertyName, opt_mergeFn) {
+    var mergedName = propertyName + '_MERGED';
+    if (constructor[mergedName]) {
+      return constructor[mergedName];
+    }
+
+    var merged = lfr.collectSuperClassesProperty(constructor, propertyName);
+    if (opt_mergeFn) {
+      merged = opt_mergeFn(merged);
+    }
+    constructor[mergedName] = merged;
+    return constructor[mergedName];
   };
 
   /**

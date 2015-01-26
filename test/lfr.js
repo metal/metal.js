@@ -148,7 +148,9 @@ describe('lfr', function() {
 
       assert.ok(called);
     });
+  });
 
+  describe('Merge Super Classes Property', function() {
     it('should collect superclass properties', function() {
       var TestSuperClass = function() {};
       TestSuperClass.FOO = 1;
@@ -159,7 +161,58 @@ describe('lfr', function() {
       lfr.inherits(TestClass, TestSuperClass);
       TestClass.FOO = 0;
 
-      assert.deepEqual([0, 1], lfr.collectSuperClassesPropertyValue(new TestClass(), 'FOO'));
+      assert.deepEqual([0, 1], lfr.collectSuperClassesProperty(TestClass, 'FOO'));
+    });
+
+    it('should merge properties', function() {
+      var Test1 = function() {};
+      Test1.FOO = 1;
+      var Test2 = function() {};
+      Test2.FOO = 2;
+      lfr.inherits(Test2, Test1);
+      var Test3 = function() {};
+      Test3.FOO = 3;
+      lfr.inherits(Test3, Test2);
+
+      var merged = lfr.mergeSuperClassesProperty(Test3, 'FOO');
+      assert.deepEqual([3, 2, 1], merged);
+      assert.deepEqual([3, 2, 1], Test3.FOO_MERGED);
+      assert.strictEqual(undefined, Test2.FOO_MERGED);
+      assert.strictEqual(undefined, Test1.FOO_MERGED);
+
+      assert.deepEqual([2, 1], lfr.mergeSuperClassesProperty(Test2, 'FOO'));
+      assert.deepEqual([1], lfr.mergeSuperClassesProperty(Test1, 'FOO'));
+    });
+
+    it('should reuse existing merged static property', function() {
+      var merged = [2, 1];
+
+      var Test1 = function() {};
+      Test1.FOO = 1;
+      var Test2 = function() {};
+      Test2.FOO = 2;
+      Test2.FOO_MERGED = merged;
+      lfr.inherits(Test2, Test1);
+
+      assert.strictEqual(merged, lfr.mergeSuperClassesProperty(Test2, 'FOO'));
+    });
+
+    it('should call merge function when given', function() {
+      var Test1 = function() {};
+      Test1.FOO = 1;
+      var Test2 = function() {};
+      Test2.FOO = 2;
+      lfr.inherits(Test2, Test1);
+      var Test3 = function() {};
+      Test3.FOO = 3;
+      lfr.inherits(Test3, Test2);
+
+      var merged = lfr.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
+        return values.reduce(function(prev, curr) {
+          return Math.max(prev, curr);
+        });
+      });
+      assert.strictEqual(3, merged);
     });
   });
 

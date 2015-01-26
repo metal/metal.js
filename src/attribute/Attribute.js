@@ -101,7 +101,7 @@
    */
   lfr.Attribute.prototype.addAttrsFromStaticHint_ = function(config) {
     if (!this.constructor.ATTRS_CACHE) {
-      var attrs = lfr.collectSuperClassesPropertyValue(this, 'ATTRS');
+      var attrs = lfr.collectSuperClassesProperty(this.constructor, 'ATTRS');
       while (attrs.length) {
         this.constructor.ATTRS_CACHE = lfr.object.mixin(
           this.constructor.ATTRS_CACHE || {}, attrs.pop());

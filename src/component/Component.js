@@ -182,7 +182,7 @@
     if (!this.constructor.ATTRS_SYNC_CACHE) {
       this.constructor.ATTRS_SYNC_CACHE = {};
       this.addAttrsSyncCache_(
-        lfr.array.flatten(lfr.collectSuperClassesPropertyValue(this, 'ATTRS_SYNC'))
+        lfr.array.flatten(lfr.collectSuperClassesProperty(this.constructor, 'ATTRS_SYNC'))
       );
     }
   };
@@ -236,7 +236,7 @@
    */
   lfr.Component.prototype.addSurfacesFromStaticHint_ = function() {
     if (!this.constructor.SURFACES_CACHE) {
-      var surfaces = lfr.collectSuperClassesPropertyValue(this, 'SURFACES');
+      var surfaces = lfr.collectSuperClassesProperty(this.constructor, 'SURFACES');
       while (surfaces.length) {
         this.constructor.SURFACES_CACHE = lfr.object.mixin(
           this.constructor.SURFACES_CACHE || {}, surfaces.pop());

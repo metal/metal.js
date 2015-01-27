@@ -109,10 +109,10 @@ describe('dom', function() {
     it('should trigger delegate listener for matched elements', function() {
       var element = document.createElement('div');
       element.innerHTML = '<div class="nomatch">' +
-        '<div class="match">' +
-        '<div class="nomatch">' +
-        '<div class="match">' +
-        '</div></div></div></div>';
+      '<div class="match">' +
+      '<div class="nomatch">' +
+      '<div class="match">' +
+      '</div></div></div></div>';
       var matchedElements = element.querySelectorAll('.match');
 
       var listenerTargets = [];
@@ -130,10 +130,10 @@ describe('dom', function() {
     it('should only trigger delegate event starting from initial target', function() {
       var element = document.createElement('div');
       element.innerHTML = '<div class="nomatch">' +
-        '<div class="match">' +
-        '<div class="nomatch">' +
-        '<div class="match">' +
-        '</div></div></div></div>';
+      '<div class="match">' +
+      '<div class="nomatch">' +
+      '<div class="match">' +
+      '</div></div></div></div>';
       var matchedElements = element.querySelectorAll('.match');
 
       var listener = sinon.stub();
@@ -147,10 +147,10 @@ describe('dom', function() {
     it('should stop triggering event if stopPropagation is called', function() {
       var element = document.createElement('div');
       element.innerHTML = '<div class="nomatch">' +
-        '<div class="match">' +
-        '<div class="nomatch">' +
-        '<div class="match">' +
-        '</div></div></div></div>';
+      '<div class="match">' +
+      '<div class="nomatch">' +
+      '<div class="match">' +
+      '</div></div></div></div>';
       var matchedElements = element.querySelectorAll('.match');
 
       var listenerTargets = [];
@@ -168,10 +168,10 @@ describe('dom', function() {
     it('should stop triggering event if stopImmediatePropagation is called', function() {
       var element = document.createElement('div');
       element.innerHTML = '<div class="nomatch">' +
-        '<div class="match">' +
-        '<div class="nomatch">' +
-        '<div class="match">' +
-        '</div></div></div></div>';
+      '<div class="match">' +
+      '<div class="nomatch">' +
+      '<div class="match">' +
+      '</div></div></div></div>';
       var matchedElements = element.querySelectorAll('.match');
 
       var listenerTargets = [];

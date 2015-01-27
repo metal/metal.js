@@ -80,6 +80,25 @@ describe('Transport', function() {
     assert.strictEqual(TestTransport.INITIAL_DEFAULT_CONFIG, transport.getDefaultConfig());
   });
 
+  it('should use first defined initial default config for subclass', function() {
+    var TestTransport = function(uri) {
+      TestTransport.base(this, 'constructor', uri);
+    };
+    lfr.inherits(TestTransport, lfr.Transport);
+    TestTransport.INITIAL_DEFAULT_CONFIG = {
+      config1: 1,
+      config2: 'two'
+    };
+
+    var TestChildTransport = function(uri) {
+      TestChildTransport.base(this, 'constructor', uri);
+    };
+    lfr.inherits(TestChildTransport, TestTransport);
+
+    var transport = new TestChildTransport('');
+    assert.strictEqual(TestTransport.INITIAL_DEFAULT_CONFIG, transport.getDefaultConfig());
+  });
+
   it('should set default config', function() {
     var transport = new lfr.Transport('');
     var defaultConfig = {

@@ -14,7 +14,11 @@
       throw new Error('Transport uri not specified');
     }
     this.uri_ = uri;
-    this.defaultConfig_ = this.constructor.INITIAL_DEFAULT_CONFIG;
+    this.defaultConfig_ = lfr.mergeSuperClassesProperty(
+      this.constructor,
+      'INITIAL_DEFAULT_CONFIG',
+      lfr.array.firstDefinedValue
+    );
 
     this.on('close', lfr.bind(this.onCloseHandler_, this));
     this.on('open', lfr.bind(this.onOpenHandler_, this));

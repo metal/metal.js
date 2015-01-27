@@ -100,14 +100,8 @@
    * @protected
    */
   lfr.Attribute.prototype.addAttrsFromStaticHint_ = function(config) {
-    if (!this.constructor.ATTRS_CACHE) {
-      var attrs = lfr.collectSuperClassesProperty(this.constructor, 'ATTRS');
-      while (attrs.length) {
-        this.constructor.ATTRS_CACHE = lfr.object.mixin(
-          this.constructor.ATTRS_CACHE || {}, attrs.pop());
-      }
-    }
-    this.addAttrs(this.constructor.ATTRS_CACHE, config);
+    lfr.mergeSuperClassesProperty(this.constructor, 'ATTRS', this.mergeAttrs_);
+    this.addAttrs(this.constructor.ATTRS_MERGED, config);
   };
 
   /**
@@ -267,7 +261,15 @@
       this.setDefaultValue_(name);
     }
     info.state = lfr.Attribute.States.INITIALIZED;
+  };
 
+  /**
+   * Merges an array of values for the ATTRS property into a single object.
+   * @param {!Array} values The values to be merged.
+   * @return {!Object} The merged value.
+   */
+  lfr.Attribute.prototype.mergeAttrs_ = function(values) {
+    return lfr.object.mixin.apply(null, [{}].concat(values.reverse()));
   };
 
   /**

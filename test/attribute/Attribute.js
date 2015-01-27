@@ -414,6 +414,74 @@ describe('Attribute', function() {
       attr.getAttrs();
     });
   });
+
+  describe('Static ATTRS', function() {
+    function createTestClass(opt_superClass) {
+      var Test = function(opt_config) {
+        Test.base(this, 'constructor', opt_config);
+      };
+      lfr.inherits(Test, opt_superClass || lfr.Attribute);
+      return Test;
+    }
+
+    it('should automatically add attributes defined by ATTRS', function() {
+      var Test = createTestClass();
+      Test.ATTRS = {
+        attr1: {
+          value: 1
+        }
+      };
+
+      var test = new Test();
+      assert.strictEqual(1, test.attr1);
+    });
+
+    it('should use config object from constructor to initialize attrs', function() {
+      var Test = createTestClass();
+      Test.ATTRS = {
+        attr1: {
+          value: 1
+        }
+      };
+
+      var test = new Test({
+        attr1: 2
+      });
+      assert.strictEqual(2, test.attr1);
+    });
+
+    it('should merge ATTRS from super class', function() {
+      var Test = createTestClass();
+      Test.ATTRS = {
+        attr1: {
+          value: 1
+        },
+        attr2: {
+          value: 2
+        }
+      };
+
+      var ChildTest = createTestClass(Test);
+      ChildTest.ATTRS = {
+        attr1: {
+          value: -1
+        },
+        attr3: {
+          value: 3
+        }
+      };
+
+      var child = new ChildTest();
+      assert.strictEqual(-1, child.attr1);
+      assert.strictEqual(2, child.attr2);
+      assert.strictEqual(3, child.attr3);
+
+      var test = new Test();
+      assert.strictEqual(1, test.attr1);
+      assert.strictEqual(2, test.attr2);
+      assert.strictEqual(undefined, test.attr3);
+    });
+  });
 });
 
 function createAttributeInstance() {

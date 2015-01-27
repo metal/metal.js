@@ -316,6 +316,20 @@
   };
 
   /**
+   * Computes the cache state for the surface content based on the decorated
+   * DOM element. The innerHTML of the surface element is read and compressed
+   * in order to minimize mismatches caused by breaking spaces or HTML
+   * formatting differences that does not affect the content structure.
+   * @protected
+   */
+  lfr.Component.prototype.computeSurfacesCacheStateFromDom_ = function() {
+    for (var surfaceId in this.surfaces_) {
+      var surface = this.getSurface(surfaceId);
+      surface.cacheState = this.computeSurfaceCacheState_(lfr.html.compress(this.getSurfaceElement(surfaceId).innerHTML));
+    }
+  };
+
+  /**
    * Creates the surface element with its id namespaced to the component id.
    * @param {string} surfaceElementId The id of the element for the surface to be
    *   created.
@@ -393,7 +407,8 @@
     }
 
     this.decorateInternal();
-    this.renderSurfacesContent_(); // TODO: Sync surfaces on decorate?
+    this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
+    this.renderSurfacesContentIfModified_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
     this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_CACHE);
 

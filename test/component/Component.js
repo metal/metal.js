@@ -128,6 +128,20 @@ describe('Component', function() {
       assert.strictEqual('span', custom.element.tagName.toLowerCase());
     });
 
+    it('should use first defined tag name', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ELEMENT_TAG_NAME = 'span';
+
+      var ChildComponent = function(opt_config) {
+        ChildComponent.base(this, 'constructor', opt_config);
+      };
+      lfr.inherits(ChildComponent, CustomComponent);
+
+      var custom = new ChildComponent();
+      custom.render();
+      assert.strictEqual('span', custom.element.tagName.toLowerCase());
+    });
+
     it('should return component instance from lifecycle methods', function() {
       var CustomComponent = createCustomComponentClass();
       var custom = new CustomComponent();
@@ -226,13 +240,13 @@ describe('Component', function() {
       });
     });
 
-    it('should overwrite default component elementClasses from static hint', function() {
+    it('should add default component elementClasses from static hint', function() {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.ELEMENT_CLASSES = ['overwritten'];
 
       var custom = new CustomComponent();
       custom.render();
-      assert.strictEqual('overwritten', Element.prototype.classList.add.args[0][0]);
+      assert.deepEqual(['overwritten', 'component'], Element.prototype.classList.add.args[0]);
     });
 
     it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
@@ -260,6 +274,35 @@ describe('Component', function() {
         assert.strictEqual(20, CustomComponent.prototype.syncFoo.args[1][0]);
       });
     });
+
+    it('should fire sync methods for attrs defined by super classes as well', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        foo: {
+          value: 0
+        }
+      };
+      CustomComponent.ATTRS_SYNC = ['foo'];
+
+      var ChildComponent = function(opt_config) {
+        ChildComponent.base(this, 'constructor', opt_config);
+      };
+      lfr.inherits(ChildComponent, CustomComponent);
+      ChildComponent.ATTRS = {
+        bar: {
+          value: 1
+        }
+      };
+      ChildComponent.ATTRS_SYNC = ['bar'];
+
+      var custom = new ChildComponent();
+      custom.syncFoo = sinon.spy();
+      custom.syncBar = sinon.spy();
+      custom.render();
+      sinon.assert.callCount(custom.syncFoo, 1);
+      sinon.assert.callCount(custom.syncBar, 1);
+    });
+
   });
 
   describe('Render', function() {
@@ -369,6 +412,21 @@ describe('Component', function() {
       CustomComponent.SURFACE_TAG_NAME = 'span';
 
       var custom = new CustomComponent();
+      custom.addSurface('header');
+      custom.render();
+      assert.strictEqual('span', custom.getSurfaceElement('header').tagName.toLowerCase());
+    });
+
+    it('should use first defined surface tag name', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.SURFACE_TAG_NAME = 'span';
+
+      var ChildComponent = function(opt_config) {
+        ChildComponent.base(this, 'constructor', opt_config);
+      };
+      lfr.inherits(ChildComponent, CustomComponent);
+
+      var custom = new ChildComponent();
       custom.addSurface('header');
       custom.render();
       assert.strictEqual('span', custom.getSurfaceElement('header').tagName.toLowerCase());

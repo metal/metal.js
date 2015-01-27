@@ -45,4 +45,10 @@ describe('array', function() {
     assert.deepEqual([1, 2, 3, 4, 5], lfr.array.flatten(arr));
     assert.deepEqual([1, [2, [3, [4, [5]]]]], arr);
   });
+
+  it('should return first defined value', function() {
+    assert.strictEqual(1, lfr.array.firstDefinedValue([1, 2, 3]));
+    assert.strictEqual(1, lfr.array.firstDefinedValue([undefined, undefined, 1, 2, 3]));
+    assert.strictEqual(null, lfr.array.firstDefinedValue([undefined, undefined, null, 2, 3]));
+  });
 });

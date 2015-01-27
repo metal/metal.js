@@ -45,7 +45,10 @@
    */
   lfr.Component = function(opt_config) {
     lfr.Component.base(this, 'constructor', opt_config);
-    this.addAttrsSyncFromStaticHint_();
+    lfr.mergeSuperClassesProperty(this.constructor, 'ATTRS_SYNC', this.mergeAttrsSync_);
+    lfr.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
+    lfr.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', lfr.array.firstDefinedValue);
+    lfr.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', lfr.array.firstDefinedValue);
     this.addSurfacesFromStaticHint_();
     this.created_();
   };
@@ -175,33 +178,6 @@
   lfr.Component.prototype.surfaces_ = null;
 
   /**
-   * Adds attributes synchronization from super classes static hint.
-   * @protected
-   */
-  lfr.Component.prototype.addAttrsSyncFromStaticHint_ = function() {
-    if (!this.constructor.ATTRS_SYNC_CACHE) {
-      this.constructor.ATTRS_SYNC_CACHE = {};
-      this.addAttrsSyncCache_(
-        lfr.array.flatten(lfr.collectSuperClassesProperty(this.constructor, 'ATTRS_SYNC'))
-      );
-    }
-  };
-
-  /**
-   * Adds cache for attributes synchronization from super classes static hint.
-   * @param {Array.<string>} attrs Attributes to synchronize.
-   * @protected
-   */
-  lfr.Component.prototype.addAttrsSyncCache_ = function(attrs) {
-    while (attrs.length) {
-      var attr = attrs.pop();
-      if (attr) {
-        this.constructor.ATTRS_SYNC_CACHE[attr] = undefined;
-      }
-    }
-  };
-
-  /**
    * Registers a surface to the component. Surface elements are not
    * automatically appended to the component element.
    * @param {string} surfaceId The surface id to be registered.
@@ -235,16 +211,10 @@
    * @protected
    */
   lfr.Component.prototype.addSurfacesFromStaticHint_ = function() {
-    if (!this.constructor.SURFACES_CACHE) {
-      var surfaces = lfr.collectSuperClassesProperty(this.constructor, 'SURFACES');
-      while (surfaces.length) {
-        this.constructor.SURFACES_CACHE = lfr.object.mixin(
-          this.constructor.SURFACES_CACHE || {}, surfaces.pop());
-      }
-    }
+    lfr.mergeSuperClassesProperty(this.constructor, 'SURFACES', this.mergeSurfaces_);
     this.surfaces_ = {};
     this.surfacesRenderAttrs_ = {};
-    this.addSurfaces(this.constructor.SURFACES_CACHE);
+    this.addSurfaces(this.constructor.SURFACES_MERGED);
   };
 
   /**
@@ -337,8 +307,7 @@
    * @protected
    */
   lfr.Component.prototype.createSurfaceElement_ = function(surfaceElementId) {
-    var el = document.createElement(
-      this.constructor.SURFACE_TAG_NAME || lfr.Component.SURFACE_TAG_NAME);
+    var el = document.createElement(this.constructor.SURFACE_TAG_NAME_MERGED);
     el.id = surfaceElementId;
     return el;
   };
@@ -410,7 +379,7 @@
     this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
     this.renderSurfacesContentIfModified_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
-    this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_CACHE);
+    this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
 
     this.attach();
     return this;
@@ -441,7 +410,7 @@
    */
   lfr.Component.prototype.fireAttrsChanges_ = function(changes) {
     for (var attr in changes) {
-      if (attr in this.constructor.ATTRS_SYNC_CACHE) {
+      if (attr in this.constructor.ATTRS_SYNC_MERGED) {
         this.fireAttrChange_(attr, changes[attr]);
       }
     }
@@ -563,6 +532,46 @@
   };
 
   /**
+   * Merges an array of values for the ATTRS_SYNC property into a single object.
+   * The final object's keys are the names of the attributes to be synchronized.
+   * @param {!Array} values The values to be merged.
+   * @return {!Object} The merged value.
+   * @protected
+   */
+  lfr.Component.prototype.mergeAttrsSync_ = function(values) {
+    var merged = {};
+    values = lfr.array.flatten(values);
+    for (var i = 0; i < values.length; i++) {
+      if (values[i]) {
+        merged[values[i]] = undefined;
+      }
+    }
+    return merged;
+  };
+
+  /**
+   * Merges an array of values for the ELEMENT_CLASSES property into a single object.
+   * @param {!Array} values The values to be merged.
+   * @return {!Object} The merged value.
+   * @protected
+   */
+  lfr.Component.prototype.mergeElementClasses_ = function(values) {
+    return lfr.array.flatten(values.filter(function(val) {
+      return val;
+    }));
+  };
+
+  /**
+   * Merges an array of values for the SURFACES property into a single object.
+   * @param {!Array} values The values to be merged.
+   * @return {!Object} The merged value.
+   * @protected
+   */
+  lfr.Component.prototype.mergeSurfaces_ = function(values) {
+    return lfr.object.mixin.apply(null, [{}].concat(values.reverse()));
+  };
+
+  /**
    * Unregisters a surface and removes its element from the DOM.
    * @param {string} surfaceId The surface id.
    * @chainable
@@ -603,7 +612,7 @@
     this.renderInternal();
     this.renderSurfacesContent_();
 
-    this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_CACHE);
+    this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
 
     this.attach(opt_parentElement, opt_siblingElement);
     return this;
@@ -700,7 +709,7 @@
    */
   lfr.Component.prototype.syncElementClasses = function(newVal, prevVal) {
     var classList = this.element.classList;
-    var classesToAdd = this.constructor.ELEMENT_CLASSES || lfr.Component.ELEMENT_CLASSES;
+    var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
     if (newVal) {
       classesToAdd = classesToAdd.concat(newVal);
     }
@@ -744,7 +753,7 @@
    * @protected
    */
   lfr.Component.prototype.valueElementFn_ = function() {
-    return document.createElement(this.constructor.ELEMENT_TAG_NAME || lfr.Component.ELEMENT_TAG_NAME);
+    return document.createElement(this.constructor.ELEMENT_TAG_NAME_MERGED);
   };
 
   /**

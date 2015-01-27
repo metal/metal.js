@@ -47,5 +47,9 @@ describe('html', function() {
       var result = fs.readFileSync(__dirname + '/fixture/testCompressResult.html');
       assert.strictEqual(result.toString(), lfr.html.compress(source.toString()));
     });
+
+    it('should compress text content', function() {
+      assert.strictEqual('foo', lfr.html.compress('   foo   '));
+    });
   });
 });

@@ -49,6 +49,10 @@
     lfr.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
     lfr.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', lfr.array.firstDefinedValue);
     lfr.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', lfr.array.firstDefinedValue);
+
+    this.elementEventProxy_ = new lfr.EventEmitterProxy(this.element, this);
+    this.delegateEventHandler_ = new lfr.EventHandler();
+
     this.addSurfacesFromStaticHint_();
     this.created_();
   };
@@ -162,6 +166,19 @@
      */
     ALREADY_RENDERED: 'Component already rendered'
   };
+
+  /**
+   * Holds events that were listened through the `delegate` Component function.
+   * @type {lfr.EventHandler}
+   */
+  lfr.Component.prototype.delegateEventHandler_ = null;
+
+  /**
+   * Instance of `lfr.EventEmitterProxy` which proxies events from the component's
+   * element to the component itself.
+   * @type {lfr.EventEmitterProxy}
+   */
+  lfr.Component.prototype.elementEventProxy_ = null;
 
   /**
    * Whether the element is in document.
@@ -313,6 +330,21 @@
   };
 
   /**
+   * Listens to a delegate event on the component's element.
+   * @param {string} eventName The name of the event to listen to.
+   * @param {string} selector The selector that matches the child elements that
+   *   the event should be triggered for.
+   * @param {!function(!Object)} callback Function to be called when the event is
+   *   triggered. It will receive the normalized event object.
+   * @return {!lfr.DomEventHandle} Can be used to remove the listener.
+   */
+  lfr.Component.prototype.delegate = function(eventName, selector, callback) {
+    var handle = lfr.dom.delegate(this.element, eventName, selector, callback);
+    this.delegateEventHandler_.add(handle);
+    return handle;
+  };
+
+  /**
    * Invokes the detached Lifecycle. When detached, the component element is
    * removed from the DOM and any other action to be performed must be
    * implemented in this method, such as, unbinding DOM events. A component
@@ -396,6 +428,13 @@
    */
   lfr.Component.prototype.disposeInternal = function() {
     this.detach();
+
+    this.elementEventProxy_.dispose();
+    this.elementEventProxy_ = null;
+
+    this.delegateEventHandler_.removeAllListeners();
+    this.delegateEventHandler_ = null;
+
     this.surfaces_ = null;
     this.surfacesRenderAttrs_ = null;
     lfr.Component.base(this, 'disposeInternal');

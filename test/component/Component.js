@@ -373,6 +373,46 @@ describe('Component', function() {
     });
   });
 
+  describe('Events', function() {
+    it('should listen to events on the element through Component\'s "on" function', function() {
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent();
+      custom.render();
+
+      var element = custom.element;
+      element.onclick = null;
+      var listener = sinon.stub();
+      custom.on('click', listener);
+
+      lfr.dom.triggerEvent(element, 'click');
+      assert.strictEqual(1, listener.callCount);
+
+      custom.dispose();
+      lfr.dom.triggerEvent(element, 'click');
+      assert.strictEqual(1, listener.callCount);
+    });
+
+    it('should listen to delegate events on the element', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.prototype.renderInternal = function() {
+        this.element.innerHTML = '<div class="foo"></div>';
+      };
+      var custom = new CustomComponent();
+      custom.render();
+
+      var fooElement = custom.element.querySelector('.foo');
+      var listener = sinon.stub();
+      custom.delegate('click', '.foo', listener);
+
+      lfr.dom.triggerEvent(fooElement, 'click');
+      assert.strictEqual(1, listener.callCount);
+
+      custom.dispose();
+      lfr.dom.triggerEvent(fooElement, 'click');
+      assert.strictEqual(1, listener.callCount);
+    });
+  });
+
   describe('Surfaces', function() {
     it('should aggregate surfaces from hierarchy static hint', function() {
       var ParentComponent = createCustomComponentClass();

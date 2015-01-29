@@ -3,10 +3,14 @@
 
   /**
    * EventEmitterProxy utility. It's responsible for linking two EventEmitter
-   * instances together, emitting all events from the first emitter through
-   * the second one.
-   * @param {lfr.EventEmitter} originEmitter
-   * @param {lfr.EventEmitter} targetEmitter
+   * instances together, emitting events from the first emitter through the
+   * second one. That means that listening to a supported event on the target
+   * emitter will mean listening to it on the origin emitter as well.
+   * @param {lfr.EventEmitter | Element} originEmitter Events originated on this emitter
+   *   will be fired for the target emitter's listeners as well. Can be either a real
+   *   EventEmitter instance or a DOM element.
+   * @param {lfr.EventEmitter} targetEmitter Event listeners attached to this emitter
+   *   will also be triggered when the event is fired by the origin emitter.
    * @param {Object} opt_blacklist Optional blacklist of events that should not be
    *   proxied.
    * @constructor
@@ -59,8 +63,9 @@
    * @inheritDoc
    */
   lfr.EventEmitterProxy.prototype.disposeInternal = function() {
+    var removeFnName = lfr.isElement(this.originEmitter_) ? 'removeEventListener' : 'removeListener';
     for (var event in this.proxiedEvents_) {
-      this.originEmitter_.removeListener(event, this.proxiedEvents_[event]);
+      this.originEmitter_[removeFnName](event, this.proxiedEvents_[event]);
     }
 
     this.proxiedEvents_ = null;
@@ -73,7 +78,7 @@
    * @param {string} event
    */
   lfr.EventEmitterProxy.prototype.proxyEvent_ = function(event) {
-    if (this.proxiedEvents_[event] || this.blacklist_[event]) {
+    if (!this.shouldProxyEvent_(event)) {
       return;
     }
 
@@ -82,7 +87,20 @@
       var args = [event].concat(Array.prototype.slice.call(arguments, 0));
       self.targetEmitter_.emit.apply(self.targetEmitter_, args);
     };
-    this.originEmitter_.on(event, this.proxiedEvents_[event]);
+
+    var addFnName = lfr.isElement(this.originEmitter_) ? 'addEventListener' : 'on';
+    this.originEmitter_[addFnName](event, this.proxiedEvents_[event]);
+  };
+
+  /**
+   * Checks if the given event should be proxied.
+   * @param {string} event
+   * @return {boolean}
+   * @protected
+   */
+  lfr.EventEmitterProxy.prototype.shouldProxyEvent_ = function(event) {
+    return !this.proxiedEvents_[event] && !this.blacklist_[event] &&
+      (!lfr.isElement(this.originEmitter_) || lfr.dom.supportsEvent(this.originEmitter_, event));
   };
 
   /**

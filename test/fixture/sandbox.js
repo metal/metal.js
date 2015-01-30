@@ -24,6 +24,7 @@ require('../../src/net/XhrTransport.js');
 require('../../src/net/WebSocketTransport.js');
 require('../../src/webchannel/WebChannel.js');
 require('../../src/component/Component.js');
+require('../../src/component/SoyComponent.js');
 
 global.window = null;
 global.Event = null;

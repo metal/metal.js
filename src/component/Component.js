@@ -41,6 +41,8 @@
    * CustomComponent.prototype.detached = function() {};
    * </code>
    *
+   * @param {!Object} opt_config An object with the initial values for this component's
+   *   attributes.
    * @constructor
    */
   lfr.Component = function(opt_config) {
@@ -280,12 +282,13 @@
   };
 
   /**
-   * Clears the surface content cache.
-   * @param {string} surfaceId The surface id to be removed from the cache.
+   * Clears the surfaces content cache.
    * @protected
    */
-  lfr.Component.prototype.clearSurfaceCache_ = function(surfaceId) {
-    this.getSurface(surfaceId).cacheState = lfr.Component.Cache.NOT_INITIALIZED;
+  lfr.Component.prototype.clearSurfacesCache_ = function() {
+    for (var surfaceId in this.surfaces_) {
+      this.getSurface(surfaceId).cacheState = lfr.Component.Cache.NOT_INITIALIZED;
+    }
   };
 
   /**
@@ -409,7 +412,7 @@
 
     this.decorateInternal();
     this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
-    this.renderSurfacesContentIfModified_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
+    this.renderSurfacesContent_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
     this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
 
@@ -500,6 +503,19 @@
   };
 
   /**
+   * Gets the content for the requested surface. By default this just calls
+   * `getSurfaceContent`, but can be overriden to add more behavior (check
+   * `lfr.SoyComponent` for an example).
+   * @param {string} surfaceId The surface id.
+   * @return {Object|string} The content to be rendered.
+   * @protected
+   */
+  lfr.Component.prototype.getSurfaceContent_ = function(surfaceId) {
+    return this.getSurfaceContent(surfaceId);
+  };
+
+  /**
+   * Gets the content for the requested surface. Should be implemented by subclasses.
    * @param {string} surfaceId The surface id.
    * @return {Object|string} The content to be rendered.
    */
@@ -544,9 +560,7 @@
    */
   lfr.Component.prototype.handleAttributesChanges_ = function(event) {
     if (this.inDocument) {
-      this.renderSurfacesContentIfModified_(
-        this.getModifiedSurfacesFromChanges_(event.changes)
-      );
+      this.renderSurfacesContent_(this.getModifiedSurfacesFromChanges_(event.changes));
     }
     this.fireAttrsChanges_(event.changes);
   };
@@ -649,7 +663,8 @@
     }
 
     this.renderInternal();
-    this.renderSurfacesContent_();
+    this.clearSurfacesCache_();
+    this.renderSurfacesContent_(this.surfaces_);
 
     this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
 
@@ -710,24 +725,13 @@
 
   /**
    * Renders all surfaces contents ignoring the cache.
-   * @protected
-   */
-  lfr.Component.prototype.renderSurfacesContent_ = function() {
-    for (var surfaceId in this.surfaces_) {
-      this.clearSurfaceCache_(surfaceId);
-      this.renderSurfaceContent(surfaceId, this.getSurfaceContent(surfaceId));
-    }
-  };
-
-  /**
-   * Renders surfaces contents if they differ from current state.
    * @param {Object.<string, Object=>} surfaces Object map where the key is
    *     the surface id and value the optional surface configuration.
    * @protected
    */
-  lfr.Component.prototype.renderSurfacesContentIfModified_ = function(surfaces) {
+  lfr.Component.prototype.renderSurfacesContent_ = function(surfaces) {
     for (var surfaceId in surfaces) {
-      this.renderSurfaceContent(surfaceId, this.getSurfaceContent(surfaceId));
+      this.renderSurfaceContent(surfaceId, this.getSurfaceContent_(surfaceId));
     }
   };
 

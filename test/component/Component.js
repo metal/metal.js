@@ -672,7 +672,7 @@ describe('Component', function() {
 
       sinon.spy(lfr.dom, 'append');
 
-      custom.renderSurfacesContentIfModified_({
+      custom.renderSurfacesContent_({
         header: true,
         body: true,
         bottom: true

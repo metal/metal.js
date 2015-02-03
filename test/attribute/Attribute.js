@@ -1,9 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('Attribute', function() {
   it('should add an attribute', function() {
     var attr = new lfr.Attribute();

@@ -1,9 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('EventEmitter', function() {
   beforeEach(function() {
     this.emitter = new lfr.EventEmitter();

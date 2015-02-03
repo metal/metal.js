@@ -1,13 +1,6 @@
 'use strict';
 
-var assert = require('assert');
-var jsdom = require('mocha-jsdom');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('EventEmitterProxy', function() {
-
-  jsdom();
 
   it('should proxy event from origin to target', function() {
     var origin = new lfr.EventEmitter();
@@ -25,7 +18,6 @@ describe('EventEmitterProxy', function() {
 
   it('should proxy event from dom element origin to target', function() {
     var origin = document.createElement('div');
-    origin.onclick = null;
 
     var target = new lfr.EventEmitter();
     new lfr.EventEmitterProxy(origin, target);
@@ -93,7 +85,6 @@ describe('EventEmitterProxy', function() {
 
   it('should not proxy dom events after disposed', function() {
     var origin = document.createElement('div');
-    origin.onclick = null;
 
     var target = new lfr.EventEmitter();
     var proxy = new lfr.EventEmitterProxy(origin, target);

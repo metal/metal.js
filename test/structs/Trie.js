@@ -1,8 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-require('../fixture/sandbox.js');
-
 describe('Trie', function() {
   it('should normalize keys', function() {
     var trie = new lfr.Trie();

@@ -1,9 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-var fs = require('fs');
-require('../fixture/sandbox.js');
-
 describe('html', function() {
   describe('compress', function() {
     it('should simplify doctype', function() {

@@ -1,10 +1,7 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
 var createFakeSocketIO = require('../fixture/FakeSocketIO');
 var FakeTransport = require('../fixture/FakeTransport');
-require('../fixture/sandbox.js');
 
 describe('WebChannel', function() {
   beforeEach(function() {

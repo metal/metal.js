@@ -1,9 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('EventHandler', function() {
   it('should remove all added listeners', function() {
     var emitter1 = new lfr.EventEmitter();

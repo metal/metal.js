@@ -1,9 +1,6 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
 var createFakeSocketIO = require('../fixture/FakeSocketIO');
-require('../fixture/sandbox.js');
 
 describe('WebSocketTransport', function() {
   before(function() {

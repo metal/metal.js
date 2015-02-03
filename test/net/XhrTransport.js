@@ -1,9 +1,6 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
 var createFakeXMLHttpRequest = require('../fixture/FakeXMLHttpRequest');
-require('../fixture/sandbox.js');
 
 describe('XhrTransport', function() {
   beforeEach(function() {

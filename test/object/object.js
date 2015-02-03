@@ -1,8 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-require('../fixture/sandbox.js');
-
 describe('object', function() {
   it('should mixin object arguments', function() {
     var original = {};

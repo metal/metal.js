@@ -1,9 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('Disposable', function() {
   it('should correctly inform if the instance has been disposed', function() {
     var disposable = new lfr.Disposable();

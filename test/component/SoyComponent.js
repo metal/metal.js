@@ -1,21 +1,6 @@
 'use strict';
 
-var assert = require('assert');
-var jsdom = require('mocha-jsdom');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('SoyComponent', function() {
-
-  jsdom();
-
-  beforeEach(function() {
-    Element.prototype.classList = {
-      add: sinon.stub(),
-      remove: sinon.stub()
-    };
-  });
-
   afterEach(function() {
     document.body.innerHTML = '';
   });
@@ -102,12 +87,12 @@ describe('SoyComponent', function() {
       done();
     });
   });
-});
 
-function createCustomComponentClass() {
-  function CustomComponent(opt_config) {
-    CustomComponent.base(this, 'constructor', opt_config);
+  function createCustomComponentClass() {
+    function CustomComponent(opt_config) {
+      CustomComponent.base(this, 'constructor', opt_config);
+    }
+    lfr.inherits(CustomComponent, lfr.SoyComponent);
+    return CustomComponent;
   }
-  lfr.inherits(CustomComponent, lfr.SoyComponent);
-  return CustomComponent;
-}
+});

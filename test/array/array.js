@@ -1,8 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-require('../fixture/sandbox.js');
-
 describe('array', function() {
   it('should remove an item from an array', function() {
     var arr = [1, 2, 3, 4, 5];

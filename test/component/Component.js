@@ -1,21 +1,6 @@
 'use strict';
 
-var assert = require('assert');
-var jsdom = require('mocha-jsdom');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('Component', function() {
-
-  jsdom();
-
-  beforeEach(function() {
-    Element.prototype.classList = {
-      add: sinon.stub(),
-      remove: sinon.stub()
-    };
-  });
-
   afterEach(function() {
     document.body.innerHTML = '';
   });
@@ -232,10 +217,16 @@ describe('Component', function() {
       });
       custom.render();
 
-      assert.deepEqual(['component', 'foo', 'bar'], Element.prototype.classList.add.args[0]);
+      assert.strictEqual(3, custom.element.classList.length);
+      assert.strictEqual('component', custom.element.classList.item(0));
+      assert.strictEqual('foo', custom.element.classList.item(1));
+      assert.strictEqual('bar', custom.element.classList.item(2));
+
       custom.elementClasses = ['other'];
       lfr.async.nextTick(function() {
-        assert.deepEqual(['component', 'other'], Element.prototype.classList.add.args[1]);
+        assert.strictEqual(2, custom.element.classList.length);
+        assert.strictEqual('component', custom.element.classList.item(0));
+        assert.strictEqual('other', custom.element.classList.item(1));
         done();
       });
     });
@@ -246,7 +237,9 @@ describe('Component', function() {
 
       var custom = new CustomComponent();
       custom.render();
-      assert.deepEqual(['overwritten', 'component'], Element.prototype.classList.add.args[0]);
+      assert.strictEqual(2, custom.element.classList.length);
+      assert.strictEqual('overwritten', custom.element.classList.item(0));
+      assert.strictEqual('component', custom.element.classList.item(1));
     });
 
     it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
@@ -692,20 +685,20 @@ describe('Component', function() {
       assert.strictEqual(custom, custom.removeSurface('header'));
     });
   });
-});
 
-function createCustomComponentClass() {
-  function CustomComponent(opt_config) {
-    CustomComponent.base(this, 'constructor', opt_config);
+  function createCustomComponentClass() {
+    function CustomComponent(opt_config) {
+      CustomComponent.base(this, 'constructor', opt_config);
+    }
+    lfr.inherits(CustomComponent, lfr.Component);
+
+    CustomComponent.prototype.created = sinon.spy();
+    CustomComponent.prototype.decorateInternal = sinon.spy();
+    CustomComponent.prototype.getSurfaceContent = sinon.spy();
+    CustomComponent.prototype.attached = sinon.spy();
+    CustomComponent.prototype.detached = sinon.spy();
+    CustomComponent.prototype.renderInternal = sinon.spy();
+
+    return CustomComponent;
   }
-  lfr.inherits(CustomComponent, lfr.Component);
-
-  CustomComponent.prototype.created = sinon.spy();
-  CustomComponent.prototype.decorateInternal = sinon.spy();
-  CustomComponent.prototype.getSurfaceContent = sinon.spy();
-  CustomComponent.prototype.attached = sinon.spy();
-  CustomComponent.prototype.detached = sinon.spy();
-  CustomComponent.prototype.renderInternal = sinon.spy();
-
-  return CustomComponent;
-}
+});

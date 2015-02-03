@@ -1,9 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-var sinon = require('sinon');
-require('./fixture/sandbox.js');
-
 describe('lfr', function() {
   describe('Uid', function() {
     it('should always generate unique id', function() {

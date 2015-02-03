@@ -1,8 +1,5 @@
 'use strict';
 
-var assert = require('assert');
-require('../fixture/sandbox.js');
-
 describe('WildcardTrie', function() {
   it('should set the value from the constructor', function() {
     var trie = new lfr.WildcardTrie('myValue');

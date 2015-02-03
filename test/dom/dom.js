@@ -1,13 +1,6 @@
 'use strict';
 
-var assert = require('assert');
-var jsdom = require('mocha-jsdom');
-var sinon = require('sinon');
-require('../fixture/sandbox.js');
-
 describe('dom', function() {
-
-  jsdom();
 
   afterEach(function() {
     document.body.innerHTML = '';
@@ -113,6 +106,7 @@ describe('dom', function() {
       '<div class="nomatch">' +
       '<div class="match">' +
       '</div></div></div></div>';
+      document.body.appendChild(element);
       var matchedElements = element.querySelectorAll('.match');
 
       var listenerTargets = [];
@@ -134,6 +128,7 @@ describe('dom', function() {
       '<div class="nomatch">' +
       '<div class="match">' +
       '</div></div></div></div>';
+      document.body.appendChild(element);
       var matchedElements = element.querySelectorAll('.match');
 
       var listener = sinon.stub();
@@ -151,6 +146,7 @@ describe('dom', function() {
       '<div class="nomatch">' +
       '<div class="match">' +
       '</div></div></div></div>';
+      document.body.appendChild(element);
       var matchedElements = element.querySelectorAll('.match');
 
       var listenerTargets = [];
@@ -172,6 +168,7 @@ describe('dom', function() {
       '<div class="nomatch">' +
       '<div class="match">' +
       '</div></div></div></div>';
+      document.body.appendChild(element);
       var matchedElements = element.querySelectorAll('.match');
 
       var listenerTargets = [];
@@ -321,14 +318,10 @@ describe('dom', function() {
 
   describe('supportsEvent', function() {
     it('should check if element supports event', function() {
-      // jsdom doesn't add the event related properties to elements,
-      // like modern browsers do, so we need to simulate it.
       var element = document.createElement('div');
-      element.onchange = null;
-      element.click = null;
 
       assert.ok(!lfr.dom.supportsEvent(element, 'lalala'));
-      assert.ok(!lfr.dom.supportsEvent(element, 'click'));
+      assert.ok(lfr.dom.supportsEvent(element, 'click'));
       assert.ok(lfr.dom.supportsEvent(element, 'change'));
     });
   });

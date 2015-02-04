@@ -25,18 +25,19 @@ module.exports = function(config) {
       'src/webchannel/WebChannel.js',
       'src/component/Component.js',
       'src/component/SoyComponent.js',
+      'test/html/fixture/*.html',
       'test/**/*.js'
     ],
 
     exclude: [
       'test/fixture/*.js',
       'test/net/*.js',
-      'test/webchannel/*.js',
-      'test/html/*.js'
+      'test/webchannel/*.js'
     ],
 
     preprocessors: {
-      'src/**/*.js': ['coverage']
+      'src/**/*.js': ['coverage'],
+      'test/html/fixture/*.html': ['html2js']
     },
 
     reporters: ['coverage', 'progress'],

@@ -9,7 +9,8 @@
     "it": true,
     "lfr": true,
     "mocha": true,
-    "sinon": true
+    "sinon": true,
+    "__html__": true
   },
   "extends": "../.jshintrc"
 }

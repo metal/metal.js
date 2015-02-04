@@ -34,6 +34,7 @@
     "karma": "^0.12.31",
     "karma-chai": "^0.1.0",
     "karma-coverage": "git://github.com/douglasduteil/karma-coverage#next",
+    "karma-html2js-preprocessor": "^0.1.0",
     "karma-mocha": "^0.1.10",
     "karma-sinon": "^1.0.4",
     "merge-stream": "^0.1.5",

@@ -1,15 +1,11 @@
 'use strict';
 
-var createFakeSocketIO = require('../fixture/FakeSocketIO');
+var FakeSocketIO = window.createFakeSocketIO();
 
 describe('WebSocketTransport', function() {
-  before(function() {
-    global.FakeSocketIO = createFakeSocketIO();
-  });
-
   beforeEach(function() {
-    global.io = function() {
-      return new global.FakeSocketIO();
+    window.io = function() {
+      return new FakeSocketIO();
     };
   });
 
@@ -20,7 +16,7 @@ describe('WebSocketTransport', function() {
 
   it('should throw error when Socket.IO not found', function() {
     var transport = new lfr.WebSocketTransport('http://liferay.com');
-    global.io = null;
+    window.io = null;
     assert.throws(function() {
       transport.open();
     }, Error);
@@ -168,7 +164,7 @@ describe('WebSocketTransport', function() {
       transport.socket.on('error', function() {
         var error = stubError.getCall(0).args[0].error;
         assert.ok(error instanceof Error);
-        assert.ok(error.socket instanceof global.FakeSocketIO);
+        assert.ok(error.socket instanceof FakeSocketIO);
         assert.strictEqual('reason', error.message);
         done();
       });

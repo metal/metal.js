@@ -14,9 +14,6 @@
     lfr.WebChannel.base(this, 'constructor');
 
     if (!opt_transport) {
-      if (!window.location) {
-        throw new Error('WebChannel cannot resolve transport uri');
-      }
       opt_transport = new lfr.WebSocketTransport(window.location.origin + window.location.pathname);
     }
 

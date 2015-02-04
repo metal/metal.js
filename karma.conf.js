@@ -29,14 +29,8 @@ module.exports = function(config) {
       'test/**/*.js'
     ],
 
-    exclude: [
-      'test/fixture/*.js',
-      'test/net/*.js',
-      'test/webchannel/*.js'
-    ],
-
     preprocessors: {
-      'src/**/*.js': ['coverage'],
+      'src/!(promise)/**/*.js': ['coverage'],
       'test/html/fixture/*.html': ['html2js']
     },
 

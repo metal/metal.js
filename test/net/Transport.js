@@ -1,6 +1,6 @@
 'use strict';
 
-var FakeTransport = require('../fixture/FakeTransport');
+var FakeTransport = window.FakeTransport;
 
 describe('Transport', function() {
   it('should set uri from constructor', function() {

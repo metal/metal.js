@@ -10,6 +10,7 @@
     "lfr": true,
     "mocha": true,
     "sinon": true,
+    "XMLHttpRequest": true,
     "__html__": true
   },
   "extends": "../.jshintrc"

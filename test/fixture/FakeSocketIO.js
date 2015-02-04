@@ -1,6 +1,6 @@
 'use strict';
 
-function createFakeSocketIO() {
+window.createFakeSocketIO = function() {
   var FakeSocketIO = function() {
     FakeSocketIO.base(this, 'constructor');
   };
@@ -31,6 +31,4 @@ function createFakeSocketIO() {
     }, 0);
   };
   return FakeSocketIO;
-}
-
-module.exports = createFakeSocketIO;
+};

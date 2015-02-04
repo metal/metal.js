@@ -27,5 +27,3 @@ function emitAsync(emitter, eventName, data) {
     emitter.emit(eventName, data);
   }, 0);
 }
-
-module.exports = FakeTransport;

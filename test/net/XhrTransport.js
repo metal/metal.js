@@ -1,10 +1,18 @@
 'use strict';
 
-var createFakeXMLHttpRequest = require('../fixture/FakeXMLHttpRequest');
+var createFakeXMLHttpRequest = window.createFakeXMLHttpRequest;
 
 describe('XhrTransport', function() {
+  before(function() {
+    this.originalXMLHttpRequest_ = XMLHttpRequest;
+  });
+
   beforeEach(function() {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(200, 'data');
+    XMLHttpRequest = createFakeXMLHttpRequest(200, 'data');
+  });
+
+  after(function() {
+    XMLHttpRequest = this.originalXMLHttpRequest_;
   });
 
   it('should set uri from constructor', function() {
@@ -184,7 +192,7 @@ describe('XhrTransport', function() {
   });
 
   it('should receive response in json format', function(done) {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(200, '{"a":1,"b":2}');
+    XMLHttpRequest = createFakeXMLHttpRequest(200, '{"a":1,"b":2}');
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
 
@@ -200,14 +208,14 @@ describe('XhrTransport', function() {
   });
 
   it('should not run success handler for failures', function(done) {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(404);
+    XMLHttpRequest = createFakeXMLHttpRequest(404);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
       var successFn = sinon.stub();
       transport.send({}, {}, successFn);
-      process.nextTick(function() {
+      lfr.async.nextTick(function() {
         assert.strictEqual(0, successFn.callCount);
         done();
       });
@@ -215,7 +223,7 @@ describe('XhrTransport', function() {
   });
 
   it('should handle failing send data', function(done) {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(404);
+    XMLHttpRequest = createFakeXMLHttpRequest(404);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
@@ -223,14 +231,14 @@ describe('XhrTransport', function() {
       transport.send({}, {}, null, function(response) {
         var error = response.error;
         assert.ok(error instanceof Error);
-        assert.ok(error.xhr instanceof global.XMLHttpRequest);
+        assert.ok(error.xhr instanceof XMLHttpRequest);
         done();
       });
     });
   });
 
   it('should fail on unknown response status', function(done) {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(304);
+    XMLHttpRequest = createFakeXMLHttpRequest(304);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
@@ -238,38 +246,38 @@ describe('XhrTransport', function() {
       transport.send({}, {}, null, function(response) {
         var error = response.error;
         assert.ok(error instanceof Error);
-        assert.ok(error.xhr instanceof global.XMLHttpRequest);
+        assert.ok(error.xhr instanceof XMLHttpRequest);
         done();
       });
     });
   });
 
   it('should abort requests when close', function(done) {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(200);
+    XMLHttpRequest = createFakeXMLHttpRequest(200);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
       transport.send();
-      assert.ok(!global.XMLHttpRequest.requests[0].aborted);
+      assert.ok(!XMLHttpRequest.requests[0].aborted);
       // Should abort xhr synchronously
       transport.close();
-      assert.ok(global.XMLHttpRequest.requests[0].aborted);
+      assert.ok(XMLHttpRequest.requests[0].aborted);
       done();
     });
   });
 
   it('should abort requests when disposed', function(done) {
-    global.XMLHttpRequest = createFakeXMLHttpRequest(200);
+    XMLHttpRequest = createFakeXMLHttpRequest(200);
 
     var transport = new lfr.XhrTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
       transport.send();
-      assert.ok(!global.XMLHttpRequest.requests[0].aborted);
+      assert.ok(!XMLHttpRequest.requests[0].aborted);
       // Should abort xhr synchronously
       transport.dispose();
-      assert.ok(global.XMLHttpRequest.requests[0].aborted);
+      assert.ok(XMLHttpRequest.requests[0].aborted);
       done();
     });
   });

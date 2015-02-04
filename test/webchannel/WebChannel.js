@@ -1,27 +1,18 @@
 'use strict';
 
-var createFakeSocketIO = require('../fixture/FakeSocketIO');
-var FakeTransport = require('../fixture/FakeTransport');
+var FakeSocketIO = window.createFakeSocketIO();
+var FakeTransport = window.FakeTransport;
 
 describe('WebChannel', function() {
-  beforeEach(function() {
-    global.window = {};
-    global.window.location = {
-      origin: 'http://localhost',
-      pathname: '/pathname'
-    };
-  });
-
   describe('default transport', function() {
     before(function() {
-      var FakeSocketIO = createFakeSocketIO();
-      global.io = function() {
+      window.io = function() {
         return new FakeSocketIO();
       };
     });
 
     after(function() {
-      global.io = null;
+      window.io = null;
     });
 
     it('should not throw error when transport is not specified', function() {
@@ -34,14 +25,7 @@ describe('WebChannel', function() {
       var channel = new lfr.WebChannel();
       var transport = channel.getTransport();
       assert.ok(transport instanceof lfr.WebSocketTransport);
-      assert.strictEqual('http://localhost/pathname', transport.getUri());
-    });
-
-    it('should throw error when web channel cannot resolve transport uri from window location', function() {
-      global.window.location = null;
-      assert.throws(function() {
-        new lfr.WebChannel();
-      });
+      assert.strictEqual(window.location.origin + window.location.pathname, transport.getUri());
     });
   });
 

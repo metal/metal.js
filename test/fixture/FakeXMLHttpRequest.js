@@ -1,6 +1,6 @@
 'use strict';
 
-function createFakeXMLHttpRequest(status, responseText) {
+window.createFakeXMLHttpRequest = function(status, responseText) {
   var FakeXMLHttpRequest = function() {
     this.aborted = false;
     this.body = null;
@@ -24,9 +24,9 @@ function createFakeXMLHttpRequest(status, responseText) {
     this.body = body;
 
     if (this.status === 200 || this.status === 304) {
-      process.nextTick(this.onload);
+      lfr.async.nextTick(this.onload);
     } else {
-      process.nextTick(this.onerror);
+      lfr.async.nextTick(this.onerror);
     }
   };
 
@@ -35,6 +35,4 @@ function createFakeXMLHttpRequest(status, responseText) {
   };
 
   return FakeXMLHttpRequest;
-}
-
-module.exports = createFakeXMLHttpRequest;
+};

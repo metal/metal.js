@@ -4,6 +4,17 @@
   lfr.dom = lfr.dom || {};
 
   /**
+   * Adds the requested CSS classes to an element.
+   * @param {!Element} element The element to add CSS classes to.
+   * @param {!Array<string>} classes CSS classes to add.
+   */
+  lfr.dom.addClasses = function(element, classes) {
+    classes.forEach(function(className) {
+      element.classList.add(className);
+    });
+  };
+
+  /**
    * Appends a child node with text or other nodes to a parent node. If
    * child is a HTML string it will be automatically converted to a document
    * fragment before appending it to the parent.
@@ -154,6 +165,17 @@
     while ((child = node.firstChild)) {
       node.removeChild(child);
     }
+  };
+
+  /**
+   * Removes the requested CSS classes from an element.
+   * @param {!Element} element The element to remove CSS classes from.
+   * @param {!Array<string>} classes CSS classes to remove.
+   */
+  lfr.dom.removeClasses = function(element, classes) {
+    classes.forEach(function(className) {
+      element.classList.remove(className);
+    });
   };
 
   /**

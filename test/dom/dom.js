@@ -35,9 +35,9 @@ describe('dom', function() {
 
       assert.ok(fragment);
       assert.strictEqual(11, fragment.nodeType);
-      assert.strictEqual(2, fragment.children.length);
-      assert.strictEqual('Hello World 1', fragment.children[0].innerHTML);
-      assert.strictEqual('Hello World 2', fragment.children[1].innerHTML);
+      assert.strictEqual(2, fragment.childNodes.length);
+      assert.strictEqual('Hello World 1', fragment.childNodes[0].innerHTML);
+      assert.strictEqual('Hello World 2', fragment.childNodes[1].innerHTML);
     });
 
     it('should remove children from element', function() {

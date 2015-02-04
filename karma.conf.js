@@ -1,5 +1,7 @@
 module.exports = function(config) {
   config.set({
+    browsers: ['PhantomJS'],
+
     frameworks: ['mocha', 'chai', 'sinon'],
 
     files: [
@@ -37,8 +39,18 @@ module.exports = function(config) {
     reporters: ['coverage', 'progress'],
 
     coverageReporter: {
-      type : 'html',
-      dir : 'coverage/'
+      reporters: [
+        {
+          type : 'text-summary'
+        },
+        {
+          type : 'html'
+        },
+        {
+          type: 'lcov',
+          subdir: 'lcov'
+        },
+      ]
     }
   });
 };

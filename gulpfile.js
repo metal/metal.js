@@ -1,7 +1,11 @@
 'use strict';
 
 var gulp = require('gulp');
-var merge = require('merge-stream');
+var karma = require('karma').server;
+var merge = require('merge');
+var mergeStream = require('merge-stream');
+var open = require('open');
+var path = require('path');
 var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
@@ -72,7 +76,7 @@ gulp.task('format', function() {
     .pipe(plugins.esformatter())
     .pipe(gulp.dest('test'));
 
-    return merge(src, test);
+    return mergeStream(src, test);
 });
 
 gulp.task('lint', function() {
@@ -92,25 +96,40 @@ gulp.task('test-complexity', function() {
     }));
 });
 
-gulp.task('test-unit', function() {
-  return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
-    .pipe(plugins.mocha());
+gulp.task('test-unit', function(done) {
+  runKarma({
+    coverageReporter: {
+      reporters: [
+        {
+          type : 'text'
+        },
+        {
+          type : 'html'
+        },
+        {
+          type: 'lcov',
+          subdir: 'lcov'
+        },
+      ]
+    }
+  }, done);
 });
 
-gulp.task('test-cover', function() {
-  return gulp.src(['src/**/*.js', '!src/promise/Promise.js'])
-    .pipe(plugins.istanbul())
-    .pipe(plugins.istanbul.hookRequire());
+gulp.task('test-coverage', function(done) {
+  runKarma({}, function() {
+    open(path.join(__dirname, 'coverage/lcov/lcov-report/index.html'));
+    done();
+  });
 });
 
-gulp.task('test-coverage', ['test-cover'], function() {
-  return gulp.src(['test/**/*.js', '!test/fixture/*.js'])
-    .pipe(plugins.mocha())
-    .pipe(plugins.istanbul.writeReports());
+gulp.task('test-browsers', function(done) {
+  runKarma({
+    browsers: ['Chrome', 'Firefox', 'Safari']
+  }, done);
 });
 
-gulp.task('test-watch', function() {
-  gulp.watch('src/**/*.js', ['test-unit']);
+gulp.task('test-watch', function(done) {
+  runKarma({singleRun: false}, done);
 });
 
 gulp.task('watch', ['build'], function() {
@@ -135,4 +154,12 @@ function banner() {
   return plugins.header(stamp, {
     pkg: pkg
   });
+}
+
+function runKarma(config, done) {
+  config = merge({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, config);
+  karma.start(config, done);
 }

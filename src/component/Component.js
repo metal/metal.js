@@ -751,13 +751,13 @@
    * @param {Array.<string>} prevVal
    */
   lfr.Component.prototype.syncElementClasses = function(newVal, prevVal) {
-    var classList = this.element.classList;
     var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
     if (newVal) {
       classesToAdd = classesToAdd.concat(newVal);
     }
-    classList.remove.apply(classList, prevVal);
-    classList.add.apply(classList, classesToAdd);
+
+    lfr.dom.removeClasses(this.element, prevVal || []);
+    lfr.dom.addClasses(this.element, classesToAdd);
   };
 
   /**

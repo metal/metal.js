@@ -1,6 +1,8 @@
 'use strict';
 
-window.createFakeXMLHttpRequest = function(status, responseText) {
+import {async} from '../../src/promise/Promise';
+
+var createFakeXMLHttpRequest = function(status, responseText) {
   var FakeXMLHttpRequest = function() {
     this.aborted = false;
     this.body = null;
@@ -24,9 +26,9 @@ window.createFakeXMLHttpRequest = function(status, responseText) {
     this.body = body;
 
     if (this.status === 200 || this.status === 304) {
-      lfr.async.nextTick(this.onload);
+      async.nextTick(this.onload);
     } else {
-      lfr.async.nextTick(this.onerror);
+      async.nextTick(this.onerror);
     }
   };
 
@@ -36,3 +38,5 @@ window.createFakeXMLHttpRequest = function(status, responseText) {
 
   return FakeXMLHttpRequest;
 };
+
+export default createFakeXMLHttpRequest;

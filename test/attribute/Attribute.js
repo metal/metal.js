@@ -1,8 +1,11 @@
 'use strict';
 
+import core from '../../src/core';
+import Attribute from '../../src/attribute/Attribute';
+
 describe('Attribute', function() {
   it('should add an attribute', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttr('attr1');
 
     var attrNames = Object.keys(attr.getAttrs());
@@ -11,7 +14,7 @@ describe('Attribute', function() {
   });
 
   it('should add multiple attributes', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {},
       attr2: {}
@@ -24,7 +27,7 @@ describe('Attribute', function() {
   });
 
   it('should not allow adding attribute with invalid name', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
 
     assert.throws(function() {
       attr.addAttrs({
@@ -34,7 +37,7 @@ describe('Attribute', function() {
   });
 
   it('should set and get attribute values', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {},
       attr2: {}
@@ -58,7 +61,7 @@ describe('Attribute', function() {
   });
 
   it('should set default attribute value with raw value', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         value: 1
@@ -69,7 +72,7 @@ describe('Attribute', function() {
   });
 
   it('should set default attribute value from function', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         valueFn: function() {
@@ -82,7 +85,7 @@ describe('Attribute', function() {
   });
 
   it('should set default attribute value from function name', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.returns1 = function() {
       return 1;
     };
@@ -96,7 +99,7 @@ describe('Attribute', function() {
   });
 
   it('should ignore invalid valueFn function', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         valueFn: 1
@@ -107,7 +110,7 @@ describe('Attribute', function() {
   });
 
   it('should override default attribute value', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs(
       {
         attr1: {
@@ -136,7 +139,7 @@ describe('Attribute', function() {
   });
 
   it('should initialize attributes lazily', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     var valueFn = sinon.stub().returns(2);
     attr.addAttrs({
       attr1: {
@@ -151,7 +154,7 @@ describe('Attribute', function() {
   });
 
   it('should validate new attribute values', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         validator: function(val) {
@@ -169,7 +172,7 @@ describe('Attribute', function() {
   });
 
   it('should validate new attribute values through function name', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.isPositive = function(val) {
       return val > 0;
     };
@@ -188,7 +191,7 @@ describe('Attribute', function() {
   });
 
   it('should validate initial attribute values', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs(
       {
         attr1: {
@@ -207,7 +210,7 @@ describe('Attribute', function() {
   });
 
   it('should not validate default attribute values', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         validator: function(val) {
@@ -221,7 +224,7 @@ describe('Attribute', function() {
   });
 
   it('should change attribute new value through setter', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         setter: Math.abs,
@@ -239,7 +242,7 @@ describe('Attribute', function() {
   });
 
   it('should change attribute new value through setter name', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.makePositive = Math.abs;
     attr.addAttrs({
       attr1: {
@@ -258,7 +261,7 @@ describe('Attribute', function() {
   });
 
   it('should allow changing an initOnly with initial value', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs(
       {
         attr1: {
@@ -275,7 +278,7 @@ describe('Attribute', function() {
   });
 
   it('should not allow changing an initOnly attribute after initialized', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttrs({
       attr1: {
         initOnly: true,
@@ -383,7 +386,7 @@ describe('Attribute', function() {
   });
 
   it('should not run setter, validator or events for removed attributes', function() {
-    var attr = new lfr.Attribute();
+    var attr = new Attribute();
     attr.addAttr('attr1', {
       setter: function(val) {
         return val + 10;
@@ -416,7 +419,7 @@ describe('Attribute', function() {
       var Test = function(opt_config) {
         Test.base(this, 'constructor', opt_config);
       };
-      lfr.inherits(Test, opt_superClass || lfr.Attribute);
+      core.inherits(Test, opt_superClass || Attribute);
       return Test;
     }
 
@@ -481,7 +484,7 @@ describe('Attribute', function() {
 });
 
 function createAttributeInstance() {
-  var attr = new lfr.Attribute();
+  var attr = new Attribute();
   attr.addAttrs({
     attr1: {
       value: 1

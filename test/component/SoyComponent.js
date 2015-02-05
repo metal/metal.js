@@ -1,5 +1,9 @@
 'use strict';
 
+import {async} from '../../src/promise/Promise';
+import core from '../../src/core';
+import SoyComponent from '../../src/component/SoyComponent';
+
 describe('SoyComponent', function() {
   afterEach(function() {
     document.body.innerHTML = '';
@@ -82,7 +86,7 @@ describe('SoyComponent', function() {
     assert.strictEqual('<p>Hello World</p>', surfaceElement.innerHTML);
 
     custom.headerContent = 'Hello World 2';
-    lfr.async.nextTick(function() {
+    async.nextTick(function() {
       assert.strictEqual('<p>Hello World 2</p>', surfaceElement.innerHTML);
       done();
     });
@@ -92,7 +96,7 @@ describe('SoyComponent', function() {
     function CustomComponent(opt_config) {
       CustomComponent.base(this, 'constructor', opt_config);
     }
-    lfr.inherits(CustomComponent, lfr.SoyComponent);
+    core.inherits(CustomComponent, SoyComponent);
     return CustomComponent;
   }
 });

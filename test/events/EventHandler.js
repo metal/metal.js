@@ -1,10 +1,13 @@
 'use strict';
 
+import EventEmitter from '../../src/events/EventEmitter';
+import EventHandler from '../../src/events/EventHandler';
+
 describe('EventHandler', function() {
   it('should remove all added listeners', function() {
-    var emitter1 = new lfr.EventEmitter();
-    var emitter2 = new lfr.EventEmitter();
-    var handler = new lfr.EventHandler();
+    var emitter1 = new EventEmitter();
+    var emitter2 = new EventEmitter();
+    var handler = new EventHandler();
     var listener1 = sinon.stub();
     var listener2 = sinon.stub();
 
@@ -40,8 +43,8 @@ describe('EventHandler', function() {
   });
 
   it('should clear listeners on dispose', function() {
-    var emitter = new lfr.EventEmitter();
-    var handler = new lfr.EventHandler();
+    var emitter = new EventEmitter();
+    var handler = new EventHandler();
     var listener = sinon.stub();
 
     handler.add(emitter.on('event', listener));

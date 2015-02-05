@@ -1,5 +1,8 @@
 'use strict';
 
+import dom from '../../src/dom/dom';
+import DomEventHandle from '../../src/events/DomEventHandle';
+
 describe('dom', function() {
 
   afterEach(function() {
@@ -11,27 +14,27 @@ describe('dom', function() {
       var parent = document.createElement('div');
       var child = document.createElement('div');
 
-      lfr.dom.append(parent, child);
+      dom.append(parent, child);
       assert.strictEqual(parent, child.parentNode);
     });
 
     it('should append string as document fragment to parent element', function() {
       var parent = document.createElement('div');
       var fragment = document.createDocumentFragment();
-      sinon.stub(lfr.dom, 'buildFragment').returns(fragment);
+      sinon.stub(dom, 'buildFragment').returns(fragment);
       sinon.spy(parent, 'appendChild');
 
-      lfr.dom.append(parent, '<div></div>');
-      assert.strictEqual(1, lfr.dom.buildFragment.callCount);
-      assert.strictEqual('<div></div>', lfr.dom.buildFragment.args[0][0]);
+      dom.append(parent, '<div></div>');
+      assert.strictEqual(1, dom.buildFragment.callCount);
+      assert.strictEqual('<div></div>', dom.buildFragment.args[0][0]);
       assert.strictEqual(1, parent.appendChild.callCount);
       assert.strictEqual(fragment, parent.appendChild.args[0][0]);
-      lfr.dom.buildFragment.restore();
+      dom.buildFragment.restore();
     });
 
     it('should create document fragment from string', function() {
       var html = '<div>Hello World 1</div><div>Hello World 2</div>';
-      var fragment = lfr.dom.buildFragment(html);
+      var fragment = dom.buildFragment(html);
 
       assert.ok(fragment);
       assert.strictEqual(11, fragment.nodeType);
@@ -44,7 +47,7 @@ describe('dom', function() {
       var element = document.createElement('div');
       element.innerHTML = '<div>0</div><div>1</div>';
 
-      lfr.dom.removeChildren(element);
+      dom.removeChildren(element);
       assert.strictEqual(0, element.children.length);
     });
   });
@@ -53,10 +56,10 @@ describe('dom', function() {
     it('should listen to event on requested element', function() {
       var element = document.createElement('div');
       var listener = sinon.stub();
-      lfr.dom.on(element, 'myEvent', listener);
+      dom.on(element, 'myEvent', listener);
       assert.strictEqual(0, listener.callCount);
 
-      lfr.dom.triggerEvent(element, 'myEvent');
+      dom.triggerEvent(element, 'myEvent');
       assert.strictEqual(1, listener.callCount);
     });
 
@@ -64,11 +67,11 @@ describe('dom', function() {
       var element = document.createElement('div');
       var listener = sinon.stub();
 
-      var handle = lfr.dom.on(element, 'myEvent', listener);
-      assert.ok(handle instanceof lfr.DomEventHandle);
+      var handle = dom.on(element, 'myEvent', listener);
+      assert.ok(handle instanceof DomEventHandle);
 
       handle.removeListener();
-      lfr.dom.triggerEvent(element, 'myEvent');
+      dom.triggerEvent(element, 'myEvent');
       assert.strictEqual(0, listener.callCount);
     });
   });
@@ -79,7 +82,7 @@ describe('dom', function() {
       var element = document.createElement('div');
       element.addEventListener('click', listener);
 
-      lfr.dom.triggerEvent(element, 'click');
+      dom.triggerEvent(element, 'click');
       assert.strictEqual(1, listener.callCount);
       assert.strictEqual('click', listener.args[0][0].type);
     });
@@ -89,7 +92,7 @@ describe('dom', function() {
       var element = document.createElement('div');
       element.addEventListener('click', listener);
 
-      lfr.dom.triggerEvent(element, 'click', {
+      dom.triggerEvent(element, 'click', {
         test: 'test'
       });
       assert.strictEqual(1, listener.callCount);
@@ -113,9 +116,9 @@ describe('dom', function() {
       var listener = function(event) {
         listenerTargets.push(event.delegateTarget);
       };
-      lfr.dom.delegate(element, 'click', '.match', listener);
+      dom.delegate(element, 'click', '.match', listener);
 
-      lfr.dom.triggerEvent(matchedElements[1], 'click');
+      dom.triggerEvent(matchedElements[1], 'click');
       assert.strictEqual(2, listenerTargets.length);
       assert.strictEqual(matchedElements[1], listenerTargets[0]);
       assert.strictEqual(matchedElements[0], listenerTargets[1]);
@@ -132,9 +135,9 @@ describe('dom', function() {
       var matchedElements = element.querySelectorAll('.match');
 
       var listener = sinon.stub();
-      lfr.dom.delegate(element, 'click', '.match', listener);
+      dom.delegate(element, 'click', '.match', listener);
 
-      lfr.dom.triggerEvent(matchedElements[0], 'click');
+      dom.triggerEvent(matchedElements[0], 'click');
       assert.strictEqual(1, listener.callCount);
       assert.strictEqual(matchedElements[0], listener.args[0][0].delegateTarget);
     });
@@ -154,9 +157,9 @@ describe('dom', function() {
         listenerTargets.push(event.delegateTarget);
         event.stopPropagation();
       };
-      lfr.dom.delegate(element, 'click', '.match', listener);
+      dom.delegate(element, 'click', '.match', listener);
 
-      lfr.dom.triggerEvent(matchedElements[1], 'click');
+      dom.triggerEvent(matchedElements[1], 'click');
       assert.strictEqual(1, listenerTargets.length);
       assert.strictEqual(matchedElements[1], listenerTargets[0]);
     });
@@ -176,9 +179,9 @@ describe('dom', function() {
         listenerTargets.push(event.delegateTarget);
         event.stopImmediatePropagation();
       };
-      lfr.dom.delegate(element, 'click', '.match', listener);
+      dom.delegate(element, 'click', '.match', listener);
 
-      lfr.dom.triggerEvent(matchedElements[1], 'click');
+      dom.triggerEvent(matchedElements[1], 'click');
       assert.strictEqual(1, listenerTargets.length);
       assert.strictEqual(matchedElements[1], listenerTargets[0]);
     });
@@ -202,7 +205,7 @@ describe('dom', function() {
     });
 
     it('should return false if no element is given', function() {
-      assert.ok(!lfr.dom.match());
+      assert.ok(!dom.match());
     });
 
     it('should use matches function when available', function() {
@@ -210,7 +213,7 @@ describe('dom', function() {
       Element.prototype.matches = sinon.stub().returns(matchedElement);
       var element = document.createElement('div');
 
-      assert.strictEqual(matchedElement, lfr.dom.match(element, '.selector'));
+      assert.strictEqual(matchedElement, dom.match(element, '.selector'));
       assert.strictEqual(1, element.matches.callCount);
       assert.strictEqual('.selector', element.matches.args[0][0]);
     });
@@ -221,7 +224,7 @@ describe('dom', function() {
       Element.prototype.webkitMatchesSelector = sinon.stub().returns(matchedElement);
       var element = document.createElement('div');
 
-      assert.strictEqual(matchedElement, lfr.dom.match(element, '.selector'));
+      assert.strictEqual(matchedElement, dom.match(element, '.selector'));
       assert.strictEqual(1, element.webkitMatchesSelector.callCount);
       assert.strictEqual('.selector', element.webkitMatchesSelector.args[0][0]);
     });
@@ -233,7 +236,7 @@ describe('dom', function() {
       Element.prototype.mozMatchesSelector = sinon.stub().returns(matchedElement);
       var element = document.createElement('div');
 
-      assert.strictEqual(matchedElement, lfr.dom.match(element, '.selector'));
+      assert.strictEqual(matchedElement, dom.match(element, '.selector'));
       assert.strictEqual(1, element.mozMatchesSelector.callCount);
       assert.strictEqual('.selector', element.mozMatchesSelector.args[0][0]);
     });
@@ -246,7 +249,7 @@ describe('dom', function() {
       Element.prototype.msMatchesSelector = sinon.stub().returns(matchedElement);
       var element = document.createElement('div');
 
-      assert.strictEqual(matchedElement, lfr.dom.match(element, '.selector'));
+      assert.strictEqual(matchedElement, dom.match(element, '.selector'));
       assert.strictEqual(1, element.msMatchesSelector.callCount);
       assert.strictEqual('.selector', element.msMatchesSelector.args[0][0]);
     });
@@ -260,7 +263,7 @@ describe('dom', function() {
       Element.prototype.oMatchesSelector = sinon.stub().returns(matchedElement);
       var element = document.createElement('div');
 
-      assert.strictEqual(matchedElement, lfr.dom.match(element, '.selector'));
+      assert.strictEqual(matchedElement, dom.match(element, '.selector'));
       assert.strictEqual(1, element.oMatchesSelector.callCount);
       assert.strictEqual('.selector', element.oMatchesSelector.args[0][0]);
     });
@@ -269,7 +272,7 @@ describe('dom', function() {
       Element.prototype.matches = sinon.stub();
 
       var element = document.createDocumentFragment();
-      assert.ok(!lfr.dom.match(element, 'selector'));
+      assert.ok(!dom.match(element, 'selector'));
       assert.strictEqual(0, Element.prototype.matches.callCount);
     });
 
@@ -287,9 +290,9 @@ describe('dom', function() {
       Element.prototype.msMatchesSelector = null;
       Element.prototype.oMatchesSelector = null;
 
-      assert.ok(lfr.dom.match(element, '.class1'));
-      assert.ok(!lfr.dom.match(element, '.class2'));
-      assert.ok(lfr.dom.match(element2, '.class2'));
+      assert.ok(dom.match(element, '.class1'));
+      assert.ok(!dom.match(element, '.class2'));
+      assert.ok(dom.match(element2, '.class2'));
     });
   });
 
@@ -297,7 +300,7 @@ describe('dom', function() {
     it('should return the element itself if one is given for conversion', function() {
       var element = document.createElement('div');
 
-      assert.strictEqual(element, lfr.dom.toElement(element));
+      assert.strictEqual(element, dom.toElement(element));
     });
 
     it('should return matching element if selector is given', function() {
@@ -305,14 +308,14 @@ describe('dom', function() {
       element.className = 'mySelector';
       document.body.appendChild(element);
 
-      assert.strictEqual(element, lfr.dom.toElement('.mySelector'));
+      assert.strictEqual(element, dom.toElement('.mySelector'));
     });
 
     it('should return null if invalid param is given', function() {
-      assert.strictEqual(null, lfr.dom.toElement({}));
-      assert.strictEqual(null, lfr.dom.toElement([]));
-      assert.strictEqual(null, lfr.dom.toElement(1));
-      assert.strictEqual(null, lfr.dom.toElement(null));
+      assert.strictEqual(null, dom.toElement({}));
+      assert.strictEqual(null, dom.toElement([]));
+      assert.strictEqual(null, dom.toElement(1));
+      assert.strictEqual(null, dom.toElement(null));
     });
   });
 
@@ -320,9 +323,9 @@ describe('dom', function() {
     it('should check if element supports event', function() {
       var element = document.createElement('div');
 
-      assert.ok(!lfr.dom.supportsEvent(element, 'lalala'));
-      assert.ok(lfr.dom.supportsEvent(element, 'click'));
-      assert.ok(lfr.dom.supportsEvent(element, 'change'));
+      assert.ok(!dom.supportsEvent(element, 'lalala'));
+      assert.ok(dom.supportsEvent(element, 'click'));
+      assert.ok(dom.supportsEvent(element, 'change'));
     });
   });
 });

@@ -1,31 +1,32 @@
-(function() {
-  'use strict';
+'use strict';
 
-  /**
-   * Abstract interface for storing and retrieving data using some persistence
-   * mechanism.
-   * @constructor
-   */
-  lfr.StorageMechanism = function() {};
+import core from '../core';
 
-  /**
-   * Set a value for a key.
-   * @param {string} key The key to set.
-   * @param {string} value The string to save.
-   */
-  lfr.storage.StorageMechanism.prototype.set = lfr.abstractMethod;
+/**
+ * Abstract interface for storing and retrieving data using some persistence
+ * mechanism.
+ * @constructor
+ */
+var StorageMechanism = function() {};
 
-  /**
-   * Get the value stored under a key.
-   * @param {string} key The key to get.
-   * @return {?string} The corresponding value, null if not found.
-   */
-  lfr.storage.StorageMechanism.prototype.get = lfr.abstractMethod;
+/**
+ * Set a value for a key.
+ * @param {string} key The key to set.
+ * @param {string} value The string to save.
+ */
+StorageMechanism.prototype.set = core.abstractMethod;
 
-  /**
-   * Remove a key and its value.
-   * @param {string} key The key to remove.
-   */
-  lfr.storage.StorageMechanism.prototype.remove = lfr.abstractMethod;
+/**
+ * Get the value stored under a key.
+ * @param {string} key The key to get.
+ * @return {?string} The corresponding value, null if not found.
+ */
+StorageMechanism.prototype.get = core.abstractMethod;
 
-}());
+/**
+ * Remove a key and its value.
+ * @param {string} key The key to remove.
+ */
+StorageMechanism.prototype.remove = core.abstractMethod;
+
+export default StorageMechanism;

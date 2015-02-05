@@ -1,11 +1,15 @@
 'use strict';
 
+import dom from '../../src/dom/dom';
+import EventEmitter from '../../src/events/EventEmitter';
+import EventEmitterProxy from '../../src/events/EventEmitterProxy';
+
 describe('EventEmitterProxy', function() {
 
   it('should proxy event from origin to target', function() {
-    var origin = new lfr.EventEmitter();
-    var target = new lfr.EventEmitter();
-    new lfr.EventEmitterProxy(origin, target);
+    var origin = new EventEmitter();
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target);
 
     var listener = sinon.stub();
     target.on('event1', listener);
@@ -19,12 +23,12 @@ describe('EventEmitterProxy', function() {
   it('should proxy event from dom element origin to target', function() {
     var origin = document.createElement('div');
 
-    var target = new lfr.EventEmitter();
-    new lfr.EventEmitterProxy(origin, target);
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target);
 
     var listener = sinon.stub();
     target.on('click', listener);
-    lfr.dom.triggerEvent(origin, 'click');
+    dom.triggerEvent(origin, 'click');
 
     assert.strictEqual(1, listener.callCount);
     assert.ok(listener.args[0][0]);
@@ -34,17 +38,17 @@ describe('EventEmitterProxy', function() {
     var origin = document.createElement('div');
     origin.addEventListener = sinon.stub();
 
-    var target = new lfr.EventEmitter();
-    new lfr.EventEmitterProxy(origin, target);
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target);
 
     target.on('event1', sinon.stub());
     assert.strictEqual(0, origin.addEventListener.callCount);
   });
 
   it('should not proxy blacklisted event', function() {
-    var origin = new lfr.EventEmitter();
-    var target = new lfr.EventEmitter();
-    new lfr.EventEmitterProxy(origin, target, {
+    var origin = new EventEmitter();
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target, {
       event1: true
     });
 
@@ -56,9 +60,9 @@ describe('EventEmitterProxy', function() {
   });
 
   it('should only emit proxied event once per listener', function() {
-    var origin = new lfr.EventEmitter();
-    var target = new lfr.EventEmitter();
-    new lfr.EventEmitterProxy(origin, target);
+    var origin = new EventEmitter();
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target);
 
     var listener1 = sinon.stub();
     target.on('event1', listener1);
@@ -71,9 +75,9 @@ describe('EventEmitterProxy', function() {
   });
 
   it('should not proxy events after disposed', function() {
-    var origin = new lfr.EventEmitter();
-    var target = new lfr.EventEmitter();
-    var proxy = new lfr.EventEmitterProxy(origin, target);
+    var origin = new EventEmitter();
+    var target = new EventEmitter();
+    var proxy = new EventEmitterProxy(origin, target);
 
     var listener = sinon.stub();
     target.on('event1', listener);
@@ -86,14 +90,14 @@ describe('EventEmitterProxy', function() {
   it('should not proxy dom events after disposed', function() {
     var origin = document.createElement('div');
 
-    var target = new lfr.EventEmitter();
-    var proxy = new lfr.EventEmitterProxy(origin, target);
+    var target = new EventEmitter();
+    var proxy = new EventEmitterProxy(origin, target);
 
     var listener = sinon.stub();
     target.on('click', listener);
 
     proxy.dispose();
-    lfr.dom.triggerEvent(origin, 'click');
+    dom.triggerEvent(origin, 'click');
     assert.strictEqual(0, listener.callCount);
   });
 });

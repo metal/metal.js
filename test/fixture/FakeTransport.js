@@ -1,9 +1,12 @@
 'use strict';
 
+import core from '../../src/core';
+import Transport from '../../src/net/Transport';
+
 function FakeTransport(uri) {
   FakeTransport.base(this, 'constructor', uri);
 }
-lfr.inherits(FakeTransport, lfr.Transport);
+core.inherits(FakeTransport, Transport);
 
 FakeTransport.prototype.close = function() {
   emitAsync(this, 'close');
@@ -27,3 +30,5 @@ function emitAsync(emitter, eventName, data) {
     emitter.emit(eventName, data);
   }, 0);
 }
+
+export default FakeTransport;

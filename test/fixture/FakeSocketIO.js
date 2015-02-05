@@ -1,10 +1,13 @@
 'use strict';
 
-window.createFakeSocketIO = function() {
+import core from '../../src/core';
+import EventEmitter from '../../src/events/EventEmitter';
+
+var createFakeSocketIO = function() {
   var FakeSocketIO = function() {
     FakeSocketIO.base(this, 'constructor');
   };
-  lfr.inherits(FakeSocketIO, lfr.EventEmitter);
+  core.inherits(FakeSocketIO, EventEmitter);
 
   FakeSocketIO.prototype.close = function() {
     var self = this;
@@ -32,3 +35,6 @@ window.createFakeSocketIO = function() {
   };
   return FakeSocketIO;
 };
+
+export default createFakeSocketIO;
+

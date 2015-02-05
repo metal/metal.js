@@ -1,13 +1,15 @@
 'use strict';
 
+import WildcardTrie from '../../src/structs/WildcardTrie';
+
 describe('WildcardTrie', function() {
   it('should set the value from the constructor', function() {
-    var trie = new lfr.WildcardTrie('myValue');
+    var trie = new WildcardTrie('myValue');
     assert.strictEqual('myValue', trie.getValue());
   });
 
   it('should get values for wildcard keys', function() {
-    var trie = new lfr.WildcardTrie('myValue');
+    var trie = new WildcardTrie('myValue');
 
     trie.setKeyValue(['some', 'event'], 'value-some.event');
     trie.setKeyValue(['some', 'other', 'event'], 'value-some.other.event');
@@ -22,7 +24,7 @@ describe('WildcardTrie', function() {
   });
 
   it('should set values with wildcard keys', function() {
-    var trie = new lfr.WildcardTrie();
+    var trie = new WildcardTrie();
 
     trie.setKeyValue(['some', 'event'], 'value-some.event');
     trie.setKeyValue(['some', 'other', 'event'], 'value-some.other.event');
@@ -40,7 +42,7 @@ describe('WildcardTrie', function() {
   });
 
   it('should work with string keys', function() {
-    var trie = new lfr.WildcardTrie();
+    var trie = new WildcardTrie();
 
     trie.setKeyValue('ab', 'value-ab');
     trie.setKeyValue('acb', 'value-acb');

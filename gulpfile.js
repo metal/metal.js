@@ -10,31 +10,6 @@ var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
 
-var mainFiles = [
-  'src/lfr.js',
-  'src/object/object.js',
-  'src/array/array.js',
-  'src/string/string.js',
-  'src/html/html.js',
-  'src/promise/Promise.js',
-  'src/disposable/Disposable.js',
-  'src/structs/Trie.js',
-  'src/structs/WildcardTrie.js',
-  'src/events/EventHandle.js',
-  'src/events/DomEventHandle.js',
-  'src/events/EventHandler.js',
-  'src/events/EventEmitter.js',
-  'src/events/EventEmitterProxy.js',
-  'src/dom/dom.js',
-  'src/attribute/Attribute.js',
-  'src/net/Transport.js',
-  'src/net/XhrTransport.js',
-  'src/net/WebSocketTransport.js',
-  'src/webchannel/WebChannel.js',
-  'src/component/Component.js',
-  'src/component/SoyComponent.js'
-];
-
 gulp.task('build', ['clean'], function() {
   return runSequence('build-raw', 'build-min', 'build-debug');
 });
@@ -97,22 +72,7 @@ gulp.task('test-complexity', function() {
 });
 
 gulp.task('test-unit', function(done) {
-  runKarma({
-    coverageReporter: {
-      reporters: [
-        {
-          type : 'text'
-        },
-        {
-          type : 'html'
-        },
-        {
-          type: 'lcov',
-          subdir: 'lcov'
-        },
-      ]
-    }
-  }, done);
+  runKarma({}, done);
 });
 
 gulp.task('test-coverage', function(done) {

@@ -1,6 +1,9 @@
 'use strict';
 
-var FakeSocketIO = window.createFakeSocketIO();
+import createFakeSocketIO from '../fixture/FakeSocketIO';
+import WebSocketTransport from '../../src/net/WebSocketTransport';
+
+var FakeSocketIO = createFakeSocketIO();
 
 describe('WebSocketTransport', function() {
   beforeEach(function() {
@@ -10,12 +13,12 @@ describe('WebSocketTransport', function() {
   });
 
   it('should set uri from constructor', function() {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
   });
 
   it('should throw error when Socket.IO not found', function() {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     window.io = null;
     assert.throws(function() {
       transport.open();
@@ -23,7 +26,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should connection open', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     var stubOpen = sinon.stub();
     transport.on('open', stubOpen);
     transport.open();
@@ -38,7 +41,7 @@ describe('WebSocketTransport', function() {
     var originalWarningFn = console.warn;
     console.warn = sinon.stub();
 
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     var stubOpen = sinon.stub();
     transport.on('open', stubOpen);
     transport.open();
@@ -58,7 +61,7 @@ describe('WebSocketTransport', function() {
     var originalWarningFn = console.warn;
     console.warn = sinon.stub();
 
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.close();
 
     var stubClose = sinon.stub();
@@ -89,7 +92,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should handle successful send message', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
       transport.on('message', function(data) {
@@ -101,7 +104,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should handle successful restful send message', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.setRestful(true);
     transport.open();
     transport.on('open', function() {
@@ -115,7 +118,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should handle successful restful send message with method', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.setRestful(true);
     transport.open();
     transport.on('open', function() {
@@ -131,7 +134,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should handle successful receive data', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     var stubData = sinon.stub();
     transport.on('data', stubData);
     transport.open();
@@ -145,7 +148,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should handle successful response data', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
       transport.send('message', {}, function(data) {
@@ -156,7 +159,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should handle failing send data', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     var stubError = sinon.stub();
     transport.on('error', stubError);
     transport.open();
@@ -173,7 +176,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should abort requests when disposed', function(done) {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.open();
     transport.on('open', function() {
       transport.send();
@@ -185,7 +188,7 @@ describe('WebSocketTransport', function() {
   });
 
   it('should listen to socket events', function() {
-    var transport = new lfr.WebSocketTransport('http://liferay.com');
+    var transport = new WebSocketTransport('http://liferay.com');
     transport.open();
 
     var listener = sinon.stub();

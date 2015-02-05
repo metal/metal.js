@@ -1,5 +1,10 @@
 'use strict';
 
+import {async} from '../../src/promise/Promise';
+import core from '../../src/core';
+import dom from '../../src/dom/dom';
+import Component from '../../src/component/Component';
+
 describe('Component', function() {
   afterEach(function() {
     document.body.innerHTML = '';
@@ -120,7 +125,7 @@ describe('Component', function() {
       var ChildComponent = function(opt_config) {
         ChildComponent.base(this, 'constructor', opt_config);
       };
-      lfr.inherits(ChildComponent, CustomComponent);
+      core.inherits(ChildComponent, CustomComponent);
 
       var custom = new ChildComponent();
       custom.render();
@@ -223,7 +228,7 @@ describe('Component', function() {
       assert.strictEqual('bar', custom.element.classList.item(2));
 
       custom.elementClasses = ['other'];
-      lfr.async.nextTick(function() {
+      async.nextTick(function() {
         assert.strictEqual(2, custom.element.classList.length);
         assert.strictEqual('component', custom.element.classList.item(0));
         assert.strictEqual('other', custom.element.classList.item(1));
@@ -262,7 +267,7 @@ describe('Component', function() {
 
       custom.foo = 20;
       sinon.assert.callCount(CustomComponent.prototype.syncFoo, 1);
-      lfr.async.nextTick(function() {
+      async.nextTick(function() {
         sinon.assert.callCount(CustomComponent.prototype.syncFoo, 2);
         assert.strictEqual(20, CustomComponent.prototype.syncFoo.args[1][0]);
       });
@@ -280,7 +285,7 @@ describe('Component', function() {
       var ChildComponent = function(opt_config) {
         ChildComponent.base(this, 'constructor', opt_config);
       };
-      lfr.inherits(ChildComponent, CustomComponent);
+      core.inherits(ChildComponent, CustomComponent);
       ChildComponent.ATTRS = {
         bar: {
           value: 1
@@ -377,11 +382,11 @@ describe('Component', function() {
       var listener = sinon.stub();
       custom.on('click', listener);
 
-      lfr.dom.triggerEvent(element, 'click');
+      dom.triggerEvent(element, 'click');
       assert.strictEqual(1, listener.callCount);
 
       custom.dispose();
-      lfr.dom.triggerEvent(element, 'click');
+      dom.triggerEvent(element, 'click');
       assert.strictEqual(1, listener.callCount);
     });
 
@@ -397,11 +402,11 @@ describe('Component', function() {
       var listener = sinon.stub();
       custom.delegate('click', '.foo', listener);
 
-      lfr.dom.triggerEvent(fooElement, 'click');
+      dom.triggerEvent(fooElement, 'click');
       assert.strictEqual(1, listener.callCount);
 
       custom.dispose();
-      lfr.dom.triggerEvent(fooElement, 'click');
+      dom.triggerEvent(fooElement, 'click');
       assert.strictEqual(1, listener.callCount);
     });
   });
@@ -417,7 +422,7 @@ describe('Component', function() {
       function ChildComponent(opt_config) {
         ChildComponent.base(this, 'constructor', opt_config);
       }
-      lfr.inherits(ChildComponent, ParentComponent);
+      core.inherits(ChildComponent, ParentComponent);
       ChildComponent.SURFACES = {
         content: {}
       };
@@ -457,7 +462,7 @@ describe('Component', function() {
       var ChildComponent = function(opt_config) {
         ChildComponent.base(this, 'constructor', opt_config);
       };
-      lfr.inherits(ChildComponent, CustomComponent);
+      core.inherits(ChildComponent, CustomComponent);
 
       var custom = new ChildComponent();
       custom.addSurface('header');
@@ -610,7 +615,7 @@ describe('Component', function() {
       assert.strictEqual('<b style="font-size:10px;">header</b>', custom.getSurfaceElement('header').innerHTML);
       assert.strictEqual('<span style="font-size:10px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
 
-      lfr.async.nextTick(function() {
+      async.nextTick(function() {
         assert.strictEqual('<b style="font-size:10px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
         assert.strictEqual('<span style="font-size:10px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
 
@@ -619,14 +624,14 @@ describe('Component', function() {
         assert.strictEqual('<b style="font-size:10px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
         assert.strictEqual('<span style="font-size:10px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
 
-        lfr.async.nextTick(function() {
+        async.nextTick(function() {
           assert.strictEqual('<b style="font-size:20px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
           assert.strictEqual('<span style="font-size:20px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
 
           // Asserts that it will not repaint if component is not in document
           custom.inDocument = false;
           custom.fontSize = '10px';
-          lfr.async.nextTick(function() {
+          async.nextTick(function() {
             assert.strictEqual('<b style="font-size:20px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
             assert.strictEqual('<span style="font-size:20px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
             done();
@@ -663,17 +668,17 @@ describe('Component', function() {
       assert.strictEqual('<div>static</div>', custom.getSurfaceElement('body').innerHTML);
       assert.strictEqual('<div>static</div>', custom.getSurfaceElement('bottom').innerHTML);
 
-      sinon.spy(lfr.dom, 'append');
+      sinon.spy(dom, 'append');
 
       custom.renderSurfacesContent_({
         header: true,
         body: true,
         bottom: true
       });
-      assert.strictEqual(1, lfr.dom.append.callCount);
-      assert.ok(lfr.dom.append.firstCall.args[0].id.indexOf('-bottom') > 0);
+      assert.strictEqual(1, dom.append.callCount);
+      assert.ok(dom.append.firstCall.args[0].id.indexOf('-bottom') > 0);
 
-      lfr.dom.append.restore();
+      dom.append.restore();
     });
 
     it('should return component instance from surface methods', function() {
@@ -690,7 +695,7 @@ describe('Component', function() {
     function CustomComponent(opt_config) {
       CustomComponent.base(this, 'constructor', opt_config);
     }
-    lfr.inherits(CustomComponent, lfr.Component);
+    core.inherits(CustomComponent, Component);
 
     CustomComponent.prototype.created = sinon.spy();
     CustomComponent.prototype.decorateInternal = sinon.spy();

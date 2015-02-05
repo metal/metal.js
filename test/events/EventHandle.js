@@ -1,10 +1,13 @@
 'use strict';
 
+import EventHandle from '../../src/events/EventHandle';
+import EventEmitter from '../../src/events/EventEmitter';
+
 describe('EventHandle', function() {
   it('should unsubscribe the listener', function() {
-    var emitter = new lfr.EventEmitter();
+    var emitter = new EventEmitter();
     var listener = sinon.stub();
-    var handle = new lfr.EventHandle(emitter, 'event', listener);
+    var handle = new EventHandle(emitter, 'event', listener);
 
     emitter.on('event', listener);
     emitter.on('event2', listener);
@@ -18,18 +21,18 @@ describe('EventHandle', function() {
   });
 
   it('should not throw error when removing listener on disposed emitter', function() {
-    var emitter = new lfr.EventEmitter();
+    var emitter = new EventEmitter();
     var listener = sinon.stub();
-    var handle = new lfr.EventHandle(emitter, 'event', listener);
+    var handle = new EventHandle(emitter, 'event', listener);
 
     emitter.dispose();
     handle.removeListener();
   });
 
   it('should delete emitter and listener references when disposed', function() {
-    var emitter = new lfr.EventEmitter();
+    var emitter = new EventEmitter();
     var listener = sinon.stub();
-    var handle = new lfr.EventHandle(emitter, 'event', listener);
+    var handle = new EventHandle(emitter, 'event', listener);
 
     handle.dispose();
     assert.ok(!handle.emitter_);

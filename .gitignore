@@ -1,3 +1,5 @@
 coverage
 node_modules
 build
+jspm_packages
+config.js

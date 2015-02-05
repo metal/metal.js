@@ -1,15 +1,17 @@
 'use strict';
 
+import Trie from '../../src/structs/Trie';
+
 describe('Trie', function() {
   it('should normalize keys', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
 
     assert.deepEqual(['a', '@', 'b', '2'], trie.normalizeKey('a@b2'));
     assert.deepEqual(['1', '2'], trie.normalizeKey(['1', '2']));
   });
 
   it('should set and get value', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
 
     assert.ok(!trie.getValue());
 
@@ -18,14 +20,14 @@ describe('Trie', function() {
   });
 
   it('should set and get value through constructor', function() {
-    var trie = new lfr.Trie('a');
+    var trie = new Trie('a');
     assert.strictEqual('a', trie.getValue());
   });
 
   it('should set and get children', function() {
-    var child1 = new lfr.Trie();
-    var child2 = new lfr.Trie();
-    var trie = new lfr.Trie();
+    var child1 = new Trie();
+    var child2 = new Trie();
+    var trie = new Trie();
 
     assert.ok(!trie.getChild('1'));
     assert.ok(!trie.getChild('2'));
@@ -39,9 +41,9 @@ describe('Trie', function() {
   });
 
   it('should get all children', function() {
-    var child1 = new lfr.Trie();
-    var child2 = new lfr.Trie();
-    var trie = new lfr.Trie();
+    var child1 = new Trie();
+    var child2 = new Trie();
+    var trie = new Trie();
 
     trie.setChild('1', child1);
     trie.setChild('2', child2);
@@ -53,7 +55,7 @@ describe('Trie', function() {
   });
 
   it('should set values for string keys', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
 
     trie.setKeyValue('abc', 'abcValue');
     assert.strictEqual('abcValue', trie.getKeyValue('abc'));
@@ -66,7 +68,7 @@ describe('Trie', function() {
   });
 
   it('should set values for array keys', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
 
     trie.setKeyValue(['abc', 'def'], '1');
     trie.setKeyValue(['abc', 'z'], '2');
@@ -78,7 +80,7 @@ describe('Trie', function() {
   });
 
   it('should override existing values', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
 
     trie.setKeyValue('abc', ['1']);
     trie.setKeyValue('abc', ['2']);
@@ -87,7 +89,7 @@ describe('Trie', function() {
   });
 
   it('should merge existing values', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
     var mergeFn = function(value1, value2) {
       return value1.concat(value2);
     };
@@ -99,7 +101,7 @@ describe('Trie', function() {
   });
 
   it('should clear the trie', function() {
-    var trie = new lfr.Trie();
+    var trie = new Trie();
 
     trie.setKeyValue('abc', 'abcValue');
     trie.setKeyValue('az', 'azValue');
@@ -111,7 +113,7 @@ describe('Trie', function() {
   });
 
   it('should dispose children on dispose', function() {
-    var trie = new lfr.Trie([]);
+    var trie = new Trie([]);
 
     trie.setKeyValue('ab', 'abValue');
     trie.setKeyValue('cd', 'cdValue');
@@ -126,7 +128,7 @@ describe('Trie', function() {
   });
 
   it('should clear value on dispose', function() {
-    var trie = new lfr.Trie([]);
+    var trie = new Trie([]);
 
     trie.dispose();
     assert.ok(!trie.getValue());

@@ -1,10 +1,12 @@
 'use strict';
 
+import object from '../../src/object/object';
+
 describe('object', function() {
   it('should mixin object arguments', function() {
     var original = {};
 
-    var mixin = lfr.object.mixin(original, {
+    var mixin = object.mixin(original, {
       a: 1
     }, {
         b: 1
@@ -21,7 +23,7 @@ describe('object', function() {
   it('should mixin array arguments', function() {
     var original = [];
 
-    var mixin = lfr.object.mixin(original, [null, 2, 3], [1]);
+    var mixin = object.mixin(original, [null, 2, 3], [1]);
 
     assert.strictEqual(original, mixin);
     assert.deepEqual([1, 2, 3], mixin);

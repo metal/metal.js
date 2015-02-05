@@ -1,8 +1,11 @@
 'use strict';
 
+import core from '../../src/core';
+import Disposable from '../../src/disposable/Disposable';
+
 describe('Disposable', function() {
   it('should correctly inform if the instance has been disposed', function() {
-    var disposable = new lfr.Disposable();
+    var disposable = new Disposable();
 
     assert.ok(!disposable.isDisposed());
 
@@ -12,7 +15,7 @@ describe('Disposable', function() {
 
   it('should call `disposeInternal` when running `dispose`', function() {
     var TestDisposable = function() {};
-    lfr.inherits(TestDisposable, lfr.Disposable);
+    core.inherits(TestDisposable, Disposable);
 
     TestDisposable.prototype.disposeInternal = sinon.stub();
 
@@ -24,7 +27,7 @@ describe('Disposable', function() {
 
   it('should not dispose more than once', function() {
     var TestDisposable = function() {};
-    lfr.inherits(TestDisposable, lfr.Disposable);
+    core.inherits(TestDisposable, Disposable);
 
     TestDisposable.prototype.disposeInternal = sinon.stub();
 

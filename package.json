@@ -28,13 +28,16 @@
     "gulp-rename": "^1.2.0",
     "gulp-rimraf": "^0.1.0",
     "gulp-uglify": "^1.0.1",
+    "isparta": "git://github.com/douglasduteil/isparta",
     "jshint-stylish": "^1.0.0",
     "karma": "^0.12.31",
+    "karma-6to5-preprocessor": "^3.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.7",
     "karma-coverage": "git://github.com/douglasduteil/karma-coverage#next",
     "karma-firefox-launcher": "^0.1.4",
     "karma-html2js-preprocessor": "^0.1.0",
+    "karma-jspm": "^1.1.4",
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
@@ -44,5 +47,11 @@
     "open": "0.0.5",
     "run-sequence": "^1.0.2",
     "sinon": "^1.10.3"
+  },
+  "jspm": {
+    "name": "alloyui-core",
+    "directories": {
+      "lib": "src"
+    }
   }
 }

@@ -1,8 +1,10 @@
 'use strict';
 
+import EventEmitter from '../../src/events/EventEmitter';
+
 describe('EventEmitter', function() {
   beforeEach(function() {
-    this.emitter = new lfr.EventEmitter();
+    this.emitter = new EventEmitter();
   });
 
   afterEach(function() {

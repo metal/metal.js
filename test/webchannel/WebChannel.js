@@ -1,7 +1,11 @@
 'use strict';
 
-var FakeSocketIO = window.createFakeSocketIO();
-var FakeTransport = window.FakeTransport;
+import createFakeSocketIO from '../fixture/FakeSocketIO';
+import FakeTransport from '../fixture/FakeTransport';
+import WebChannel from '../../src/webchannel/WebChannel';
+import WebSocketTransport from '../../src/net/WebSocketTransport';
+
+var FakeSocketIO = createFakeSocketIO();
 
 describe('WebChannel', function() {
   describe('default transport', function() {
@@ -17,62 +21,62 @@ describe('WebChannel', function() {
 
     it('should not throw error when transport is not specified', function() {
       assert.doesNotThrow(function() {
-        new lfr.WebChannel();
+        new WebChannel();
       });
     });
 
     it('should default to web socket when transport is not specified', function() {
-      var channel = new lfr.WebChannel();
+      var channel = new WebChannel();
       var transport = channel.getTransport();
-      assert.ok(transport instanceof lfr.WebSocketTransport);
+      assert.ok(transport instanceof WebSocketTransport);
       assert.strictEqual(window.location.origin + window.location.pathname, transport.getUri());
     });
   });
 
   it('should not throw error when transport is specified', function() {
     assert.doesNotThrow(function() {
-      new lfr.WebChannel(new FakeTransport(''));
+      new WebChannel(new FakeTransport(''));
     }, Error);
   });
 
   it('should retrieve the specified transport', function() {
     var transport = new FakeTransport('uri');
-    var channel = new lfr.WebChannel(transport);
+    var channel = new WebChannel(transport);
     assert.strictEqual(transport, channel.getTransport());
   });
 
   it('should set timeout', function() {
-    var channel = new lfr.WebChannel(new FakeTransport('uri'));
+    var channel = new WebChannel(new FakeTransport('uri'));
     channel.setTimeoutMs(0);
     assert.strictEqual(0, channel.getTimeoutMs());
   });
 
   it('should head message', function(done) {
-    assertRequestSent('head', lfr.WebChannel.HttpVerbs.HEAD, done);
+    assertRequestSent('head', WebChannel.HttpVerbs.HEAD, done);
   });
 
   it('should patch message', function(done) {
-    assertRequestSent('patch', lfr.WebChannel.HttpVerbs.PATCH, done);
+    assertRequestSent('patch', WebChannel.HttpVerbs.PATCH, done);
   });
 
   it('should post message', function(done) {
-    assertRequestSent('post', lfr.WebChannel.HttpVerbs.POST, done);
+    assertRequestSent('post', WebChannel.HttpVerbs.POST, done);
   });
 
   it('should put message', function(done) {
-    assertRequestSent('put', lfr.WebChannel.HttpVerbs.PUT, done);
+    assertRequestSent('put', WebChannel.HttpVerbs.PUT, done);
   });
 
   it('should get message', function(done) {
-    assertRequestSent('get', lfr.WebChannel.HttpVerbs.GET, done);
+    assertRequestSent('get', WebChannel.HttpVerbs.GET, done);
   });
 
   it('should delete message', function(done) {
-    assertRequestSent('delete', lfr.WebChannel.HttpVerbs.DELETE, done);
+    assertRequestSent('delete', WebChannel.HttpVerbs.DELETE, done);
   });
 
   it('should timeout action', function(done) {
-    var channel = new lfr.WebChannel(new FakeTransport('uri'));
+    var channel = new WebChannel(new FakeTransport('uri'));
     channel.setTimeoutMs(0);
     channel.get(Math.PI)
       .thenCatch(function(reason) {
@@ -85,22 +89,22 @@ describe('WebChannel', function() {
   });
 
   it('should send pending messages when transport reopens', function(done) {
-    var channel = new lfr.WebChannel(new FakeTransport('uri'));
+    var channel = new WebChannel(new FakeTransport('uri'));
     channel.post(Math.PI).then(function(data) {
       assert.strictEqual(data, Math.PI);
       done();
     });
-    assert.strictEqual(channel.pendingRequests_[0].status, lfr.WebChannel.MessageStatus.SENT);
+    assert.strictEqual(channel.pendingRequests_[0].status, WebChannel.MessageStatus.SENT);
     channel.getTransport().close();
     setTimeout(function() {
-      assert.strictEqual(channel.pendingRequests_[0].status, lfr.WebChannel.MessageStatus.PENDING);
+      assert.strictEqual(channel.pendingRequests_[0].status, WebChannel.MessageStatus.PENDING);
       channel.getTransport().open();
     }, 0);
   });
 
   it('should cancel message when it receives error response', function(done) {
     var transport = new FakeTransport('uri');
-    var channel = new lfr.WebChannel(transport);
+    var channel = new WebChannel(transport);
     var firstRequest = channel.post(Math.PI);
 
     // Simulate an error response for the next request.
@@ -119,7 +123,7 @@ describe('WebChannel', function() {
 
   it('should cancel pending messages when transport emits error', function(done) {
     var transport = new FakeTransport('uri');
-    var channel = new lfr.WebChannel(transport);
+    var channel = new WebChannel(transport);
     var firstRequest = channel.post(Math.PI);
     var secondRequest = channel.post(Math.PI);
 
@@ -133,7 +137,7 @@ describe('WebChannel', function() {
   });
 
   it('should not remove message from queue when mismatch message id arrives', function(done) {
-    var channel = new lfr.WebChannel(new FakeTransport('uri'));
+    var channel = new WebChannel(new FakeTransport('uri'));
     channel.get().then(function() {
       done();
     });
@@ -147,7 +151,7 @@ describe('WebChannel', function() {
 
   it('should emit events from transport', function() {
     var transport = new FakeTransport('uri');
-    var channel = new lfr.WebChannel(transport);
+    var channel = new WebChannel(transport);
 
     var listener = sinon.stub();
     channel.on('event1', listener);
@@ -156,7 +160,7 @@ describe('WebChannel', function() {
   });
 
   it('should dispose web channel', function(done) {
-    var channel = new lfr.WebChannel(new FakeTransport('uri'));
+    var channel = new WebChannel(new FakeTransport('uri'));
     channel.getTransport().once('close', function() {
       done();
     });
@@ -168,7 +172,7 @@ function assertRequestSent(sendFnName, httpVerb, done) {
   var transport = new FakeTransport('uri');
   sinon.spy(transport, 'send');
 
-  var channel = new lfr.WebChannel(transport);
+  var channel = new WebChannel(transport);
   var config = {
     config1: 'config1Value'
   };

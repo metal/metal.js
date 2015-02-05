@@ -1,21 +1,23 @@
 'use strict';
 
-describe('lfr', function() {
+import core from '../../src/core';
+
+describe('core', function() {
   describe('Uid', function() {
     it('should always generate unique id', function() {
-      assert.notStrictEqual(lfr.getUid(), lfr.getUid());
+      assert.notStrictEqual(core.getUid(), core.getUid());
     });
 
     it('should mutate object with unique id', function() {
       var obj = {};
-      assert.strictEqual(lfr.getUid(obj), lfr.getUid(obj));
+      assert.strictEqual(core.getUid(obj), core.getUid(obj));
     });
   });
 
   describe('Abstract Method', function() {
     it('should throw errors for calling abstract methods', function() {
       assert.throws(function() {
-        lfr.abstractMethod();
+        core.abstractMethod();
       }, Error);
     });
   });
@@ -28,7 +30,7 @@ describe('lfr', function() {
       };
 
       var obj = new TestClass();
-      lfr.bind(obj.method, obj)();
+      core.bind(obj.method, obj)();
 
       assert.strictEqual(1, obj.innerVar);
     });
@@ -43,7 +45,7 @@ describe('lfr', function() {
       };
 
       var obj = new TestClass();
-      lfr.bind(obj.method, obj)();
+      core.bind(obj.method, obj)();
 
       assert.strictEqual(1, obj.innerVar);
 
@@ -62,7 +64,7 @@ describe('lfr', function() {
       };
 
       var obj = new TestClass();
-      lfr.bind(obj.method, obj, 2)(3);
+      core.bind(obj.method, obj, 2)(3);
 
       assert.strictEqual(1, obj.innerVar);
       assert.strictEqual(2, obj.arg1);
@@ -73,7 +75,7 @@ describe('lfr', function() {
 
     it('should throw errors when binding with no function', function() {
       assert.throws(function() {
-        lfr.bind();
+        core.bind();
       }, Error);
     });
   });
@@ -85,7 +87,7 @@ describe('lfr', function() {
       TestSuperClass.prototype.func = function() {};
 
       var TestClass = function() {};
-      lfr.inherits(TestClass, TestSuperClass);
+      core.inherits(TestClass, TestSuperClass);
       TestClass.prototype.var2 = 2;
       TestClass.prototype.func2 = function() {};
 
@@ -103,7 +105,7 @@ describe('lfr', function() {
       TestSuperClass.prototype.func = function() {};
 
       var TestClass = function() {};
-      lfr.inherits(TestClass, TestSuperClass);
+      core.inherits(TestClass, TestSuperClass);
       TestClass.prototype.var1 = 2;
       TestClass.prototype.func = function() {};
 
@@ -118,7 +120,7 @@ describe('lfr', function() {
       TestSuperClass.prototype.func = sinon.stub();
 
       var TestClass = function() {};
-      lfr.inherits(TestClass, TestSuperClass);
+      core.inherits(TestClass, TestSuperClass);
       TestClass.prototype.func = function() {
         TestClass.base(this, 'func');
       };
@@ -138,7 +140,7 @@ describe('lfr', function() {
       var TestClass = function() {
         TestClass.base(this, 'constructor');
       };
-      lfr.inherits(TestClass, TestSuperClass);
+      core.inherits(TestClass, TestSuperClass);
 
       new TestClass();
 
@@ -154,10 +156,10 @@ describe('lfr', function() {
       var TestClass = function() {
         TestClass.base(this, 'constructor');
       };
-      lfr.inherits(TestClass, TestSuperClass);
+      core.inherits(TestClass, TestSuperClass);
       TestClass.FOO = 0;
 
-      assert.deepEqual([0, 1], lfr.collectSuperClassesProperty(TestClass, 'FOO'));
+      assert.deepEqual([0, 1], core.collectSuperClassesProperty(TestClass, 'FOO'));
     });
 
     it('should merge properties', function() {
@@ -165,19 +167,19 @@ describe('lfr', function() {
       Test1.FOO = 1;
       var Test2 = function() {};
       Test2.FOO = 2;
-      lfr.inherits(Test2, Test1);
+      core.inherits(Test2, Test1);
       var Test3 = function() {};
       Test3.FOO = 3;
-      lfr.inherits(Test3, Test2);
+      core.inherits(Test3, Test2);
 
-      var merged = lfr.mergeSuperClassesProperty(Test3, 'FOO');
+      var merged = core.mergeSuperClassesProperty(Test3, 'FOO');
       assert.deepEqual([3, 2, 1], merged);
       assert.deepEqual([3, 2, 1], Test3.FOO_MERGED);
       assert.strictEqual(undefined, Test2.FOO_MERGED);
       assert.strictEqual(undefined, Test1.FOO_MERGED);
 
-      assert.deepEqual([2, 1], lfr.mergeSuperClassesProperty(Test2, 'FOO'));
-      assert.deepEqual([1], lfr.mergeSuperClassesProperty(Test1, 'FOO'));
+      assert.deepEqual([2, 1], core.mergeSuperClassesProperty(Test2, 'FOO'));
+      assert.deepEqual([1], core.mergeSuperClassesProperty(Test1, 'FOO'));
     });
 
     it('should reuse existing merged static property', function() {
@@ -188,9 +190,9 @@ describe('lfr', function() {
       var Test2 = function() {};
       Test2.FOO = 2;
       Test2.FOO_MERGED = merged;
-      lfr.inherits(Test2, Test1);
+      core.inherits(Test2, Test1);
 
-      assert.strictEqual(merged, lfr.mergeSuperClassesProperty(Test2, 'FOO'));
+      assert.strictEqual(merged, core.mergeSuperClassesProperty(Test2, 'FOO'));
     });
 
     it('should call merge function when given', function() {
@@ -198,12 +200,12 @@ describe('lfr', function() {
       Test1.FOO = 1;
       var Test2 = function() {};
       Test2.FOO = 2;
-      lfr.inherits(Test2, Test1);
+      core.inherits(Test2, Test1);
       var Test3 = function() {};
       Test3.FOO = 3;
-      lfr.inherits(Test3, Test2);
+      core.inherits(Test3, Test2);
 
-      var merged = lfr.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
+      var merged = core.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
         return values.reduce(function(prev, curr) {
           return Math.max(prev, curr);
         });
@@ -214,93 +216,93 @@ describe('lfr', function() {
 
   describe('Identity Function', function() {
     it('should return the first arg passed to identity function', function() {
-      assert.strictEqual(1, lfr.identityFunction(1));
+      assert.strictEqual(1, core.identityFunction(1));
 
       var obj = {
         a: 2
       };
-      assert.strictEqual(obj, lfr.identityFunction(obj));
+      assert.strictEqual(obj, core.identityFunction(obj));
     });
   });
 
   describe('Type Check', function() {
     it('should check if var is defined', function() {
-      assert.ok(!lfr.isDef(undefined));
+      assert.ok(!core.isDef(undefined));
 
-      assert.ok(lfr.isDef(1));
-      assert.ok(lfr.isDef(''));
-      assert.ok(lfr.isDef({}));
-      assert.ok(lfr.isDef([]));
-      assert.ok(lfr.isDef(function() {}));
-      assert.ok(lfr.isDef(null));
+      assert.ok(core.isDef(1));
+      assert.ok(core.isDef(''));
+      assert.ok(core.isDef({}));
+      assert.ok(core.isDef([]));
+      assert.ok(core.isDef(function() {}));
+      assert.ok(core.isDef(null));
     });
 
     it('should check if var is function', function() {
-      assert.ok(!lfr.isFunction(1));
-      assert.ok(!lfr.isFunction(''));
-      assert.ok(!lfr.isFunction({}));
-      assert.ok(!lfr.isFunction([]));
-      assert.ok(!lfr.isFunction(null));
-      assert.ok(!lfr.isFunction(undefined));
+      assert.ok(!core.isFunction(1));
+      assert.ok(!core.isFunction(''));
+      assert.ok(!core.isFunction({}));
+      assert.ok(!core.isFunction([]));
+      assert.ok(!core.isFunction(null));
+      assert.ok(!core.isFunction(undefined));
 
-      assert.ok(lfr.isFunction(function() {}));
+      assert.ok(core.isFunction(function() {}));
     });
 
     it('should check if var is string', function() {
-      assert.ok(!lfr.isString(1));
-      assert.ok(!lfr.isString({}));
-      assert.ok(!lfr.isString([]));
-      assert.ok(!lfr.isString(function() {}));
-      assert.ok(!lfr.isString(null));
-      assert.ok(!lfr.isString(undefined));
+      assert.ok(!core.isString(1));
+      assert.ok(!core.isString({}));
+      assert.ok(!core.isString([]));
+      assert.ok(!core.isString(function() {}));
+      assert.ok(!core.isString(null));
+      assert.ok(!core.isString(undefined));
 
-      assert.ok(lfr.isString(''));
+      assert.ok(core.isString(''));
     });
 
     it('should check if var is boolean', function() {
-      assert.ok(lfr.isBoolean(true));
-      assert.ok(lfr.isBoolean(false));
-      assert.ok(lfr.isBoolean(Boolean(true)));
-      assert.ok(lfr.isBoolean(Boolean(false)));
+      assert.ok(core.isBoolean(true));
+      assert.ok(core.isBoolean(false));
+      assert.ok(core.isBoolean(Boolean(true)));
+      assert.ok(core.isBoolean(Boolean(false)));
 
-      assert.ok(!lfr.isBoolean(undefined));
-      assert.ok(!lfr.isBoolean(null));
-      assert.ok(!lfr.isBoolean(''));
-      assert.ok(!lfr.isBoolean(0));
+      assert.ok(!core.isBoolean(undefined));
+      assert.ok(!core.isBoolean(null));
+      assert.ok(!core.isBoolean(''));
+      assert.ok(!core.isBoolean(0));
 
-      assert.ok(!lfr.isBoolean(1));
-      assert.ok(!lfr.isBoolean('foo'));
+      assert.ok(!core.isBoolean(1));
+      assert.ok(!core.isBoolean('foo'));
     });
 
     it('should check if var is element', function() {
-      assert.ok(lfr.isElement({
+      assert.ok(core.isElement({
         nodeType: 1
       }));
-      assert.ok(!lfr.isElement({}));
-      assert.ok(!lfr.isElement(null));
-      assert.ok(!lfr.isElement(true));
+      assert.ok(!core.isElement({}));
+      assert.ok(!core.isElement(null));
+      assert.ok(!core.isElement(true));
     });
 
     it('should check if var is null', function() {
-      assert.ok(lfr.isNull(null));
-      assert.ok(!lfr.isNull(false));
-      assert.ok(!lfr.isNull(undefined));
-      assert.ok(!lfr.isNull(''));
-      assert.ok(!lfr.isNull(0));
+      assert.ok(core.isNull(null));
+      assert.ok(!core.isNull(false));
+      assert.ok(!core.isNull(undefined));
+      assert.ok(!core.isNull(''));
+      assert.ok(!core.isNull(0));
     });
 
     it('should check if var is defined and not null', function() {
-      assert.ok(lfr.isDefAndNotNull(false));
-      assert.ok(lfr.isDefAndNotNull(''));
-      assert.ok(lfr.isDefAndNotNull(0));
-      assert.ok(!lfr.isDefAndNotNull(null));
-      assert.ok(!lfr.isDefAndNotNull(undefined));
+      assert.ok(core.isDefAndNotNull(false));
+      assert.ok(core.isDefAndNotNull(''));
+      assert.ok(core.isDefAndNotNull(0));
+      assert.ok(!core.isDefAndNotNull(null));
+      assert.ok(!core.isDefAndNotNull(undefined));
     });
   });
 
   describe('Null Function', function() {
     it('should not return anything', function() {
-      assert.strictEqual(undefined, lfr.nullFunction());
+      assert.strictEqual(undefined, core.nullFunction());
     });
   });
 
@@ -319,16 +321,16 @@ describe('lfr', function() {
       };
 
       var obj = new TestClass();
-      lfr.rbind(obj.method, obj, 'param2')('param1');
+      core.rbind(obj.method, obj, 'param2')('param1');
 
       assert.strictEqual(1, obj.innerVar);
 
-      lfr.rbind(obj.method2, obj)('param1');
+      core.rbind(obj.method2, obj)('param1');
     });
 
     it('should throw errors when rbinding with no function', function() {
       assert.throws(function() {
-        lfr.rbind();
+        core.rbind();
       }, Error);
     });
   });

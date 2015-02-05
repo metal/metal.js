@@ -1,27 +1,29 @@
 'use strict';
 
-var FakeTransport = window.FakeTransport;
+import core from '../../src/core';
+import Transport from '../../src/net/Transport';
+import FakeTransport from '../fixture/FakeTransport';
 
 describe('Transport', function() {
   it('should set uri from constructor', function() {
-    var transport = new lfr.Transport('http://liferay.com');
+    var transport = new Transport('http://liferay.com');
     assert.strictEqual('http://liferay.com', transport.getUri(), 'Should set uri from constructor');
   });
 
   it('should default state be empty', function() {
-    var transport = new lfr.Transport('');
+    var transport = new Transport('');
     assert.strictEqual('', transport.getState());
   });
 
   it('should throw error when a message is sent before open', function() {
-    var transport = new lfr.Transport('');
+    var transport = new Transport('');
     assert.throws(function() {
       transport.send(null);
     }, Error);
   });
 
   it('should throw error when a message is sent from abstract transport', function() {
-    var transport = new lfr.Transport('');
+    var transport = new Transport('');
     transport.setState('open');
     assert.throws(function() {
       transport.send(null);
@@ -39,16 +41,16 @@ describe('Transport', function() {
 
   it('should throw error when uri is not specified', function() {
     assert.throws(function() {
-      new lfr.Transport();
+      new Transport();
     }, Error);
 
     assert.doesNotThrow(function() {
-      new lfr.Transport('');
+      new Transport('');
     });
   });
 
   it('should change state when open/close event is emitted', function() {
-    var transport = new lfr.Transport('');
+    var transport = new Transport('');
     assert.strictEqual('', transport.getState());
 
     transport.emit('open');
@@ -59,15 +61,15 @@ describe('Transport', function() {
   });
 
   it('should set initial default config', function() {
-    var transport = new lfr.Transport('');
-    assert.strictEqual(lfr.Transport.INITIAL_DEFAULT_CONFIG, transport.getDefaultConfig());
+    var transport = new Transport('');
+    assert.strictEqual(Transport.INITIAL_DEFAULT_CONFIG, transport.getDefaultConfig());
   });
 
   it('should set initial default config for subclass', function() {
     var TestTransport = function(uri) {
       TestTransport.base(this, 'constructor', uri);
     };
-    lfr.inherits(TestTransport, lfr.Transport);
+    core.inherits(TestTransport, Transport);
     TestTransport.INITIAL_DEFAULT_CONFIG = {
       config1: 1,
       config2: 'two'
@@ -81,7 +83,7 @@ describe('Transport', function() {
     var TestTransport = function(uri) {
       TestTransport.base(this, 'constructor', uri);
     };
-    lfr.inherits(TestTransport, lfr.Transport);
+    core.inherits(TestTransport, Transport);
     TestTransport.INITIAL_DEFAULT_CONFIG = {
       config1: 1,
       config2: 'two'
@@ -90,14 +92,14 @@ describe('Transport', function() {
     var TestChildTransport = function(uri) {
       TestChildTransport.base(this, 'constructor', uri);
     };
-    lfr.inherits(TestChildTransport, TestTransport);
+    core.inherits(TestChildTransport, TestTransport);
 
     var transport = new TestChildTransport('');
     assert.strictEqual(TestTransport.INITIAL_DEFAULT_CONFIG, transport.getDefaultConfig());
   });
 
   it('should set default config', function() {
-    var transport = new lfr.Transport('');
+    var transport = new Transport('');
     var defaultConfig = {
       config1: 1,
       config2: 'two'

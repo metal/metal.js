@@ -42,18 +42,6 @@ gulp.task('clean', function() {
   return gulp.src('build').pipe(plugins.rimraf());
 });
 
-gulp.task('format', function() {
-  var src = gulp.src(['src/**/*.js'])
-    .pipe(plugins.esformatter())
-    .pipe(gulp.dest('src'));
-
-  var test = gulp.src(['test/**/*.js'])
-    .pipe(plugins.esformatter())
-    .pipe(gulp.dest('test'));
-
-    return mergeStream(src, test);
-});
-
 gulp.task('lint', function() {
   return gulp.src(['src/**/*.js', 'test/**/*.js'])
     .pipe(plugins.jshint())

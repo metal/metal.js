@@ -1,5 +1,6 @@
 'use strict';
 
+var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
 var karma = require('karma').server;
 var merge = require('merge');
@@ -9,32 +10,32 @@ var path = require('path');
 var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
+var sourcemaps = require('gulp-sourcemaps');
 var to5 = require('gulp-6to5');
+var transpile = require('gulp-es6-module-transpiler');
 
 gulp.task('build', ['clean'], function() {
-  return runSequence('build-raw', 'build-min', 'build-debug');
+  return runSequence(['build-raw', 'build-min']);
 });
 
 gulp.task('build-raw', function() {
-  return gulp.src(mainFiles)
-    .pipe(plugins.concat('lfr.js'))
-    .pipe(banner())
+  return gulp.src('src/**/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(transpile({
+      basePath: 'src',
+      bundleFileName: 'alloyui.js',
+      formatter: new GlobalsFormatter({globalName: 'alloyui'})
+    }))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('build'));
 });
 
-gulp.task('build-min', function() {
-  return gulp.src(mainFiles)
+gulp.task('build-min', ['build-raw'], function() {
+  return gulp.src('build/alloyui.js')
+    .pipe(plugins.rename('alloyui-min.js'))
     .pipe(plugins.uglify({
       preserveComments: 'some'
     }))
-    .pipe(plugins.concat('lfr-min.js'))
-    .pipe(banner())
-    .pipe(gulp.dest('build'));
-});
-
-gulp.task('build-debug', function() {
-  return gulp.src(mainFiles)
-    .pipe(plugins.concat('lfr-debug.js'))
     .pipe(banner())
     .pipe(gulp.dest('build'));
 });

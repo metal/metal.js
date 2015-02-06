@@ -9,6 +9,7 @@ var path = require('path');
 var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
+var to5 = require('gulp-6to5');
 
 gulp.task('build', ['clean'], function() {
   return runSequence('build-raw', 'build-min', 'build-debug');
@@ -53,7 +54,8 @@ gulp.task('test', function(done) {
 });
 
 gulp.task('test-complexity', function() {
-  return gulp.src(['src/**/*.js', '!src/promise/Promise.js', 'test/**/*.js', '!test/fixture/sandbox.js'])
+  return gulp.src(['src/**/*.js', '!src/promise/Promise.js', 'test/**/*.js'])
+    .pipe(to5())
     .pipe(plugins.complexity({
       halstead: [15, 15, 20]
     }));

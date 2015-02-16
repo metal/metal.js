@@ -2,6 +2,10 @@
 
 var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
+var gutil = require('gulp-util');
+var jspm = require('jspm');
+var jspmCore = require('jspm/lib/core');
+var jspmUi = require('jspm/lib/ui');
 var karma = require('karma').server;
 var merge = require('merge');
 var mergeStream = require('merge-stream');
@@ -44,6 +48,22 @@ gulp.task('clean', function() {
   return gulp.src('build').pipe(plugins.rimraf());
 });
 
+gulp.task('jspm', function(done) {
+  jspm.promptDefaults(true);
+  jspm.install(true, {lock: true}).then(function() {
+    return jspmCore.checkDlLoader();
+  }).then(function() {
+    return jspmCore.setMode('local');
+  }).then(function() {
+    gutil.log(gutil.colors.cyan('Install complete'));
+    done();
+  }, function(err) {
+    gutil.log(gutil.colors.red('err', err.stack || err))
+    gutil.log(gutil.colors.red('Installation changes not saved.'));
+    done();
+  });
+});
+
 gulp.task('lint', function() {
   return gulp.src(['src/**/*.js', 'test/**/*.js'])
     .pipe(plugins.jshint())
@@ -62,24 +82,24 @@ gulp.task('test-complexity', function() {
     }));
 });
 
-gulp.task('test-unit', function(done) {
+gulp.task('test-unit', ['jspm'], function(done) {
   runKarma({}, done);
 });
 
-gulp.task('test-coverage', function(done) {
+gulp.task('test-coverage', ['jspm'], function(done) {
   runKarma({}, function() {
     open(path.join(__dirname, 'coverage/lcov/lcov-report/index.html'));
     done();
   });
 });
 
-gulp.task('test-browsers', function(done) {
+gulp.task('test-browsers', ['jspm'], function(done) {
   runKarma({
     browsers: ['Chrome', 'Firefox', 'Safari']
   }, done);
 });
 
-gulp.task('test-watch', function(done) {
+gulp.task('test-watch', ['jspm'], function(done) {
   runKarma({singleRun: false}, done);
 });
 

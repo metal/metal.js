@@ -5,10 +5,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jspm = require('jspm');
 var jspmCore = require('jspm/lib/core');
-var jspmUi = require('jspm/lib/ui');
 var karma = require('karma').server;
 var merge = require('merge');
-var mergeStream = require('merge-stream');
 var open = require('open');
 var path = require('path');
 var pkg = require('./package.json');
@@ -28,7 +26,9 @@ gulp.task('build-raw', function() {
     .pipe(transpile({
       basePath: 'src',
       bundleFileName: 'alloyui.js',
-      formatter: new GlobalsFormatter({globalName: 'alloyui'})
+      formatter: new GlobalsFormatter({
+        globalName: 'alloyui'
+      })
     }))
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('build'));
@@ -50,7 +50,9 @@ gulp.task('clean', function() {
 
 gulp.task('jspm', function(done) {
   jspm.promptDefaults(true);
-  jspm.install(true, {lock: true}).then(function() {
+  jspm.install(true, {
+    lock: true
+  }).then(function() {
     return jspmCore.checkDlLoader();
   }).then(function() {
     return jspmCore.setMode('local');
@@ -100,7 +102,9 @@ gulp.task('test-browsers', ['jspm'], function(done) {
 });
 
 gulp.task('test-watch', ['jspm'], function(done) {
-  runKarma({singleRun: false}, done);
+  runKarma({
+    singleRun: false
+  }, done);
 });
 
 gulp.task('watch', ['build'], function() {

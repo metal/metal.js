@@ -1,5 +1,6 @@
 'use strict';
 
+var del = require('del');
 var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -44,8 +45,8 @@ gulp.task('build-min', ['build-raw'], function() {
     .pipe(gulp.dest('build'));
 });
 
-gulp.task('clean', function() {
-  return gulp.src('build').pipe(plugins.rimraf());
+gulp.task('clean', function(done) {
+  del(['build'], done);
 });
 
 gulp.task('jspm', function(done) {

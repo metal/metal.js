@@ -25,9 +25,9 @@ gulp.task('build-raw', function() {
     .pipe(sourcemaps.init())
     .pipe(transpile({
       basePath: 'src',
-      bundleFileName: 'alloyui.js',
+      bundleFileName: 'aui.js',
       formatter: new GlobalsFormatter({
-        globalName: 'alloyui'
+        globalName: 'aui'
       })
     }))
     .pipe(sourcemaps.write('./'))
@@ -35,8 +35,8 @@ gulp.task('build-raw', function() {
 });
 
 gulp.task('build-min', ['build-raw'], function() {
-  return gulp.src('build/alloyui.js')
-    .pipe(plugins.rename('alloyui-min.js'))
+  return gulp.src('build/aui.js')
+    .pipe(plugins.rename('aui-min.js'))
     .pipe(plugins.uglify({
       preserveComments: 'some'
     }))

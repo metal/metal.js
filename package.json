@@ -54,8 +54,7 @@
   },
   "jspm": {
     "directories": {
-      "lib": "src",
-      "name": "alloyui-core"
+      "lib": "src"
     }
   }
 }

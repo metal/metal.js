@@ -7,6 +7,7 @@ import Transport from './Transport';
 /**
  * Provides implementation of transport-based cross-browser/cross-device
  * bi-directional communication layer for Socket.IO.
+ * @param {string} uri
  * @constructor
  * @extends {Transport}
  */

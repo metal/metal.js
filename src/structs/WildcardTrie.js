@@ -7,6 +7,7 @@ import Trie from './Trie';
  * A trie that can handle wildcards.
  * @param {*} value
  * @constructor
+ * @extends {Trie}
  */
 var WildcardTrie = function(value) {
   WildcardTrie.base(this, 'constructor', value);

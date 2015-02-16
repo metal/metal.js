@@ -11,6 +11,7 @@ import {async} from '../promise/Promise';
  * See the `addAttr` method for a complete list of available attribute
  * configuration options.
  * @constructor
+ * @extends {EventEmitter}
  */
 var Attribute = function(opt_config) {
   Attribute.base(this, 'constructor');

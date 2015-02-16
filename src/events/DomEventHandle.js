@@ -10,6 +10,7 @@ import EventHandle from '../events/EventHandle';
  * @param {string} event The name of the event that was subscribed to.
  * @param {!Function} listener The listener subscribed to the event.
  * @constructor
+ * @extends {EventHandle}
  */
 var DomEventHandle = function(emitter, event, listener) {
   DomEventHandle.base(this, 'constructor', emitter, event, listener);

@@ -11,8 +11,8 @@ import Component from '../component/Component';
  * templates defined with their names, skipping the call to `getSurfaceContent`.
  * @param {Object} opt_config An object with the initial values for this component's
  *   attributes.
- * @extends {Component}
  * @constructor
+ * @extends {Component}
  */
 var SoyComponent = function(opt_config) {
   SoyComponent.base(this, 'constructor', opt_config);

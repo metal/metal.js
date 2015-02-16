@@ -7,8 +7,8 @@ import EventEmitter from '../events/EventEmitter';
 
 /**
  * Provides a convenient API for data transport.
- * @constructor
  * @param {string} uri
+ * @constructor
  * @extends {EventEmitter}
  */
 var Transport = function(uri) {

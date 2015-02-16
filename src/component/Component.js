@@ -53,6 +53,7 @@ import EventHandler from '../events/EventHandler';
  * @param {!Object} opt_config An object with the initial values for this component's
  *   attributes.
  * @constructor
+ * @extends {Attribute}
  */
 var Component = function(opt_config) {
   Component.base(this, 'constructor', opt_config);

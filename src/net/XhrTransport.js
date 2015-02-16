@@ -6,6 +6,7 @@ import Transport from './Transport';
 
 /**
  * Provides XMLHttpRequest implementation for transport.
+ * @param {string} uri
  * @constructor
  * @extends {Transport}
  */

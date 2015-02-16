@@ -8,6 +8,7 @@ import Disposable from '../disposable/Disposable';
  * information related to strings and their prefixes. See
  * http://en.wikipedia.org/wiki/Trie.
  * @constructor
+ * @extends {Disposable}
  */
 var Trie = function(value) {
   this.value_ = value;

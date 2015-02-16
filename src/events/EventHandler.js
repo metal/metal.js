@@ -7,6 +7,7 @@ import Disposable from '../disposable/Disposable';
  * EventHandler utility. It's useful for easily removing a group of
  * listeners from different EventEmitter instances.
  * @constructor
+ * @extends {Disposable}
  */
 var EventHandler = function() {
   this.eventHandles_ = [];

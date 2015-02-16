@@ -8,6 +8,7 @@ import WildcardTrie from '../structs/WildcardTrie';
 /**
  * EventEmitter utility.
  * @constructor
+ * @extends {Disposable}
  */
 var EventEmitter = function() {
   this.listenersTree_ = new WildcardTrie();

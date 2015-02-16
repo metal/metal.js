@@ -17,6 +17,7 @@ import Disposable from '../disposable/Disposable';
  * @param {Object} opt_blacklist Optional blacklist of events that should not be
  *   proxied.
  * @constructor
+ * @extends {Disposable}
  */
 var EventEmitterProxy = function(originEmitter, targetEmitter, opt_blacklist) {
   this.originEmitter_ = originEmitter;

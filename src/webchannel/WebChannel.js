@@ -10,10 +10,10 @@ import WebSocketTransport from '../net/WebSocketTransport';
 /**
  * API for WebChannel messaging. Supports HTTP verbs for point-to-point
  * socket-like communication between a browser client and a remote origin.
- * @constructor
  * @param {!Transport} opt_transport Optional transport. If not
  *   specified defaults to <code>WebSocketTransport(location.origin +
  *   location.pathname)</code>.
+ * @constructor
  * @extends {EventEmitter}
  */
 var WebChannel = function(opt_transport) {

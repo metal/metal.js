@@ -13,6 +13,7 @@ import Disposable from '../disposable/Disposable';
  * @param {string} event The name of the event that was subscribed to.
  * @param {!Function} listener The listener subscribed to the event.
  * @constructor
+ * @extends {Disposable}
  */
 var EventHandle = function(emitter, event, listener) {
   this.emitter_ = emitter;

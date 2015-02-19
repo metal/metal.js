@@ -9,6 +9,26 @@ describe('dom', function() {
     document.body.innerHTML = '';
   });
 
+  describe('css classes', function() {
+    it('should add css classes to requested element', function() {
+      var element = document.createElement('div');
+      dom.addClasses(element, ['class1', 'class2']);
+
+      assert.strictEqual(2, element.classList.length);
+      assert.strictEqual('class1', element.classList.item(0));
+      assert.strictEqual('class2', element.classList.item(1));
+    });
+
+    it('should check if an element has the requested css class', function() {
+      var element = document.createElement('div');
+      dom.addClasses(element, ['class1', 'class2']);
+
+      assert.ok(dom.hasClass(element, 'class1'));
+      assert.ok(dom.hasClass(element, 'class2'));
+      assert.ok(!dom.hasClass(element, 'class3'));
+    });
+  });
+
   describe('manipulation', function() {
     it('should append element to parent element', function() {
       var parent = document.createElement('div');

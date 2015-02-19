@@ -98,6 +98,16 @@ dom.handleDelegateEvent_ = function(selector, callback, event) {
 };
 
 /**
+ * Checks if the given element has the requested css class.
+ * @param {!Element} element
+ * @param {string} className
+ * @return {boolean}
+ */
+dom.hasClass = function(element, className) {
+  return element.classList.contains(className);
+};
+
+/**
  * Check if an element matches a given selector.
  * @param {Element} element
  * @param {string} selector

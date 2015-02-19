@@ -1,5 +1,6 @@
 'use strict';
 
+import {async} from '../../src/promise/Promise';
 import core from '../../src/core';
 import Attribute from '../../src/attribute/Attribute';
 
@@ -361,6 +362,16 @@ describe('Attribute', function() {
     attr.attr2 = 20;
     attr.attr1 = 12;
     attr.attr2 = 21;
+  });
+
+  it('should not throw error when trying to emit scheduled attrsChanged after disposed', function(done) {
+    var attr = createAttributeInstance();
+
+    attr.attr1 = 10;
+    attr.dispose();
+    async.nextTick(function() {
+      done();
+    });
   });
 
   it('should get all attribute values', function() {

@@ -187,6 +187,7 @@ Attribute.prototype.callValidator_ = function(name, value) {
  * @inheritDoc
  */
 Attribute.prototype.disposeInternal = function() {
+  Attribute.base(this, 'disposeInternal');
   this.attrsInfo_ = null;
   this.scheduledBatchData_ = null;
 };
@@ -196,9 +197,11 @@ Attribute.prototype.disposeInternal = function() {
  * @protected
  */
 Attribute.prototype.emitBatchEvent_ = function() {
-  var data = this.scheduledBatchData_;
-  this.scheduledBatchData_ = null;
-  this.emit('attrsChanged', data);
+  if (!this.isDisposed()) {
+    var data = this.scheduledBatchData_;
+    this.scheduledBatchData_ = null;
+    this.emit('attrsChanged', data);
+  }
 };
 
 /**

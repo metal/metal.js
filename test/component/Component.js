@@ -483,6 +483,18 @@ describe('Component', function() {
       assert.strictEqual(surface, custom.getSurfaceElement('header'));
     });
 
+    it('should not share same surface config object between instances', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.SURFACES = {
+        header: {}
+      };
+
+      var custom1 = new CustomComponent();
+      var custom2 = new CustomComponent();
+
+      assert.ok(custom1.getSurface('header') !== custom2.getSurface('header'));
+    });
+
     it('should get surface element from the document when it exists', function() {
       var element = document.createElement('div');
       element.id = 'custom';

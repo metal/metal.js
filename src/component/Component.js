@@ -214,9 +214,7 @@ Component.prototype.surfaces_ = null;
  * @chainable
  */
 Component.prototype.addSurface = function(surfaceId, opt_config) {
-  this.surfaces_[surfaceId] = opt_config || {
-    cacheState: Component.Cache.NOT_INITIALIZED
-  };
+  this.surfaces_[surfaceId] = opt_config || {};
   this.cacheSurfaceRenderAttrs_(surfaceId);
   return this;
 };
@@ -243,7 +241,11 @@ Component.prototype.addSurfacesFromStaticHint_ = function() {
   core.mergeSuperClassesProperty(this.constructor, 'SURFACES', this.mergeSurfaces_);
   this.surfaces_ = {};
   this.surfacesRenderAttrs_ = {};
-  this.addSurfaces(this.constructor.SURFACES_MERGED);
+
+  var configs = this.constructor.SURFACES_MERGED;
+  for (var surfaceId in configs) {
+    this.addSurface(surfaceId, object.mixin({}, configs[surfaceId]));
+  }
 };
 
 /**

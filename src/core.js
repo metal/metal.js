@@ -51,8 +51,8 @@ core.abstractMethod = function() {
  *     invoked as a method of.
  */
 core.bind = function(fn) {
-  if (!fn) {
-    throw new Error();
+  if (!core.isFunction(fn)) {
+    throw new Error('bind failed - the provided parameter is not a valid function.');
   }
 
   if (Function.prototype.bind) {
@@ -354,8 +354,8 @@ core.nullFunction = function() {};
  *     invoked as a method of.
  */
 core.rbind = function(fn, context) {
-  if (!fn) {
-    throw new Error();
+  if (!core.isFunction(fn)) {
+    throw new Error('rbind failed - the provided parameter is not a valid function.');
   }
 
   if (arguments.length > 2) {

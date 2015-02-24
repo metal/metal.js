@@ -2,6 +2,7 @@
 
 import {async} from '../../src/promise/Promise';
 import core from '../../src/core';
+import dom from '../../src/dom/dom';
 import SoyComponent from '../../src/component/SoyComponent';
 
 describe('SoyComponent', function() {
@@ -90,6 +91,83 @@ describe('SoyComponent', function() {
       assert.strictEqual('<p>Hello World 2</p>', surfaceElement.innerHTML);
       done();
     });
+  });
+
+  it('should attach events via delegate when specified in the template', function() {
+    var CustomComponent = createCustomComponentClass();
+
+    CustomComponent.ATTRS = {
+      bodyContent: {
+        value: '<div id="innerButton" onclick="handleButtonClick"></div>'
+      },
+      footerContent: {
+        value: 'Hello World from footer'
+      },
+      headerContent: {
+        value: 'Hello World from header'
+      }
+    };
+
+    CustomComponent.SURFACES = {
+      body: {
+        renderAttrs: ['bodyContent']
+      },
+      header: {
+        renderAttrs: ['headerContent']
+      },
+      footer: {
+        renderAttrs: ['footerContent']
+      }
+    };
+
+    CustomComponent.TEMPLATES = {
+      element: function(data) {
+        return {
+          content: '<div id="' + data.id + '-header" onclick="handleClick"></div>' +
+            '<div id="' + data.id + '-body" onclick="handleClick"></div>' +
+            '<div id="' + data.id + '-footer" onclick="handleClick"></div>'
+        };
+      },
+      body: function(data) {
+        return {
+          content: '<div>' + data.bodyContent + '</div>'
+        };
+      },
+      header: function(data) {
+        return {
+          content: '<p>' + data.headerContent + '</p>'
+        };
+      },
+      footer: function(data) {
+        return {
+          content: '<p>' + data.footerContent + '</p>'
+        };
+      }
+    };
+
+    var custom = new CustomComponent();
+    custom.handleClick = sinon.stub();
+    custom.handleButtonClick = sinon.stub();
+    custom.render();
+
+    var testEvents = function() {
+      var headerElement = custom.getSurfaceElement('header');
+      dom.triggerEvent(headerElement, 'click');
+
+      var footerElement = custom.getSurfaceElement('footer');
+      dom.triggerEvent(footerElement, 'click');
+
+      var innerButton = custom.getSurfaceElement('body').querySelector('#innerButton');
+      dom.triggerEvent(innerButton, 'click');
+
+      assert.ok(custom.handleClick.calledThrice, 'Click on parent element should trigger click event');
+      assert.ok(custom.handleButtonClick.calledOnce, 'Click on child element should trigger click event');
+    };
+
+    testEvents();
+    custom.detach();
+    custom.attach();
+    testEvents();
   });
 
   function createCustomComponentClass() {

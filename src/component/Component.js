@@ -670,7 +670,7 @@ Component.prototype.removeSurface = function(surfaceId) {
  * @chainable
  */
 Component.prototype.render = function(opt_parentElement, opt_siblingElement) {
-  if (this.inDocument) {
+  if (this.wasRendered_) {
     throw new Error(Component.Error.ALREADY_RENDERED);
   }
 
@@ -681,6 +681,9 @@ Component.prototype.render = function(opt_parentElement, opt_siblingElement) {
   this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
 
   this.attach(opt_parentElement, opt_siblingElement);
+
+  this.wasRendered_ = true;
+
   return this;
 };
 
@@ -727,9 +730,7 @@ Component.prototype.renderSurfaceContent = function(surfaceId, content) {
       cacheState === Component.Cache.NOT_CACHEABLE ||
       cacheState !== surface.cacheState) {
 
-      var el = this.getSurfaceElement(surfaceId);
-      dom.removeChildren(el);
-      dom.append(el, content);
+      this.replaceSurfaceContent_(surfaceId, content);
     }
     surface.cacheState = cacheState;
   }
@@ -745,6 +746,19 @@ Component.prototype.renderSurfacesContent_ = function(surfaces) {
   for (var surfaceId in surfaces) {
     this.renderSurfaceContent(surfaceId, this.getSurfaceContent_(surfaceId));
   }
+};
+
+/**
+ * Replaces the content of a surface with a new one.
+ * @param {string} surfaceId The surface id.
+ * @param {Object|string} content The content to be rendered.
+ * @protected
+ */
+Component.prototype.replaceSurfaceContent_ = function(surfaceId, content) {
+  var el = this.getSurfaceElement(surfaceId);
+
+  dom.removeChildren(el);
+  dom.append(el, content);
 };
 
 /**

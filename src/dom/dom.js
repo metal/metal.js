@@ -87,7 +87,7 @@ dom.handleDelegateEvent_ = function(selector, callback, event) {
   var returnValue = true;
 
   while (currentElement && !event.stopped) {
-    if (dom.match(currentElement, selector)) {
+    if (currentElement === selector || (core.isString(selector) && dom.match(currentElement, selector))) {
       event.delegateTarget = currentElement;
       returnValue &= callback(event);
     }

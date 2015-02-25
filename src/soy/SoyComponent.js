@@ -4,10 +4,19 @@ import core from '../core';
 import dom from '../dom/dom';
 import object from '../object/object';
 import Component from '../component/Component';
+import ComponentCollector from '../component/ComponentCollector';
+import ComponentRegistry from '../component/ComponentRegistry';
 import DomVisitor from '../dom/DomVisitor';
 import EventsCollector from '../component/EventsCollector';
 
 import './SoyComponent.soy';
+
+/**
+ * We need to listen to calls to the SoyComponent template so we can use them to
+ * properly instantiate and update child components defined through soy.
+ * TODO: Switch to using proper AOP.
+ */
+var originalTemplate = ComponentRegistry.Templates.SoyComponent.component;
 
 /**
  * Special Component class that handles a better integration between soy templates
@@ -23,11 +32,33 @@ class SoyComponent extends Component {
     super(opt_config);
 
     /**
+     * Holds a `ComponentCollector` that will extract inner components.
+     * @type {!ComponentCollector}
+     * @protected
+     */
+    this.componentCollector_ = new ComponentCollector();
+
+    /**
+     * Holds the this component's child components.
+     * @type {!Object<string, !Component>}
+     * @protected
+     */
+    this.components_ = {};
+
+    /**
      * Holds events that were listened through the element.
-     * @type {EventHandler}
+     * @type {!EventHandler}
      * @protected
      */
     this.eventsCollector_ = null;
+
+    /**
+     * Stores the arguments that were passed to the last call to the SoyComponent
+     * template for each component instance (mapped by its ref).
+     * @type {!Object}
+     * @protected
+     */
+    this.lastComponentTemplateCall_ = {};
 
     core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
   }
@@ -39,9 +70,16 @@ class SoyComponent extends Component {
   attach(opt_parentElement, opt_siblingElement) {
     var eventsCollector = this.getEventsCollector_();
     eventsCollector.detachAllListeners();
+
+    var extractComponents = this.componentCollector_.extractComponents.bind(this.componentCollector_);
     DomVisitor.visit(this.element)
       .addHandler(eventsCollector.attachListeners.bind(eventsCollector))
+      .addHandler(extractComponents, this.lastComponentTemplateCall_)
       .start();
+
+    this.components_ = this.componentCollector_.getComponents();
+    this.lastComponentTemplateCall_ = {};
+
     super.attach(opt_parentElement, opt_siblingElement);
     return this;
   }
@@ -78,11 +116,20 @@ class SoyComponent extends Component {
   getSurfaceContent_(surfaceId) {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
-      return surfaceTemplate(this).content;
-    }
-    else {
+      return this.renderTemplate_(surfaceTemplate);
+    } else {
       return super.getSurfaceContent_(surfaceId);
     }
+  }
+
+  /**
+   * Handles a call to the SoyComponent template.
+   * @param {!Object} data The data the template was called with.
+   * @return {string} The original return value of the template.
+   */
+  handleTemplateCall_(data) {
+    this.lastComponentTemplateCall_[data.ref] = data;
+    return originalTemplate.apply(originalTemplate, arguments);
   }
 
   /**
@@ -98,34 +145,70 @@ class SoyComponent extends Component {
   /**
    * Overrides the behavior of this method to automatically render the element
    * template if it's defined and to automatically attach listeners to all
-   * specified events by the user in the template.
+   * specified events by the user in the template. Also handles any calls to
+   * component templates.
    * @override
    */
   renderInternal() {
     var elementTemplate = this.constructor.TEMPLATES_MERGED.element;
     if (core.isFunction(elementTemplate)) {
-      dom.append(this.element, elementTemplate(this).content);
+      dom.append(this.element, this.renderTemplate_(elementTemplate));
     }
   }
 
   /**
-   * Replaces the content of a surface with a new one.
+   * Overrides the default behavior of `renderSurfaceContent` to also
+   * handle calls to component templates done by the surface's template.
    * @param {string} surfaceId The surface id.
    * @param {Object|string} content The content to be rendered.
-   * @protected
    * @override
    */
-  replaceSurfaceContent_(surfaceId, content) {
-    var frag = dom.buildFragment(content);
+  renderSurfaceContent(surfaceId, content) {
+    super.renderSurfaceContent(surfaceId, content);
+
     if (this.inDocument) {
-      var elementId = this.makeSurfaceId_(surfaceId);
       var eventsCollector = this.getEventsCollector_();
-      eventsCollector.detachListeners(elementId);
-      DomVisitor.visit(frag)
-        .addHandler(eventsCollector.attachListeners.bind(eventsCollector))
-        .start();
+      eventsCollector.detachListeners(this.makeSurfaceId_(surfaceId));
+
+      var visitor = DomVisitor.visit(this.getSurfaceElement(surfaceId))
+        .addHandler(eventsCollector.attachListeners.bind(eventsCollector));
+
+      if (this.getSurface(surfaceId).cacheMiss) {
+        visitor.addHandler(
+          this.componentCollector_.extractComponents.bind(this.componentCollector_),
+          this.lastComponentTemplateCall_
+        );
+      } else {
+        this.updateComponents_();
+      }
+      this.lastComponentTemplateCall_ = {};
+
+      visitor.start();
+      this.components_ = this.componentCollector_.getComponents();
     }
-    super.replaceSurfaceContent_(surfaceId, frag);
+  }
+
+  /**
+   * Renders the specified template.
+   * @param {!function()} templateFn [description]
+   * @return {string} The template's result content.
+   */
+  renderTemplate_(templateFn) {
+    ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
+    var content = templateFn(this, null, {}).content;
+    ComponentRegistry.Templates.SoyComponent.component = originalTemplate;
+    return content;
+  }
+
+  /**
+   * Updates all inner components with their last template call data.
+   * @protected
+   */
+  updateComponents_() {
+    for (var ref in this.lastComponentTemplateCall_) {
+      var data = this.lastComponentTemplateCall_[ref];
+      this.components_[data.ref].setAttrs(data.data);
+    }
   }
 }
 

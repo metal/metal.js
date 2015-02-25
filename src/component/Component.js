@@ -649,10 +649,10 @@ class Component extends Attribute {
       var surface = this.getSurface(surfaceId);
       var cacheState = this.computeSurfaceCacheState_(content);
 
-      if (cacheState === Component.Cache.NOT_INITIALIZED ||
+      surface.cacheMiss = cacheState === Component.Cache.NOT_INITIALIZED ||
         cacheState === Component.Cache.NOT_CACHEABLE ||
-        cacheState !== surface.cacheState) {
-
+        cacheState !== surface.cacheState;
+      if (surface.cacheMiss) {
         this.replaceSurfaceContent_(surfaceId, content);
       }
       surface.cacheState = cacheState;

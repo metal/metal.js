@@ -1,7 +1,10 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
+import ComponentRegistry from '../../src/component/ComponentRegistry';
 import SoyComponent from '../../src/soy/SoyComponent';
+
+var SoyTemplates = ComponentRegistry.Templates.SoyComponent;
 
 describe('SoyComponent', function() {
   afterEach(function() {
@@ -88,6 +91,114 @@ describe('SoyComponent', function() {
     async.nextTick(function() {
       assert.strictEqual('<p>Hello World 2</p>', surfaceElement.innerHTML);
       done();
+    });
+  });
+
+  describe('Child Components', function() {
+    beforeEach(function() {
+      var ChildComponent = createCustomComponentClass();
+      ComponentRegistry.register('ChildComponent', ChildComponent);
+      ChildComponent.ATTRS = {
+        bar: {
+          value: ''
+        }
+      };
+
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        count: {
+          value: 1
+        },
+        foo: {
+          value: 'bar'
+        }
+      };
+      CustomComponent.SURFACES = {
+        component: {
+          renderAttrs: ['foo', 'count']
+        }
+      };
+      CustomComponent.TEMPLATES = {
+        element: function(data) {
+          return {
+            content: '<div id="' + data.id + '-component"></div>'
+          };
+        },
+        component: function(data) {
+          var result = {content: ''};
+          for (var i = 0; i < data.count; i++) {
+            var childData = {
+              data: {bar: data.foo},
+              name: 'ChildComponent',
+              parentId: data.id,
+              ref: 'myChild' + i
+            };
+            result.content += SoyTemplates.component(childData, null, {});
+          }
+          return result;
+        }
+      };
+
+      this.ChildComponent = ChildComponent;
+      this.CustomComponent = CustomComponent;
+    });
+
+    it('should instantiate rendered child component', function() {
+      var custom = new this.CustomComponent();
+      custom.render();
+
+      var child = custom.components_.myChild0;
+      assert.ok(child);
+      assert.strictEqual(this.ChildComponent, child.constructor);
+      assert.strictEqual('bar', child.bar);
+      assert.ok(custom.element.querySelector('#' + child.id));
+    });
+
+    it('should update rendered child component', function(done) {
+      var test = this;
+      var custom = new this.CustomComponent();
+      custom.render();
+
+      custom.foo = 'bar2';
+      custom.on('attrsChanged', function() {
+        var child = custom.components_.myChild0;
+        assert.ok(child);
+        assert.strictEqual(test.ChildComponent, child.constructor);
+        assert.strictEqual('bar2', child.bar);
+        assert.ok(custom.element.querySelector('#' + child.id));
+
+        done();
+      });
+    });
+
+    it('should reuse previously rendered component instances', function(done) {
+      var custom = new this.CustomComponent();
+      custom.render();
+
+      var prevChild = custom.components_.myChild0;
+      custom.count = 2;
+      custom.on('attrsChanged', function() {
+        assert.strictEqual(prevChild, custom.components_.myChild0);
+        assert.ok(custom.components_.myChild1);
+        assert.notStrictEqual(prevChild, custom.components_.myChild1);
+        done();
+      });
+    });
+
+    it('should ignore component elements that were not rendered via a SoyTemplate call', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.TEMPLATES = {
+        element: function() {
+          return {
+            content: '<div data-ref="myChild0" data-component="ChildComponent"></div>'
+          };
+        }
+      };
+
+      var custom = new CustomComponent();
+      custom.render();
+
+      assert.ok(!custom.components_.myChild0);
     });
   });
 

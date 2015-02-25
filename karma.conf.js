@@ -6,11 +6,13 @@ module.exports = function(config) {
 
     jspm: {
       // ES6 files need to go through jspm for module loading.
-      loadFiles: ['src/**/*.js', 'test/**/*.js']
+      loadFiles: ['test/**/*.js'],
+      serveFiles: ['src/**/*.js']
     },
 
     files: [
-      'test/html/fixture/*.html',
+      'node_modules/closure-templates/soyutils.js',
+      'test/html/fixture/*.html'
     ],
 
     preprocessors: {

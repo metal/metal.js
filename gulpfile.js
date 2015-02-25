@@ -5,5 +5,6 @@ var registerTasks = require('alloyui-tasks');
 
 registerTasks({
   bundleFileName: 'aui.js',
+  corePathFromSoy: '../',
   pkg: pkg
 });

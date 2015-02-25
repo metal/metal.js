@@ -6,6 +6,8 @@ import object from '../object/object';
 import Component from '../component/Component';
 import EventsCollector from '../component/EventsCollector';
 
+import './SoyComponent.soy';
+
 /**
  * Special Component class that handles a better integration between soy templates
  * and the components. It allows for automatic rendering of surfaces that have soy

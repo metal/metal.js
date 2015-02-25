@@ -8,7 +8,8 @@
   "evil": false,
   "forin": false,
   "globals": {
-    "lfr": true
+    "lfr": true,
+    "soy": true
   },
   "immed": true,
   "indent": 2,

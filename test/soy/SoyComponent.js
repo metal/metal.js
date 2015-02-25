@@ -1,7 +1,7 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
-import SoyComponent from '../../src/component/SoyComponent';
+import SoyComponent from '../../src/soy/SoyComponent';
 
 describe('SoyComponent', function() {
   afterEach(function() {

@@ -2,8 +2,8 @@
 
 import {async} from '../../src/promise/Promise';
 import dom from '../../src/dom/dom';
-import SoyComponent from '../../src/component/SoyComponent';
 import EventsCollector from '../../src/component/EventsCollector';
+import SoyComponent from '../../src/soy/SoyComponent';
 
 describe('EventsCollector', function() {
   afterEach(function() {

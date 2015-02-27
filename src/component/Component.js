@@ -207,6 +207,12 @@ Component.prototype.inDocument = false;
 Component.prototype.surfaces_ = null;
 
 /**
+ * Whether the element was rendered.
+ * @type {Boolean}
+ */
+Component.prototype.wasRendered = false;
+
+/**
  * Registers a surface to the component. Surface elements are not
  * automatically appended to the component element.
  * @param {string} surfaceId The surface id to be registered.
@@ -554,7 +560,7 @@ Component.prototype.getSurfaceElement = function(surfaceId) {
   if (!surface.element) {
     var surfaceElementId = this.makeSurfaceId_(surfaceId);
     surface.element = document.getElementById(surfaceElementId) ||
-    this.element.querySelector('#' + surfaceElementId) ||
+      this.element.querySelector('#' + surfaceElementId) ||
     this.createSurfaceElement_(surfaceElementId);
   }
   return surface.element;
@@ -674,7 +680,7 @@ Component.prototype.removeSurface = function(surfaceId) {
  * @chainable
  */
 Component.prototype.render = function(opt_parentElement, opt_siblingElement) {
-  if (this.wasRendered_) {
+  if (this.wasRendered) {
     throw new Error(Component.Error.ALREADY_RENDERED);
   }
 
@@ -686,7 +692,7 @@ Component.prototype.render = function(opt_parentElement, opt_siblingElement) {
 
   this.attach(opt_parentElement, opt_siblingElement);
 
-  this.wasRendered_ = true;
+  this.wasRendered = true;
 
   return this;
 };
@@ -755,12 +761,11 @@ Component.prototype.renderSurfacesContent_ = function(surfaces) {
 /**
  * Replaces the content of a surface with a new one.
  * @param {string} surfaceId The surface id.
- * @param {Object|string} content The content to be rendered.
+ * @param {Element|string} content The content to be rendered.
  * @protected
  */
 Component.prototype.replaceSurfaceContent_ = function(surfaceId, content) {
   var el = this.getSurfaceElement(surfaceId);
-
   dom.removeChildren(el);
   dom.append(el, content);
 };

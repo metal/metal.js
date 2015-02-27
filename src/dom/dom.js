@@ -72,13 +72,13 @@ dom.delegate = function(element, eventName, selector, callback) {
 /**
  * This is called when an event is triggered by a delegate listener (see
  * `dom.delegate` for more details).
- * @param {string} selector The selector that matches the child elements that
- *   the event should be triggered for.
- * @param {!function(!Object)} callback Function to be called when the event is
- *   triggered. It will receive the normalized event object.
+ * @param {string} selector The selector or element that matches the child
+ *   elements that the event should be triggered for.
+ * @param {!function(!Object)} callback Function to be called when the event
+ *   is triggered. It will receive the normalized event object.
  * @param {!Event} event The event payload.
- * @return {boolean} False if at least one of the triggered callbacks returns false,
- *   or true otherwise.
+ * @return {boolean} False if at least one of the triggered callbacks returns
+ *   false, or true otherwise.
  */
 dom.handleDelegateEvent_ = function(selector, callback, event) {
   dom.normalizeDelegateEvent_(event);

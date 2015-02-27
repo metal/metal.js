@@ -77,11 +77,13 @@ describe('Component', function() {
       sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 
       custom.detach();
+      custom.detach(); // Allow multiple
       assert.strictEqual(null, document.getElementById(custom.id));
       assert.strictEqual(false, custom.inDocument);
       sinon.assert.callCount(CustomComponent.prototype.detached, 1);
 
       custom.attach();
+      custom.attach(); // Allow multiple
       assert.notStrictEqual(null, document.getElementById(custom.id));
       assert.strictEqual(true, custom.inDocument);
       sinon.assert.callCount(CustomComponent.prototype.attached, 2);

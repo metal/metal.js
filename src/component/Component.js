@@ -263,9 +263,11 @@ Component.prototype.addSurfacesFromStaticHint_ = function() {
  * @chainable
  */
 Component.prototype.attach = function(opt_parentElement, opt_siblingElement) {
-  this.renderElement_(opt_parentElement, opt_siblingElement);
-  this.inDocument = true;
-  this.attached();
+  if (!this.inDocument) {
+    this.renderElement_(opt_parentElement, opt_siblingElement);
+    this.inDocument = true;
+    this.attached();
+  }
   return this;
 };
 
@@ -367,9 +369,11 @@ Component.prototype.delegate = function(eventName, selector, callback) {
  * @chainable
  */
 Component.prototype.detach = function() {
-  this.element.parentNode.removeChild(this.element);
-  this.inDocument = false;
-  this.detached();
+  if (this.inDocument) {
+    this.element.parentNode.removeChild(this.element);
+    this.inDocument = false;
+    this.detached();
+  }
   return this;
 };
 

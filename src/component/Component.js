@@ -466,6 +466,18 @@ Component.prototype.disposeInternal = function() {
 };
 
 /**
+ * Extracts the surfaceId from the elementId.
+ * @param {Element} element
+ * @return {?string}
+ */
+Component.prototype.extractSurfaceId_ = function(elementId) {
+  var separator = elementId.indexOf('-');
+  if ((separator > -1) && (elementId.substring(0, separator) === this.id)) {
+    return elementId.substring(separator + 1);
+  }
+};
+
+/**
  * Fires attributes synchronization changes for attributes registered on
  * `ATTRS_SYNC` static hint.
  * @param {Object.<string, Object>} changes Object containing the attribute

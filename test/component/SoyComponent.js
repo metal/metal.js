@@ -145,29 +145,39 @@ describe('SoyComponent', function() {
       }
     };
 
-    var custom = new CustomComponent();
-    custom.handleClick = sinon.stub();
-    custom.handleButtonClick = sinon.stub();
-    custom.render();
-
-    var testEvents = function() {
-      var headerElement = custom.getSurfaceElement('header');
+    var testEvents = function(instance) {
+      var headerElement = instance.getSurfaceElement('header');
       dom.triggerEvent(headerElement, 'click');
 
-      var footerElement = custom.getSurfaceElement('footer');
+      var footerElement = instance.getSurfaceElement('footer');
       dom.triggerEvent(footerElement, 'click');
 
-      var innerButton = custom.getSurfaceElement('body').querySelector('#innerButton');
+      var innerButton = instance.getSurfaceElement('body').querySelector('#innerButton');
       dom.triggerEvent(innerButton, 'click');
 
-      assert.ok(custom.handleClick.calledThrice, 'Click on parent element should trigger click event');
-      assert.ok(custom.handleButtonClick.calledOnce, 'Click on child element should trigger click event');
+      assert.ok(instance.handleClick.calledThrice, 'Click on parent element should trigger click event');
+      assert.ok(instance.handleButtonClick.calledOnce, 'Click on child element should trigger click event');
     };
 
-    testEvents();
-    custom.detach();
-    custom.attach();
-    testEvents();
+    var customRender = new CustomComponent();
+    customRender.handleClick = sinon.stub();
+    customRender.handleButtonClick = sinon.stub();
+    customRender.render();
+
+    testEvents(customRender);
+    customRender.detach();
+    customRender.attach();
+    testEvents(customRender);
+    customRender.dispose();
+
+    var customDecorate = new CustomComponent();
+    customDecorate.handleClick = sinon.stub();
+    customDecorate.handleButtonClick = sinon.stub();
+    customDecorate.renderInternal(); // Manual invoke to prepare surfaces.
+    customDecorate.decorate();
+
+    testEvents(customDecorate);
+    customDecorate.dispose();
   });
 
   function createCustomComponentClass() {

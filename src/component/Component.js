@@ -605,7 +605,7 @@ Component.prototype.handleAttributesChanges_ = function(event) {
  * @protected
  */
 Component.prototype.makeId_ = function() {
-  return 'lfr_c_' + core.getUid(this);
+  return 'aui_c_' + core.getUid(this);
 };
 
 /**

@@ -25,8 +25,8 @@ var EventsCollector = function(component) {
 core.inherits(EventsCollector, Disposable);
 
 /**
- * [component_ description]
- * @type {[type]}
+ * Holds the component intance.
+ * @type {Component}
  */
 EventsCollector.prototype.component_ = null;
 
@@ -53,10 +53,11 @@ EventsCollector.prototype.attachListeners_ = function(collectedEvents) {
 };
 
 /**
- * [collect description]
- * @param  {[type]} groupName   [description]
- * @param  {[type]} rootElement [description]
- * @return {[type]}             [description]
+ * Visits all `rootElement` children and collects inline events into
+ * `groupName`. For each found surface element a new group element will be
+ * created.
+ * @param {String} groupName
+ * @param {Element} rootElement
  * @chainable
  */
 EventsCollector.prototype.collect = function(groupName, rootElement) {
@@ -121,27 +122,25 @@ EventsCollector.prototype.collectInlineEventsFromAttributes_ = function(groupNam
 };
 
 /**
- * [detachAllListeners description]
- * @return {[type]} [description]
+ * Removes all previously attached event listeners to the component.
  * @chainable
  */
 EventsCollector.prototype.detachAllListeners = function() {
-  for (var elementId in this.eventHandler_) {
-    this.eventHandler_[elementId].removeAllListeners();
+  for (var groupName in this.eventHandler_) {
+    this.eventHandler_[groupName].removeAllListeners();
   }
   this.eventHandler_ = {};
   return this;
 };
 
 /**
- * Removes all previously attached event listeners to the component.
- * @protected
+ * Removes all previously attached event listeners to the group.
  * @chainable
  */
-EventsCollector.prototype.detachListeners = function(elementId) {
-  if (this.eventHandler_[elementId]) {
-    this.eventHandler_[elementId].removeAllListeners();
-    this.eventHandler_[elementId] = null;
+EventsCollector.prototype.detachListeners = function(groupName) {
+  if (this.eventHandler_[groupName]) {
+    this.eventHandler_[groupName].removeAllListeners();
+    this.eventHandler_[groupName] = null;
   }
   return this;
 };

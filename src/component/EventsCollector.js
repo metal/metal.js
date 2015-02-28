@@ -125,7 +125,7 @@ EventsCollector.prototype.collectInlineEventsFromAttributes_ = function(groupNam
  */
 EventsCollector.prototype.detachAllListeners = function() {
   for (var groupName in this.eventHandler_) {
-    this.eventHandler_[groupName].removeAllListeners();
+    this.detachListeners(groupName);
   }
   this.eventHandler_ = {};
   return this;

@@ -471,9 +471,9 @@ Component.prototype.disposeInternal = function() {
  * @return {?string}
  */
 Component.prototype.extractSurfaceId_ = function(elementId) {
-  var separator = elementId.indexOf('-');
-  if ((separator > -1) && (elementId.substring(0, separator) === this.id)) {
-    return elementId.substring(separator + 1);
+  var separator = elementId.indexOf(this.id + '-');
+  if (separator === 0) {
+    return elementId.substring(this.id.length + 1);
   }
 };
 

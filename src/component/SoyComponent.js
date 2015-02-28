@@ -119,8 +119,9 @@ SoyComponent.prototype.renderInternal = function() {
 SoyComponent.prototype.replaceSurfaceContent_ = function(surfaceId, content) {
   var frag = dom.buildFragment(content);
   if (this.inDocument) {
-    this.getEventsCollector_().detachListeners(this.makeSurfaceId_(surfaceId));
-    this.getEventsCollector_().collect(surfaceId, frag);
+    var elementId = this.makeSurfaceId_(surfaceId);
+    this.getEventsCollector_().detachListeners(elementId);
+    this.getEventsCollector_().collect(elementId, frag);
   }
   SoyComponent.base(this, 'replaceSurfaceContent_', surfaceId, frag);
 };

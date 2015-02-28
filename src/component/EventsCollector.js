@@ -93,7 +93,7 @@ EventsCollector.prototype.collectInlineEventsFromAttribute_ = function(groupName
   if ((attribute.name.indexOf('on') === 0) && dom.supportsEvent(element, event)) {
     var surfaceId = this.component_.extractSurfaceId_(element.id);
     if (surfaceId) {
-      groupName = surfaceId;
+      groupName = element.id;
     }
     collectedEvents.push({
       group: groupName,

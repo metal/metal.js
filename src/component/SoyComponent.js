@@ -39,21 +39,22 @@ SoyComponent.prototype.eventsCollector_ = null;
 
 /**
  * @inheritDoc
+ * @override
  */
 SoyComponent.prototype.attach = function(opt_parentElement, opt_siblingElement) {
   this.getEventsCollector_().detachAllListeners();
   this.getEventsCollector_().collect(this.element.id, this.element);
   SoyComponent.base(this, 'attach', opt_parentElement, opt_siblingElement);
+  return this;
 };
 
 /**
- * Detaches any attached event listeners to the component and the surfaces.
+ * @inheritDoc
  * @override
- * @chainable
  */
 SoyComponent.prototype.detach = function() {
-  SoyComponent.base(this, 'detach');
   this.getEventsCollector_().detachAllListeners();
+  SoyComponent.base(this, 'detach');
   return this;
 };
 

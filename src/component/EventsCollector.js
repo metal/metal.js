@@ -6,13 +6,11 @@ import Disposable from '../disposable/Disposable';
 import EventHandler from '../events/EventHandler';
 
 /**
- * Special Component class that handles a better integration between soy templates
- * and the components. It allows for automatic rendering of surfaces that have soy
- * templates defined with their names, skipping the call to `getSurfaceContent`.
- * @param {Object} opt_config An object with the initial values for this component's
- *   attributes.
+ * Collects inline events from an passed element into a group. For each found
+ * surface element a new group element will be created.
+ * @param {Component} component
  * @constructor
- * @extends {Component}
+ * @extends {Disposable}
  */
 var EventsCollector = function(component) {
   if (!component) {

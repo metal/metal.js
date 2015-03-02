@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../core';
 import EventHandle from '../events/EventHandle';
 
 /**
@@ -12,16 +11,17 @@ import EventHandle from '../events/EventHandle';
  * @constructor
  * @extends {EventHandle}
  */
-var DomEventHandle = function(emitter, event, listener) {
-  DomEventHandle.base(this, 'constructor', emitter, event, listener);
-};
-core.inherits(DomEventHandle, EventHandle);
+class DomEventHandle extends EventHandle {
+  constructor(emitter, event, listener) {
+    super(emitter, event, listener);
+  }
 
-/**
- * @inheritDoc
- */
-DomEventHandle.prototype.removeListener = function() {
-  this.emitter_.removeEventListener(this.event_, this.listener_);
-};
+  /**
+   * @inheritDoc
+   */
+  removeListener() {
+    this.emitter_.removeEventListener(this.event_, this.listener_);
+  }
+}
 
 export default DomEventHandle;

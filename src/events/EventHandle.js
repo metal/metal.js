@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../core';
 import Disposable from '../disposable/Disposable';
 
 /**
@@ -15,12 +14,33 @@ import Disposable from '../disposable/Disposable';
  * @constructor
  * @extends {Disposable}
  */
-var EventHandle = function(emitter, event, listener) {
-  this.emitter_ = emitter;
-  this.event_ = event;
-  this.listener_ = listener;
-};
-core.inherits(EventHandle, Disposable);
+class EventHandle extends Disposable {
+  constructor(emitter, event, listener) {
+    super(emitter, event, listener);
+
+    this.emitter_ = emitter;
+    this.event_ = event;
+    this.listener_ = listener;
+  }
+
+  /**
+   * Disposes of this instance's object references.
+   * @override
+   */
+  disposeInternal() {
+    this.emitter_ = null;
+    this.listener_ = null;
+  }
+
+  /**
+   * Removes the listener subscription from the emitter.
+   */
+  removeListener() {
+    if (!this.emitter_.isDisposed()) {
+      this.emitter_.removeListener(this.event_, this.listener_);
+    }
+  }
+}
 
 /**
  * The EventEmitter instance that the event was subscribed to.
@@ -42,23 +62,5 @@ EventHandle.prototype.event_ = null;
  * @protected
  */
 EventHandle.prototype.listener_ = null;
-
-/**
- * Disposes of this instance's object references.
- * @override
- */
-EventHandle.prototype.disposeInternal = function() {
-  this.emitter_ = null;
-  this.listener_ = null;
-};
-
-/**
- * Removes the listener subscription from the emitter.
- */
-EventHandle.prototype.removeListener = function() {
-  if (!this.emitter_.isDisposed()) {
-    this.emitter_.removeListener(this.event_, this.listener_);
-  }
-};
 
 export default EventHandle;

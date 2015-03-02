@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../core';
 import Disposable from '../disposable/Disposable';
 
 /**
@@ -9,10 +8,41 @@ import Disposable from '../disposable/Disposable';
  * @constructor
  * @extends {Disposable}
  */
-var EventHandler = function() {
-  this.eventHandles_ = [];
-};
-core.inherits(EventHandler, Disposable);
+class EventHandler extends Disposable {
+	constructor() {
+  		this.eventHandles_ = [];
+	}
+
+	/**
+	 * Adds event handles to be removed later through the `removeAllListeners`
+	 * method.
+	 * @param {...(!EventHandle)} var_args
+	 */
+	add() {
+	  for (var i = 0; i < arguments.length; i++) {
+	    this.eventHandles_.push(arguments[i]);
+	  }
+	}
+
+	/**
+	 * Disposes of this instance's object references.
+	 * @override
+	 */
+	disposeInternal() {
+	  this.eventHandles_ = null;
+	}
+
+	/**
+	 * Removes all listeners that have been added through the `add` method.
+	 */
+	removeAllListeners() {
+	  for (var i = 0; i < this.eventHandles_.length; i++) {
+	    this.eventHandles_[i].removeListener();
+	  }
+
+	  this.eventHandles_ = [];
+	}
+}
 
 /**
  * An array that holds the added event handles, so the listeners can be
@@ -21,35 +51,5 @@ core.inherits(EventHandler, Disposable);
  * @protected
  */
 EventHandler.prototype.eventHandles_ = null;
-
-/**
- * Adds event handles to be removed later through the `removeAllListeners`
- * method.
- * @param {...(!EventHandle)} var_args
- */
-EventHandler.prototype.add = function() {
-  for (var i = 0; i < arguments.length; i++) {
-    this.eventHandles_.push(arguments[i]);
-  }
-};
-
-/**
- * Disposes of this instance's object references.
- * @override
- */
-EventHandler.prototype.disposeInternal = function() {
-  this.eventHandles_ = null;
-};
-
-/**
- * Removes all listeners that have been added through the `add` method.
- */
-EventHandler.prototype.removeAllListeners = function() {
-  for (var i = 0; i < this.eventHandles_.length; i++) {
-    this.eventHandles_[i].removeListener();
-  }
-
-  this.eventHandles_ = [];
-};
 
 export default EventHandler;

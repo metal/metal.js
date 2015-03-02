@@ -9,7 +9,25 @@ import core from '../core';
  * `disposeInternal` to implement any specific disposing logic.
  * @constructor
  */
-var Disposable = function() {};
+class Disposable {
+  /**
+   * Disposes of this instance's object references. Calls `disposeInternal`.
+   */
+  dispose() {
+    if (!this.disposed_) {
+      this.disposeInternal();
+      this.disposed_ = true;
+    }
+  }
+
+  /**
+   * Checks if this instance has already been disposed.
+   * @return {boolean}
+   */
+  isDisposed() {
+    return this.disposed_;
+  }
+}
 
 /**
  * Flag indicating if this instance has already been disposed.
@@ -19,28 +37,10 @@ var Disposable = function() {};
 Disposable.prototype.disposed_ = false;
 
 /**
- * Disposes of this instance's object references. Calls `disposeInternal`.
- */
-Disposable.prototype.dispose = function() {
-  if (!this.disposed_) {
-    this.disposeInternal();
-    this.disposed_ = true;
-  }
-};
-
-/**
  * Subclasses should override this method to implement any specific
  * disposing logic (like clearing references and calling `dispose` on other
  * disposables).
  */
 Disposable.prototype.disposeInternal = core.nullFunction;
-
-/**
- * Checks if this instance has already been disposed.
- * @return {boolean}
- */
-Disposable.prototype.isDisposed = function() {
-  return this.disposed_;
-};
 
 export default Disposable;

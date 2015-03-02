@@ -7,7 +7,7 @@ import core from '../core';
  * mechanism.
  * @constructor
  */
-var StorageMechanism = function() {};
+class StorageMechanism {}
 
 /**
  * Set a value for a key.

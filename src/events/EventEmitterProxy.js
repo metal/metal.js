@@ -19,15 +19,70 @@ import Disposable from '../disposable/Disposable';
  * @constructor
  * @extends {Disposable}
  */
-var EventEmitterProxy = function(originEmitter, targetEmitter, opt_blacklist) {
-  this.originEmitter_ = originEmitter;
-  this.targetEmitter_ = targetEmitter;
-  this.blacklist_ = opt_blacklist || {};
-  this.proxiedEvents_ = {};
+class EventEmitterProxy extends Disposable {
+  constructor(originEmitter, targetEmitter, opt_blacklist) {
+    super(originEmitter, targetEmitter, opt_blacklist);
 
-  this.startProxy_();
-};
-core.inherits(EventEmitterProxy, Disposable);
+    this.originEmitter_ = originEmitter;
+    this.targetEmitter_ = targetEmitter;
+    this.blacklist_ = opt_blacklist || {};
+    this.proxiedEvents_ = {};
+
+    this.startProxy_();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  disposeInternal() {
+    var removeFnName = core.isElement(this.originEmitter_) ? 'removeEventListener' : 'removeListener';
+    for (var event in this.proxiedEvents_) {
+      this.originEmitter_[removeFnName](event, this.proxiedEvents_[event]);
+    }
+
+    this.proxiedEvents_ = null;
+    this.originEmitter_ = null;
+    this.targetEmitter_ = null;
+  }
+
+  /**
+   * Proxies the given event from the origin to the target emitter.
+   * @param {string} event
+   */
+  proxyEvent_(event) {
+    if (!this.shouldProxyEvent_(event)) {
+      return;
+    }
+
+    var self = this;
+    this.proxiedEvents_[event] = function() {
+      var args = [event].concat(Array.prototype.slice.call(arguments, 0));
+      self.targetEmitter_.emit.apply(self.targetEmitter_, args);
+    };
+
+    var addFnName = core.isElement(this.originEmitter_) ? 'addEventListener' : 'on';
+    this.originEmitter_[addFnName](event, this.proxiedEvents_[event]);
+  }
+
+  /**
+   * Checks if the given event should be proxied.
+   * @param {string} event
+   * @return {boolean}
+   * @protected
+   */
+  shouldProxyEvent_(event) {
+    return !this.proxiedEvents_[event] && !this.blacklist_[event] &&
+      (!core.isElement(this.originEmitter_) || dom.supportsEvent(this.originEmitter_, event));
+  }
+
+  /**
+   * Starts proxying all events from the origin to the target emitter.
+   * @protected
+   */
+  startProxy_() {
+    this.targetEmitter_.on('newListener', core.bind(this.proxyEvent_, this));
+  }
+}
 
 /**
  * Map of events that should not be proxied.
@@ -62,57 +117,5 @@ EventEmitterProxy.prototype.proxiedEvents_ = null;
  * @protected
  */
 EventEmitterProxy.prototype.targetEmitter_ = null;
-
-/**
- * @inheritDoc
- */
-EventEmitterProxy.prototype.disposeInternal = function() {
-  var removeFnName = core.isElement(this.originEmitter_) ? 'removeEventListener' : 'removeListener';
-  for (var event in this.proxiedEvents_) {
-    this.originEmitter_[removeFnName](event, this.proxiedEvents_[event]);
-  }
-
-  this.proxiedEvents_ = null;
-  this.originEmitter_ = null;
-  this.targetEmitter_ = null;
-};
-
-/**
- * Proxies the given event from the origin to the target emitter.
- * @param {string} event
- */
-EventEmitterProxy.prototype.proxyEvent_ = function(event) {
-  if (!this.shouldProxyEvent_(event)) {
-    return;
-  }
-
-  var self = this;
-  this.proxiedEvents_[event] = function() {
-    var args = [event].concat(Array.prototype.slice.call(arguments, 0));
-    self.targetEmitter_.emit.apply(self.targetEmitter_, args);
-  };
-
-  var addFnName = core.isElement(this.originEmitter_) ? 'addEventListener' : 'on';
-  this.originEmitter_[addFnName](event, this.proxiedEvents_[event]);
-};
-
-/**
- * Checks if the given event should be proxied.
- * @param {string} event
- * @return {boolean}
- * @protected
- */
-EventEmitterProxy.prototype.shouldProxyEvent_ = function(event) {
-  return !this.proxiedEvents_[event] && !this.blacklist_[event] &&
-    (!core.isElement(this.originEmitter_) || dom.supportsEvent(this.originEmitter_, event));
-};
-
-/**
- * Starts proxying all events from the origin to the target emitter.
- * @protected
- */
-EventEmitterProxy.prototype.startProxy_ = function() {
-  this.targetEmitter_.on('newListener', core.bind(this.proxyEvent_, this));
-};
 
 export default EventEmitterProxy;

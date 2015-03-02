@@ -89,9 +89,6 @@ describe('XhrTransport', function() {
   it('should queue pending requests', function(done) {
     var transport = new XhrTransport('http://liferay.com');
 
-    var stubMessage = sinon.stub();
-    transport.on('message', stubMessage);
-
     transport.open();
     transport.on('open', function() {
       transport.send();
@@ -280,6 +277,42 @@ describe('XhrTransport', function() {
       // Should abort xhr synchronously
       transport.dispose();
       assert.ok(XMLHttpRequest.requests[0].aborted);
+      done();
+    });
+  });
+
+  it('should send GET request message as query string', function(done) {
+    var transport = new XhrTransport('http://liferay.com');
+    transport.open();
+    var message = 'message part';
+    transport.send(message, {
+      method: 'GET'
+    });
+    transport.on('message', function(data) {
+      assert.strictEqual(1, XMLHttpRequest.requests.length);
+      var request = XMLHttpRequest.requests[0];
+      assert.strictEqual('GET', request.method);
+      assert.strictEqual('http://liferay.com?data=message%20part', request.uri);
+      assert.strictEqual(message, data);
+      done();
+    });
+  });
+
+  it('should send GET request data as query string', function(done) {
+    var transport = new XhrTransport('http://liferay.com');
+    transport.open();
+    var message = {
+      key: 'message part'
+    };
+    transport.send(message, {
+      method: 'GET'
+    });
+    transport.on('message', function(data) {
+      assert.strictEqual(1, XMLHttpRequest.requests.length);
+      var request = XMLHttpRequest.requests[0];
+      assert.strictEqual('GET', request.method);
+      assert.strictEqual('http://liferay.com?key=message%20part', request.uri);
+      assert.strictEqual(message, data);
       done();
     });
   });

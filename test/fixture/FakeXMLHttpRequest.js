@@ -18,8 +18,9 @@ var createFakeXMLHttpRequest = function(status, responseText) {
     this.aborted = true;
   };
 
-  FakeXMLHttpRequest.prototype.open = function(method) {
+  FakeXMLHttpRequest.prototype.open = function(method, uri) {
     this.method = method;
+    this.uri = uri;
   };
 
   FakeXMLHttpRequest.prototype.send = function(body) {

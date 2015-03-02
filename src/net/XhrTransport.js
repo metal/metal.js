@@ -51,24 +51,6 @@ XhrTransport.ResponseTypes = {
 XhrTransport.prototype.sendInstances_ = null;
 
 /**
- * Makes a XMLHttpRequest instance already open.
- * @param {!Object} config
- * @param {function(!Object)} successFn
- * @param {function(!Object)} errorFn
- * @return {XMLHttpRequest}
- * @protected
- */
-XhrTransport.prototype.createXhr_ = function(config, successFn, errorFn) {
-  var xhr = new XMLHttpRequest();
-  xhr.onload = core.bind(this.onXhrLoad_, this, xhr, config, successFn);
-  xhr.onerror = core.bind(this.onXhrError_, this, xhr, errorFn);
-  this.openXhr_(xhr, config.method);
-  this.setXhrHttpHeaders_(xhr, config.headers);
-
-  return xhr;
-};
-
-/**
  * @inheritDoc
  */
 XhrTransport.prototype.close = function() {
@@ -172,13 +154,22 @@ XhrTransport.prototype.open = function() {
 };
 
 /**
- * Opens the given xhr request.
- * @param {!XMLHttpRequest} xhr The xhr request to open.
- * @param {string} method Optional method to override the default.
- * @protected
+ * Serializes message as query string.
+ * @param {*} message
+ * @param @param {!Object} config
+ * @return {string}
  */
-XhrTransport.prototype.openXhr_ = function(xhr, method) {
-  xhr.open(method, this.getUri(), true);
+XhrTransport.prototype.serializeMessageAsQueryString = function(message, config) {
+  if (!core.isObject(message)) {
+    message = {
+      data: message
+    };
+  }
+  var query = '';
+  for (var key in message) {
+    query += key + '=' + encodeURIComponent(this.encodeData(message[key], config)) + '&';
+  }
+  return query.slice(0, -1);
 };
 
 /**
@@ -197,11 +188,24 @@ XhrTransport.prototype.setXhrHttpHeaders_ = function(xhr, headers) {
  * @inheritDoc
  */
 XhrTransport.prototype.write = function(message, config, opt_success, opt_error) {
-  var xhr = this.createXhr_(config, opt_success, opt_error);
-  this.sendInstances_.push(xhr);
+  var xhr = new XMLHttpRequest();
+  xhr.onload = core.bind(this.onXhrLoad_, this, xhr, config, opt_success);
+  xhr.onerror = core.bind(this.onXhrError_, this, xhr, opt_error);
 
-  message = this.encodeData(message, config);
+  var uri = this.getUri();
+
+  if (config.method.toUpperCase() === 'GET') {
+    uri += (uri.indexOf('?') > -1) ? '&' : '?';
+    uri += this.serializeMessageAsQueryString(message, config);
+  }
+  else {
+    message = this.encodeData(message, config);
+  }
+
+  xhr.open(config.method, uri, true);
+  this.setXhrHttpHeaders_(xhr, config.headers);
   this.emitAsync_('message', message);
+  this.sendInstances_.push(xhr);
   xhr.send(message);
 };
 

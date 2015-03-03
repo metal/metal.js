@@ -13,7 +13,7 @@ import EventEmitter from '../events/EventEmitter';
  */
 class Transport extends EventEmitter {
   constructor(uri) {
-    super(uri);
+    super();
 
     if (!core.isDef(uri)) {
       throw new Error('Transport uri not specified');

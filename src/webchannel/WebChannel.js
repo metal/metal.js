@@ -18,7 +18,7 @@ import WebSocketTransport from '../net/WebSocketTransport';
  */
 class WebChannel extends EventEmitter {
   constructor(opt_transport) {
-    super(opt_transport);
+    super();
 
     if (!opt_transport) {
       opt_transport = new WebSocketTransport(window.location.origin + window.location.pathname);

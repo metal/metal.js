@@ -12,8 +12,6 @@ import Disposable from '../disposable/Disposable';
  */
 class Trie extends Disposable {
   constructor(value) {
-    super(value);
-
     this.value_ = value;
     this.children_ = {};
   }

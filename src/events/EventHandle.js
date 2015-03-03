@@ -16,8 +16,6 @@ import Disposable from '../disposable/Disposable';
  */
 class EventHandle extends Disposable {
   constructor(emitter, event, listener) {
-    super(emitter, event, listener);
-
     this.emitter_ = emitter;
     this.event_ = event;
     this.listener_ = listener;

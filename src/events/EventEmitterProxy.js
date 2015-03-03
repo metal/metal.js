@@ -21,8 +21,6 @@ import Disposable from '../disposable/Disposable';
  */
 class EventEmitterProxy extends Disposable {
   constructor(originEmitter, targetEmitter, opt_blacklist) {
-    super(originEmitter, targetEmitter, opt_blacklist);
-
     this.originEmitter_ = originEmitter;
     this.targetEmitter_ = targetEmitter;
     this.blacklist_ = opt_blacklist || {};

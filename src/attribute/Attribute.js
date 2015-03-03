@@ -15,7 +15,7 @@ import {async} from '../promise/Promise';
  */
 class Attribute extends EventEmitter {
   constructor(opt_config) {
-    super(opt_config);
+    super();
 
     this.attrsInfo_ = {};
     this.addAttrsFromStaticHint_(opt_config);

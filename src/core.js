@@ -133,12 +133,22 @@ class core {
    * @param {!function()} constructor Class constructor.
    * @param {string} propertyName Property name to be collected.
    * @return {Array.<*>} Array of collected values.
+   * TODO(*): Rethink superclass loop.
    */
   static collectSuperClassesProperty(constructor, propertyName) {
     var propertyValues = [constructor[propertyName]];
-    while (constructor.superClass_) {
-      constructor = constructor.superClass_.constructor;
-      propertyValues.push(constructor[propertyName]);
+
+    if (constructor.superClass_) {
+      while (constructor.superClass_) {
+        constructor = constructor.superClass_.constructor;
+        propertyValues.push(constructor[propertyName]);
+      }
+    }
+    else {
+      while (!constructor.__proto__.isPrototypeOf(Function)) {
+        constructor = constructor.__proto__;
+        propertyValues.push(constructor[propertyName]);
+      }
     }
     return propertyValues;
   }

@@ -1,13 +1,13 @@
 'use strict';
 
-import core from '../../src/core';
 import EventEmitter from '../../src/events/EventEmitter';
 
 var createFakeSocketIO = function() {
-  var FakeSocketIO = function() {
-    FakeSocketIO.base(this, 'constructor');
-  };
-  core.inherits(FakeSocketIO, EventEmitter);
+  class FakeSocketIO extends EventEmitter {
+    constructor() {
+      super();
+    }
+  }
 
   FakeSocketIO.prototype.close = function() {
     var self = this;

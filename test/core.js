@@ -22,97 +22,28 @@ describe('core', function() {
     });
   });
 
-  describe('Inheritance', function() {
-    it('should copy superclass prototype to subclass', function() {
-      var TestSuperClass = function() {};
-      TestSuperClass.prototype.var1 = 1;
-      TestSuperClass.prototype.func = function() {};
-
-      var TestClass = function() {};
-      core.inherits(TestClass, TestSuperClass);
-      TestClass.prototype.var2 = 2;
-      TestClass.prototype.func2 = function() {};
-
-      var obj = new TestClass();
-
-      assert.strictEqual(1, obj.var1);
-      assert.strictEqual(2, obj.var2);
-      assert.strictEqual(TestSuperClass.prototype.func, obj.func);
-      assert.strictEqual(TestClass.prototype.func2, obj.func2);
-    });
-
-    it('should override properties of the superclass', function() {
-      var TestSuperClass = function() {};
-      TestSuperClass.prototype.var1 = 1;
-      TestSuperClass.prototype.func = function() {};
-
-      var TestClass = function() {};
-      core.inherits(TestClass, TestSuperClass);
-      TestClass.prototype.var1 = 2;
-      TestClass.prototype.func = function() {};
-
-      var obj = new TestClass();
-
-      assert.strictEqual(2, obj.var1);
-      assert.notStrictEqual(TestSuperClass.prototype.func, obj.func);
-    });
-
-    it('should allow calling superclass functions', function() {
-      var TestSuperClass = function() {};
-      TestSuperClass.prototype.func = sinon.stub();
-
-      var TestClass = function() {};
-      core.inherits(TestClass, TestSuperClass);
-      TestClass.prototype.func = function() {
-        TestClass.base(this, 'func');
-      };
-
-      var obj = new TestClass();
-      obj.func();
-
-      assert.strictEqual(1, TestSuperClass.prototype.func.callCount);
-    });
-
-    it('should allow calling superclass constructor', function() {
-      var called = false;
-      var TestSuperClass = function() {
-        called = true;
-      };
-
-      var TestClass = function() {
-        TestClass.base(this, 'constructor');
-      };
-      core.inherits(TestClass, TestSuperClass);
-
-      new TestClass();
-
-      assert.ok(called);
-    });
-  });
-
   describe('Merge Super Classes Property', function() {
     it('should collect superclass properties', function() {
       var TestSuperClass = function() {};
       TestSuperClass.FOO = 1;
 
-      var TestClass = function() {
-        TestClass.base(this, 'constructor');
-      };
-      core.inherits(TestClass, TestSuperClass);
+      class TestClass extends TestSuperClass {
+        constructor() {
+          super();
+        }
+      }
       TestClass.FOO = 0;
 
       assert.deepEqual([0, 1], core.collectSuperClassesProperty(TestClass, 'FOO'));
     });
 
     it('should merge properties', function() {
-      var Test1 = function() {};
+      class Test1 {}
       Test1.FOO = 1;
-      var Test2 = function() {};
+      class Test2 extends Test1 {}
       Test2.FOO = 2;
-      core.inherits(Test2, Test1);
-      var Test3 = function() {};
+      class Test3 extends Test2 {}
       Test3.FOO = 3;
-      core.inherits(Test3, Test2);
 
       var merged = core.mergeSuperClassesProperty(Test3, 'FOO');
       assert.deepEqual([3, 2, 1], merged);
@@ -125,27 +56,23 @@ describe('core', function() {
     });
 
     it('should reuse existing merged static property', function() {
-      var merged = [2, 1];
-
-      var Test1 = function() {};
+      class Test1 {}
       Test1.FOO = 1;
-      var Test2 = function() {};
+      class Test2 extends Test1 {}
       Test2.FOO = 2;
-      Test2.FOO_MERGED = merged;
-      core.inherits(Test2, Test1);
+
+      var merged = core.mergeSuperClassesProperty(Test2, 'FOO');
 
       assert.strictEqual(merged, core.mergeSuperClassesProperty(Test2, 'FOO'));
     });
 
     it('should call merge function when given', function() {
-      var Test1 = function() {};
+      class Test1 {}
       Test1.FOO = 1;
-      var Test2 = function() {};
+      class Test2 extends Test1 {}
       Test2.FOO = 2;
-      core.inherits(Test2, Test1);
-      var Test3 = function() {};
+      class Test3 extends Test2 {}
       Test3.FOO = 3;
-      core.inherits(Test3, Test2);
 
       var merged = core.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
         return values.reduce(function(prev, curr) {

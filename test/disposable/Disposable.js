@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../../src/core';
 import Disposable from '../../src/disposable/Disposable';
 
 describe('Disposable', function() {
@@ -14,8 +13,7 @@ describe('Disposable', function() {
   });
 
   it('should call `disposeInternal` when running `dispose`', function() {
-    var TestDisposable = function() {};
-    core.inherits(TestDisposable, Disposable);
+    class TestDisposable extends Disposable {}
 
     TestDisposable.prototype.disposeInternal = sinon.stub();
 
@@ -26,8 +24,7 @@ describe('Disposable', function() {
   });
 
   it('should not dispose more than once', function() {
-    var TestDisposable = function() {};
-    core.inherits(TestDisposable, Disposable);
+    class TestDisposable extends Disposable {}
 
     TestDisposable.prototype.disposeInternal = sinon.stub();
 

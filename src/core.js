@@ -22,8 +22,7 @@ class core {
   /**
    * Loops constructor super classes collecting its properties values. If
    * property is not available on the super class `undefined` will be
-   * collected as value for the class hierarchy position. Must be used with
-   * classes created using `core.inherits`.
+   * collected as value for the class hierarchy position.
    * @param {!function()} constructor Class constructor.
    * @param {string} propertyName Property name to be collected.
    * @return {Array.<*>} Array of collected values.
@@ -31,18 +30,9 @@ class core {
    */
   static collectSuperClassesProperty(constructor, propertyName) {
     var propertyValues = [constructor[propertyName]];
-
-    if (constructor.superClass_) {
-      while (constructor.superClass_) {
-        constructor = constructor.superClass_.constructor;
-        propertyValues.push(constructor[propertyName]);
-      }
-    }
-    else {
-      while (!constructor.__proto__.isPrototypeOf(Function)) {
-        constructor = constructor.__proto__;
-        propertyValues.push(constructor[propertyName]);
-      }
+    while (!constructor.__proto__.isPrototypeOf(Function)) {
+      constructor = constructor.__proto__;
+      propertyValues.push(constructor[propertyName]);
     }
     return propertyValues;
   }
@@ -62,53 +52,6 @@ class core {
         (opt_object[core.UID_PROPERTY] = core.uniqueIdCounter_++);
     }
     return core.uniqueIdCounter_++;
-  }
-
-  /**
-   * Inherits the prototype methods from one constructor into another.
-   *
-   * Usage:
-   * <pre>
-   * function ParentClass(a, b) { }
-   * ParentClass.prototype.foo = function(a) { }
-   *
-   * function ChildClass(a, b, c) {
-   *   core.base(this, a, b);
-   * }
-   * core.inherits(ChildClass, ParentClass);
-   *
-   * var child = new ChildClass('a', 'b', 'c');
-   * child.foo();
-   * </pre>
-   *
-   * @param {Function} childCtor Child class.
-   * @param {Function} parentCtor Parent class.
-   */
-  static inherits(childCtor, parentCtor) {
-    function TempCtor() {
-    }
-    TempCtor.prototype = parentCtor.prototype;
-    childCtor.superClass_ = parentCtor.prototype;
-    childCtor.prototype = new TempCtor();
-    childCtor.prototype.constructor = childCtor;
-
-    /**
-     * Calls superclass constructor/method.
-     *
-     * This function is only available if you use core.inherits to express
-     * inheritance relationships between classes.
-     *
-     * @param {!object} me Should always be "this".
-     * @param {string} methodName The method name to call. Calling superclass
-     *     constructor can be done with the special string 'constructor'.
-     * @param {...*} var_args The arguments to pass to superclass
-     *     method/constructor.
-     * @return {*} The return value of the superclass method/constructor.
-     */
-    childCtor.base = function(me, methodName) {
-      var args = Array.prototype.slice.call(arguments, 2);
-      return parentCtor.prototype[methodName].apply(me, args);
-    };
   }
 
   /**

@@ -1160,15 +1160,15 @@ CancellablePromise.setUnhandledRejectionHandler = function(handler) {
  * @extends {Error}
  * @final
  */
-CancellablePromise.CancellationError = function(opt_message) {
-  CancellablePromise.CancellationError.base(this, 'constructor', opt_message);
+CancellablePromise.CancellationError = class extends Error {
+  constructor(opt_message) {
+     super(opt_message);
 
-  if (opt_message) {
-    this.message = opt_message;
-  }
+     if (opt_message) {
+       this.message = opt_message;
+     }
+   }
 };
-core.inherits(CancellablePromise.CancellationError, Error);
-
 
 /** @override */
 CancellablePromise.CancellationError.prototype.name = 'cancel';

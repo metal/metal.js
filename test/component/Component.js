@@ -1,7 +1,6 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
-import core from '../../src/core';
 import dom from '../../src/dom/dom';
 import Component from '../../src/component/Component';
 
@@ -124,10 +123,11 @@ describe('Component', function() {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.ELEMENT_TAG_NAME = 'span';
 
-      var ChildComponent = function(opt_config) {
-        ChildComponent.base(this, 'constructor', opt_config);
-      };
-      core.inherits(ChildComponent, CustomComponent);
+      class ChildComponent extends CustomComponent {
+        constructor(opt_config) {
+          super(opt_config);
+        }
+      }
 
       var custom = new ChildComponent();
       custom.render();
@@ -284,10 +284,12 @@ describe('Component', function() {
       };
       CustomComponent.ATTRS_SYNC = ['foo'];
 
-      var ChildComponent = function(opt_config) {
-        ChildComponent.base(this, 'constructor', opt_config);
-      };
-      core.inherits(ChildComponent, CustomComponent);
+      class ChildComponent extends CustomComponent {
+        constructor(opt_config) {
+          super(opt_config);
+        }
+      }
+
       ChildComponent.ATTRS = {
         bar: {
           value: 1
@@ -421,10 +423,12 @@ describe('Component', function() {
         bottom: {}
       };
 
-      function ChildComponent(opt_config) {
-        ChildComponent.base(this, 'constructor', opt_config);
+      class ChildComponent extends ParentComponent {
+        constructor(opt_config) {
+          super(opt_config);
+        }
       }
-      core.inherits(ChildComponent, ParentComponent);
+
       ChildComponent.SURFACES = {
         content: {}
       };
@@ -461,10 +465,11 @@ describe('Component', function() {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.SURFACE_TAG_NAME = 'span';
 
-      var ChildComponent = function(opt_config) {
-        ChildComponent.base(this, 'constructor', opt_config);
-      };
-      core.inherits(ChildComponent, CustomComponent);
+      class ChildComponent extends CustomComponent {
+        constructor(opt_config) {
+          super(opt_config);
+        }
+      }
 
       var custom = new ChildComponent();
       custom.addSurface('header');
@@ -706,10 +711,11 @@ describe('Component', function() {
   });
 
   function createCustomComponentClass() {
-    function CustomComponent(opt_config) {
-      CustomComponent.base(this, 'constructor', opt_config);
+    class CustomComponent extends Component {
+      constructor(opt_config) {
+        super(opt_config);
+      }
     }
-    core.inherits(CustomComponent, Component);
 
     CustomComponent.prototype.created = sinon.spy();
     CustomComponent.prototype.decorateInternal = sinon.spy();

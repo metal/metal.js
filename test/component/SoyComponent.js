@@ -1,7 +1,6 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
-import core from '../../src/core';
 import SoyComponent from '../../src/component/SoyComponent';
 
 describe('SoyComponent', function() {
@@ -93,10 +92,11 @@ describe('SoyComponent', function() {
   });
 
   function createCustomComponentClass() {
-    function CustomComponent(opt_config) {
-      CustomComponent.base(this, 'constructor', opt_config);
+    class CustomComponent extends SoyComponent {
+      constructor(opt_config) {
+        super(opt_config);
+      }
     }
-    core.inherits(CustomComponent, SoyComponent);
     return CustomComponent;
   }
 });

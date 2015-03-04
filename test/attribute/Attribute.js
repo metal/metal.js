@@ -1,7 +1,6 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
-import core from '../../src/core';
 import Attribute from '../../src/attribute/Attribute';
 
 describe('Attribute', function() {
@@ -426,11 +425,12 @@ describe('Attribute', function() {
   });
 
   describe('Static ATTRS', function() {
-    function createTestClass(opt_superClass) {
-      var Test = function(opt_config) {
-        Test.base(this, 'constructor', opt_config);
-      };
-      core.inherits(Test, opt_superClass || Attribute);
+    function createTestClass() {
+      class Test extends Attribute {
+        constructor(opt_config) {
+          super(opt_config);
+        }
+      }
       return Test;
     }
 
@@ -471,7 +471,12 @@ describe('Attribute', function() {
         }
       };
 
-      var ChildTest = createTestClass(Test);
+      class ChildTest extends Test {
+        constructor(opt_config) {
+          super(opt_config);
+        }
+      }
+
       ChildTest.ATTRS = {
         attr1: {
           value: -1

@@ -24,10 +24,9 @@ import EventHandler from '../events/EventHandler';
  * Example:
  *
  * <code>
- * function CustomComponent(opt_config) {
- *   CustomComponent.base(this, 'constructor', opt_config);
+ * class CustomComponent extends Component(config) {
+ *   super(config);
  * }
- * core.inherits(CustomComponent, Component);
  *
  * CustomComponent.ATTRS = {
  *   title: { value: 'Title' },

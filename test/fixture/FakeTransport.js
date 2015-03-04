@@ -1,12 +1,12 @@
 'use strict';
 
-import core from '../../src/core';
 import Transport from '../../src/net/Transport';
 
-function FakeTransport(uri) {
-  FakeTransport.base(this, 'constructor', uri);
+class FakeTransport extends Transport {
+  constructor(uri) {
+    super(uri);
+  }
 }
-core.inherits(FakeTransport, Transport);
 
 FakeTransport.prototype.close = function() {
   emitAsync(this, 'close');

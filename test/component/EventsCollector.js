@@ -1,7 +1,6 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
-import core from '../../src/core';
 import dom from '../../src/dom/dom';
 import SoyComponent from '../../src/component/SoyComponent';
 import EventsCollector from '../../src/component/EventsCollector';
@@ -76,10 +75,11 @@ describe('EventsCollector', function() {
   });
 
   function createCustomComponentClass() {
-    function CustomComponent(opt_config) {
-      CustomComponent.base(this, 'constructor', opt_config);
+    class CustomComponent extends SoyComponent {
+      constructor(opt_config) {
+        super(opt_config);
+      }
     }
-    core.inherits(CustomComponent, SoyComponent);
 
     CustomComponent.ATTRS = {
       bodyContent: {

@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../../src/core';
 import Transport from '../../src/net/Transport';
 import FakeTransport from '../fixture/FakeTransport';
 
@@ -66,10 +65,11 @@ describe('Transport', function() {
   });
 
   it('should set initial default config for subclass', function() {
-    var TestTransport = function(uri) {
-      TestTransport.base(this, 'constructor', uri);
-    };
-    core.inherits(TestTransport, Transport);
+    class TestTransport extends Transport {
+      constructor(uri) {
+        super(uri);
+      }
+    }
     TestTransport.INITIAL_DEFAULT_CONFIG = {
       config1: 1,
       config2: 'two'
@@ -80,19 +80,21 @@ describe('Transport', function() {
   });
 
   it('should use first defined initial default config for subclass', function() {
-    var TestTransport = function(uri) {
-      TestTransport.base(this, 'constructor', uri);
-    };
-    core.inherits(TestTransport, Transport);
+    class TestTransport extends Transport {
+      constructor(uri) {
+        super(uri);
+      }
+    }
     TestTransport.INITIAL_DEFAULT_CONFIG = {
       config1: 1,
       config2: 'two'
     };
 
-    var TestChildTransport = function(uri) {
-      TestChildTransport.base(this, 'constructor', uri);
-    };
-    core.inherits(TestChildTransport, TestTransport);
+    class TestChildTransport extends TestTransport {
+      constructor(uri) {
+        super(uri);
+      }
+    }
 
     var transport = new TestChildTransport('');
     assert.strictEqual(TestTransport.INITIAL_DEFAULT_CONFIG, transport.getDefaultConfig());

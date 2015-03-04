@@ -156,8 +156,8 @@ class XhrTransport extends Transport {
    */
   write(message, config, opt_success, opt_error) {
     var xhr = new XMLHttpRequest();
-    xhr.onload = core.bind(this.onXhrLoad_, this, xhr, config, opt_success);
-    xhr.onerror = core.bind(this.onXhrError_, this, xhr, opt_error);
+    xhr.onload = this.onXhrLoad_.bind(this, xhr, config, opt_success);
+    xhr.onerror = this.onXhrError_.bind(this, xhr, opt_error);
 
     var uri = this.getUri();
 

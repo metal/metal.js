@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../core';
 import EventEmitterProxy from '../events/EventEmitterProxy';
 import Transport from './Transport';
 
@@ -54,11 +53,11 @@ class WebSocketTransport extends Transport {
     this.verifySocketIOExists_();
 
     var socket = io(this.getUri());
-    this.addSocketListener_(socket, 'connect', core.bind(this.onSocketConnect_, this));
-    this.addSocketListener_(socket, 'disconnect', core.bind(this.onSocketDisconnect_, this));
-    this.addSocketListener_(socket, 'error', core.bind(this.onSocketError_, this));
-    this.addSocketListener_(socket, 'data', core.bind(this.onSocketData_, this));
-    this.addSocketListener_(socket, 'message', core.bind(this.onSocketMessage_, this));
+    this.addSocketListener_(socket, 'connect', this.onSocketConnect_.bind(this));
+    this.addSocketListener_(socket, 'disconnect', this.onSocketDisconnect_.bind(this));
+    this.addSocketListener_(socket, 'error', this.onSocketError_.bind(this));
+    this.addSocketListener_(socket, 'data', this.onSocketData_.bind(this));
+    this.addSocketListener_(socket, 'message', this.onSocketMessage_.bind(this));
     return socket;
   }
 

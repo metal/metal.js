@@ -222,7 +222,7 @@ async.run.WorkItem_ = function(fn, scope) {
 async.nextTick = function(callback, opt_context) {
   var cb = callback;
   if (opt_context) {
-    cb = core.bind(callback, opt_context);
+    cb = callback.bind(opt_context);
   }
   cb = async.nextTick.wrapCallback_(cb);
   // Introduced and currently only supported by IE10.
@@ -276,14 +276,14 @@ async.nextTick.getSetImmediateEmulator_ = function() {
       doc.close();
       var message = 'callImmediate' + Math.random();
       var origin = win.location.protocol + '//' + win.location.host;
-      var onmessage = core.bind(function(e) {
+      var onmessage = function(e) {
         // Validate origin and message to make sure that this message was
         // intended for us.
         if (e.origin !== origin && e.data !== message) {
           return;
         }
         this.port1.onmessage();
-      }, this);
+      }.bind(this);
       win.addEventListener('message', onmessage, false);
       this.port1 = {};
       this.port2 = {

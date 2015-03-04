@@ -64,7 +64,7 @@ class dom {
     return dom.on(
       element,
       eventName,
-      core.bind(dom.handleDelegateEvent_, null, selector, callback)
+      dom.handleDelegateEvent_.bind(null, selector, callback)
     );
   }
 

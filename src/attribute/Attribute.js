@@ -51,8 +51,8 @@ class Attribute extends EventEmitter {
 
     Object.defineProperty(this, name, {
       configurable: true,
-      get: core.bind(this.getAttrValue_, this, name),
-      set: core.bind(this.setAttrValue_, this, name)
+      get: this.getAttrValue_.bind(this, name),
+      set: this.setAttrValue_.bind(this, name)
     });
   }
 

@@ -25,9 +25,9 @@ class Transport extends EventEmitter {
       array.firstDefinedValue
     );
 
-    this.on('close', core.bind(this.onCloseHandler_, this));
-    this.on('open', core.bind(this.onOpenHandler_, this));
-    this.on('opening', core.bind(this.onOpeningHandler_, this));
+    this.on('close', this.onCloseHandler_.bind(this));
+    this.on('open', this.onOpenHandler_.bind(this));
+    this.on('opening', this.onOpeningHandler_.bind(this));
   }
 
   /**

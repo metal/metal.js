@@ -1,7 +1,6 @@
 'use strict';
 
 import array from '../array/array';
-import core from '../core';
 import EventEmitter from '../events/EventEmitter';
 import EventEmitterProxy from '../events/EventEmitterProxy';
 import {CancellablePromise} from '../promise/Promise';
@@ -224,9 +223,9 @@ class WebChannel extends EventEmitter {
     this.eventEmitterProxy_ = new EventEmitterProxy(transport, this);
 
     this.transport_ = transport;
-    this.transport_.on('close', core.bind(this.onTransportClose_, this));
-    this.transport_.on('error', core.bind(this.onTransportError_, this));
-    this.transport_.on('open', core.bind(this.onTransportOpen_, this));
+    this.transport_.on('close', this.onTransportClose_.bind(this));
+    this.transport_.on('error', this.onTransportError_.bind(this));
+    this.transport_.on('open', this.onTransportOpen_.bind(this));
     this.transport_.open();
   }
 

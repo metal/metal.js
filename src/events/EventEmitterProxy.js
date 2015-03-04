@@ -78,7 +78,7 @@ class EventEmitterProxy extends Disposable {
    * @protected
    */
   startProxy_() {
-    this.targetEmitter_.on('newListener', core.bind(this.proxyEvent_, this));
+    this.targetEmitter_.on('newListener', this.proxyEvent_.bind(this));
   }
 }
 

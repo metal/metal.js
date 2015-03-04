@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../core';
 import dom from '../dom/dom';
 import Disposable from '../disposable/Disposable';
 import EventHandler from '../events/EventHandler';
@@ -33,7 +32,7 @@ class EventsCollector extends Disposable {
         this.eventHandler_[event.group] = new EventHandler();
       }
       this.eventHandler_[event.group].add(
-        this.component_.delegate(event.name, event.element, core.bind(this.component_[event.value], this.component_))
+        this.component_.delegate(event.name, event.element, this.component_[event.value].bind(this.component_))
       );
     }
   }

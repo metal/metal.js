@@ -22,64 +22,6 @@ describe('core', function() {
     });
   });
 
-  describe('Bind', function() {
-    it('should throw errors when binding with no function', function() {
-      var TestClass = function() {};
-      TestClass.prototype.method = function() {
-        this.innerVar = 1;
-      };
-
-      var obj = new TestClass();
-      core.bind(obj.method, obj)();
-
-      assert.strictEqual(1, obj.innerVar);
-    });
-
-    it('should work without Function.prototype.bind', function() {
-      var bind = Function.prototype.bind;
-      Function.prototype.bind = null;
-
-      var TestClass = function() {};
-      TestClass.prototype.method = function() {
-        this.innerVar = 1;
-      };
-
-      var obj = new TestClass();
-      core.bind(obj.method, obj)();
-
-      assert.strictEqual(1, obj.innerVar);
-
-      Function.prototype.bind = bind;
-    });
-
-    it('should pass args without Function.prototype.bind', function() {
-      var bind = Function.prototype.bind;
-      Function.prototype.bind = null;
-
-      var TestClass = function() {};
-      TestClass.prototype.method = function(arg1, arg2) {
-        this.innerVar = 1;
-        this.arg1 = arg1;
-        this.arg2 = arg2;
-      };
-
-      var obj = new TestClass();
-      core.bind(obj.method, obj, 2)(3);
-
-      assert.strictEqual(1, obj.innerVar);
-      assert.strictEqual(2, obj.arg1);
-      assert.strictEqual(3, obj.arg2);
-
-      Function.prototype.bind = bind;
-    });
-
-    it('should throw errors when binding with no function', function() {
-      assert.throws(function() {
-        core.bind();
-      }, Error);
-    });
-  });
-
   describe('Inheritance', function() {
     it('should copy superclass prototype to subclass', function() {
       var TestSuperClass = function() {};
@@ -303,35 +245,6 @@ describe('core', function() {
   describe('Null Function', function() {
     it('should not return anything', function() {
       assert.strictEqual(undefined, core.nullFunction());
-    });
-  });
-
-  describe('RBind', function() {
-    it('should add additionally supplied parameters to the end of the arguments the function is executed with', function() {
-      var TestClass = function() {};
-      TestClass.prototype.method = function(param1, param2) {
-        this.innerVar = 1;
-
-        assert.strictEqual(param1, 'param1');
-        assert.strictEqual(param2, 'param2');
-      };
-
-      TestClass.prototype.method2 = function() {
-        assert.strictEqual(1, arguments.length);
-      };
-
-      var obj = new TestClass();
-      core.rbind(obj.method, obj, 'param2')('param1');
-
-      assert.strictEqual(1, obj.innerVar);
-
-      core.rbind(obj.method2, obj)('param1');
-    });
-
-    it('should throw errors when rbinding with no function', function() {
-      assert.throws(function() {
-        core.rbind();
-      }, Error);
     });
   });
 });

@@ -10,7 +10,13 @@ import Disposable from '../disposable/Disposable';
  */
 class EventHandler extends Disposable {
 	constructor() {
-  		this.eventHandles_ = [];
+      /**
+       * An array that holds the added event handles, so the listeners can be
+       * removed later.
+       * @type {Array.<EventHandle>}
+       * @protected
+       */
+      this.eventHandles_ = [];
 	}
 
 	/**
@@ -43,13 +49,5 @@ class EventHandler extends Disposable {
 	  this.eventHandles_ = [];
 	}
 }
-
-/**
- * An array that holds the added event handles, so the listeners can be
- * removed later.
- * @type {Array.<EventHandle>}
- * @protected
- */
-EventHandler.prototype.eventHandles_ = null;
 
 export default EventHandler;

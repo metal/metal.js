@@ -14,6 +14,21 @@ import EventHandler from '../events/EventHandler';
 class EventsCollector extends Disposable {
   constructor(component) {
     super();
+
+    /**
+     * Holds the component intance.
+     * @type {Component}
+     * @protected
+     */
+    this.component_ = null;
+
+    /**
+     * Holds events that were listened through the element.
+     * @type {EventHandler}
+     * @protected
+     */
+    this.eventHandler_ = null;
+
     if (!component) {
       throw new Error('The component instance is mandatory');
     }
@@ -139,17 +154,5 @@ class EventsCollector extends Disposable {
     this.eventHandler_ = null;
   }
 }
-
-/**
- * Holds the component intance.
- * @type {Component}
- */
-EventsCollector.prototype.component_ = null;
-
-/**
- * Holds events that were listened through the element.
- * @type {EventHandler}
- */
-EventsCollector.prototype.eventHandler_ = null;
 
 export default EventsCollector;

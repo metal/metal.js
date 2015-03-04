@@ -58,6 +58,41 @@ class Component extends Attribute {
   constructor(opt_config) {
     super(opt_config);
 
+    /**
+     * Holds events that were listened through the `delegate` Component function.
+     * @type {EventHandler}
+     * @protected
+     */
+    this.delegateEventHandler_ = null;
+
+    /**
+     * Instance of `EventEmitterProxy` which proxies events from the component's
+     * element to the component itself.
+     * @type {EventEmitterProxy}
+     * @protected
+     */
+    this.elementEventProxy_ = null;
+
+    /**
+     * Whether the element is in document.
+     * @type {Boolean}
+     */
+    this.inDocument = false;
+
+    /**
+     * Maps that index the surfaces instances by the surface id.
+     * @type {Object}
+     * @default null
+     * @protected
+     */
+    this.surfaces_ = null;
+
+    /**
+     * Whether the element was rendered.
+     * @type {Boolean}
+     */
+    this.wasRendered = false;
+
     core.mergeSuperClassesProperty(this.constructor, 'ATTRS_SYNC', this.mergeAttrsSync_);
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
@@ -134,6 +169,17 @@ class Component extends Attribute {
     }
     return this;
   }
+
+  /**
+   * Lifecycle. When attached, the component element is appended to the DOM
+   * and any other action to be performed must be implemented in this method,
+   * such as, binding DOM events. A component can be re-attached multiple
+   * times, therefore the undo behavior for any action performed in this phase
+   * must be implemented on the detach phase.
+   */
+  attached() {
+  }
+
   /**
    * Caches surface render attributes into a O(k) flat map representation.
    * Relevant for performance to calculate the surfaces group that were
@@ -188,6 +234,18 @@ class Component extends Attribute {
   }
 
   /**
+   * Lifecycle. Creation phase of the component happens once after the
+   * component is instantiated, therefore its the initial phase of the
+   * component Lifecycle. Be conscious about actions performed in this phase
+   * to not compromise instantiation time with operations that can be
+   * postponed to further phases. It's recommended to bind component custom
+   * events in this phase, in contrast to DOM events that must be bind on
+   * attach phase.
+   */
+  created() {
+  }
+
+  /**
    * Creates the surface element with its id namespaced to the component id.
    * @param {string} surfaceElementId The id of the element for the surface to be
    *   created.
@@ -198,6 +256,13 @@ class Component extends Attribute {
     var el = document.createElement(this.constructor.SURFACE_TAG_NAME_MERGED);
     el.id = surfaceElementId;
     return el;
+  }
+
+  /**
+   * Lifecycle. Internal implementation for decoration. Any extra operation
+   * necessary to prepare the component DOM must be implemented in this phase.
+   */
+  decorateInternal() {
   }
 
   /**
@@ -229,6 +294,16 @@ class Component extends Attribute {
       this.detached();
     }
     return this;
+  }
+
+  /**
+   * Lifecycle. When detached, the component element is removed from the DOM
+   * and any other action to be performed must be implemented in this method,
+   * such as, unbinding DOM events. A component can be detached multiple
+   * times, therefore the undo behavior for any action performed in this phase
+   * must be implemented on the attach phase.
+   */
+  detached() {
   }
 
   /**
@@ -356,6 +431,14 @@ class Component extends Attribute {
    */
   getSurface(surfaceId) {
     return this.surfaces_[surfaceId] || null;
+  }
+
+  /**
+   * Gets the content for the requested surface. Should be implemented by subclasses.
+   * @param {string} surfaceId The surface id.
+   * @return {Object|string} The content to be rendered.
+   */
+  getSurfaceContent() {
   }
 
   /**
@@ -540,6 +623,13 @@ class Component extends Attribute {
       var parent = dom.toElement(opt_parentElement) || document.body;
       parent.insertBefore(this.element, dom.toElement(opt_siblingElement));
     }
+  }
+
+  /**
+   * Lifecycle. Internal implementation for rendering. Any extra operation
+   * necessary to prepare the component DOM must be implemented in this phase.
+   */
+  renderInternal() {
   }
 
   /**
@@ -773,86 +863,5 @@ Component.Error = {
    */
   ALREADY_RENDERED: 'Component already rendered'
 };
-
-/**
- * Lifecycle. When attached, the component element is appended to the DOM
- * and any other action to be performed must be implemented in this method,
- * such as, binding DOM events. A component can be re-attached multiple
- * times, therefore the undo behavior for any action performed in this phase
- * must be implemented on the detach phase.
- */
-Component.prototype.attached = core.nullFunction;
-
-/**
- * Lifecycle. Creation phase of the component happens once after the
- * component is instantiated, therefore its the initial phase of the
- * component Lifecycle. Be conscious about actions performed in this phase
- * to not compromise instantiation time with operations that can be
- * postponed to further phases. It's recommended to bind component custom
- * events in this phase, in contrast to DOM events that must be bind on
- * attach phase.
- */
-Component.prototype.created = core.nullFunction;
-
-/**
- * Lifecycle. Internal implementation for decoration. Any extra operation
- * necessary to prepare the component DOM must be implemented in this phase.
- */
-Component.prototype.decorateInternal = core.nullFunction;
-
-/**
- * Holds events that were listened through the `delegate` Component function.
- * @type {EventHandler}
- */
-Component.prototype.delegateEventHandler_ = null;
-
-/**
- * Instance of `EventEmitterProxy` which proxies events from the component's
- * element to the component itself.
- * @type {EventEmitterProxy}
- */
-Component.prototype.elementEventProxy_ = null;
-
-/**
- * Lifecycle. When detached, the component element is removed from the DOM
- * and any other action to be performed must be implemented in this method,
- * such as, unbinding DOM events. A component can be detached multiple
- * times, therefore the undo behavior for any action performed in this phase
- * must be implemented on the attach phase.
- */
-Component.prototype.detached = core.nullFunction;
-
-/**
- * Gets the content for the requested surface. Should be implemented by subclasses.
- * @param {string} surfaceId The surface id.
- * @return {Object|string} The content to be rendered.
- */
-Component.prototype.getSurfaceContent = core.nullFunction;
-
-/**
- * Whether the element is in document.
- * @type {Boolean}
- */
-Component.prototype.inDocument = false;
-
-/**
- * Lifecycle. Internal implementation for rendering. Any extra operation
- * necessary to prepare the component DOM must be implemented in this phase.
- */
-Component.prototype.renderInternal = core.nullFunction;
-
-/**
- * Maps that index the surfaces instances by the surface id.
- * @type {Object}
- * @default null
- * @protected
- */
-Component.prototype.surfaces_ = null;
-
-/**
- * Whether the element was rendered.
- * @type {Boolean}
- */
-Component.prototype.wasRendered = false;
 
 export default Component;

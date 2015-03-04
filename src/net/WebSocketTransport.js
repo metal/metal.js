@@ -14,6 +14,39 @@ class WebSocketTransport extends Transport {
   constructor(uri) {
     super(uri);
 
+    /**
+     * EventEmitterProxy instance that proxies events from the socket to this
+     * transport.
+     * @type {EventEmitterProxy}
+     * @default null
+     * @protected
+     */
+    this.eventEmitterProxy_ = null;
+
+    /**
+     * If the requests should be RESTful or not. RESTful requests are always sent as
+     * JSON data, with the method as one of the params, and the original data to be
+     * sent accessible through the `data` key.
+     * @type {boolean}
+     * @default false
+     * @protected
+     */
+    this.restful_ = false;
+
+    /**
+     * Holds the underlying socket mechanism. Default mechanism uses Socket.IO.
+     * @type {Socket.IO}
+     * @default null
+     */
+    this.socket = null;
+
+    /**
+     * Holds information about the events that are being listened in the socket.
+     * This is necessary for removing these listeners when the transport is
+     * disposed.
+     * @type {Array<Object>}
+     * @default null
+     */
     this.socketEvents_ = [];
   }
 
@@ -206,40 +239,5 @@ class WebSocketTransport extends Transport {
 WebSocketTransport.INITIAL_DEFAULT_CONFIG = {
   method: 'POST'
 };
-
-/**
- * EventEmitterProxy instance that proxies events from the socket to this
- * transport.
- * @type {EventEmitterProxy}
- * @default null
- * @protected
- */
-WebSocketTransport.prototype.eventEmitterProxy_ = null;
-
-/**
- * If the requests should be RESTful or not. RESTful requests are always sent as
- * JSON data, with the method as one of the params, and the original data to be
- * sent accessible through the `data` key.
- * @type {boolean}
- * @default false
- * @protected
- */
-WebSocketTransport.prototype.restful_ = false;
-
-/**
- * Holds the underlying socket mechanism. Default mechanism uses Socket.IO.
- * @type {Socket.IO}
- * @default null
- */
-WebSocketTransport.prototype.socket = null;
-
-/**
- * Holds information about the events that are being listened in the socket.
- * This is necessary for removing these listeners when the transport is
- * disposed.
- * @type {Array<Object>}
- * @default null
- */
-WebSocketTransport.prototype.socketEvents_ = null;
 
 export default WebSocketTransport;

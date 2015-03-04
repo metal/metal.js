@@ -14,6 +14,12 @@ class XhrTransport extends Transport {
   constructor(uri) {
     super(uri);
 
+    /**
+     * Holds the XMLHttpRequest sent objects.
+     * @type {Array.<XMLHttpRequest>}
+     * @default null
+     * @protected
+     */
     this.sendInstances_ = [];
   }
 
@@ -201,13 +207,5 @@ XhrTransport.ResponseTypes = {
   HTML: 'html',
   JSON: 'json'
 };
-
-/**
- * Holds the XMLHttpRequest sent objects.
- * @type {Array.<XMLHttpRequest>}
- * @default null
- * @protected
- */
-XhrTransport.prototype.sendInstances_ = null;
 
 export default XhrTransport;

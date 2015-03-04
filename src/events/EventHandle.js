@@ -16,8 +16,25 @@ import Disposable from '../disposable/Disposable';
  */
 class EventHandle extends Disposable {
   constructor(emitter, event, listener) {
+    /**
+     * The EventEmitter instance that the event was subscribed to.
+     * @type {EventEmitter}
+     * @protected
+     */
     this.emitter_ = emitter;
+
+    /**
+     * The name of the event that was subscribed to.
+     * @type {string}
+     * @protected
+     */
     this.event_ = event;
+
+    /**
+     * The listener subscribed to the event.
+     * @type {Function}
+     * @protected
+     */
     this.listener_ = listener;
   }
 
@@ -39,26 +56,5 @@ class EventHandle extends Disposable {
     }
   }
 }
-
-/**
- * The EventEmitter instance that the event was subscribed to.
- * @type {EventEmitter}
- * @protected
- */
-EventHandle.prototype.emitter_ = null;
-
-/**
- * The name of the event that was subscribed to.
- * @type {string}
- * @protected
- */
-EventHandle.prototype.event_ = null;
-
-/**
- * The listener subscribed to the event.
- * @type {Function}
- * @protected
- */
-EventHandle.prototype.listener_ = null;
 
 export default EventHandle;

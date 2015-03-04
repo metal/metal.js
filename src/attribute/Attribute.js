@@ -17,7 +17,21 @@ class Attribute extends EventEmitter {
   constructor(opt_config) {
     super();
 
+    /**
+     * Object with information about the batch event that is currently
+     * scheduled, or null if none is.
+     * @type {Object}
+     * @protected
+     */
+    this.scheduledBatchData_ = null;
+
+    /**
+     * Object that contains information about all this instance's attributes.
+     * @type {!Object<string, !Object>}
+     * @protected
+     */
     this.attrsInfo_ = {};
+
     this.addAttrsFromStaticHint_(opt_config);
   }
 
@@ -388,20 +402,5 @@ Attribute.States = {
   INITIALIZING_DEFAULT: 2,
   INITIALIZED: 3
 };
-
-/**
- * Object that contains information about all this instance's attributes.
- * @type {!Object<string, !Object>}
- * @protected
- */
-Attribute.prototype.attrsInfo_ = null;
-
-/**
- * Object with information about the batch event that is currently scheduled, or
- * null if none is.
- * @type {Object}
- * @protected
- */
-Attribute.prototype.scheduledBatchData_ = null;
 
 export default Attribute;

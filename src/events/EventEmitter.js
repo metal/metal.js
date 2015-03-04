@@ -12,7 +12,44 @@ import WildcardTrie from '../structs/WildcardTrie';
  */
 class EventEmitter extends Disposable {
   constructor() {
+    /**
+     * The delimiter being used for namespaces.
+     * @type {string}
+     * @protected
+     */
+    this.delimiter_ = '.';
+
+    /**
+     * Holds event listeners scoped by event type.
+     * @type {Trie}
+     * @protected
+     */
     this.listenersTree_ = new WildcardTrie();
+
+    /**
+     * The maximum number of listeners allowed for each event type. If the number
+     * becomes higher than the max, a warning will be issued.
+     * @type {number}
+     * @protected
+     */
+    this.maxListeners_ = 10;
+
+    /**
+     * The id that will be assigned to the next listener added to this event
+     * emitter.
+     * @type {number}
+     * @protected
+     */
+    this.nextId_ = 1;
+
+    /**
+     * Configuration option which determines if an event facade should be sent
+     * as a param of listeners when emitting events. If set to true, the facade
+     * will be passed as the first argument of the listener.
+     * @type {boolean}
+     * @protected
+     */
+    this.shouldUseFacade_ = false;
   }
 
   /**
@@ -254,6 +291,16 @@ class EventEmitter extends Disposable {
   }
 
   /**
+   * Adds a listener to the end of the listeners array for the specified events.
+   * @param {!(Array|string)} events
+   * @param {!Function} listener
+   * @return {!EventHandle} Can be used to remove the listener.
+   */
+  on() {
+    return this.addListener.apply(this, arguments);
+  }
+
+  /**
    * Adds a one time listener for the events. This listener is invoked only the
    * next time each event is fired, after which it is removed.
    * @param {!(Array|string)} events
@@ -308,6 +355,17 @@ class EventEmitter extends Disposable {
         listenerObjects.splice(i, 1);
       }
     }
+  }
+
+  /**
+   * Removes a listener for the specified events.
+   * Caution: changes array indices in the listener array behind the listener.
+   * @param {!(Array|string)} events
+   * @param {!Function} listener
+   * @return {!Object} Returns emitter, so calls can be chained.
+   */
+  removeListener() {
+    return this.off.apply(this, arguments);
   }
 
   /**
@@ -385,61 +443,5 @@ class EventEmitter extends Disposable {
     }
   }
 }
-
-/**
- * The delimiter being used for namespaces.
- * @type {string}
- * @protected
- */
-EventEmitter.prototype.delimiter_ = '.';
-
-/**
- * Holds event listeners scoped by event type.
- * @type {Trie}
- * @protected
- */
-EventEmitter.prototype.listenersTree_ = null;
-
-/**
- * The maximum number of listeners allowed for each event type. If the number
- * becomes higher than the max, a warning will be issued.
- * @type {number}
- * @protected
- */
-EventEmitter.prototype.maxListeners_ = 10;
-
-/**
- * The id that will be assigned to the next listener added to this event
- * emitter.
- * @type {number}
- * @protected
- */
-EventEmitter.prototype.nextId_ = 1;
-
-/**
- * Adds a listener to the end of the listeners array for the specified events.
- * @param {!(Array|string)} events
- * @param {!Function} listener
- * @return {!EventHandle} Can be used to remove the listener.
- */
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-/**
- * Removes a listener for the specified events.
- * Caution: changes array indices in the listener array behind the listener.
- * @param {!(Array|string)} events
- * @param {!Function} listener
- * @return {!Object} Returns emitter, so calls can be chained.
- */
-EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
-
-/**
- * Configuration option which determines if an event facade should be sent
- * as a param of listeners when emitting events. If set to true, the facade
- * will be passed as the first argument of the listener.
- * @type {boolean}
- * @protected
- */
-EventEmitter.prototype.shouldUseFacade_ = false;
 
 export default EventEmitter;

@@ -19,6 +19,13 @@ class SoyComponent extends Component {
   constructor(opt_config) {
     super(opt_config);
 
+    /**
+     * Holds events that were listened through the element.
+     * @type {EventHandler}
+     * @protected
+     */
+    this.eventsCollector_ = null;
+
     core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
   }
 
@@ -122,11 +129,5 @@ class SoyComponent extends Component {
  * @static
  */
 SoyComponent.TEMPLATES = {};
-
-/**
- * Holds events that were listened through the element.
- * @type {EventHandler}
- */
-SoyComponent.prototype.eventsCollector_ = null;
 
 export default SoyComponent;

@@ -21,10 +21,35 @@ import Disposable from '../disposable/Disposable';
  */
 class EventEmitterProxy extends Disposable {
   constructor(originEmitter, targetEmitter, opt_blacklist) {
+    /**
+     * Map of events that should not be proxied.
+     * @type {Object}
+     * @protected
+     */
+   this.blacklist_ = opt_blacklist || {};
+
+    /**
+     * The origin emitter. This emitter's events will be proxied through the
+     * target emitter.
+     * @type {EventEmitter}
+     * @protected
+     */
     this.originEmitter_ = originEmitter;
-    this.targetEmitter_ = targetEmitter;
-    this.blacklist_ = opt_blacklist || {};
+
+    /**
+     * Holds a map of events from the origin emitter that are already being proxied.
+     * @type {Object}
+     * @protected
+     */
     this.proxiedEvents_ = {};
+
+    /**
+     * The target emitter. This emitter will emit all events that come from
+     * the origin emitter.
+     * @type {EventEmitter}
+     * @protected
+     */
+    this.targetEmitter_ = targetEmitter;
 
     this.startProxy_();
   }
@@ -81,39 +106,5 @@ class EventEmitterProxy extends Disposable {
     this.targetEmitter_.on('newListener', this.proxyEvent_.bind(this));
   }
 }
-
-/**
- * Map of events that should not be proxied.
- * @type {Object}
- * @default null
- * @protected
- */
-EventEmitterProxy.prototype.blacklist_ = null;
-
-/**
- * The origin emitter. This emitter's events will be proxied through the
- * target emitter.
- * @type {EventEmitter}
- * @default null
- * @protected
- */
-EventEmitterProxy.prototype.originEmitter_ = null;
-
-/**
- * Holds a map of events from the origin emitter that are already being proxied.
- * @type {Object}
- * @default null
- * @protected
- */
-EventEmitterProxy.prototype.proxiedEvents_ = null;
-
-/**
- * The target emitter. This emitter will emit all events that come from
- * the origin emitter.
- * @type {EventEmitter}
- * @default null
- * @protected
- */
-EventEmitterProxy.prototype.targetEmitter_ = null;
 
 export default EventEmitterProxy;

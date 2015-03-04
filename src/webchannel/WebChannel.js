@@ -19,11 +19,43 @@ class WebChannel extends EventEmitter {
   constructor(opt_transport) {
     super();
 
+    /**
+     * EventEmitterProxy instance that proxies events from the transport to this
+     * web channel.
+     * @type {EventEmitterProxy}
+     * @default null
+     * @protected
+     */
+    this.eventEmitterProxy_ = null;
+
+    /**
+     * Holds pending requests.
+     * @type {Array}
+     * @default null
+     * @protected
+     */
+    this.pendingRequests_ = [];
+
+    /**
+     * Timeout for performed database action in milliseconds.
+     * @type {number}
+     * @default 30000
+     * @protected
+     */
+    this.timeoutMs_ = 30000;
+
+    /**
+     * Holds the transport.
+     * @type {Transport}
+     * @default null
+     * @protected
+     */
+    this.transport_ = null;
+
     if (!opt_transport) {
       opt_transport = new WebSocketTransport(window.location.origin + window.location.pathname);
     }
 
-    this.pendingRequests_ = [];
     this.setTransport_(opt_transport);
   }
 
@@ -269,38 +301,5 @@ WebChannel.MessageStatus = {
   PENDING: 0,
   SENT: 1
 };
-
-/**
- * EventEmitterProxy instance that proxies events from the transport to this
- * web channel.
- * @type {EventEmitterProxy}
- * @default null
- * @protected
- */
-WebChannel.prototype.eventEmitterProxy_ = null;
-
-/**
- * Holds pending requests.
- * @type {Array}
- * @default null
- * @protected
- */
-WebChannel.prototype.pendingRequests_ = null;
-
-/**
- * Timeout for performed database action in milliseconds.
- * @type {number}
- * @default 30000
- * @protected
- */
-WebChannel.prototype.timeoutMs_ = 30000;
-
-/**
- * Holds the transport.
- * @type {Transport}
- * @default null
- * @protected
- */
-WebChannel.prototype.transport_ = null;
 
 export default WebChannel;

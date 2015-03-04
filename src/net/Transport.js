@@ -15,6 +15,32 @@ class Transport extends EventEmitter {
   constructor(uri) {
     super();
 
+    /**
+     * Holds the default configuration for this transport. Configuration options
+     * passed for a request override these defaults.
+     * @type {Object}
+     * @default null
+     * @protected
+     */
+    this.defaultConfig_ = null;
+
+    /**
+     * Holds the transport state, it supports the available states: '',
+     * 'opening', 'open' and 'closed'.
+     * @type {string}
+     * @default ''
+     * @protected
+     */
+    this.state_ = '';
+
+    /**
+     * Holds the transport uri.
+     * @type {string}
+     * @default ''
+     * @protected
+     */
+    this.uri_ = '';
+
     if (!core.isDef(uri)) {
       throw new Error('Transport uri not specified');
     }
@@ -31,11 +57,20 @@ class Transport extends EventEmitter {
   }
 
   /**
-   * Gets this transport's default configuration.
-   * @return {Object}
+   * Closes the transport.
+   * @chainable
    */
-  getDefaultConfig() {
-    return this.defaultConfig_;
+  close() {
+    core.abstractMethod();
+  }
+
+  /**
+   * Decodes a data chunk received.
+   * @param {*=} data
+   * @return {?}
+   */
+  decodeData(opt_returnValue) {
+    return core.identityFunction(opt_returnValue);
   }
 
   /**
@@ -47,6 +82,23 @@ class Transport extends EventEmitter {
       super.disposeInternal();
     });
     this.close();
+  }
+
+  /**
+   * Encodes a data chunk to be sent.
+   * @param {*=} data
+   * @return {?}
+   */
+  encodeData(opt_returnValue) {
+    return core.identityFunction(opt_returnValue);
+  }
+
+  /**
+   * Gets this transport's default configuration.
+   * @return {Object}
+   */
+  getDefaultConfig() {
+    return this.defaultConfig_;
   }
 
   /**
@@ -84,6 +136,14 @@ class Transport extends EventEmitter {
    */
   onCloseHandler_() {
     this.state_ = Transport.State.CLOSED;
+  }
+
+  /**
+   * Opens the transport.
+   * @chainable
+   */
+  open() {
+    core.abstractMethod();
   }
 
   /**
@@ -134,6 +194,21 @@ class Transport extends EventEmitter {
    */
   setState(state) {
     this.state_ = state;
+  }
+
+  /**
+   * Writes data to the transport.
+   * @param {*} message The data that will be sent through the transport.
+   * @param {!Object} config Relevant if the transport needs information such as
+   *   HTTP method, headers and parameters.
+   * @param {function(*)} opt_success Function to be called when the request receives
+   *   a success response.
+   * @param {function(*)} opt_error Function to be called when the request receives
+   *   an error response.
+   * @chainable
+   */
+  write() {
+    core.abstractMethod();
   }
 }
 
@@ -200,70 +275,5 @@ Transport.TRANSPORT_EVENTS = {
    */
   opening: true
 };
-
-/**
- * Closes the transport.
- * @chainable
- */
-Transport.prototype.close = core.abstractMethod;
-
-/**
- * Holds the default configuration for this transport. Configuration options
- * passed for a request override these defaults.
- * @type {Object}
- * @default null
- * @protected
- */
-Transport.prototype.defaultConfig_ = null;
-
-/**
- * Decodes a data chunk received.
- * @param {*=} data
- * @return {?}
- */
-Transport.prototype.decodeData = core.identityFunction;
-
-/**
- * Encodes a data chunk to be sent.
- * @param {*=} data
- * @return {?}
- */
-Transport.prototype.encodeData = core.identityFunction;
-
-/**
- * Opens the transport.
- * @chainable
- */
-Transport.prototype.open = core.abstractMethod;
-
-/**
- * Holds the transport state, it supports the available states: '',
- * 'opening', 'open' and 'closed'.
- * @type {string}
- * @default ''
- * @protected
- */
-Transport.prototype.state_ = '';
-
-/**
- * Holds the transport uri.
- * @type {string}
- * @default ''
- * @protected
- */
-Transport.prototype.uri_ = '';
-
-/**
- * Writes data to the transport.
- * @param {*} message The data that will be sent through the transport.
- * @param {!Object} config Relevant if the transport needs information such as
- *   HTTP method, headers and parameters.
- * @param {function(*)} opt_success Function to be called when the request receives
- *   a success response.
- * @param {function(*)} opt_error Function to be called when the request receives
- *   an error response.
- * @chainable
- */
-Transport.prototype.write = core.abstractMethod;
 
 export default Transport;

@@ -1,7 +1,5 @@
 'use strict';
 
-import core from '../core';
-
 /**
  * Disposable utility. When inherited provides the `dispose` function to its
  * subclass, which is responsible for disposing of any object references
@@ -10,6 +8,15 @@ import core from '../core';
  * @constructor
  */
 class Disposable {
+  constructor() {
+    /**
+     * Flag indicating if this instance has already been disposed.
+     * @type {boolean}
+     * @protected
+     */
+    this.disposed_ = false;
+  }
+
   /**
    * Disposes of this instance's object references. Calls `disposeInternal`.
    */
@@ -21,6 +28,14 @@ class Disposable {
   }
 
   /**
+   * Subclasses should override this method to implement any specific
+   * disposing logic (like clearing references and calling `dispose` on other
+   * disposables).
+   */
+  disposeInternal() {
+  }
+
+  /**
    * Checks if this instance has already been disposed.
    * @return {boolean}
    */
@@ -28,19 +43,5 @@ class Disposable {
     return this.disposed_;
   }
 }
-
-/**
- * Flag indicating if this instance has already been disposed.
- * @type {boolean}
- * @protected
- */
-Disposable.prototype.disposed_ = false;
-
-/**
- * Subclasses should override this method to implement any specific
- * disposing logic (like clearing references and calling `dispose` on other
- * disposables).
- */
-Disposable.prototype.disposeInternal = core.nullFunction;
 
 export default Disposable;

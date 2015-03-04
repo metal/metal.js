@@ -11,6 +11,12 @@ import core from '../core';
  */
 class Storage {
   constructor(mechanism) {
+    /**
+     * The mechanism used to persist key-value pairs.
+     * @type {StorageMechanism}
+     * @default null
+     * @protected
+     */
     this.mechanism_ = mechanism;
   }
 
@@ -81,13 +87,5 @@ class Storage {
  * @static
  */
 Storage.INVALID_VALUE = 'Storage: Invalid value was encountered';
-
-/**
- * The mechanism used to persist key-value pairs.
- * @type {StorageMechanism}
- * @default null
- * @protected
- */
-Storage.prototype.mechanism_ = null;
 
 export default Storage;

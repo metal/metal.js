@@ -208,7 +208,7 @@ class core {
    */
   static mergeSuperClassesProperty(constructor, propertyName, opt_mergeFn) {
     var mergedName = propertyName + '_MERGED';
-    if (constructor[mergedName]) {
+    if (constructor.hasOwnProperty(mergedName)) {
       return constructor[mergedName];
     }
 

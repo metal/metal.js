@@ -55,7 +55,7 @@ describe('EventsCollector', function() {
       dom.triggerEvent(innerButton, 'click');
       dom.triggerEvent(innerButton, 'mousedown');
 
-      assert.ok(custom.handleClick.calledThrice, 'Click on parent element should trigger click event');
+      assert.strictEqual(4, custom.handleClick.callCount, 'Click on parent element should trigger click event');
       assert.ok(custom.handleButtonMousedown.calledOnce, 'Click on parent element should trigger click event');
 
       custom.dispose();

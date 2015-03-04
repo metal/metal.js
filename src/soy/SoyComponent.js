@@ -4,6 +4,7 @@ import core from '../core';
 import dom from '../dom/dom';
 import object from '../object/object';
 import Component from '../component/Component';
+import DomVisitor from '../dom/DomVisitor';
 import EventsCollector from '../component/EventsCollector';
 
 import './SoyComponent.soy';
@@ -36,8 +37,11 @@ class SoyComponent extends Component {
    * @override
    */
   attach(opt_parentElement, opt_siblingElement) {
-    this.getEventsCollector_().detachAllListeners();
-    this.getEventsCollector_().collect(this.element.id, this.element);
+    var eventsCollector = this.getEventsCollector_();
+    eventsCollector.detachAllListeners();
+    DomVisitor.visit(this.element)
+      .addHandler(eventsCollector.attachListeners.bind(eventsCollector))
+      .start();
     super.attach(opt_parentElement, opt_siblingElement);
     return this;
   }
@@ -115,8 +119,11 @@ class SoyComponent extends Component {
     var frag = dom.buildFragment(content);
     if (this.inDocument) {
       var elementId = this.makeSurfaceId_(surfaceId);
-      this.getEventsCollector_().detachListeners(elementId);
-      this.getEventsCollector_().collect(elementId, frag);
+      var eventsCollector = this.getEventsCollector_();
+      eventsCollector.detachListeners(elementId);
+      DomVisitor.visit(frag)
+        .addHandler(eventsCollector.attachListeners.bind(eventsCollector))
+        .start();
     }
     super.replaceSurfaceContent_(surfaceId, frag);
   }

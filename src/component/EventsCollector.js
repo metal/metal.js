@@ -37,88 +37,80 @@ class EventsCollector extends Disposable {
   }
 
   /**
-   * Attaches a list of collected events to an element.
-   * @param {!Array} events List of collected events which should be attached.
+   * Attaches all listeners declared in the collected events array.
+   * @param {!Array<!Object>} collectedEvents
+   * @param {string} groupName
+   * @protected
    */
-  attachListeners_(collectedEvents) {
+  attachCollectedListeners_(collectedEvents, groupName) {
     for (var i = 0; i < collectedEvents.length; i++) {
       var event = collectedEvents[i];
-      if (!this.eventHandler_[event.group]) {
-        this.eventHandler_[event.group] = new EventHandler();
+      if (!this.eventHandler_[groupName]) {
+        this.eventHandler_[groupName] = new EventHandler();
       }
-      this.eventHandler_[event.group].add(
+      this.eventHandler_[groupName].add(
         this.component_.delegate(event.name, event.element, this.component_[event.value].bind(this.component_))
       );
     }
   }
 
   /**
-   * Visits all `rootElement` children and collects inline events into
-   * `groupName`. For each found surface element a new group element will be
-   * created.
+   * Attaches all listeners declared as attributes on the given element.
+   * @param {Element} element
    * @param {String} groupName
-   * @param {Element} rootElement
-   * @chainable
    */
-  collect(groupName, rootElement) {
-    var collectedEvents = [];
-    this.collectInlineEvents_(groupName, rootElement, collectedEvents);
-    this.attachListeners_(collectedEvents);
-    return this;
-  }
-
-  /**
-   * Collects all events from a document element and its children.
-   * TODO(*): Analyzes performance.
-   * @param {Element} element The element from which the events should be
-   *   extracted.
-   * @param {!Array} collectedEvents List of collected events.
-   * @return {Array} The collected list of events.
-   */
-  collectInlineEvents_(groupName, rootElement, collectedEvents) {
-    for (var i = 0; i < rootElement.childNodes.length; i++) {
-      this.collectInlineEvents_(groupName, rootElement.childNodes[i], collectedEvents);
+  attachListeners(element, groupName) {
+    groupName = groupName || element.id || this.component_.id;
+    var collectedEvents = this.collectInlineEventsFromAttributes_(element);
+    this.attachCollectedListeners_(collectedEvents, groupName);
+    if (element.id && this.component_.extractSurfaceId_(element.id)) {
+      groupName = element.id;
     }
-    this.collectInlineEventsFromAttributes_(groupName, rootElement, collectedEvents);
+    return groupName;
   }
 
   /**
    * Processes the attribute of an element and stores the found attribute
    * events to an array.
-   * TODO(*): Analyzes performance.
+   * TODO(*): Analyze performance.
    * @param {Element} element The element which should be processed.
+   * @param {!Object} attribute
+   * @return {Object} An objects that represents an event that should be
+   *   attached to this element.
    * @protected
    */
-  collectInlineEventsFromAttribute_(groupName, element, attribute, collectedEvents) {
+  collectInlineEventFromAttribute_(element, attribute) {
     var event = attribute.name.substring(2);
     if ((attribute.name.indexOf('on') === 0) && dom.supportsEvent(element, event)) {
-      var surfaceId = this.component_.extractSurfaceId_(element.id);
-      if (surfaceId) {
-        groupName = element.id;
-      }
-      collectedEvents.push({
-        group: groupName,
+      element.removeAttribute(attribute.name);
+      return {
         element: element,
         name: event,
         value: attribute.value
-      });
-      element.removeAttribute(attribute.name);
+      };
     }
   }
 
   /**
    * Processes the attributes of an element and stores the found attribute
    * events to an array.
-   * TODO(*): Analyzes performance.
+   * TODO(*): Analyze performance.
    * @param {Element} element The element which should be processed.
+   * @return {!Array<!Object>} An array with objects that represent each an
+   *   event that should be attached to this element.
    * @protected
    */
-  collectInlineEventsFromAttributes_(groupName, element, collectedEvents) {
+  collectInlineEventsFromAttributes_(element) {
+    var collectedEvents = [];
     if (element.attributes) {
       for (var i = element.attributes.length - 1; i >= 0; i--) {
-        this.collectInlineEventsFromAttribute_(groupName, element, element.attributes[i], collectedEvents);
+        var eventObj = this.collectInlineEventFromAttribute_(element, element.attributes[i]);
+        if (eventObj) {
+          collectedEvents.push(eventObj);
+        }
       }
     }
+    return collectedEvents;
   }
 
   /**

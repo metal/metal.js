@@ -31,8 +31,14 @@ describe('dom', function() {
       dom.addClasses(element, ['class1', 'class2']);
 
       assert.ok(dom.hasClass(element, 'class1'));
+      assert.ok(dom.hasClassWithoutNative_(element, 'class1'));
+
       assert.ok(dom.hasClass(element, 'class2'));
+      assert.ok(dom.hasClassWithoutNative_(element, 'class2'));
+
       assert.ok(!dom.hasClass(element, 'class3'));
+      assert.ok(!dom.hasClassWithoutNative_(element, 'class3'));
+    });
     });
   });
 

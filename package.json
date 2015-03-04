@@ -22,7 +22,7 @@
     "gulp": "^3.8.11",
     "isparta": "git://github.com/douglasduteil/isparta",
     "karma": "^0.12.31",
-    "karma-6to5-preprocessor": "^3.0.0",
+    "karma-babel-preprocessor": "^4.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.7",
     "karma-coverage": "git://github.com/douglasduteil/karma-coverage#next",

@@ -16,15 +16,15 @@ module.exports = function(config) {
     preprocessors: {
       // All src files should be included in the coverage report, except
       // Promise, since that's not our code for now. These files don't
-      // need to go through the `6to5` preprocessor, as the `coverage`
+      // need to go through the `babel` preprocessor, as the `coverage`
       // preprocessor already does the necessary conversion.
       'src/*.js': ['coverage'],
       'src/!(promise)/**/*.js': ['coverage'],
 
       // Since tests and Promise are not going through the `coverage`
-      // preprocessor we need to explicitly make them go through `6to5`.
-      'src/promise/Promise.js': ['6to5'],
-      'test/**/*.js': ['6to5'],
+      // preprocessor we need to explicitly make them go through `babel`.
+      'src/promise/Promise.js': ['babel'],
+      'test/**/*.js': ['babel'],
 
       // Fixture htmls should go through `html2js` so tests can access
       // them through the `window.__html__` variable.

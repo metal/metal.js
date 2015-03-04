@@ -30,7 +30,7 @@ class core {
    */
   static collectSuperClassesProperty(constructor, propertyName) {
     var propertyValues = [constructor[propertyName]];
-    while (!constructor.__proto__.isPrototypeOf(Function)) {
+    while (constructor.__proto__ && !constructor.__proto__.isPrototypeOf(Function)) {
       constructor = constructor.__proto__;
       propertyValues.push(constructor[propertyName]);
     }

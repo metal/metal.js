@@ -20,6 +20,7 @@
   "node": true,
   "onevar": false,
   "quotmark": "single",
+  "proto": true,
   "regexp": true,
   "smarttabs": true,
   "strict": true,

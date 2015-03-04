@@ -31,13 +31,6 @@ module.exports = function(config) {
       'test/html/fixture/*.html': ['html2js']
     },
 
-    '6to5Preprocessor': {
-      options: {
-        sourceMap: 'inline',
-        modules: 'system'
-      }
-    },
-
     reporters: ['coverage', 'progress'],
 
     coverageReporter: {

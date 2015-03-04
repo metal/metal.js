@@ -63,11 +63,11 @@ class Component extends Attribute {
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
     core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
+    this.addSurfacesFromStaticHint_();
 
     this.elementEventProxy_ = new EventEmitterProxy(this.element, this);
     this.delegateEventHandler_ = new EventHandler();
 
-    this.addSurfacesFromStaticHint_();
     this.created_();
   }
 

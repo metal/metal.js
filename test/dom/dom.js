@@ -11,12 +11,19 @@ describe('dom', function() {
 
   describe('css classes', function() {
     it('should add css classes to requested element', function() {
+      function assertClassesAdded() {
+        assert.strictEqual(2, getClassNames(element).length);
+        assert.strictEqual('class1', getClassNames(element)[0]);
+        assert.strictEqual('class2', getClassNames(element)[1]);
+      }
+
       var element = document.createElement('div');
       dom.addClasses(element, ['class1', 'class2']);
+      assertClassesAdded();
 
-      assert.strictEqual(2, element.classList.length);
-      assert.strictEqual('class1', element.classList.item(0));
-      assert.strictEqual('class2', element.classList.item(1));
+      element.className = '';
+      dom.addClassesWithoutNative_(element, ['class1', 'class2']);
+      assertClassesAdded();
     });
 
     it('should check if an element has the requested css class', function() {
@@ -352,4 +359,9 @@ describe('dom', function() {
       assert.ok(dom.supportsEvent(element, 'change'));
     });
   });
+
+  function getClassNames(element) {
+    return element.className.trim().split(' ');
+  }
+
 });

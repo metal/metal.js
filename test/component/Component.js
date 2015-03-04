@@ -224,16 +224,16 @@ describe('Component', function() {
       });
       custom.render();
 
-      assert.strictEqual(3, custom.element.classList.length);
-      assert.strictEqual('component', custom.element.classList.item(0));
-      assert.strictEqual('foo', custom.element.classList.item(1));
-      assert.strictEqual('bar', custom.element.classList.item(2));
+      assert.strictEqual(3, getClassNames(custom.element).length);
+      assert.strictEqual('component', getClassNames(custom.element)[0]);
+      assert.strictEqual('foo', getClassNames(custom.element)[1]);
+      assert.strictEqual('bar', getClassNames(custom.element)[2]);
 
       custom.elementClasses = ['other'];
       async.nextTick(function() {
-        assert.strictEqual(2, custom.element.classList.length);
-        assert.strictEqual('component', custom.element.classList.item(0));
-        assert.strictEqual('other', custom.element.classList.item(1));
+        assert.strictEqual(2, getClassNames(custom.element).length);
+        assert.strictEqual('component', getClassNames(custom.element)[0]);
+        assert.strictEqual('other', getClassNames(custom.element)[1]);
         done();
       });
     });
@@ -244,9 +244,9 @@ describe('Component', function() {
 
       var custom = new CustomComponent();
       custom.render();
-      assert.strictEqual(2, custom.element.classList.length);
-      assert.strictEqual('overwritten', custom.element.classList.item(0));
-      assert.strictEqual('component', custom.element.classList.item(1));
+      assert.strictEqual(2, getClassNames(custom.element).length);
+      assert.strictEqual('overwritten', getClassNames(custom.element)[0]);
+      assert.strictEqual('component', getClassNames(custom.element)[1]);
     });
 
     it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
@@ -725,5 +725,9 @@ describe('Component', function() {
     CustomComponent.prototype.renderInternal = sinon.spy();
 
     return CustomComponent;
+  }
+
+  function getClassNames(element) {
+    return element.className.trim().split(' ');
   }
 });

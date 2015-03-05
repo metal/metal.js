@@ -41,6 +41,12 @@ class SoyComponent extends Component {
     this.componentCollector_ = new ComponentCollector();
 
     /**
+     * Gets all nested components.
+     * @type {!Array<!Component>}
+     */
+    this.components = null;
+
+    /**
      * Holds events that were listened through the element.
      * @type {!EventHandler}
      * @protected
@@ -83,16 +89,13 @@ class SoyComponent extends Component {
     return this;
   }
 
-  getComponents() {
+  /**
+   * Gets all nested components.
+   * @return {!Array<!Component>}
+   * @protected
+   */
+  getComponents_() {
     return this.componentCollector_.getComponents();
-  }
-
-  informVisitorAttachListeners_(visitor) {
-    visitor.addHandler(this.eventsCollector_.attachListeners.bind(this.eventsCollector_));
-  }
-
-  informVisitorExtractComponents_(visitor) {
-    visitor.addHandler(this.componentCollector_.extractComponents.bind(this.componentCollector_), this.componentsInterceptedData_);
   }
 
   /**
@@ -120,6 +123,24 @@ class SoyComponent extends Component {
   handleTemplateCall_(data) {
     this.componentsInterceptedData_[data.ref] = data;
     return originalTemplate.apply(originalTemplate, arguments);
+  }
+
+  /**
+   * Informs visitor to attach events if needed.
+   * @param {DomVisitor} visitor
+   * @protected
+   */
+  informVisitorAttachListeners_(visitor) {
+    visitor.addHandler(this.eventsCollector_.attachListeners.bind(this.eventsCollector_));
+  }
+
+  /**
+   * Informs visitor to extract components.
+   * @param {DomVisitor} visitor
+   * @protected
+   */
+  informVisitorExtractComponents_(visitor) {
+    visitor.addHandler(this.componentCollector_.extractComponents.bind(this.componentCollector_), this.componentsInterceptedData_);
   }
 
   /**
@@ -198,6 +219,8 @@ class SoyComponent extends Component {
       this.setComponentsAttrs_();
       this.componentsInterceptedData_ = {};
     }
+    // TODO(edu): Moves assignment to be a getter Attribute instead.
+    this.components = this.getComponents_();
   }
 
   /**

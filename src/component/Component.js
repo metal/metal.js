@@ -24,8 +24,30 @@ import EventHandler from '../events/EventHandler';
  * Example:
  *
  * <code>
- * class CustomComponent extends Component(config) {
- *   super(config);
+ * class CustomComponent extends Component {
+ *   constructor(config) {
+ *     super(config);
+ *   }
+ *
+ *   created() {
+ *   }
+ *
+ *   decorateInternal() {
+ *   }
+ *
+ *   renderInternal() {
+ *     this.element.appendChild(this.getSurfaceElement('header'));
+ *     this.element.appendChild(this.getSurfaceElement('bottom'));
+ *   }
+ *
+ *   getSurfaceContent(surfaceId) {
+ *   }
+ *
+ *   attached() {
+ *   }
+ *
+ *   detached() {
+ *   }
  * }
  *
  * CustomComponent.ATTRS = {
@@ -37,16 +59,6 @@ import EventHandler from '../events/EventHandler';
  *   header: { renderAttrs: ['title', 'fontSize'] },
  *   bottom: { renderAttrs: ['fontSize'] }
  * };
- *
- * CustomComponent.prototype.created = function() {};
- * CustomComponent.prototype.decorateInternal = function() {};
- * CustomComponent.prototype.renderInternal = function() {
- *   this.element.appendChild(this.getSurfaceElement('header'));
- *   this.element.appendChild(this.getSurfaceElement('bottom'));
- * };
- * CustomComponent.prototype.getSurfaceContent = function() {};
- * CustomComponent.prototype.attached = function() {};
- * CustomComponent.prototype.detached = function() {};
  * </code>
  *
  * @param {!Object} opt_config An object with the initial values for this component's

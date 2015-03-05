@@ -199,13 +199,21 @@ class Attribute extends EventEmitter {
    */
   getAttrs() {
     var attrsMap = {};
-    var names = Object.keys(this.attrsInfo_);
+    var names = this.getAttrNames();
 
     for (var i = 0; i < names.length; i++) {
       attrsMap[names[i]] = this[names[i]];
     }
 
     return attrsMap;
+  }
+
+  /**
+   * Returns an array with all attribute names.
+   * @return {Array.<string>}
+   */
+  getAttrNames() {
+    return Object.keys(this.attrsInfo_);
   }
 
   /**

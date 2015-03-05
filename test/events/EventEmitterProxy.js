@@ -22,6 +22,7 @@ describe('EventEmitterProxy', function() {
 
   it('should proxy event from dom element origin to target', function() {
     var origin = document.createElement('div');
+    document.body.appendChild(origin);
 
     var target = new EventEmitter();
     new EventEmitterProxy(origin, target);
@@ -32,6 +33,7 @@ describe('EventEmitterProxy', function() {
 
     assert.strictEqual(1, listener.callCount);
     assert.ok(listener.args[0][0]);
+    document.body.removeChild(origin);
   });
 
   it('should not proxy unsupported dom event from dom element', function() {

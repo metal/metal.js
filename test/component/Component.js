@@ -311,6 +311,22 @@ describe('Component', function() {
       sinon.assert.callCount(custom.syncBar, 1);
     });
 
+    it('should only accept arrays of components as children attribute', function() {
+      var CustomComponent = createCustomComponentClass();
+      var custom = new CustomComponent({
+        children: 'children'
+      });
+      assert.deepEqual([], custom.children);
+
+      custom.children = 1;
+      custom.children = [1, 2];
+      custom.children = new CustomComponent();
+      assert.deepEqual([], custom.children);
+
+      var componentsArray = [new CustomComponent(), new Component()];
+      custom.children = componentsArray;
+      assert.strictEqual(componentsArray, custom.children);
+    });
   });
 
   describe('Render', function() {

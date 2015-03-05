@@ -276,9 +276,9 @@ class dom {
   static removeClassesWithoutNative_(element, classes) {
     var elementClassName = ' ' + element.className + ' ';
 
-    for (var i = 0; i < classes.length; i++) {;
+    for (var i = 0; i < classes.length; i++) {
       elementClassName = elementClassName.replace(' ' + classes[i] + ' ', ' ');
-    };
+    }
 
     element.className = elementClassName.trim();
   }

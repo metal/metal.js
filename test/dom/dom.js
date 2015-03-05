@@ -39,6 +39,17 @@ describe('dom', function() {
       assert.ok(!dom.hasClass(element, 'class3'));
       assert.ok(!dom.hasClassWithoutNative_(element, 'class3'));
     });
+
+    it('should check if css classes are being removed', function() {
+      var element = document.createElement('div');
+      dom.addClasses(element, ['class1', 'class2']);
+
+      dom.removeClasses(element, ['class1']);
+      assert.ok(!dom.hasClass(element, 'class1'));
+      assert.ok(dom.hasClass(element, 'class2'));
+
+      dom.removeClassesWithoutNative_(element, ['class2']);
+      assert.ok(!dom.hasClass(element, 'class2'));
     });
   });
 

@@ -1,5 +1,6 @@
 'use strict';
 
+import array from '../array/array';
 import core from '../core';
 import dom from '../dom/dom';
 import object from '../object/object';
@@ -143,6 +144,26 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Renders this component's child components, if their placeholder is found.
+   * @protected
+   */
+  renderChildren_() {
+    var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));
+    if (placeholder) {
+      dom.removeChildren(placeholder);
+
+      var children = this.children;
+      children.forEach(function(child) {
+        if (child.wasRendered) {
+          dom.append(placeholder, child.element);
+        } else {
+          child.render(placeholder);
+        }
+      });
+    }
+  }
+
+  /**
    * Overrides the behavior of this method to automatically render the element
    * template if it's defined and to automatically attach listeners to all
    * specified events by the user in the template. Also handles any calls to
@@ -201,12 +222,26 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Syncs the component according to the new value of the `children` attribute.
+   */
+  syncChildren(newVal, prevVal) {
+    if (!array.equal(newVal, prevVal || [])) {
+      this.renderChildren_();
+    }
+  }
+
+  /**
    * Updates all inner components with their last template call data.
    * @protected
    */
   updateComponents_() {
-    for (var ref in this.lastComponentTemplateCall_) {
-      var data = this.lastComponentTemplateCall_[ref];
+    var templateCalls = this.lastComponentTemplateCall_;
+    var mainComponents = this.componentCollector_.getMainComponents();
+    for (var ref in mainComponents) {
+      var data = templateCalls[ref];
+      if (data && data.children) {
+        this.componentCollector_.extractChildren(data.children.content, ref, templateCalls);
+      }
       this.components_[data.ref].setAttrs(data.data);
     }
   }

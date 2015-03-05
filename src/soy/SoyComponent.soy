@@ -1,6 +1,7 @@
 {namespace Templates.SoyComponent}
 
 /**
+ * @param? children
  * @param data
  * @param name
  * @param ref
@@ -8,16 +9,31 @@
 {template .component}
   <div data-component="{$name}" data-ref="{$ref}">
     {if $ij.renderChildComponents}
-      {delcall ComponentElement data="$data" variant="$name" /}
+      {delcall ComponentElement data="$data" variant="$name"}
+        {param children: $children /}
+      {/delcall}
     {/if}
   </div>
 {/template}
 
 /**
+ * @param? children
  * @param data
  * @param name
  * @param ref
  */
 {deltemplate Component}
   {call Templates.SoyComponent.component data="all" /}
+{/deltemplate}
+
+/**
+ * @param children
+ * @param id
+ */
+{deltemplate ComponentChildren}
+  <div id="{$id}-children-placeholder">
+    {if $ij.renderChildComponents}
+      {$children}
+    {/if}
+  </div>
 {/deltemplate}

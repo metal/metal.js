@@ -50,4 +50,21 @@ describe('array', function() {
     assert.strictEqual(1, array.firstDefinedValue([undefined, undefined, 1, 2, 3]));
     assert.strictEqual(null, array.firstDefinedValue([undefined, undefined, null, 2, 3]));
   });
+
+  describe('equal', function() {
+    it('should return false for arrays with different length', function() {
+      assert.ok(!array.equal([1, 2], [1, 2, 3]));
+    });
+
+    it('should return false for arrays with different object instances', function() {
+      assert.ok(!array.equal([1, {}], [1, {}]));
+    });
+
+    it('should return true for arrays with the same content', function() {
+      assert.ok(array.equal([], []));
+      assert.ok(array.equal([1, 2], [1, 2]));
+      var obj = {};
+      assert.ok(array.equal([1, obj], [1, obj]));
+    });
+  });
 });

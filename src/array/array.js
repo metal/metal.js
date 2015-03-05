@@ -2,6 +2,21 @@
 
 class array {
   /**
+   * Checks if the given arrays have the same content.
+   * @param {!Array<*>} arr1
+   * @param {!Array<*>} arr2
+   * @return {boolean}
+   */
+  static equal(arr1, arr2) {
+    for (var i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+    return arr1.length === arr2.length;
+  }
+
+  /**
    * Returns the first value in the given array that isn't undefined.
    * @param {!Array} arr
    * @return {*}

@@ -82,12 +82,14 @@ class EventsCollector extends Disposable {
   collectInlineEventFromAttribute_(element, attribute) {
     var event = attribute.name.substring(2);
     if ((attribute.name.indexOf('on') === 0) && dom.supportsEvent(element, event)) {
-      element.removeAttribute(attribute.name);
-      return {
+      var eventData = {
         element: element,
         name: event,
         value: attribute.value
       };
+      element.removeAttribute(attribute.name);
+      element[attribute.name] = null;
+      return eventData;
     }
   }
 

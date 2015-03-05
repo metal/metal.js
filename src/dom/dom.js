@@ -11,9 +11,46 @@ class dom {
    * @param {!Array<string>} classes CSS classes to add.
    */
   static addClasses(element, classes) {
+    if ('classList' in element) {
+      dom.addClassesWithNative_(element, classes);
+    } else {
+      dom.addClassesWithoutNative_(element, classes);
+    }
+  }
+
+  /**
+   * Adds the requested CSS classes to an element using classList.
+   * @param {!Element} element The element to add CSS classes to.
+   * @param {!Array<string>} classes CSS classes to add.
+   * @protected
+   */
+  static addClassesWithNative_(element, classes) {
     classes.forEach(function(className) {
       element.classList.add(className);
     });
+  }
+
+  /**
+   * Adds the requested CSS classes to an element without using classList.
+   * @param {!Element} element The element to add CSS classes to.
+   * @param {!Array<string>} classes CSS classes to add.
+   * @protected
+   */
+  static addClassesWithoutNative_(element, classes) {
+    var elementClassName = ' ' + element.className + ' ';
+    var classesToAppend = '';
+
+    for (var i = 0; i < classes.length; i++) {
+      var className = classes[i];
+
+      if (elementClassName.indexOf(' ' + className + ' ') === -1) {
+        classesToAppend += ' ' + className;
+      }
+    }
+
+    if (classesToAppend) {
+      element.className = element.className + classesToAppend;
+    }
   }
 
   /**

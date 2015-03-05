@@ -248,9 +248,39 @@ class dom {
    * @param {!Array<string>} classes CSS classes to remove.
    */
   static removeClasses(element, classes) {
+    if ('classList' in element) {
+      dom.removeClassesWithNative_(element, classes);
+    } else {
+      dom.removeClassesWithoutNative_(element, classes);
+    }
+  }
+
+  /**
+   * Removes the requested CSS classes from an element using classList.
+   * @param {!Element} element The element to remove CSS classes from.
+   * @param {!Array<string>} classes CSS classes to remove.
+   * @protected
+   */
+  static removeClassesWithNative_(element, classes) {
     classes.forEach(function(className) {
       element.classList.remove(className);
     });
+  }
+
+  /**
+   * Removes the requested CSS classes from an element without using classList.
+   * @param {!Element} element The element to remove CSS classes from.
+   * @param {!Array<string>} classes CSS classes to remove.
+   * @protected
+   */
+  static removeClassesWithoutNative_(element, classes) {
+    var elementClassName = ' ' + element.className + ' ';
+
+    for (var i = 0; i < classes.length; i++) {;
+      elementClassName = elementClassName.replace(' ' + classes[i] + ' ', ' ');
+    };
+
+    element.className = elementClassName.trim();
   }
 
   /**

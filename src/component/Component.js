@@ -93,7 +93,6 @@ class Component extends Attribute {
      */
     this.wasRendered = false;
 
-    core.mergeSuperClassesProperty(this.constructor, 'ATTRS_SYNC', this.mergeAttrsSync_);
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
     core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
@@ -339,7 +338,7 @@ class Component extends Attribute {
     this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
     this.renderSurfacesContent_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
-    this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
+    this.syncAttrs_(this.getAttrNames());
 
     this.attach();
     return this;
@@ -375,17 +374,26 @@ class Component extends Attribute {
   }
 
   /**
-   * Fires attributes synchronization changes for attributes registered on
-   * `ATTRS_SYNC` static hint.
+   * Fires attributes synchronization changes for attributes.
    * @param {Object.<string, Object>} changes Object containing the attribute
    *     name as key and an object with newVal and prevVal as value.
    * @protected
    */
-  fireAttrsChanges_(changes) {
+  syncAttrs_(attrsName) {
+    for (var i in attrsName) {
+      this.fireAttrChange_(attrsName[i]);
+    }
+  }
+
+  /**
+   * Fires attributes synchronization changes for attributes.
+   * @param {Object.<string, Object>} changes Object containing the attribute
+   *     name as key and an object with newVal and prevVal as value.
+   * @protected
+   */
+  syncAttrsFromChanges_(changes) {
     for (var attr in changes) {
-      if (attr in this.constructor.ATTRS_SYNC_MERGED) {
-        this.fireAttrChange_(attr, changes[attr]);
-      }
+      this.fireAttrChange_(attr, changes[attr]);
     }
   }
 
@@ -494,7 +502,7 @@ class Component extends Attribute {
     if (this.inDocument) {
       this.renderSurfacesContent_(this.getModifiedSurfacesFromChanges_(event.changes));
     }
-    this.fireAttrsChanges_(event.changes);
+    this.syncAttrsFromChanges_(event.changes);
   }
 
   /**
@@ -514,24 +522,6 @@ class Component extends Attribute {
    */
   makeSurfaceId_(surfaceId) {
     return this.id + '-' + surfaceId;
-  }
-
-  /**
-   * Merges an array of values for the ATTRS_SYNC property into a single object.
-   * The final object's keys are the names of the attributes to be synchronized.
-   * @param {!Array} values The values to be merged.
-   * @return {!Object} The merged value.
-   * @protected
-   */
-  mergeAttrsSync_(values) {
-    var merged = {};
-    values = array.flatten(values);
-    for (var i = 0; i < values.length; i++) {
-      if (values[i]) {
-        merged[values[i]] = undefined;
-      }
-    }
-    return merged;
   }
 
   /**
@@ -598,7 +588,7 @@ class Component extends Attribute {
     this.clearSurfacesCache_();
     this.renderSurfacesContent_(this.surfaces_);
 
-    this.fireAttrsChanges_(this.constructor.ATTRS_SYNC_MERGED);
+    this.syncAttrs_(this.getAttrNames());
 
     this.attach(opt_parentElement, opt_siblingElement);
 
@@ -792,19 +782,6 @@ Component.ATTRS = {
     valueFn: 'valueIdFn_'
   }
 };
-
-/**
- * Defines component attributes that automatically invokes synchronization
- * logic when the component render or the attribute value change. For
- * instance, if attribute `foo` gets modified, the synchronization method
- * `syncFoo(newVal, prevVal)` is called. Synchronization methods are bound
- * to `attrsChanged` batch event, therefore they wait for all possible
- * attributes mutations to happen, and consecutively fire once for the last
- * attribute state.
- * @type {Array}
- * @static
- */
-Component.ATTRS_SYNC = ['elementClasses'];
 
 /**
  * CSS classes to be applied to the element.

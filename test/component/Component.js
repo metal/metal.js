@@ -256,14 +256,16 @@ describe('Component', function() {
           value: 0
         }
       };
-      CustomComponent.ATTRS_SYNC = ['foo', 'unknown'];
+      CustomComponent.prototype.syncUnkown = sinon.spy();
       CustomComponent.prototype.syncFoo = sinon.spy();
 
       var custom = new CustomComponent({
         foo: 10
       });
+      sinon.assert.notCalled(CustomComponent.prototype.syncUnkown);
       sinon.assert.notCalled(CustomComponent.prototype.syncFoo);
       custom.render();
+      sinon.assert.notCalled(CustomComponent.prototype.syncUnkown);
       sinon.assert.callCount(CustomComponent.prototype.syncFoo, 1);
       assert.strictEqual(10, CustomComponent.prototype.syncFoo.args[0][0]);
 
@@ -272,6 +274,12 @@ describe('Component', function() {
       async.nextTick(function() {
         sinon.assert.callCount(CustomComponent.prototype.syncFoo, 2);
         assert.strictEqual(20, CustomComponent.prototype.syncFoo.args[1][0]);
+      });
+
+      custom.unknown = 20;
+      sinon.assert.notCalled(CustomComponent.prototype.syncUnkown);
+      async.nextTick(function() {
+        sinon.assert.notCalled(CustomComponent.prototype.syncUnkown);
       });
     });
 
@@ -282,7 +290,6 @@ describe('Component', function() {
           value: 0
         }
       };
-      CustomComponent.ATTRS_SYNC = ['foo'];
 
       class ChildComponent extends CustomComponent {
         constructor(opt_config) {
@@ -295,7 +302,6 @@ describe('Component', function() {
           value: 1
         }
       };
-      ChildComponent.ATTRS_SYNC = ['bar'];
 
       var custom = new ChildComponent();
       custom.syncFoo = sinon.spy();

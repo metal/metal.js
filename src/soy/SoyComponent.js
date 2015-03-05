@@ -36,6 +36,7 @@ class SoyComponent extends Component {
      * Holds a `ComponentCollector` that will extract inner components.
      * @type {!ComponentCollector}
      * @protected
+     * TODO(edu): Merge components and surfaces?
      */
     this.componentCollector_ = new ComponentCollector();
 
@@ -134,6 +135,7 @@ class SoyComponent extends Component {
   /**
    * Renders this component's child components, if their placeholder is found.
    * @protected
+   * TODO(edu): Re-think this part.
    */
   renderChildrenComponents_() {
     var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));

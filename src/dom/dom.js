@@ -140,7 +140,33 @@ class dom {
    * @return {boolean}
    */
   static hasClass(element, className) {
+    if ('classList' in element) {
+      return dom.hasClassWithNative_(element, className);
+    } else {
+      return dom.hasClassWithoutNative_(element, className);
+    }
+  }
+
+  /**
+   * Checks if the given element has the requested css class using classList.
+   * @param {!Element} element
+   * @param {string} className
+   * @return {boolean}
+   * @protected
+   */
+  static hasClassWithNative_(element, className) {
     return element.classList.contains(className);
+  }
+
+  /**
+   * Checks if the given element has the requested css class without using classList.
+   * @param {!Element} element
+   * @param {string} className
+   * @return {boolean}
+   * @protected
+   */
+  static hasClassWithoutNative_(element, className) {
+    return (' ' + element.className + ' ').indexOf(' ' + className + ' ') >= 0;
   }
 
   /**

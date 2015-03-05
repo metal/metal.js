@@ -11,12 +11,19 @@ describe('dom', function() {
 
   describe('css classes', function() {
     it('should add css classes to requested element', function() {
+      function assertClassesAdded() {
+        assert.strictEqual(2, getClassNames(element).length);
+        assert.strictEqual('class1', getClassNames(element)[0]);
+        assert.strictEqual('class2', getClassNames(element)[1]);
+      }
+
       var element = document.createElement('div');
       dom.addClasses(element, ['class1', 'class2']);
+      assertClassesAdded();
 
-      assert.strictEqual(2, element.classList.length);
-      assert.strictEqual('class1', element.classList.item(0));
-      assert.strictEqual('class2', element.classList.item(1));
+      element.className = '';
+      dom.addClassesWithoutNative_(element, ['class1', 'class2']);
+      assertClassesAdded();
     });
 
     it('should check if an element has the requested css class', function() {
@@ -24,8 +31,25 @@ describe('dom', function() {
       dom.addClasses(element, ['class1', 'class2']);
 
       assert.ok(dom.hasClass(element, 'class1'));
+      assert.ok(dom.hasClassWithoutNative_(element, 'class1'));
+
       assert.ok(dom.hasClass(element, 'class2'));
+      assert.ok(dom.hasClassWithoutNative_(element, 'class2'));
+
       assert.ok(!dom.hasClass(element, 'class3'));
+      assert.ok(!dom.hasClassWithoutNative_(element, 'class3'));
+    });
+
+    it('should check if css classes are being removed', function() {
+      var element = document.createElement('div');
+      dom.addClasses(element, ['class1', 'class2']);
+
+      dom.removeClasses(element, ['class1']);
+      assert.ok(!dom.hasClass(element, 'class1'));
+      assert.ok(dom.hasClass(element, 'class2'));
+
+      dom.removeClassesWithoutNative_(element, ['class2']);
+      assert.ok(!dom.hasClass(element, 'class2'));
     });
   });
 
@@ -100,16 +124,19 @@ describe('dom', function() {
     it('should trigger dom event', function() {
       var listener = sinon.stub();
       var element = document.createElement('div');
+      document.body.appendChild(element);
       element.addEventListener('click', listener);
 
       dom.triggerEvent(element, 'click');
       assert.strictEqual(1, listener.callCount);
       assert.strictEqual('click', listener.args[0][0].type);
+      document.body.removeChild(element);
     });
 
     it('should add specified payload keys to triggered event', function() {
       var listener = sinon.stub();
       var element = document.createElement('div');
+      document.body.appendChild(element);
       element.addEventListener('click', listener);
 
       dom.triggerEvent(element, 'click', {
@@ -118,6 +145,7 @@ describe('dom', function() {
       assert.strictEqual(1, listener.callCount);
       assert.strictEqual('click', listener.args[0][0].type);
       assert.strictEqual('test', listener.args[0][0].test);
+      document.body.removeChild(element);
     });
   });
 
@@ -348,4 +376,9 @@ describe('dom', function() {
       assert.ok(dom.supportsEvent(element, 'change'));
     });
   });
+
+  function getClassNames(element) {
+    return element.className.trim().split(' ');
+  }
+
 });

@@ -57,16 +57,16 @@ class EventsCollector extends Disposable {
   /**
    * Attaches all listeners declared as attributes on the given element.
    * @param {Element} element
-   * @param {String} groupName
+   * @param {String=} opt_groupName
    */
-  attachListeners(element, groupName) {
-    groupName = groupName || element.id || this.component_.id;
+  attachListeners(element, opt_groupName) {
+    opt_groupName = opt_groupName || element.id || this.component_.id;
     var collectedEvents = this.collectInlineEventsFromAttributes_(element);
-    this.attachCollectedListeners_(collectedEvents, groupName);
+    this.attachCollectedListeners_(collectedEvents, opt_groupName);
     if (element.id && this.component_.extractSurfaceId_(element.id)) {
-      groupName = element.id;
+      opt_groupName = element.id;
     }
-    return groupName;
+    return opt_groupName;
   }
 
   /**

@@ -128,7 +128,7 @@ describe('SoyComponent', function() {
       var custom = new NestedComponent();
       custom.render();
 
-      var child = custom.components_.myChild0;
+      var child = custom.getComponents().myChild0;
       assert.ok(child);
       assert.strictEqual(this.ChildComponent, child.constructor);
       assert.strictEqual('bar', child.bar);
@@ -143,7 +143,7 @@ describe('SoyComponent', function() {
 
       custom.foo = 'bar2';
       custom.on('attrsChanged', function() {
-        var child = custom.components_.myChild0;
+        var child = custom.getComponents().myChild0;
         assert.ok(child);
         assert.strictEqual(test.ChildComponent, child.constructor);
         assert.strictEqual('bar2', child.bar);
@@ -158,12 +158,12 @@ describe('SoyComponent', function() {
       var custom = new NestedComponent();
       custom.render();
 
-      var prevChild = custom.components_.myChild0;
+      var prevChild = custom.getComponents().myChild0;
       custom.count = 2;
       custom.on('attrsChanged', function() {
-        assert.strictEqual(prevChild, custom.components_.myChild0);
-        assert.ok(custom.components_.myChild1);
-        assert.notStrictEqual(prevChild, custom.components_.myChild1);
+        assert.strictEqual(prevChild, custom.getComponents().myChild0);
+        assert.ok(custom.getComponents().myChild1);
+        assert.notStrictEqual(prevChild, custom.getComponents().myChild1);
         done();
       });
     });
@@ -181,7 +181,7 @@ describe('SoyComponent', function() {
       var custom = new CustomComponent();
       custom.render();
 
-      assert.ok(!custom.components_.myChild0);
+      assert.ok(!custom.getComponents().myChild0);
     });
 
     it('should pass children to nested components', function() {
@@ -189,7 +189,7 @@ describe('SoyComponent', function() {
       var component = new MultipleNestedComponent();
       component.render();
 
-      var comps = component.components_;
+      var comps = component.getComponents();
       assert.ok(comps.child1);
       assert.ok(comps.child2);
       assert.ok(comps.child3);
@@ -211,7 +211,7 @@ describe('SoyComponent', function() {
 
       component.bar = 'foo';
       component.on('attrsChanged', function() {
-        var comps = component.components_;
+        var comps = component.getComponents();
         assert.strictEqual('foo', comps.child1.bar);
         assert.strictEqual('foo', comps.child2.bar);
         assert.strictEqual('foo', comps.child3.bar);
@@ -225,7 +225,7 @@ describe('SoyComponent', function() {
       var component = new MultipleNestedComponent();
       component.render();
 
-      var comps = component.components_;
+      var comps = component.getComponents();
       var placeholder = document.getElementById(comps.nested.id + '-children-placeholder');
       assert.strictEqual(2, placeholder.childNodes.length);
       assert.strictEqual(comps.child2.element, placeholder.childNodes[0]);
@@ -258,7 +258,7 @@ describe('SoyComponent', function() {
       var component = new MainComponent();
       component.render();
 
-      var comps = component.components_;
+      var comps = component.getComponents();
       assert.ok(!comps.child.wasRendered);
     });
 
@@ -267,7 +267,7 @@ describe('SoyComponent', function() {
       var component = new MultipleNestedComponent();
       component.render();
 
-      var comps = component.components_;
+      var comps = component.getComponents();
 
       component.invert = true;
       comps.nested.on('attrsChanged', function() {

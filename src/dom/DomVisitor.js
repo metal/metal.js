@@ -72,15 +72,15 @@ class DomVisitor extends Disposable {
   /**
    * Runs all the handlers for the given element.
    * @param {!Element} element
-   * @param {Array<*>} handlerData
+   * @param {Array<*>=} opt_handlerData
    * @protected
    */
-  runHandlers_(element, handlerData) {
-    handlerData = handlerData || [];
+  runHandlers_(element, opt_handlerData) {
+    opt_handlerData = opt_handlerData || [];
     var newHandlerData = [];
-    this.handlers_.forEach(function(handler, index) {
-      newHandlerData.push(handler(element, handlerData[index]));
-    });
+    for (var i = 0; i < this.handlers_.length; i++) {
+      newHandlerData.push(this.handlers_[i](element, opt_handlerData[i]));
+    }
     return newHandlerData;
   }
 

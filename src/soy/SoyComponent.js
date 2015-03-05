@@ -40,26 +40,19 @@ class SoyComponent extends Component {
     this.componentCollector_ = new ComponentCollector();
 
     /**
-     * Holds the this component's child components.
-     * @type {!Object<string, !Component>}
-     * @protected
-     */
-    this.components_ = {};
-
-    /**
      * Holds events that were listened through the element.
      * @type {!EventHandler}
      * @protected
      */
-    this.eventsCollector_ = null;
+    this.eventsCollector_ = new EventsCollector(this);
 
     /**
-     * Stores the arguments that were passed to the last call to the SoyComponent
-     * template for each component instance (mapped by its ref).
+     * Stores the arguments that were passed to the last call to the
+     * SoyComponent template for each component instance (mapped by its ref).
      * @type {!Object}
      * @protected
      */
-    this.lastComponentTemplateCall_ = {};
+    this.componentsInterceptedData_ = {};
 
     core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
   }
@@ -69,17 +62,10 @@ class SoyComponent extends Component {
    * @override
    */
   attach(opt_parentElement, opt_siblingElement) {
-    var eventsCollector = this.getEventsCollector_();
-    eventsCollector.detachAllListeners();
-
-    var extractComponents = this.componentCollector_.extractComponents.bind(this.componentCollector_);
-    DomVisitor.visit(this.element)
-      .addHandler(eventsCollector.attachListeners.bind(eventsCollector))
-      .addHandler(extractComponents, this.lastComponentTemplateCall_)
-      .start();
-
-    this.components_ = this.componentCollector_.getComponents();
-    this.lastComponentTemplateCall_ = {};
+    var visitor = DomVisitor.visit(this.element);
+    this.informVisitorAttachListeners_(visitor);
+    this.informVisitorExtractComponents_(visitor);
+    visitor.start();
 
     super.attach(opt_parentElement, opt_siblingElement);
     return this;
@@ -90,20 +76,22 @@ class SoyComponent extends Component {
    * @override
    */
   detach() {
-    this.getEventsCollector_().detachAllListeners();
+    this.componentsInterceptedData_ = {};
+    this.eventsCollector_.detachAllListeners();
     super.detach();
     return this;
   }
 
-  /**
-   * Returns the events collector instance.
-   * @return {EventCollector}
-   */
-  getEventsCollector_() {
-    if (!this.eventsCollector_) {
-      this.eventsCollector_ = new EventsCollector(this);
-    }
-    return this.eventsCollector_;
+  getComponents() {
+    return this.componentCollector_.getComponents();
+  }
+
+  informVisitorAttachListeners_(visitor) {
+    visitor.addHandler(this.eventsCollector_.attachListeners.bind(this.eventsCollector_));
+  }
+
+  informVisitorExtractComponents_(visitor) {
+    visitor.addHandler(this.componentCollector_.extractComponents.bind(this.componentCollector_), this.componentsInterceptedData_);
   }
 
   /**
@@ -129,7 +117,7 @@ class SoyComponent extends Component {
    * @return {string} The original return value of the template.
    */
   handleTemplateCall_(data) {
-    this.lastComponentTemplateCall_[data.ref] = data;
+    this.componentsInterceptedData_[data.ref] = data;
     return originalTemplate.apply(originalTemplate, arguments);
   }
 
@@ -147,7 +135,7 @@ class SoyComponent extends Component {
    * Renders this component's child components, if their placeholder is found.
    * @protected
    */
-  renderChildren_() {
+  renderChildrenComponents_() {
     var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));
     if (placeholder) {
       dom.removeChildren(placeholder);
@@ -188,24 +176,25 @@ class SoyComponent extends Component {
     super.renderSurfaceContent(surfaceId, content);
 
     if (this.inDocument) {
-      var eventsCollector = this.getEventsCollector_();
-      eventsCollector.detachListeners(this.makeSurfaceId_(surfaceId));
-
-      var visitor = DomVisitor.visit(this.getSurfaceElement(surfaceId))
-        .addHandler(eventsCollector.attachListeners.bind(eventsCollector));
-
+      var visitor = DomVisitor.visit(this.getSurfaceElement(surfaceId));
+      this.informVisitorAttachListeners_(visitor);
       if (this.getSurface(surfaceId).cacheMiss) {
-        visitor.addHandler(
-          this.componentCollector_.extractComponents.bind(this.componentCollector_),
-          this.lastComponentTemplateCall_
-        );
-      } else {
-        this.updateComponents_();
+        this.informVisitorExtractComponents_(visitor);
       }
-      this.lastComponentTemplateCall_ = {};
-
+      this.eventsCollector_.detachListeners(this.makeSurfaceId_(surfaceId));
       visitor.start();
-      this.components_ = this.componentCollector_.getComponents();
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  renderSurfacesContent_(surfaces) {
+    super.renderSurfacesContent_(surfaces);
+
+    if (this.inDocument) {
+      this.setComponentsAttrs_();
+      this.componentsInterceptedData_ = {};
     }
   }
 
@@ -222,27 +211,30 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Syncs the component according to the new value of the `children` attribute.
+   * Updates all inner components with their last template call data.
+   * @protected
    */
-  syncChildren(newVal, prevVal) {
-    if (!array.equal(newVal, prevVal || [])) {
-      this.renderChildren_();
+  setComponentsAttrs_() {
+    var rootComponents = this.componentCollector_.getRootComponents();
+    for (var ref in rootComponents) {
+      var data = this.componentsInterceptedData_[ref];
+      if (data) {
+        if (data.children) {
+          this.componentCollector_.extractChildren(data.children.content, ref, this.componentsInterceptedData_);
+        }
+        if (rootComponents[data.ref]) {
+          rootComponents[data.ref].setAttrs(data.data);
+        }
+      }
     }
   }
 
   /**
-   * Updates all inner components with their last template call data.
-   * @protected
+   * Syncs the component according to the new value of the `children` attribute.
    */
-  updateComponents_() {
-    var templateCalls = this.lastComponentTemplateCall_;
-    var mainComponents = this.componentCollector_.getMainComponents();
-    for (var ref in mainComponents) {
-      var data = templateCalls[ref];
-      if (data && data.children) {
-        this.componentCollector_.extractChildren(data.children.content, ref, templateCalls);
-      }
-      this.components_[data.ref].setAttrs(data.data);
+  syncChildren(newVal, prevVal) {
+    if (!array.equal(newVal, prevVal || [])) {
+      this.renderChildrenComponents_();
     }
   }
 }

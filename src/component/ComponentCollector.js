@@ -17,12 +17,12 @@ class ComponentCollector extends Disposable {
     this.components_ = {};
 
     /**
-     * Holds the main extracted components (that is, components that are
+     * Holds the root extracted components (that is, components that are
      * not children of other extracted components), indexed by ref.
      * @type {!Object<string, !Component>}
      * @protected
      */
-    this.mainComponents_ = {};
+    this.rootComponents_ = {};
   }
 
   /**
@@ -36,7 +36,7 @@ class ComponentCollector extends Disposable {
   createComponent_(ref, name, data, parent) {
     var ConstructorFn = ComponentRegistry.getConstructor(name);
     this.components_[ref] = new ConstructorFn(data).render(parent.parentNode, parent);
-    this.mainComponents_[ref] = this.components_[ref];
+    this.rootComponents_[ref] = this.components_[ref];
     parent.parentNode.removeChild(parent);
   }
 
@@ -49,11 +49,11 @@ class ComponentCollector extends Disposable {
   }
 
   /**
-   * Gets all the main extracted components.
+   * Gets all the root extracted components.
    * @return {!Array<!Component>}
    */
-  getMainComponents() {
-    return this.mainComponents_;
+  getRootComponents() {
+    return this.rootComponents_;
   }
 
   /**
@@ -71,7 +71,7 @@ class ComponentCollector extends Disposable {
       var ConstructorFn = ComponentRegistry.getConstructor(data.name);
       component = new ConstructorFn(data.data);
       this.components_[data.ref] = component;
-      delete this.mainComponents_[data.ref];
+      delete this.rootComponents_[data.ref];
     }
     return component;
   }

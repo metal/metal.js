@@ -70,7 +70,7 @@ describe('EventsCollector', function() {
     custom.handleButtonClick = sinon.stub();
     custom.render();
     assertEventsCalled(custom);
-    custom.getEventsCollector_().dispose();
+    custom.eventsCollector_.dispose();
     assertEventsCalled(custom);
   });
 

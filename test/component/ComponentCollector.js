@@ -170,7 +170,7 @@ describe('ComponentCollector', function() {
     };
     collector.extractComponents(element, creationData);
 
-    var components = collector.getMainComponents();
+    var components = collector.getRootComponents();
     assert.strictEqual(1, Object.keys(components).length);
     assert.ok(components.comp instanceof TestComponent);
   });

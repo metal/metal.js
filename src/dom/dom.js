@@ -11,9 +11,46 @@ class dom {
    * @param {!Array<string>} classes CSS classes to add.
    */
   static addClasses(element, classes) {
+    if ('classList' in element) {
+      dom.addClassesWithNative_(element, classes);
+    } else {
+      dom.addClassesWithoutNative_(element, classes);
+    }
+  }
+
+  /**
+   * Adds the requested CSS classes to an element using classList.
+   * @param {!Element} element The element to add CSS classes to.
+   * @param {!Array<string>} classes CSS classes to add.
+   * @protected
+   */
+  static addClassesWithNative_(element, classes) {
     classes.forEach(function(className) {
       element.classList.add(className);
     });
+  }
+
+  /**
+   * Adds the requested CSS classes to an element without using classList.
+   * @param {!Element} element The element to add CSS classes to.
+   * @param {!Array<string>} classes CSS classes to add.
+   * @protected
+   */
+  static addClassesWithoutNative_(element, classes) {
+    var elementClassName = ' ' + element.className + ' ';
+    var classesToAppend = '';
+
+    for (var i = 0; i < classes.length; i++) {
+      var className = classes[i];
+
+      if (elementClassName.indexOf(' ' + className + ' ') === -1) {
+        classesToAppend += ' ' + className;
+      }
+    }
+
+    if (classesToAppend) {
+      element.className = element.className + classesToAppend;
+    }
   }
 
   /**
@@ -103,7 +140,33 @@ class dom {
    * @return {boolean}
    */
   static hasClass(element, className) {
+    if ('classList' in element) {
+      return dom.hasClassWithNative_(element, className);
+    } else {
+      return dom.hasClassWithoutNative_(element, className);
+    }
+  }
+
+  /**
+   * Checks if the given element has the requested css class using classList.
+   * @param {!Element} element
+   * @param {string} className
+   * @return {boolean}
+   * @protected
+   */
+  static hasClassWithNative_(element, className) {
     return element.classList.contains(className);
+  }
+
+  /**
+   * Checks if the given element has the requested css class without using classList.
+   * @param {!Element} element
+   * @param {string} className
+   * @return {boolean}
+   * @protected
+   */
+  static hasClassWithoutNative_(element, className) {
+    return (' ' + element.className + ' ').indexOf(' ' + className + ' ') >= 0;
   }
 
   /**
@@ -185,9 +248,39 @@ class dom {
    * @param {!Array<string>} classes CSS classes to remove.
    */
   static removeClasses(element, classes) {
+    if ('classList' in element) {
+      dom.removeClassesWithNative_(element, classes);
+    } else {
+      dom.removeClassesWithoutNative_(element, classes);
+    }
+  }
+
+  /**
+   * Removes the requested CSS classes from an element using classList.
+   * @param {!Element} element The element to remove CSS classes from.
+   * @param {!Array<string>} classes CSS classes to remove.
+   * @protected
+   */
+  static removeClassesWithNative_(element, classes) {
     classes.forEach(function(className) {
       element.classList.remove(className);
     });
+  }
+
+  /**
+   * Removes the requested CSS classes from an element without using classList.
+   * @param {!Element} element The element to remove CSS classes from.
+   * @param {!Array<string>} classes CSS classes to remove.
+   * @protected
+   */
+  static removeClassesWithoutNative_(element, classes) {
+    var elementClassName = ' ' + element.className + ' ';
+
+    for (var i = 0; i < classes.length; i++) {;
+      elementClassName = elementClassName.replace(' ' + classes[i] + ' ', ' ');
+    };
+
+    element.className = elementClassName.trim();
   }
 
   /**

@@ -2,19 +2,6 @@
 
 class array {
   /**
-   * Returns the first value in the given array that isn't undefined.
-   * @param {!Array} arr
-   * @return {*}
-   */
-  static firstDefinedValue(arr) {
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i] !== undefined) {
-        return arr[i];
-      }
-    }
-  }
-
-  /**
    * Transforms the input nested array to become flat.
    * @param {Array.<*|Array.<*>>} arr Nested array to flatten.
    * @param {Array.<*>} opt_output Optional output array.

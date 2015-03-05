@@ -106,8 +106,6 @@ class Component extends Attribute {
     this.wasRendered = false;
 
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
-    core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
-    core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
     this.addSurfacesFromStaticHint_();
 
     this.elementEventProxy_ = new EventEmitterProxy(this.element, this);
@@ -264,7 +262,7 @@ class Component extends Attribute {
    * @protected
    */
   createSurfaceElement_(surfaceElementId) {
-    var el = document.createElement(this.constructor.SURFACE_TAG_NAME_MERGED);
+    var el = document.createElement(this.constructor.SURFACE_TAG_NAME);
     el.id = surfaceElementId;
     return el;
   }
@@ -744,7 +742,7 @@ class Component extends Attribute {
    * @protected
    */
   valueElementFn_() {
-    return document.createElement(this.constructor.ELEMENT_TAG_NAME_MERGED);
+    return document.createElement(this.constructor.ELEMENT_TAG_NAME);
   }
 
   /**

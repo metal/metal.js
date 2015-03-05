@@ -1,5 +1,6 @@
 'use strict';
 
+import array from '../array/array';
 import core from '../core';
 import object from '../object/object';
 import EventEmitter from '../events/EventEmitter';
@@ -44,7 +45,11 @@ class Transport extends EventEmitter {
       throw new Error('Transport uri not specified');
     }
     this.uri_ = uri;
-    this.defaultConfig_ = this.constructor.INITIAL_DEFAULT_CONFIG;
+    this.defaultConfig_ = core.mergeSuperClassesProperty(
+      this.constructor,
+      'INITIAL_DEFAULT_CONFIG',
+      array.firstDefinedValue
+    );
 
     this.on('close', this.onCloseHandler_.bind(this));
     this.on('open', this.onOpenHandler_.bind(this));

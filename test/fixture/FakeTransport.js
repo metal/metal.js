@@ -1,5 +1,6 @@
 'use strict';
 
+import {async} from '../../src/promise/Promise';
 import Transport from '../../src/net/Transport';
 
 class FakeTransport extends Transport {
@@ -22,13 +23,13 @@ FakeTransport.prototype.open = function() {
 FakeTransport.prototype.write = function(message, opt_config, opt_success) {
   setTimeout(function() {
     opt_success(message);
-  }, 10);
+  }, 30);
 };
 
 function emitAsync(emitter, eventName, data) {
-  setTimeout(function() {
+  async.nextTick(function() {
     emitter.emit(eventName, data);
-  }, 0);
+  });
 }
 
 export default FakeTransport;

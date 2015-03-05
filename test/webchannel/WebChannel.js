@@ -8,6 +8,8 @@ import WebSocketTransport from '../../src/net/WebSocketTransport';
 var FakeSocketIO = createFakeSocketIO();
 
 describe('WebChannel', function() {
+  this.timeout(5000);
+
   describe('default transport', function() {
     before(function() {
       window.io = function() {
@@ -78,14 +80,16 @@ describe('WebChannel', function() {
   it('should timeout action', function(done) {
     var channel = new WebChannel(new FakeTransport('uri'));
     channel.setTimeoutMs(0);
-    channel.get(Math.PI)
-      .thenCatch(function(reason) {
-        assert.ok(reason instanceof Error);
-        done();
-      })
-      .then(function() {
-        assert.fail('Deferred should be cancelled with timeout error');
-      });
+    setTimeout(function() {
+      channel.get(Math.PI)
+        .thenCatch(function(reason) {
+          assert.ok(reason instanceof Error);
+          done();
+        })
+        .then(function() {
+          assert.fail('Deferred should be cancelled with timeout error');
+        });
+      }, 0);
   });
 
   it('should send pending messages when transport reopens', function(done) {

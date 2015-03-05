@@ -100,16 +100,19 @@ describe('dom', function() {
     it('should trigger dom event', function() {
       var listener = sinon.stub();
       var element = document.createElement('div');
+      document.body.appendChild(element);
       element.addEventListener('click', listener);
 
       dom.triggerEvent(element, 'click');
       assert.strictEqual(1, listener.callCount);
       assert.strictEqual('click', listener.args[0][0].type);
+      document.body.removeChild(element);
     });
 
     it('should add specified payload keys to triggered event', function() {
       var listener = sinon.stub();
       var element = document.createElement('div');
+      document.body.appendChild(element);
       element.addEventListener('click', listener);
 
       dom.triggerEvent(element, 'click', {
@@ -118,6 +121,7 @@ describe('dom', function() {
       assert.strictEqual(1, listener.callCount);
       assert.strictEqual('click', listener.args[0][0].type);
       assert.strictEqual('test', listener.args[0][0].test);
+      document.body.removeChild(element);
     });
   });
 
@@ -348,4 +352,9 @@ describe('dom', function() {
       assert.ok(dom.supportsEvent(element, 'change'));
     });
   });
+
+  function getClassNames(element) {
+    return element.className.trim().split(' ');
+  }
+
 });

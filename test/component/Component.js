@@ -224,16 +224,16 @@ describe('Component', function() {
       });
       custom.render();
 
-      assert.strictEqual(3, custom.element.classList.length);
-      assert.strictEqual('component', custom.element.classList.item(0));
-      assert.strictEqual('foo', custom.element.classList.item(1));
-      assert.strictEqual('bar', custom.element.classList.item(2));
+      assert.strictEqual(3, getClassNames(custom.element).length);
+      assert.strictEqual('component', getClassNames(custom.element)[0]);
+      assert.strictEqual('foo', getClassNames(custom.element)[1]);
+      assert.strictEqual('bar', getClassNames(custom.element)[2]);
 
       custom.elementClasses = ['other'];
       async.nextTick(function() {
-        assert.strictEqual(2, custom.element.classList.length);
-        assert.strictEqual('component', custom.element.classList.item(0));
-        assert.strictEqual('other', custom.element.classList.item(1));
+        assert.strictEqual(2, getClassNames(custom.element).length);
+        assert.strictEqual('component', getClassNames(custom.element)[0]);
+        assert.strictEqual('other', getClassNames(custom.element)[1]);
         done();
       });
     });
@@ -244,9 +244,9 @@ describe('Component', function() {
 
       var custom = new CustomComponent();
       custom.render();
-      assert.strictEqual(2, custom.element.classList.length);
-      assert.strictEqual('overwritten', custom.element.classList.item(0));
-      assert.strictEqual('component', custom.element.classList.item(1));
+      assert.strictEqual(2, getClassNames(custom.element).length);
+      assert.strictEqual('overwritten', getClassNames(custom.element)[0]);
+      assert.strictEqual('component', getClassNames(custom.element)[1]);
     });
 
     it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
@@ -631,28 +631,28 @@ describe('Component', function() {
 
       custom.headerContent = 'modified1';
       // Asserts that surfaces will only re-paint on nextTick
-      assert.strictEqual('<b style="font-size:10px;">header</b>', custom.getSurfaceElement('header').innerHTML);
-      assert.strictEqual('<span style="font-size:10px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
+      assert.strictEqual('header', custom.getSurfaceElement('header').querySelector('b').innerHTML);
+      assert.strictEqual('10px', custom.getSurfaceElement('bottom').querySelector('span').style.fontSize);
 
       async.nextTick(function() {
-        assert.strictEqual('<b style="font-size:10px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
-        assert.strictEqual('<span style="font-size:10px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
+        assert.strictEqual('modified1', custom.getSurfaceElement('header').querySelector('b').innerHTML);
+        assert.strictEqual('10px', custom.getSurfaceElement('bottom').querySelector('span').style.fontSize);
 
         custom.fontSize = '20px';
         // Asserts that surfaces will only re-paint on nextTick
-        assert.strictEqual('<b style="font-size:10px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
-        assert.strictEqual('<span style="font-size:10px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
+        assert.strictEqual('modified1', custom.getSurfaceElement('header').querySelector('b').innerHTML);
+        assert.strictEqual('10px', custom.getSurfaceElement('bottom').querySelector('span').style.fontSize);
 
         async.nextTick(function() {
-          assert.strictEqual('<b style="font-size:20px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
-          assert.strictEqual('<span style="font-size:20px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
+          assert.strictEqual('20px', custom.getSurfaceElement('header').querySelector('b').style.fontSize);
+          assert.strictEqual('20px', custom.getSurfaceElement('bottom').querySelector('span').style.fontSize);
 
           // Asserts that it will not repaint if component is not in document
           custom.inDocument = false;
           custom.fontSize = '10px';
           async.nextTick(function() {
-            assert.strictEqual('<b style="font-size:20px;">modified1</b>', custom.getSurfaceElement('header').innerHTML);
-            assert.strictEqual('<span style="font-size:20px;">bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
+            assert.strictEqual('20px', custom.getSurfaceElement('header').querySelector('b').style.fontSize);
+            assert.strictEqual('20px', custom.getSurfaceElement('bottom').querySelector('span').style.fontSize);
             done();
           });
         });
@@ -725,5 +725,9 @@ describe('Component', function() {
     CustomComponent.prototype.renderInternal = sinon.spy();
 
     return CustomComponent;
+  }
+
+  function getClassNames(element) {
+    return element.className.trim().split(' ');
   }
 });

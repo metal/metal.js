@@ -1,3 +1,3 @@
 liferay-core
 ===============
-[![Build Status](https://travis-ci.org/alloyui/core.svg?branch=master)](https://travis-ci.org/alloyui/core)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/alloyui/core)

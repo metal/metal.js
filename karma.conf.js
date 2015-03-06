@@ -35,6 +35,8 @@ module.exports = function(config) {
 
     reporters: ['coverage', 'progress'],
 
+    logLevel: config.LOG_ERROR,
+
     coverageReporter: {
       instrumenters: { isparta : require('isparta') },
       instrumenter: {

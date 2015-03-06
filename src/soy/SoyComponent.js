@@ -62,6 +62,25 @@ class SoyComponent extends Component {
     this.componentsInterceptedData_ = {};
 
     core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
+    this.addSurfacesFromTemplates_();
+  }
+
+  /**
+   * Adds surfaces for each registered template that is not named `element`.
+   * @protected
+   */
+  addSurfacesFromTemplates_() {
+    var templates = this.constructor.TEMPLATES_MERGED;
+    for (var templateName in templates) {
+      if (templateName !== 'element') {
+        var surface = this.getSurface(templateName);
+        if (!surface) {
+          this.addSurface(templateName, {
+            renderAttrs: templates[templateName].params
+          });
+        }
+      }
+    }
   }
 
   /**

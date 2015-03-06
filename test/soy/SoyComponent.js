@@ -95,6 +95,66 @@ describe('SoyComponent', function() {
     });
   });
 
+  describe('Surfaces', function() {
+    it('should automatically create surfaces for a component\'s templates', function() {
+      var ChildComponent = createCustomComponentClass('ChildComponent');
+      ChildComponent.TEMPLATES = {
+        header: function() {},
+        footer: function() {}
+      };
+
+      var child = new ChildComponent();
+      var surfaces = child.getSurfaces();
+      assert.deepEqual(['header', 'footer'], Object.keys(surfaces));
+    });
+
+    it('should not create surface for element template', function() {
+      var ChildComponent = createCustomComponentClass('ChildComponent');
+      ChildComponent.TEMPLATES = {
+        element: function() {},
+        header: function() {}
+      };
+
+      var child = new ChildComponent();
+      var surfaces = child.getSurfaces();
+      assert.deepEqual(['header'], Object.keys(surfaces));
+    });
+
+    it('should set surface renderAttrs to its template params', function() {
+      var ChildComponent = createCustomComponentClass('ChildComponent');
+      ChildComponent.TEMPLATES = {
+        element: function() {},
+        header: function() {},
+        footer: function() {}
+      };
+      ChildComponent.TEMPLATES.header.params = ['headerContent'];
+      ChildComponent.TEMPLATES.footer.params = ['footerContent', 'footerToolbar'];
+
+      var child = new ChildComponent();
+      var surfaces = child.getSurfaces();
+      assert.deepEqual(['headerContent'], surfaces.header.renderAttrs);
+      assert.deepEqual(['footerContent', 'footerToolbar'], surfaces.footer.renderAttrs);
+    });
+
+    it('should not override surface config when it already exists', function() {
+      var ChildComponent = createCustomComponentClass('ChildComponent');
+      ChildComponent.TEMPLATES = {
+        element: function() {},
+        header: function() {}
+      };
+      ChildComponent.TEMPLATES.header.params = ['headerContent'];
+      ChildComponent.SURFACES = {
+        header: {
+          renderAttrs: ['foo']
+        }
+      };
+
+      var child = new ChildComponent();
+      var surfaces = child.getSurfaces();
+      assert.deepEqual(['foo'], surfaces.header.renderAttrs);
+    });
+  });
+
   describe('Child Components', function() {
     beforeEach(function() {
       var ChildComponent = createCustomComponentClass('ChildComponent');

@@ -91,14 +91,12 @@ describe('ComponentCollector', function() {
         ref: 'child1'
       },
       child2: {
-        children: {content: '<div data-component data-ref="child1"></div>'},
-        data: {},
+        data: {children: '<div data-component data-ref="child1"></div>'},
         name: 'TestComponent',
         ref: 'child2'
       },
       comp: {
-        children: {content: '<div data-component data-ref="child2"></div>'},
-        data: {},
+        data: {children: '<div data-component data-ref="child2"></div>'},
         name: 'TestComponent',
         ref: 'comp'
       }
@@ -125,30 +123,51 @@ describe('ComponentCollector', function() {
         name: 'TestComponent',
         ref: 'child1'
       },
-      child2: {
-        data: {},
+      comp: {
+        data: {children: '<div data-component data-ref="child1"></div>'},
         name: 'TestComponent',
-        ref: 'child2'
+        ref: 'comp'
+      }
+    };
+    var components = collector.getComponents();
+    collector.extractComponents(element, creationData);
+    assert.strictEqual(undefined, components.child1.bar);
+
+    parent.innerHTML = '';
+    dom.append(parent, element);
+    creationData = {
+      child1: {
+        data: {bar: 'child1'},
+        name: 'TestComponent',
+        ref: 'child1'
       },
       comp: {
-        children: {
-          content: '<div data-component data-ref="child1"></div>' +
-            '<div data-component data-ref="child2"></div>'
-        },
-        data: {},
+        data: {children: '<div data-component data-ref="child1"></div>'},
+        name: 'TestComponent',
+        ref: 'comp'
+      }
+    };
+    collector.extractComponents(element, creationData);
+    assert.strictEqual('child1', components.child1.bar);
+  });
+
+  it('should keep the original value of non component config strings', function() {
+    var element = createComponentElement();
+
+    var collector = new ComponentCollector();
+    var creationData = {
+      comp: {
+        data: {bar: 'I have a data-component.'},
         name: 'TestComponent',
         ref: 'comp'
       }
     };
     collector.extractComponents(element, creationData);
 
-    parent.innerHTML = '';
-    dom.append(parent, element);
-    creationData.child1.data.bar = 'child1';
-    collector.extractComponents(element, creationData);
-
     var components = collector.getComponents();
-    assert.strictEqual('child1', components.child1.bar);
+    assert.strictEqual(1, Object.keys(components).length);
+    assert.ok(components.comp instanceof TestComponent);
+    assert.strictEqual('I have a data-component.', components.comp.bar);
   });
 
   it('should separately return components that are not children of others', function() {
@@ -162,8 +181,7 @@ describe('ComponentCollector', function() {
         ref: 'child1'
       },
       comp: {
-        children: {content: '<div data-component data-ref="child1"></div>'},
-        data: {},
+        data: {children: '<div data-component data-ref="child1"></div>'},
         name: 'TestComponent',
         ref: 'comp'
       }

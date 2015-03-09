@@ -1,7 +1,7 @@
 'use strict';
 
+import core from '../core';
 import dom from '../dom/dom';
-import object from '../object/object';
 import ComponentRegistry from '../component/ComponentRegistry';
 import Disposable from '../disposable/Disposable';
 
@@ -26,17 +26,30 @@ class ComponentCollector extends Disposable {
   }
 
   /**
-   * Creates a child component and renders it inside the specified parent.
+   * Creates a component instance.
+   * @param {string} ref The component ref.
+   * @param {string} name The component name.
+   * @param {!Object} data The component config data.
+   * @return {!Component} The created component instance.
+   * @protected
+   */
+  createComponent_(ref, name, data) {
+    var ConstructorFn = ComponentRegistry.getConstructor(name);
+    this.components_[ref] = new ConstructorFn(data);
+    return this.components_[ref];
+  }
+
+  /**
+   * Creates a root component instance.
    * @param {string} ref The component ref.
    * @param {string} name The component name.
    * @param {!Object} data The component config data.
    * @param {Element} parent The component's parent element.
    * @protected
    */
-  createComponent_(ref, name, data, parent) {
-    var ConstructorFn = ComponentRegistry.getConstructor(name);
-    this.components_[ref] = new ConstructorFn(data).render(parent.parentNode, parent);
-    this.rootComponents_[ref] = this.components_[ref];
+  createRootComponent_(ref, name, data, parent) {
+    this.rootComponents_[ref] = this.createComponent_(ref, name, data);
+    this.rootComponents_[ref].render(parent.parentNode, parent);
     parent.parentNode.removeChild(parent);
   }
 
@@ -57,48 +70,19 @@ class ComponentCollector extends Disposable {
   }
 
   /**
-   * Handles the child component with the given ref, creating it for the first
-   * time or updating it in case it doesn't exist yet.
-   * @param {!Object} data The child component's template call data.
-   * @return {!Component} The child component's instance.
-   * @protected
-   */
-  extractChild_(data) {
-    var component = this.components_[data.ref];
-    if (component) {
-      component.setAttrs(data.data);
-    } else {
-      var ConstructorFn = ComponentRegistry.getConstructor(data.name);
-      component = new ConstructorFn(data.data);
-      this.components_[data.ref] = component;
-      delete this.rootComponents_[data.ref];
-    }
-    return component;
-  }
-
-  /**
-   * Handles the given array of rendered child soy templates, converting them to
-   * component instances.
-   * @param {string} children Rendered children.
-   * @param {string} ref The parent component's ref.
+   * Extracts components from the given element.
+   * @param {!Element} element
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
    *   their ref strings.
+   * @return {!Object<string, !Object>} The original `componentData` object.
    */
-  extractChildren(children, parentRef, componentData) {
-    var parentData = componentData[parentRef];
-    parentData.data = object.mixin({}, parentData.data);
-    parentData.data.children = [];
-
-    var frag = dom.buildFragment(children);
-    for (var i = 0; i < frag.childNodes.length; i++) {
-      var ref = frag.childNodes[i].getAttribute('data-ref');
-      var data = componentData[ref];
-      if (data.children) {
-        this.extractChildren(data.children.content, ref, componentData);
-      }
-      parentData.data.children.push(this.extractChild_(data));
+  extractComponents(element, componentData) {
+    if (element.hasAttribute && element.hasAttribute('data-component')) {
+      var ref = element.getAttribute('data-ref');
+      this.extractRootComponent_(element, ref, componentData);
     }
+    return componentData;
   }
 
   /**
@@ -111,48 +95,97 @@ class ComponentCollector extends Disposable {
    *   their ref strings.
    * @protected
    */
-  extractComponent_(element, ref, componentData) {
+  extractRootComponent_(element, ref, componentData) {
     var data = componentData[ref];
     if (!data) {
       return;
     }
 
-    if (data.children) {
-      this.extractChildren(data.children.content, ref, componentData);
-    }
+    this.extractSubcomponents(data, componentData);
 
     if (this.components_[data.ref]) {
-      this.updateComponent_(data.ref, data.data, element);
+      this.updateRootComponent_(data.ref, data.data, element);
     } else {
-      this.createComponent_(data.ref, data.name, data.data, element);
+      this.createRootComponent_(data.ref, data.name, data.data, element);
     }
   }
 
   /**
-   * Extracts components from the given element.
-   * @param {!Element} element
+   * Handles the subcomponent with the given ref, creating it for the first
+   * time or updating it in case it doesn't exist yet.
+   * @param {!Object} data The subcomponent's template call data.
+   * @return {!Component} The subcomponent's instance.
+   * @protected
+   */
+  extractSubcomponent_(data) {
+    var component = this.components_[data.ref];
+    if (component) {
+      component.setAttrs(data.data);
+    } else {
+      component = this.createComponent_(data.ref, data.name, data.data);
+      delete this.rootComponents_[data.ref];
+    }
+    return component;
+  }
+
+  /**
+   * Converts values in the given data object to arrays of components, when
+   * possible.
+   * @param {!Object} data The subcomponent's template call data.
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
    *   their ref strings.
-   * @return {!Object<string, !Object>} The original `componentData` object.
    */
-  extractComponents(element, componentData) {
-    if (element.hasAttribute && element.hasAttribute('data-component')) {
-      var ref = element.getAttribute('data-ref');
-      this.extractComponent_(element, ref, componentData);
+  extractSubcomponents(data, componentData) {
+    for (var key in data.data) {
+      if (this.shouldExtractSubcomponents_(data.data[key])) {
+        data.data[key] = this.extractSubcomponentsFromString_(data.data[key], componentData);
+      }
     }
-
-    return componentData;
   }
 
   /**
-   * Updates a child component's data and parent.
+   * Handles the given string of rendered templates, converting them to
+   * component instances.
+   * @param {string} renderedComponents Rendered components.
+   * @param {!Object<string, !Object>} componentData An object with creation
+   *   data for components that may be found inside the element, indexed by
+   *   their ref strings.
+   * @return {string|!Array<!Component>} [description]
+   * @protected
+   */
+  extractSubcomponentsFromString_(renderedComponents, componentData) {
+    var components = [];
+    var frag = dom.buildFragment(renderedComponents);
+    for (var i = 0; i < frag.childNodes.length; i++) {
+      var node = frag.childNodes[i];
+      if (node.getAttribute) {
+        var ref = node.getAttribute('data-ref');
+        var data = componentData[ref];
+        this.extractSubcomponents(data, componentData);
+        components.push(this.extractSubcomponent_(data));
+      }
+    }
+    return components.length > 0 ? components : renderedComponents;
+  }
+
+  /**
+   * Checks if the given value has sub components that should be extracted.
+   * @param {*} value
+   * @return {boolean}
+   */
+  shouldExtractSubcomponents_(value) {
+    return core.isString(value) && value.indexOf('data-component') !== -1;
+  }
+
+  /**
+   * Updates a root component's data and parentNode.
    * @param {string} ref The component's ref.
    * @param {!Object} data The component's data.
    * @param {Element} parent The component's parent element.
    * @protected
    */
-  updateComponent_(ref, data, parent) {
+  updateRootComponent_(ref, data, parent) {
     var component = this.components_[ref];
     parent.parentNode.insertBefore(component.element, parent);
     parent.parentNode.removeChild(parent);

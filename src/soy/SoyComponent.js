@@ -140,6 +140,7 @@ class SoyComponent extends Component {
    * @return {string} The original return value of the template.
    */
   handleTemplateCall_(data) {
+    data.data = this.normalizeTemplateCallData_(data.data);
     this.componentsInterceptedData_[data.ref] = data;
     return originalTemplate.apply(originalTemplate, arguments);
   }
@@ -170,6 +171,23 @@ class SoyComponent extends Component {
    */
   mergeTemplates_(values) {
     return object.mixin.apply(null, [{}].concat(values.reverse()));
+  }
+
+  /**
+   * Normalizes a template's call data, converting special soy objects
+   * into html strings. This function doesn't change the original data
+   * object.
+   * @param {!Object} data
+   * @return {!Object}
+   */
+  normalizeTemplateCallData_(data) {
+    data = object.mixin({}, data);
+    for (var key in data) {
+      if (data[key] instanceof soydata.SanitizedHtml) {
+        data[key] = data[key].content;
+      }
+    }
+    return data;
   }
 
   /**
@@ -263,9 +281,7 @@ class SoyComponent extends Component {
     for (var ref in rootComponents) {
       var data = this.componentsInterceptedData_[ref];
       if (data) {
-        if (data.children) {
-          this.componentCollector_.extractChildren(data.children.content, ref, this.componentsInterceptedData_);
-        }
+        this.componentCollector_.extractSubcomponents(data, this.componentsInterceptedData_);
         if (rootComponents[data.ref]) {
           rootComponents[data.ref].setAttrs(data.data);
         }

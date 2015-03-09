@@ -307,8 +307,7 @@ describe('SoyComponent', function() {
             ref: 'child'
           }, null, {});
           return SoyTemplates.component({
-            children: {content: child.content},
-            data: {},
+            data: {children: child},
             name: 'NoPlaceholderComponent',
             ref: 'noPlaceholder'
           }, null, {});
@@ -409,26 +408,29 @@ describe('SoyComponent', function() {
         };
       },
       children: function(data) {
-        var childData = {bar: data.bar};
         var child1 = SoyTemplates.component({
-          data: childData,
+          data: {bar: data.bar},
           name: 'ChildComponent',
           ref: 'child1'
         }, null, {});
         var child2 = SoyTemplates.component({
-          children: child1,
-          data: childData,
+          data:{
+            bar: data.bar,
+            children: child1
+          },
           name: 'ChildComponent',
           ref: 'child2'
         }, null, {});
         var child3 = SoyTemplates.component({
-          data: childData,
+          data: {bar: data.bar},
           name: 'ChildComponent',
           ref: 'child3'
         }, null, {});
         var nested = SoyTemplates.component({
-          children: {content: data.invert ? child3.content + child2.content : child2.content + child3.content},
-          data: childData,
+          data: {
+            bar: data.bar,
+            children: sanitizeHtml(data.invert ? child3.content + child2.content : child2.content + child3.content),
+          },
           name: 'ChildComponent',
           ref: 'nested'
         }, null, {});
@@ -437,5 +439,9 @@ describe('SoyComponent', function() {
       }
     };
     return MultipleNestedComponent;
+  }
+
+  function sanitizeHtml(content) {
+    return soydata.VERY_UNSAFE.ordainSanitizedHtml(content);
   }
 });

@@ -9,7 +9,8 @@
   "forin": false,
   "globals": {
     "lfr": true,
-    "soy": true
+    "soy": true,
+    "soydata": true
   },
   "immed": true,
   "indent": 2,

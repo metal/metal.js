@@ -18,7 +18,7 @@
   },
   "keywords": [],
   "devDependencies": {
-    "alloyui-tasks": "git://github.com/alloyui/tasks",
+    "alloyui-tasks": "git://github.com/mairatma/alloyui-tasks#soyBuild",
     "closure-templates": "^20141017.0.0",
     "gulp": "^3.8.11",
     "isparta": "git://github.com/douglasduteil/isparta",

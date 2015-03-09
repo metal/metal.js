@@ -59,4 +59,5 @@ if (goog.DEBUG) {
   Templates.SoyComponent.__deltemplate_s15_26860e4b.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s15_26860e4b';
 }
 soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentChildren'), '', 0, Templates.SoyComponent.__deltemplate_s15_26860e4b);
+
 /* jshint ignore:end */

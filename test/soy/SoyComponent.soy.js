@@ -24,10 +24,8 @@ describe('SoyComponent.soy', function() {
 
   it('should render component wrapper', function() {
     var rendered = Templates.SoyComponent.component({
-      name: 'MyComponent',
-      data: {
-        foo: 'Foo'
-      },
+      componentName: 'MyComponent',
+      foo: 'Foo',
       ref: 'ref'
     }, null, {});
 
@@ -42,10 +40,8 @@ describe('SoyComponent.soy', function() {
 
   it('should render component template inside wrapper if renderChildComponents is true', function() {
     var rendered = Templates.SoyComponent.component({
-      name: 'MyComponent',
-      data: {
-        foo: 'Foo'
-      },
+      componentName: 'MyComponent',
+      foo: 'Foo',
       parentId: 'parentId',
       ref: 'ref'
     }, null, {renderChildComponents: true});

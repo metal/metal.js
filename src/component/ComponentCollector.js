@@ -106,7 +106,7 @@ class ComponentCollector extends Disposable {
     if (this.components_[data.ref]) {
       this.updateRootComponent_(data.ref, data.data, element);
     } else {
-      this.createRootComponent_(data.ref, data.name, data.data, element);
+      this.createRootComponent_(data.ref, data.componentName, data.data, element);
     }
   }
 
@@ -122,7 +122,7 @@ class ComponentCollector extends Disposable {
     if (component) {
       component.setAttrs(data.data);
     } else {
-      component = this.createComponent_(data.ref, data.name, data.data);
+      component = this.createComponent_(data.ref, data.componentName, data.data);
       delete this.rootComponents_[data.ref];
     }
     return component;
@@ -159,11 +159,13 @@ class ComponentCollector extends Disposable {
     var frag = dom.buildFragment(renderedComponents);
     for (var i = 0; i < frag.childNodes.length; i++) {
       var node = frag.childNodes[i];
-      if (node.getAttribute) {
+      if (core.isElement(node)) {
         var ref = node.getAttribute('data-ref');
-        var data = componentData[ref];
-        this.extractSubcomponents(data, componentData);
-        components.push(this.extractSubcomponent_(data));
+        if (ref) {
+          var data = componentData[ref];
+          this.extractSubcomponents(data, componentData);
+          components.push(this.extractSubcomponent_(data));
+        }
       }
     }
     return components.length > 0 ? components : renderedComponents;

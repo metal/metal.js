@@ -44,7 +44,7 @@ describe('ComponentCollector', function() {
       data: {
         bar: 1
       },
-      name: 'TestComponent',
+      componentName: 'TestComponent',
       ref: 'comp'
     };
     collector.extractComponents(element, {comp: creationData});
@@ -65,7 +65,7 @@ describe('ComponentCollector', function() {
       data: {
         bar: 1
       },
-      name: 'TestComponent',
+      componentName: 'TestComponent',
       ref: 'comp'
     };
     collector.extractComponents(element, {comp: creationData});
@@ -87,17 +87,17 @@ describe('ComponentCollector', function() {
     var creationData = {
       child1: {
         data: {},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'child1'
       },
       child2: {
         data: {children: '<div data-component data-ref="child1"></div>'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'child2'
       },
       comp: {
         data: {children: '<div data-component data-ref="child2"></div>'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'comp'
       }
     };
@@ -120,12 +120,12 @@ describe('ComponentCollector', function() {
     var creationData = {
       child1: {
         data: {},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'child1'
       },
       comp: {
         data: {children: '<div data-component data-ref="child1"></div>'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'comp'
       }
     };
@@ -138,12 +138,12 @@ describe('ComponentCollector', function() {
     creationData = {
       child1: {
         data: {bar: 'child1'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'child1'
       },
       comp: {
         data: {children: '<div data-component data-ref="child1"></div>'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'comp'
       }
     };
@@ -158,7 +158,7 @@ describe('ComponentCollector', function() {
     var creationData = {
       comp: {
         data: {bar: 'I have a data-component.'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'comp'
       }
     };
@@ -170,6 +170,30 @@ describe('ComponentCollector', function() {
     assert.strictEqual('I have a data-component.', components.comp.bar);
   });
 
+  it('should ignore non component elements on component attribute', function() {
+    var element = createComponentElement();
+
+    var collector = new ComponentCollector();
+    var creationData = {
+      child1: {
+        data: {},
+        componentName: 'TestComponent',
+        ref: 'child1'
+      },
+      comp: {
+        data: {children: '<span>Ignore</span><div data-component data-ref="child1"></div>'},
+        componentName: 'TestComponent',
+        ref: 'comp'
+      }
+    };
+    collector.extractComponents(element, creationData);
+
+    var components = collector.getComponents();
+    assert.strictEqual(2, Object.keys(components).length);
+    assert.ok(components.comp instanceof TestComponent);
+    assert.ok(components.child1 instanceof TestComponent);
+  });
+
   it('should separately return components that are not children of others', function() {
     var element = createComponentElement();
 
@@ -177,12 +201,12 @@ describe('ComponentCollector', function() {
     var creationData = {
       child1: {
         data: {},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'child1'
       },
       comp: {
         data: {children: '<div data-component data-ref="child1"></div>'},
-        name: 'TestComponent',
+        componentName: 'TestComponent',
         ref: 'comp'
       }
     };

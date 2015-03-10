@@ -36,7 +36,6 @@ class SoyComponent extends Component {
      * Holds a `ComponentCollector` that will extract inner components.
      * @type {!ComponentCollector}
      * @protected
-     * TODO(edu): Merge components and surfaces?
      */
     this.componentCollector_ = new ComponentCollector();
 
@@ -140,8 +139,12 @@ class SoyComponent extends Component {
    * @return {string} The original return value of the template.
    */
   handleTemplateCall_(data) {
-    data.data = this.normalizeTemplateCallData_(data.data);
-    this.componentsInterceptedData_[data.ref] = data;
+    var callData = {
+      componentName: data.componentName,
+      ref: data.ref
+    };
+    callData.data = this.normalizeTemplateCallData_(data);
+    this.componentsInterceptedData_[callData.ref] = callData;
     return originalTemplate.apply(originalTemplate, arguments);
   }
 
@@ -181,7 +184,10 @@ class SoyComponent extends Component {
    * @return {!Object}
    */
   normalizeTemplateCallData_(data) {
-    data = object.mixin({}, data);
+    data = object.mixin({}, data, {
+      componentName: null,
+      ref: null
+    });
     for (var key in data) {
       if (data[key] instanceof soydata.SanitizedHtml) {
         data[key] = data[key].content;

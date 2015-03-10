@@ -302,13 +302,12 @@ describe('SoyComponent', function() {
       MainComponent.TEMPLATES = {
         element: function() {
           var child = SoyTemplates.component({
-            data: {},
-            name: 'ChildComponent',
+            componentName: 'ChildComponent',
             ref: 'child'
           }, null, {});
           return SoyTemplates.component({
-            data: {children: child},
-            name: 'NoPlaceholderComponent',
+            children: child,
+            componentName: 'NoPlaceholderComponent',
             ref: 'noPlaceholder'
           }, null, {});
         }
@@ -374,8 +373,8 @@ describe('SoyComponent', function() {
         var result = {content: ''};
         for (var i = 0; i < data.count; i++) {
           var childData = {
-            data: {bar: data.foo},
-            name: 'ChildComponent',
+            bar: data.foo,
+            componentName: 'ChildComponent',
             ref: 'myChild' + i
           };
           result.content += SoyTemplates.component(childData, null, {});
@@ -409,29 +408,25 @@ describe('SoyComponent', function() {
       },
       children: function(data) {
         var child1 = SoyTemplates.component({
-          data: {bar: data.bar},
-          name: 'ChildComponent',
+          bar: data.bar,
+          componentName: 'ChildComponent',
           ref: 'child1'
         }, null, {});
         var child2 = SoyTemplates.component({
-          data:{
-            bar: data.bar,
-            children: child1
-          },
-          name: 'ChildComponent',
+          bar: data.bar,
+          children: child1,
+          componentName: 'ChildComponent',
           ref: 'child2'
         }, null, {});
         var child3 = SoyTemplates.component({
-          data: {bar: data.bar},
-          name: 'ChildComponent',
+          bar: data.bar,
+          componentName: 'ChildComponent',
           ref: 'child3'
         }, null, {});
         var nested = SoyTemplates.component({
-          data: {
-            bar: data.bar,
-            children: sanitizeHtml(data.invert ? child3.content + child2.content : child2.content + child3.content),
-          },
-          name: 'ChildComponent',
+          bar: data.bar,
+          children: sanitizeHtml(data.invert ? child3.content + child2.content : child2.content + child3.content),
+          componentName: 'ChildComponent',
           ref: 'nested'
         }, null, {});
 

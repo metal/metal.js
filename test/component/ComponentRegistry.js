@@ -34,4 +34,13 @@ describe('ComponentRegistry', function() {
   it('should store templates', function() {
     assert.strictEqual('object', typeof ComponentRegistry.Templates);
   });
+
+  it('should set TEMPLATES variable on component with its templates', function() {
+    ComponentRegistry.Templates.TemplateComponent = {};
+
+    class TemplateComponent {}
+    ComponentRegistry.register('TemplateComponent', TemplateComponent);
+
+    assert.strictEqual(ComponentRegistry.Templates.TemplateComponent, TemplateComponent.TEMPLATES);
+  });
 });

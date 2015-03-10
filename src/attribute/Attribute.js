@@ -1,5 +1,6 @@
 'use strict';
 
+import array from '../array/array';
 import core from '../core';
 import object from '../object/object';
 import EventEmitter from '../events/EventEmitter';
@@ -32,6 +33,7 @@ class Attribute extends EventEmitter {
      */
     this.attrsInfo_ = {};
 
+    this.mergeInvalidAttrs_();
     this.addAttrsFromStaticHint_(opt_config);
   }
 
@@ -105,8 +107,8 @@ class Attribute extends EventEmitter {
    * @throws {Error}
    */
   assertValidAttrName_(name) {
-    if (name === 'attrs') {
-      throw new Error('It\'s not allowed to create an attribute with the name "attrs".');
+    if (this.constructor.INVALID_ATTRS_MERGED[name]) {
+      throw new Error('It\'s not allowed to create an attribute with the name "' + name + '".');
     }
   }
 
@@ -272,9 +274,26 @@ class Attribute extends EventEmitter {
    * Merges an array of values for the ATTRS property into a single object.
    * @param {!Array} values The values to be merged.
    * @return {!Object} The merged value.
+   * @protected
    */
   mergeAttrs_(values) {
     return object.mixin.apply(null, [{}].concat(values.reverse()));
+  }
+
+  /**
+   * Merges the values of the `INVALID_ATTRS` static for the whole hierarchy of
+   * the current instance.
+   * @protected
+   */
+  mergeInvalidAttrs_() {
+    core.mergeSuperClassesProperty(this.constructor, 'INVALID_ATTRS', function(values) {
+      return array.flatten(values).reduce(function(merged, val) {
+        if (val) {
+          merged[val] = true;
+        }
+        return merged;
+      }, {});
+    });
   }
 
   /**
@@ -401,8 +420,16 @@ class Attribute extends EventEmitter {
 }
 
 /**
+ * A list with attribute names that will automatically be rejected as invalid.
+ * Subclasses can define their own invalid attributes by setting this static
+ * on their constructors, which will be merged together and handled automatically.
+ * @type {!Array<string>}
+ */
+Attribute.INVALID_ATTRS = ['attrs'];
+
+/**
  * Constants that represent the states that an attribute can be in.
- * @type {Object}
+ * @type {!Object}
  */
 Attribute.States = {
   UNINITIALIZED: 0,

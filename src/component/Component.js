@@ -876,4 +876,10 @@ Component.Error = {
   ALREADY_RENDERED: 'Component already rendered'
 };
 
+/**
+ * A list with attribute names that will automatically be rejected as invalid.
+ * @type {!Array<string>}
+ */
+Component.INVALID_ATTRS = ['componentName', 'components', 'ref'];
+
 export default Component;

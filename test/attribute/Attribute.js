@@ -26,11 +26,43 @@ describe('Attribute', function() {
     assert.strictEqual('attr2', attrNames[1]);
   });
 
-  it('should not allow adding attribute with invalid name', function() {
+  it('should not allow adding attribute named "attrs"', function() {
     var attr = new Attribute();
 
     assert.throws(function() {
       attr.addAttrs({
+        attrs: {}
+      });
+    });
+  });
+
+  it('should not allow adding attribute with name contained in INVALID_ATTRS', function() {
+    class Test extends Attribute {
+      constructor(opt_config) {
+        super(opt_config);
+      }
+    }
+    Test.INVALID_ATTRS = ['invalid'];
+
+    var test = new Test();
+    assert.throws(function() {
+      test.addAttrs({
+        invalid: {}
+      });
+    });
+  });
+
+  it('should not allow adding attribute named "attrs" on subclasses', function() {
+    class Test extends Attribute {
+      constructor(opt_config) {
+        super(opt_config);
+      }
+    }
+    Test.INVALID_ATTRS = ['invalid'];
+
+    var test = new Test();
+    assert.throws(function() {
+      test.addAttrs({
         attrs: {}
       });
     });

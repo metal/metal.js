@@ -327,6 +327,39 @@ describe('Component', function() {
       custom.children = componentsArray;
       assert.strictEqual(componentsArray, custom.children);
     });
+
+    it('should not allow defining attribute named componentName', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        componentName: {}
+      };
+
+      assert.throws(function() {
+        new CustomComponent();
+      });
+    });
+
+    it('should not allow defining attribute named components', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        components: {}
+      };
+
+      assert.throws(function() {
+        new CustomComponent();
+      });
+    });
+
+    it('should not allow defining attribute named ref', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        ref: {}
+      };
+
+      assert.throws(function() {
+        new CustomComponent();
+      });
+    });
   });
 
   describe('Render', function() {

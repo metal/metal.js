@@ -14,7 +14,15 @@ class ComponentRegistry {
    * @static
    */
   static getConstructor(name) {
-    return ComponentRegistry.components_[name];
+    var constructorFn = ComponentRegistry.components_[name];
+    if (!constructorFn) {
+      console.error(
+        'There\'s no constructor registered for the component ' +
+        'named ' + name + '. Components need to be registered via ' +
+        'ComponentRegistry.register.'
+      );
+    }
+    return constructorFn;
   }
 
   /**

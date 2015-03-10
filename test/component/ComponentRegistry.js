@@ -3,8 +3,21 @@
 import ComponentRegistry from '../../src/component/ComponentRegistry';
 
 describe('ComponentRegistry', function() {
+  beforeEach(function() {
+    sinon.stub(console, 'error');
+  });
+
+  afterEach(function() {
+    console.error.restore();
+  });
+
   it('should return undefined for getting constructor of unregistered component', function() {
     assert.ok(!ComponentRegistry.getConstructor('UnregisteredComponent'));
+  });
+
+  it('should log error when getting constructor of unregistered component', function() {
+    ComponentRegistry.getConstructor('UnregisteredComponent');
+    assert.strictEqual(1, console.error.callCount);
   });
 
   it('should return constructor of registered components', function() {

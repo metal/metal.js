@@ -141,6 +141,20 @@ describe('Attribute', function() {
     assert.strictEqual(undefined, attr.attr1);
   });
 
+  it('should not use valueFn function if value is also defined', function() {
+    var attr = new Attribute();
+    attr.addAttrs({
+      attr1: {
+        value: '',
+        valueFn: function() {
+          return '1';
+        }
+      }
+    });
+
+    assert.strictEqual('', attr.attr1);
+  });
+
   it('should override default attribute value', function() {
     var attr = new Attribute();
     attr.addAttrs(

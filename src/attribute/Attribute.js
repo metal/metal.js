@@ -367,7 +367,7 @@ class Attribute extends EventEmitter {
   setDefaultValue_(name) {
     var config = this.attrsInfo_[name].config;
 
-    if (config.value) {
+    if (config.value !== undefined) {
       this[name] = config.value;
     } else {
       this[name] = this.callFunction_(config.valueFn);

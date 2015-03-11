@@ -16,6 +16,14 @@ TestComponent.ATTRS = {
 };
 
 describe('ComponentCollector', function() {
+  beforeEach(function() {
+    sinon.stub(console, 'warn');
+  });
+
+  afterEach(function() {
+    console.warn.restore();
+  });
+
   it('should not create components on element without data-component attribute', function() {
     var element = createComponentElement();
     element.removeAttribute('data-component');
@@ -192,6 +200,7 @@ describe('ComponentCollector', function() {
     assert.strictEqual(2, Object.keys(components).length);
     assert.ok(components.comp instanceof TestComponent);
     assert.ok(components.child1 instanceof TestComponent);
+    assert.strictEqual(1, console.warn.callCount);
   });
 
   it('should separately return components that are not children of others', function() {

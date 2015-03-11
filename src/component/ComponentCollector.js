@@ -114,10 +114,15 @@ class ComponentCollector extends Disposable {
    * Handles the subcomponent with the given ref, creating it for the first
    * time or updating it in case it doesn't exist yet.
    * @param {!Object} data The subcomponent's template call data.
+   * @param {!Object<string, !Object>} componentData An object with creation
+   *   data for components that may be found inside the element, indexed by
+   *   their ref strings.
    * @return {!Component} The subcomponent's instance.
    * @protected
    */
-  extractSubcomponent_(data) {
+  extractSubcomponent_(data, componentData) {
+    this.extractSubcomponents(data, componentData);
+
     var component = this.components_[data.ref];
     if (component) {
       component.setAttrs(data.data);
@@ -157,18 +162,28 @@ class ComponentCollector extends Disposable {
   extractSubcomponentsFromString_(renderedComponents, componentData) {
     var components = [];
     var frag = dom.buildFragment(renderedComponents);
+    var ignored = false;
     for (var i = 0; i < frag.childNodes.length; i++) {
       var node = frag.childNodes[i];
-      if (core.isElement(node)) {
+      if (core.isElement(node) && node.getAttribute('data-ref')) {
         var ref = node.getAttribute('data-ref');
-        if (ref) {
-          var data = componentData[ref];
-          this.extractSubcomponents(data, componentData);
-          components.push(this.extractSubcomponent_(data));
-        }
+        components.push(this.extractSubcomponent_(componentData[ref], componentData));
+      } else {
+        ignored = true;
       }
     }
-    return components.length > 0 ? components : renderedComponents;
+
+    if (components.length) {
+      if (ignored) {
+        console.warn(
+          'One or more HTML nodes were ignored when extracting components. ' +
+          'Only nodes with the data-ref attribute set are valid.'
+        );
+      }
+      return components;
+    } else {
+      return renderedComponents;
+    }
   }
 
   /**

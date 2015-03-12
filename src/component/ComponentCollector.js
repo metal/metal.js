@@ -44,13 +44,13 @@ class ComponentCollector extends Disposable {
    * @param {string} ref The component ref.
    * @param {string} name The component name.
    * @param {!Object} data The component config data.
-   * @param {Element} parent The component's parent element.
+   * @param {Element} element The component's element.
    * @protected
    */
-  createRootComponent_(ref, name, data, parent) {
+  createRootComponent_(ref, name, data, element) {
+    data.element = element;
     this.rootComponents_[ref] = this.createComponent_(ref, name, data);
-    this.rootComponents_[ref].render(parent.parentNode, parent);
-    parent.parentNode.removeChild(parent);
+    this.rootComponents_[ref].render();
   }
 
   /**
@@ -199,13 +199,16 @@ class ComponentCollector extends Disposable {
    * Updates a root component's data and parentNode.
    * @param {string} ref The component's ref.
    * @param {!Object} data The component's data.
-   * @param {Element} parent The component's parent element.
+   * @param {Element} element The element indicating the position the component
+   *   should be at.
    * @protected
    */
-  updateRootComponent_(ref, data, parent) {
+  updateRootComponent_(ref, data, element) {
     var component = this.components_[ref];
-    parent.parentNode.insertBefore(component.element, parent);
-    parent.parentNode.removeChild(parent);
+    if (component.element !== element) {
+      element.parentNode.insertBefore(component.element, element);
+      element.parentNode.removeChild(element);
+    }
     component.setAttrs(data);
   }
 }

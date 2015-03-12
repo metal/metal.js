@@ -61,6 +61,7 @@ describe('ComponentCollector', function() {
     assert.strictEqual(1, Object.keys(components).length);
     assert.ok(components.comp instanceof TestComponent);
     assert.strictEqual(1, components.comp.bar);
+    assert.strictEqual(element, components.comp.element);
     assert.strictEqual(parent, components.comp.element.parentNode);
   });
 
@@ -85,7 +86,32 @@ describe('ComponentCollector', function() {
 
     var components = collector.getComponents();
     assert.strictEqual(2, components.comp.bar);
+    assert.strictEqual(element, components.comp.element);
     assert.strictEqual(parent, components.comp.element.parentNode);
+  });
+
+  it('should reposition existing component if extracted from a different element', function() {
+    var parent = document.createElement('div');
+    var element = createComponentElement(parent);
+
+    var collector = new ComponentCollector();
+    var creationData = {
+      data: {
+        bar: 1
+      },
+      componentName: 'TestComponent',
+      ref: 'comp'
+    };
+    collector.extractComponents(element, {comp: creationData});
+
+    var parent2 = document.createElement('div');
+    var element2 = createComponentElement(parent2);
+    dom.append(parent2, element2);
+    collector.extractComponents(element2, {comp: creationData});
+
+    var components = collector.getComponents();
+    assert.strictEqual(element, components.comp.element);
+    assert.strictEqual(parent2, components.comp.element.parentNode);
   });
 
   it('should instantiate extracted component children', function() {

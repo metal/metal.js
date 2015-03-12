@@ -8,7 +8,9 @@ var Templates = ComponentRegistry.Templates;
  * @fileoverview Templates in namespace Templates.SoyComponent.
  * @hassoydeltemplate {Component}
  * @hassoydeltemplate {ComponentChildren}
+ * @hassoydeltemplate {ComponentElement}
  * @hassoydelcall {ComponentElement}
+ * @hassoydelcall {ComponentTemplate}
  */
 
 if (typeof Templates.SoyComponent == 'undefined') { Templates.SoyComponent = {}; }
@@ -22,7 +24,7 @@ if (typeof Templates.SoyComponent == 'undefined') { Templates.SoyComponent = {};
  * @suppress {checkTypes}
  */
 Templates.SoyComponent.component = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div data-component="' + soy.$$escapeHtmlAttribute(opt_data.componentName) + '" data-ref="' + soy.$$escapeHtmlAttribute(opt_data.ref) + '">' + ((opt_ijData.renderChildComponents) ? soy.$$escapeHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentElement'), opt_data.componentName, true)(opt_data, null, opt_ijData)) : '') + '</div>');
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml((opt_ijData.renderChildComponents) ? soy.$$escapeHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), opt_data.componentName, true)(opt_data, null, opt_ijData)) : soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentElement'), opt_data.componentName, true)(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
   Templates.SoyComponent.component.soyTemplateName = 'Templates.SoyComponent.component';
@@ -36,13 +38,13 @@ if (goog.DEBUG) {
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.SoyComponent.__deltemplate_s12_0084916f = function(opt_data, opt_ignored, opt_ijData) {
+Templates.SoyComponent.__deltemplate_s10_0084916f = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml(Templates.SoyComponent.component(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.SoyComponent.__deltemplate_s12_0084916f.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s12_0084916f';
+  Templates.SoyComponent.__deltemplate_s10_0084916f.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s10_0084916f';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('Component'), '', 0, Templates.SoyComponent.__deltemplate_s12_0084916f);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('Component'), '', 0, Templates.SoyComponent.__deltemplate_s10_0084916f);
 
 
 /**
@@ -52,12 +54,31 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('Component'), '', 0, Templates.S
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.SoyComponent.__deltemplate_s14_26860e4b = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-children-placeholder">' + ((opt_ijData.renderChildComponents) ? soy.$$escapeHtml(opt_data.children) : '') + '</div>');
+Templates.SoyComponent.__deltemplate_s12_26860e4b = function(opt_data, opt_ignored, opt_ijData) {
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-children-placeholder" data-component-children>' + ((opt_ijData.renderChildComponents) ? soy.$$escapeHtml(opt_data.children) : '') + '</div>');
 };
 if (goog.DEBUG) {
-  Templates.SoyComponent.__deltemplate_s14_26860e4b.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s14_26860e4b';
+  Templates.SoyComponent.__deltemplate_s12_26860e4b.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s12_26860e4b';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentChildren'), '', 0, Templates.SoyComponent.__deltemplate_s14_26860e4b);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentChildren'), '', 0, Templates.SoyComponent.__deltemplate_s12_26860e4b);
+
+
+/**
+ * @param {Object.<string, *>=} opt_data
+ * @param {(null|undefined)=} opt_ignored
+ * @param {Object.<string, *>=} opt_ijData
+ * @return {!soydata.SanitizedHtml}
+ * @suppress {checkTypes}
+ */
+Templates.SoyComponent.__deltemplate_s20_40718f6d = function(opt_data, opt_ignored, opt_ijData) {
+  var output = '';
+  var tag__soy21 = opt_data.tagName ? opt_data.tagName : 'div';
+  output += '<' + soy.$$filterHtmlElementName(tag__soy21) + ' data-component="' + soy.$$escapeHtmlAttribute(opt_data.componentName) + '" data-ref="' + soy.$$escapeHtmlAttribute(opt_data.ref ? opt_data.ref : '') + '">' + ((opt_data.contents) ? soy.$$escapeHtml(opt_data.contents) : '') + '</' + soy.$$filterHtmlElementName(tag__soy21) + '>';
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml(output);
+};
+if (goog.DEBUG) {
+  Templates.SoyComponent.__deltemplate_s20_40718f6d.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s20_40718f6d';
+}
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), '', 0, Templates.SoyComponent.__deltemplate_s20_40718f6d);
 
 /* jshint ignore:end */

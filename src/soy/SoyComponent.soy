@@ -5,11 +5,14 @@
  * @param ref
  */
 {template .component}
-  <div data-component="{$componentName}" data-ref="{$ref}">
-    {if $ij.renderChildComponents}
-      {delcall ComponentElement data="all" variant="$componentName" /}
-    {/if}
-  </div>
+  {if $ij.renderChildComponents}
+    {delcall ComponentTemplate data="all" variant="$componentName" /}
+  {else}
+    {delcall ComponentElement variant="$componentName"}
+      {param componentName: $componentName /}
+      {param ref: $ref /}
+    {/delcall}
+  {/if}
 {/template}
 
 /**
@@ -25,9 +28,24 @@
  * @param id
  */
 {deltemplate ComponentChildren}
-  <div id="{$id}-children-placeholder">
+  <div id="{$id}-children-placeholder" data-component-children>
     {if $ij.renderChildComponents}
       {$children}
     {/if}
   </div>
+{/deltemplate}
+
+/**
+ * @param componentName
+ * @param? contents
+ * @param ref
+ * @param? tagName
+ */
+{deltemplate ComponentElement}
+  {let $tag: $tagName ? $tagName : 'div' /}
+  <{$tag} data-component="{$componentName}" data-ref="{$ref ? $ref : ''}">
+    {if $contents}
+      {$contents}
+    {/if}
+  </{$tag}>
 {/deltemplate}

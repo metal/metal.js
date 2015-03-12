@@ -58,12 +58,46 @@ class html {
    * @return {string}
    * @protected
    */
-  static lookupPossibleTagEnd_(htmlString, openTag) {
+  static lookupPossibleTagBoundary_(htmlString, openTag) {
     var tagPos = htmlString.indexOf(openTag);
     if (tagPos > -1) {
       tagPos += htmlString.substring(tagPos).indexOf('>') + 1;
     }
     return tagPos;
+  }
+
+  /**
+   * Searches for first occurrence of the specified open tag string pattern
+   * and from that point finds correct closing tag.
+   * @param {string} openTagPattern
+   * @param {string} openTag Open tag string pattern without open tag ending
+   *     character, e.g. "<textarea" or " data-foo=".
+   * @return {string}
+   * @protected
+   */
+  static lookupPossibleTagEnd_(htmlString, openTagPattern) {
+    var tagEnd = html.lookupPossibleTagBoundary_(htmlString, openTagPattern);
+    var abut = 0;
+    var malformed = true;
+    while (tagEnd < htmlString.length) {
+      if (htmlString.charAt(tagEnd) === '<') {
+        if (htmlString.charAt(tagEnd + 1) === '/') {
+          if (abut === 0) {
+            malformed = false;
+            break;
+          }
+          abut--;
+        }
+        else {
+          abut++;
+        }
+      }
+      tagEnd++;
+    }
+    if (malformed) {
+      throw new Error('Cannot remove element contents on malformed HTML.');
+    }
+    return tagEnd;
   }
 
   /**
@@ -88,6 +122,27 @@ class html {
   }
 
   /**
+   * Removes inner contents inside tags that matches with the specified tag
+   * pattern recursively.
+   * @param {string} htmlString
+   * @param {string} openTagPattern Open tag string pattern without open tag
+   *     ending character, e.g. "<textarea" or "<code".
+   * @return {html} The HTML with inner content removed for desired tag.
+   * @protected
+   */
+  static removeElementContent(htmlString, openTagPattern) {
+    var tagPosEnd = html.lookupPossibleTagBoundary_(htmlString, openTagPattern);
+    if (tagPosEnd > -1) {
+      var tagPosEndBoundary = html.lookupPossibleTagEnd_(htmlString, openTagPattern);
+      htmlString = string.replaceInterval(htmlString, tagPosEnd, tagPosEndBoundary, '');
+      htmlString = htmlString.replace(openTagPattern, '%%%~1~%%%');
+      htmlString = html.removeElementContent(htmlString, openTagPattern);
+    }
+    htmlString = htmlString.replace(/%%%~1~%%%/g, openTagPattern);
+    return htmlString;
+  }
+
+  /**
    * Preserves inner contents inside the specified tag. When preserved,
    * original content are replaced with an unique generated block id and
    * stored into `preserved` map.
@@ -102,13 +157,13 @@ class html {
    * @protected
    */
   static preserveInnerHtml_(htmlString, openTag, closeTag, preserved) {
-    var tagPosEnd = html.lookupPossibleTagEnd_(htmlString, openTag);
+    var tagPosEnd = html.lookupPossibleTagBoundary_(htmlString, openTag);
     while (tagPosEnd > -1) {
       var tagEndPos = htmlString.indexOf(closeTag);
       htmlString = html.preserveInterval_(htmlString, tagPosEnd, tagEndPos, preserved);
       htmlString = htmlString.replace(openTag, '%%%~1~%%%');
       htmlString = htmlString.replace(closeTag, '%%%~2~%%%');
-      tagPosEnd = html.lookupPossibleTagEnd_(htmlString, openTag);
+      tagPosEnd = html.lookupPossibleTagBoundary_(htmlString, openTag);
     }
     htmlString = htmlString.replace(/%%%~1~%%%/g, openTag);
     htmlString = htmlString.replace(/%%%~2~%%%/g, closeTag);

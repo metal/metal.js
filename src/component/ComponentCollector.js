@@ -23,6 +23,14 @@ class ComponentCollector extends Disposable {
      * @protected
      */
     this.rootComponents_ = {};
+
+    /**
+     * Flag indicating if new components should be decorated instead of
+     * rendered.
+     * @type {boolean}
+     * @protected
+     */
+    this.shouldDecorate_ = false;
   }
 
   /**
@@ -50,7 +58,12 @@ class ComponentCollector extends Disposable {
   createRootComponent_(ref, name, data, element) {
     data.element = element;
     this.rootComponents_[ref] = this.createComponent_(ref, name, data);
-    this.rootComponents_[ref].render();
+
+    if (this.shouldDecorate_ && element.childNodes.length > 0) {
+      this.rootComponents_[ref].decorate();
+    } else {
+      this.rootComponents_[ref].render();
+    }
   }
 
   /**
@@ -184,6 +197,15 @@ class ComponentCollector extends Disposable {
     } else {
       return renderedComponents;
     }
+  }
+
+  /**
+   * Sets the flag that indicates if new components should be decorated instead
+   * of rendered.
+   * @param {boolean} shouldDecorate
+   */
+  setShouldDecorate(shouldDecorate) {
+    this.shouldDecorate_ = shouldDecorate;
   }
 
   /**

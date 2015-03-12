@@ -338,7 +338,35 @@ describe('SoyComponent', function() {
       });
     });
 
-    describe('Decorate Children', function() {
+    describe('Decorate Nested Root Components', function() {
+      it('should decorate nested components if main component was decorated', function() {
+        var content = '<div data-component="ChildComponent" data-ref="child">Decorate</div>';
+        var element = document.createElement('div');
+        dom.append(element, content);
+
+        var DecoratedComponent = createCustomComponentClass('DecoratedComponent');
+        DecoratedComponent.TEMPLATES = {
+          element: function() {
+            return {
+              content: SoyTemplates.component({
+                componentName: 'ChildComponent',
+                ref: 'child'
+              }, null, {})
+            };
+          }
+        };
+        var component = new DecoratedComponent({
+          element: element,
+          id: 'decorated'
+        });
+        component.decorate();
+
+        var comps = component.components;
+        assert.ok(comps.child.wasDecorated);
+      });
+    });
+
+    describe('Decorate Children Components', function() {
       it('should decorate children components if main component was decorated', function() {
         var content = '<div id="decorated-children-placeholder">' +
           '<div></div><div></div></div>';

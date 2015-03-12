@@ -65,7 +65,61 @@ describe('ComponentCollector', function() {
     assert.strictEqual(parent, components.comp.element.parentNode);
   });
 
-  it('should update extracted component instances', function() {
+  it('should render new extracted components', function() {
+    var parent = document.createElement('div');
+    var element = createComponentElement(parent);
+
+    var collector = new ComponentCollector();
+    var creationData = {
+      data: {},
+      componentName: 'TestComponent',
+      ref: 'comp'
+    };
+    collector.extractComponents(element, {comp: creationData});
+
+    var components = collector.getComponents();
+    assert.ok(components.comp.wasRendered);
+    assert.ok(!components.comp.wasDecorated);
+  });
+
+  it('should decorate new extracted component if setShouldDecorate is called with true', function() {
+    var parent = document.createElement('div');
+    var element = createComponentElement(parent);
+    dom.append(element, 'Some Content');
+
+    var collector = new ComponentCollector();
+    var creationData = {
+      data: {},
+      componentName: 'TestComponent',
+      ref: 'comp'
+    };
+    collector.setShouldDecorate(true);
+    collector.extractComponents(element, {comp: creationData});
+
+    var components = collector.getComponents();
+    assert.ok(components.comp.wasRendered);
+    assert.ok(components.comp.wasDecorated);
+  });
+
+  it('should not decorate new extracted component when element has no content', function() {
+    var parent = document.createElement('div');
+    var element = createComponentElement(parent);
+
+    var collector = new ComponentCollector();
+    var creationData = {
+      data: {},
+      componentName: 'TestComponent',
+      ref: 'comp'
+    };
+    collector.setShouldDecorate(true);
+    collector.extractComponents(element, {comp: creationData});
+
+    var components = collector.getComponents();
+    assert.ok(components.comp.wasRendered);
+    assert.ok(!components.comp.wasDecorated);
+  });
+
+  it('should update existing extracted component', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 

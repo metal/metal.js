@@ -87,11 +87,20 @@ class SoyComponent extends Component {
    * @override
    */
   attach(opt_parentElement, opt_siblingElement) {
+    if (this.decorating_) {
+      // We need to call the element soy template function when the component
+      // is being decorated, even though we won't use its results. This call is
+      // only needed in order for us tointercept the call data for nested components.
+      this.renderElementTemplate();
+      this.componentCollector_.setShouldDecorate(true);
+    }
+
     var visitor = DomVisitor.visit(this.element);
     this.informVisitorAttachListeners_(visitor);
     this.informVisitorExtractComponents_(visitor);
     visitor.start();
 
+    this.componentCollector_.setShouldDecorate(false);
     super.attach(opt_parentElement, opt_siblingElement);
     return this;
   }
@@ -243,9 +252,9 @@ class SoyComponent extends Component {
    * @override
    */
   renderInternal() {
-    var elementTemplate = this.constructor.TEMPLATES_MERGED.element;
-    if (core.isFunction(elementTemplate)) {
-      dom.append(this.element, this.renderTemplate_(elementTemplate));
+    var templateContent = this.renderElementTemplate();
+    if (templateContent) {
+      dom.append(this.element, templateContent);
     }
   }
 
@@ -282,6 +291,18 @@ class SoyComponent extends Component {
     }
     // TODO(edu): Moves assignment to be a getter Attribute instead.
     this.components = this.getComponents_();
+  }
+
+  /**
+   * Renders the main element's template.
+   * @return {?string} The template's result content, or undefined if the
+   *   template doesn't exist.
+   */
+  renderElementTemplate() {
+    var elementTemplate = this.constructor.TEMPLATES_MERGED.element;
+    if (core.isFunction(elementTemplate)) {
+      return this.renderTemplate_(elementTemplate);
+    }
   }
 
   /**

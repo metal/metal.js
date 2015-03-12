@@ -97,6 +97,20 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Calls decorate on all children components, setting their element
+   * attribute to the appropriate element inside the children placeholder.
+   * @param {!Element} placeholder Placeholder where the children should be
+   *   rendered.
+   * @param {!Array<!Component>} children An array of children components.
+   * @return {boolean}
+   */
+  decorateChildren_(placeholder, children) {
+    children.forEach(function(child) {
+      child.decorate();
+    });
+  }
+
+  /**
    * @inheritDoc
    * @override
    */
@@ -204,9 +218,13 @@ class SoyComponent extends Component {
   renderChildrenComponents_() {
     var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));
     if (placeholder) {
-      dom.removeChildren(placeholder);
-
       var children = this.children;
+      if (this.shouldDecorateChildren_(placeholder)) {
+        this.decorateChildren_(placeholder, children);
+        return;
+      }
+
+      dom.removeChildren(placeholder);
       children.forEach(function(child) {
         if (child.wasRendered) {
           dom.append(placeholder, child.element);
@@ -293,6 +311,18 @@ class SoyComponent extends Component {
         }
       }
     }
+  }
+
+  /**
+   * Checks if children components should be decorated. Returns true when this
+   * component is being decorated and the placeholder contents match the number
+   * of children.
+   * @param {!Element} placeholder Placeholder where the children should be
+   *   rendered.
+   * @return {boolean}
+   */
+  shouldDecorateChildren_(placeholder) {
+    return this.decorating_ && placeholder.childNodes.length > 0;
   }
 
   /**

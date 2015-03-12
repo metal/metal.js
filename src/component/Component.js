@@ -71,6 +71,13 @@ class Component extends Attribute {
     super(opt_config);
 
     /**
+     * Whether the element is being decorated.
+     * @type {boolean}
+     * @protected
+     */
+    this.decorating_ = false;
+
+    /**
      * Holds events that were listened through the `delegate` Component function.
      * @type {EventHandler}
      * @protected
@@ -87,7 +94,7 @@ class Component extends Attribute {
 
     /**
      * Whether the element is in document.
-     * @type {Boolean}
+     * @type {boolean}
      */
     this.inDocument = false;
 
@@ -101,9 +108,15 @@ class Component extends Attribute {
 
     /**
      * Whether the element was rendered.
-     * @type {Boolean}
+     * @type {boolean}
      */
     this.wasRendered = false;
+
+    /**
+     * Whether the element was decorated.
+     * @type {boolean}
+     */
+    this.wasDecorated = false;
 
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
     core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
@@ -345,6 +358,7 @@ class Component extends Attribute {
     if (this.inDocument) {
       throw new Error(Component.Error.ALREADY_RENDERED);
     }
+    this.decorating_ = true;
 
     this.decorateInternal();
     this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
@@ -353,6 +367,11 @@ class Component extends Attribute {
     this.syncAttrs_(this.getAttrNames());
 
     this.attach();
+
+    this.decorating_ = false;
+    this.wasDecorated = true;
+    this.wasRendered = true;
+
     return this;
   }
 

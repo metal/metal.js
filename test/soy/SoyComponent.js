@@ -1,6 +1,7 @@
 'use strict';
 
 import {async} from '../../src/promise/Promise';
+import dom from '../../src/dom/dom';
 import ComponentRegistry from '../../src/component/ComponentRegistry';
 import SoyComponent from '../../src/soy/SoyComponent';
 
@@ -155,7 +156,7 @@ describe('SoyComponent', function() {
     });
   });
 
-  describe('Child Components', function() {
+  describe('Nested Components', function() {
     beforeEach(function() {
       var ChildComponent = createCustomComponentClass('ChildComponent');
       ChildComponent.ATTRS = {
@@ -334,6 +335,29 @@ describe('SoyComponent', function() {
         assert.strictEqual(comps.child3.element, placeholder.childNodes[0]);
         assert.strictEqual(comps.child2.element, placeholder.childNodes[1]);
         done();
+      });
+    });
+
+    describe('Decorate Children', function() {
+      it('should decorate children components if main component was decorated', function() {
+        var content = '<div id="decorated-children-placeholder">' +
+          '<div></div><div></div></div>';
+        var element = document.createElement('div');
+        dom.append(element, content);
+
+        class DecoratedComponent extends SoyComponent {
+          constructor(opt_config) {
+            super(opt_config);
+          }
+        }
+        var comp = new DecoratedComponent({
+          children: [new DecoratedComponent(), new DecoratedComponent()],
+          element: element,
+          id: 'decorated'
+        }).decorate();
+
+        assert.ok(comp.children[0].wasDecorated);
+        assert.ok(comp.children[1].wasDecorated);
       });
     });
   });

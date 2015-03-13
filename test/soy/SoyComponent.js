@@ -356,13 +356,48 @@ describe('SoyComponent', function() {
           }
         };
         var component = new DecoratedComponent({
+          element: element
+        });
+        component.decorate();
+
+        var comps = component.components;
+        assert.ok(comps.child.wasDecorated);
+      });
+
+      it('should decorate nested components inside surfaces if main component was decorated', function() {
+        var content = '<div id="decorated-component">' +
+          '<div data-component="ChildComponent" data-ref="myChild0">Decorate</div>' +
+          '</div>';
+        var element = document.createElement('div');
+        dom.append(element, content);
+
+        var NestedComponent = createNestedComponentClass();
+        var component = new NestedComponent({
           element: element,
           id: 'decorated'
         });
         component.decorate();
 
         var comps = component.components;
-        assert.ok(comps.child.wasDecorated);
+        assert.ok(comps.myChild0.wasDecorated);
+      });
+
+      it('should not decorate nested components inside surfaces surface had cache miss', function() {
+        var content = '<div id="decorated-component">Lalala' +
+          '<div data-component="ChildComponent" data-ref="myChild0">Decorate</div>' +
+          '</div>';
+        var element = document.createElement('div');
+        dom.append(element, content);
+
+        var NestedComponent = createNestedComponentClass();
+        var component = new NestedComponent({
+          element: element,
+          id: 'decorated'
+        });
+        component.decorate();
+
+        var comps = component.components;
+        assert.ok(!comps.myChild0.wasDecorated);
       });
     });
 
@@ -378,6 +413,33 @@ describe('SoyComponent', function() {
             super(opt_config);
           }
         }
+        var comp = new DecoratedComponent({
+          children: [new DecoratedComponent(), new DecoratedComponent()],
+          element: element,
+          id: 'decorated'
+        }).decorate();
+
+        assert.ok(comp.children[0].wasDecorated);
+        assert.ok(comp.children[1].wasDecorated);
+      });
+
+      it('should decorate children components inside surface if main component was decorated', function() {
+        var content = '<div id="decorated-children">' +
+          '<div id="decorated-children-placeholder" data-component-children>' +
+          '<div></div><div></div></div></div>';
+        var element = document.createElement('div');
+        dom.append(element, content);
+
+        class DecoratedComponent extends SoyComponent {
+          constructor(opt_config) {
+            super(opt_config);
+          }
+        }
+        DecoratedComponent.TEMPLATES = {
+          children: function() {
+            return {content: '<div id="decorated-children-placeholder" data-component-children></div>'};
+          }
+        };
         var comp = new DecoratedComponent({
           children: [new DecoratedComponent(), new DecoratedComponent()],
           element: element,

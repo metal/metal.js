@@ -230,6 +230,16 @@ class Component extends Attribute {
   }
 
   /**
+   * Compresses the requested html for caching purposes.
+   * @param {string} htmlString The html to be compressed.
+   * @return {string} The compressed html.
+   * @protected
+   */
+  compressHtmlForCache_(htmlString) {
+    return html.compress(htmlString);
+  }
+
+  /**
    * Computes the cache state for the surface content. If value is string, the
    * cache state is represented by its hashcode.
    * @param {Object} value The value to calculate the cache state.
@@ -253,7 +263,9 @@ class Component extends Attribute {
   computeSurfacesCacheStateFromDom_() {
     for (var surfaceId in this.surfaces_) {
       var surface = this.getSurface(surfaceId);
-      surface.cacheState = this.computeSurfaceCacheState_(html.compress(this.getSurfaceElement(surfaceId).innerHTML));
+      surface.cacheState = this.computeSurfaceCacheState_(
+        this.compressHtmlForCache_(this.getSurfaceElement(surfaceId).innerHTML)
+      );
     }
   }
 

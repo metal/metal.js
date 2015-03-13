@@ -240,13 +240,14 @@ describe('Component', function() {
 
     it('should add default component elementClasses from static hint', function() {
       var CustomComponent = createCustomComponentClass();
-      CustomComponent.ELEMENT_CLASSES = 'overwritten';
+      CustomComponent.ELEMENT_CLASSES = 'overwritten1 overwritten2';
 
       var custom = new CustomComponent();
       custom.render();
-      assert.strictEqual(2, getClassNames(custom.element).length);
-      assert.strictEqual('overwritten', getClassNames(custom.element)[0]);
-      assert.strictEqual('component', getClassNames(custom.element)[1]);
+      assert.strictEqual(3, getClassNames(custom.element).length);
+      assert.strictEqual('overwritten1', getClassNames(custom.element)[0]);
+      assert.strictEqual('overwritten2', getClassNames(custom.element)[1]);
+      assert.strictEqual('component', getClassNames(custom.element)[2]);
     });
 
     it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {

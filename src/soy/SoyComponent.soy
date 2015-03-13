@@ -2,7 +2,7 @@
 
 /**
  * @param componentName
- * @param ref
+ * @param id
  */
 {template .component}
   {if $ij.renderChildComponents}
@@ -10,14 +10,14 @@
   {else}
     {delcall ComponentElement variant="$componentName"}
       {param componentName: $componentName /}
-      {param ref: $ref /}
+      {param id: $id /}
     {/delcall}
   {/if}
 {/template}
 
 /**
- * @param name
- * @param ref
+ * @param componentName
+ * @param id
  */
 {deltemplate Component}
   {call Templates.SoyComponent.component data="all" /}
@@ -38,12 +38,12 @@
 /**
  * @param componentName
  * @param? contents
- * @param ref
+ * @param id
  * @param? tagName
  */
 {deltemplate ComponentElement}
   {let $tag: $tagName ? $tagName : 'div' /}
-  <{$tag} data-component="{$componentName}" data-ref="{$ref ? $ref : ''}">
+  <{$tag} id="{$id}" data-component>
     {if $contents}
       {$contents}
     {/if}

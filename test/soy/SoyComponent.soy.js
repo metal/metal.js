@@ -25,8 +25,7 @@ describe('SoyComponent.soy', function() {
 
       assert.ok(wrapper);
       assert.strictEqual('DIV', wrapper.tagName);
-      assert.strictEqual('MyComponent', wrapper.getAttribute('data-component'));
-      assert.strictEqual('ref', wrapper.getAttribute('data-ref'));
+      assert.ok( wrapper.hasAttribute('data-component'));
       assert.strictEqual('', wrapper.innerHTML);
     });
 

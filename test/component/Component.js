@@ -200,6 +200,16 @@ describe('Component', function() {
       assert.strictEqual(element, custom.element);
     });
 
+    it('should set component element to default value if selector doesn\'t match any element', function() {
+      var CustomComponent = createCustomComponentClass();
+
+      var custom = new CustomComponent({
+        element: '.myClass'
+      });
+      custom.render();
+      assert.ok(custom.element);
+    });
+
     it('should set component element id from id attr', function() {
       var CustomComponent = createCustomComponentClass();
 

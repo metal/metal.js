@@ -234,7 +234,7 @@ describe('SoyComponent', function() {
       CustomComponent.TEMPLATES = {
         element: function() {
           return {
-            content: '<div data-ref="myChild0" data-component="ChildComponent"></div>'
+            content: '<div id="myChild0" data-component="ChildComponent"></div>'
           };
         }
       };
@@ -304,12 +304,12 @@ describe('SoyComponent', function() {
         element: function() {
           var child = SoyTemplates.component({
             componentName: 'ChildComponent',
-            ref: 'child'
+            id: 'child'
           }, null, {});
           return SoyTemplates.component({
             children: child,
             componentName: 'NoPlaceholderComponent',
-            ref: 'noPlaceholder'
+            id: 'noPlaceholder'
           }, null, {});
         }
       };
@@ -340,7 +340,7 @@ describe('SoyComponent', function() {
 
     describe('Decorate Nested Root Components', function() {
       it('should decorate nested components if main component was decorated', function() {
-        var content = '<div data-component="ChildComponent" data-ref="child">Decorate</div>';
+        var content = '<div data-component="ChildComponent" id="child">Decorate</div>';
         var element = document.createElement('div');
         dom.append(element, content);
 
@@ -350,7 +350,7 @@ describe('SoyComponent', function() {
             return {
               content: SoyTemplates.component({
                 componentName: 'ChildComponent',
-                ref: 'child'
+                id: 'child'
               }, null, {})
             };
           }
@@ -366,7 +366,7 @@ describe('SoyComponent', function() {
 
       it('should decorate nested components inside surfaces if main component was decorated', function() {
         var content = '<div id="decorated-component">' +
-          '<div data-component="ChildComponent" data-ref="myChild0">Decorate</div>' +
+          '<div id="myChild0" data-component>Decorate</div>' +
           '</div>';
         var element = document.createElement('div');
         dom.append(element, content);
@@ -384,7 +384,7 @@ describe('SoyComponent', function() {
 
       it('should not decorate nested components inside surfaces surface had cache miss', function() {
         var content = '<div id="decorated-component">Lalala' +
-          '<div data-component="ChildComponent" data-ref="myChild0">Decorate</div>' +
+          '<div id="myChild0" data-component>Decorate</div>' +
           '</div>';
         var element = document.createElement('div');
         dom.append(element, content);
@@ -489,7 +489,7 @@ describe('SoyComponent', function() {
           var childData = {
             bar: data.foo,
             componentName: 'ChildComponent',
-            ref: 'myChild' + i
+            id: 'myChild' + i
           };
           result.content += SoyTemplates.component(childData, null, {});
         }
@@ -524,24 +524,24 @@ describe('SoyComponent', function() {
         var child1 = SoyTemplates.component({
           bar: data.bar,
           componentName: 'ChildComponent',
-          ref: 'child1'
+          id: 'child1'
         }, null, {});
         var child2 = SoyTemplates.component({
           bar: data.bar,
           children: child1,
           componentName: 'ChildComponent',
-          ref: 'child2'
+          id: 'child2'
         }, null, {});
         var child3 = SoyTemplates.component({
           bar: data.bar,
           componentName: 'ChildComponent',
-          ref: 'child3'
+          id: 'child3'
         }, null, {});
         var nested = SoyTemplates.component({
           bar: data.bar,
           children: sanitizeHtml(data.invert ? child3.content + child2.content : child2.content + child3.content),
           componentName: 'ChildComponent',
-          ref: 'nested'
+          id: 'nested'
         }, null, {});
 
         return nested;

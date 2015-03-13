@@ -50,10 +50,10 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       data: {
-        bar: 1
+        bar: 1,
+        id: 'comp'
       },
-      componentName: 'TestComponent',
-      ref: 'comp'
+      componentName: 'TestComponent'
     };
     collector.extractComponents(element, {comp: creationData});
 
@@ -71,9 +71,8 @@ describe('ComponentCollector', function() {
 
     var collector = new ComponentCollector();
     var creationData = {
-      data: {},
-      componentName: 'TestComponent',
-      ref: 'comp'
+      data: {id: 'comp'},
+      componentName: 'TestComponent'
     };
     collector.extractComponents(element, {comp: creationData});
 
@@ -89,9 +88,8 @@ describe('ComponentCollector', function() {
 
     var collector = new ComponentCollector();
     var creationData = {
-      data: {},
-      componentName: 'TestComponent',
-      ref: 'comp'
+      data: {id: 'comp'},
+      componentName: 'TestComponent'
     };
     collector.setShouldDecorate(true);
     collector.extractComponents(element, {comp: creationData});
@@ -107,9 +105,8 @@ describe('ComponentCollector', function() {
 
     var collector = new ComponentCollector();
     var creationData = {
-      data: {},
-      componentName: 'TestComponent',
-      ref: 'comp'
+      data: {id: 'comp'},
+      componentName: 'TestComponent'
     };
     collector.setShouldDecorate(true);
     collector.extractComponents(element, {comp: creationData});
@@ -126,7 +123,8 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       data: {
-        bar: 1
+        bar: 1,
+        id: 'comp'
       },
       componentName: 'TestComponent',
       ref: 'comp'
@@ -151,10 +149,10 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       data: {
-        bar: 1
+        bar: 1,
+        id: 'comp'
       },
-      componentName: 'TestComponent',
-      ref: 'comp'
+      componentName: 'TestComponent'
     };
     collector.extractComponents(element, {comp: creationData});
 
@@ -174,19 +172,22 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       child1: {
-        data: {},
-        componentName: 'TestComponent',
-        ref: 'child1'
+        data: {id: 'child1'},
+        componentName: 'TestComponent'
       },
       child2: {
-        data: {children: '<div data-component data-ref="child1"></div>'},
-        componentName: 'TestComponent',
-        ref: 'child2'
+        data: {
+          children: '<div data-component id="child1"></div>',
+          id: 'child2'
+        },
+        componentName: 'TestComponent'
       },
       comp: {
-        data: {children: '<div data-component data-ref="child2"></div>'},
-        componentName: 'TestComponent',
-        ref: 'comp'
+        data: {
+          children: '<div data-component id="child2"></div>',
+          id: 'comp'
+        },
+        componentName: 'TestComponent'
       }
     };
     collector.extractComponents(element, creationData);
@@ -207,14 +208,15 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       child1: {
-        data: {},
-        componentName: 'TestComponent',
-        ref: 'child1'
+        data: {id: 'child1'},
+        componentName: 'TestComponent'
       },
       comp: {
-        data: {children: '<div data-component data-ref="child1"></div>'},
-        componentName: 'TestComponent',
-        ref: 'comp'
+        data: {
+          children: '<div data-component id="child1"></div>',
+          id: 'comp'
+        },
+        componentName: 'TestComponent'
       }
     };
     var components = collector.getComponents();
@@ -225,14 +227,18 @@ describe('ComponentCollector', function() {
     dom.append(parent, element);
     creationData = {
       child1: {
-        data: {bar: 'child1'},
-        componentName: 'TestComponent',
-        ref: 'child1'
+        data: {
+          bar: 'child1',
+          id: 'child1'
+        },
+        componentName: 'TestComponent'
       },
       comp: {
-        data: {children: '<div data-component data-ref="child1"></div>'},
-        componentName: 'TestComponent',
-        ref: 'comp'
+        data: {
+          children: '<div data-component id="child1"></div>',
+          id: 'comp'
+        },
+        componentName: 'TestComponent'
       }
     };
     collector.extractComponents(element, creationData);
@@ -245,9 +251,11 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       comp: {
-        data: {bar: 'I have a data-component.'},
-        componentName: 'TestComponent',
-        ref: 'comp'
+        data: {
+          bar: 'I have a data-component.',
+          id: 'comp'
+        },
+        componentName: 'TestComponent'
       }
     };
     collector.extractComponents(element, creationData);
@@ -264,14 +272,15 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       child1: {
-        data: {},
-        componentName: 'TestComponent',
-        ref: 'child1'
+        data: {id: 'child1'},
+        componentName: 'TestComponent'
       },
       comp: {
-        data: {children: '<span>Ignore</span><div data-component data-ref="child1"></div>'},
-        componentName: 'TestComponent',
-        ref: 'comp'
+        data: {
+          children: '<span>Ignore</span><div data-component id="child1"></div>',
+          id: 'comp'
+        },
+        componentName: 'TestComponent'
       }
     };
     collector.extractComponents(element, creationData);
@@ -289,14 +298,16 @@ describe('ComponentCollector', function() {
     var collector = new ComponentCollector();
     var creationData = {
       child1: {
-        data: {},
+        data: {id: 'child1'},
         componentName: 'TestComponent',
         ref: 'child1'
       },
       comp: {
-        data: {children: '<div data-component data-ref="child1"></div>'},
-        componentName: 'TestComponent',
-        ref: 'comp'
+        data: {
+          children: '<div data-component id="child1"></div>',
+          id: 'comp'
+        },
+        componentName: 'TestComponent'
       }
     };
     collector.extractComponents(element, creationData);
@@ -310,7 +321,7 @@ describe('ComponentCollector', function() {
     parent = parent || document.createElement('div');
     var element = document.createElement('div');
     element.setAttribute('data-component', true);
-    element.setAttribute('data-ref', 'comp');
+    element.setAttribute('id', 'comp');
     dom.append(parent, element);
     return element;
   }

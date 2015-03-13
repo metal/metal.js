@@ -55,7 +55,7 @@ class SoyComponent extends Component {
 
     /**
      * Stores the arguments that were passed to the last call to the
-     * SoyComponent template for each component instance (mapped by its ref).
+     * SoyComponent template for each component instance (mapped by its id).
      * @type {!Object}
      * @protected
      */
@@ -178,11 +178,10 @@ class SoyComponent extends Component {
    */
   handleTemplateCall_(data) {
     var callData = {
-      componentName: data.componentName,
-      ref: data.ref
+      componentName: data.componentName
     };
     callData.data = this.normalizeTemplateCallData_(data);
-    this.componentsInterceptedData_[callData.ref] = callData;
+    this.componentsInterceptedData_[data.id] = callData;
     return originalTemplate.apply(originalTemplate, arguments);
   }
 
@@ -223,8 +222,7 @@ class SoyComponent extends Component {
    */
   normalizeTemplateCallData_(data) {
     data = object.mixin({}, data, {
-      componentName: null,
-      ref: null
+      componentName: null
     });
     for (var key in data) {
       if (data[key] instanceof soydata.SanitizedHtml) {
@@ -338,12 +336,12 @@ class SoyComponent extends Component {
    */
   setComponentsAttrs_() {
     var rootComponents = this.componentCollector_.getRootComponents();
-    for (var ref in rootComponents) {
-      var data = this.componentsInterceptedData_[ref];
+    for (var id in rootComponents) {
+      var data = this.componentsInterceptedData_[id];
       if (data) {
         this.componentCollector_.extractSubcomponents(data, this.componentsInterceptedData_);
-        if (rootComponents[data.ref]) {
-          rootComponents[data.ref].setAttrs(data.data);
+        if (rootComponents[data.data.id]) {
+          rootComponents[data.data.id].setAttrs(data.data);
         }
       }
     }

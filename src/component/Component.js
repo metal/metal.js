@@ -739,7 +739,11 @@ class Component extends Attribute {
    * @protected
    */
   setterElementFn_(val) {
-    return dom.toElement(val);
+    var element = dom.toElement(val);
+    if (!element) {
+      element = this.valueElementFn_();
+    }
+    return element;
   }
 
   /**

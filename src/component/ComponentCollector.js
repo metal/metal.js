@@ -10,7 +10,7 @@ class ComponentCollector extends Disposable {
     super();
 
     /**
-     * Holds the extracted components, indexed by ref.
+     * Holds the extracted components, indexed by id.
      * @type {!Object<string, !Component>}
      * @protected
      */
@@ -18,7 +18,7 @@ class ComponentCollector extends Disposable {
 
     /**
      * Holds the root extracted components (that is, components that are
-     * not children of other extracted components), indexed by ref.
+     * not children of other extracted components), indexed by id.
      * @type {!Object<string, !Component>}
      * @protected
      */
@@ -35,34 +35,35 @@ class ComponentCollector extends Disposable {
 
   /**
    * Creates a component instance.
-   * @param {string} ref The component ref.
+   * @param {string} id The component id.
    * @param {string} name The component name.
    * @param {!Object} data The component config data.
    * @return {!Component} The created component instance.
    * @protected
    */
-  createComponent_(ref, name, data) {
+  createComponent_(id, name, data) {
     var ConstructorFn = ComponentRegistry.getConstructor(name);
-    this.components_[ref] = new ConstructorFn(data);
-    return this.components_[ref];
+    data.element = data.element ? data.element : '#' + id;
+    this.components_[id] = new ConstructorFn(data);
+    return this.components_[id];
   }
 
   /**
    * Creates a root component instance.
-   * @param {string} ref The component ref.
+   * @param {string} id The component id.
    * @param {string} name The component name.
    * @param {!Object} data The component config data.
    * @param {Element} element The component's element.
    * @protected
    */
-  createRootComponent_(ref, name, data, element) {
+  createRootComponent_(id, name, data, element) {
     data.element = element;
-    this.rootComponents_[ref] = this.createComponent_(ref, name, data);
+    this.rootComponents_[id] = this.createComponent_(id, name, data);
 
     if (this.shouldDecorate_ && element.childNodes.length > 0) {
-      this.rootComponents_[ref].decorate();
+      this.rootComponents_[id].decorate();
     } else {
-      this.rootComponents_[ref].render();
+      this.rootComponents_[id].render();
     }
   }
 
@@ -87,13 +88,12 @@ class ComponentCollector extends Disposable {
    * @param {!Element} element
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
-   *   their ref strings.
+   *   their ids.
    * @return {!Object<string, !Object>} The original `componentData` object.
    */
   extractComponents(element, componentData) {
     if (element.hasAttribute && element.hasAttribute('data-component')) {
-      var ref = element.getAttribute('data-ref');
-      this.extractRootComponent_(element, ref, componentData);
+      this.extractRootComponent_(element, componentData);
     }
     return componentData;
   }
@@ -102,46 +102,47 @@ class ComponentCollector extends Disposable {
    * Extracts a component from the given element.
    * @param {!Element} element Element that represents a component that should
    *   be extracted.
-   * @param {string} ref The component's ref.
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
-   *   their ref strings.
+   *   their ids.
    * @protected
    */
-  extractRootComponent_(element, ref, componentData) {
-    var data = componentData[ref];
+  extractRootComponent_(element, componentData) {
+    var id = element.id;
+    var data = componentData[id];
     if (!data) {
       return;
     }
 
     this.extractSubcomponents(data, componentData);
 
-    if (this.components_[data.ref]) {
-      this.updateRootComponent_(data.ref, data.data, element);
+    if (this.components_[id]) {
+      this.updateRootComponent_(id, data.data, element);
     } else {
-      this.createRootComponent_(data.ref, data.componentName, data.data, element);
+      this.createRootComponent_(id, data.componentName, data.data, element);
     }
   }
 
   /**
-   * Handles the subcomponent with the given ref, creating it for the first
-   * time or updating it in case it doesn't exist yet.
+   * Handles a subcomponent, creating it for the first time or updating it in
+   * case it doesn't exist yet.
    * @param {!Object} data The subcomponent's template call data.
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
-   *   their ref strings.
+   *   their ids.
    * @return {!Component} The subcomponent's instance.
    * @protected
    */
   extractSubcomponent_(data, componentData) {
     this.extractSubcomponents(data, componentData);
 
-    var component = this.components_[data.ref];
+    var id = data.data.id;
+    var component = this.components_[id];
     if (component) {
       component.setAttrs(data.data);
     } else {
-      component = this.createComponent_(data.ref, data.componentName, data.data);
-      delete this.rootComponents_[data.ref];
+      component = this.createComponent_(id, data.componentName, data.data);
+      delete this.rootComponents_[id];
     }
     return component;
   }
@@ -152,7 +153,7 @@ class ComponentCollector extends Disposable {
    * @param {!Object} data The subcomponent's template call data.
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
-   *   their ref strings.
+   *   their ids.
    */
   extractSubcomponents(data, componentData) {
     for (var key in data.data) {
@@ -168,7 +169,7 @@ class ComponentCollector extends Disposable {
    * @param {string} renderedComponents Rendered components.
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
-   *   their ref strings.
+   *   their ids.
    * @return {string|!Array<!Component>} [description]
    * @protected
    */
@@ -178,9 +179,8 @@ class ComponentCollector extends Disposable {
     var ignored = false;
     for (var i = 0; i < frag.childNodes.length; i++) {
       var node = frag.childNodes[i];
-      if (core.isElement(node) && node.getAttribute('data-ref')) {
-        var ref = node.getAttribute('data-ref');
-        components.push(this.extractSubcomponent_(componentData[ref], componentData));
+      if (core.isElement(node) && node.hasAttribute('data-component') && node.id) {
+        components.push(this.extractSubcomponent_(componentData[node.id], componentData));
       } else {
         ignored = true;
       }
@@ -190,7 +190,7 @@ class ComponentCollector extends Disposable {
       if (ignored) {
         console.warn(
           'One or more HTML nodes were ignored when extracting components. ' +
-          'Only nodes with the data-ref attribute set are valid.'
+          'Only nodes with both the id and the data-component attribute set are valid.'
         );
       }
       return components;
@@ -219,14 +219,14 @@ class ComponentCollector extends Disposable {
 
   /**
    * Updates a root component's data and parentNode.
-   * @param {string} ref The component's ref.
+   * @param {string} id The component's id.
    * @param {!Object} data The component's data.
    * @param {Element} element The element indicating the position the component
    *   should be at.
    * @protected
    */
-  updateRootComponent_(ref, data, element) {
-    var component = this.components_[ref];
+  updateRootComponent_(id, data, element) {
+    var component = this.components_[id];
     if (component.element !== element) {
       element.parentNode.insertBefore(component.element, element);
       element.parentNode.removeChild(element);

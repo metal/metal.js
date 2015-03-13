@@ -73,7 +73,7 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentChildren'), '', 0, Tem
 Templates.SoyComponent.__deltemplate_s20_40718f6d = function(opt_data, opt_ignored, opt_ijData) {
   var output = '';
   var tag__soy21 = opt_data.tagName ? opt_data.tagName : 'div';
-  output += '<' + soy.$$filterHtmlElementName(tag__soy21) + ' data-component="' + soy.$$escapeHtmlAttribute(opt_data.componentName) + '" data-ref="' + soy.$$escapeHtmlAttribute(opt_data.ref ? opt_data.ref : '') + '">' + ((opt_data.contents) ? soy.$$escapeHtml(opt_data.contents) : '') + '</' + soy.$$filterHtmlElementName(tag__soy21) + '>';
+  output += '<' + soy.$$filterHtmlElementName(tag__soy21) + ' id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" data-component>' + ((opt_data.contents) ? soy.$$escapeHtml(opt_data.contents) : '') + '</' + soy.$$filterHtmlElementName(tag__soy21) + '>';
   return soydata.VERY_UNSAFE.ordainSanitizedHtml(output);
 };
 if (goog.DEBUG) {

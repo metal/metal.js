@@ -1,9 +1,9 @@
 {
-  "name": "liferay-core",
+  "name": "alloyui",
   "version": "0.0.1",
   "description": "Liferay's common JavaScript library",
-  "license": "MIT",
-  "repository": "eduardolundgren/liferay-core",
+  "license": "BSD",
+  "repository": "alloyui/core",
   "author": {
     "name": "Eduardo Lundgren",
     "email": "edua@rdo.io",
@@ -12,11 +12,13 @@
   "engines": {
     "node": ">=0.10.0"
   },
-  "main": "./index.js",
   "scripts": {
     "test": "gulp test"
   },
-  "keywords": [],
+  "keywords": [
+    "javascript",
+    "library"
+  ],
   "devDependencies": {
     "alloyui-tasks": "git://github.com/alloyui/tasks",
     "closure-templates": "^20141017.0.0",

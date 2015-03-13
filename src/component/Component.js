@@ -3,6 +3,7 @@
 import array from '../array/array';
 import core from '../core';
 import dom from '../dom/dom';
+import features from '../dom/features';
 import html from '../html/html';
 import object from '../object/object';
 import string from '../string/string';
@@ -248,6 +249,9 @@ class Component extends Attribute {
    */
   computeSurfaceCacheState_(value) {
     if (core.isString(value)) {
+      if (features.checkAttrOrderChange()) {
+        value = this.convertHtmlToBrowserFormat_(value);
+      }
       return string.hashCode(value);
     }
     return Component.Cache.NOT_CACHEABLE;
@@ -267,6 +271,20 @@ class Component extends Attribute {
         this.compressHtmlForCache_(this.getSurfaceElement(surfaceId).innerHTML)
       );
     }
+  }
+
+  /**
+   * Converts the given html string to the format the current browser uses
+   * when html is rendered. This is done by rendering the html in a temporary
+   * element, and returning its resulting rendered html.
+   * @param {string} htmlString The html to be converted.
+   * @return {string}
+   * @protected
+   */
+  convertHtmlToBrowserFormat_(htmlString) {
+    var element = document.createElement('div');
+    dom.append(element, htmlString);
+    return element.innerHTML;
   }
 
   /**

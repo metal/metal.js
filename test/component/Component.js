@@ -750,8 +750,9 @@ describe('Component', function() {
         body: true,
         bottom: true
       });
-      assert.strictEqual(1, dom.append.callCount);
-      assert.ok(dom.append.firstCall.args[0].id.indexOf('-bottom') > 0);
+      assert.ok(!custom.getSurface('header').cacheMiss);
+      assert.ok(!custom.getSurface('body').cacheMiss);
+      assert.ok(custom.getSurface('bottom').cacheMiss);
 
       dom.append.restore();
     });

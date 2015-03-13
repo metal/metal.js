@@ -538,14 +538,14 @@ class Component extends Attribute {
 
   /**
    * Merges an array of values for the ELEMENT_CLASSES property into a single object.
-   * @param {!Array} values The values to be merged.
-   * @return {!Object} The merged value.
+   * @param {!Array.<string>} values The values to be merged.
+   * @return {!string} The merged value.
    * @protected
    */
   mergeElementClasses_(values) {
-    return array.flatten(values.filter(function(val) {
+    return values.filter(function(val) {
       return val;
-    }));
+    }).join(' ');
   }
 
   /**
@@ -695,17 +695,18 @@ class Component extends Attribute {
 
   /**
    * Attribute synchronization logic for elementClasses attribute.
-   * @param {Array.<string>} newVal
-   * @param {Array.<string>} prevVal
+   * @param {string} newVal
+   * @param {string} prevVal
    */
   syncElementClasses(newVal, prevVal) {
     var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
     if (newVal) {
-      classesToAdd = classesToAdd.concat(newVal);
+      classesToAdd = classesToAdd + ' ' + newVal;
     }
-
-    dom.removeClasses(this.element, prevVal || []);
-    dom.addClasses(this.element, classesToAdd);
+    if (prevVal) {
+      dom.removeClasses(this.element, prevVal.split(' '));
+    }
+    dom.addClasses(this.element, classesToAdd.split(' '));
   }
 
   /**
@@ -732,12 +733,12 @@ class Component extends Attribute {
 
   /**
    * Validator logic for elementClasses attribute.
-   * @param {Array.<string>} val
+   * @param {string} val
    * @return {Boolean} True if val is a valid element classes.
    * @protected
    */
   validatorElementClassesFn_(val) {
-    return Array.isArray(val);
+    return core.isString(val);
   }
 
   /**
@@ -820,11 +821,11 @@ Component.ATTRS = {
 
 /**
  * CSS classes to be applied to the element.
- * @type {Array.<string>}
+ * @type {string}
  * @protected
  * @static
  */
-Component.ELEMENT_CLASSES = ['component'];
+Component.ELEMENT_CLASSES = 'component';
 
 /**
  * Element tag name is a string that specifies the type of element to be

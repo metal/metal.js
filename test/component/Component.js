@@ -220,7 +220,7 @@ describe('Component', function() {
       var CustomComponent = createCustomComponentClass();
 
       var custom = new CustomComponent({
-        elementClasses: ['foo', 'bar']
+        elementClasses: 'foo bar'
       });
       custom.render();
 
@@ -229,7 +229,7 @@ describe('Component', function() {
       assert.strictEqual('foo', getClassNames(custom.element)[1]);
       assert.strictEqual('bar', getClassNames(custom.element)[2]);
 
-      custom.elementClasses = ['other'];
+      custom.elementClasses = 'other';
       async.nextTick(function() {
         assert.strictEqual(2, getClassNames(custom.element).length);
         assert.strictEqual('component', getClassNames(custom.element)[0]);
@@ -240,7 +240,7 @@ describe('Component', function() {
 
     it('should add default component elementClasses from static hint', function() {
       var CustomComponent = createCustomComponentClass();
-      CustomComponent.ELEMENT_CLASSES = ['overwritten'];
+      CustomComponent.ELEMENT_CLASSES = 'overwritten';
 
       var custom = new CustomComponent();
       custom.render();

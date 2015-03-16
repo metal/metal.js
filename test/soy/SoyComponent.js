@@ -16,7 +16,7 @@ describe('SoyComponent', function() {
   it('should render element content automatically when template is defined', function() {
     var CustomComponent = createCustomComponentClass();
     CustomComponent.TEMPLATES = {
-      element: function() {
+      content: function() {
         return {
           content: '<div class="myContent">Hello World</div>'
         };
@@ -36,7 +36,7 @@ describe('SoyComponent', function() {
       header: {}
     };
     CustomComponent.TEMPLATES = {
-      element: function(data) {
+      content: function(data) {
         return {
           content: '<div id="' + data.id + '-header">Header Surface</div>'
         };
@@ -71,7 +71,7 @@ describe('SoyComponent', function() {
       }
     };
     CustomComponent.TEMPLATES = {
-      element: function(data) {
+      content: function(data) {
         return {
           content: '<div id="' + data.id + '-header"></div>'
         };
@@ -112,7 +112,7 @@ describe('SoyComponent', function() {
     it('should not create surface for element template', function() {
       var ChildComponent = createCustomComponentClass('ChildComponent');
       ChildComponent.TEMPLATES = {
-        element: function() {},
+        content: function() {},
         header: function() {}
       };
 
@@ -124,7 +124,7 @@ describe('SoyComponent', function() {
     it('should set surface renderAttrs to its template params', function() {
       var ChildComponent = createCustomComponentClass('ChildComponent');
       ChildComponent.TEMPLATES = {
-        element: function() {},
+        content: function() {},
         header: function() {},
         footer: function() {}
       };
@@ -140,7 +140,7 @@ describe('SoyComponent', function() {
     it('should not override surface config when it already exists', function() {
       var ChildComponent = createCustomComponentClass('ChildComponent');
       ChildComponent.TEMPLATES = {
-        element: function() {},
+        content: function() {},
         header: function() {}
       };
       ChildComponent.TEMPLATES.header.params = ['headerContent'];
@@ -170,7 +170,7 @@ describe('SoyComponent', function() {
         }
       };
       ChildComponent.TEMPLATES = {
-        element: function(data) {
+        content: function(data) {
           return {
             content: '<div id="' + data.id + '-children"></div>'
           };
@@ -232,7 +232,7 @@ describe('SoyComponent', function() {
     it('should ignore component elements that were not rendered via a SoyTemplate call', function() {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.TEMPLATES = {
-        element: function() {
+        content: function() {
           return {
             content: '<div id="myChild0" data-component="ChildComponent"></div>'
           };
@@ -301,7 +301,7 @@ describe('SoyComponent', function() {
       createCustomComponentClass('NoPlaceholderComponent');
       var MainComponent = createCustomComponentClass('MainComponent');
       MainComponent.TEMPLATES = {
-        element: function() {
+        content: function() {
           var child = SoyTemplates.component({
             componentName: 'ChildComponent',
             id: 'child'
@@ -346,7 +346,7 @@ describe('SoyComponent', function() {
 
         var DecoratedComponent = createCustomComponentClass('DecoratedComponent');
         DecoratedComponent.TEMPLATES = {
-          element: function() {
+          content: function() {
             return {
               content: SoyTemplates.component({
                 componentName: 'ChildComponent',
@@ -478,7 +478,7 @@ describe('SoyComponent', function() {
       }
     };
     NestedComponent.TEMPLATES = {
-      element: function(data) {
+      content: function(data) {
         return {
           content: '<div id="' + data.id + '-component"></div>'
         };
@@ -515,7 +515,7 @@ describe('SoyComponent', function() {
       }
     };
     MultipleNestedComponent.TEMPLATES = {
-      element: function(data) {
+      content: function(data) {
         return {
           content: '<div id="' + data.id + '-children"></div>'
         };

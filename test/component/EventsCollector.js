@@ -106,16 +106,16 @@ describe('EventsCollector', function() {
     };
 
     CustomComponent.TEMPLATES = {
-      element: function(data) {
+      body: function(data) {
+        return {
+          content: '<div>' + data.bodyContent + '</div>'
+        };
+      },
+      content: function(data) {
         return {
           content: '<div id="' + data.id + '-header" onclick="handleClick"></div>' +
             '<div id="' + data.id + '-body" onclick="handleClick"></div>' +
             '<div id="' + data.id + '-footer" onclick="handleClick"></div>'
-        };
-      },
-      body: function(data) {
-        return {
-          content: '<div>' + data.bodyContent + '</div>'
         };
       },
       header: function(data) {

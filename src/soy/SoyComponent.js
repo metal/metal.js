@@ -72,7 +72,7 @@ class SoyComponent extends Component {
   addSurfacesFromTemplates_() {
     var templates = this.constructor.TEMPLATES_MERGED;
     for (var templateName in templates) {
-      if (templateName !== 'element') {
+      if (templateName !== 'content') {
         var surface = this.getSurface(templateName);
         if (!surface) {
           this.addSurface(templateName, {
@@ -312,7 +312,7 @@ class SoyComponent extends Component {
    *   template doesn't exist.
    */
   renderElementTemplate() {
-    var elementTemplate = this.constructor.TEMPLATES_MERGED.element;
+    var elementTemplate = this.constructor.TEMPLATES_MERGED.content;
     if (core.isFunction(elementTemplate)) {
       return this.renderTemplate_(elementTemplate);
     }

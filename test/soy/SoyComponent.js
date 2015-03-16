@@ -30,6 +30,26 @@ describe('SoyComponent', function() {
     assert.strictEqual('myContent', custom.element.children[0].className);
   });
 
+  it('should render element tag according to its template when defined', function() {
+    var CustomComponent = createCustomComponentClass();
+    CustomComponent.TEMPLATES = {
+      content: function() {
+        return {
+          content: '<div class="myContent">Hello World</div>'
+        };
+      },
+      contentElement: function() {
+        return {
+          content: '<button></button>'
+        };
+      }
+    };
+
+    var custom = new CustomComponent();
+    custom.render();
+    assert.strictEqual('BUTTON', custom.element.tagName);
+  });
+
   it('should create surfaces from element template', function() {
     var CustomComponent = createCustomComponentClass();
     CustomComponent.SURFACES = {

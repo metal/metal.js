@@ -31,6 +31,7 @@ var originalTemplate = ComponentRegistry.Templates.SoyComponent.component;
  */
 class SoyComponent extends Component {
   constructor(opt_config) {
+    core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
     super(opt_config);
 
     /**
@@ -61,7 +62,6 @@ class SoyComponent extends Component {
      */
     this.componentsInterceptedData_ = {};
 
-    core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
     this.addSurfacesFromTemplates_();
   }
 
@@ -72,7 +72,10 @@ class SoyComponent extends Component {
   addSurfacesFromTemplates_() {
     var templates = this.constructor.TEMPLATES_MERGED;
     for (var templateName in templates) {
-      if (templateName !== 'content') {
+      if (templateName !== 'content' &&
+        templateName !== 'contentElement' &&
+        templateName.substr(0, 13) !== '__deltemplate') {
+
         var surface = this.getSurface(templateName);
         if (!surface) {
           this.addSurface(templateName, {
@@ -366,6 +369,29 @@ class SoyComponent extends Component {
     if (!array.equal(newVal, prevVal || [])) {
       this.renderChildrenComponents_();
     }
+  }
+
+  /**
+   * Provides the default value for element attribute.
+   * @return {Element} The element.
+   * @protected
+   */
+  valueElementFn_() {
+    if (!this.constructor.TEMPLATES_MERGED.contentElement) {
+      return super.valueElementFn_();
+    }
+
+    var frag = dom.buildFragment(
+      this.renderTemplate_(this.constructor.TEMPLATES_MERGED.contentElement)
+    );
+    var element = frag.childNodes[0];
+
+    // Remove element from fragment, so it won't have a parent. Otherwise,
+    // the `attach` method will think that the element has already been
+    // attached.
+    frag.removeChild(element);
+
+    return element;
   }
 }
 

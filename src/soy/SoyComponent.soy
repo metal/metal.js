@@ -8,10 +8,7 @@
   {if $ij.renderChildComponents}
     {delcall ComponentTemplate data="all" variant="$componentName" /}
   {else}
-    {delcall ComponentElement variant="$componentName"}
-      {param componentName: $componentName /}
-      {param id: $id /}
-    {/delcall}
+    {delcall ComponentElement data="all" variant="$componentName" /}
   {/if}
 {/template}
 
@@ -36,16 +33,14 @@
 {/deltemplate}
 
 /**
- * @param componentName
- * @param? contents
+ * @param? elementContent
+ * @param? elementClasses
  * @param id
- * @param? tagName
  */
 {deltemplate ComponentElement}
-  {let $tag: $tagName ? $tagName : 'div' /}
-  <{$tag} id="{$id}" data-component>
-    {if $contents}
-      {$contents}
+  <div id="{$id}" class="{$elementClasses ? $elementClasses : ''}" data-component>
+    {if $elementContent}
+      {$elementContent}
     {/if}
-  </{$tag}>
+  </div>
 {/deltemplate}

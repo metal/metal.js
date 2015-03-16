@@ -934,6 +934,6 @@ Component.Error = {
  * A list with attribute names that will automatically be rejected as invalid.
  * @type {!Array<string>}
  */
-Component.INVALID_ATTRS = ['componentName', 'components', 'ref'];
+Component.INVALID_ATTRS = ['componentName', 'components', 'elementContent', 'ref'];
 
 export default Component;

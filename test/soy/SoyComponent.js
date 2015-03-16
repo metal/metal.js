@@ -366,7 +366,7 @@ describe('SoyComponent', function() {
 
       it('should decorate nested components inside surfaces if main component was decorated', function() {
         var content = '<div id="decorated-component">' +
-          '<div id="myChild0" data-component>Decorate</div>' +
+          '<div id="myChild0" class="" data-component>Decorate</div>' +
           '</div>';
         var element = document.createElement('div');
         dom.append(element, content);
@@ -384,7 +384,7 @@ describe('SoyComponent', function() {
 
       it('should not decorate nested components inside surfaces surface had cache miss', function() {
         var content = '<div id="decorated-component">Lalala' +
-          '<div id="myChild0" data-component>Decorate</div>' +
+          '<div id="myChild0" class="" data-component>Decorate</div>' +
           '</div>';
         var element = document.createElement('div');
         dom.append(element, content);

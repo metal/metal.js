@@ -361,6 +361,17 @@ describe('Component', function() {
       });
     });
 
+    it('should not allow defining attribute named elementContent', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        elementContent: {}
+      };
+
+      assert.throws(function() {
+        new CustomComponent();
+      });
+    });
+
     it('should not allow defining attribute named ref', function() {
       var CustomComponent = createCustomComponentClass();
       CustomComponent.ATTRS = {

@@ -18,6 +18,7 @@ TestComponent.ATTRS = {
 describe('ComponentCollector', function() {
   beforeEach(function() {
     sinon.stub(console, 'warn');
+    document.body.innerHTML = '';
   });
 
   afterEach(function() {
@@ -28,8 +29,8 @@ describe('ComponentCollector', function() {
     var element = createComponentElement();
     element.removeAttribute('data-component');
 
-    var collector = new ComponentCollector();
-    collector.extractComponents(element, {});
+    var collector = new ComponentCollector(element);
+    collector.extractComponents({});
 
     assert.deepEqual({}, collector.getComponents());
   });
@@ -37,8 +38,15 @@ describe('ComponentCollector', function() {
   it('should not create components on element without their creation data', function() {
     var element = createComponentElement();
 
-    var collector = new ComponentCollector();
-    collector.extractComponents(element, {});
+    var collector = new ComponentCollector(element);
+    collector.extractComponents({});
+
+    assert.deepEqual({}, collector.getComponents());
+  });
+
+  it('should not create components on element if placeholder can\'t be found', function() {
+    var collector = new ComponentCollector(document.createElement('div'));
+    collector.extractComponents({comp: {}});
 
     assert.deepEqual({}, collector.getComponents());
   });
@@ -47,7 +55,7 @@ describe('ComponentCollector', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       data: {
         bar: 1,
@@ -55,7 +63,7 @@ describe('ComponentCollector', function() {
       },
       componentName: 'TestComponent'
     };
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
     var components = collector.getComponents();
     assert.strictEqual(1, Object.keys(components).length);
@@ -69,12 +77,12 @@ describe('ComponentCollector', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       data: {id: 'comp'},
       componentName: 'TestComponent'
     };
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
     var components = collector.getComponents();
     assert.ok(components.comp.wasRendered);
@@ -86,13 +94,13 @@ describe('ComponentCollector', function() {
     var element = createComponentElement(parent);
     dom.append(element, 'Some Content');
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       data: {id: 'comp'},
       componentName: 'TestComponent'
     };
     collector.setShouldDecorate(true);
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
     var components = collector.getComponents();
     assert.ok(components.comp.wasRendered);
@@ -103,13 +111,13 @@ describe('ComponentCollector', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       data: {id: 'comp'},
       componentName: 'TestComponent'
     };
     collector.setShouldDecorate(true);
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
     var components = collector.getComponents();
     assert.ok(components.comp.wasRendered);
@@ -120,7 +128,7 @@ describe('ComponentCollector', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       data: {
         bar: 1,
@@ -129,12 +137,10 @@ describe('ComponentCollector', function() {
       componentName: 'TestComponent',
       ref: 'comp'
     };
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
-    parent.innerHTML = '';
-    dom.append(parent, element);
     creationData.data.bar = 2;
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
     var components = collector.getComponents();
     assert.strictEqual(2, components.comp.bar);
@@ -146,7 +152,7 @@ describe('ComponentCollector', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       data: {
         bar: 1,
@@ -154,12 +160,12 @@ describe('ComponentCollector', function() {
       },
       componentName: 'TestComponent'
     };
-    collector.extractComponents(element, {comp: creationData});
+    collector.extractComponents({comp: creationData});
 
+    parent.removeChild(element);
     var parent2 = document.createElement('div');
-    var element2 = createComponentElement(parent2);
-    dom.append(parent2, element2);
-    collector.extractComponents(element2, {comp: creationData});
+    createComponentElement(parent2);
+    collector.extractComponents({comp: creationData});
 
     var components = collector.getComponents();
     assert.strictEqual(element, components.comp.element);
@@ -169,7 +175,7 @@ describe('ComponentCollector', function() {
   it('should instantiate extracted component children', function() {
     var element = createComponentElement();
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       child1: {
         data: {id: 'child1'},
@@ -190,7 +196,7 @@ describe('ComponentCollector', function() {
         componentName: 'TestComponent'
       }
     };
-    collector.extractComponents(element, creationData);
+    collector.extractComponents(creationData);
 
     var components = collector.getComponents();
     assert.strictEqual(3, Object.keys(components).length);
@@ -205,7 +211,7 @@ describe('ComponentCollector', function() {
     var parent = document.createElement('div');
     var element = createComponentElement(parent);
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       child1: {
         data: {id: 'child1'},
@@ -220,11 +226,9 @@ describe('ComponentCollector', function() {
       }
     };
     var components = collector.getComponents();
-    collector.extractComponents(element, creationData);
+    collector.extractComponents(creationData);
     assert.strictEqual(undefined, components.child1.bar);
 
-    parent.innerHTML = '';
-    dom.append(parent, element);
     creationData = {
       child1: {
         data: {
@@ -241,14 +245,14 @@ describe('ComponentCollector', function() {
         componentName: 'TestComponent'
       }
     };
-    collector.extractComponents(element, creationData);
+    collector.extractComponents(creationData);
     assert.strictEqual('child1', components.child1.bar);
   });
 
   it('should keep the original value of non component config strings', function() {
     var element = createComponentElement();
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       comp: {
         data: {
@@ -258,7 +262,7 @@ describe('ComponentCollector', function() {
         componentName: 'TestComponent'
       }
     };
-    collector.extractComponents(element, creationData);
+    collector.extractComponents(creationData);
 
     var components = collector.getComponents();
     assert.strictEqual(1, Object.keys(components).length);
@@ -269,7 +273,7 @@ describe('ComponentCollector', function() {
   it('should ignore non component elements on component attribute', function() {
     var element = createComponentElement();
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       child1: {
         data: {id: 'child1'},
@@ -283,7 +287,7 @@ describe('ComponentCollector', function() {
         componentName: 'TestComponent'
       }
     };
-    collector.extractComponents(element, creationData);
+    collector.extractComponents(creationData);
 
     var components = collector.getComponents();
     assert.strictEqual(2, Object.keys(components).length);
@@ -295,7 +299,7 @@ describe('ComponentCollector', function() {
   it('should separately return components that are not children of others', function() {
     var element = createComponentElement();
 
-    var collector = new ComponentCollector();
+    var collector = new ComponentCollector(element);
     var creationData = {
       child1: {
         data: {id: 'child1'},
@@ -310,7 +314,7 @@ describe('ComponentCollector', function() {
         componentName: 'TestComponent'
       }
     };
-    collector.extractComponents(element, creationData);
+    collector.extractComponents(creationData);
 
     var components = collector.getRootComponents();
     assert.strictEqual(1, Object.keys(components).length);
@@ -323,6 +327,7 @@ describe('ComponentCollector', function() {
     element.setAttribute('data-component', true);
     element.setAttribute('id', 'comp');
     dom.append(parent, element);
+    dom.append(document.body, parent);
     return element;
   }
 });

@@ -39,7 +39,7 @@ class SoyComponent extends Component {
      * @type {!ComponentCollector}
      * @protected
      */
-    this.componentCollector_ = new ComponentCollector();
+    this.componentCollector_ = new ComponentCollector(this.element);
 
     /**
      * Gets all nested components.
@@ -101,11 +101,14 @@ class SoyComponent extends Component {
 
     var visitor = DomVisitor.visit(this.element);
     this.informVisitorAttachListeners_(visitor);
-    this.informVisitorExtractComponents_(visitor);
     visitor.start();
 
+    this.componentCollector_.extractComponents(this.componentsInterceptedData_);
     this.componentCollector_.setShouldDecorate(false);
+
     super.attach(opt_parentElement, opt_siblingElement);
+    this.componentsInterceptedData_ = {};
+
     return this;
   }
 
@@ -142,7 +145,6 @@ class SoyComponent extends Component {
    * @override
    */
   detach() {
-    this.componentsInterceptedData_ = {};
     this.eventsCollector_.detachAllListeners();
     super.detach();
     return this;
@@ -195,15 +197,6 @@ class SoyComponent extends Component {
    */
   informVisitorAttachListeners_(visitor) {
     visitor.addHandler(this.eventsCollector_.attachListeners.bind(this.eventsCollector_));
-  }
-
-  /**
-   * Informs visitor to extract components.
-   * @param {DomVisitor} visitor
-   * @protected
-   */
-  informVisitorExtractComponents_(visitor) {
-    visitor.addHandler(this.componentCollector_.extractComponents.bind(this.componentCollector_), this.componentsInterceptedData_);
   }
 
   /**
@@ -285,13 +278,15 @@ class SoyComponent extends Component {
     super.renderSurfaceContent(surfaceId, content);
 
     if (this.inDocument) {
+      this.eventsCollector_.detachListeners(this.makeSurfaceId_(surfaceId));
+
       var visitor = DomVisitor.visit(this.getSurfaceElement(surfaceId));
       this.informVisitorAttachListeners_(visitor);
-      if (this.getSurface(surfaceId).cacheMiss) {
-        this.informVisitorExtractComponents_(visitor);
-      }
-      this.eventsCollector_.detachListeners(this.makeSurfaceId_(surfaceId));
       visitor.start();
+
+      if (this.getSurface(surfaceId).cacheMiss) {
+        this.componentCollector_.extractComponents(this.componentsInterceptedData_);
+      }
     }
   }
 

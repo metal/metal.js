@@ -6,7 +6,7 @@ import ComponentRegistry from '../component/ComponentRegistry';
 import Disposable from '../disposable/Disposable';
 
 class ComponentCollector extends Disposable {
-  constructor() {
+  constructor(element) {
     super();
 
     /**
@@ -15,6 +15,21 @@ class ComponentCollector extends Disposable {
      * @protected
      */
     this.components_ = {};
+
+    /**
+     * DOM element to search for component placeholders in.
+     * @type {!Element}
+     * @protected
+     */
+    this.element_ = element;
+
+    /**
+     * Holds a map of component ids that indicate if each component has already
+     * been extracted as a subcomponent on this call to `extractComponents`.
+     * @type {!Object<string, boolean>}
+     * @protected
+     */
+    this.extractedSubComponents_ = {};
 
     /**
      * Holds the root extracted components (that is, components that are
@@ -84,18 +99,27 @@ class ComponentCollector extends Disposable {
   }
 
   /**
-   * Extracts components from the given element.
-   * @param {!Element} element
+   * Extracts components according, looking for elements with the appropriate
+   * ids on the document, and creating component instances tied to those.
    * @param {!Object<string, !Object>} componentData An object with creation
    *   data for components that may be found inside the element, indexed by
    *   their ids.
-   * @return {!Object<string, !Object>} The original `componentData` object.
    */
-  extractComponents(element, componentData) {
-    if (element.hasAttribute && element.hasAttribute('data-component')) {
-      this.extractRootComponent_(element, componentData);
+  extractComponents(componentData) {
+    var id;
+    this.extractedSubComponents_ = {};
+
+    for (id in componentData) {
+      this.extractSubcomponents(componentData[id], componentData);
     }
-    return componentData;
+    for (id in componentData) {
+      if (!this.extractedSubComponents_[id]) {
+        var element = document.getElementById(id) || this.element_.querySelector('#' + id);
+        if (element) {
+          this.extractRootComponent_(element, componentData);
+        }
+      }
+    }
   }
 
   /**
@@ -110,11 +134,6 @@ class ComponentCollector extends Disposable {
   extractRootComponent_(element, componentData) {
     var id = element.id;
     var data = componentData[id];
-    if (!data) {
-      return;
-    }
-
-    this.extractSubcomponents(data, componentData);
 
     if (this.components_[id]) {
       this.updateRootComponent_(id, data.data, element);
@@ -144,6 +163,7 @@ class ComponentCollector extends Disposable {
       component = this.createComponent_(id, data.componentName, data.data);
       delete this.rootComponents_[id];
     }
+    this.extractedSubComponents_[id] = true;
     return component;
   }
 

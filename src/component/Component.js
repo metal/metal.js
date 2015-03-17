@@ -427,7 +427,7 @@ class Component extends Attribute {
    * @param {Element} element
    * @return {?string}
    */
-  extractSurfaceId_(elementId) {
+  extractSurfaceId(elementId) {
     var separator = elementId.indexOf(this.id + '-');
     if (separator === 0) {
       return elementId.substring(this.id.length + 1);

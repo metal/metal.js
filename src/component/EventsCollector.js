@@ -63,7 +63,7 @@ class EventsCollector extends Disposable {
     opt_groupName = opt_groupName || element.id || this.component_.id;
     var collectedEvents = this.collectInlineEventsFromAttributes_(element);
     this.attachCollectedListeners_(collectedEvents, opt_groupName);
-    if (element.id && this.component_.extractSurfaceId_(element.id)) {
+    if (element.id && this.component_.extractSurfaceId(element.id)) {
       opt_groupName = element.id;
     }
     return opt_groupName;

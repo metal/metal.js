@@ -8,7 +8,6 @@ import object from '../object/object';
 import Component from '../component/Component';
 import ComponentCollector from '../component/ComponentCollector';
 import ComponentRegistry from '../component/ComponentRegistry';
-import DomVisitor from '../dom/DomVisitor';
 import EventsCollector from '../component/EventsCollector';
 
 import './SoyComponent.soy';
@@ -98,17 +97,22 @@ class SoyComponent extends Component {
       this.componentCollector_.setShouldDecorate(true);
     }
 
-    var visitor = DomVisitor.visit(this.element);
-    this.informVisitorAttachListeners_(visitor);
-    visitor.start();
-
     this.componentCollector_.extractComponents(this.componentsInterceptedData_);
     this.componentCollector_.setShouldDecorate(false);
 
     super.attach(opt_parentElement, opt_siblingElement);
     this.componentsInterceptedData_ = {};
+    this.attachInlineListeners_();
 
     return this;
+  }
+
+  /**
+   * Attaches inline listeners to the main element.
+   * @protected
+   */
+  attachInlineListeners_() {
+    this.eventsCollector_.attachListeners(this.element.parentNode.innerHTML);
   }
 
   /**
@@ -190,15 +194,6 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Informs visitor to attach events if needed.
-   * @param {DomVisitor} visitor
-   * @protected
-   */
-  informVisitorAttachListeners_(visitor) {
-    visitor.addHandler(this.eventsCollector_.attachListeners.bind(this.eventsCollector_));
-  }
-
-  /**
    * Merges an array of values for the `TEMPLATES` property into a single object.
    * @param {!Array} values The values to be merged.
    * @return {!Object} The merged value.
@@ -277,12 +272,6 @@ class SoyComponent extends Component {
     super.renderSurfaceContent(surfaceId, content);
 
     if (this.inDocument) {
-      this.eventsCollector_.detachListeners(this.makeSurfaceId_(surfaceId));
-
-      var visitor = DomVisitor.visit(this.getSurfaceElement(surfaceId));
-      this.informVisitorAttachListeners_(visitor);
-      visitor.start();
-
       if (this.getSurface(surfaceId).cacheMiss) {
         this.componentCollector_.extractComponents(this.componentsInterceptedData_);
       }
@@ -298,6 +287,7 @@ class SoyComponent extends Component {
     if (this.inDocument) {
       this.setComponentsAttrs_();
       this.componentsInterceptedData_ = {};
+      this.attachInlineListeners_();
     }
     // TODO(edu): Moves assignment to be a getter Attribute instead.
     this.components = this.getComponents_();

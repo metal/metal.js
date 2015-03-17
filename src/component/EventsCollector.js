@@ -1,12 +1,10 @@
 'use strict';
 
-import dom from '../dom/dom';
 import Disposable from '../disposable/Disposable';
-import EventHandler from '../events/EventHandler';
 
 /**
- * Collects inline events from an passed element into a group. For each found
- * surface element a new group element will be created.
+ * Collects inline events from a passed element, detaching previously
+ * attached events that are not being used anymore.
  * @param {Component} component
  * @constructor
  * @extends {Disposable}
@@ -15,128 +13,97 @@ class EventsCollector extends Disposable {
   constructor(component) {
     super();
 
-    /**
-     * Holds the component intance.
-     * @type {Component}
-     * @protected
-     */
-    this.component_ = null;
-
-    /**
-     * Holds events that were listened through the element.
-     * @type {EventHandler}
-     * @protected
-     */
-    this.eventHandler_ = null;
-
     if (!component) {
       throw new Error('The component instance is mandatory');
     }
+
+    /**
+     * Holds the component intance.
+     * @type {!Component}
+     * @protected
+     */
     this.component_ = component;
-    this.eventHandler_ = {};
+
+    /**
+     * Holds the attached delegate event handles, indexed by the css selector.
+     * @type {!Object<string, !DomEventHandle>}
+     * @protected
+     */
+    this.eventHandles_ = {};
+
+    /**
+     * Holds the number of extracted listeners, indexed by the listener's css selector.
+     * @type {!Object<string, number>}
+     * @protected
+     */
+    this.listenerCounts_ = {};
   }
 
   /**
-   * Attaches all listeners declared in the collected events array.
-   * @param {!Array<!Object>} collectedEvents
-   * @param {string} groupName
+   * Attaches the listener described by the given params, unless it has already
+   * been attached.
+   * @param {string} eventType
+   * @param {string} fnName
    * @protected
    */
-  attachCollectedListeners_(collectedEvents, groupName) {
-    for (var i = 0; i < collectedEvents.length; i++) {
-      var event = collectedEvents[i];
-      if (!this.eventHandler_[groupName]) {
-        this.eventHandler_[groupName] = new EventHandler();
-      }
-      this.eventHandler_[groupName].add(
-        this.component_.delegate(event.name, event.element, this.component_[event.value].bind(this.component_))
-      );
+  attachListener_(eventType, fnName) {
+    var selector = '[data-on' + eventType + '="' + fnName + '"]';
+    this.listenerCounts_[selector] = (this.listenerCounts_[selector] || 0) + 1;
+    if (!this.eventHandles_[selector]) {
+      var fn = this.component_[fnName].bind(this.component_);
+      this.eventHandles_[selector] = this.component_.delegate(eventType, selector, fn);
     }
   }
 
   /**
-   * Attaches all listeners declared as attributes on the given element.
-   * @param {Element} element
-   * @param {String=} opt_groupName
+   * Attaches all listeners declared as attributes on the given element and
+   * its children.
+   * @param {string} content
    */
-  attachListeners(element, opt_groupName) {
-    opt_groupName = opt_groupName || element.id || this.component_.id;
-    var collectedEvents = this.collectInlineEventsFromAttributes_(element);
-    this.attachCollectedListeners_(collectedEvents, opt_groupName);
-    if (element.id && this.component_.extractSurfaceId(element.id)) {
-      opt_groupName = element.id;
-    }
-    return opt_groupName;
+  attachListeners(content) {
+    this.listenerCounts_ = {};
+    this.attachListenersFromHtml_(content);
+    this.detachUnusedListeners_();
   }
 
   /**
-   * Processes the attribute of an element and stores the found attribute
-   * events to an array.
-   * TODO(*): Analyze performance.
-   * @param {Element} element The element which should be processed.
-   * @param {!Object} attribute
-   * @return {Object} An objects that represents an event that should be
-   *   attached to this element.
+   * Attaches listeners found in the given html content.
+   * @param {string} content
    * @protected
    */
-  collectInlineEventFromAttribute_(element, attribute) {
-    var event = attribute.name.substring(2);
-    if ((attribute.name.indexOf('on') === 0) && dom.supportsEvent(element, event)) {
-      var eventData = {
-        element: element,
-        name: event,
-        value: attribute.value
-      };
-      element.removeAttribute(attribute.name);
-      element[attribute.name] = null;
-      return eventData;
+  attachListenersFromHtml_(content) {
+    var regex = /data-on([a-z]+)=['|"](\w+)['|"]/g;
+    var match = regex.exec(content);
+    while(match) {
+      this.attachListener_(match[1], match[2]);
+      match = regex.exec(content);
     }
-  }
-
-  /**
-   * Processes the attributes of an element and stores the found attribute
-   * events to an array.
-   * TODO(*): Analyze performance.
-   * @param {Element} element The element which should be processed.
-   * @return {!Array<!Object>} An array with objects that represent each an
-   *   event that should be attached to this element.
-   * @protected
-   */
-  collectInlineEventsFromAttributes_(element) {
-    var collectedEvents = [];
-    if (element.attributes) {
-      for (var i = element.attributes.length - 1; i >= 0; i--) {
-        var eventObj = this.collectInlineEventFromAttribute_(element, element.attributes[i]);
-        if (eventObj) {
-          collectedEvents.push(eventObj);
-        }
-      }
-    }
-    return collectedEvents;
   }
 
   /**
    * Removes all previously attached event listeners to the component.
-   * @chainable
    */
   detachAllListeners() {
-    for (var groupName in this.eventHandler_) {
-      this.detachListeners(groupName);
+    for (var selector in this.eventHandles_) {
+      if (this.eventHandles_[selector]) {
+        this.eventHandles_[selector].removeListener();
+      }
     }
-    this.eventHandler_ = {};
-    return this;
+    this.eventHandles_ = {};
+    this.listenerCounts_ = {};
   }
 
   /**
-   * Removes all previously attached event listeners to the group.
-   * @chainable
+   * Detaches all existing listeners that are not being used anymore.
+   * @protected
    */
-  detachListeners(groupName) {
-    if (this.eventHandler_[groupName]) {
-      this.eventHandler_[groupName].removeAllListeners();
-      this.eventHandler_[groupName] = null;
+  detachUnusedListeners_() {
+    for (var selector in this.eventHandles_) {
+      if (!this.listenerCounts_[selector]) {
+        this.eventHandles_[selector].removeListener();
+        this.eventHandles_[selector] = null;
+      }
     }
-    return this;
   }
 
   /**
@@ -145,7 +112,6 @@ class EventsCollector extends Disposable {
   disposeInternal() {
     this.detachAllListeners();
     this.component_ = null;
-    this.eventHandler_ = null;
   }
 }
 

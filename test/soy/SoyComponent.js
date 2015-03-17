@@ -9,7 +9,7 @@ var SoyTemplates = ComponentRegistry.Templates.SoyComponent;
 var placeholderTemplate = soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentChildren'));
 
 describe('SoyComponent', function() {
-  afterEach(function() {
+  beforeEach(function() {
     document.body.innerHTML = '';
   });
 
@@ -173,6 +173,117 @@ describe('SoyComponent', function() {
       var child = new ChildComponent();
       var surfaces = child.getSurfaces();
       assert.deepEqual(['foo'], surfaces.header.renderAttrs);
+    });
+  });
+
+  describe('Inline Events', function() {
+    it('should attach listeners from element template', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.TEMPLATES = {
+        content: function() {
+          return {content: '<div data-onclick="handleClick"></div>'};
+        }
+      };
+      CustomComponent.prototype.handleClick = sinon.stub();
+
+      var custom = new CustomComponent().render();
+      dom.triggerEvent(custom.element.childNodes[0], 'click');
+      assert.strictEqual(1, custom.handleClick.callCount);
+    });
+
+    it('should attach listeners from surface template', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.TEMPLATES = {
+        content: function(data) {
+          return {content: '<div id="' + data.id + '-header"></div>'};
+        },
+        header: function() {
+          return {content: '<div data-onclick="handleClick"></div>'};
+        }
+      };
+      CustomComponent.prototype.handleClick = sinon.stub();
+
+      var custom = new CustomComponent().render();
+      dom.triggerEvent(custom.getSurfaceElement('header').childNodes[0], 'click');
+      assert.strictEqual(1, custom.handleClick.callCount);
+    });
+
+    it('should detach unused listeners after surface update', function(done) {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        count: {value: 5}
+      };
+      CustomComponent.TEMPLATES = {
+        content: function(data) {
+          return {content: '<div id="' + data.id + '-header"></div>'};
+        },
+        header: function(data) {
+          var content = '';
+          for (var i = 0; i < data.count; i++) {
+            content += '<div data-onclick="handleClick"></div>';
+          }
+          return {content: content};
+        }
+      };
+      CustomComponent.TEMPLATES.header.params = ['count'];
+      CustomComponent.prototype.handleClick = sinon.stub();
+
+      var custom = new CustomComponent().render();
+      sinon.spy(custom.element, 'removeEventListener');
+
+      custom.count = 0;
+      custom.on('attrsChanged', function() {
+        assert.strictEqual(1, custom.element.removeEventListener.callCount);
+        assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
+        done();
+      });
+    });
+
+    it('should not detach listeners that are still useful after surface update', function(done) {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.ATTRS = {
+        count: {value: 5}
+      };
+      CustomComponent.TEMPLATES = {
+        content: function(data) {
+          return {content: '<div id="' + data.id + '-header"></div>'};
+        },
+        header: function(data) {
+          var content = '';
+          for (var i = 0; i < data.count; i++) {
+            content += '<div data-onclick="handleClick"></div>';
+          }
+          return {content: content};
+        }
+      };
+      CustomComponent.TEMPLATES.header.params = ['count'];
+      CustomComponent.prototype.handleClick = sinon.stub();
+
+      var custom = new CustomComponent().render();
+      sinon.spy(custom.element, 'removeEventListener');
+
+      custom.count = 4;
+      custom.on('attrsChanged', function() {
+        assert.strictEqual(0, custom.element.removeEventListener.callCount);
+        done();
+      });
+    });
+
+    it('should detach all listeners when element is detached', function() {
+      var CustomComponent = createCustomComponentClass();
+      CustomComponent.TEMPLATES = {
+        content: function() {
+          return {content: '<div data-onclick="handleClick"></div>'};
+        }
+      };
+      CustomComponent.prototype.handleClick = sinon.stub();
+
+      var custom = new CustomComponent().render();
+      custom.detach();
+      dom.append(document.body, custom.element);
+
+      dom.triggerEvent(custom.element.childNodes[0], 'click');
+      assert.strictEqual(0, custom.handleClick.callCount);
     });
   });
 

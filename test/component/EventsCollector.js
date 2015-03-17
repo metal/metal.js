@@ -1,150 +1,152 @@
 'use strict';
 
-import {async} from '../../src/promise/Promise';
 import dom from '../../src/dom/dom';
+import Component from '../../src/component/Component';
 import EventsCollector from '../../src/component/EventsCollector';
-import SoyComponent from '../../src/soy/SoyComponent';
 
 describe('EventsCollector', function() {
-  afterEach(function() {
-    document.body.innerHTML = '';
-  });
-
   it('should fail when component instance is not passed', function() {
     assert.throws(function() {
       new EventsCollector();
     });
   });
 
-  it('should attach events when specified in the template on render', function() {
-    var CustomComponent = createCustomComponentClass();
-    var custom = new CustomComponent();
-    custom.handleClick = sinon.stub();
-    custom.handleButtonClick = sinon.stub();
-    custom.render();
-    assertEventsCalled(custom);
-    custom.detach();
-    custom.attach();
-    assertEventsCalled(custom);
-    custom.dispose();
+  it('should attach event listener', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick"></div><div></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
+
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
+
+    assert.strictEqual(0, custom.handleClick.callCount);
+    dom.triggerEvent(custom.element.childNodes[0], 'click');
+    assert.strictEqual(1, custom.handleClick.callCount);
+    dom.triggerEvent(custom.element.childNodes[1], 'click');
+    assert.strictEqual(1, custom.handleClick.callCount);
   });
 
-  it('should attach events when specified in the template on decorate', function() {
-    var CustomComponent = createCustomComponentClass();
-    var custom = new CustomComponent();
-    custom.handleClick = sinon.stub();
-    custom.handleButtonClick = sinon.stub();
-    custom.renderInternal(); // Manual invoke to prepare surfaces.
-    custom.decorate();
-    assertEventsCalled(custom);
-    custom.dispose();
+  it('should attach multiple event listeners', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
+    CustomComponent.prototype.handleKeyDown = sinon.stub();
+
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
+
+    dom.triggerEvent(custom.element.childNodes[0], 'click');
+    assert.strictEqual(1, custom.handleClick.callCount);
+
+    dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+    assert.strictEqual(1, custom.handleKeyDown.callCount);
   });
 
-  it('should re-attach surface events when surface content is updated', function(done) {
-    var CustomComponent = createCustomComponentClass();
-    var custom = new CustomComponent();
-    custom.handleClick = sinon.stub();
-    custom.handleButtonClick = sinon.stub();
-    custom.handleButtonMousedown = sinon.stub();
-    custom.render();
-    assertEventsCalled(custom);
+  it('should trigger attached listener registered by multiple elements only once', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick"></div><div data-onclick="handleClick"></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
 
-    custom.bodyContent = '<div id="innerButton" onmousedown="handleButtonMousedown"></div>';
-    async.nextTick(function() {
-      var innerButton = custom.getSurfaceElement('body').querySelector('#innerButton');
-      dom.triggerEvent(innerButton, 'click');
-      dom.triggerEvent(innerButton, 'mousedown');
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
 
-      assert.strictEqual(4, custom.handleClick.callCount, 'Click on parent element should trigger click event');
-      assert.ok(custom.handleButtonMousedown.calledOnce, 'Click on parent element should trigger click event');
-
-      custom.dispose();
-      done();
-    });
+    dom.triggerEvent(custom.element.childNodes[0], 'click');
+    assert.strictEqual(1, custom.handleClick.callCount);
+    dom.triggerEvent(custom.element.childNodes[1], 'click');
+    assert.strictEqual(2, custom.handleClick.callCount);
   });
 
-  it('should detach events when component is disposed', function() {
-    var CustomComponent = createCustomComponentClass();
-    var custom = new CustomComponent();
-    custom.handleClick = sinon.stub();
-    custom.handleButtonClick = sinon.stub();
-    custom.render();
-    assertEventsCalled(custom);
-    custom.eventsCollector_.dispose();
-    assertEventsCalled(custom);
+  it('should detach listeners that are unused after collecting again', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
+    CustomComponent.prototype.handleKeyDown = sinon.stub();
+
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
+
+    var trigger = custom.element.childNodes[0];
+    trigger.removeAttribute('data-onclick');
+    custom.element.removeEventListener = sinon.stub();
+    collector.attachListeners(custom.element.innerHTML);
+
+    assert.strictEqual(1, custom.element.removeEventListener.callCount);
+    assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
   });
 
-  function createCustomComponentClass() {
-    class CustomComponent extends SoyComponent {
+  it('should detach all listeners when detachAllListeners is called', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
+    CustomComponent.prototype.handleKeyDown = sinon.stub();
+
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
+
+    collector.detachAllListeners();
+    dom.triggerEvent(custom.element.childNodes[0], 'click');
+    assert.strictEqual(0, custom.handleClick.callCount);
+    dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+    assert.strictEqual(0, custom.handleKeyDown.callCount);
+  });
+
+  it('should detach remaining listeners when detachAllListeners is called', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
+    CustomComponent.prototype.handleKeyDown = sinon.stub();
+
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
+
+    var trigger = custom.element.childNodes[0];
+    trigger.removeAttribute('data-onclick');
+    collector.attachListeners(custom.element.innerHTML);
+
+    collector.detachAllListeners();
+    dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+    assert.strictEqual(0, custom.handleKeyDown.callCount);
+  });
+
+  it('should detach all listeners when collector is disposed', function() {
+    var CustomComponent = createCustomComponent(
+      '<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+    );
+    CustomComponent.prototype.handleClick = sinon.stub();
+    CustomComponent.prototype.handleKeyDown = sinon.stub();
+
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+    collector.attachListeners(custom.element.innerHTML);
+
+    collector.dispose();
+    dom.triggerEvent(custom.element.childNodes[0], 'click');
+    assert.strictEqual(0, custom.handleClick.callCount);
+    dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+    assert.strictEqual(0, custom.handleKeyDown.callCount);
+  });
+
+  function createCustomComponent(content) {
+    class CustomComponent extends Component {
       constructor(opt_config) {
         super(opt_config);
       }
     }
-
-    CustomComponent.ATTRS = {
-      bodyContent: {
-        value: '<div id="innerButton" onclick="handleButtonClick"></div>'
-      },
-      footerContent: {
-        value: 'Hello World from footer'
-      },
-      headerContent: {
-        value: 'Hello World from header'
-      }
+    CustomComponent.prototype.renderInternal = function() {
+      dom.append(this.element, content);
     };
-
-    CustomComponent.SURFACES = {
-      body: {
-        renderAttrs: ['bodyContent']
-      },
-      header: {
-        renderAttrs: ['headerContent']
-      },
-      footer: {
-        renderAttrs: ['footerContent']
-      }
-    };
-
-    CustomComponent.TEMPLATES = {
-      body: function(data) {
-        return {
-          content: '<div>' + data.bodyContent + '</div>'
-        };
-      },
-      content: function(data) {
-        return {
-          content: '<div id="' + data.id + '-header" onclick="handleClick"></div>' +
-            '<div id="' + data.id + '-body" onclick="handleClick"></div>' +
-            '<div id="' + data.id + '-footer" onclick="handleClick"></div>'
-        };
-      },
-      header: function(data) {
-        return {
-          content: '<p>' + data.headerContent + '</p>'
-        };
-      },
-      footer: function(data) {
-        return {
-          content: '<p>' + data.footerContent + '</p>'
-        };
-      }
-    };
-
     return CustomComponent;
   }
-
-  var assertEventsCalled = function(instance) {
-    var headerElement = instance.getSurfaceElement('header');
-    dom.triggerEvent(headerElement, 'click');
-
-    var footerElement = instance.getSurfaceElement('footer');
-    dom.triggerEvent(footerElement, 'click');
-
-    var innerButton = instance.getSurfaceElement('body').querySelector('#innerButton');
-    dom.triggerEvent(innerButton, 'click');
-
-    assert.ok(instance.handleClick.calledThrice, 'Click on parent element should trigger click event');
-    assert.ok(instance.handleButtonClick.calledOnce, 'Click on child element should trigger click event');
-  };
-
 });

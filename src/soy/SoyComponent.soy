@@ -8,7 +8,9 @@
   {if $ij.renderChildComponents}
     {delcall ComponentTemplate data="all" variant="$componentName" /}
   {else}
-    {delcall ComponentElement data="all" variant="$componentName" /}
+    {delcall ComponentElement data="all" variant="$componentName"}
+      {param elementContent: '' /}
+    {/delcall}
   {/if}
 {/template}
 
@@ -28,19 +30,6 @@
   <div id="{$id}-children-placeholder" data-component-children>
     {if $ij.renderChildComponents}
       {$children}
-    {/if}
-  </div>
-{/deltemplate}
-
-/**
- * @param? elementContent
- * @param? elementClasses
- * @param id
- */
-{deltemplate ComponentElement}
-  <div id="{$id}" class="{$elementClasses ? $elementClasses : ''}" data-component>
-    {if $elementContent}
-      {$elementContent}
     {/if}
   </div>
 {/deltemplate}

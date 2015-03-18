@@ -45,7 +45,7 @@ describe('SoyComponent', function() {
       }
     };
 
-    soy.$$registerDelegateFn(soy.$$getDelTemplateId('DelTemplateComponent'), 'element', 0, function(data) {
+    soy.$$registerDelegateFn(soy.$$getDelTemplateId('DelTemplateComponent'), '', 0, function(data) {
       return {content: '<button id="' + data.id + '"></button>'};
     });
 
@@ -586,14 +586,15 @@ describe('SoyComponent', function() {
         super(opt_config);
       }
     }
-    sinon.stub(console, 'error');
-    if (!ComponentRegistry.getConstructor(name)) {
-      soy.$$registerDelegateFn(soy.$$getDelTemplateId(name), '', 0, function() {
-        return {content: '<div></div>'};
+    ComponentRegistry.register(name, CustomComponent);
+
+    var hasDelegate = soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentElement'), name, true);
+    if (!hasDelegate({}, null, {})) {
+      soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), name, 0, function(data) {
+        return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + data.id + '" class="" data-component>' + data.elementContent + '</div>');
       });
     }
-    console.error.restore();
-    ComponentRegistry.register(name, CustomComponent);
+
     return CustomComponent;
   }
 

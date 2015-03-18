@@ -307,7 +307,7 @@ class SoyComponent extends Component {
 
   /**
    * Renders the specified template.
-   * @param {!function()} templateFn [description]
+   * @param {!function()} templateFn
    * @return {string} The template's result content.
    */
   renderTemplate_(templateFn) {
@@ -376,8 +376,13 @@ class SoyComponent extends Component {
    * @protected
    */
   valueElementFn_() {
-    var templateFn = soy.$$getDelegateFn(this.constructor.NAME, 'element');
-    var frag = dom.buildFragment(this.renderTemplate_(templateFn));
+    var templateFn = soy.$$getDelegateFn(this.constructor.NAME, '', true);
+    var rendered = templateFn(this, null, {}).content;
+    if (!rendered) {
+      return super.valueElementFn_();
+    }
+
+    var frag = dom.buildFragment(rendered);
     var element = frag.childNodes[0];
 
     // Remove element from fragment, so it won't have a parent. Otherwise,

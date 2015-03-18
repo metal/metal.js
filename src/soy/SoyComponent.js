@@ -73,7 +73,6 @@ class SoyComponent extends Component {
     var templates = this.constructor.TEMPLATES_MERGED;
     for (var templateName in templates) {
       if (templateName !== 'content' &&
-        templateName !== 'contentElement' &&
         templateName.substr(0, 13) !== '__deltemplate') {
 
         var surface = this.getSurface(templateName);

@@ -45,8 +45,8 @@ describe('SoyComponent', function() {
       }
     };
 
-    soy.$$registerDelegateFn(soy.$$getDelTemplateId('DelTemplateComponent'), 'element', 0, function() {
-      return {content: '<button></button>'};
+    soy.$$registerDelegateFn(soy.$$getDelTemplateId('DelTemplateComponent'), 'element', 0, function(data) {
+      return {content: '<button id="' + data.id + '"></button>'};
     });
 
     var custom = new DelTemplateComponent();

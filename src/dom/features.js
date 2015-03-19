@@ -14,7 +14,7 @@ class features {
    */
   static checkAttrOrderChange() {
     if (attrOrderChange === undefined) {
-      var originalContent = '<div data-component data-ref></div>';
+      var originalContent = '<div data-component="" data-ref=""></div>';
       var element = document.createElement('div');
       dom.append(element, originalContent);
       attrOrderChange = originalContent !== element.innerHTML;

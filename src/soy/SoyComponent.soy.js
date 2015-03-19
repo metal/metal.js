@@ -54,7 +54,7 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('Component'), '', 0, Templates.S
  * @suppress {checkTypes}
  */
 Templates.SoyComponent.__deltemplate_s11_26860e4b = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-children-placeholder" data-component-children>' + ((opt_ijData.renderChildComponents) ? soy.$$escapeHtml(opt_data.children) : '') + '</div>');
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-children-placeholder" data-component-children="">' + ((opt_ijData.renderChildComponents) ? soy.$$escapeHtml(opt_data.children) : '') + '</div>');
 };
 if (goog.DEBUG) {
   Templates.SoyComponent.__deltemplate_s11_26860e4b.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s11_26860e4b';

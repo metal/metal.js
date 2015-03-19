@@ -501,7 +501,7 @@ describe('SoyComponent', function() {
 
       it('should decorate nested components inside surfaces if main component was decorated', function() {
         var content = '<div id="decorated-component">' +
-          '<div id="myChild0" class="" data-component>Decorate</div>' +
+          '<div id="myChild0" class="" data-component="">Decorate</div>' +
           '</div>';
         var element = document.createElement('div');
         dom.append(element, content);
@@ -556,7 +556,7 @@ describe('SoyComponent', function() {
 
       it('should decorate children components inside surface if main component was decorated', function() {
         var content = '<div id="decorated-children">' +
-          '<div id="decorated-children-placeholder" data-component-children>' +
+          '<div id="decorated-children-placeholder" data-component-children="">' +
           '<div></div><div></div></div></div>';
         var element = document.createElement('div');
         dom.append(element, content);
@@ -564,7 +564,7 @@ describe('SoyComponent', function() {
         var DecoratedComponent = createCustomComponentClass('DecoratedComponent');
         DecoratedComponent.TEMPLATES = {
           children: function() {
-            return {content: '<div id="decorated-children-placeholder" data-component-children></div>'};
+            return {content: '<div id="decorated-children-placeholder" data-component-children=""></div>'};
           }
         };
         var comp = new DecoratedComponent({
@@ -591,7 +591,7 @@ describe('SoyComponent', function() {
     var hasDelegate = soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentElement'), name, true);
     if (!hasDelegate({}, null, {})) {
       soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), name, 0, function(data) {
-        return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + data.id + '" class="" data-component>' + data.elementContent + '</div>');
+        return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + data.id + '" class="" data-component="">' + data.elementContent + '</div>');
       });
     }
 

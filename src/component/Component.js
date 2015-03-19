@@ -423,18 +423,6 @@ class Component extends Attribute {
   }
 
   /**
-   * Extracts the surfaceId from the elementId.
-   * @param {Element} element
-   * @return {?string}
-   */
-  extractSurfaceId(elementId) {
-    var separator = elementId.indexOf(this.id + '-');
-    if (separator === 0) {
-      return elementId.substring(this.id.length + 1);
-    }
-  }
-
-  /**
    * Fires attributes synchronization changes for attributes.
    * @param {Object.<string, Object>} changes Object containing the attribute
    *     name as key and an object with newVal and prevVal as value.

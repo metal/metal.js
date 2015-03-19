@@ -112,7 +112,7 @@ class SoyComponent extends Component {
    * @protected
    */
   attachInlineListeners_() {
-    this.eventsCollector_.attachListeners(this.element.parentNode.innerHTML);
+    this.eventsCollector_.attachListeners(this.element.outerHTML);
   }
 
   /**

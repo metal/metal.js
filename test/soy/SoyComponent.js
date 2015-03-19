@@ -31,8 +31,8 @@ describe('SoyComponent', function() {
   });
 
   it('should render element tag according to its template when defined', function() {
-    var CustomComponent = createCustomComponentClass();
-    CustomComponent.TEMPLATES = {
+    var DelTemplateComponent = createCustomComponentClass('DelTemplateComponent');
+    DelTemplateComponent.TEMPLATES = {
       content: function() {
         return {
           content: '<div class="myContent">Hello World</div>'
@@ -45,7 +45,11 @@ describe('SoyComponent', function() {
       }
     };
 
-    var custom = new CustomComponent();
+    soy.$$registerDelegateFn(soy.$$getDelTemplateId('DelTemplateComponent'), 'element', 0, function() {
+      return {content: '<button></button>'};
+    });
+
+    var custom = new DelTemplateComponent();
     custom.render();
     assert.strictEqual('BUTTON', custom.element.tagName);
   });
@@ -539,11 +543,7 @@ describe('SoyComponent', function() {
         var element = document.createElement('div');
         dom.append(element, content);
 
-        class DecoratedComponent extends SoyComponent {
-          constructor(opt_config) {
-            super(opt_config);
-          }
-        }
+        var DecoratedComponent = createCustomComponentClass('DecoratedComponent');
         var comp = new DecoratedComponent({
           children: [new DecoratedComponent(), new DecoratedComponent()],
           element: element,
@@ -561,11 +561,7 @@ describe('SoyComponent', function() {
         var element = document.createElement('div');
         dom.append(element, content);
 
-        class DecoratedComponent extends SoyComponent {
-          constructor(opt_config) {
-            super(opt_config);
-          }
-        }
+        var DecoratedComponent = createCustomComponentClass('DecoratedComponent');
         DecoratedComponent.TEMPLATES = {
           children: function() {
             return {content: '<div id="decorated-children-placeholder" data-component-children></div>'};
@@ -584,12 +580,20 @@ describe('SoyComponent', function() {
   });
 
   function createCustomComponentClass(name) {
+    name = name || 'CustomComponent';
     class CustomComponent extends SoyComponent {
       constructor(opt_config) {
         super(opt_config);
       }
     }
-    ComponentRegistry.register(name || 'CustomComponent', CustomComponent);
+    sinon.stub(console, 'error');
+    if (!ComponentRegistry.getConstructor(name)) {
+      soy.$$registerDelegateFn(soy.$$getDelTemplateId(name), '', 0, function() {
+        return {content: '<div></div>'};
+      });
+    }
+    console.error.restore();
+    ComponentRegistry.register(name, CustomComponent);
     return CustomComponent;
   }
 

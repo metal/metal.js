@@ -33,6 +33,7 @@ class ComponentRegistry {
    */
   static register(name, constructorFn) {
     ComponentRegistry.components_[name] = constructorFn;
+    constructorFn.NAME = name;
     constructorFn.TEMPLATES = ComponentRegistry.Templates[name];
   }
 }

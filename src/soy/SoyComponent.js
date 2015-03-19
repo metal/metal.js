@@ -361,13 +361,12 @@ class SoyComponent extends Component {
    * @protected
    */
   valueElementFn_() {
-    if (!this.constructor.TEMPLATES_MERGED.contentElement) {
+    var templateFn = soy.$$getDelegateFn(this.constructor.NAME, 'element');
+    if (!templateFn) {
       return super.valueElementFn_();
     }
 
-    var frag = dom.buildFragment(
-      this.renderTemplate_(this.constructor.TEMPLATES_MERGED.contentElement)
-    );
+    var frag = dom.buildFragment(this.renderTemplate_(templateFn));
     var element = frag.childNodes[0];
 
     // Remove element from fragment, so it won't have a parent. Otherwise,

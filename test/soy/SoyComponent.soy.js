@@ -1,6 +1,5 @@
 'use strict';
 
-import dom from '../../src/dom/dom';
 import ComponentRegistry from '../../src/component/ComponentRegistry';
 
 import '../../src/soy/SoyComponent.soy';

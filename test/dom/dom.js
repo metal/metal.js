@@ -62,6 +62,19 @@ describe('dom', function() {
       assert.strictEqual(parent, child.parentNode);
     });
 
+    it('should node enter document', function() {
+      var element = document.createElement('div');
+      dom.enterDocument(element);
+      assert.strictEqual(document.body, element.parentNode);
+    });
+
+    it('should node exit document', function() {
+      var element = document.createElement('div');
+      dom.enterDocument(element);
+      dom.exitDocument(element);
+      assert.strictEqual(null, element.parentNode);
+    });
+
     it('should append string as document fragment to parent element', function() {
       var parent = document.createElement('div');
       var fragment = document.createDocumentFragment();

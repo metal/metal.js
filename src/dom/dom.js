@@ -106,6 +106,24 @@ class dom {
   }
 
   /**
+   * Inserts node in document as last element.
+   * @param {Element} node Element to remove children from.
+   */
+  static enterDocument(node) {
+    dom.append(document.body, node);
+  }
+
+  /**
+   * Removes node from document.
+   * @param {Element} node Element to remove children from.
+   */
+  static exitDocument(node) {
+    if (node.parentNode) {
+      node.parentNode.removeChild(node);
+    }
+  }
+
+  /**
    * This is called when an event is triggered by a delegate listener (see
    * `dom.delegate` for more details).
    * @param {string} selector The selector or element that matches the child

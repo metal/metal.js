@@ -214,9 +214,10 @@ class Component extends Attribute {
    */
   cacheSurfaceRenderAttrs_(surfaceId) {
     var attrs = this.getSurface(surfaceId).renderAttrs;
-    for (var i in attrs) {
-      this.surfacesRenderAttrs_[attrs[i]] = this.surfacesRenderAttrs_[attrs[i]] || {};
-      this.surfacesRenderAttrs_[attrs[i]][surfaceId] = true;
+    var attrNames = attrs ? Object.keys(attrs) : [];
+    for (var i = 0; i < attrNames.length; i++) {
+      this.surfacesRenderAttrs_[attrs[attrNames[i]]] = this.surfacesRenderAttrs_[attrs[attrNames[i]]] || {};
+      this.surfacesRenderAttrs_[attrs[attrNames[i]]][surfaceId] = true;
     }
   }
 

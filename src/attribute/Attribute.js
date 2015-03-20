@@ -129,14 +129,12 @@ class Attribute extends EventEmitter {
    * Calls the requested function, running the appropriate code for when it's
    * passed as an actual function object or just the function's name.
    * @param {!Function|string} fn Function, or name of the function to run.
-   * @param {...*} A variable number of optional parameters to be passed to the
+   * @param {!Array} An optional array of parameters to be passed to the
    *   function that will be called.
    * @return {*} The return value of the called function.
    * @protected
    */
-  callFunction_(fn) {
-    var args = Array.prototype.slice.call(arguments, 1);
-
+  callFunction_(fn, args) {
     if (core.isString(fn)) {
       return this[fn].apply(this, args);
     } else if (core.isFunction(fn)) {
@@ -154,7 +152,7 @@ class Attribute extends EventEmitter {
     var info = this.attrsInfo_[name];
     var config = info.config;
     if (config.setter) {
-      value = this.callFunction_(config.setter, value);
+      value = this.callFunction_(config.setter, [value]);
     }
     return value;
   }
@@ -169,7 +167,7 @@ class Attribute extends EventEmitter {
     var info = this.attrsInfo_[name];
     var config = info.config;
     if (config.validator) {
-      return this.callFunction_(config.validator, value);
+      return this.callFunction_(config.validator, [value]);
     }
     return true;
   }

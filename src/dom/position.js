@@ -1,5 +1,7 @@
 'use strict';
 
+import math from '../math/math';
+
 /**
  * Class with static methods responsible for doing browser position checks.
  */
@@ -16,9 +18,23 @@ class position {
   }
 
   /**
+   * Tests if a region intersects with another.
+   * @param {DOMRect} r1
+   * @param {DOMRect} r2
+   * @return {boolean}
+   */
+  static intersectRegion(r1, r2) {
+    return math.intersectRect(
+      r1.top, r1.left, r1.bottom, r1.right,
+      r2.top, r2.left, r2.bottom, r2.right);
+  }
+
+  /**
    * Gets the region of the viewport excluding scrollbar.
    * @param {Window=} opt_window Optional window element to test.
-   * @return {!Object} Object with values 'width' and 'height'.
+   * @return {!DOMRect} The returned value is a simulated DOMRect object which
+   *     is the union of the rectangles returned by getClientRects() for the
+   *     element, i.e., the CSS border-boxes associated with the element.
    */
   static getViewportRegion(opt_window) {
     var region = this.getViewportSize(opt_window);

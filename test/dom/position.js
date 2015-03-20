@@ -40,4 +40,31 @@ describe('position', function() {
     assert.strictEqual(0, region.left);
     assert.strictEqual(0, region.top);
   });
+
+  it('should check if same regions intersects', function() {
+    var r1 = { top: 0, left: 0, bottom: 100, right: 100 };
+    var r2 = { top: 0, left: 0, bottom: 100, right: 100 };
+    assert.ok(position.intersectRegion(r1, r2));
+  });
+
+  it('should check if regions intersects', function() {
+    var r1 = { top: 0, left: 0, bottom: 100, right: 100 };
+    var r2 = { top: 50, left: 50, bottom: 75, right: 75 };
+    assert.ok(position.intersectRegion(r1, r2));
+    assert.ok(position.intersectRegion(r2, r1));
+  });
+
+  it('should check if negative regions intersects', function() {
+    var r1 = { top: 0, left: 0, bottom: 100, right: 100 };
+    var r2 = { top: -1, left: -1, bottom: 101, right: 101 };
+    assert.ok(position.intersectRegion(r1, r2));
+    assert.ok(position.intersectRegion(r2, r1));
+  });
+
+  it('should check if external regions do not intersect', function() {
+    var r1 = { top: 0, left: 0, bottom: 100, right: 100 };
+    var r2 = { top: 101, left: 101, bottom: 200, right: 200 };
+    assert.ok(!position.intersectRegion(r1, r2));
+    assert.ok(!position.intersectRegion(r2, r1));
+  });
 });

@@ -34,17 +34,17 @@ class SoyComponent extends Component {
     super(opt_config);
 
     /**
-     * Holds a `ComponentCollector` that will extract inner components.
-     * @type {!ComponentCollector}
-     * @protected
-     */
-    this.componentCollector_ = new ComponentCollector(this.element);
-
-    /**
      * Gets all nested components.
      * @type {!Array<!Component>}
      */
-    this.components = null;
+    this.components = {};
+
+    /**
+     * Helper responsible for extracting components from strings and config data.
+     * @type {!ComponentCollector}
+     * @protected
+     */
+    this.componentsCollector_ = new ComponentCollector();
 
     /**
      * Holds events that were listened through the element.
@@ -54,14 +54,34 @@ class SoyComponent extends Component {
     this.eventsCollector_ = new EventsCollector(this);
 
     /**
-     * Stores the arguments that were passed to the last call to the
-     * SoyComponent template for each component instance (mapped by its id).
-     * @type {!Object}
+     * The component that should receive extracted component references when a
+     * soy template is called. Starts with this component instance, but can change
+     * as nested templates are called.
+     * @type {!Component}
      * @protected
      */
-    this.componentsInterceptedData_ = {};
+    this.parentComponent_ = this;
+
+    /**
+     * Holds the components that were most recently added via `addComponentRef`.
+     * This object is cleared after the `attach` and `renderSurfacesContent`
+     * methods are run.
+     * @type {!Array<!Component>}
+     * @protected
+     */
+    this.recentlyAddedComponents_ = [];
 
     this.addSurfacesFromTemplates_();
+  }
+
+  /**
+   * Adds a component reference to the `components` variable.
+   * @param {string} ref Key that should be used to reference the give component.
+   * @param {!Component} component Component instance to be referenced.
+   */
+  addComponentRef(ref, component) {
+    this.components[ref] = component;
+    this.recentlyAddedComponents_.push(component);
   }
 
   /**
@@ -92,16 +112,16 @@ class SoyComponent extends Component {
     if (this.decorating_) {
       // We need to call the element soy template function when the component
       // is being decorated, even though we won't use its results. This call is
-      // only needed in order for us tointercept the call data for nested components.
+      // only needed in order for us to intercept the call data for nested components.
       this.renderElementTemplate();
-      this.componentCollector_.setShouldDecorate(true);
     }
 
-    this.componentCollector_.extractComponents(this.componentsInterceptedData_);
-    this.componentCollector_.setShouldDecorate(false);
-
     super.attach(opt_parentElement, opt_siblingElement);
-    this.componentsInterceptedData_ = {};
+
+    if (!this.wasRendered) {
+      this.attachNestedComponents_();
+    }
+
     this.attachInlineListeners_();
 
     return this;
@@ -113,6 +133,73 @@ class SoyComponent extends Component {
    */
   attachInlineListeners_() {
     this.eventsCollector_.attachListeners(this.element.outerHTML);
+  }
+
+  /**
+   * Attaches recently added components to the dom.
+   * @protected
+   */
+  attachNestedComponents_() {
+    var element = this.element;
+
+    this.recentlyAddedComponents_.forEach(function(component) {
+      if (component.wasRendered) {
+        var id = component.id;
+        var placeholder = document.getElementById(id) || element.querySelector('#' + id);
+        var componentElement = component.element;
+        if (placeholder !== componentElement) {
+          placeholder.parentNode.insertBefore(componentElement, placeholder);
+          placeholder.parentNode.removeChild(placeholder);
+        }
+      } else {
+        component.decorateAsSubComponent();
+      }
+    });
+    this.recentlyAddedComponents_ = [];
+  }
+
+  /**
+   * Builds the config data for a component from the data that was passed to its
+   * soy template function.
+   * @param {!Object} templateData
+   * @return {!Object} The component's config data.
+   * @protected
+   */
+  buildComponentConfigData_(templateData) {
+    var config = {};
+    for (var key in templateData) {
+      var value = templateData[key];
+      if (this.hasSubcomponents_(value)) {
+        config[key] = this.componentsCollector_.extractComponentsFromString(value);
+      } else {
+        config[key] = templateData[key];
+      }
+    }
+    return config;
+  }
+
+  /**
+   * Builds the data object that should be passed to the real soy template function
+   * for a component.
+   * @param {!Object} data The original data passed to the template function.
+   * @param {!Object} config The config data that was passed to the component's constructor.
+   * @param {!Component} component The component that was extracted from the original
+   *   template data.
+   * @return {!Object}
+   * @protected
+   */
+  buildTemplateData_(data, config, component) {
+    var newData = {};
+    for (var key in data) {
+      if (key === 'id' || key === 'componentName' || config[key] !== data[key]) {
+        // Pass down the original string value of attributes that are converted
+        // into subcomponents, so the template can render it.
+        newData[key] = data[key];
+      } else {
+        newData[key] = component[key];
+      }
+    }
+    return newData;
   }
 
   /**
@@ -130,17 +217,17 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Calls decorate on all children components, setting their element
-   * attribute to the appropriate element inside the children placeholder.
-   * @param {!Element} placeholder Placeholder where the children should be
-   *   rendered.
-   * @param {!Array<!Component>} children An array of children components.
-   * @return {boolean}
+   * Decorates this component as a subcomponent, meaning that no rendering is
+   * needed since it was already rendered by the parent component.
    */
-  decorateChildren_(placeholder, children) {
-    children.forEach(function(child) {
-      child.decorate();
-    });
+  decorateAsSubComponent() {
+    this.decoratingAsSubcomponent_ = true;
+
+    this.syncAttrs_(this.getAttrNames());
+    this.attach();
+
+    this.wasRendered = true;
+    this.decoratingAsSubcomponent_ = false;
   }
 
   /**
@@ -151,15 +238,6 @@ class SoyComponent extends Component {
     this.eventsCollector_.detachAllListeners();
     super.detach();
     return this;
-  }
-
-  /**
-   * Gets all nested components.
-   * @return {!Array<!Component>}
-   * @protected
-   */
-  getComponents_() {
-    return this.componentCollector_.getComponents();
   }
 
   /**
@@ -182,15 +260,34 @@ class SoyComponent extends Component {
   /**
    * Handles a call to the SoyComponent template.
    * @param {!Object} data The data the template was called with.
+   * @param {(null|undefined)=} ignored Second argument for soy templates.
+   * @param {Object.<string, *>=} ijData Optional injected data.
    * @return {string} The original return value of the template.
+   * @protected
    */
-  handleTemplateCall_(data) {
-    var callData = {
-      componentName: data.componentName
-    };
-    callData.data = this.normalizeTemplateCallData_(data);
-    this.componentsInterceptedData_[data.id] = callData;
-    return originalTemplate.apply(originalTemplate, arguments);
+  handleTemplateCall_(data, ignored, ijData) {
+    var config  = this.buildComponentConfigData_(data);
+    var component = this.componentsCollector_.createOrUpdateComponent(data.componentName, config);
+    this.parentComponent_.addComponentRef(data.id, component);
+
+    var prevParentComponent = this.parentComponent_;
+    this.parentComponent_ = component;
+
+    var newData = this.buildTemplateData_(data, config, component);
+    var renderedTemplate = originalTemplate(newData, ignored, ijData);
+
+    this.parentComponent_ = prevParentComponent;
+    return renderedTemplate;
+  }
+
+  /**
+   * Checks if the given value has subcomponents to be extracted.
+   * @param {*} value
+   * @return {boolean}
+   * @protected
+   */
+  hasSubcomponents_(value) {
+    return value instanceof soydata.SanitizedHtml && value.content.indexOf('data-component') !== -1;
   }
 
   /**
@@ -204,25 +301,6 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Normalizes a template's call data, converting special soy objects
-   * into html strings. This function doesn't change the original data
-   * object.
-   * @param {!Object} data
-   * @return {!Object}
-   */
-  normalizeTemplateCallData_(data) {
-    data = object.mixin({}, data, {
-      componentName: null
-    });
-    for (var key in data) {
-      if (data[key] instanceof soydata.SanitizedHtml) {
-        data[key] = data[key].content;
-      }
-    }
-    return data;
-  }
-
-  /**
    * Renders this component's child components, if their placeholder is found.
    * @protected
    * TODO(edu): Re-think this part.
@@ -230,20 +308,26 @@ class SoyComponent extends Component {
   renderChildrenComponents_() {
     var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));
     if (placeholder) {
-      var children = this.children;
-      if (this.shouldDecorateChildren_(placeholder)) {
-        this.decorateChildren_(placeholder, children);
-        return;
-      }
-
       dom.removeChildren(placeholder);
-      children.forEach(function(child) {
+      this.children.forEach(function(child) {
         if (child.wasRendered) {
           dom.append(placeholder, child.element);
         } else {
           child.render(placeholder);
         }
       });
+    }
+  }
+
+  /**
+   * Renders the main element's template.
+   * @return {?string} The template's result content, or undefined if the
+   *   template doesn't exist.
+   */
+  renderElementTemplate() {
+    var elementTemplate = this.constructor.TEMPLATES_MERGED.content;
+    if (core.isFunction(elementTemplate)) {
+      return this.renderTemplate_(elementTemplate);
     }
   }
 
@@ -262,46 +346,18 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Overrides the default behavior of `renderSurfaceContent` to also
-   * handle calls to component templates done by the surface's template.
-   * @param {string} surfaceId The surface id.
-   * @param {Object|string} content The content to be rendered.
-   * @override
-   */
-  renderSurfaceContent(surfaceId, content) {
-    super.renderSurfaceContent(surfaceId, content);
-
-    if (this.inDocument) {
-      if (this.getSurface(surfaceId).cacheMiss) {
-        this.componentCollector_.extractComponents(this.componentsInterceptedData_);
-      }
-    }
-  }
-
-  /**
    * @inheritDoc
    */
   renderSurfacesContent_(surfaces) {
-    super.renderSurfacesContent_(surfaces);
-
-    if (this.inDocument) {
-      this.setComponentsAttrs_();
-      this.componentsInterceptedData_ = {};
-      this.attachInlineListeners_();
+    // If this component is still being rendered we shouldn't render
+    // surfaces content or attach inline listeners, since these will
+    // already be done for the entire content.
+    if (this.inDocument || this.decorating_) {
+      super.renderSurfacesContent_(surfaces);
     }
-    // TODO(edu): Moves assignment to be a getter Attribute instead.
-    this.components = this.getComponents_();
-  }
-
-  /**
-   * Renders the main element's template.
-   * @return {?string} The template's result content, or undefined if the
-   *   template doesn't exist.
-   */
-  renderElementTemplate() {
-    var elementTemplate = this.constructor.TEMPLATES_MERGED.content;
-    if (core.isFunction(elementTemplate)) {
-      return this.renderTemplate_(elementTemplate);
+    if (this.inDocument) {
+      this.attachNestedComponents_();
+      this.attachInlineListeners_();
     }
   }
 
@@ -318,39 +374,10 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Updates all inner components with their last template call data.
-   * @protected
-   */
-  setComponentsAttrs_() {
-    var rootComponents = this.componentCollector_.getRootComponents();
-    for (var id in rootComponents) {
-      var data = this.componentsInterceptedData_[id];
-      if (data) {
-        this.componentCollector_.extractSubcomponents(data, this.componentsInterceptedData_);
-        if (rootComponents[data.data.id]) {
-          rootComponents[data.data.id].setAttrs(data.data);
-        }
-      }
-    }
-  }
-
-  /**
-   * Checks if children components should be decorated. Returns true when this
-   * component is being decorated and the placeholder contents match the number
-   * of children.
-   * @param {!Element} placeholder Placeholder where the children should be
-   *   rendered.
-   * @return {boolean}
-   */
-  shouldDecorateChildren_(placeholder) {
-    return this.decorating_ && placeholder.childNodes.length > 0;
-  }
-
-  /**
    * Syncs the component according to the new value of the `children` attribute.
    */
   syncChildren(newVal, prevVal) {
-    if (!array.equal(newVal, prevVal || [])) {
+    if (!this.decoratingAsSubcomponent_ && !array.equal(newVal, prevVal || [])) {
       this.renderChildrenComponents_();
     }
   }
@@ -361,8 +388,11 @@ class SoyComponent extends Component {
    * @protected
    */
   valueElementFn_() {
-    var templateFn = soy.$$getDelegateFn(this.constructor.NAME, '', true);
-    var rendered = templateFn(this, null, {}).content;
+    var templateFn = soy.$$getDelegateFn(this.constructor.NAME, 'element', true);
+    var attrs = this.getAttrs();
+    attrs.elementContent = '';
+    attrs.id = attrs.id || this.makeId_();
+    var rendered = templateFn(attrs, null, {}).content;
     if (!rendered) {
       return super.valueElementFn_();
     }

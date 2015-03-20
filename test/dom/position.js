@@ -4,25 +4,18 @@ import dom from '../../src/dom/dom';
 import position from '../../src/dom/position';
 
 describe('position', function() {
-  var iframeAbsolute = dom.buildFragment('<iframe id="iframeAbsolute" style="height:10000px;width:10000px;padding:0;margin:0;border-width:0;position:absolute;top:0;left:0;"></iframe>').firstChild;
-  var iframeStatic = dom.buildFragment('<iframe id="iframeStatic" style="height:10000px;width:10000px;padding:0;margin:0;border-width:0;position:relative;"></iframe>').firstChild;
+  var paddingElement = dom.buildFragment('<div id="paddingElement" style="height:10000px;width:10000px;position:relative;"></div>').firstChild;
 
   before(function() {
-    dom.enterDocument(iframeAbsolute);
-    dom.enterDocument(iframeStatic);
+    document.body.style.margin = '0px';
+    dom.enterDocument(paddingElement);
   });
 
   after(function() {
-    dom.exitDocument(iframeAbsolute);
-    dom.exitDocument(iframeStatic);
+    dom.exitDocument(paddingElement);
   });
 
   describe('viewport', function() {
-    it('should check iframe viewport size', function() {
-      assert.strictEqual(10000, position.getViewportSize(iframeStatic.contentWindow).height);
-      assert.strictEqual(10000, position.getViewportSize(iframeStatic.contentWindow).width);
-    });
-
     it('should check window viewport size', function() {
       assert.ok(window.document.documentElement.scrollHeight > position.getViewportSize().height);
       assert.ok(window.document.documentElement.scrollWidth > position.getViewportSize().width);
@@ -31,7 +24,7 @@ describe('position', function() {
 
   describe('region', function() {
     it('should get node region', function() {
-      var region = position.getRegion(iframeAbsolute);
+      var region = position.getRegion(paddingElement);
       assert.strictEqual(10000, region.height);
       assert.strictEqual(10000, region.width);
       assert.strictEqual(10000, region.right);

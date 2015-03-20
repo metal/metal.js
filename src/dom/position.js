@@ -21,8 +21,7 @@ class position {
    * @return {!Object} Object with values 'width' and 'height'.
    */
   static getViewportSize(opt_window) {
-    var win = opt_window || window;
-    var el = win.document.documentElement;
+    var el = (opt_window || window).document.documentElement;
     return {
       height: el.clientHeight,
       width: el.clientWidth

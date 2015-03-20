@@ -16,6 +16,20 @@ class position {
   }
 
   /**
+   * Gets the region of the viewport excluding scrollbar.
+   * @param {Window=} opt_window Optional window element to test.
+   * @return {!Object} Object with values 'width' and 'height'.
+   */
+  static getViewportRegion(opt_window) {
+    var region = this.getViewportSize(opt_window);
+    region.bottom = region.height;
+    region.left = 0;
+    region.right = region.width;
+    region.top = 0;
+    return region;
+  }
+
+  /**
    * Gets the dimensions of the viewport excluding scrollbar.
    * @param {Window=} opt_window Optional window element to test.
    * @return {!Object} Object with values 'width' and 'height'.

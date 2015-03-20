@@ -20,6 +20,17 @@ describe('position', function() {
     assert.ok(window.document.documentElement.scrollWidth > position.getViewportSize().width);
   });
 
+  it('should check viewport region', function() {
+    var size = position.getViewportSize();
+    var region = position.getViewportRegion();
+    assert.strictEqual(size.height, region.height);
+    assert.strictEqual(size.height, region.bottom);
+    assert.strictEqual(size.width, region.width);
+    assert.strictEqual(size.width, region.right);
+    assert.strictEqual(0, region.left);
+    assert.strictEqual(0, region.top);
+  });
+
   it('should get node region', function() {
     var region = position.getRegion(paddingElement);
     assert.strictEqual(10000, region.height);

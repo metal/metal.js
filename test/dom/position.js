@@ -15,22 +15,18 @@ describe('position', function() {
     dom.exitDocument(paddingElement);
   });
 
-  describe('viewport', function() {
-    it('should check window viewport size', function() {
-      assert.ok(window.document.documentElement.scrollHeight > position.getViewportSize().height);
-      assert.ok(window.document.documentElement.scrollWidth > position.getViewportSize().width);
-    });
+  it('should check window viewport size', function() {
+    assert.ok(window.document.documentElement.scrollHeight > position.getViewportSize().height);
+    assert.ok(window.document.documentElement.scrollWidth > position.getViewportSize().width);
   });
 
-  describe('region', function() {
-    it('should get node region', function() {
-      var region = position.getRegion(paddingElement);
-      assert.strictEqual(10000, region.height);
-      assert.strictEqual(10000, region.width);
-      assert.strictEqual(10000, region.right);
-      assert.strictEqual(10000, region.bottom);
-      assert.strictEqual(0, region.left);
-      assert.strictEqual(0, region.top);
-    });
+  it('should get node region', function() {
+    var region = position.getRegion(paddingElement);
+    assert.strictEqual(10000, region.height);
+    assert.strictEqual(10000, region.width);
+    assert.strictEqual(10000, region.right);
+    assert.strictEqual(10000, region.bottom);
+    assert.strictEqual(0, region.left);
+    assert.strictEqual(0, region.top);
   });
 });

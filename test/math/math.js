@@ -27,7 +27,7 @@ describe('math', function() {
     assert.ok(math.intersectRect(P01[0], P01[1], P02[0], P02[1], P11[0], P11[1], P12[0], P12[1]));
   });
 
-  it('should externalrectangles not intersect', function() {
+  it('should external rectangles not intersect', function() {
     var P01 = [0, 0];
     var P02 = [10, 10];
     var P11 = [11, 11];

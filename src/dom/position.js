@@ -29,6 +29,15 @@ class position {
   }
 
   /**
+   * Tests if a region is inside viewport region.
+   * @param {DOMRect} region
+   * @return {boolean}
+   */
+  static insideViewportRegion(region) {
+    return this.insideRegion(this.getViewportRegion(), region);
+  }
+
+  /**
    * Tests if a region intersects with another.
    * @param {DOMRect} r1
    * @param {DOMRect} r2

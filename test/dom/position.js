@@ -99,5 +99,15 @@ describe('position', function() {
       assert.ok(!position.insideRegion(r1, r2));
       assert.ok(!position.insideRegion(r2, r1));
     });
+
+    it('should check if region inside viewport is not considered inside viewport region', function() {
+      var region = { top: 0, left: 0, bottom: 100, right: 100 };
+      assert.ok(position.insideViewportRegion(region));
+    });
+
+    it('should check if region outside viewport is not considered inside viewport region', function() {
+      var region = { top: -1, left: -1, bottom: 100, right: 100 };
+      assert.ok(!position.insideViewportRegion(region));
+    });
   });
 });

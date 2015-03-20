@@ -11,6 +11,16 @@ describe('EventsCollector', function() {
     });
   });
 
+  it('should not throw error if no listeners are found', function() {
+    var CustomComponent = createCustomComponent('<div></div><div></div>');
+    var custom = new CustomComponent().render();
+    var collector = new EventsCollector(custom);
+
+    assert.doesNotThrow(function() {
+      collector.attachListeners(custom.element.innerHTML);
+    });
+  });
+
   it('should attach event listener', function() {
     var CustomComponent = createCustomComponent(
       '<div data-onclick="handleClick"></div><div></div>'

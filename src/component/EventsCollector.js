@@ -72,6 +72,9 @@ class EventsCollector extends Disposable {
    * @protected
    */
   attachListenersFromHtml_(content) {
+    if (content.indexOf('data-on') === -1) {
+      return;
+    }
     var regex = /data-on([a-z]+)=['|"](\w+)['|"]/g;
     var match = regex.exec(content);
     while(match) {

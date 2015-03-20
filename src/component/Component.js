@@ -124,7 +124,7 @@ class Component extends Attribute {
     core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
     this.addSurfacesFromStaticHint_();
 
-    this.elementEventProxy_ = new EventEmitterProxy(this.element, this);
+    this.setUpEventEmitterProxy_();
     this.delegateEventHandler_ = new EventHandler();
 
     this.created_();
@@ -412,8 +412,10 @@ class Component extends Attribute {
   disposeInternal() {
     this.detach();
 
-    this.elementEventProxy_.dispose();
-    this.elementEventProxy_ = null;
+    if (this.elementEventProxy_) {
+      this.elementEventProxy_.dispose();
+      this.elementEventProxy_ = null;
+    }
 
     this.delegateEventHandler_.removeAllListeners();
     this.delegateEventHandler_ = null;
@@ -733,6 +735,21 @@ class Component extends Attribute {
       element = this.valueElementFn_();
     }
     return element;
+  }
+
+  /**
+   * Sets up the `EventEmitterProxy` instance that will handle the proxy of dom events.
+   * @protected
+   */
+  setUpEventEmitterProxy_() {
+    var instance = this;
+    var handle = this.on('newListener', function(event) {
+      if (dom.supportsEvent(this.constructor.ELEMENT_TAG_NAME_MERGED, event)) {
+        instance.elementEventProxy_ = new EventEmitterProxy(instance.element, instance);
+        instance.elementEventProxy_.proxyEvent_(event);
+        handle.removeListener();
+      }
+    });
   }
 
   /**

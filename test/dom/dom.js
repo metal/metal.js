@@ -389,6 +389,12 @@ describe('dom', function() {
       assert.ok(dom.supportsEvent(element, 'click'));
       assert.ok(dom.supportsEvent(element, 'change'));
     });
+
+    it('should check if element with the given tag supports event', function() {
+      assert.ok(!dom.supportsEvent('div', 'lalala'));
+      assert.ok(dom.supportsEvent('div', 'click'));
+      assert.ok(dom.supportsEvent('div', 'change'));
+    });
   });
 
   function getClassNames(element) {

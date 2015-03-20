@@ -321,11 +321,14 @@ class dom {
 
   /**
    * Checks if the given element supports the given event type.
-   * @param {!Element} element The DOM element to check.
+   * @param {!Element|string} element The DOM element or element tag name to check.
    * @param {string} eventName The name of the event to check.
    * @return {boolean}
    */
   static supportsEvent(element, eventName) {
+    if (core.isString(element)) {
+      element = document.createElement(element);
+    }
     return 'on' + eventName in element;
   }
 

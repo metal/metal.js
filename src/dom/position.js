@@ -18,6 +18,17 @@ class position {
   }
 
   /**
+   * Tests if a region is inside another.
+   * @param {DOMRect} r1
+   * @param {DOMRect} r2
+   * @return {boolean}
+   */
+  static insideRegion(r1, r2) {
+    return (r2.top >= r1.top) && (r2.bottom <= r1.bottom) &&
+              (r2.right <= r1.right) && (r2.left >= r1.left);
+  }
+
+  /**
    * Tests if a region intersects with another.
    * @param {DOMRect} r1
    * @param {DOMRect} r2

@@ -10,7 +10,7 @@ class math {
      *      -------- x1y1       -------- x3y3
      * </pre>
      *
-     * Note that coordinates starts from top to down (y), left ro right (x):
+     * Note that coordinates starts from top to down (y), left to right (x):
      *
      * <pre>
      *      ------> (x)

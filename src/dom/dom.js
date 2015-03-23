@@ -343,7 +343,11 @@ class dom {
     if (core.isElement(selectorOrElement) || core.isDocument(selectorOrElement)) {
       return selectorOrElement;
     } else if (core.isString(selectorOrElement)) {
-      return document.querySelector(selectorOrElement);
+      if (selectorOrElement[0] === '#' && selectorOrElement.indexOf(' ') === -1) {
+        return document.getElementById(selectorOrElement.substr(1));
+      } else {
+        return document.querySelector(selectorOrElement);
+      }
     } else {
       return null;
     }

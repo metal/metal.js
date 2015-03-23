@@ -373,6 +373,25 @@ describe('dom', function() {
       assert.strictEqual(element, dom.toElement('.mySelector'));
     });
 
+    it('should return matching element when selector is id', function() {
+      var element = document.createElement('div');
+      element.id = 'myId';
+      document.body.appendChild(element);
+
+      assert.strictEqual(element, dom.toElement('#myId'));
+    });
+
+    it('should return matching element when selector is inside id', function() {
+      var element = document.createElement('div');
+      element.id = 'myId';
+      document.body.appendChild(element);
+      var element2 = document.createElement('div');
+      element2.className = 'myClass';
+      dom.append(element, element2);
+
+      assert.strictEqual(element2, dom.toElement('#myId .myClass'));
+    });
+
     it('should return null if invalid param is given', function() {
       assert.strictEqual(null, dom.toElement({}));
       assert.strictEqual(null, dom.toElement([]));

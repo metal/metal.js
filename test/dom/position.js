@@ -109,5 +109,23 @@ describe('position', function() {
       var region = { top: -1, left: -1, bottom: 100, right: 100 };
       assert.ok(!position.insideViewportRegion(region));
     });
+
+    it('should intersection between two equivalent regions be the same region', function() {
+      var r1 = {bottom: 100, height: 100, left: 0, right: 100, top: 0, width: 100};
+      var r2 = {bottom: 100, height: 100, left: 0, right: 100, top: 0, width: 100};
+      assert.deepEqual(r1, position.intersection(r1, r2));
+    });
+
+    it('should computes the intersection between two regions', function() {
+      var r1 = {bottom: 100, height: 100, left: 0, right: 100, top: 0, width: 100};
+      var r2 = {bottom: 50, height: 50, left: 0, right: 50, top: 0, width: 50};
+      assert.deepEqual(r2, position.intersection(r1, r2));
+    });
+
+    it('should the intersection between two external regions empty', function() {
+      var r1 = { top: 0, left: 0, bottom: 100, right: 100 };
+      var r2 = { top: 101, left: 101, bottom: 200, right: 200 };
+      assert.isNull(position.intersection(r1, r2));
+    });
   });
 });

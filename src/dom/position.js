@@ -38,6 +38,31 @@ class position {
   }
 
   /**
+   * Computes the intersection region between two regions.
+   * @param {DOMRect} r1
+   * @param {DOMRect} r2
+   * @return {?DOMRect} Intersection region or null if regions doesn't
+   *     intersects.
+   */
+  static intersection(r1, r2) {
+    if (!this.intersectRegion(r1, r2)) {
+      return null;
+    }
+    var bottom = Math.min(r1.bottom, r2.bottom);
+    var right = Math.min(r1.right, r2.right);
+    var left = Math.max(r1.left, r2.left);
+    var top = Math.max(r1.top, r2.top);
+    return {
+      bottom: bottom,
+      height: bottom - top,
+      left: left,
+      right: right,
+      top: top,
+      width: right - left
+    };
+  }
+
+  /**
    * Tests if a region intersects with another.
    * @param {DOMRect} r1
    * @param {DOMRect} r2

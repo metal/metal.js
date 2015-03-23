@@ -356,21 +356,6 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Overrides the default value function for the `id` attribute, so it will
-   * handle the case where `element` is in the middle of its creation, which
-   * means the id should be generated.
-   * @return {string} The id.
-   * @protected
-   * @override
-   */
-  valueIdFn_() {
-    if (!this.element) {
-      return this.makeId_();
-    }
-    return super.valueIdFn_();
-  }
-
-  /**
    * Provides the default value for element attribute.
    * @return {Element} The element.
    * @protected
@@ -391,6 +376,21 @@ class SoyComponent extends Component {
     frag.removeChild(element);
 
     return element;
+  }
+
+  /**
+   * Overrides the default value function for the `id` attribute, so it will
+   * handle the case where `element` is in the middle of its creation, which
+   * means the id should be generated.
+   * @return {string} The id.
+   * @protected
+   * @override
+   */
+  valueIdFn_() {
+    if (!this.element) {
+      return this.makeId_();
+    }
+    return super.valueIdFn_();
   }
 }
 

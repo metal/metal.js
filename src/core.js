@@ -38,6 +38,23 @@ class core {
   }
 
   /**
+   * Returns a debounced function that calls the specified function.
+   * @param {Function} fn
+   * @param {Number} delay
+   * @return {Function}
+   */
+  static debounce(fn, delay) {
+    var id;
+    return function() {
+      var args = arguments;
+      clearTimeout(id);
+      id = setTimeout(function() {
+        fn.apply(this, args);
+      }, delay);
+    };
+  }
+
+  /**
    * Gets an unique id. If `opt_object` argument is passed, the object is
    * mutated with an unique id. Consecutive calls with the same object
    * reference won't mutate the object again, instead the current object uid

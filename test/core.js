@@ -3,6 +3,35 @@
 import core from '../../src/core';
 
 describe('core', function() {
+  describe('Debounce', function() {
+    it('should debounce function execution', function() {
+      var listener = sinon.stub();
+      var fn = core.debounce(listener, 0);
+      fn();
+      fn();
+      fn();
+      setTimeout(function() {
+        assert.strictEqual(1, listener.callCount);
+      }, 0);
+    });
+
+    it('should debounce function execution for the specified delay', function(done) {
+      var listener = sinon.stub();
+      var fn = core.debounce(listener, 20);
+      fn();
+      setTimeout(function() {
+        fn();
+      }, 10);
+      setTimeout(function() {
+        fn();
+      }, 10);
+      setTimeout(function() {
+        assert.strictEqual(1, listener.callCount);
+        done();
+      }, 40);
+    });
+  });
+
   describe('Uid', function() {
     it('should always generate unique id', function() {
       assert.notStrictEqual(core.getUid(), core.getUid());

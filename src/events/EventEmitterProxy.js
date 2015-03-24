@@ -19,7 +19,7 @@ import Disposable from '../disposable/Disposable';
  * @extends {Disposable}
  */
 class EventEmitterProxy extends Disposable {
-  constructor(originEmitter, targetEmitter, opt_blacklist) {
+  constructor(originEmitter, targetEmitter, opt_blacklist, opt_whitelist) {
     /**
      * Map of events that should not be proxied.
      * @type {Object}
@@ -49,6 +49,14 @@ class EventEmitterProxy extends Disposable {
      * @protected
      */
     this.targetEmitter_ = targetEmitter;
+
+     /**
+      * Map of events that should be proxied. If whitelist is set blacklist is
+      * ignored.
+      * @type {Object}
+      * @protected
+      */
+    this.whitelist_ = opt_whitelist;
 
     this.startProxy_();
   }
@@ -93,7 +101,13 @@ class EventEmitterProxy extends Disposable {
    * @protected
    */
   shouldProxyEvent_(event) {
-    return (!this.proxiedEvents_[event] && !this.blacklist_[event]) &&
+    if (this.whitelist_ && !this.whitelist_[event]) {
+      return false;
+    }
+    if (this.blacklist_[event]) {
+      return false;
+    }
+    return !this.proxiedEvents_[event] &&
       (!(this.originEmitter_.removeEventListener || this.originEmitter_.addEventListener) ||
           dom.supportsEvent(this.originEmitter_, event));
   }

@@ -61,6 +61,40 @@ describe('EventEmitterProxy', function() {
     assert.strictEqual(0, listener.callCount);
   });
 
+  it('should proxy only whitelisted events', function() {
+    var origin = new EventEmitter();
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target, null, {
+      event1: true
+    });
+
+    var listener = sinon.stub();
+    target.on('event1', listener);
+    target.on('event2', listener);
+    origin.emit('event1', 1, 2);
+    origin.emit('event2', 1, 2);
+
+    assert.strictEqual(1, listener.callCount);
+  });
+
+  it('should not proxy whitelisted and blacklisted events at the same time', function() {
+    var origin = new EventEmitter();
+    var target = new EventEmitter();
+    new EventEmitterProxy(origin, target, {
+      event1: true
+    }, {
+      event1: true
+    });
+
+    var listener = sinon.stub();
+    target.on('event1', listener);
+    target.on('event2', listener);
+    origin.emit('event1', 1, 2);
+    origin.emit('event2', 1, 2);
+
+    assert.strictEqual(0, listener.callCount);
+  });
+
   it('should only emit proxied event once per listener', function() {
     var origin = new EventEmitter();
     var target = new EventEmitter();

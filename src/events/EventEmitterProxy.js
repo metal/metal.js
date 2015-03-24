@@ -1,6 +1,5 @@
 'use strict';
 
-import core from '../core';
 import dom from '../dom/dom';
 import Disposable from '../disposable/Disposable';
 
@@ -58,7 +57,7 @@ class EventEmitterProxy extends Disposable {
    * @inheritDoc
    */
   disposeInternal() {
-    var removeFnName = core.isElement(this.originEmitter_) ? 'removeEventListener' : 'removeListener';
+    var removeFnName = this.originEmitter_.removeEventListener ? 'removeEventListener' : 'removeListener';
     for (var event in this.proxiedEvents_) {
       this.originEmitter_[removeFnName](event, this.proxiedEvents_[event]);
     }
@@ -83,7 +82,7 @@ class EventEmitterProxy extends Disposable {
       self.targetEmitter_.emit.apply(self.targetEmitter_, args);
     };
 
-    var addFnName = core.isElement(this.originEmitter_) ? 'addEventListener' : 'on';
+    var addFnName = this.originEmitter_.addEventListener ? 'addEventListener' : 'on';
     this.originEmitter_[addFnName](event, this.proxiedEvents_[event]);
   }
 
@@ -94,8 +93,9 @@ class EventEmitterProxy extends Disposable {
    * @protected
    */
   shouldProxyEvent_(event) {
-    return !this.proxiedEvents_[event] && !this.blacklist_[event] &&
-      (!core.isElement(this.originEmitter_) || dom.supportsEvent(this.originEmitter_, event));
+    return (!this.proxiedEvents_[event] && !this.blacklist_[event]) &&
+      (!(this.originEmitter_.removeEventListener || this.originEmitter_.addEventListener) ||
+          dom.supportsEvent(this.originEmitter_, event));
   }
 
   /**

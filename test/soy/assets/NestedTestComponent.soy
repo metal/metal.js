@@ -1,0 +1,23 @@
+{namespace Templates.NestedTestComponent}
+
+/**
+ */
+{template .content}
+  {delcall NestedTestComponent.components data="all" /}
+{/template}
+
+/**
+ * @param count
+ * @param foo
+ * @param id
+ * @param invert
+ */
+{template .components}
+  {for $index in range($count)}
+    {let $childIndex: $invert ? $count - $index - 1 : $index  /}
+    {delcall ChildrenTestComponent}
+      {param bar: $foo /}
+      {param id: $id + 'MyChild' + $childIndex /}
+    {/delcall}
+  {/for}
+{/template}

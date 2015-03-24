@@ -1,0 +1,15 @@
+{namespace Templates.ComponentAttrTestComponent}
+
+/**
+ * @param id
+ */
+{template .content}
+  {delcall ChildrenTestComponent}
+    {param id: $id + 'Child' /}
+    {param moreComponents kind="html"}
+      {delcall ChildrenTestComponent}
+        {param id: $id + 'More' /}
+      {/delcall}
+    {/param}
+  {/delcall}
+{/template}

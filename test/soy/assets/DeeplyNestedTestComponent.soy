@@ -1,0 +1,45 @@
+{namespace Templates.DeeplyNestedTestComponent}
+
+/**
+ */
+{template .content}
+  {delcall DeeplyNestedTestComponent.components data="all" /}
+{/template}
+
+/**
+ * @param bar
+ * @param id
+ * @param invert
+ */
+{template .components}
+  {let $child2 kind="html"}
+    {delcall ChildrenTestComponent}
+      {param bar: $bar /}
+      {param children kind="html"}
+        {delcall ChildrenTestComponent}
+          {param bar: $bar /}
+          {param id: $id + 'Child1' /}
+        {/delcall}
+      {/param}
+      {param id: $id + 'Child2' /}
+    {/delcall}
+  {/let}
+  {let $child3 kind="html"}
+    {delcall ChildrenTestComponent}
+      {param bar: $bar /}
+      {param id: $id + 'Child3' /}
+    {/delcall}
+  {/let}
+
+  {delcall ChildrenTestComponent}
+    {param bar: $bar /}
+    {param children kind="html"}
+      {if $invert}
+        {$child3}{$child2}
+      {else}
+        {$child2}{$child3}
+      {/if}
+    {/param}
+    {param id: $id + 'Main' /}
+  {/delcall}
+{/template}

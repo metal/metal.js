@@ -1,0 +1,17 @@
+{namespace Templates.EventsTestComponent}
+
+/**
+ */
+{template .content}
+  <div class="content" data-onclick="handleClick"></div>
+  {delcall EventsTestComponent.footer data="all" /}
+{/template}
+
+/**
+ * @param footerButtons
+ */
+{template .footer}
+  {foreach $button in $footerButtons}
+    <button data-onclick="handleClick" data-onmouseover="handleMouseOver">$button.label</button>
+  {/foreach}
+{/template}

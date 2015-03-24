@@ -22,7 +22,7 @@ if (typeof Templates.SoyComponent == 'undefined') { Templates.SoyComponent = {};
  * @suppress {checkTypes}
  */
 Templates.SoyComponent.component = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$escapeHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), opt_data.componentName, true)(opt_data, null, opt_ijData)));
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), opt_data.componentName, true)(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
   Templates.SoyComponent.component.soyTemplateName = 'Templates.SoyComponent.component';

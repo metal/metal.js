@@ -2,6 +2,7 @@
 
 var del = require('del');
 var gulp = require('gulp');
+var path = require('path');
 var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
 var registerTasks = require('alloyui-tasks');
@@ -9,8 +10,19 @@ var runSequence = require('run-sequence');
 
 registerTasks({
   bundleFileName: 'aui.js',
-  corePathFromSoy: '../',
-  shouldSkipSoyTemplatesGeneration: true
+  corePathFromSoy: function(file) {
+    return path.relative(path.dirname(file.path), path.resolve('src'));
+  },
+  soyDest: function(file) {
+    if (file.base == path.resolve('temp')) {
+      return 'test';
+    } else {
+      return file.base;
+    }
+  },
+  soyGeneratedOutputGlob: false,
+  soyGenerationGlob: '**/test/**/*.soy',
+  soySrc: ['src/**/*.soy', 'test/**/*.soy']
 });
 
 gulp.task('build', function(done) {

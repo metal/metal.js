@@ -167,6 +167,14 @@ describe('core', function() {
       assert.ok(!core.isDefAndNotNull(null));
       assert.ok(!core.isDefAndNotNull(undefined));
     });
+
+    it('should check if var is number', function() {
+      assert.ok(core.isNumber(-1));
+      assert.ok(core.isNumber(0));
+      assert.ok(core.isNumber(1));
+      assert.ok(core.isNumber(Number.NEGATIVE_INFINITY));
+      assert.ok(core.isNumber(Infinity));
+    });
   });
 
   describe('Null Function', function() {

@@ -118,6 +118,15 @@ class core {
   }
 
   /**
+   * Returns true if the specified value is a number.
+   * @param {?} val Variable to test.
+   * @return {boolean} Whether variable is a number.
+   */
+  static isNumber(val) {
+    return typeof val === 'number';
+  }
+
+  /**
    * Returns true if the specified value is an object. This includes arrays
    * and functions.
    * @param {?} val Variable to test.

@@ -29,13 +29,13 @@ describe('EventHandle', function() {
     handle.removeListener();
   });
 
-  it('should delete emitter and listener references when disposed', function() {
+  it('should remove listeners when disposed', function() {
     var emitter = new EventEmitter();
     var listener = sinon.stub();
     var handle = new EventHandle(emitter, 'event', listener);
-
+    emitter.on('event', listener);
     handle.dispose();
-    assert.ok(!handle.emitter_);
-    assert.ok(!handle.listener_);
+    emitter.emit('event');
+    assert.strictEqual(0, listener.callCount);
   });
 });

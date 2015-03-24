@@ -43,6 +43,7 @@ class EventHandle extends Disposable {
    * @override
    */
   disposeInternal() {
+    this.removeListener();
     this.emitter_ = null;
     this.listener_ = null;
   }

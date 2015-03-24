@@ -33,6 +33,24 @@ describe('position', function() {
     });
   });
 
+  describe('document', function() {
+    it('should check document size', function() {
+      assert.strictEqual(10000, position.getDocumentSize().height);
+      assert.strictEqual(10000, position.getDocumentSize().width);
+    });
+
+    it('should check document region', function() {
+      var size = position.getDocumentSize();
+      var region = position.getDocumentRegion();
+      assert.strictEqual(size.height, region.height);
+      assert.strictEqual(size.height, region.bottom);
+      assert.strictEqual(size.width, region.width);
+      assert.strictEqual(size.width, region.right);
+      assert.strictEqual(0, region.left);
+      assert.strictEqual(0, region.top);
+    });
+  });
+
   describe('region', function() {
     it('should get node region', function() {
       var region = position.getRegion(paddingElement);

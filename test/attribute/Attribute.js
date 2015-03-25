@@ -306,13 +306,13 @@ describe('Attribute', function() {
     assert.strictEqual(3, attr.attr1);
   });
 
-  it('should allow changing an initOnly with initial value', function() {
+  it('should allow setting a writeOnce with initial value', function() {
     var attr = new Attribute();
     attr.addAttrs(
       {
         attr1: {
-          initOnly: true,
-          value: 1
+          value: 1,
+          writeOnce: true
         }
       },
       {
@@ -323,28 +323,52 @@ describe('Attribute', function() {
     assert.strictEqual(2, attr.attr1);
   });
 
-  it('should not allow changing an initOnly attribute after initialized', function() {
+  it('should allow setting a writeOnce attribute before it has been written', function() {
     var attr = new Attribute();
     attr.addAttrs({
       attr1: {
-        initOnly: true,
-        value: 1
+        value: 1,
+        writeOnce: true
       }
     });
 
+    attr.attr1 = 2;
+    assert.strictEqual(2, attr.attr1);
+  });
+
+
+  it('should not allow changing a writeOnce attribute after it has been written', function() {
+    var attr = new Attribute();
+    attr.addAttrs({
+      attr1: {
+        value: 1,
+        writeOnce: true
+      }
+    });
+
+    assert.strictEqual(1, attr.attr1);
     attr.attr1 = 2;
     assert.strictEqual(1, attr.attr1);
   });
 
   it('should emit event when attribute changes', function() {
-    var attr = createAttributeInstance();
+    var attr = new Attribute();
+    attr.addAttrs({
+      attr1: {
+        value: 1,
+        writeOnce: true
+      }
+    }, {
+      attr1: 10
+    });
+
     var listener = sinon.stub();
     attr.on('attr1Changed', listener);
 
     attr.attr1 = 2;
     assert.strictEqual(1, listener.callCount);
     assert.strictEqual('attr1', listener.args[0][0].attrName);
-    assert.strictEqual(1, listener.args[0][0].prevVal);
+    assert.strictEqual(10, listener.args[0][0].prevVal);
     assert.strictEqual(2, listener.args[0][0].newVal);
   });
 
@@ -395,9 +419,9 @@ describe('Attribute', function() {
 
     attr.on('attrsChanged', function(data) {
       assert.strictEqual(2, Object.keys(data.changes).length);
-      assert.strictEqual(1, data.changes.attr1.prevVal);
+      assert.strictEqual(undefined, data.changes.attr1.prevVal);
       assert.strictEqual(12, data.changes.attr1.newVal);
-      assert.strictEqual(2, data.changes.attr2.prevVal);
+      assert.strictEqual(undefined, data.changes.attr2.prevVal);
       assert.strictEqual(21, data.changes.attr2.newVal);
       done();
     });

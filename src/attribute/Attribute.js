@@ -42,8 +42,6 @@ class Attribute extends EventEmitter {
    * @param {string} name The name of the new attribute.
    * @param {Object.<string, *>=} config The configuration object for the new attribute.
    *   This object can have the following keys:
-   *   initOnly - Ignores writes to the attribute after it's been initialized. That is,
-   *   allows writes only when adding the attribute for the first time.
    *   setter - Function for normalizing new attribute values. It receives the new value
    *   that was set, and returns the value that should be stored.
    *   validator - Function that validates new attribute values. When it returns false,
@@ -55,6 +53,8 @@ class Attribute extends EventEmitter {
    *   valueFn - A function that returns the default value for this attribute.
    * @param {*} initialValue The initial value of the new attribute. This value has higher
    *   precedence than the default value specified in this attribute's configuration.
+   *   writeOnce - Ignores writes to the attribute after it's been first written to. That is,
+   *   allows writes only when setting the attribute for the first time.
    */
   addAttr(name, config, initialValue) {
     this.assertValidAttrName_(name);
@@ -113,19 +113,6 @@ class Attribute extends EventEmitter {
   }
 
   /**
-   * Checks if the it's allowed to write on the requested attribute.
-   * @param {string} name The name of the attribute.
-   * @return {Boolean}
-   * @protected
-   */
-  canWrite_(name) {
-    this.initAttr_(name);
-
-    var info = this.attrsInfo_[name];
-    return !info.config.initOnly || info.state !== Attribute.States.INITIALIZED;
-  }
-
-  /**
    * Calls the requested function, running the appropriate code for when it's
    * passed as an actual function object or just the function's name.
    * @param {!Function|string} fn Function, or name of the function to run.
@@ -161,7 +148,7 @@ class Attribute extends EventEmitter {
    * Calls the attribute's validator, if there is one.
    * @param {string} name The name of the attribute.
    * @param {*} value The value to be validated.
-   * @return {Boolean} Flag indicating if value is valid or not.
+   * @return {boolean} Flag indicating if value is valid or not.
    */
   callValidator_(name, value) {
     var info = this.attrsInfo_[name];
@@ -170,6 +157,16 @@ class Attribute extends EventEmitter {
       return this.callFunction_(config.validator, [value]);
     }
     return true;
+  }
+
+  /**
+   * Checks if the it's allowed to write on the requested attribute.
+   * @param {string} name The name of the attribute.
+   * @return {boolean}
+   */
+  canSetAttribute(name) {
+    var info = this.attrsInfo_[name];
+    return !info.config.writeOnce || !info.written;
   }
 
   /**
@@ -346,11 +343,15 @@ class Attribute extends EventEmitter {
    * @protected
    */
   setAttrValue_(name, value) {
-    if (!this.canWrite_(name) || !this.validateAttrValue_(name, value)) {
+    if (!this.canSetAttribute(name) || !this.validateAttrValue_(name, value)) {
       return;
     }
 
     var info = this.attrsInfo_[name];
+    if (info.initialValue === undefined && info.state === Attribute.States.UNINITIALIZED) {
+      info.state = Attribute.States.INITIALIZED;
+    }
+
     var prevVal = this[name];
     info.value = this.callSetter_(name, value);
     info.written = true;
@@ -394,7 +395,7 @@ class Attribute extends EventEmitter {
    * the internal data has stayed the same.
    * @param {string} name The name of the attribute.
    * @param {*} prevVal The previous value of the attribute.
-   * @return {Boolean}
+   * @return {boolean}
    */
   shouldInformChange_(name, prevVal) {
     var info = this.attrsInfo_[name];
@@ -407,7 +408,7 @@ class Attribute extends EventEmitter {
    * in the attribute's configuration object, if there is one.
    * @param {string} name The name of the attribute.
    * @param {*} value The value to be validated.
-   * @return {Boolean} Flag indicating if value is valid or not.
+   * @return {boolean} Flag indicating if value is valid or not.
    */
   validateAttrValue_(name, value) {
     var info = this.attrsInfo_[name];

@@ -849,13 +849,13 @@ Component.ATTRS = {
   /**
    * Component element bounding box.
    * @type {Element}
-   * @initOnly
+   * @writeOnce
    */
   element: {
-    initOnly: true,
     setter: 'setterElementFn_',
     validator: 'validatorElementFn_',
-    valueFn: 'valueElementFn_'
+    valueFn: 'valueElementFn_',
+    writeOnce: true
   },
 
   /**
@@ -869,12 +869,12 @@ Component.ATTRS = {
   /**
    * Component element id. If not specified will be generated.
    * @type {string}
-   * @initOnly
+   * @writeOnce
    */
   id: {
-    initOnly: true,
     validator: 'validatorIdFn_',
-    valueFn: 'valueIdFn_'
+    valueFn: 'valueIdFn_',
+    writeOnce: true
   }
 };
 

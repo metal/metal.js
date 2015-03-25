@@ -186,11 +186,30 @@ describe('SoyComponent', function() {
       var NestedTestComponent = createNestedTestComponentClass();
       var custom = new NestedTestComponent({id: 'nested'}).render();
 
+      var childPlaceholder = custom.element.querySelector('#nestedMyChild0');
       var child = custom.components.nestedMyChild0;
       assert.ok(child);
       assert.strictEqual(this.ChildrenTestComponent, child.constructor);
       assert.strictEqual('bar', child.bar);
-      assert.ok(custom.element.querySelector('#' + child.id));
+      assert.strictEqual(childPlaceholder, child.element);
+      assert.strictEqual(1, childPlaceholder.childNodes.length);
+    });
+
+    it('should replace placeholder with child component\'s element if it\'s already defined', function() {
+      this.ChildrenTestComponent.prototype.created = function() {
+        dom.addClasses(this.element, ['myClass']);
+      };
+      var NestedTestComponent = createNestedTestComponentClass();
+      var custom = new NestedTestComponent({id: 'nested'}).render();
+
+      var childPlaceholder = custom.element.querySelector('#nestedMyChild0');
+      var child = custom.components.nestedMyChild0;
+      assert.ok(child);
+      assert.strictEqual(this.ChildrenTestComponent, child.constructor);
+      assert.strictEqual('bar', child.bar);
+      assert.strictEqual(childPlaceholder, child.element);
+      assert.strictEqual(1, childPlaceholder.childNodes.length);
+      assert.ok(dom.hasClass(child.element, 'myClass'));
     });
 
     it('should update rendered child component', function(done) {
@@ -251,6 +270,18 @@ describe('SoyComponent', function() {
       custom.detach();
       custom.attach();
       assert.strictEqual(0, child.setAttrs.callCount);
+    });
+
+    it('should render nested component correctly when element is not on document', function() {
+      var element = document.createElement('div');
+      var NestedTestComponent = createNestedTestComponentClass();
+      var custom = new NestedTestComponent({id: 'nested'}).render(element);
+
+      var child = custom.components.nestedMyChild0;
+      assert.ok(child);
+      assert.strictEqual(this.ChildrenTestComponent, child.constructor);
+      assert.strictEqual('bar', child.bar);
+      assert.ok(custom.element.querySelector('#' + child.id));
     });
 
     it('should pass children to nested components', function() {
@@ -322,12 +353,14 @@ describe('SoyComponent', function() {
       var comps = component.components;
 
       component.invert = true;
-      comps.nestedMain.on('attrsChanged', function() {
-        var placeholder = document.getElementById(comps.nestedMain.id + '-children-placeholder');
-        assert.strictEqual(2, placeholder.childNodes.length);
-        assert.strictEqual(comps.nestedChild3.element, placeholder.childNodes[0]);
-        assert.strictEqual(comps.nestedChild2.element, placeholder.childNodes[1]);
-        done();
+      component.once('attrsChanged', function() {
+        comps.nestedMain.once('attrsChanged', function() {
+          var placeholder = document.getElementById(comps.nestedMain.id + '-children-placeholder');
+          assert.strictEqual(2, placeholder.childNodes.length);
+          assert.strictEqual(comps.nestedChild3.element, placeholder.childNodes[0]);
+          assert.strictEqual(comps.nestedChild2.element, placeholder.childNodes[1]);
+          done();
+        });
       });
     });
 

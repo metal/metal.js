@@ -136,25 +136,47 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Attaches the given component at the position of the given placeholder.
+   * @param {!Component} component
+   * @param {!Element} placeholder
+   * @protected
+   */
+  attachNestedComponent_(component, placeholder) {
+    var replacedPlaceholder = false;
+    if (placeholder !== component.element) {
+      // If the component's element is not the placeholder, we need to replace
+      // the placeholder with the real element.
+      placeholder.parentNode.insertBefore(component.element, placeholder);
+      placeholder.parentNode.removeChild(placeholder);
+      replacedPlaceholder = true;
+    }
+
+    if (!component.wasRendered) {
+      // If this component hasn't been rendered yet, we should do it now.
+      if (replacedPlaceholder) {
+        // If we had to replace the placeholder with the component's element,
+        // we'll need to copy the html over so we don't have to run soy again
+        // to render it.
+        dom.append(component.element, placeholder.innerHTML);
+      }
+      component.decorateAsSubComponent();
+    }
+  }
+
+  /**
    * Attaches recently added components to the dom.
    * @protected
    */
   attachNestedComponents_() {
     var element = this.element;
-
-    this.recentlyAddedComponents_.forEach(function(component) {
-      if (component.wasRendered) {
-        var id = component.id;
-        var placeholder = document.getElementById(id) || element.querySelector('#' + id);
-        var componentElement = component.element;
-        if (placeholder !== componentElement) {
-          placeholder.parentNode.insertBefore(componentElement, placeholder);
-          placeholder.parentNode.removeChild(placeholder);
-        }
-      } else {
-        component.decorateAsSubComponent();
+    var components = this.recentlyAddedComponents_;
+    for (var i = 0; i < components.length; i++) {
+      var id = components[i].id;
+      var placeholder = document.getElementById(id) || element.querySelector('#' + id);
+      if (placeholder) {
+        this.attachNestedComponent_(components[i], placeholder);
       }
-    });
+    }
     this.recentlyAddedComponents_ = [];
   }
 

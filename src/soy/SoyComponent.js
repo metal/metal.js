@@ -62,10 +62,10 @@ class SoyComponent extends Component {
     this.parentComponent_ = this;
 
     /**
-     * Holds the components that were most recently added via `addComponentRef`.
-     * This object is cleared after the `attach` and `renderSurfacesContent`
-     * methods are run.
-     * @type {!Array<!Component>}
+     * Holds the ids of the components that were most recently added via
+     * `addComponentRef`. This object is cleared after the `attach` and
+     * `renderSurfacesContent` methods are run.
+     * @type {!Array<string>}
      * @protected
      */
     this.recentlyAddedComponents_ = [];
@@ -80,7 +80,7 @@ class SoyComponent extends Component {
    */
   addComponentRef(ref, component) {
     this.components[ref] = component;
-    this.recentlyAddedComponents_.push(component);
+    this.recentlyAddedComponents_.push(ref);
   }
 
   /**
@@ -169,12 +169,12 @@ class SoyComponent extends Component {
    */
   attachNestedComponents_() {
     var element = this.element;
-    var components = this.recentlyAddedComponents_;
-    for (var i = 0; i < components.length; i++) {
-      var id = components[i].id;
+    var componentIds = this.recentlyAddedComponents_;
+    for (var i = 0; i < componentIds.length; i++) {
+      var id = componentIds[i];
       var placeholder = document.getElementById(id) || element.querySelector('#' + id);
       if (placeholder) {
-        this.attachNestedComponent_(components[i], placeholder);
+        this.attachNestedComponent_(this.components[id], placeholder);
       }
     }
     this.recentlyAddedComponents_ = [];

@@ -362,6 +362,7 @@ describe('dom', function() {
       var element = document.createElement('div');
 
       assert.strictEqual(element, dom.toElement(element));
+      assert.strictEqual(document, dom.toElement(document));
     });
 
     it('should return matching element if selector is given', function() {

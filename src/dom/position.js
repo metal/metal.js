@@ -1,5 +1,6 @@
 'use strict';
 
+import core from '../core';
 import math from '../math/math';
 
 /**
@@ -76,13 +77,13 @@ class position {
 
   /**
    * Gets the region of the document including scrollbar.
-   * @param {Document=} opt_doc Optional document element to test.
+   * @param {Element|Document=} opt_doc Optional element to test.
    * @return {!DOMRect} The returned value is a simulated DOMRect object which
    *     is the union of the rectangles returned by getClientRects() for the
    *     element, i.e., the CSS border-boxes associated with the element.
    */
-  static getDocumentRegion(opt_doc) {
-    var region = this.getDocumentSize(opt_doc);
+  static getDocumentRegion(opt_element) {
+    var region = this.getDocumentSize(opt_element);
     region.bottom = region.height;
     region.left = 0;
     region.right = region.width;
@@ -92,16 +93,24 @@ class position {
 
   /**
    * Gets the dimensions of the document including scrollbar.
-   * @param {Document=} opt_doc Optional window element to test.
+   * @param {Element|Document=} opt_element Optional element to test.
    * @return {!Object} Object with values 'width' and 'height'.
    */
-  static getDocumentSize(opt_doc) {
-    var doc = (opt_doc || document);
-    var docEl = doc.documentElement;
-    return {
-      height: Math.max(doc.body.scrollHeight, docEl.scrollHeight, doc.body.offsetHeight, docEl.offsetHeight, docEl.clientHeight),
-      width: Math.max(doc.body.scrollWidth, docEl.scrollWidth, doc.body.offsetWidth, docEl.offsetWidth, docEl.clientWidth)
-    };
+  static getDocumentSize(opt_element) {
+    var el = (opt_element || document);
+    if (core.isDocument(el)) {
+      var docEl = el.documentElement;
+      return {
+        height: Math.max(el.body.scrollHeight, docEl.scrollHeight, el.body.offsetHeight, docEl.offsetHeight, docEl.clientHeight),
+        width: Math.max(el.body.scrollWidth, docEl.scrollWidth, el.body.offsetWidth, docEl.offsetWidth, docEl.clientWidth)
+      };
+    }
+    else {
+      return {
+        height: Math.max(opt_element.scrollHeight, opt_element.offsetHeight),
+        width: Math.max(opt_element.scrollWidth, opt_element.offsetWidth)
+      };
+    }
   }
 
   /**

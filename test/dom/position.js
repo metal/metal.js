@@ -39,6 +39,11 @@ describe('position', function() {
       assert.strictEqual(10000, position.getDocumentSize().width);
     });
 
+    it('should check document element size', function() {
+      assert.strictEqual(10000, position.getDocumentSize(paddingElement).height);
+      assert.strictEqual(10000, position.getDocumentSize(paddingElement).width);
+    });
+
     it('should check document region', function() {
       var size = position.getDocumentSize();
       var region = position.getDocumentRegion();

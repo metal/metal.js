@@ -333,11 +333,11 @@ class dom {
    * Converts the given argument to a DOM element. Strings are assumed to
    * be selectors, and so a matched element will be returned. If the arg
    * is already a DOM element it will be the return value.
-   * @param {string|Element} selectorOrElement
+   * @param {string|Element|Document} selectorOrElement
    * @return {Element} The converted element, or null if none was found.
    */
   static toElement(selectorOrElement) {
-    if (core.isElement(selectorOrElement)) {
+    if (core.isElement(selectorOrElement) || core.isDocument(selectorOrElement)) {
       return selectorOrElement;
     } else if (core.isString(selectorOrElement)) {
       return document.querySelector(selectorOrElement);

@@ -3,7 +3,6 @@
 import array from '../array/array';
 import core from '../core';
 import dom from '../dom/dom';
-import html from '../html/html';
 import object from '../object/object';
 import Component from '../component/Component';
 import ComponentCollector from '../component/ComponentCollector';
@@ -222,20 +221,6 @@ class SoyComponent extends Component {
       }
     }
     return newData;
-  }
-
-  /**
-   * Overrides the method that compresses html for caching, so that it now
-   * first empties all nested component placeholders before compressing.
-   * @param {string} htmlString The html to be compressed.
-   * @return {string} The compressed html.
-   * @protected
-   * @override
-   */
-  compressHtmlForCache_(htmlString) {
-    htmlString = html.removeElementContent(htmlString, ' data-component');
-    htmlString = html.removeElementContent(htmlString, ' data-component-children');
-    return super.compressHtmlForCache_(htmlString);
   }
 
   /**

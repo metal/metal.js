@@ -56,7 +56,7 @@ describe('SoyComponent', function() {
   it('should not throw error if surface template is not defined', function() {
     var CustomTestComponent = createCustomTestComponentClass();
     CustomTestComponent.ATTRS = {body: {}};
-    CustomTestComponent.SURFACES = {body: {renderAttrs: 'body'}};
+    CustomTestComponent.SURFACES = {body: {renderAttrs: ['body']}};
 
     var custom = new CustomTestComponent();
 

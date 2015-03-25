@@ -213,11 +213,10 @@ class Component extends Attribute {
    * @protected
    */
   cacheSurfaceRenderAttrs_(surfaceId) {
-    var attrs = this.getSurface(surfaceId).renderAttrs;
-    var attrNames = attrs ? Object.keys(attrs) : [];
-    for (var i = 0; i < attrNames.length; i++) {
-      this.surfacesRenderAttrs_[attrs[attrNames[i]]] = this.surfacesRenderAttrs_[attrs[attrNames[i]]] || {};
-      this.surfacesRenderAttrs_[attrs[attrNames[i]]][surfaceId] = true;
+    var attrs = this.getSurface(surfaceId).renderAttrs || [];
+    for (var i = 0; i < attrs.length; i++) {
+      this.surfacesRenderAttrs_[attrs[i]] = this.surfacesRenderAttrs_[attrs[i]] || {};
+      this.surfacesRenderAttrs_[attrs[i]][surfaceId] = true;
     }
   }
 

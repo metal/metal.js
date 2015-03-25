@@ -108,6 +108,15 @@ class core {
   }
 
   /**
+   * Returns true if value is a document.
+   * @param {*} val
+   * @return {Boolean}
+   */
+  static isDocument(val) {
+    return val && typeof val === 'object' && val.nodeType === 9;
+  }
+
+  /**
    * Returns true if value is a dom element.
    * @param {*} val
    * @return {Boolean}
@@ -141,6 +150,15 @@ class core {
    */
   static isNumber(val) {
     return typeof val === 'number';
+  }
+
+  /**
+   * Returns true if value is a window.
+   * @param {*} val
+   * @return {Boolean}
+   */
+  static isWindow(val) {
+    return val !== null && val === val.window;
   }
 
   /**

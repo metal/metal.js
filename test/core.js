@@ -181,6 +181,30 @@ describe('core', function() {
       assert.ok(!core.isElement(true));
     });
 
+    it('should check if var is document', function() {
+      assert.ok(core.isDocument({
+        nodeType: 9
+      }));
+      assert.ok(!core.isDocument({
+        nodeType: 1
+      }));
+      assert.ok(!core.isDocument({}));
+      assert.ok(!core.isDocument(null));
+      assert.ok(!core.isDocument(true));
+    });
+
+    it('should check if var is window', function() {
+      assert.ok(!core.isWindow({
+        nodeType: 9
+      }));
+      assert.ok(!core.isWindow({
+        nodeType: 1
+      }));
+      assert.ok(core.isWindow(window));
+      assert.ok(!core.isWindow(null));
+      assert.ok(!core.isWindow(true));
+    });
+
     it('should check if var is null', function() {
       assert.ok(core.isNull(null));
       assert.ok(!core.isNull(false));

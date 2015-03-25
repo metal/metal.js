@@ -90,7 +90,7 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), 'ChildrenT
  * @suppress {checkTypes}
  */
 Templates.ChildrenTestComponent.__deltemplate_s25_2820b540 = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="childrentestcomponent ' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? opt_data.elementClasses : '') + '" data-component="">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="childrentestcomponent' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? ' ' + opt_data.elementClasses : '') + '" data-component="">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
 };
 if (goog.DEBUG) {
   Templates.ChildrenTestComponent.__deltemplate_s25_2820b540.soyTemplateName = 'Templates.ChildrenTestComponent.__deltemplate_s25_2820b540';
@@ -138,7 +138,7 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent.children'
  * @suppress {checkTypes}
  */
 Templates.ChildrenTestComponent.__deltemplate_s41_095ec0e8 = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent.children'), 'element', true)(soy.$$augmentMap(opt_data, {elementContent: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + Templates.ChildrenTestComponent.children(opt_data, null, opt_ijData))}), null, opt_ijData));
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent.children'), 'element', true)(soy.$$augmentMap(opt_data, {elementContent: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + ((! opt_ijData.skipSurfaceContents) ? Templates.ChildrenTestComponent.children(opt_data, null, opt_ijData) : ''))}), null, opt_ijData));
 };
 if (goog.DEBUG) {
   Templates.ChildrenTestComponent.__deltemplate_s41_095ec0e8.soyTemplateName = 'Templates.ChildrenTestComponent.__deltemplate_s41_095ec0e8';

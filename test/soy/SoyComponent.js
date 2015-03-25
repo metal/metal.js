@@ -413,6 +413,22 @@ describe('SoyComponent', function() {
       assert.ok(comps.nestedMyChild0.wasRendered);
       assert.ok(component.element.querySelector('#nestedMyChild0'));
     });
+
+    it('should not need to update nested components when main component is decorated', function() {
+      var content = '<div id="nested-components">' +
+        '<div id="nestedMyChild0" class="" data-component="">' +
+        '<div id="nestedMyChild0-children-placeholder" data-component-children=""></div>' +
+        '</div>' +
+        '</div>';
+      var element = document.createElement('div');
+      element.id = 'nested';
+      dom.append(element, content);
+
+      sinon.spy(this.ChildrenTestComponent.prototype, 'setAttrs');
+      var NestedTestComponent = createNestedTestComponentClass();
+      var component = new NestedTestComponent({element: element}).decorate();
+      assert.strictEqual(0, component.components.nestedMyChild0.setAttrs.callCount);
+    });
   });
 
   function createCustomTestComponentClass(name) {

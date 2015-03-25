@@ -111,8 +111,9 @@ class SoyComponent extends Component {
     if (this.decorating_) {
       // We need to call the element soy template function when the component
       // is being decorated, even though we won't use its results. This call is
-      // only needed in order for us to intercept the call data for nested components.
-      this.renderElementTemplate();
+      // only needed in order for us to intercept the call data for nested components
+      // that are outside surfaces.
+      this.renderElementTemplate({skipSurfaceContents: true});
     }
 
     super.attach(opt_parentElement, opt_siblingElement);
@@ -328,13 +329,14 @@ class SoyComponent extends Component {
 
   /**
    * Renders the main element's template.
+   * @param {Object=} opt_injectedData
    * @return {?string} The template's result content, or undefined if the
    *   template doesn't exist.
    */
-  renderElementTemplate() {
+  renderElementTemplate(opt_injectedData) {
     var elementTemplate = this.constructor.TEMPLATES_MERGED.content;
     if (core.isFunction(elementTemplate)) {
-      return this.renderTemplate_(elementTemplate);
+      return this.renderTemplate_(elementTemplate, opt_injectedData);
     }
   }
 
@@ -371,11 +373,12 @@ class SoyComponent extends Component {
   /**
    * Renders the specified template.
    * @param {!function()} templateFn
+   * @param {Object=} opt_injectedData
    * @return {string} The template's result content.
    */
-  renderTemplate_(templateFn) {
+  renderTemplate_(templateFn, opt_injectedData) {
     ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
-    var content = templateFn(this, null, {}).content;
+    var content = templateFn(this, null, opt_injectedData || {}).content;
     ComponentRegistry.Templates.SoyComponent.component = originalTemplate;
     return content;
   }

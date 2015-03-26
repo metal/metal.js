@@ -73,13 +73,13 @@ if (goog.DEBUG) {
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s79_e76f4e0e = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s83_e76f4e0e = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml('<custom id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="btn ' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? opt_data.elementClasses : '') + '" data-component>' + soy.$$escapeHtml(opt_data.elementContent) + '</custom>');
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s79_e76f4e0e.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s79_e76f4e0e';
+  Templates.CustomTestComponent.__deltemplate_s83_e76f4e0e.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s83_e76f4e0e';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), 'element', 0, Templates.CustomTestComponent.__deltemplate_s79_e76f4e0e);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), 'element', 0, Templates.CustomTestComponent.__deltemplate_s83_e76f4e0e);
 
 
 /**
@@ -89,13 +89,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), 'element
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s87_691db6c1 = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s91_691db6c1 = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('Component'), '', true)(soy.$$augmentMap(opt_data, {componentName: 'CustomTestComponent'}), null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s87_691db6c1.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s87_691db6c1';
+  Templates.CustomTestComponent.__deltemplate_s91_691db6c1.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s91_691db6c1';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), '', 0, Templates.CustomTestComponent.__deltemplate_s87_691db6c1);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), '', 0, Templates.CustomTestComponent.__deltemplate_s91_691db6c1);
 
 
 /**
@@ -105,13 +105,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), '', 0, T
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s90_4e91280b = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'CustomTestComponent', true)(soy.$$augmentMap(opt_data, {elementContent: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + Templates.CustomTestComponent.content(opt_data, null, opt_ijData))}), null, opt_ijData));
+Templates.CustomTestComponent.__deltemplate_s94_4e91280b = function(opt_data, opt_ignored, opt_ijData) {
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'CustomTestComponent', true)(soy.$$augmentMap(opt_data, {elementContent: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + ((! opt_ijData.skipNestedComponentContents) ? Templates.CustomTestComponent.content(opt_data, null, opt_ijData) : ''))}), null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s90_4e91280b.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s90_4e91280b';
+  Templates.CustomTestComponent.__deltemplate_s94_4e91280b.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s94_4e91280b';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), 'CustomTestComponent', 0, Templates.CustomTestComponent.__deltemplate_s90_4e91280b);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), 'CustomTestComponent', 0, Templates.CustomTestComponent.__deltemplate_s94_4e91280b);
 
 
 /**
@@ -121,13 +121,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), 'CustomTes
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s94_05e27e73 = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s100_05e27e73 = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('CustomTestComponent'), 'element', true)(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s94_05e27e73.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s94_05e27e73';
+  Templates.CustomTestComponent.__deltemplate_s100_05e27e73.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s100_05e27e73';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'CustomTestComponent', 0, Templates.CustomTestComponent.__deltemplate_s94_05e27e73);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'CustomTestComponent', 0, Templates.CustomTestComponent.__deltemplate_s100_05e27e73);
 
 
 /**
@@ -137,13 +137,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'CustomTest
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s96_d413db05 = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s102_d413db05 = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-header">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s96_d413db05.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s96_d413db05';
+  Templates.CustomTestComponent.__deltemplate_s102_d413db05.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s102_d413db05';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), 'element', 0, Templates.CustomTestComponent.__deltemplate_s96_d413db05);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), 'element', 0, Templates.CustomTestComponent.__deltemplate_s102_d413db05);
 
 
 /**
@@ -153,13 +153,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), '
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s102_36760565 = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s108_36760565 = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), 'element', true)(soy.$$augmentMap(opt_data, {elementContent: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + ((! opt_ijData.skipSurfaceContents) ? Templates.CustomTestComponent.header(opt_data, null, opt_ijData) : ''))}), null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s102_36760565.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s102_36760565';
+  Templates.CustomTestComponent.__deltemplate_s108_36760565.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s108_36760565';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), '', 0, Templates.CustomTestComponent.__deltemplate_s102_36760565);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), '', 0, Templates.CustomTestComponent.__deltemplate_s108_36760565);
 
 
 /**
@@ -169,13 +169,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.header'), '
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s108_b1bd47d7 = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s114_b1bd47d7 = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-footer">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s108_b1bd47d7.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s108_b1bd47d7';
+  Templates.CustomTestComponent.__deltemplate_s114_b1bd47d7.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s114_b1bd47d7';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.footer'), 'element', 0, Templates.CustomTestComponent.__deltemplate_s108_b1bd47d7);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.footer'), 'element', 0, Templates.CustomTestComponent.__deltemplate_s114_b1bd47d7);
 
 
 /**
@@ -185,13 +185,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.footer'), '
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.CustomTestComponent.__deltemplate_s114_16e9baf4 = function(opt_data, opt_ignored, opt_ijData) {
+Templates.CustomTestComponent.__deltemplate_s120_16e9baf4 = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.footer'), 'element', true)(soy.$$augmentMap(opt_data, {elementContent: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + ((! opt_ijData.skipSurfaceContents) ? Templates.CustomTestComponent.footer(opt_data, null, opt_ijData) : ''))}), null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.CustomTestComponent.__deltemplate_s114_16e9baf4.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s114_16e9baf4';
+  Templates.CustomTestComponent.__deltemplate_s120_16e9baf4.soyTemplateName = 'Templates.CustomTestComponent.__deltemplate_s120_16e9baf4';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.footer'), '', 0, Templates.CustomTestComponent.__deltemplate_s114_16e9baf4);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('CustomTestComponent.footer'), '', 0, Templates.CustomTestComponent.__deltemplate_s120_16e9baf4);
 
 Templates.CustomTestComponent.header.params = ["headerContent"];
 Templates.CustomTestComponent.footer.params = ["footerContent"];

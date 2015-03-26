@@ -37,9 +37,8 @@ class ComponentCollector extends Disposable {
    */
   extractComponentsFromString(renderedComponents) {
     var components = [];
-    var content = html.removeElementContent(renderedComponents.toString(), ' data-component');
     var regex = /\sid=(?:["'\s])?([^"']+)\1?/g;
-    var match = regex.exec(content);
+    var match = regex.exec(renderedComponents);
     while(match) {
       if (match && match.length === 2) {
         var id = match[1];
@@ -47,7 +46,7 @@ class ComponentCollector extends Disposable {
         if (component) {
           components.push(component);
         }
-        match = regex.exec(content);
+        match = regex.exec(renderedComponents);
       }
     }
     return components;

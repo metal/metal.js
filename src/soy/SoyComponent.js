@@ -261,7 +261,11 @@ class SoyComponent extends Component {
   getSurfaceContent_(surfaceId) {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
-      return this.renderTemplate_(surfaceTemplate);
+      var content = this.renderTemplate_(surfaceTemplate, {skipNestedComponentContents: true});
+      if (content.indexOf('data-component') !== -1) {
+        content = this.renderTemplate_(surfaceTemplate, {}, true);
+      }
+      return content;
     } else {
       return super.getSurfaceContent_(surfaceId);
     }
@@ -333,13 +337,14 @@ class SoyComponent extends Component {
   /**
    * Renders the main element's template.
    * @param {Object=} opt_injectedData
+   * @param {boolean} opt_skipTemplateInterception
    * @return {?string} The template's result content, or undefined if the
    *   template doesn't exist.
    */
-  renderElementTemplate(opt_injectedData) {
+  renderElementTemplate(opt_injectedData, opt_skipTemplateInterception) {
     var elementTemplate = this.constructor.TEMPLATES_MERGED.content;
     if (core.isFunction(elementTemplate)) {
-      return this.renderTemplate_(elementTemplate, opt_injectedData);
+      return this.renderTemplate_(elementTemplate, opt_injectedData, opt_skipTemplateInterception);
     }
   }
 
@@ -351,8 +356,11 @@ class SoyComponent extends Component {
    * @override
    */
   renderInternal() {
-    var templateContent = this.renderElementTemplate();
+    var templateContent = this.renderElementTemplate({skipNestedComponentContents: true});
     if (templateContent) {
+      if (templateContent.indexOf('data-component') !== -1) {
+        templateContent = this.renderElementTemplate({}, true);
+      }
       dom.append(this.element, templateContent);
     }
   }
@@ -377,10 +385,13 @@ class SoyComponent extends Component {
    * Renders the specified template.
    * @param {!function()} templateFn
    * @param {Object=} opt_injectedData
+   * @param {boolean} opt_skipTemplateInterception
    * @return {string} The template's result content.
    */
-  renderTemplate_(templateFn, opt_injectedData) {
-    ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
+  renderTemplate_(templateFn, opt_injectedData, opt_skipTemplateInterception) {
+    if (!opt_skipTemplateInterception) {
+      ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
+    }
     var content = templateFn(this, null, opt_injectedData || {}).content;
     ComponentRegistry.Templates.SoyComponent.component = originalTemplate;
     return content;

@@ -89,7 +89,9 @@ class SoyComponent extends Component {
    */
   addSurfacesFromTemplates_() {
     var templates = this.constructor.TEMPLATES_MERGED;
-    for (var templateName in templates) {
+    var templateNames = Object.keys(templates);
+    for (var i = 0; i < templateNames.length; i++) {
+      var templateName = templateNames[i];
       if (templateName !== 'content' &&
         templateName.substr(0, 13) !== '__deltemplate') {
 

@@ -327,7 +327,10 @@ class dom {
    */
   static supportsEvent(element, eventName) {
     if (core.isString(element)) {
-      element = document.createElement(element);
+      if (!elementsByTag[element]) {
+        elementsByTag[element] = document.createElement(element);
+      }
+      element = elementsByTag[element];
     }
     return 'on' + eventName in element;
   }
@@ -368,5 +371,7 @@ class dom {
     element.dispatchEvent(eventObj);
   }
 }
+
+var elementsByTag = {};
 
 export default dom;

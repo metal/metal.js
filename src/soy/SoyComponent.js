@@ -310,14 +310,15 @@ class SoyComponent extends Component {
 
   /**
    * Renders this component's child components, if their placeholder is found.
+   * @param {!Array<!Component>} children
    * @protected
    * TODO(edu): Re-think this part.
    */
-  renderChildrenComponents_() {
+  renderChildrenComponents_(children) {
     var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));
-    if (placeholder) {
+    if (placeholder && children.length) {
       dom.removeChildren(placeholder);
-      this.children.forEach(function(child) {
+      children.forEach(function(child) {
         if (child.wasRendered) {
           dom.append(placeholder, child.element);
         } else {
@@ -388,7 +389,7 @@ class SoyComponent extends Component {
    */
   syncChildren(newVal, prevVal) {
     if (!this.decoratingAsSubcomponent_ && !array.equal(newVal, prevVal || [])) {
-      this.renderChildrenComponents_();
+      this.renderChildrenComponents_(newVal);
     }
   }
 

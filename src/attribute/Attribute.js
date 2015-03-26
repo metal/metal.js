@@ -57,13 +57,7 @@ class Attribute extends EventEmitter {
    *   allows writes only when setting the attribute for the first time.
    */
   addAttr(name, config, initialValue) {
-    this.assertValidAttrName_(name);
-
-    this.attrsInfo_[name] = {
-      config: config || {},
-      initialValue: initialValue,
-      state: Attribute.States.UNINITIALIZED
-    };
+    this.buildAttrInfo_(name, config, initialValue);
 
     Object.defineProperty(this, name, {
       configurable: true,
@@ -84,9 +78,14 @@ class Attribute extends EventEmitter {
     initialValues = initialValues || {};
     var names = Object.keys(configs);
 
+    var props = {};
     for (var i = 0; i < names.length; i++) {
-      this.addAttr(names[i], configs[names[i]], initialValues[names[i]]);
+      var name = names[i];
+      this.buildAttrInfo_(name, configs[name], initialValues[name]);
+      props[name] = this.buildAttrPropertyDef_(name);
     }
+
+    Object.defineProperties(this, props);
   }
 
   /**
@@ -110,6 +109,37 @@ class Attribute extends EventEmitter {
     if (this.constructor.INVALID_ATTRS_MERGED[name]) {
       throw new Error('It\'s not allowed to create an attribute with the name "' + name + '".');
     }
+  }
+
+  /**
+   * Builds the info object for the requested attribute.
+   * @param {string} name The name of the attribute.
+   * @param {Object} config The config object of the attribute.
+   * @param {*} initialValue The initial value of the attribute.
+   * @protected
+   */
+  buildAttrInfo_(name, config, initialValue) {
+    this.assertValidAttrName_(name);
+
+    this.attrsInfo_[name] = {
+      config: config || {},
+      initialValue: initialValue,
+      state: Attribute.States.UNINITIALIZED
+    };
+  }
+
+  /**
+   * Builds the property definition object for the requested attribute.
+   * @param {string} name The name of the attribute.
+   * @return {!Object}
+   * @protected
+   */
+  buildAttrPropertyDef_(name) {
+    return {
+      configurable: true,
+      get: this.getAttrValue_.bind(this, name),
+      set: this.setAttrValue_.bind(this, name)
+    };
   }
 
   /**

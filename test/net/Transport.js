@@ -147,15 +147,4 @@ describe('Transport', function() {
     transport.dispose();
     assert.strictEqual(1, transport.close.callCount);
   });
-
-  it('should be able to open after disposed', function() {
-    var transport = new FakeTransport('');
-    sinon.stub(transport, 'close');
-
-    transport.dispose();
-    transport.emit('close');
-    assert.throws(function() {
-      transport.open();
-    });
-  });
 });

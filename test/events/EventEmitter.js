@@ -2,7 +2,7 @@
 
 import EventEmitter from '../../src/events/EventEmitter';
 
-describe('EventEmitter', function() {
+describe('EventEmitter Tests', function() {
   beforeEach(function() {
     this.emitter = new EventEmitter();
   });
@@ -23,90 +23,27 @@ describe('EventEmitter', function() {
     assert.strictEqual(1, listener.callCount);
   });
 
-  it('should work with namespaced events', function() {
-    var listener = sinon.stub();
-
-    this.emitter.on('namespaced.event.1', listener);
-
-    this.emitter.emit('namespaced');
-    assert.strictEqual(0, listener.callCount);
-
-    this.emitter.emit('namespaced.event.1');
-    assert.strictEqual(1, listener.callCount);
-  });
-
-  it('should work with namespaced events with wildcards', function() {
-    var listener1 = sinon.stub();
-    var listener2 = sinon.stub();
-    var listener3 = sinon.stub();
-    var listener4 = sinon.stub();
-
-    this.emitter.on('namespaced.event.1', listener1);
-    this.emitter.on('namespaced.event.2', listener2);
-    this.emitter.on('namespaced.event.*', listener3);
-    this.emitter.on('namespaced.*.1', listener4);
-
-    this.emitter.emit('namespaced.event.1');
-    assert.strictEqual(1, listener1.callCount);
-    assert.strictEqual(0, listener2.callCount);
-    assert.strictEqual(1, listener3.callCount);
-    assert.strictEqual(1, listener4.callCount);
-
-    this.emitter.emit('namespaced.string.1');
-    assert.strictEqual(1, listener1.callCount);
-    assert.strictEqual(0, listener2.callCount);
-    assert.strictEqual(1, listener3.callCount);
-    assert.strictEqual(2, listener4.callCount);
-
-    this.emitter.emit('*.event.*');
-    assert.strictEqual(2, listener1.callCount);
-    assert.strictEqual(1, listener2.callCount);
-    assert.strictEqual(2, listener3.callCount);
-    assert.strictEqual(3, listener4.callCount);
-  });
-
-  it('should work with namespaced events using custom delimiter', function() {
-    var listener1 = sinon.stub();
-    var listener2 = sinon.stub();
-
-    this.emitter.setDelimiter('::');
-    this.emitter.on('namespaced::event::2', listener1);
-    this.emitter.on('namespaced::*::1', listener2);
-
-    this.emitter.emit('namespaced::event::1');
-    assert.strictEqual(0, listener1.callCount);
-    assert.strictEqual(1, listener2.callCount);
-
-    this.emitter.emit('namespaced::string::1');
-    assert.strictEqual(0, listener1.callCount);
-    assert.strictEqual(2, listener2.callCount);
-
-    this.emitter.emit('*::event::*');
-    assert.strictEqual(1, listener1.callCount);
-    assert.strictEqual(3, listener2.callCount);
-  });
-
   it('should listen to multiple events on the same call', function() {
     var listener = sinon.stub();
 
-    this.emitter.on(['namespaced.event', 'event'], listener);
+    this.emitter.on(['event1', 'event2'], listener);
 
-    this.emitter.emit('namespaced.event');
+    this.emitter.emit('event1');
     assert.strictEqual(1, listener.callCount);
 
-    this.emitter.emit('event');
+    this.emitter.emit('event2');
     assert.strictEqual(2, listener.callCount);
   });
 
   it('should listen to events through `addListener`', function() {
     var listener = sinon.stub();
 
-    this.emitter.addListener(['namespaced.event', 'event'], listener);
+    this.emitter.addListener(['event1', 'event2'], listener);
 
-    this.emitter.emit('namespaced.event');
+    this.emitter.emit('event1');
     assert.strictEqual(1, listener.callCount);
 
-    this.emitter.emit('event');
+    this.emitter.emit('event2');
     assert.strictEqual(2, listener.callCount);
   });
 
@@ -203,9 +140,9 @@ describe('EventEmitter', function() {
       order += '2';
     };
 
-    this.emitter.on('event.*', listener1);
-    this.emitter.on('event.1', listener2);
-    this.emitter.emit('event.1');
+    this.emitter.on('event', listener1);
+    this.emitter.on('event', listener2);
+    this.emitter.emit('event');
 
     assert.strictEqual(order, '12');
   });
@@ -488,11 +425,13 @@ describe('EventEmitter', function() {
     );
   });
 
-  it('should dispose the listeners tree on dispose', function() {
-    var tree = this.emitter.listenersTree_;
+  it('should remove all listeners on dispose', function() {
+    var listener = sinon.stub();
+    this.emitter.on('event', listener);
 
     this.emitter.dispose();
-    assert.ok(tree.isDisposed());
-    assert.ok(!this.emitter.listenersTree_);
+    this.emitter.emit('event');
+
+    assert.strictEqual(0, listener.callCount);
   });
 });

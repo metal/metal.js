@@ -3,7 +3,6 @@
 import core from '../core';
 import Disposable from '../disposable/Disposable';
 import EventHandle from '../events/EventHandle';
-import WildcardTrie from '../structs/WildcardTrie';
 
 /**
  * EventEmitter utility.
@@ -13,18 +12,11 @@ import WildcardTrie from '../structs/WildcardTrie';
 class EventEmitter extends Disposable {
   constructor() {
     /**
-     * The delimiter being used for namespaces.
-     * @type {string}
-     * @protected
-     */
-    this.delimiter_ = '.';
-
-    /**
      * Holds event listeners scoped by event type.
-     * @type {Trie}
+     * @type {!Object<string, !Array<!function()>>}
      * @protected
      */
-    this.listenersTree_ = new WildcardTrie();
+    this.events_ = [];
 
     /**
      * The maximum number of listeners allowed for each event type. If the number
@@ -33,14 +25,6 @@ class EventEmitter extends Disposable {
      * @protected
      */
     this.maxListeners_ = 10;
-
-    /**
-     * The id that will be assigned to the next listener added to this event
-     * emitter.
-     * @type {number}
-     * @protected
-     */
-    this.nextId_ = 1;
 
     /**
      * Configuration option which determines if an event facade should be sent
@@ -80,16 +64,15 @@ class EventEmitter extends Disposable {
   addSingleListener_(event, listener, opt_origin) {
     this.emit('newListener', event, listener);
 
-    var listeners = this.listenersTree_.setKeyValue(
-      this.splitNamespaces_(event),
-      [{
-        fn: listener,
-        id: this.nextId_++,
-        origin: opt_origin
-      }],
-      this.mergeListenerArrays_
-    );
+    if (!this.events_[event]) {
+      this.events_[event] = [];
+    }
+    this.events_[event].push({
+      fn: listener,
+      origin: opt_origin
+    });
 
+    var listeners = this.events_[event];
     if (listeners.length > this.maxListeners_ && !listeners.warned) {
       console.warn(
         'Possible EventEmitter memory leak detected. %d listeners added ' +
@@ -102,23 +85,11 @@ class EventEmitter extends Disposable {
   }
 
   /**
-   * Comparison function between listener objects.
-   * @param {!Object} listener1
-   * @param {!Object} listener2
-   * @return {Number} The difference between the ids of the objects.
-   * @protected
-   */
-  compareListenerObjs_(obj1, obj2) {
-    return obj1.id - obj2.id;
-  }
-
-  /**
    * Disposes of this instance's object references.
    * @override
    */
   disposeInternal() {
-    this.listenersTree_.dispose();
-    this.listenersTree_ = null;
+    this.events_ = [];
   }
 
   /**
@@ -148,14 +119,6 @@ class EventEmitter extends Disposable {
   }
 
   /**
-   * Gets the delimiter to be used by namespaces.
-   * @return {string}
-   */
-  getDelimiter() {
-    return this.delimiter_;
-  }
-
-  /**
    * Gets the configuration option which determines if an event facade should
    * be sent as a param of listeners when emitting events. If set to true, the
    * facade will be passed as the first argument of the listener.
@@ -171,20 +134,7 @@ class EventEmitter extends Disposable {
    * @return {Array} Array of listeners.
    */
   listeners(event) {
-    var listenerArrays = this.searchListenerTree_(event);
-    var listeners = [];
-
-    for (var i = 0; i < listenerArrays.length; i++) {
-      listeners = listeners.concat(listenerArrays[i]);
-    }
-
-    if (listenerArrays.length > 1) {
-      // If there was more than one result, we should reorder the listeners,
-      // since we joined them without taking the order into account.
-      listeners.sort(this.compareListenerObjs_);
-    }
-
-    return listeners.map(function(listener) {
+    return (this.events_[event] || []).map(function(listener) {
       return listener.fn;
     });
   }
@@ -249,20 +199,6 @@ class EventEmitter extends Disposable {
   }
 
   /**
-   * Merges two objects that contain event listeners.
-   * @param  {!Object} arr1
-   * @param  {!Object} arr2
-   * @return {!Object}
-   * @protected
-   */
-  mergeListenerArrays_(arr1, arr2) {
-    for (var i = 0; i < arr2.length; i++) {
-      arr1.push(arr2[i]);
-    }
-    return arr1;
-  }
-
-  /**
    * Converts the parameter to an array if only one event is given.
    * @param  {!(Array|string)} events
    * @return {!Array}
@@ -282,9 +218,10 @@ class EventEmitter extends Disposable {
   off(events, listener) {
     this.validateListener_(listener);
 
-    var listenerArrays = this.searchListenerTree_(events);
-    for (var i = 0; i < listenerArrays.length; i++) {
-      this.removeMatchingListenerObjs_(listenerArrays[i], listener);
+    events = this.normalizeEvents_(events);
+    for (var i = 0; i < events.length; i++) {
+      var listenerObjs = this.events_[events[i]] || [];
+      this.removeMatchingListenerObjs_(listenerObjs, listener);
     }
 
     return this;
@@ -319,40 +256,28 @@ class EventEmitter extends Disposable {
    * @return {!Object} Returns emitter, so calls can be chained.
    */
   removeAllListeners(opt_events) {
-    if (!opt_events) {
-      this.listenersTree_.clear();
-      return this;
+    if (opt_events) {
+      var events = this.normalizeEvents_(opt_events);
+      for (var i = 0; i < events.length; i++) {
+        this.events_[events[i]] = null;
+      }
+    } else {
+      this.events_ = {};
     }
-
-    return this.removeAllListenersForEvents_(opt_events);
-  }
-
-  /**
-   * Removes all listeners for the specified events.
-   * @param  {!(Array|string)} events
-   * @return {!Object} Returns emitter, so calls can be chained.
-   * @protected
-   */
-  removeAllListenersForEvents_(events) {
-    events = this.normalizeEvents_(events);
-    for (var i = 0; i < events.length; i++) {
-      this.listenersTree_.setKeyValue(this.splitNamespaces_(events[i]), []);
-    }
-
     return this;
   }
 
   /**
    * Removes all listener objects from the given array that match the given
    * listener function.
-   * @param {!Array.<Object>} listenerObjects
+   * @param {!Array.<Object>} listenerObjs
    * @param {!Function} listener
    * @protected
    */
-  removeMatchingListenerObjs_(listenerObjects, listener) {
-    for (var i = listenerObjects.length - 1; i >= 0; i--) {
-      if (this.matchesListener_(listenerObjects[i], listener)) {
-        listenerObjects.splice(i, 1);
+  removeMatchingListenerObjs_(listenerObjs, listener) {
+    for (var i = listenerObjs.length - 1; i >= 0; i--) {
+      if (this.matchesListener_(listenerObjs[i], listener)) {
+        listenerObjs.splice(i, 1);
       }
     }
   }
@@ -366,35 +291,6 @@ class EventEmitter extends Disposable {
    */
   removeListener() {
     return this.off.apply(this, arguments);
-  }
-
-  /**
-   * Searches the listener tree for the given events.
-   * @param {!(Array|string)} events
-   * @return {!Array.<Array>} An array of listener arrays returned by the tree.
-   * @protected
-   */
-  searchListenerTree_(events) {
-    var values = [];
-
-    events = this.normalizeEvents_(events);
-    for (var i = 0; i < events.length; i++) {
-      values = values.concat(
-        this.listenersTree_.getKeyValue(this.splitNamespaces_(events[i]))
-      );
-    }
-
-    return values;
-  }
-
-  /**
-   * Sets the delimiter to be used by namespaces.
-   * @param {string} delimiter
-   * @return {!Object} Returns emitter, so calls can be chained.
-   */
-  setDelimiter(delimiter) {
-    this.delimiter_ = delimiter;
-    return this;
   }
 
   /**
@@ -420,16 +316,6 @@ class EventEmitter extends Disposable {
   setShouldUseFacade(shouldUseFacade) {
     this.shouldUseFacade_ = shouldUseFacade;
     return this;
-  }
-
-  /**
-   * Splits the event, using the current delimiter.
-   * @param {string} event
-   * @return {!Array}
-   * @protected
-   */
-  splitNamespaces_(event) {
-    return event.split(this.getDelimiter());
   }
 
   /**

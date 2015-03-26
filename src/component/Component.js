@@ -649,10 +649,11 @@ class Component extends Attribute {
    * @protected
    */
   renderElement_(opt_parentElement, opt_siblingElement) {
-    this.element.id = this.id;
-    if (opt_siblingElement || !this.element.parentNode) {
+    var element = this.element;
+    element.id = this.id;
+    if (opt_siblingElement || !element.parentNode) {
       var parent = dom.toElement(opt_parentElement) || document.body;
-      parent.insertBefore(this.element, dom.toElement(opt_siblingElement));
+      parent.insertBefore(element, dom.toElement(opt_siblingElement));
     }
   }
 

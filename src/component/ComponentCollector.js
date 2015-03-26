@@ -1,7 +1,6 @@
 'use strict';
 
-import core from '../core';
-import dom from '../dom/dom';
+import html from '../html/html';
 import ComponentRegistry from '../component/ComponentRegistry';
 import Disposable from '../disposable/Disposable';
 
@@ -38,22 +37,18 @@ class ComponentCollector extends Disposable {
    */
   extractComponentsFromString(renderedComponents) {
     var components = [];
-    var frag = dom.buildFragment(renderedComponents);
-    var ignored = false;
-    for (var i = 0; i < frag.childNodes.length; i++) {
-      var node = frag.childNodes[i];
-      if (core.isElement(node) && node.id && ComponentCollector.components[node.id]) {
-        components.push(ComponentCollector.components[node.id]);
-      } else {
-        ignored = true;
+    var content = html.removeElementContent(renderedComponents.toString(), ' data-component');
+    var regex = /\sid=(?:["'\s])?([^"']+)\1?/g;
+    var match = regex.exec(content);
+    while(match) {
+      if (match && match.length === 2) {
+        var id = match[1];
+        var component = ComponentCollector.components[id];
+        if (component) {
+          components.push(component);
+        }
+        match = regex.exec(content);
       }
-    }
-
-    if (ignored) {
-      console.warn(
-        'One or more HTML nodes were ignored when extracting components. ' +
-        'Only nodes with both the id and the data-component attribute set are valid.'
-      );
     }
     return components;
   }

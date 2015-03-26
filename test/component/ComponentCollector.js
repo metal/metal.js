@@ -76,17 +76,4 @@ describe('ComponentCollector', function() {
     assert.ok(child1, components[0]);
     assert.ok(child2, components[1]);
   });
-
-  it('should ignore non component elements when extracting components from string', function() {
-    var collector = new ComponentCollector();
-    collector.createOrUpdateComponent('TestComponent', {id: 'child1'});
-    collector.createOrUpdateComponent('TestComponent', {id: 'child2'});
-
-    var childrenString = '<div data-component id="child1"></div>' +
-      '<span>Ignore</span><div data-component id="child2"></div>';
-    var components = collector.extractComponentsFromString(childrenString);
-
-    assert.strictEqual(2, components.length);
-    assert.strictEqual(1, console.warn.callCount);
-  });
 });

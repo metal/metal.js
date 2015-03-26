@@ -402,7 +402,7 @@ class Component extends Attribute {
     this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
     this.renderSurfacesContent_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
-    this.syncAttrs_(this.getAttrNames());
+    this.syncAttrs_();
 
     this.attach();
 
@@ -434,13 +434,12 @@ class Component extends Attribute {
 
   /**
    * Fires attributes synchronization changes for attributes.
-   * @param {Object.<string, Object>} changes Object containing the attribute
-   *     name as key and an object with newVal and prevVal as value.
    * @protected
    */
-  syncAttrs_(attrsName) {
-    for (var i in attrsName) {
-      this.fireAttrChange_(attrsName[i]);
+  syncAttrs_() {
+    var attrNames = this.getAttrNames();
+    for (var i = 0; i < attrNames.length; i++) {
+      this.fireAttrChange_(attrNames[i]);
     }
   }
 
@@ -647,7 +646,7 @@ class Component extends Attribute {
     this.clearSurfacesCache_();
     this.renderSurfacesContent_(this.surfaces_);
 
-    this.syncAttrs_(this.getAttrNames());
+    this.syncAttrs_();
 
     this.attach(opt_parentElement, opt_siblingElement);
 

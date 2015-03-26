@@ -231,7 +231,7 @@ class SoyComponent extends Component {
   decorateAsSubComponent() {
     this.decoratingAsSubcomponent_ = true;
 
-    this.syncAttrs_(this.getAttrNames());
+    this.syncAttrs_();
     this.attach();
 
     this.wasRendered = true;

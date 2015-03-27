@@ -68,8 +68,7 @@ describe('ComponentCollector', function() {
     var child1 = collector.createOrUpdateComponent('TestComponent', {id: 'child1'});
     var child2 = collector.createOrUpdateComponent('TestComponent', {id: 'child2'});
 
-    var childrenString = '<div data-component id="child1"></div>' +
-      '<div data-component id="child2"></div>';
+    var childrenString = '%%%%~child1~%%%%%%%%~child2~%%%%';
     var components = collector.extractComponentsFromString(childrenString);
 
     assert.strictEqual(2, components.length);

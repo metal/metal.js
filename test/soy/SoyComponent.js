@@ -186,11 +186,19 @@ describe('SoyComponent', function() {
       var NestedTestComponent = createNestedTestComponentClass();
       var custom = new NestedTestComponent({id: 'nested'}).render();
 
-      var childPlaceholder = custom.element.querySelector('#nestedMyChild0');
       var child = custom.components.nestedMyChild0;
       assert.ok(child);
       assert.strictEqual(this.ChildrenTestComponent, child.constructor);
       assert.strictEqual('bar', child.bar);
+    });
+
+    it('should render nested component inside parent', function() {
+      var NestedTestComponent = createNestedTestComponentClass();
+      var custom = new NestedTestComponent({id: 'nested'}).render();
+
+      var childPlaceholder = custom.element.querySelector('#nestedMyChild0');
+      var child = custom.components.nestedMyChild0;
+
       assert.strictEqual(childPlaceholder, child.element);
       assert.strictEqual(1, childPlaceholder.childNodes.length);
     });

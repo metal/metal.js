@@ -1,6 +1,5 @@
 'use strict';
 
-import html from '../html/html';
 import ComponentRegistry from '../component/ComponentRegistry';
 import Disposable from '../disposable/Disposable';
 
@@ -37,7 +36,7 @@ class ComponentCollector extends Disposable {
    */
   extractComponentsFromString(renderedComponents) {
     var components = [];
-    var regex = /\sid=(?:["'\s])?([^"']+)\1?/g;
+    var regex = /\%\%\%\%~([^~]+)~\%\%\%\%/g;
     var match = regex.exec(renderedComponents);
     while(match) {
       if (match && match.length === 2) {

@@ -62,6 +62,13 @@ class SoyComponent extends Component {
     this.parentComponent_ = this;
 
     /**
+     * Holds the html strings of each rendered nested component, indexed by id.
+     * @type {!Object<string, string>}
+     * @protected
+     */
+    this.renderedComponents_ = {};
+
+    /**
      * Holds the ids of the components that were most recently added via
      * `addComponentRef`. This object is cleared after the `attach` and
      * `renderSurfacesContent` methods are run.
@@ -251,6 +258,14 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Gets this component's `EventsCollector` instance.
+   * @return {!EventsCollector}
+   */
+  getEventsCollector() {
+    return this.eventsCollector_;
+  }
+
+  /**
    * Overrides the default behavior so that this can automatically render
    * the appropriate soy template when one exists.
    * @param {string} surfaceId The surface id.
@@ -261,10 +276,8 @@ class SoyComponent extends Component {
   getSurfaceContent_(surfaceId) {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
-      var content = this.renderTemplate_(surfaceTemplate, {skipNestedComponentContents: true});
-      if (content.indexOf('data-component') !== -1) {
-        content = this.renderTemplate_(surfaceTemplate, {}, true);
-      }
+      var content = this.renderTemplate_(surfaceTemplate);
+      content = this.replaceComponentStringPlaceholders_(content);
       return content;
     } else {
       return super.getSurfaceContent_(surfaceId);
@@ -288,10 +301,12 @@ class SoyComponent extends Component {
     this.parentComponent_ = component;
 
     var newData = this.buildTemplateData_(data, config, component);
-    var renderedTemplate = originalTemplate(newData, ignored, ijData);
+    var renderedComponent = originalTemplate(newData, ignored, ijData);
+    this.renderedComponents_[data.id] = renderedComponent;
+    component.getEventsCollector().attachListeners(renderedComponent.content);
 
     this.parentComponent_ = prevParentComponent;
-    return renderedTemplate;
+    return '%%%%~' + data.id + '~%%%%';
   }
 
   /**
@@ -301,7 +316,7 @@ class SoyComponent extends Component {
    * @protected
    */
   hasSubcomponents_(value) {
-    return value instanceof soydata.SanitizedHtml && value.content.indexOf('data-component') !== -1;
+    return value instanceof soydata.SanitizedHtml;
   }
 
   /**
@@ -356,11 +371,9 @@ class SoyComponent extends Component {
    * @override
    */
   renderInternal() {
-    var templateContent = this.renderElementTemplate({skipNestedComponentContents: true});
+    var templateContent = this.renderElementTemplate();
     if (templateContent) {
-      if (templateContent.indexOf('data-component') !== -1) {
-        templateContent = this.renderElementTemplate({}, true);
-      }
+      templateContent = this.replaceComponentStringPlaceholders_(templateContent);
       dom.append(this.element, templateContent);
     }
   }
@@ -394,6 +407,36 @@ class SoyComponent extends Component {
     }
     var content = templateFn(this, null, opt_injectedData || {}).content;
     ComponentRegistry.Templates.SoyComponent.component = originalTemplate;
+    return content;
+  }
+
+  /**
+   * Replaces the matched placeholder with the appropriate component's content, if
+   * it exists. Otherwise, keep the original content as it is.
+   * @param {string} match String placeholder.
+   * @param {string} id The id of the component that should replace the placeholder.
+   * @return {string} The content that should replace the placeholder.
+   * @protected
+   */
+  replaceComponentStringPlaceholder_(match, id) {
+    return this.renderedComponents_[id] ? this.renderedComponents_[id] : match[0];
+  }
+
+  /**
+   * Replaces all string placeholders added to the given content by `handleTemplateCall_`
+   * with the real component content that should have been inserted there instead.
+   * @param {string} content
+   * @return {string} The content string with the replaced placeholders.
+   * @protected
+   */
+  replaceComponentStringPlaceholders_(content) {
+    var regex = /\%\%\%\%~([^~]+)~\%\%\%\%/g;
+    var previousContent;
+    do {
+      previousContent = content;
+      content = content.replace(regex, this.replaceComponentStringPlaceholder_.bind(this));
+    } while (previousContent !== content);
+    this.renderedComponents_ = {};
     return content;
   }
 

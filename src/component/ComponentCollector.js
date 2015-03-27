@@ -36,7 +36,7 @@ class ComponentCollector extends Disposable {
    */
   extractComponentsFromString(renderedComponents) {
     var components = [];
-    var regex = /\%\%\%\%~([^~]+)~\%\%\%\%/g;
+    var regex = /\%\%\%\%~comp-([^~]+)~\%\%\%\%/g;
     var match = regex.exec(renderedComponents);
     while(match) {
       if (match && match.length === 2) {

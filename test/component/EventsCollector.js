@@ -17,7 +17,7 @@ describe('EventsCollector', function() {
     var collector = new EventsCollector(custom);
 
     assert.doesNotThrow(function() {
-      collector.attachListeners(custom.element.innerHTML);
+      collector.attachListeners(custom.element.innerHTML, 'group');
     });
   });
 
@@ -29,7 +29,7 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     assert.strictEqual(0, custom.handleClick.callCount);
     dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -47,7 +47,7 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     dom.triggerEvent(custom.element.childNodes[0], 'click');
     assert.strictEqual(1, custom.handleClick.callCount);
@@ -64,7 +64,7 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     dom.triggerEvent(custom.element.childNodes[0], 'click');
     assert.strictEqual(1, custom.handleClick.callCount);
@@ -72,7 +72,7 @@ describe('EventsCollector', function() {
     assert.strictEqual(2, custom.handleClick.callCount);
   });
 
-  it('should detach listeners that are unused after collecting again', function() {
+  it('should detach listeners that are unused', function() {
     var CustomComponent = createCustomComponent(
       '<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
     );
@@ -81,12 +81,14 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     var trigger = custom.element.childNodes[0];
     trigger.removeAttribute('data-onclick');
     custom.element.removeEventListener = sinon.stub();
-    collector.attachListeners(custom.element.innerHTML);
+
+    collector.attachListeners(custom.element.innerHTML, 'group');
+    collector.detachUnusedListeners();
 
     assert.strictEqual(1, custom.element.removeEventListener.callCount);
     assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
@@ -101,7 +103,7 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     collector.detachAllListeners();
     dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -119,11 +121,13 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     var trigger = custom.element.childNodes[0];
     trigger.removeAttribute('data-onclick');
-    collector.attachListeners(custom.element.innerHTML);
+
+    collector.attachListeners(custom.element.innerHTML, 'group');
+    collector.detachUnusedListeners();
 
     collector.detachAllListeners();
     dom.triggerEvent(custom.element.childNodes[0], 'keydown');
@@ -139,7 +143,7 @@ describe('EventsCollector', function() {
 
     var custom = new CustomComponent().render();
     var collector = new EventsCollector(custom);
-    collector.attachListeners(custom.element.innerHTML);
+    collector.attachListeners(custom.element.innerHTML, 'group');
 
     collector.dispose();
     dom.triggerEvent(custom.element.childNodes[0], 'click');

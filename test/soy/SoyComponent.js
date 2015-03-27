@@ -180,6 +180,10 @@ describe('SoyComponent', function() {
       var ChildrenTestComponent = createCustomTestComponentClass('ChildrenTestComponent');
       ChildrenTestComponent.ATTRS = {bar: {value: ''}};
       this.ChildrenTestComponent = ChildrenTestComponent;
+
+      var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
+      EventsTestComponent.ATTRS = {footerButtons: {value: []}};
+      EventsTestComponent.prototype.handleClick = sinon.stub();
     });
 
     it('should instantiate rendered child component', function() {
@@ -333,7 +337,6 @@ describe('SoyComponent', function() {
         var comps = component.components;
         assert.strictEqual('foo', comps.nestedChild1.bar);
         assert.strictEqual('foo', comps.nestedChild2.bar);
-        assert.strictEqual('foo', comps.nestedChild3.bar);
         assert.strictEqual('foo', comps.nestedMain.bar);
         done();
       });
@@ -370,6 +373,15 @@ describe('SoyComponent', function() {
           done();
         });
       });
+    });
+
+    it('should attach listeners on nested components from template', function() {
+      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+
+      var child3 = component.components.nestedChild3;
+      dom.triggerEvent(child3.element.querySelector('.content'), 'click');
+      assert.strictEqual(1, child3.handleClick.callCount);
     });
 
     it('should render received children components inside placeholder', function() {

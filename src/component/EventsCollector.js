@@ -32,11 +32,11 @@ class EventsCollector extends Disposable {
     this.eventHandles_ = {};
 
     /**
-     * Holds the number of extracted listeners, indexed by the listener's css selector.
-     * @type {!Object<string, number>}
+     * Holds flags indicating which selectors a group has listeners for.
+     * @type {!Object<string, !Object<string, boolean>>}
      * @protected
      */
-    this.listenerCounts_ = {};
+    this.groupHasListener_ = {};
   }
 
   /**
@@ -44,11 +44,14 @@ class EventsCollector extends Disposable {
    * been attached.
    * @param {string} eventType
    * @param {string} fnName
+   * @param {boolean} permanent
    * @protected
    */
-  attachListener_(eventType, fnName) {
+  attachListener_(eventType, fnName, groupName) {
     var selector = '[data-on' + eventType + '="' + fnName + '"]';
-    this.listenerCounts_[selector] = (this.listenerCounts_[selector] || 0) + 1;
+
+    this.groupHasListener_[groupName][selector] = true;
+
     if (!this.eventHandles_[selector]) {
       var fn = this.component_[fnName].bind(this.component_);
       this.eventHandles_[selector] = this.component_.delegate(eventType, selector, fn);
@@ -59,26 +62,27 @@ class EventsCollector extends Disposable {
    * Attaches all listeners declared as attributes on the given element and
    * its children.
    * @param {string} content
+   * @param {boolean} groupName
    */
-  attachListeners(content) {
-    this.listenerCounts_ = {};
-    this.attachListenersFromHtml_(content);
-    this.detachUnusedListeners_();
+  attachListeners(content, groupName) {
+    this.groupHasListener_[groupName] = {};
+    this.attachListenersFromHtml_(content, groupName);
   }
 
   /**
    * Attaches listeners found in the given html content.
    * @param {string} content
+   * @param {boolean} groupName
    * @protected
    */
-  attachListenersFromHtml_(content) {
+  attachListenersFromHtml_(content, groupName) {
     if (content.indexOf('data-on') === -1) {
       return;
     }
     var regex = /data-on([a-z]+)=['|"](\w+)['|"]/g;
     var match = regex.exec(content);
     while(match) {
-      this.attachListener_(match[1], match[2]);
+      this.attachListener_(match[1], match[2], groupName);
       match = regex.exec(content);
     }
   }
@@ -100,9 +104,16 @@ class EventsCollector extends Disposable {
    * Detaches all existing listeners that are not being used anymore.
    * @protected
    */
-  detachUnusedListeners_() {
+  detachUnusedListeners() {
     for (var selector in this.eventHandles_) {
-      if (!this.listenerCounts_[selector]) {
+      var unused = true;
+      for (var groupName in this.groupHasListener_) {
+        if (this.groupHasListener_[groupName][selector]) {
+          unused = false;
+          break;
+        }
+      }
+      if (unused) {
         this.eventHandles_[selector].removeListener();
         this.eventHandles_[selector] = null;
       }

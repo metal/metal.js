@@ -20,7 +20,7 @@
     "library"
   ],
   "devDependencies": {
-    "alloyui-tasks": "git://github.com/mairatma/alloyui-tasks#skip",
+    "alloyui-tasks": "git://github.com/mairatma/alloyui-tasks#perf",
     "closure-templates": "^20141017.0.0",
     "del": "^1.1.1",
     "gulp": "^3.8.11",

@@ -17,6 +17,7 @@ import './SoyComponent.soy';
  * TODO: Switch to using proper AOP.
  */
 var originalTemplate = ComponentRegistry.Templates.SoyComponent.component;
+var originalSurfaceTemplate = ComponentRegistry.Templates.SoyComponent.surface;
 
 /**
  * Special Component class that handles a better integration between soy templates
@@ -62,11 +63,12 @@ class SoyComponent extends Component {
     this.parentComponent_ = this;
 
     /**
-     * Holds the html strings of each rendered nested component, indexed by id.
+     * Holds the html strings of each rendered nested component or surface,
+     * indexed by their element ids.
      * @type {!Object<string, string>}
      * @protected
      */
-    this.renderedComponents_ = {};
+    this.renderedTemplates_ = {};
 
     /**
      * Holds the ids of the components that were most recently added via
@@ -131,17 +133,7 @@ class SoyComponent extends Component {
       this.attachNestedComponents_();
     }
 
-    this.attachInlineListeners_();
-
     return this;
-  }
-
-  /**
-   * Attaches inline listeners to the main element.
-   * @protected
-   */
-  attachInlineListeners_() {
-    this.eventsCollector_.attachListeners(this.element.outerHTML);
   }
 
   /**
@@ -277,6 +269,7 @@ class SoyComponent extends Component {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
       var content = this.renderTemplate_(surfaceTemplate);
+      this.eventsCollector_.attachListeners(content, this.makeSurfaceId_(surfaceId));
       content = this.replaceComponentStringPlaceholders_(content);
       return content;
     } else {
@@ -285,7 +278,22 @@ class SoyComponent extends Component {
   }
 
   /**
-   * Handles a call to the SoyComponent template.
+   * Handles a call to the SoyComponent surface template.
+   * @param {!Object} data The data the template was called with.
+   * @param {(null|undefined)=} ignored Second argument for soy templates.
+   * @param {Object.<string, *>=} ijData Optional injected data.
+   * @return {string} The original return value of the template.
+   * @protected
+   */
+  handleSurfaceCall_(data, ignored, ijData) {
+    var renderedComponent = originalSurfaceTemplate(data, ignored, ijData);
+    this.renderedTemplates_[data.id] = renderedComponent;
+    this.parentComponent_.getEventsCollector().attachListeners(renderedComponent.content, data.id);
+    return '%%%%~surface-' + data.id + '~%%%%';
+  }
+
+  /**
+   * Handles a call to the SoyComponent component template.
    * @param {!Object} data The data the template was called with.
    * @param {(null|undefined)=} ignored Second argument for soy templates.
    * @param {Object.<string, *>=} ijData Optional injected data.
@@ -302,11 +310,11 @@ class SoyComponent extends Component {
 
     var newData = this.buildTemplateData_(data, config, component);
     var renderedComponent = originalTemplate(newData, ignored, ijData);
-    this.renderedComponents_[data.id] = renderedComponent;
-    component.getEventsCollector().attachListeners(renderedComponent.content);
+    this.renderedTemplates_[data.id] = renderedComponent;
+    this.parentComponent_.getEventsCollector().attachListeners(renderedComponent.content, data.id);
 
     this.parentComponent_ = prevParentComponent;
-    return '%%%%~' + data.id + '~%%%%';
+    return '%%%%~comp-' + data.id + '~%%%%';
   }
 
   /**
@@ -352,14 +360,13 @@ class SoyComponent extends Component {
   /**
    * Renders the main element's template.
    * @param {Object=} opt_injectedData
-   * @param {boolean} opt_skipTemplateInterception
    * @return {?string} The template's result content, or undefined if the
    *   template doesn't exist.
    */
-  renderElementTemplate(opt_injectedData, opt_skipTemplateInterception) {
+  renderElementTemplate(opt_injectedData) {
     var elementTemplate = this.constructor.TEMPLATES_MERGED.content;
     if (core.isFunction(elementTemplate)) {
-      return this.renderTemplate_(elementTemplate, opt_injectedData, opt_skipTemplateInterception);
+      return this.renderTemplate_(elementTemplate, opt_injectedData);
     }
   }
 
@@ -373,6 +380,7 @@ class SoyComponent extends Component {
   renderInternal() {
     var templateContent = this.renderElementTemplate();
     if (templateContent) {
+      this.eventsCollector_.attachListeners(templateContent, this.id);
       templateContent = this.replaceComponentStringPlaceholders_(templateContent);
       dom.append(this.element, templateContent);
     }
@@ -390,7 +398,7 @@ class SoyComponent extends Component {
     }
     if (this.inDocument) {
       this.attachNestedComponents_();
-      this.attachInlineListeners_();
+      this.eventsCollector_.detachUnusedListeners();
     }
   }
 
@@ -398,15 +406,14 @@ class SoyComponent extends Component {
    * Renders the specified template.
    * @param {!function()} templateFn
    * @param {Object=} opt_injectedData
-   * @param {boolean} opt_skipTemplateInterception
    * @return {string} The template's result content.
    */
-  renderTemplate_(templateFn, opt_injectedData, opt_skipTemplateInterception) {
-    if (!opt_skipTemplateInterception) {
-      ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
-    }
+  renderTemplate_(templateFn, opt_injectedData) {
+    ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
+    ComponentRegistry.Templates.SoyComponent.surface = this.handleSurfaceCall_.bind(this);
     var content = templateFn(this, null, opt_injectedData || {}).content;
     ComponentRegistry.Templates.SoyComponent.component = originalTemplate;
+    ComponentRegistry.Templates.SoyComponent.surface = originalSurfaceTemplate;
     return content;
   }
 
@@ -414,12 +421,13 @@ class SoyComponent extends Component {
    * Replaces the matched placeholder with the appropriate component's content, if
    * it exists. Otherwise, keep the original content as it is.
    * @param {string} match String placeholder.
+   * @param {string} type Either `comp` or `surface`.
    * @param {string} id The id of the component that should replace the placeholder.
    * @return {string} The content that should replace the placeholder.
    * @protected
    */
-  replaceComponentStringPlaceholder_(match, id) {
-    return this.renderedComponents_[id] ? this.renderedComponents_[id] : match[0];
+  replaceComponentStringPlaceholder_(match, type, id) {
+    return this.renderedTemplates_[id] ? this.renderedTemplates_[id] : match[0];
   }
 
   /**
@@ -430,13 +438,13 @@ class SoyComponent extends Component {
    * @protected
    */
   replaceComponentStringPlaceholders_(content) {
-    var regex = /\%\%\%\%~([^~]+)~\%\%\%\%/g;
+    var regex = /\%\%\%\%~(comp|surface)-([^~]+)~\%\%\%\%/g;
     var previousContent;
     do {
       previousContent = content;
       content = content.replace(regex, this.replaceComponentStringPlaceholder_.bind(this));
     } while (previousContent !== content);
-    this.renderedComponents_ = {};
+    this.renderedTemplates_ = {};
     return content;
   }
 

@@ -9,6 +9,13 @@
 {/template}
 
 /**
+ * @param content
+ */
+{template .surface}
+  {$content}
+{/template}
+
+/**
  * @param componentName
  * @param id
  */
@@ -24,4 +31,10 @@
   <div id="{$id}-children-placeholder" data-component-children="">
     {$children}
   </div>
+{/deltemplate}
+
+/**
+ */
+{deltemplate Surface}
+  {call Templates.SoyComponent.surface data="all" /}
 {/deltemplate}

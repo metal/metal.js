@@ -172,7 +172,7 @@ class SoyComponent extends Component {
   attachNestedComponents_() {
     var element = this.element;
     var componentIds = this.recentlyAddedComponents_;
-    for (var i = 0; i < componentIds.length; i++) {
+    for (var i = componentIds.length - 1; i >= 0; i--) {
       var id = componentIds[i];
       var placeholder = document.getElementById(id) || element.querySelector('#' + id);
       if (placeholder) {

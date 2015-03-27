@@ -761,18 +761,6 @@ class Component extends Attribute {
   }
 
   /**
-   * Validator logic for `children` element.
-   * @param {*} val
-   * @return {boolean}
-   * @protected
-   */
-  validatorChildrenFn_(val) {
-    return (val instanceof Array) && val.every(function(component) {
-      return component instanceof Component;
-    });
-  }
-
-  /**
    * Validator logic for element attribute.
    * @param {string|Element} val
    * @return {boolean} True if val is a valid element.
@@ -827,17 +815,6 @@ class Component extends Attribute {
  * @static
  */
 Component.ATTRS = {
-  /**
-   * Child components passed to this component.
-   * @type {Array<Component>}
-   */
-  children: {
-    validator: 'validatorChildrenFn_',
-    valueFn: function() {
-      return [];
-    }
-  },
-
   /**
    * Component element bounding box.
    * @type {Element}

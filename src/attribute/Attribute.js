@@ -221,6 +221,16 @@ class Attribute extends EventEmitter {
   }
 
   /**
+   * Gets the config object for the requested attribute.
+   * @param {string} name The attribute's name.
+   * @return {!Object}
+   * @protected
+   */
+  getAttrConfig(name) {
+    return (this.attrsInfo_[name] || {}).config;
+  }
+
+  /**
    * Returns an object that maps all attribute names to their values.
    * @return {Object.<string, *>}
    */

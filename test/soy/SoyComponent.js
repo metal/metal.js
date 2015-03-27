@@ -316,7 +316,7 @@ describe('SoyComponent', function() {
     });
 
     it('should pass attribute with components to nested components', function() {
-      this.ChildrenTestComponent.ATTRS.moreComponents = {};
+      this.ChildrenTestComponent.ATTRS.moreComponents = {isComponentsArray: true};
 
       var ComponentAttrTestComponent = createCustomTestComponentClass('ComponentAttrTestComponent');
       var component = new ComponentAttrTestComponent({id: 'nested'}).render();

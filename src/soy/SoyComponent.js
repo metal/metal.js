@@ -31,7 +31,6 @@ var originalSurfaceTemplate = ComponentRegistry.Templates.SoyComponent.surface;
 class SoyComponent extends Component {
   constructor(opt_config) {
     core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
-    super(opt_config);
 
     /**
      * Gets all nested components.
@@ -78,6 +77,8 @@ class SoyComponent extends Component {
      * @protected
      */
     this.recentlyAddedComponents_ = [];
+
+    super(opt_config);
 
     this.addSurfacesFromTemplates_();
   }
@@ -182,6 +183,22 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Overrides Attribute's `buildAttrInfo_` method to handle the `isComponentsArray`
+   * special attribute config.
+   * @param {string} name The name of the attribute.
+   * @param {Object} config The config object of the attribute.
+   * @param {*} initialValue The initial value of the attribute.
+   * @protected
+   * @override
+   */
+  buildAttrInfo_(name, config, initialValue) {
+    if (config.isComponentsArray && !config.setter) {
+      config.setter = 'extractComponents_';
+    }
+    super.buildAttrInfo_(name, config, initialValue);
+  }
+
+  /**
    * Builds the config data for a component from the data that was passed to its
    * soy template function.
    * @param {!Object} templateData
@@ -191,12 +208,7 @@ class SoyComponent extends Component {
   buildComponentConfigData_(templateData) {
     var config = {};
     for (var key in templateData) {
-      var value = templateData[key];
-      if (this.hasSubcomponents_(value)) {
-        config[key] = this.componentsCollector_.extractComponentsFromString(value);
-      } else {
-        config[key] = templateData[key];
-      }
+      config[key] = templateData[key];
     }
     return config;
   }
@@ -204,24 +216,23 @@ class SoyComponent extends Component {
   /**
    * Builds the data object that should be passed to the real soy template function
    * for a component.
-   * @param {!Object} data The original data passed to the template function.
-   * @param {!Object} config The config data that was passed to the component's constructor.
    * @param {!Component} component The component that was extracted from the original
    *   template data.
+   * @param {!Object} data The original data passed to the template function.
    * @return {!Object}
    * @protected
    */
-  buildTemplateData_(data, config, component) {
+  buildTemplateData_(component, data) {
     var newData = {};
-    for (var key in data) {
-      if (key === 'id' || key === 'componentName' || config[key] !== data[key]) {
-        // Pass down the original string value of attributes that are converted
-        // into subcomponents, so the template can render it.
-        newData[key] = data[key];
-      } else {
-        newData[key] = component[key];
+    var attrNames = component.getAttrNames();
+    for (var i = 0; i < attrNames.length; i++) {
+      var name = attrNames[i];
+      if (name !== 'element' && !component.getAttrConfig(name).isComponentsArray) {
+        newData[name] = component[name];
       }
     }
+    newData.componentName = data.componentName;
+    newData.children = data.children;
     return newData;
   }
 
@@ -247,6 +258,20 @@ class SoyComponent extends Component {
     this.eventsCollector_.detachAllListeners();
     super.detach();
     return this;
+  }
+
+  /**
+   * Extracts components from the given value, if it's a rendered soy template.
+   * Otherwise, returns the original value.
+   * @param {!Array|string} val
+   * @return {!Array}
+   * @protected
+   */
+  extractComponents_(val) {
+    if (this.hasSubcomponents_(val)) {
+      return this.componentsCollector_.extractComponentsFromString(val);
+    }
+    return val;
   }
 
   /**
@@ -301,14 +326,14 @@ class SoyComponent extends Component {
    * @protected
    */
   handleTemplateCall_(data, ignored, ijData) {
-    var config  = this.buildComponentConfigData_(data);
+    var config = this.buildComponentConfigData_(data);
     var component = this.componentsCollector_.createOrUpdateComponent(data.componentName, config);
     this.parentComponent_.addComponentRef(data.id, component);
 
     var prevParentComponent = this.parentComponent_;
     this.parentComponent_ = component;
 
-    var newData = this.buildTemplateData_(data, config, component);
+    var newData = this.buildTemplateData_(component, data);
     var renderedComponent = originalTemplate(newData, ignored, ijData);
     this.renderedTemplates_[data.id] = renderedComponent;
     this.parentComponent_.getEventsCollector().attachListeners(renderedComponent.content, data.id);
@@ -458,6 +483,16 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Validator logic for `children` element.
+   * @param {*} val
+   * @return {boolean}
+   * @protected
+   */
+  validatorChildrenFn_(val) {
+    return this.hasSubcomponents_(val) || Array.isArray(val);
+  }
+
+  /**
    * Provides the default value for element attribute.
    * @return {Element} The element.
    * @protected
@@ -498,6 +533,25 @@ class SoyComponent extends Component {
     return super.valueIdFn_();
   }
 }
+
+/**
+ * SoyComponent attributes definition.
+ * @type {Object}
+ * @static
+ */
+SoyComponent.ATTRS = {
+  /**
+   * Child components passed to this component.
+   * @type {Array<Component>}
+   */
+  children: {
+    isComponentsArray: true,
+    validator: 'validatorChildrenFn_',
+    valueFn: function() {
+      return [];
+    }
+  }
+};
 
 /**
  * The soy templates for this component. Templates that have the same

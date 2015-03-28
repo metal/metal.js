@@ -433,6 +433,15 @@ class Component extends Attribute {
   }
 
   /**
+   * Extracts the surfaceId from the elementId.
+   * @param {Element} element
+   * @return {?string}
+   */
+  static extractComponentId(surfaceElementId) {
+    return surfaceElementId.split('-')[0];
+  }
+
+  /**
    * Fires attributes synchronization changes for attributes.
    * @protected
    */

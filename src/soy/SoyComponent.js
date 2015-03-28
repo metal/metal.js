@@ -59,7 +59,7 @@ class SoyComponent extends Component {
      * @type {!Component}
      * @protected
      */
-    this.parentComponent_ = this;
+    this.componentInProcess_ = this;
 
     /**
      * Holds the html strings of each rendered nested component or surface,
@@ -133,6 +133,14 @@ class SoyComponent extends Component {
     if (!this.wasRendered) {
       this.attachNestedComponents_();
     }
+
+    ComponentCollector.components[this.id] = this;
+    for (var id in this.renderedTemplates_) {
+      var componentInProcess = ComponentCollector.components[Component.extractComponentId(id)];
+      componentInProcess.getEventsCollector().attachListeners(this.renderedTemplates_[id].content, id);
+    }
+
+    this.renderedTemplates_ = {};
 
     return this;
   }
@@ -294,12 +302,10 @@ class SoyComponent extends Component {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
       var content = this.renderTemplate_(surfaceTemplate);
-      this.eventsCollector_.attachListeners(content, this.makeSurfaceId_(surfaceId));
-      content = this.replaceComponentStringPlaceholders_(content);
-      return content;
-    } else {
-      return super.getSurfaceContent_(surfaceId);
+      this.renderedTemplates_[this.makeSurfaceId_(surfaceId)] = content;
+      return this.replaceComponentStringPlaceholders_(content);
     }
+    return super.getSurfaceContent_(surfaceId);
   }
 
   /**
@@ -311,9 +317,7 @@ class SoyComponent extends Component {
    * @protected
    */
   handleSurfaceCall_(data, ignored, ijData) {
-    var renderedComponent = originalSurfaceTemplate(data, ignored, ijData);
-    this.renderedTemplates_[data.id] = renderedComponent;
-    this.parentComponent_.getEventsCollector().attachListeners(renderedComponent.content, data.id);
+    this.renderedTemplates_[data.id] = originalSurfaceTemplate(data, ignored, ijData);
     return '%%%%~surface-' + data.id + '~%%%%';
   }
 
@@ -328,17 +332,15 @@ class SoyComponent extends Component {
   handleTemplateCall_(data, ignored, ijData) {
     var config = this.buildComponentConfigData_(data);
     var component = this.componentsCollector_.createOrUpdateComponent(data.componentName, config);
-    this.parentComponent_.addComponentRef(data.id, component);
+    this.componentInProcess_.addComponentRef(data.id, component);
 
-    var prevParentComponent = this.parentComponent_;
-    this.parentComponent_ = component;
-
+    var prevComponentInProcess = this.componentInProcess_;
+    this.componentInProcess_ = component;
     var newData = this.buildTemplateData_(component, data);
     var renderedComponent = originalTemplate(newData, ignored, ijData);
     this.renderedTemplates_[data.id] = renderedComponent;
-    this.parentComponent_.getEventsCollector().attachListeners(renderedComponent.content, data.id);
+    this.componentInProcess_ = prevComponentInProcess;
 
-    this.parentComponent_ = prevParentComponent;
     return '%%%%~comp-' + data.id + '~%%%%';
   }
 
@@ -469,8 +471,20 @@ class SoyComponent extends Component {
       previousContent = content;
       content = content.replace(regex, this.replaceComponentStringPlaceholder_.bind(this));
     } while (previousContent !== content);
-    this.renderedTemplates_ = {};
     return content;
+  }
+
+  /**
+   * @inheritDoc
+   * @override
+   */
+  replaceSurfaceContent_(surfaceId, content) {
+    var id = this.makeSurfaceId_(surfaceId);
+    var renderedTemplate = this.renderedTemplates_[id];
+    if (core.isString(renderedTemplate)) {
+      this.eventsCollector_.attachListeners(renderedTemplate, id);
+    }
+    super.replaceSurfaceContent_(surfaceId, content);
   }
 
   /**

@@ -102,6 +102,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
       EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 
       var custom = new EventsTestComponent({footerButtons: [{label: 'Ok'}]}).render();
@@ -113,6 +114,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
       EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 
       var custom = new EventsTestComponent({footerButtons: [{label: 'Ok'}]}).render();
@@ -126,6 +128,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
       EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 
       var custom = new EventsTestComponent({footerButtons: [{label: 'Ok'}]}).render();
@@ -143,6 +146,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
       EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 
       var custom = new EventsTestComponent({footerButtons: [{label: 'Ok'}]}).render();
@@ -159,6 +163,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
       EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 
       var custom = new EventsTestComponent({footerButtons: [{label: 'Ok'}]}).render();
@@ -184,6 +189,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {value: []}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
       EventsTestComponent.prototype.handleMouseOver = sinon.stub();
     });
 
@@ -382,6 +388,9 @@ describe('SoyComponent', function() {
       var child3 = component.components.nestedChild3;
       dom.triggerEvent(child3.element.querySelector('.content'), 'click');
       assert.strictEqual(1, child3.handleClick.callCount);
+
+      dom.triggerEvent(child3.element.querySelector('.content'), 'mousedown');
+      assert.strictEqual(1, child3.handleMouseDown.callCount);
 
       dom.triggerEvent(child3.element.querySelector('button'), 'click');
       assert.strictEqual(2, child3.handleClick.callCount);

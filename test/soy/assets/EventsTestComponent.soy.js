@@ -28,7 +28,7 @@ if (typeof Templates.EventsTestComponent == 'undefined') { Templates.EventsTestC
  * @suppress {checkTypes}
  */
 Templates.EventsTestComponent.content = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div class="content" data-onclick="handleClick"></div>' + soy.$$getDelegateFn(soy.$$getDelTemplateId('EventsTestComponent.footer'), '', true)(opt_data, null, opt_ijData));
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div class="content" data-onclick="handleClick" data-onmousedown="handleMouseDown"></div>' + soy.$$getDelegateFn(soy.$$getDelTemplateId('EventsTestComponent.footer'), '', true)(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
   Templates.EventsTestComponent.content.soyTemplateName = 'Templates.EventsTestComponent.content';

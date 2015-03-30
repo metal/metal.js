@@ -184,6 +184,7 @@ describe('SoyComponent', function() {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {value: []}};
       EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseOver = sinon.stub();
     });
 
     it('should instantiate rendered child component', function() {
@@ -382,6 +383,12 @@ describe('SoyComponent', function() {
       var child3 = component.components.nestedChild3;
       dom.triggerEvent(child3.element.querySelector('.content'), 'click');
       assert.strictEqual(1, child3.handleClick.callCount);
+
+      dom.triggerEvent(child3.element.querySelector('button'), 'click');
+      assert.strictEqual(2, child3.handleClick.callCount);
+
+      dom.triggerEvent(child3.element.querySelector('button'), 'mouseover');
+      assert.strictEqual(1, child3.handleMouseOver.callCount);
     });
 
     it('should render received children components inside placeholder', function() {

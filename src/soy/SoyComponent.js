@@ -526,10 +526,7 @@ class SoyComponent extends Component {
    */
   replaceSurfaceContent_(surfaceId, content) {
     var id = this.makeSurfaceId_(surfaceId);
-    var renderedTemplate = this.renderedTemplates_[id];
-    if (core.isDef(renderedTemplate)) {
-      this.eventsCollector_.attachListeners(renderedTemplate.content, id);
-    }
+    this.eventsCollector_.attachListeners(this.renderedTemplates_[id].content, id);
     super.replaceSurfaceContent_(surfaceId, content);
   }
 

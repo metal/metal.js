@@ -383,9 +383,6 @@ describe('SoyComponent', function() {
 
     it('should attach listeners on nested components from template', function() {
       var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
-      DeeplyNestedTestComponent.prototype.handleClick = sinon.stub();
-      DeeplyNestedTestComponent.prototype.handleMouseDown = sinon.stub();
-      DeeplyNestedTestComponent.prototype.handleMouseOver = sinon.stub();
       var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
 
       var child3 = component.components.nestedChild3;
@@ -421,6 +418,23 @@ describe('SoyComponent', function() {
 
         assert.strictEqual(0, component.handleClick.callCount);
         done();
+      });
+    });
+
+    it('should detach unused listeners from nested components', function(done) {
+      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+
+      var child3 = component.components.nestedChild3;
+      sinon.spy(child3.element, 'removeEventListener');
+
+      component.footerButtons = [];
+      component.once('attrsChanged', function() {
+        child3.once('attrsChanged', function() {
+          assert.strictEqual(1, child3.element.removeEventListener.callCount);
+          assert.strictEqual('mouseover', child3.element.removeEventListener.args[0][0]);
+          done();
+        });
       });
     });
 
@@ -532,9 +546,15 @@ describe('SoyComponent', function() {
   function createDeeplyNestedTestComponentClass() {
     createNestedTestComponentClass();
     var DeeplyNestedTestComponent = createCustomTestComponentClass('DeeplyNestedTestComponent');
+    DeeplyNestedTestComponent.prototype.handleClick = sinon.stub();
+    DeeplyNestedTestComponent.prototype.handleMouseDown = sinon.stub();
+    DeeplyNestedTestComponent.prototype.handleMouseOver = sinon.stub();
     DeeplyNestedTestComponent.ATTRS = {
       bar: {
         value: 'bar'
+      },
+      footerButtons: {
+        value: [{label: 'Ok'}]
       },
       invert: {
         value: false

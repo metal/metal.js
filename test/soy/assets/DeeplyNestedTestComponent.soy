@@ -8,6 +8,7 @@
 
 /**
  * @param bar
+ * @param footerButtons
  * @param id
  * @param invert
  */
@@ -26,7 +27,7 @@
   {/let}
   {let $child3 kind="html"}
     {delcall EventsTestComponent}
-      {param footerButtons: [['label': 'Ok']] /}
+      {param footerButtons: $footerButtons /}
       {param id: $id + 'Child3' /}
     {/delcall}
   {/let}

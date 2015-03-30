@@ -19,16 +19,16 @@
       {param children kind="html"}
         {delcall NestedTestComponent}
           {param count: 1 /}
-          {param id: $id + 'Child1' /}
+          {param id: $id + '-child1' /}
         {/delcall}
       {/param}
-      {param id: $id + 'Child2' /}
+      {param id: $id + '-child2' /}
     {/delcall}
   {/let}
   {let $child3 kind="html"}
     {delcall EventsTestComponent}
       {param footerButtons: $footerButtons /}
-      {param id: $id + 'Child3' /}
+      {param id: $id + '-child3' /}
     {/delcall}
   {/let}
 
@@ -41,6 +41,6 @@
         {$child2}{$child3}
       {/if}
     {/param}
-    {param id: $id + 'Main' /}
+    {param id: $id + '-main' /}
   {/delcall}
 {/template}

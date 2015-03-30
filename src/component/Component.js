@@ -438,7 +438,8 @@ class Component extends Attribute {
    * @return {?string}
    */
   static extractComponentId(surfaceElementId) {
-    return surfaceElementId.split('-')[0];
+    var index = surfaceElementId.lastIndexOf('-');
+    return index === -1 ? surfaceElementId : surfaceElementId.substring(0, index);
   }
 
   /**

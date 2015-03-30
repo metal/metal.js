@@ -303,25 +303,6 @@ describe('SoyComponent', function() {
       assert.ok(custom.element.querySelector('#' + child.id));
     });
 
-    it('should pass children to nested components', function() {
-      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
-      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
-
-      var comps = component.components;
-      assert.ok(comps.nestedChild1);
-      assert.ok(comps.nestedChild2);
-      assert.ok(comps.nestedChild3);
-      assert.ok(comps.nestedMain);
-
-      assert.strictEqual(0, component.children.length);
-      assert.strictEqual(2, comps.nestedMain.children.length);
-      assert.deepEqual([comps.nestedChild2, comps.nestedChild3], comps.nestedMain.children);
-      assert.strictEqual(0, comps.nestedChild1.children.length);
-      assert.strictEqual(1, comps.nestedChild2.children.length);
-      assert.deepEqual([comps.nestedChild1], comps.nestedChild2.children);
-      assert.strictEqual(0, comps.nestedChild3.children.length);
-    });
-
     it('should pass attribute with components to nested components', function() {
       this.ChildrenTestComponent.ATTRS.moreComponents = {isComponentsArray: true};
 
@@ -335,6 +316,25 @@ describe('SoyComponent', function() {
       assert.deepEqual([comps.nestedMore], comps.nestedChild.moreComponents);
     });
 
+    it('should pass children to nested components', function() {
+      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+
+      var comps = component.components;
+      assert.ok(comps['nested-child1']);
+      assert.ok(comps['nested-child2']);
+      assert.ok(comps['nested-child3']);
+      assert.ok(comps['nested-main']);
+
+      assert.strictEqual(0, component.children.length);
+      assert.strictEqual(2, comps['nested-main'].children.length);
+      assert.deepEqual([comps['nested-child2'], comps['nested-child3']], comps['nested-main'].children);
+      assert.strictEqual(0, comps['nested-child1'].children.length);
+      assert.strictEqual(1, comps['nested-child2'].children.length);
+      assert.deepEqual([comps['nested-child1']], comps['nested-child2'].children);
+      assert.strictEqual(0, comps['nested-child3'].children.length);
+    });
+
     it('should update nested components children', function(done) {
       var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
       var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
@@ -342,8 +342,8 @@ describe('SoyComponent', function() {
       component.bar = 'foo';
       component.on('attrsChanged', function() {
         var comps = component.components;
-        assert.strictEqual('foo', comps.nestedChild2.bar);
-        assert.strictEqual('foo', comps.nestedMain.bar);
+        assert.strictEqual('foo', comps['nested-child2'].bar);
+        assert.strictEqual('foo', comps['nested-main'].bar);
         done();
       });
     });
@@ -353,14 +353,14 @@ describe('SoyComponent', function() {
       var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
 
       var comps = component.components;
-      var placeholder = document.getElementById(comps.nestedMain.id + '-children-placeholder');
+      var placeholder = document.getElementById(comps['nested-main'].id + '-children-placeholder');
       assert.strictEqual(2, placeholder.childNodes.length);
-      assert.strictEqual(comps.nestedChild2.element, placeholder.childNodes[0]);
-      assert.strictEqual(comps.nestedChild3.element, placeholder.childNodes[1]);
+      assert.strictEqual(comps['nested-child2'].element, placeholder.childNodes[0]);
+      assert.strictEqual(comps['nested-child3'].element, placeholder.childNodes[1]);
 
-      placeholder = document.getElementById(comps.nestedChild2.id + '-children-placeholder');
+      placeholder = document.getElementById(comps['nested-child2'].id + '-children-placeholder');
       assert.strictEqual(1, placeholder.childNodes.length);
-      assert.strictEqual(comps.nestedChild1.element, placeholder.childNodes[0]);
+      assert.strictEqual(comps['nested-child1'].element, placeholder.childNodes[0]);
     });
 
     it('should reposition children when they are moved by template call', function(done) {
@@ -371,11 +371,11 @@ describe('SoyComponent', function() {
 
       component.invert = true;
       component.once('attrsChanged', function() {
-        comps.nestedMain.once('attrsChanged', function() {
-          var placeholder = document.getElementById(comps.nestedMain.id + '-children-placeholder');
+        comps['nested-main'].once('attrsChanged', function() {
+          var placeholder = document.getElementById(comps['nested-main'].id + '-children-placeholder');
           assert.strictEqual(2, placeholder.childNodes.length);
-          assert.strictEqual(comps.nestedChild3.element, placeholder.childNodes[0]);
-          assert.strictEqual(comps.nestedChild2.element, placeholder.childNodes[1]);
+          assert.strictEqual(comps['nested-child3'].element, placeholder.childNodes[0]);
+          assert.strictEqual(comps['nested-child2'].element, placeholder.childNodes[1]);
           done();
         });
       });
@@ -385,22 +385,22 @@ describe('SoyComponent', function() {
       var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
       var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
 
-      var child3 = component.components.nestedChild3;
+      var child3 = component.components['nested-child3'];
       dom.triggerEvent(child3.element.querySelector('.content'), 'click');
+      assert.strictEqual(0, component.handleClick.callCount);
       assert.strictEqual(1, child3.handleClick.callCount);
 
       dom.triggerEvent(child3.element.querySelector('.content'), 'mousedown');
+      assert.strictEqual(0, component.handleMouseDown.callCount);
       assert.strictEqual(1, child3.handleMouseDown.callCount);
 
       dom.triggerEvent(child3.element.querySelector('button'), 'click');
+      assert.strictEqual(0, component.handleClick.callCount);
       assert.strictEqual(2, child3.handleClick.callCount);
 
       dom.triggerEvent(child3.element.querySelector('button'), 'mouseover');
-      assert.strictEqual(1, child3.handleMouseOver.callCount);
-
-      assert.strictEqual(0, component.handleClick.callCount);
-      assert.strictEqual(0, component.handleMouseDown.callCount);
       assert.strictEqual(0, component.handleMouseOver.callCount);
+      assert.strictEqual(1, child3.handleMouseOver.callCount);
     });
 
     it('should attach listeners on nested components after parent surface update', function(done) {
@@ -412,7 +412,7 @@ describe('SoyComponent', function() {
 
       component.invert = true;
       component.once('attrsChanged', function() {
-        var child3 = component.components.nestedChild3;
+        var child3 = component.components['nested-child3'];
         dom.triggerEvent(child3.element.querySelector('.content'), 'click');
         assert.strictEqual(1, child3.handleClick.callCount);
 
@@ -425,7 +425,7 @@ describe('SoyComponent', function() {
       var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
       var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
 
-      var child3 = component.components.nestedChild3;
+      var child3 = component.components['nested-child3'];
       sinon.spy(child3.element, 'removeEventListener');
 
       component.footerButtons = [];
@@ -444,9 +444,9 @@ describe('SoyComponent', function() {
 
       assert.strictEqual(4, Object.keys(component.components).length);
 
-      var child1 = component.components.nestedChild1;
+      var child1 = component.components['nested-child1'];
       assert.strictEqual(1, Object.keys(child1.components).length);
-      assert.strictEqual('nestedChild1MyChild0', Object.keys(child1.components)[0]);
+      assert.strictEqual('nested-child1MyChild0', Object.keys(child1.components)[0]);
     });
 
     it('should render received children components inside placeholder', function() {

@@ -64,7 +64,7 @@ class SoyComponent extends Component {
     /**
      * Holds the html strings of each rendered nested component or surface,
      * indexed by their element ids.
-     * @type {!Object<string, string>}
+     * @type {!Object<string, !{content: string, isSurface: ?boolean}>}
      * @protected
      */
     this.renderedTemplates_ = {};
@@ -136,7 +136,11 @@ class SoyComponent extends Component {
 
     ComponentCollector.components[this.id] = this;
     for (var id in this.renderedTemplates_) {
-      var componentInProcess = ComponentCollector.components[Component.extractComponentId(id)];
+      var componentId = id;
+      if (this.renderedTemplates_[id].isSurface) {
+        componentId = Component.extractComponentId(id);
+      }
+      var componentInProcess = ComponentCollector.components[componentId];
       componentInProcess.getEventsCollector().attachListeners(this.renderedTemplates_[id].content, id);
     }
 
@@ -302,7 +306,7 @@ class SoyComponent extends Component {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
       var content = this.renderTemplate_(surfaceTemplate);
-      this.renderedTemplates_[this.makeSurfaceId_(surfaceId)] = content;
+      this.renderedTemplates_[this.makeSurfaceId_(surfaceId)] = {content: content};
       return this.replaceComponentStringPlaceholders_(content);
     }
     return super.getSurfaceContent_(surfaceId);
@@ -317,7 +321,11 @@ class SoyComponent extends Component {
    * @protected
    */
   handleSurfaceCall_(data, ignored, ijData) {
-    this.renderedTemplates_[data.id] = originalSurfaceTemplate(data, ignored, ijData);
+    var rendered = originalSurfaceTemplate(data, ignored, ijData);
+    this.renderedTemplates_[data.id] = {
+      content: rendered.content,
+      isSurface: true
+    };
     return '%%%%~surface-' + data.id + '~%%%%';
   }
 
@@ -454,7 +462,7 @@ class SoyComponent extends Component {
    * @protected
    */
   replaceComponentStringPlaceholder_(match, type, id) {
-    return this.renderedTemplates_[id] ? this.renderedTemplates_[id] : match[0];
+    return this.renderedTemplates_[id] ? this.renderedTemplates_[id].content : match[0];
   }
 
   /**
@@ -481,8 +489,8 @@ class SoyComponent extends Component {
   replaceSurfaceContent_(surfaceId, content) {
     var id = this.makeSurfaceId_(surfaceId);
     var renderedTemplate = this.renderedTemplates_[id];
-    if (core.isString(renderedTemplate)) {
-      this.eventsCollector_.attachListeners(renderedTemplate, id);
+    if (core.isDef(renderedTemplate)) {
+      this.eventsCollector_.attachListeners(renderedTemplate.content, id);
     }
     super.replaceSurfaceContent_(surfaceId, content);
   }

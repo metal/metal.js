@@ -16,6 +16,7 @@ var Templates = ComponentRegistry.Templates;
  * @hassoydelcall {DeeplyNestedTestComponent}
  * @hassoydelcall {DeeplyNestedTestComponent.components}
  * @hassoydelcall {EventsTestComponent}
+ * @hassoydelcall {NestedTestComponent}
  * @hassoydelcall {Surface}
  */
 
@@ -46,7 +47,7 @@ if (goog.DEBUG) {
  */
 Templates.DeeplyNestedTestComponent.components = function(opt_data, opt_ignored, opt_ijData) {
   var output = '';
-  var child2__soy137 = '' + soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), '', true)({bar: opt_data.bar, children: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), '', true)({bar: opt_data.bar, id: opt_data.id + 'Child1'}, null, opt_ijData)), id: opt_data.id + 'Child2'}, null, opt_ijData);
+  var child2__soy137 = '' + soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), '', true)({bar: opt_data.bar, children: soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks('' + soy.$$getDelegateFn(soy.$$getDelTemplateId('NestedTestComponent'), '', true)({count: 1, id: opt_data.id + 'Child1'}, null, opt_ijData)), id: opt_data.id + 'Child2'}, null, opt_ijData);
   child2__soy137 = soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks(child2__soy137);
   var child3__soy145 = '' + soy.$$getDelegateFn(soy.$$getDelTemplateId('EventsTestComponent'), '', true)({footerButtons: [{label: 'Ok'}], id: opt_data.id + 'Child3'}, null, opt_ijData);
   child3__soy145 = soydata.VERY_UNSAFE.$$ordainSanitizedHtmlForInternalBlocks(child3__soy145);

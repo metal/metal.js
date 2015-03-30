@@ -336,7 +336,6 @@ describe('SoyComponent', function() {
       component.bar = 'foo';
       component.on('attrsChanged', function() {
         var comps = component.components;
-        assert.strictEqual('foo', comps.nestedChild1.bar);
         assert.strictEqual('foo', comps.nestedChild2.bar);
         assert.strictEqual('foo', comps.nestedMain.bar);
         done();
@@ -389,6 +388,17 @@ describe('SoyComponent', function() {
 
       dom.triggerEvent(child3.element.querySelector('button'), 'mouseover');
       assert.strictEqual(1, child3.handleMouseOver.callCount);
+    });
+
+    it('should store nested component references on creator component', function() {
+      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+
+      assert.strictEqual(4, Object.keys(component.components).length);
+
+      var child1 = component.components.nestedChild1;
+      assert.strictEqual(1, Object.keys(child1.components).length);
+      assert.strictEqual('nestedChild1MyChild0', Object.keys(child1.components)[0]);
     });
 
     it('should render received children components inside placeholder', function() {
@@ -486,6 +496,7 @@ describe('SoyComponent', function() {
   }
 
   function createDeeplyNestedTestComponentClass() {
+    createNestedTestComponentClass();
     var DeeplyNestedTestComponent = createCustomTestComponentClass('DeeplyNestedTestComponent');
     DeeplyNestedTestComponent.ATTRS = {
       bar: {

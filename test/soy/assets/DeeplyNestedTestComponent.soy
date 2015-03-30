@@ -16,8 +16,8 @@
     {delcall ChildrenTestComponent}
       {param bar: $bar /}
       {param children kind="html"}
-        {delcall ChildrenTestComponent}
-          {param bar: $bar /}
+        {delcall NestedTestComponent}
+          {param count: 1 /}
           {param id: $id + 'Child1' /}
         {/delcall}
       {/param}

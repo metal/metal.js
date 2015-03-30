@@ -125,31 +125,16 @@ class SoyComponent extends Component {
       // is being decorated, even though we won't use its results. This call is
       // only needed in order for us to intercept the call data for nested components
       // that are outside surfaces.
-      this.renderElementTemplate({skipSurfaceContents: true});
+      var templateContent = this.renderElementTemplate({skipSurfaceContents: true});
+      this.renderedTemplates_[this.id] = {content: templateContent};
     }
 
     super.attach(opt_parentElement, opt_siblingElement);
 
     if (!this.wasRendered) {
       this.attachNestedComponents_();
+      this.finishProcessingRenderedTemplates_();
     }
-
-    ComponentCollector.components[this.id] = this;
-    for (var id in this.renderedTemplates_) {
-      var componentId = id;
-      if (this.renderedTemplates_[id].isSurface) {
-        componentId = Component.extractComponentId(id);
-      }
-      var componentInProcess = ComponentCollector.components[componentId];
-      componentInProcess.getEventsCollector().attachListeners(this.renderedTemplates_[id].content, id);
-
-      if (this.renderedTemplates_[id].isSurface) {
-        var surfaceId = id.substr(componentId.length + 1);
-        componentInProcess.cacheSurfaceContent(surfaceId, this.renderedTemplates_[id].content);
-      }
-    }
-
-    this.renderedTemplates_ = {};
 
     return this;
   }
@@ -255,8 +240,8 @@ class SoyComponent extends Component {
 
   /**
    * Overrides the original `cacheSurfaceContent_` function from `Component`, so it
-   * will cache a version of the surface content without have nested component
-   * contents (that is, before replacing their placeholders with the contents).
+   * will cache a version of the surface content without nested component contents
+   * (that is, before replacing their placeholders with the contents).
    * @param {string} surfaceId
    * @param {string} content
    * @override
@@ -309,6 +294,29 @@ class SoyComponent extends Component {
       return this.componentsCollector_.extractComponentsFromString(val);
     }
     return val;
+  }
+
+  /**
+   * Finishes processing the templates rendered by this component. This processing
+   * includes attaching listeners and caching surface contents.
+   * @protected
+   */
+  finishProcessingRenderedTemplates_() {
+    ComponentCollector.components[this.id] = this;
+    for (var id in this.renderedTemplates_) {
+      var componentId = id;
+      if (this.renderedTemplates_[id].isSurface) {
+        componentId = Component.extractComponentId(id);
+      }
+      var componentInProcess = ComponentCollector.components[componentId];
+      componentInProcess.getEventsCollector().attachListeners(this.renderedTemplates_[id].content, id);
+
+      if (this.renderedTemplates_[id].isSurface) {
+        var surfaceId = id.substr(componentId.length + 1);
+        componentInProcess.cacheSurfaceContent(surfaceId, this.renderedTemplates_[id].content);
+      }
+    }
+    this.renderedTemplates_ = {};
   }
 
   /**
@@ -444,7 +452,7 @@ class SoyComponent extends Component {
   renderInternal() {
     var templateContent = this.renderElementTemplate();
     if (templateContent) {
-      this.eventsCollector_.attachListeners(templateContent, this.id);
+      this.renderedTemplates_[this.id] = {content: templateContent};
       templateContent = this.replaceComponentStringPlaceholders_(templateContent);
       dom.append(this.element, templateContent);
     }

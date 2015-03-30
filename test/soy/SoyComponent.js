@@ -124,6 +124,29 @@ describe('SoyComponent', function() {
       assert.strictEqual(1, custom.handleMouseOver.callCount);
     });
 
+    it('should attach listeners after decorating component', function() {
+      var content = '<div class="content" data-onclick="handleClick" data-onmousedown="handleMouseDown"></div>' +
+        '<div id="events-footer">' +
+        '<button data-onclick="handleClick" data-onmouseover="handleMouseOver">Ok</button></div>';
+      var element = document.createElement('div');
+      element.id = 'events';
+      dom.append(element, content);
+      dom.append(document.body, element);
+
+      var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
+      EventsTestComponent.ATTRS = {footerButtons: {}};
+      EventsTestComponent.prototype.handleClick = sinon.stub();
+      EventsTestComponent.prototype.handleMouseDown = sinon.stub();
+      EventsTestComponent.prototype.handleMouseOver = sinon.stub();
+
+      var custom = new EventsTestComponent({
+        element: '#events',
+        footerButtons: [{label: 'Ok'}]
+      }).decorate();
+      dom.triggerEvent(custom.element.querySelector('.content'), 'mousedown');
+      assert.strictEqual(1, custom.handleMouseDown.callCount);
+    });
+
     it('should detach unused listeners after surface update', function(done) {
       var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
       EventsTestComponent.ATTRS = {footerButtons: {}};
@@ -249,7 +272,6 @@ describe('SoyComponent', function() {
     });
 
     it('should not rerender own surface if only nested component contents changed', function(done) {
-      var test = this;
       var NestedTestComponent = createNestedTestComponentClass();
       var custom = new NestedTestComponent({id: 'nested'}).render();
 

@@ -224,6 +224,17 @@ class Component extends Attribute {
   }
 
   /**
+   * Caches the given content for the surface with the requested id.
+   * @param {string} surfaceId
+   * @param {string} content
+   */
+  cacheSurfaceContent(surfaceId, content) {
+    var cacheState = this.computeSurfaceCacheState_(content);
+    var surface = this.getSurface(surfaceId);
+    surface.cacheState = cacheState;
+  }
+
+  /**
    * Caches surface render attributes into a O(k) flat map representation.
    * Relevant for performance to calculate the surfaces group that were
    * modified by attributes mutation.
@@ -274,10 +285,7 @@ class Component extends Attribute {
    */
   computeSurfacesCacheStateFromDom_() {
     for (var surfaceId in this.surfaces_) {
-      var surface = this.getSurface(surfaceId);
-      surface.cacheState = this.computeSurfaceCacheState_(
-        html.compress(this.getSurfaceElement(surfaceId).innerHTML)
-      );
+      this.cacheSurfaceContent(surfaceId, html.compress(this.getSurfaceElement(surfaceId).innerHTML));
     }
   }
 
@@ -704,15 +712,16 @@ class Component extends Attribute {
   renderSurfaceContent(surfaceId, content) {
     if (core.isDefAndNotNull(content)) {
       var surface = this.getSurface(surfaceId);
-      var cacheState = this.computeSurfaceCacheState_(content);
+      var previousCacheState = surface.cacheState;
+      this.cacheSurfaceContent(surfaceId, content);
 
+      var cacheState = surface.cacheState;
       surface.cacheMiss = cacheState === Component.Cache.NOT_INITIALIZED ||
         cacheState === Component.Cache.NOT_CACHEABLE ||
-        cacheState !== surface.cacheState;
+        cacheState !== previousCacheState;
       if (surface.cacheMiss) {
         this.replaceSurfaceContent_(surfaceId, content);
       }
-      surface.cacheState = cacheState;
     }
   }
 

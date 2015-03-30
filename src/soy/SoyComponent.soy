@@ -30,7 +30,9 @@
  */
 {deltemplate ComponentChildren}
   <div id="{$id}-children-placeholder" data-component-children="">
-    {$children}
+    {if $children}
+      {$children}
+    {/if}
   </div>
 {/deltemplate}
 

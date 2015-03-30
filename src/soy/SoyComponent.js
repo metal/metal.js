@@ -142,6 +142,11 @@ class SoyComponent extends Component {
       }
       var componentInProcess = ComponentCollector.components[componentId];
       componentInProcess.getEventsCollector().attachListeners(this.renderedTemplates_[id].content, id);
+
+      if (this.renderedTemplates_[id].isSurface) {
+        var surfaceId = id.substr(componentId.length + 1);
+        componentInProcess.cacheSurfaceContent(surfaceId, this.renderedTemplates_[id].content);
+      }
     }
 
     this.renderedTemplates_ = {};
@@ -249,6 +254,26 @@ class SoyComponent extends Component {
   }
 
   /**
+   * Overrides the original `cacheSurfaceContent_` function from `Component`, so it
+   * will cache a version of the surface content without have nested component
+   * contents (that is, before replacing their placeholders with the contents).
+   * @param {string} surfaceId
+   * @param {string} content
+   * @override
+   */
+  cacheSurfaceContent(surfaceId, content) {
+    if (this.decorating_) {
+      return super.cacheSurfaceContent(surfaceId, content);
+    }
+
+    var elementId = this.makeSurfaceId_(surfaceId);
+    if (this.renderedTemplates_[elementId]) {
+      content = this.renderedTemplates_[elementId].content;
+    }
+    super.cacheSurfaceContent(surfaceId, content);
+  }
+
+  /**
    * Decorates this component as a subcomponent, meaning that no rendering is
    * needed since it was already rendered by the parent component.
    */
@@ -306,7 +331,10 @@ class SoyComponent extends Component {
     var surfaceTemplate = this.constructor.TEMPLATES_MERGED[surfaceId];
     if (core.isFunction(surfaceTemplate)) {
       var content = this.renderTemplate_(surfaceTemplate);
-      this.renderedTemplates_[this.makeSurfaceId_(surfaceId)] = {content: content};
+      this.renderedTemplates_[this.makeSurfaceId_(surfaceId)] = {
+        content: content,
+        isSurface: true
+      };
       return this.replaceComponentStringPlaceholders_(content);
     }
     return super.getSurfaceContent_(surfaceId);
@@ -431,6 +459,7 @@ class SoyComponent extends Component {
     // already be done for the entire content.
     if (this.inDocument || this.decorating_) {
       super.renderSurfacesContent_(surfaces);
+      this.renderedTemplates_ = {};
     }
     if (this.inDocument) {
       this.attachNestedComponents_();

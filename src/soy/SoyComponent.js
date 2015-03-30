@@ -379,7 +379,8 @@ class SoyComponent extends Component {
    * TODO(edu): Re-think this part.
    */
   renderChildrenComponents_(children) {
-    var placeholder = this.element.querySelector('#' + this.makeSurfaceId_('children-placeholder'));
+    var id = this.makeSurfaceId_('children-placeholder');
+    var placeholder = document.getElementById(id) || this.element.querySelector('#' + id);
     if (placeholder && children.length) {
       dom.removeChildren(placeholder);
       children.forEach(function(child) {

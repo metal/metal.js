@@ -483,6 +483,13 @@ describe('SoyComponent', function() {
       assert.strictEqual('nested-child1MyChild0', Object.keys(child1.components)[0]);
     });
 
+    it('should ignore bad component placeholder matches inside rendered template', function() {
+      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+
+      assert.strictEqual(-1, component.element.innerHTML.indexOf('%%%%~comp-nonExisting~%%%%'));
+    });
+
     it('should render received children components inside placeholder', function() {
       var child = new this.ChildrenTestComponent();
       var component = new this.ChildrenTestComponent({children: [child]}).render();

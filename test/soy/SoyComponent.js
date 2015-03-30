@@ -383,6 +383,9 @@ describe('SoyComponent', function() {
 
     it('should attach listeners on nested components from template', function() {
       var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      DeeplyNestedTestComponent.prototype.handleClick = sinon.stub();
+      DeeplyNestedTestComponent.prototype.handleMouseDown = sinon.stub();
+      DeeplyNestedTestComponent.prototype.handleMouseOver = sinon.stub();
       var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
 
       var child3 = component.components.nestedChild3;
@@ -397,6 +400,28 @@ describe('SoyComponent', function() {
 
       dom.triggerEvent(child3.element.querySelector('button'), 'mouseover');
       assert.strictEqual(1, child3.handleMouseOver.callCount);
+
+      assert.strictEqual(0, component.handleClick.callCount);
+      assert.strictEqual(0, component.handleMouseDown.callCount);
+      assert.strictEqual(0, component.handleMouseOver.callCount);
+    });
+
+    it('should attach listeners on nested components after parent surface update', function(done) {
+      var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+      DeeplyNestedTestComponent.prototype.handleClick = sinon.stub();
+      DeeplyNestedTestComponent.prototype.handleMouseDown = sinon.stub();
+      DeeplyNestedTestComponent.prototype.handleMouseOver = sinon.stub();
+      var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+
+      component.invert = true;
+      component.once('attrsChanged', function() {
+        var child3 = component.components.nestedChild3;
+        dom.triggerEvent(child3.element.querySelector('.content'), 'click');
+        assert.strictEqual(1, child3.handleClick.callCount);
+
+        assert.strictEqual(0, component.handleClick.callCount);
+        done();
+      });
     });
 
     it('should store nested component references on creator component', function() {

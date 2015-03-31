@@ -1,6 +1,6 @@
 'use strict';
 
-import {async} from '../../src/promise/Promise';
+import async from '../../src/async/async';
 import dom from '../../src/dom/dom';
 import Component from '../../src/component/Component';
 

@@ -1,6 +1,6 @@
 'use strict';
 
-import {async} from '../../src/promise/Promise';
+import async from '../../src/async/async';
 import Attribute from '../../src/attribute/Attribute';
 
 describe('Attribute', function() {

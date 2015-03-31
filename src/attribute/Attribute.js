@@ -4,7 +4,7 @@ import array from '../array/array';
 import core from '../core';
 import object from '../object/object';
 import EventEmitter from '../events/EventEmitter';
-import {async} from '../promise/Promise';
+import async from '../async/async';
 
 /**
  * Attribute adds support for having object properties that can be watched for

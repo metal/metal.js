@@ -14,7 +14,7 @@ registerTasks({
     return path.relative(path.dirname(file.path), path.resolve('src'));
   },
   soyDest: function(file) {
-    if (file.base == path.resolve('temp')) {
+    if (file.base === path.resolve('temp')) {
       return 'test';
     } else {
       return file.base;

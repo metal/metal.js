@@ -1,11 +1,6 @@
 /*!
  * Polyfill from Google's Closure Library.
- *
- *      Copyright 2013 The Closure Library Authors. All Rights Reserved.
- *
- * NOTE(eduardo): Promise support is not ready on all supported browsers,
- * therefore core.js is temporarily using Google's promises as polyfill. It
- * supports cancellable promises and has clean and fast implementation.
+ * Copyright 2013 The Closure Library Authors. All Rights Reserved.
  */
 
 'use strict';

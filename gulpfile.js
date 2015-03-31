@@ -5,7 +5,7 @@ var gulp = require('gulp');
 var path = require('path');
 var pkg = require('./package.json');
 var plugins = require('gulp-load-plugins')();
-var registerTasks = require('alloyui-tasks');
+var registerTasks = require('metal-tasks');
 var runSequence = require('run-sequence');
 
 registerTasks({

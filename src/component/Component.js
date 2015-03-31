@@ -587,7 +587,7 @@ class Component extends Attribute {
    * @protected
    */
   makeId_() {
-    return 'aui_c_' + core.getUid(this);
+    return 'metal_c_' + core.getUid(this);
   }
 
   /**

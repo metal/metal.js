@@ -9,7 +9,7 @@ var registerTasks = require('metal-tasks');
 var runSequence = require('run-sequence');
 
 registerTasks({
-  bundleFileName: 'aui.js',
+  bundleFileName: 'metal.js',
   corePathFromSoy: function(file) {
     return path.relative(path.dirname(file.path), path.resolve('src'));
   },
@@ -30,8 +30,8 @@ gulp.task('build', function(done) {
 });
 
 gulp.task('build:min', ['build:globals'], function() {
-  return gulp.src('build/aui.js')
-    .pipe(plugins.rename('aui-min.js'))
+  return gulp.src('build/metal.js')
+    .pipe(plugins.rename('metal-min.js'))
     .pipe(plugins.uglify({
       compress: {drop_console: true},
       preserveComments: 'some'

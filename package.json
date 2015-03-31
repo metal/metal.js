@@ -6,8 +6,7 @@
   "repository": "liferay/metal",
   "author": {
     "name": "Eduardo Lundgren",
-    "email": "edua@rdo.io",
-    "url": "http://eduardo.io"
+    "email": "eduardo.lundgren@liferay.com"
   },
   "engines": {
     "node": ">=0.10.0"

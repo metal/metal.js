@@ -90,13 +90,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), 'ChildrenT
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.ChildrenTestComponent.__deltemplate_s31_2820b540 = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="childrentestcomponent component' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? ' ' + opt_data.elementClasses : '') + '" data-component="">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
+Templates.ChildrenTestComponent.__deltemplate_s31_4b28d686 = function(opt_data, opt_ignored, opt_ijData) {
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), 'element', true)(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.ChildrenTestComponent.__deltemplate_s31_2820b540.soyTemplateName = 'Templates.ChildrenTestComponent.__deltemplate_s31_2820b540';
+  Templates.ChildrenTestComponent.__deltemplate_s31_4b28d686.soyTemplateName = 'Templates.ChildrenTestComponent.__deltemplate_s31_4b28d686';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), 'element', 0, Templates.ChildrenTestComponent.__deltemplate_s31_2820b540);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'ChildrenTestComponent', 0, Templates.ChildrenTestComponent.__deltemplate_s31_4b28d686);
 
 
 /**
@@ -106,13 +106,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), 'eleme
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.ChildrenTestComponent.__deltemplate_s39_4b28d686 = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), 'element', true)(opt_data, null, opt_ijData));
+Templates.ChildrenTestComponent.__deltemplate_s33_2820b540 = function(opt_data, opt_ignored, opt_ijData) {
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="childrentestcomponent component' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? ' ' + opt_data.elementClasses : '') + '" data-component="">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
 };
 if (goog.DEBUG) {
-  Templates.ChildrenTestComponent.__deltemplate_s39_4b28d686.soyTemplateName = 'Templates.ChildrenTestComponent.__deltemplate_s39_4b28d686';
+  Templates.ChildrenTestComponent.__deltemplate_s33_2820b540.soyTemplateName = 'Templates.ChildrenTestComponent.__deltemplate_s33_2820b540';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'ChildrenTestComponent', 0, Templates.ChildrenTestComponent.__deltemplate_s39_4b28d686);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ChildrenTestComponent'), 'element', 0, Templates.ChildrenTestComponent.__deltemplate_s33_2820b540);
 
 
 /**

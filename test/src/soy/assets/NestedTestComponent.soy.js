@@ -96,13 +96,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), 'NestedTes
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.NestedTestComponent.__deltemplate_s251_93ce19a3 = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="nestedtestcomponent component' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? ' ' + opt_data.elementClasses : '') + '" data-component="">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
+Templates.NestedTestComponent.__deltemplate_s251_c3a53166 = function(opt_data, opt_ignored, opt_ijData) {
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('NestedTestComponent'), 'element', true)(opt_data, null, opt_ijData));
 };
 if (goog.DEBUG) {
-  Templates.NestedTestComponent.__deltemplate_s251_93ce19a3.soyTemplateName = 'Templates.NestedTestComponent.__deltemplate_s251_93ce19a3';
+  Templates.NestedTestComponent.__deltemplate_s251_c3a53166.soyTemplateName = 'Templates.NestedTestComponent.__deltemplate_s251_c3a53166';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('NestedTestComponent'), 'element', 0, Templates.NestedTestComponent.__deltemplate_s251_93ce19a3);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'NestedTestComponent', 0, Templates.NestedTestComponent.__deltemplate_s251_c3a53166);
 
 
 /**
@@ -112,13 +112,13 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('NestedTestComponent'), 'element
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.NestedTestComponent.__deltemplate_s259_c3a53166 = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('NestedTestComponent'), 'element', true)(opt_data, null, opt_ijData));
+Templates.NestedTestComponent.__deltemplate_s253_93ce19a3 = function(opt_data, opt_ignored, opt_ijData) {
+  return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '" class="nestedtestcomponent component' + soy.$$escapeHtmlAttribute(opt_data.elementClasses ? ' ' + opt_data.elementClasses : '') + '" data-component="">' + soy.$$escapeHtml(opt_data.elementContent) + '</div>');
 };
 if (goog.DEBUG) {
-  Templates.NestedTestComponent.__deltemplate_s259_c3a53166.soyTemplateName = 'Templates.NestedTestComponent.__deltemplate_s259_c3a53166';
+  Templates.NestedTestComponent.__deltemplate_s253_93ce19a3.soyTemplateName = 'Templates.NestedTestComponent.__deltemplate_s253_93ce19a3';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentElement'), 'NestedTestComponent', 0, Templates.NestedTestComponent.__deltemplate_s259_c3a53166);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('NestedTestComponent'), 'element', 0, Templates.NestedTestComponent.__deltemplate_s253_93ce19a3);
 
 
 /**

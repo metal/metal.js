@@ -6,13 +6,13 @@ module.exports = function(config) {
 
     jspm: {
       // ES6 files need to go through jspm for module loading.
-      loadFiles: ['test/**/*.js'],
+      loadFiles: ['test/src/**/*.js'],
       serveFiles: ['src/**/*.js']
     },
 
     files: [
       'node_modules/closure-templates/soyutils.js',
-      'test/html/fixture/*.html'
+      'test/src/html/fixture/*.html'
     ],
 
     preprocessors: {
@@ -26,11 +26,11 @@ module.exports = function(config) {
       // Since tests and async are not going through the `coverage`
       // preprocessor we need to explicitly make them go through `babel`.
       'src/async/async.js': ['babel'],
-      'test/**/*.js': ['babel'],
+      'test/src/**/*.js': ['babel'],
 
       // Fixture htmls should go through `html2js` so tests can access
       // them through the `window.__html__` variable.
-      'test/html/fixture/*.html': ['html2js']
+      'test/src/html/fixture/*.html': ['html2js']
     },
 
     reporters: ['coverage', 'progress'],

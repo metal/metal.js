@@ -1,0 +1,10 @@
+
+/**
+ */
+{deltemplate ComponentTemplate variant="'<%= moduleName %>'"}
+  {delcall ComponentElement data="all" variant="'<%= moduleName %>'"}
+    {param elementContent kind="html"}
+      {call .content data="all" /}
+    {/param}
+  {/delcall}
+{/deltemplate}

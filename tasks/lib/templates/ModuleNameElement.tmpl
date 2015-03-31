@@ -1,0 +1,11 @@
+
+/**
+ * @param? elementContent
+ * @param? elementClasses
+ * @param id
+ */
+{deltemplate <%= moduleName %> variant="'element'"}
+  <div id="{$id}" class="<%= className %> component{$elementClasses ? ' ' + $elementClasses : ''}" data-component="">
+    {$elementContent}
+  </div>
+{/deltemplate}

@@ -1,0 +1,35 @@
+{namespace Templates.DefinedElement}
+
+/**
+ */
+{template .content}
+  {delcall Simple.hello data="all" /}
+{/template}
+
+/**
+ * @param name
+ */
+{template .hello}
+  Hello {$name}!
+{/template}
+
+/**
+ * @param? elementContent
+ * @param id
+ */
+{deltemplate DefinedElement.hello variant="'element'"}
+  <button id="{$id}-hello">
+    {$elementContent}
+  </button>
+{/deltemplate}
+
+/**
+ * @param? elementContent
+ * @param? elementClasses
+ * @param id
+ */
+{deltemplate DefinedElement variant="'element'"}
+  <button id="{$id}" class="simple component{$elementClasses ? ' ' + $elementClasses : ''}" data-component="">
+    {$elementContent}
+  </button>
+{/deltemplate}

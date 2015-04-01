@@ -1,6 +1,7 @@
 'use strict';
 
 var del = require('del');
+var execFile = require('child_process').execFile;
 var gulp = require('gulp');
 var path = require('path');
 var pkg = require('./package.json');
@@ -22,7 +23,7 @@ registerTasks({
   },
   soyGeneratedOutputGlob: false,
   soyGenerationGlob: '**/test/**/*.soy',
-  soySrc: ['src/**/*.soy', 'test/**/*.soy']
+  soySrc: ['src/**/*.soy', 'test/**/*.soy', '!test/tasks/**/*.soy']
 });
 
 gulp.task('build', function(done) {
@@ -48,6 +49,16 @@ gulp.task('lint', function() {
   return gulp.src(['src/**/*.js', 'tasks/**/*.js', 'test/**/*.js'])
     .pipe(plugins.jshint())
     .pipe(plugins.jshint.reporter(require('jshint-stylish')));
+});
+
+gulp.task('test:tasks', function(done) {
+  var args = ['test/tasks/*.js', '--slow', '1000', '--timeout', '3000'];
+  var localMocha = path.join(process.cwd(), 'node_modules', '.bin', 'mocha');
+  var child = execFile(localMocha, args, {stdio: 'inherit'}, function() {
+    done();
+  });
+  child.stdout.pipe(process.stdout);
+  child.stderr.pipe(process.stderr);
 });
 
 function banner() {

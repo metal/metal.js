@@ -1,0 +1,14 @@
+{namespace Templates.Simple}
+
+/**
+ */
+{template .content}
+  {delcall Simple.hello data="all" /}
+{/template}
+
+/**
+ * @param name
+ */
+{template .hello}
+  Hello {$name}!
+{/template}

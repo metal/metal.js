@@ -9,7 +9,7 @@ var jspmCore = require('jspm/lib/core');
 var karma = require('karma').server;
 var lodash = require('engine-lodash');
 var merge = require('merge');
-var open = require('open');
+var openFile = require('open');
 var path = require('path');
 var plugins = require('gulp-load-plugins')();
 var renamer = require('gulp-es6-imports-renamer');
@@ -24,7 +24,7 @@ var transpile = require('gulp-es6-module-transpiler');
 function handleError(error) {
   console.error(error.toString());
 
-  this.emit('end');
+  this.emit('end'); // jshint ignore:line
 }
 
 module.exports = function(options) {
@@ -111,7 +111,7 @@ module.exports = function(options) {
 
   gulp.task(taskPrefix + 'test:coverage', [taskPrefix + 'soy'], function(done) {
     runKarma({}, function() {
-      open(path.resolve('coverage/lcov/lcov-report/index.html'));
+      openFile(path.resolve('coverage/lcov/lcov-report/index.html'));
       done();
     });
   });

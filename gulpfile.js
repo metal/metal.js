@@ -45,7 +45,7 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['src/**/*.js', 'test/**/*.js'])
+  return gulp.src(['src/**/*.js', 'tasks/**/*.js', 'test/**/*.js'])
     .pipe(plugins.jshint())
     .pipe(plugins.jshint.reporter(require('jshint-stylish')));
 });

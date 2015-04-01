@@ -48,8 +48,8 @@
     "merge": "^1.2.0",
     "open": "0.0.5",
     "run-sequence": "^1.0.2",
-    "through2": "^0.6.3",
-    "tunic": "^0.3.0"
+    "soyparser": "^0.1.0",
+    "through2": "^0.6.3"
   },
   "devDependencies": {
     "karma-babel-preprocessor": "^4.0.0",

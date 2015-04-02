@@ -11,5 +11,5 @@
     "XMLHttpRequest": true,
     "__html__": true
   },
-  "extends": "../.jshintrc"
+  "extends": "../../.jshintrc"
 }

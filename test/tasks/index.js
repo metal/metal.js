@@ -5,7 +5,9 @@ var fs = require('fs');
 var gulp = require('gulp');
 var path = require('path');
 var registerTasks = require('../../tasks/index');
-var soyparser = require('soyparser');
+require('./fixture/soyutils-mock');
+
+Templates = {};
 
 describe('Tasks', function() {
   before(function() {
@@ -22,79 +24,47 @@ describe('Tasks', function() {
       registerTasks({soySrc: ['src/simple.soy']});
 
       gulp.start('soy', function() {
-        var parsed = soyparser(fs.readFileSync('build/simple.soy'));
-        assert.strictEqual(8, parsed.templates.length);
-        assert.strictEqual('content', parsed.templates[0].name);
-        assert.ok(!parsed.templates[0].deltemplate);
+        loadSoyFile('src/simple.soy.js');
 
-        assert.strictEqual('hello', parsed.templates[1].name);
-        assert.ok(!parsed.templates[1].deltemplate);
+        assert.ok(Templates.Simple);
+        assert.ok(Templates.Simple.content);
+        assert.ok(Templates.Simple.hello);
 
-        assert.strictEqual('Simple', parsed.templates[2].name);
-        assert.ok(parsed.templates[2].deltemplate);
-        assert.strictEqual(undefined, parsed.templates[2].variant);
+        assert.ok(soy.$$getDelegateFn('Simple', ''));
+        assert.ok(soy.$$getDelegateFn('Simple', 'element'));
+        assert.ok(soy.$$getDelegateFn('ComponentTemplate', 'Simple'));
+        assert.ok(soy.$$getDelegateFn('ComponentElement', 'Simple'));
+        assert.ok(soy.$$getDelegateFn('Simple.hello', ''));
+        assert.ok(soy.$$getDelegateFn('Simple.hello', 'element'));
 
-        assert.strictEqual('ComponentTemplate', parsed.templates[3].name);
-        assert.ok(parsed.templates[3].deltemplate);
-        assert.strictEqual('Simple', parsed.templates[3].variant);
-
-        assert.strictEqual('ComponentElement', parsed.templates[4].name);
-        assert.ok(parsed.templates[4].deltemplate);
-        assert.strictEqual('Simple', parsed.templates[4].variant);
-
-        assert.strictEqual('Simple', parsed.templates[5].name);
-        assert.ok(parsed.templates[5].deltemplate);
-        assert.strictEqual('element', parsed.templates[5].variant);
-
-        assert.strictEqual('Simple.hello', parsed.templates[6].name);
-        assert.ok(parsed.templates[6].deltemplate);
-        assert.strictEqual('element', parsed.templates[6].variant);
-
-        assert.strictEqual('Simple.hello', parsed.templates[7].name);
-        assert.ok(parsed.templates[7].deltemplate);
-        assert.strictEqual(undefined, parsed.templates[7].variant);
         done();
       });
     });
 
-    it('should not generate duplicate deltemplate for a surface element', function(done) {
+    it('should not generate deltemplate for the main and surface elements if one already exists', function(done) {
       registerTasks({soySrc: ['src/definedElement.soy']});
 
       gulp.start('soy', function() {
-        var parsed = soyparser(fs.readFileSync('build/definedElement.soy'));
-        assert.strictEqual(8, parsed.templates.length);
+        loadSoyFile('src/definedElement.soy.js');
 
-        var surfaceElementTemplates = [];
-        parsed.templates.forEach(function(template) {
-          if (template.name === 'DefinedElement.hello' && template.variant === 'element') {
-            surfaceElementTemplates.push(template);
-          }
-        });
+        var templateFn = soy.$$getDelegateFn('DefinedElement.hello', 'element');
+        assert.ok(templateFn);
+        assert.notStrictEqual(-1, templateFn({id: 'id'}).indexOf('<button'));
 
-        assert.strictEqual(1, surfaceElementTemplates.length);
-        assert.notStrictEqual(-1, surfaceElementTemplates[0].contents.indexOf('button'));
-        done();
-      });
-    });
+        templateFn = soy.$$getDelegateFn('DefinedElement', 'element');
+        assert.ok(templateFn);
+        assert.notStrictEqual(-1, templateFn({id: 'id'}).indexOf('<button'));
 
-    it('should not generate duplicate deltemplate for the main element', function(done) {
-      registerTasks({soySrc: ['src/definedElement.soy']});
-
-      gulp.start('soy', function() {
-        var parsed = soyparser(fs.readFileSync('build/definedElement.soy'));
-        assert.strictEqual(8, parsed.templates.length);
-
-        var surfaceElementTemplates = [];
-        parsed.templates.forEach(function(template) {
-          if (template.name === 'DefinedElement' && template.variant === 'element') {
-            surfaceElementTemplates.push(template);
-          }
-        });
-
-        assert.strictEqual(1, surfaceElementTemplates.length);
-        assert.notStrictEqual(-1, surfaceElementTemplates[0].contents.indexOf('button'));
         done();
       });
     });
   });
 });
+
+function loadSoyFile(filePath) {
+  var contents = fs.readFileSync(filePath, 'utf8');
+  contents = contents.split('\n');
+  contents.splice(0, 3);
+  contents = contents.join('\n');
+  eval(contents);
+}

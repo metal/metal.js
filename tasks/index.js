@@ -1,20 +1,15 @@
 'use strict';
 
-var del = require('del');
 var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
 var karma = require('karma').server;
-var lodash = require('engine-lodash');
 var merge = require('merge');
 var openFile = require('open');
 var path = require('path');
-var plugins = require('gulp-load-plugins')();
+var registerSoyTask = require('./lib/soy');
 var runSequence = require('run-sequence');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
-var soyparser = require('soyparser');
-var templates = require('./lib/templates');
-var through = require('through2');
 var transpile = require('gulp-es6-module-transpiler');
 
 function handleError(error) {
@@ -23,28 +18,34 @@ function handleError(error) {
   this.emit('end'); // jshint ignore:line
 }
 
+function normalizeOptions(options) {
+  options.bundleFileName = options.bundleFileName || 'metal.js';
+  options.corePathFromSoy = options.corePathFromSoy || '../bower_components/metal/src';
+  options.buildDest = options.buildDest || 'build';
+  options.buildSrc = options.buildSrc || 'src/**/*.js';
+  options.globalName = options.globalName || 'metal';
+  options.soyBase = options.soyBase;
+  options.soyDest = options.soyDest || 'src';
+  options.soyGeneratedOutputGlob = options.soyGeneratedOutputGlob === undefined ? '*.soy' : options.soyGeneratedOutputGlob;
+  options.soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
+  options.soySrc = options.soySrc || 'src/**/*.soy';
+  options.taskPrefix = options.taskPrefix || '';
+  return options;
+}
+
 module.exports = function(options) {
-  options = options || {};
-  var bundleFileName = options.bundleFileName || 'metal.js';
-  var corePathFromSoy = options.corePathFromSoy || '../bower_components/metal/src';
-  var taskPrefix = options.taskPrefix || '';
-  var buildDest = options.buildDest || 'build';
-  var buildSrc = options.buildSrc || 'src/**/*.js';
-  var soyBase = options.soyBase;
-  var soyDest = options.soyDest || 'src';
-  var soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
-  var soyGeneratedOutputGlob = options.soyGeneratedOutputGlob === undefined ? '*.soy' : options.soyGeneratedOutputGlob;
-  var soySrc = options.soySrc || 'src/**/*.soy';
-  var globalName = options.globalName || 'metal';
+  options = options ? normalizeOptions(options) : {};
+  var taskPrefix = options.taskPrefix;
+  registerSoyTask(options);
 
   gulp.task(taskPrefix + 'build:globals', [taskPrefix + 'soy'], function() {
-    return gulp.src(buildSrc)
+    return gulp.src(options.buildSrc)
       .pipe(sourcemaps.init())
       .pipe(transpile({
         basePath: process.cwd(),
-        bundleFileName: bundleFileName,
+        bundleFileName: options.bundleFileName,
         formatter: new GlobalsFormatter({
-          globalName: globalName
+          globalName: options.globalName
         })
       }))
       .pipe(babel({
@@ -52,27 +53,7 @@ module.exports = function(options) {
         compact: false
       })).on('error', handleError)
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest(buildDest));
-  });
-
-  gulp.task(taskPrefix + 'soy', function(done) {
-    gulp.src(soySrc, {base: soyBase})
-      .pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
-      .pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(buildDest)))
-      .pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
-      .pipe(plugins.soynode({
-        loadCompiledTemplates: false,
-        shouldDeclareTopLevelNamespaces: false
-      }))
-      .pipe(plugins.ignore.exclude('*.soy'))
-      .pipe(plugins.wrapper({
-        header: getHeaderContent(corePathFromSoy),
-        footer: getFooterContent
-      }))
-      .pipe(gulp.dest(soyDest))
-      .on('end', function() {
-        del('temp', done);
-      });
+      .pipe(gulp.dest(options.buildDest));
   });
 
   gulp.task(taskPrefix + 'test', function(done) {
@@ -174,7 +155,7 @@ module.exports = function(options) {
   });
 
   gulp.task(taskPrefix + 'test:watch', [taskPrefix + 'soy'], function(done) {
-    gulp.watch(soySrc, [taskPrefix + 'soy']);
+    gulp.watch(options.soySrc, [taskPrefix + 'soy']);
 
     runKarma({
       singleRun: false
@@ -184,127 +165,6 @@ module.exports = function(options) {
 
 // Private helpers
 // ===============
-
-function addTemplateParam(filePath, namespace, templateName, param) {
-  var soyJsPath = filePath + '.js';
-  templateName = namespace + '.' + templateName;
-  templateParams[soyJsPath] = templateParams[soyJsPath] || {};
-  templateParams[soyJsPath][templateName] = templateParams[soyJsPath][templateName] || [];
-  templateParams[soyJsPath][templateName].push(param);
-}
-
-function createComponentElementSoy(moduleName, hasElementTemplate) {
-  var data = {
-    className: moduleName.toLowerCase(),
-    moduleName: moduleName
-  };
-  var soy = lodash.renderSync(templates.ComponentElement, data);
-  if (!hasElementTemplate) {
-    soy += lodash.renderSync(templates.ModuleNameElement, data);
-  }
-  return soy;
-}
-
-function createComponentSoy(moduleName) {
-  return lodash.renderSync(templates.ModuleName, {moduleName: moduleName});
-}
-
-function createComponentTemplateSoy(moduleName) {
-  return lodash.renderSync(templates.ComponentTemplate, {moduleName: moduleName});
-}
-
-function createSurfaceElementSoy(moduleName, surfaceName, hasElementTemplate) {
-  if (!hasElementTemplate) {
-    return lodash.renderSync(templates.SurfaceElement, {
-      moduleName: moduleName,
-      surfaceName: surfaceName
-    });
-  }
-  return '';
-}
-
-function createSurfaceSoy(moduleName, surfaceName) {
-  return lodash.renderSync(templates.Surface, {
-    moduleName: moduleName,
-    surfaceName: surfaceName
-  });
-}
-
-function generateDelTemplate(namespace, templateName, hasElementTemplate) {
-  var moduleName = namespace.substr(10);
-  if (templateName === 'content') {
-    return createComponentSoy(moduleName) + createComponentTemplateSoy(moduleName) +
-      createComponentElementSoy(moduleName, hasElementTemplate);
-  } else {
-    return createSurfaceElementSoy(moduleName, templateName, hasElementTemplate) +
-      createSurfaceSoy(moduleName, templateName);
-  }
-}
-
-var templateParams = {};
-function generateTemplatesAndExtractParams() {
-  return through.obj(function(file, encoding, callback) {
-    var fileString = file.contents.toString(encoding);
-    fileString += '\n// The following templates were generated by alloyui-tasks.\n' +
-      '// Please don\'t edit them by hand.\n';
-
-    var parsed = soyparser(file.contents);
-    var namespace = parsed.namespace;
-    var moduleName = namespace.substr(10);
-    var hasElementTemplateMap = getHasElementTemplateMap(parsed.templates);
-
-    parsed.templates.forEach(function(cmd) {
-      if (cmd.deltemplate) {
-        return;
-      }
-
-      var fullName = cmd.name === 'content' ? moduleName : moduleName + '.' + cmd.name;
-      fileString += generateDelTemplate(namespace, cmd.name, hasElementTemplateMap[fullName]);
-
-      cmd.params.forEach(function(tag) {
-        if (tag.name !== '?') {
-          addTemplateParam(file.relative, namespace, cmd.name, tag.name);
-        }
-      });
-    });
-
-    file.contents = new Buffer(fileString);
-    this.push(file);
-    callback();
-  });
-}
-
-function getFooterContent(file) {
-  var footer = '';
-  var fileParams = templateParams[file.relative];
-  for (var templateName in fileParams) {
-    footer += '\n' + templateName + '.params = ' + JSON.stringify(fileParams[templateName]) + ';';
-  }
-  return footer + '\n/* jshint ignore:end */\n';
-}
-
-function getHasElementTemplateMap(templateCmds) {
-  var hasElementTemplateMap = {};
-  templateCmds.forEach(function(cmd) {
-    if (cmd.deltemplate && cmd.variant === 'element') {
-      hasElementTemplateMap[cmd.name] = true;
-    }
-  });
-  return hasElementTemplateMap;
-}
-
-function getHeaderContent(corePathFromSoy) {
-  return function(file) {
-    var corePath = corePathFromSoy;
-    if (typeof corePath === 'function') {
-      corePath = corePathFromSoy(file);
-    }
-    var registryModulePath = path.join(corePath, '/component/ComponentRegistry');
-    return '/* jshint ignore:start */\n' +
-      'import ComponentRegistry from \'' + registryModulePath + '\';\n' +
-      'var Templates = ComponentRegistry.Templates;\n';
-  };
-}
 
 function runKarma(config, done) {
   config = merge({

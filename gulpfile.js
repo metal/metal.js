@@ -51,6 +51,9 @@ gulp.task('lint', function() {
 });
 
 gulp.task('test:tasks', function(done) {
+  // Mocha is being run as a separate process, because we need its gulp instance
+  // to be different from the gulp instance being used for this task. That's
+  // necessary for testing gulp tasks.
   var args = ['test/tasks/*.js', '--slow', '1000', '--timeout', '3000'];
   var localMocha = path.join(process.cwd(), 'node_modules', '.bin', 'mocha');
   var child = execFile(localMocha, args, {stdio: 'inherit'}, function() {

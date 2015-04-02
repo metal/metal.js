@@ -59,15 +59,68 @@ describe('Tasks', function() {
       });
     });
 
-    it('should set the "params" variable for each template, with a list of its param names', function() {
+    it('should set the "params" variable for each template, with a list of its param names', function(done) {
       registerTasks({soySrc: ['src/simple.soy']});
 
       gulp.start('soy', function() {
         loadSoyFile('src/simple.soy.js');
 
-        assert.ok(Templates.Simple.hello.content.params);
-        assert.deepEqual(['firstName', 'lastName'], Templates.Simple.hello.content.params);
+        assert.ok(Templates.Simple.hello.params);
+        assert.deepEqual(['firstName', 'lastName'], Templates.Simple.hello.params);
 
+        done();
+      });
+    });
+
+    it('should not add optional params to the "params" variable', function(done) {
+      registerTasks({soySrc: ['src/optionalParam.soy']});
+
+      gulp.start('soy', function() {
+        loadSoyFile('src/optionalParam.soy.js');
+
+        assert.ok(Templates.Simple.hello.params);
+        assert.deepEqual(['firstName'], Templates.OptionalParam.hello.params);
+
+        done();
+      });
+    });
+
+    it('should add lines to generated soy js file that import ComponentRegistry', function(done) {
+      registerTasks({soySrc: ['src/simple.soy']});
+
+      gulp.start('soy', function() {
+        var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
+        assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metal/src/component/ComponentRegistry\';'));
+        done();
+      });
+    });
+
+    it('should import ComponentRegistry according to core path indicated by the corePathFromSoy option', function(done) {
+      registerTasks({
+        corePathFromSoy: 'some/path',
+        soySrc: ['src/simple.soy']
+      });
+
+      gulp.start('soy', function() {
+        var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
+        assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metal/src/component/ComponentRegistry\';'));
+        assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'some/path/component/ComponentRegistry\';'));
+        done();
+      });
+    });
+
+    it('should import ComponentRegistry according to core path indicated by the result of the corePathFromSoy option fn', function(done) {
+      registerTasks({
+        corePathFromSoy: function() {
+          return 'fn/path';
+        },
+        soySrc: ['src/simple.soy']
+      });
+
+      gulp.start('soy', function() {
+        var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
+        assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metal/src/component/ComponentRegistry\';'));
+        assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'fn/path/component/ComponentRegistry\';'));
         done();
       });
     });

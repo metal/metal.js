@@ -7,7 +7,7 @@ var path = require('path');
 var registerTasks = require('../../tasks/index');
 require('./fixture/soyutils-mock');
 
-Templates = {};
+global.Templates = {};
 
 describe('Tasks', function() {
   before(function() {
@@ -54,6 +54,19 @@ describe('Tasks', function() {
         templateFn = soy.$$getDelegateFn('DefinedElement', 'element');
         assert.ok(templateFn);
         assert.notStrictEqual(-1, templateFn({id: 'id'}).indexOf('<button'));
+
+        done();
+      });
+    });
+
+    it('should set the "params" variable for each template, with a list of its param names', function() {
+      registerTasks({soySrc: ['src/simple.soy']});
+
+      gulp.start('soy', function() {
+        loadSoyFile('src/simple.soy.js');
+
+        assert.ok(Templates.Simple.hello.content.params);
+        assert.deepEqual(['firstName', 'lastName'], Templates.Simple.hello.content.params);
 
         done();
       });

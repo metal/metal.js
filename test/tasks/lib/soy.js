@@ -89,7 +89,7 @@ describe('Soy Task', function() {
 
     gulp.start('soy', function() {
       var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
-      assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metal/src/component/ComponentRegistry\';'));
+      assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metaljs/src/component/ComponentRegistry\';'));
       done();
     });
   });
@@ -102,7 +102,7 @@ describe('Soy Task', function() {
 
     gulp.start('soy', function() {
       var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
-      assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metal/src/component/ComponentRegistry\';'));
+      assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metaljs/src/component/ComponentRegistry\';'));
       assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'some/path/component/ComponentRegistry\';'));
       done();
     });
@@ -118,7 +118,7 @@ describe('Soy Task', function() {
 
     gulp.start('soy', function() {
       var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
-      assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metal/src/component/ComponentRegistry\';'));
+      assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metaljs/src/component/ComponentRegistry\';'));
       assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'fn/path/component/ComponentRegistry\';'));
       done();
     });

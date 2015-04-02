@@ -3,16 +3,12 @@
 var del = require('del');
 var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
-var gutil = require('gulp-util');
-var jspm = require('jspm');
-var jspmCore = require('jspm/lib/core');
 var karma = require('karma').server;
 var lodash = require('engine-lodash');
 var merge = require('merge');
 var openFile = require('open');
 var path = require('path');
 var plugins = require('gulp-load-plugins')();
-var renamer = require('gulp-es6-imports-renamer');
 var runSequence = require('run-sequence');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
@@ -33,7 +29,6 @@ module.exports = function(options) {
   var taskPrefix = options.taskPrefix || '';
   var buildDest = options.buildDest || 'build';
   var buildSrc = options.buildSrc || 'src/**/*.js';
-  var jspmConfigFile = options.jspmConfigFile || 'config.js';
   var soyBase = options.soyBase;
   var soyDest = options.soyDest || 'src';
   var soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
@@ -44,10 +39,6 @@ module.exports = function(options) {
   gulp.task(taskPrefix + 'build:globals', [taskPrefix + 'soy'], function() {
     return gulp.src(buildSrc)
       .pipe(sourcemaps.init())
-      .pipe(renamer({
-        basePath: process.cwd(),
-        configPath: path.resolve(jspmConfigFile)
-      })).on('error', handleError)
       .pipe(transpile({
         basePath: process.cwd(),
         bundleFileName: bundleFileName,
@@ -61,24 +52,6 @@ module.exports = function(options) {
       })).on('error', handleError)
       .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest(buildDest));
-  });
-
-  gulp.task(taskPrefix + 'jspm', function(done) {
-    jspm.promptDefaults(true);
-    jspm.install(true, {
-      lock: true
-    }).then(function() {
-      return jspmCore.checkDlLoader();
-    }).then(function() {
-      return jspmCore.setMode('local');
-    }).then(function() {
-      gutil.log(gutil.colors.cyan('Install complete'));
-      done();
-    }, function(err) {
-      gutil.log(gutil.colors.red('err', err.stack || err));
-      gutil.log(gutil.colors.red('Installation changes not saved.'));
-      done();
-    });
   });
 
   gulp.task(taskPrefix + 'soy', function(done) {
@@ -122,7 +95,7 @@ module.exports = function(options) {
     }, done);
   });
 
-  gulp.task(taskPrefix + 'test:saucelabs', [taskPrefix + 'jspm', taskPrefix + 'soy'], function(done) {
+  gulp.task(taskPrefix + 'test:saucelabs', [taskPrefix + 'soy'], function(done) {
     var launchers = {
       sl_chrome: {
         base: 'SauceLabs',

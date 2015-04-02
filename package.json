@@ -64,10 +64,5 @@
     "karma-sinon": "^1.0.4",
     "merge": "^1.2.0",
     "mocha": "^2.2.1"
-  },
-  "jspm": {
-    "directories": {
-      "lib": "src"
-    }
   }
 }

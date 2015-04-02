@@ -33,7 +33,7 @@ module.exports = function (config) {
     reporters: ['coverage', 'progress'],
 
     coverageReporter: {
-      ignore: ['**/bower_components/**', '**/test/**', '**/src/async/*.js'],
+      ignore: ['**/bower_components/**', '**/test/**', '**/src/async/*.js', '**/*.soy.js'],
       reporters: [
         {type: 'text-summary'},
         {type: 'html'},

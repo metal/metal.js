@@ -4,6 +4,7 @@ var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
 var karma = require('karma').server;
 var merge = require('merge');
+var normalizeOptions = require('./lib/options');
 var openFile = require('open');
 var path = require('path');
 var registerSoyTask = require('./lib/soy');
@@ -18,23 +19,8 @@ function handleError(error) {
   this.emit('end'); // jshint ignore:line
 }
 
-function normalizeOptions(options) {
-  options.bundleFileName = options.bundleFileName || 'metal.js';
-  options.corePathFromSoy = options.corePathFromSoy || '../bower_components/metal/src';
-  options.buildDest = options.buildDest || 'build';
-  options.buildSrc = options.buildSrc || 'src/**/*.js';
-  options.globalName = options.globalName || 'metal';
-  options.soyBase = options.soyBase;
-  options.soyDest = options.soyDest || 'src';
-  options.soyGeneratedOutputGlob = options.soyGeneratedOutputGlob === undefined ? '*.soy' : options.soyGeneratedOutputGlob;
-  options.soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
-  options.soySrc = options.soySrc || 'src/**/*.soy';
-  options.taskPrefix = options.taskPrefix || '';
-  return options;
-}
-
 module.exports = function(options) {
-  options = options ? normalizeOptions(options) : {};
+  options = normalizeOptions(options);
   var taskPrefix = options.taskPrefix;
   registerSoyTask(options);
 

@@ -3,6 +3,7 @@
 var del = require('del');
 var gulp = require('gulp');
 var lodash = require('engine-lodash');
+var normalizeOptions = require('./options');
 var path = require('path');
 var plugins = require('gulp-load-plugins')();
 var soyparser = require('soyparser');
@@ -12,21 +13,17 @@ var through = require('through2');
 var templateParams = {};
 
 module.exports = function(options) {
-  var buildDest = options.buildDest;
-  var corePathFromSoy = options.corePathFromSoy;
-  var soyBase = options.soyBase;
-  var soyDest = options.soyDest;
+  options = normalizeOptions(options);
+
   var soyGenerationGlob = options.soyGenerationGlob;
   var soyGeneratedOutputGlob = options.soyGeneratedOutputGlob;
-  var soySrc = options.soySrc;
-  var taskPrefix = options.taskPrefix;
 
-  gulp.task(taskPrefix + 'soy', function(done) {
+  gulp.task(options.taskPrefix + 'soy', function(done) {
     templateParams = {};
 
-    gulp.src(soySrc, {base: soyBase})
+    gulp.src(options.soySrc, {base: options.soyBase})
       .pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
-      .pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(buildDest)))
+      .pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.buildDest)))
       .pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
       .pipe(plugins.soynode({
         loadCompiledTemplates: false,
@@ -34,10 +31,10 @@ module.exports = function(options) {
       }))
       .pipe(plugins.ignore.exclude('*.soy'))
       .pipe(plugins.wrapper({
-        header: getHeaderContent(corePathFromSoy),
+        header: getHeaderContent(options.corePathFromSoy),
         footer: getFooterContent
       }))
-      .pipe(gulp.dest(soyDest))
+      .pipe(gulp.dest(options.soyDest))
       .on('end', function() {
         del('temp', done);
       });

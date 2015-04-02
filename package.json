@@ -63,6 +63,7 @@
     "karma-safari-launcher": "^0.1.1",
     "karma-sinon": "^1.0.4",
     "mocha": "^2.2.1",
+    "mockery": "^1.4.0",
     "sinon": "^1.14.1"
   }
 }

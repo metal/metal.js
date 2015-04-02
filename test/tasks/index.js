@@ -6,6 +6,7 @@ var sinon = require('sinon');
 
 var registerSoyTask = sinon.stub();
 var registerTasks;
+var registerTestTasks = sinon.stub();
 
 describe('Tasks', function() {
   before(function() {
@@ -15,6 +16,7 @@ describe('Tasks', function() {
       warnOnUnregistered: false
     });
     mockery.registerMock('./lib/soy', registerSoyTask);
+    mockery.registerMock('./lib/test', registerTestTasks);
 
     // We need to delay requiring `registerTasks` until mockery has already been
     // enabled and prepared.
@@ -25,8 +27,9 @@ describe('Tasks', function() {
     mockery.disable();
   });
 
-  it('should register soy task', function() {
+  it('should register soy and test task', function() {
     registerTasks();
     assert.strictEqual(1, registerSoyTask.callCount);
+    assert.strictEqual(1, registerTestTasks.callCount);
   });
 });

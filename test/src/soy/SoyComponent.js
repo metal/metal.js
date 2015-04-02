@@ -5,11 +5,11 @@ import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyComponent from '../../../src/soy/SoyComponent';
 
-import './assets/DeeplyNestedTestComponent.soy';
-import './assets/ChildrenTestComponent.soy';
-import './assets/CustomTestComponent.soy';
-import './assets/EventsTestComponent.soy';
-import './assets/NestedTestComponent.soy';
+import './assets/DeeplyNestedTestComponent.soy.js';
+import './assets/ChildrenTestComponent.soy.js';
+import './assets/CustomTestComponent.soy.js';
+import './assets/EventsTestComponent.soy.js';
+import './assets/NestedTestComponent.soy.js';
 
 describe('SoyComponent', function() {
   beforeEach(function() {

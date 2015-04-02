@@ -9,7 +9,7 @@ import ComponentCollector from '../component/ComponentCollector';
 import ComponentRegistry from '../component/ComponentRegistry';
 import EventsCollector from '../component/EventsCollector';
 
-import './SoyComponent.soy';
+import './SoyComponent.soy.js';
 
 /**
  * We need to listen to calls to the SoyComponent template so we can use them to

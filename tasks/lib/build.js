@@ -6,6 +6,7 @@ var normalizeOptions = require('./options');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
 var transpile = require('gulp-es6-module-transpiler');
+var plugins = require('gulp-load-plugins')();
 
 module.exports = function(options) {
   options = normalizeOptions(options);
@@ -25,6 +26,10 @@ module.exports = function(options) {
         blacklist: 'useStrict',
         compact: false
       })).on('error', handleError)
+      .pipe(plugins.wrapper({
+        header: ';(function() {',
+        footer: '}());'
+      }))
       .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest(options.buildDest));
   });

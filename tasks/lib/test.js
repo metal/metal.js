@@ -13,11 +13,15 @@ module.exports = function(options) {
   var taskPrefix = options.taskPrefix;
 
   gulp.task(taskPrefix + 'test', function(done) {
-    return runSequence(taskPrefix + 'test:unit', done);
+    runSequence(taskPrefix + 'test:unit', function() {
+      done();
+    });
   });
 
   gulp.task(taskPrefix + 'test:unit', [taskPrefix + 'soy'], function(done) {
-    runKarma({}, done);
+    runKarma({}, function() {
+      done();
+    });
   });
 
   gulp.task(taskPrefix + 'test:coverage', [taskPrefix + 'soy'], function(done) {

@@ -29,7 +29,7 @@ describe('Tasks', function() {
     mockery.disable();
   });
 
-  it('should register soy and test task', function() {
+  it('should register all tasks', function() {
     registerTasks();
     assert.strictEqual(1, registerBuildTask.callCount);
     assert.strictEqual(1, registerSoyTask.callCount);

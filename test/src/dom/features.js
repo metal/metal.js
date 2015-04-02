@@ -6,6 +6,7 @@ import features from '../../../src/dom/features';
 describe('features', function() {
   before(function() {
     sinon.spy(dom, 'append');
+    features.attrOrderChange_ = undefined;
   });
 
   after(function() {

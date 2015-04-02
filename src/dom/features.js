@@ -13,16 +13,16 @@ class features {
    * @return {boolean}
    */
   static checkAttrOrderChange() {
-    if (attrOrderChange === undefined) {
+    if (features.attrOrderChange_ === undefined) {
       var originalContent = '<div data-component="" data-ref=""></div>';
       var element = document.createElement('div');
       dom.append(element, originalContent);
-      attrOrderChange = originalContent !== element.innerHTML;
+      features.attrOrderChange_ = originalContent !== element.innerHTML;
     }
-    return attrOrderChange;
+    return features.attrOrderChange_;
   }
 }
 
-var attrOrderChange;
+features.attrOrderChange_ = undefined;
 
 export default features;

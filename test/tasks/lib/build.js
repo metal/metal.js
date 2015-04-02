@@ -39,4 +39,18 @@ describe('Build Tasks', function() {
       done();
     });
   });
+
+  it('should trigger "end" event even when build:globals throws error for invalid js', function(done) {
+    registerTasks({
+      buildSrc: 'invalidSrc/Invalid.js',
+      bundleFileName: 'invalid.js',
+      globalName: 'invalid'
+    });
+    sinon.stub(console, 'error');
+
+    gulp.start('build:globals', function() {
+      assert.strictEqual(1, console.error.callCount);
+      done();
+    });
+  });
 });

@@ -20,7 +20,7 @@ module.exports = function(options) {
         formatter: new GlobalsFormatter({
           globalName: options.globalName
         })
-      }))
+      })).on('error', handleError)
       .pipe(babel({
         blacklist: 'useStrict',
         compact: false

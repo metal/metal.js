@@ -45,7 +45,7 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['src/**/*.js', 'tasks/**/*.js', 'test/**/*.js', '!test/**/build/**/*.js'])
+  return gulp.src(['src/**/*.js', 'tasks/**/*.js', 'test/**/*.js', '!test/**/build/**/*.js', '!test/**/assets/**/*.js'])
     .pipe(plugins.jshint())
     .pipe(plugins.jshint.reporter(require('jshint-stylish')));
 });

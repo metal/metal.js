@@ -24,8 +24,9 @@ function handleError(error) {
 }
 
 module.exports = function(options) {
-  var bundleFileName = options.bundleFileName;
-  var corePathFromSoy = options.corePathFromSoy || 'aui';
+  options = options || {};
+  var bundleFileName = options.bundleFileName || 'metal.js';
+  var corePathFromSoy = options.corePathFromSoy || '../bower_components/metal/src';
   var taskPrefix = options.taskPrefix || '';
   var buildDest = options.buildDest || 'build';
   var buildSrc = options.buildSrc || 'src/**/*.js';
@@ -34,7 +35,7 @@ module.exports = function(options) {
   var soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
   var soyGeneratedOutputGlob = options.soyGeneratedOutputGlob === undefined ? '*.soy' : options.soyGeneratedOutputGlob;
   var soySrc = options.soySrc || 'src/**/*.soy';
-  var globalName = options.globalName || 'aui';
+  var globalName = options.globalName || 'metal';
 
   gulp.task(taskPrefix + 'build:globals', [taskPrefix + 'soy'], function() {
     return gulp.src(buildSrc)

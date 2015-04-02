@@ -10,7 +10,6 @@ var registerTasks = require('./index');
 var runSequence = require('run-sequence');
 
 registerTasks({
-  bundleFileName: 'metal.js',
   corePathFromSoy: function(file) {
     return path.relative(path.dirname(file.path), path.resolve('src'));
   },

@@ -20,10 +20,13 @@ describe('Soy Task', function() {
   });
 
   it('should generate extra templates', function(done) {
-    registerSoyTasks({soySrc: ['src/simple.soy']});
+    registerSoyTasks({
+      soyDest: 'soy',
+      soySrc: ['soy/simple.soy']
+    });
 
     gulp.start('soy', function() {
-      loadSoyFile('src/simple.soy.js');
+      loadSoyFile('soy/simple.soy.js');
 
       assert.ok(Templates.Simple);
       assert.ok(Templates.Simple.content);
@@ -41,10 +44,13 @@ describe('Soy Task', function() {
   });
 
   it('should not generate deltemplate for the main and surface elements if one already exists', function(done) {
-    registerSoyTasks({soySrc: ['src/definedElement.soy']});
+    registerSoyTasks({
+      soyDest: 'soy',
+      soySrc: ['soy/definedElement.soy']
+    });
 
     gulp.start('soy', function() {
-      loadSoyFile('src/definedElement.soy.js');
+      loadSoyFile('soy/definedElement.soy.js');
 
       var templateFn = soy.$$getDelegateFn('DefinedElement.hello', 'element');
       assert.ok(templateFn);
@@ -59,10 +65,13 @@ describe('Soy Task', function() {
   });
 
   it('should set the "params" variable for each template, with a list of its param names', function(done) {
-    registerSoyTasks({soySrc: ['src/simple.soy']});
+    registerSoyTasks({
+      soyDest: 'soy',
+      soySrc: ['soy/simple.soy']
+    });
 
     gulp.start('soy', function() {
-      loadSoyFile('src/simple.soy.js');
+      loadSoyFile('soy/simple.soy.js');
 
       assert.ok(Templates.Simple.hello.params);
       assert.deepEqual(['firstName', 'lastName'], Templates.Simple.hello.params);
@@ -72,10 +81,13 @@ describe('Soy Task', function() {
   });
 
   it('should not add optional params to the "params" variable', function(done) {
-    registerSoyTasks({soySrc: ['src/optionalParam.soy']});
+    registerSoyTasks({
+      soyDest: 'soy',
+      soySrc: ['soy/optionalParam.soy']
+    });
 
     gulp.start('soy', function() {
-      loadSoyFile('src/optionalParam.soy.js');
+      loadSoyFile('soy/optionalParam.soy.js');
 
       assert.ok(Templates.Simple.hello.params);
       assert.deepEqual(['firstName'], Templates.OptionalParam.hello.params);
@@ -85,10 +97,13 @@ describe('Soy Task', function() {
   });
 
   it('should add lines to generated soy js file that import ComponentRegistry', function(done) {
-    registerSoyTasks({soySrc: ['src/simple.soy']});
+    registerSoyTasks({
+      soyDest: 'soy',
+      soySrc: ['soy/simple.soy']
+    });
 
     gulp.start('soy', function() {
-      var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
+      var contents = fs.readFileSync('soy/simple.soy.js', 'utf8');
       assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metaljs/src/component/ComponentRegistry\';'));
       done();
     });
@@ -97,11 +112,12 @@ describe('Soy Task', function() {
   it('should import ComponentRegistry according to core path indicated by the corePathFromSoy option', function(done) {
     registerSoyTasks({
       corePathFromSoy: 'some/path',
-      soySrc: ['src/simple.soy']
+      soyDest: 'soy',
+      soySrc: ['soy/simple.soy']
     });
 
     gulp.start('soy', function() {
-      var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
+      var contents = fs.readFileSync('soy/simple.soy.js', 'utf8');
       assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metaljs/src/component/ComponentRegistry\';'));
       assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'some/path/component/ComponentRegistry\';'));
       done();
@@ -113,11 +129,12 @@ describe('Soy Task', function() {
       corePathFromSoy: function() {
         return 'fn/path';
       },
-      soySrc: ['src/simple.soy']
+      soyDest: 'soy',
+      soySrc: ['soy/simple.soy']
     });
 
     gulp.start('soy', function() {
-      var contents = fs.readFileSync('src/simple.soy.js', 'utf8');
+      var contents = fs.readFileSync('soy/simple.soy.js', 'utf8');
       assert.strictEqual(-1, contents.indexOf('import ComponentRegistry from \'../bower_components/metaljs/src/component/ComponentRegistry\';'));
       assert.notStrictEqual(-1, contents.indexOf('import ComponentRegistry from \'fn/path/component/ComponentRegistry\';'));
       done();

@@ -1,58 +1,43 @@
-module.exports = function(config) {
+var isparta = require('isparta');
+var istanbul = require('browserify-istanbul');
+
+module.exports = function (config) {
   config.set({
-    browsers: ['Chrome'],
-
-    frameworks: ['jspm', 'mocha', 'chai', 'sinon'],
-
-    jspm: {
-      // ES6 files need to go through jspm for module loading.
-      loadFiles: ['test/src/**/*.js'],
-      serveFiles: ['src/**/*.js']
-    },
+    frameworks: ['mocha', 'chai', 'sinon', 'browserify'],
 
     files: [
+      'test/src/html/fixture/*.html',
       'node_modules/closure-templates/soyutils.js',
-      'test/src/html/fixture/*.html'
+      'src/**/*.js',
+      'test/src/**/*.js'
     ],
 
     preprocessors: {
-      // All src files should be included in the coverage report, except
-      // async, since that's not our code for now. These files don't
-      // need to go through the `babel` preprocessor, as the `coverage`
-      // preprocessor already does the necessary conversion.
-      'src/*.js': ['coverage'],
-      'src/!(async)/**/*.js': ['coverage'],
-
-      // Since tests and async are not going through the `coverage`
-      // preprocessor we need to explicitly make them go through `babel`.
-      'src/async/async.js': ['babel'],
-      'test/src/**/*.js': ['babel'],
-
+      'src/**/*.js': ['browserify'],
+      'test/src/**/*.js': ['browserify'],
       // Fixture htmls should go through `html2js` so tests can access
       // them through the `window.__html__` variable.
       'test/src/html/fixture/*.html': ['html2js']
     },
 
+    browserify: {
+      transform: [istanbul({
+        defaultIgnore: false,
+        instrumenter: isparta
+      })],
+      debug: true
+    },
+
+    browsers: ['Chrome'],
+
     reporters: ['coverage', 'progress'],
 
-    logLevel: config.LOG_ERROR,
-
     coverageReporter: {
-      instrumenters: { isparta : require('isparta') },
-      instrumenter: {
-        '**/*.js': 'isparta'
-      },
+      ignore: ['**/bower_components/**', '**/test/**', '**/src/async/*.js'],
       reporters: [
-        {
-          type : 'text-summary'
-        },
-        {
-          type : 'html'
-        },
-        {
-          type: 'lcov',
-          subdir: 'lcov'
-        },
+        {type: 'text-summary'},
+        {type: 'html'},
+        { type: 'lcov', subdir: 'lcov' }
       ]
     }
   });

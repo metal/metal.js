@@ -51,10 +51,10 @@ class Attribute extends EventEmitter {
    *   have each attribute instance use a different reference, use the `valueFn` option
    *   instead.
    *   valueFn - A function that returns the default value for this attribute.
-   * @param {*} initialValue The initial value of the new attribute. This value has higher
-   *   precedence than the default value specified in this attribute's configuration.
    *   writeOnce - Ignores writes to the attribute after it's been first written to. That is,
    *   allows writes only when setting the attribute for the first time.
+   * @param {*} initialValue The initial value of the new attribute. This value has higher
+   *   precedence than the default value specified in this attribute's configuration.
    */
   addAttr(name, config, initialValue) {
     this.buildAttrInfo_(name, config, initialValue);

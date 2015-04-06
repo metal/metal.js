@@ -5,14 +5,14 @@
  * @param id
  */
 {template .component}
-  {delcall ComponentTemplate data="all" variant="$componentName" /}
+	{delcall ComponentTemplate data="all" variant="$componentName" /}
 {/template}
 
 /**
  * @param content
  */
 {template .surface}
-  {$content}
+	{$content}
 {/template}
 
 /**
@@ -20,7 +20,7 @@
  * @param id
  */
 {deltemplate Component}
-  {call Templates.SoyComponent.component data="all" /}
+	{call Templates.SoyComponent.component data="all" /}
 {/deltemplate}
 
 /**
@@ -29,15 +29,15 @@
  * @param id
  */
 {deltemplate ComponentChildren}
-  <div id="{$id}-children-placeholder" data-component-children="">
-    {if $children}
-      {$children}
-    {/if}
-  </div>
+	<div id="{$id}-children-placeholder" data-component-children="">
+		{if $children}
+			{$children}
+		{/if}
+	</div>
 {/deltemplate}
 
 /**
  */
 {deltemplate Surface}
-  {call Templates.SoyComponent.surface data="all" /}
+	{call Templates.SoyComponent.surface data="all" /}
 {/deltemplate}

@@ -15,47 +15,47 @@ import Disposable from '../disposable/Disposable';
  * @extends {Disposable}
  */
 class EventHandle extends Disposable {
-  constructor(emitter, event, listener) {
-    /**
-     * The EventEmitter instance that the event was subscribed to.
-     * @type {EventEmitter}
-     * @protected
-     */
-    this.emitter_ = emitter;
+	constructor(emitter, event, listener) {
+		/**
+		 * The EventEmitter instance that the event was subscribed to.
+		 * @type {EventEmitter}
+		 * @protected
+		 */
+		this.emitter_ = emitter;
 
-    /**
-     * The name of the event that was subscribed to.
-     * @type {string}
-     * @protected
-     */
-    this.event_ = event;
+		/**
+		 * The name of the event that was subscribed to.
+		 * @type {string}
+		 * @protected
+		 */
+		this.event_ = event;
 
-    /**
-     * The listener subscribed to the event.
-     * @type {Function}
-     * @protected
-     */
-    this.listener_ = listener;
-  }
+		/**
+		 * The listener subscribed to the event.
+		 * @type {Function}
+		 * @protected
+		 */
+		this.listener_ = listener;
+	}
 
-  /**
-   * Disposes of this instance's object references.
-   * @override
-   */
-  disposeInternal() {
-    this.removeListener();
-    this.emitter_ = null;
-    this.listener_ = null;
-  }
+	/**
+	 * Disposes of this instance's object references.
+	 * @override
+	 */
+	disposeInternal() {
+		this.removeListener();
+		this.emitter_ = null;
+		this.listener_ = null;
+	}
 
-  /**
-   * Removes the listener subscription from the emitter.
-   */
-  removeListener() {
-    if (!this.emitter_.isDisposed()) {
-      this.emitter_.removeListener(this.event_, this.listener_);
-    }
-  }
+	/**
+	 * Removes the listener subscription from the emitter.
+	 */
+	removeListener() {
+		if (!this.emitter_.isDisposed()) {
+			this.emitter_.removeListener(this.event_, this.listener_);
+		}
+	}
 }
 
 export default EventHandle;

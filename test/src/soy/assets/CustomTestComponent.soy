@@ -3,22 +3,22 @@
 /**
  */
 {template .content}
-  {delcall CustomTestComponent.header data="all" /}
-  {delcall CustomTestComponent.footer data="all" /}
+	{delcall CustomTestComponent.header data="all" /}
+	{delcall CustomTestComponent.footer data="all" /}
 {/template}
 
 /**
  * @param headerContent
  */
 {template .header}
-  {$headerContent}
+	{$headerContent}
 {/template}
 
 /**
  * @param footerContent
  */
 {template .footer}
-  {$footerContent}
+	{$footerContent}
 {/template}
 
 /**
@@ -27,7 +27,7 @@
  * @param id
  */
 {deltemplate CustomTestComponent variant="'element'"}
-  <custom id="{$id}" class="btn {$elementClasses ? $elementClasses : ''}" data-component>
-    {$elementContent}
-  </custom>
+	<custom id="{$id}" class="btn {$elementClasses ? $elementClasses : ''}" data-component>
+		{$elementContent}
+	</custom>
 {/deltemplate}

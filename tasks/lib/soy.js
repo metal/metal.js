@@ -13,151 +13,151 @@ var through = require('through2');
 var templateParams = {};
 
 module.exports = function(options) {
-  options = normalizeOptions(options);
+	options = normalizeOptions(options);
 
-  var soyGenerationGlob = options.soyGenerationGlob;
-  var soyGeneratedOutputGlob = options.soyGeneratedOutputGlob;
+	var soyGenerationGlob = options.soyGenerationGlob;
+	var soyGeneratedOutputGlob = options.soyGeneratedOutputGlob;
 
-  gulp.task(options.taskPrefix + 'soy', function(done) {
-    templateParams = {};
+	gulp.task(options.taskPrefix + 'soy', function(done) {
+		templateParams = {};
 
-    gulp.src(options.soySrc, {base: options.soyBase})
-      .pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
-      .pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.buildDest)))
-      .pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
-      .pipe(plugins.soynode({
-        loadCompiledTemplates: false,
-        shouldDeclareTopLevelNamespaces: false
-      }))
-      .pipe(plugins.ignore.exclude('*.soy'))
-      .pipe(plugins.wrapper({
-        header: getHeaderContent(options.corePathFromSoy),
-        footer: getFooterContent
-      }))
-      .pipe(gulp.dest(options.soyDest))
-      .on('end', function() {
-        del('temp', done);
-      });
-  });
+		gulp.src(options.soySrc, {base: options.soyBase})
+			.pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
+			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.buildDest)))
+			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
+			.pipe(plugins.soynode({
+				loadCompiledTemplates: false,
+				shouldDeclareTopLevelNamespaces: false
+			}))
+			.pipe(plugins.ignore.exclude('*.soy'))
+			.pipe(plugins.wrapper({
+				header: getHeaderContent(options.corePathFromSoy),
+				footer: getFooterContent
+			}))
+			.pipe(gulp.dest(options.soyDest))
+			.on('end', function() {
+				del('temp', done);
+			});
+	});
 };
 
 // Private helpers
 function addTemplateParam(filePath, namespace, templateName, param) {
-  var soyJsPath = filePath + '.js';
-  templateName = namespace + '.' + templateName;
-  templateParams[soyJsPath] = templateParams[soyJsPath] || {};
-  templateParams[soyJsPath][templateName] = templateParams[soyJsPath][templateName] || [];
-  templateParams[soyJsPath][templateName].push(param);
+	var soyJsPath = filePath + '.js';
+	templateName = namespace + '.' + templateName;
+	templateParams[soyJsPath] = templateParams[soyJsPath] || {};
+	templateParams[soyJsPath][templateName] = templateParams[soyJsPath][templateName] || [];
+	templateParams[soyJsPath][templateName].push(param);
 }
 
 function createComponentElementSoy(moduleName, hasElementTemplate) {
-  var data = {
-    className: moduleName.toLowerCase(),
-    moduleName: moduleName
-  };
-  var soy = lodash.renderSync(templates.ComponentElement, data);
-  if (!hasElementTemplate) {
-    soy += lodash.renderSync(templates.ModuleNameElement, data);
-  }
-  return soy;
+	var data = {
+		className: moduleName.toLowerCase(),
+		moduleName: moduleName
+	};
+	var soy = lodash.renderSync(templates.ComponentElement, data);
+	if (!hasElementTemplate) {
+		soy += lodash.renderSync(templates.ModuleNameElement, data);
+	}
+	return soy;
 }
 
 function createComponentSoy(moduleName) {
-  return lodash.renderSync(templates.ModuleName, {moduleName: moduleName});
+	return lodash.renderSync(templates.ModuleName, {moduleName: moduleName});
 }
 
 function createComponentTemplateSoy(moduleName) {
-  return lodash.renderSync(templates.ComponentTemplate, {moduleName: moduleName});
+	return lodash.renderSync(templates.ComponentTemplate, {moduleName: moduleName});
 }
 
 function createSurfaceElementSoy(moduleName, surfaceName, hasElementTemplate) {
-  if (!hasElementTemplate) {
-    return lodash.renderSync(templates.SurfaceElement, {
-      moduleName: moduleName,
-      surfaceName: surfaceName
-    });
-  }
-  return '';
+	if (!hasElementTemplate) {
+		return lodash.renderSync(templates.SurfaceElement, {
+			moduleName: moduleName,
+			surfaceName: surfaceName
+		});
+	}
+	return '';
 }
 
 function createSurfaceSoy(moduleName, surfaceName) {
-  return lodash.renderSync(templates.Surface, {
-    moduleName: moduleName,
-    surfaceName: surfaceName
-  });
+	return lodash.renderSync(templates.Surface, {
+		moduleName: moduleName,
+		surfaceName: surfaceName
+	});
 }
 
 function generateDelTemplate(namespace, templateName, hasElementTemplate) {
-  var moduleName = namespace.substr(10);
-  if (templateName === 'content') {
-    return createComponentSoy(moduleName) + createComponentTemplateSoy(moduleName) +
-      createComponentElementSoy(moduleName, hasElementTemplate);
-  } else {
-    return createSurfaceElementSoy(moduleName, templateName, hasElementTemplate) +
-      createSurfaceSoy(moduleName, templateName);
-  }
+	var moduleName = namespace.substr(10);
+	if (templateName === 'content') {
+		return createComponentSoy(moduleName) + createComponentTemplateSoy(moduleName) +
+			createComponentElementSoy(moduleName, hasElementTemplate);
+	} else {
+		return createSurfaceElementSoy(moduleName, templateName, hasElementTemplate) +
+			createSurfaceSoy(moduleName, templateName);
+	}
 }
 
 function generateTemplatesAndExtractParams() {
-  return through.obj(function(file, encoding, callback) {
-    var fileString = file.contents.toString(encoding);
-    fileString += '\n// The following templates were generated by alloyui-tasks.\n' +
-      '// Please don\'t edit them by hand.\n';
+	return through.obj(function(file, encoding, callback) {
+		var fileString = file.contents.toString(encoding);
+		fileString += '\n// The following templates were generated by alloyui-tasks.\n' +
+			'// Please don\'t edit them by hand.\n';
 
-    var parsed = soyparser(file.contents);
-    var namespace = parsed.namespace;
-    var moduleName = namespace.substr(10);
-    var hasElementTemplateMap = getHasElementTemplateMap(parsed.templates);
+		var parsed = soyparser(file.contents);
+		var namespace = parsed.namespace;
+		var moduleName = namespace.substr(10);
+		var hasElementTemplateMap = getHasElementTemplateMap(parsed.templates);
 
-    parsed.templates.forEach(function(cmd) {
-      if (cmd.deltemplate) {
-        return;
-      }
+		parsed.templates.forEach(function(cmd) {
+			if (cmd.deltemplate) {
+				return;
+			}
 
-      var fullName = cmd.name === 'content' ? moduleName : moduleName + '.' + cmd.name;
-      fileString += generateDelTemplate(namespace, cmd.name, hasElementTemplateMap[fullName]);
+			var fullName = cmd.name === 'content' ? moduleName : moduleName + '.' + cmd.name;
+			fileString += generateDelTemplate(namespace, cmd.name, hasElementTemplateMap[fullName]);
 
-      cmd.params.forEach(function(tag) {
-        if (tag.name !== '?') {
-          addTemplateParam(file.relative, namespace, cmd.name, tag.name);
-        }
-      });
-    });
+			cmd.params.forEach(function(tag) {
+				if (tag.name !== '?') {
+					addTemplateParam(file.relative, namespace, cmd.name, tag.name);
+				}
+			});
+		});
 
-    file.contents = new Buffer(fileString);
-    this.push(file);
-    callback();
-  });
+		file.contents = new Buffer(fileString);
+		this.push(file);
+		callback();
+	});
 }
 
 function getFooterContent(file) {
-  var footer = '';
-  var fileParams = templateParams[file.relative];
-  for (var templateName in fileParams) {
-    footer += '\n' + templateName + '.params = ' + JSON.stringify(fileParams[templateName]) + ';';
-  }
-  return footer + '\n/* jshint ignore:end */\n';
+	var footer = '';
+	var fileParams = templateParams[file.relative];
+	for (var templateName in fileParams) {
+		footer += '\n' + templateName + '.params = ' + JSON.stringify(fileParams[templateName]) + ';';
+	}
+	return footer + '\n/* jshint ignore:end */\n';
 }
 
 function getHasElementTemplateMap(templateCmds) {
-  var hasElementTemplateMap = {};
-  templateCmds.forEach(function(cmd) {
-    if (cmd.deltemplate && cmd.variant === 'element') {
-      hasElementTemplateMap[cmd.name] = true;
-    }
-  });
-  return hasElementTemplateMap;
+	var hasElementTemplateMap = {};
+	templateCmds.forEach(function(cmd) {
+		if (cmd.deltemplate && cmd.variant === 'element') {
+			hasElementTemplateMap[cmd.name] = true;
+		}
+	});
+	return hasElementTemplateMap;
 }
 
 function getHeaderContent(corePathFromSoy) {
-  return function(file) {
-    var corePath = corePathFromSoy;
-    if (typeof corePath === 'function') {
-      corePath = corePathFromSoy(file);
-    }
-    var registryModulePath = path.join(corePath, '/component/ComponentRegistry');
-    return '/* jshint ignore:start */\n' +
-      'import ComponentRegistry from \'' + registryModulePath + '\';\n' +
-      'var Templates = ComponentRegistry.Templates;\n';
-  };
+	return function(file) {
+		var corePath = corePathFromSoy;
+		if (typeof corePath === 'function') {
+			corePath = corePathFromSoy(file);
+		}
+		var registryModulePath = path.join(corePath, '/component/ComponentRegistry');
+		return '/* jshint ignore:start */\n' +
+			'import ComponentRegistry from \'' + registryModulePath + '\';\n' +
+			'var Templates = ComponentRegistry.Templates;\n';
+	};
 }

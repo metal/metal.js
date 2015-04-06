@@ -44,15 +44,15 @@ The following example is a class that extends from Attribute and defines an attr
 
 ```javascript
 class TestAttributes extend Attribute {
-  constructor(opt_config) {
-    super(opt_config);
-  }
+	constructor(opt_config) {
+		super(opt_config);
+	}
 }
 
 TestAttributes.ATTRS = {
-  foo: {
-    value: 'Initial value'
-  }
+	foo: {
+		value: 'Initial value'
+	}
 }
 ```
 
@@ -72,8 +72,8 @@ You can also listen to attribute value changes by listening to the appropriate e
 
 ```javascript
 obj.on('fooChanged', function(event) {
-  // event.prevVal has the previous value.
-  // event.newVal has the new value.
+	// event.prevVal has the previous value.
+	// event.newVal has the new value.
 });
 ```
 
@@ -89,18 +89,18 @@ So, for example, let's say we want to create a widget called **TestWidget**, tha
 
 ```javascript
 class TestWidget extends SoyComponent {
-  constructor(opt_config) {
-    super(opt_config);
-  }
+	constructor(opt_config) {
+		super(opt_config);
+	}
 }
 
 TestWidget.ATTRS = {
-  bodyContent: {
-    value: 'Initial body content.'
-  },
-  footerContent: {
-    value: 'Initial footer content.'
-  }
+	bodyContent: {
+		value: 'Initial body content.'
+	},
+	footerContent: {
+		value: 'Initial footer content.'
+	}
 };
 ```
 
@@ -113,8 +113,8 @@ This file just defines a class named TestWidget, makes it extend from SoyCompone
  * This renders the component's whole content.
  */
 {template .content}
-  {delcall TestWidget.body data="all" /}
-  {delcall TestWidget.footer data="all" /}
+	{delcall TestWidget.body data="all" /}
+	{delcall TestWidget.footer data="all" /}
 {/template}
 
 /**
@@ -122,7 +122,7 @@ This file just defines a class named TestWidget, makes it extend from SoyCompone
  * @param bodyContent
  */
 {template .body}
-  <p>{$bodyContent}</p>
+	<p>{$bodyContent}</p>
 {/template}
 
 /**
@@ -130,7 +130,7 @@ This file just defines a class named TestWidget, makes it extend from SoyCompone
  * @param footerContent
  */
 {template .footer}
-  <footer>{$footerContent}</footer>
+	<footer>{$footerContent}</footer>
 {/template}
 ```
 
@@ -155,14 +155,14 @@ This can already be done with SoyComponent. For example, let's say we have the M
 
 ```
 {template .footer}
-  {delcall Button}
-    {param id: 'ok' /}
-    {param label: 'Ok' /}
-  {/delcall}
-  {delcall Button}
-  {param id: 'cancel' /}
-    {param label: 'Cancel' /}
-  {/delcall}
+	{delcall Button}
+		{param id: 'ok' /}
+		{param label: 'Ok' /}
+	{/delcall}
+	{delcall Button}
+	{param id: 'cancel' /}
+		{param label: 'Cancel' /}
+	{/delcall}
 {/template}
 ```
 

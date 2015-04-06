@@ -9,7 +9,7 @@ class string {
 	 * @return {string} Copy of the string with normalized breaking spaces.
 	 */
 	static collapseBreakingSpaces(str) {
-	  return str.replace(/[\t\r\n ]+/g, ' ').replace(/^[\t\r\n ]+|[\t\r\n ]+$/g, '');
+		return str.replace(/[\t\r\n ]+/g, ' ').replace(/^[\t\r\n ]+|[\t\r\n ]+$/g, '');
 	}
 
 	/**
@@ -22,12 +22,12 @@ class string {
 	 * @return {Number} Returns the string hashcode.
 	 */
 	static hashCode(val) {
-	  var hash = 0;
-	  for (var i = 0, len = val.length; i < len; i++) {
-	    hash = 31 * hash + val.charCodeAt(i);
-	    hash %= 0x100000000;
-	  }
-	  return hash;
+		var hash = 0;
+		for (var i = 0, len = val.length; i < len; i++) {
+			hash = 31 * hash + val.charCodeAt(i);
+			hash %= 0x100000000;
+		}
+		return hash;
 	}
 
 	/**
@@ -40,7 +40,7 @@ class string {
 	 * @return {string}
 	 */
 	static replaceInterval(str, start, end, value) {
-	  return str.substring(0, start) + value + str.substring(end);
+		return str.substring(0, start) + value + str.substring(end);
 	}
 }
 

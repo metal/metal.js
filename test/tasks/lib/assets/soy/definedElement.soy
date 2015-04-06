@@ -3,14 +3,14 @@
 /**
  */
 {template .content}
-  {delcall Simple.hello data="all" /}
+	{delcall Simple.hello data="all" /}
 {/template}
 
 /**
  * @param name
  */
 {template .hello}
-  Hello {$name}!
+	Hello {$name}!
 {/template}
 
 /**
@@ -18,9 +18,9 @@
  * @param id
  */
 {deltemplate DefinedElement.hello variant="'element'"}
-  <button id="{$id}-hello">
-    {$elementContent}
-  </button>
+	<button id="{$id}-hello">
+		{$elementContent}
+	</button>
 {/deltemplate}
 
 /**
@@ -29,7 +29,7 @@
  * @param id
  */
 {deltemplate DefinedElement variant="'element'"}
-  <button id="{$id}" class="simple component{$elementClasses ? ' ' + $elementClasses : ''}" data-component="">
-    {$elementContent}
-  </button>
+	<button id="{$id}" class="simple component{$elementClasses ? ' ' + $elementClasses : ''}" data-component="">
+		{$elementContent}
+	</button>
 {/deltemplate}

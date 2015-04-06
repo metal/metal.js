@@ -12,16 +12,16 @@ import EventHandle from '../events/EventHandle';
  * @extends {EventHandle}
  */
 class DomEventHandle extends EventHandle {
-  constructor(emitter, event, listener) {
-    super(emitter, event, listener);
-  }
+	constructor(emitter, event, listener) {
+		super(emitter, event, listener);
+	}
 
-  /**
-   * @inheritDoc
-   */
-  removeListener() {
-    this.emitter_.removeEventListener(this.event_, this.listener_);
-  }
+	/**
+	 * @inheritDoc
+	 */
+	removeListener() {
+		this.emitter_.removeEventListener(this.event_, this.listener_);
+	}
 }
 
 export default DomEventHandle;

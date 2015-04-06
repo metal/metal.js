@@ -8,14 +8,14 @@ class object {
 	 * @return {Object} Returns the target object reference.
 	 */
 	static mixin(target) {
-	  var key, source;
-	  for (var i = 1; i < arguments.length; i++) {
-	    source = arguments[i];
-	    for (key in source) {
-	      target[key] = source[key];
-	    }
-	  }
-	  return target;
+		var key, source;
+		for (var i = 1; i < arguments.length; i++) {
+			source = arguments[i];
+			for (key in source) {
+				target[key] = source[key];
+			}
+		}
+		return target;
 	}
 }
 

@@ -3,7 +3,7 @@
 /**
  */
 {template .content}
-  {delcall OptionalParam.hello data="all" /}
+	{delcall OptionalParam.hello data="all" /}
 {/template}
 
 /**
@@ -11,5 +11,5 @@
  * @param? lastName
  */
 {template .hello}
-  Hello {$firstName}{if $lastName} {$lastName}{/if}!
+	Hello {$firstName}{if $lastName} {$lastName}{/if}!
 {/template}

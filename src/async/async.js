@@ -18,10 +18,10 @@ var async = {};
  * @param {*} exception
  */
 async.throwException = function(exception) {
-  // Each throw needs to be in its own context.
-  async.nextTick(function() {
-    throw exception;
-  });
+	// Each throw needs to be in its own context.
+	async.nextTick(function() {
+		throw exception;
+	});
 };
 
 
@@ -34,14 +34,14 @@ async.throwException = function(exception) {
  * @template THIS
  */
 async.run = function(callback, opt_context) {
-  if (!async.run.workQueueScheduled_) {
-    // Nothing is currently scheduled, schedule it now.
-    async.nextTick(async.run.processWorkQueue);
-    async.run.workQueueScheduled_ = true;
-  }
+	if (!async.run.workQueueScheduled_) {
+		// Nothing is currently scheduled, schedule it now.
+		async.nextTick(async.run.processWorkQueue);
+		async.run.workQueueScheduled_ = true;
+	}
 
-  async.run.workQueue_.push(
-    new async.run.WorkItem_(callback, opt_context));
+	async.run.workQueue_.push(
+		new async.run.WorkItem_(callback, opt_context));
 };
 
 
@@ -58,23 +58,23 @@ async.run.workQueue_ = [];
  * async.nextTick.
  */
 async.run.processWorkQueue = function() {
-  // NOTE: additional work queue items may be pushed while processing.
-  while (async.run.workQueue_.length) {
-    // Don't let the work queue grow indefinitely.
-    var workItems = async.run.workQueue_;
-    async.run.workQueue_ = [];
-    for (var i = 0; i < workItems.length; i++) {
-      var workItem = workItems[i];
-      try {
-        workItem.fn.call(workItem.scope);
-      } catch (e) {
-        async.throwException(e);
-      }
-    }
-  }
+	// NOTE: additional work queue items may be pushed while processing.
+	while (async.run.workQueue_.length) {
+		// Don't let the work queue grow indefinitely.
+		var workItems = async.run.workQueue_;
+		async.run.workQueue_ = [];
+		for (var i = 0; i < workItems.length; i++) {
+			var workItem = workItems[i];
+			try {
+				workItem.fn.call(workItem.scope);
+			} catch (e) {
+				async.throwException(e);
+			}
+		}
+	}
 
-  // There are no more work items, reset the work queue.
-  async.run.workQueueScheduled_ = false;
+	// There are no more work items, reset the work queue.
+	async.run.workQueueScheduled_ = false;
 };
 
 
@@ -88,10 +88,10 @@ async.run.processWorkQueue = function() {
  * @param {Object|null|undefined} scope
  */
 async.run.WorkItem_ = function(fn, scope) {
-  /** @const */
-  this.fn = fn;
-  /** @const */
-  this.scope = scope;
+	/** @const */
+	this.fn = fn;
+	/** @const */
+	this.scope = scope;
 };
 
 
@@ -105,21 +105,21 @@ async.run.WorkItem_ = function(fn, scope) {
  * @template SCOPE
  */
 async.nextTick = function(callback, opt_context) {
-  var cb = callback;
-  if (opt_context) {
-    cb = callback.bind(opt_context);
-  }
-  cb = async.nextTick.wrapCallback_(cb);
-  // Introduced and currently only supported by IE10.
-  if (core.isFunction(window.setImmediate)) {
-    window.setImmediate(cb);
-    return;
-  }
-  // Look for and cache the custom fallback version of setImmediate.
-  if (!async.nextTick.setImmediate_) {
-    async.nextTick.setImmediate_ = async.nextTick.getSetImmediateEmulator_();
-  }
-  async.nextTick.setImmediate_(cb);
+	var cb = callback;
+	if (opt_context) {
+		cb = callback.bind(opt_context);
+	}
+	cb = async.nextTick.wrapCallback_(cb);
+	// Introduced and currently only supported by IE10.
+	if (core.isFunction(window.setImmediate)) {
+		window.setImmediate(cb);
+		return;
+	}
+	// Look for and cache the custom fallback version of setImmediate.
+	if (!async.nextTick.setImmediate_) {
+		async.nextTick.setImmediate_ = async.nextTick.getSetImmediateEmulator_();
+	}
+	async.nextTick.setImmediate_(cb);
 };
 
 
@@ -138,87 +138,87 @@ async.nextTick.setImmediate_ = null;
  * @private
  */
 async.nextTick.getSetImmediateEmulator_ = function() {
-  // Create a private message channel and use it to postMessage empty messages
-  // to ourselves.
-  var Channel = window.MessageChannel;
-  // If MessageChannel is not available and we are in a browser, implement
-  // an iframe based polyfill in browsers that have postMessage and
-  // document.addEventListener. The latter excludes IE8 because it has a
-  // synchronous postMessage implementation.
-  if (typeof Channel === 'undefined' && typeof window !== 'undefined' &&
-    window.postMessage && window.addEventListener) {
-    /** @constructor */
-    Channel = function() {
-      // Make an empty, invisible iframe.
-      var iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = '';
-      document.documentElement.appendChild(iframe);
-      var win = iframe.contentWindow;
-      var doc = win.document;
-      doc.open();
-      doc.write('');
-      doc.close();
-      var message = 'callImmediate' + Math.random();
-      var origin = win.location.protocol + '//' + win.location.host;
-      var onmessage = function(e) {
-        // Validate origin and message to make sure that this message was
-        // intended for us.
-        if (e.origin !== origin && e.data !== message) {
-          return;
-        }
-        this.port1.onmessage();
-      }.bind(this);
-      win.addEventListener('message', onmessage, false);
-      this.port1 = {};
-      this.port2 = {
-        postMessage: function() {
-          win.postMessage(message, origin);
-        }
-      };
-    };
-  }
-  if (typeof Channel !== 'undefined') {
-    var channel = new Channel();
-    // Use a fifo linked list to call callbacks in the right order.
-    var head = {};
-    var tail = head;
-    channel.port1.onmessage = function() {
-      head = head.next;
-      var cb = head.cb;
-      head.cb = null;
-      cb();
-    };
-    return function(cb) {
-      tail.next = {
-        cb: cb
-      };
-      tail = tail.next;
-      channel.port2.postMessage(0);
-    };
-  }
-  // Implementation for IE6-8: Script elements fire an asynchronous
-  // onreadystatechange event when inserted into the DOM.
-  if (typeof document !== 'undefined' && 'onreadystatechange' in
-      document.createElement('script')) {
-    return function(cb) {
-      var script = document.createElement('script');
-      script.onreadystatechange = function() {
-        // Clean up and call the callback.
-        script.onreadystatechange = null;
-        script.parentNode.removeChild(script);
-        script = null;
-        cb();
-        cb = null;
-      };
-      document.documentElement.appendChild(script);
-    };
-  }
-  // Fall back to setTimeout with 0. In browsers this creates a delay of 5ms
-  // or more.
-  return function(cb) {
-    setTimeout(cb, 0);
-  };
+	// Create a private message channel and use it to postMessage empty messages
+	// to ourselves.
+	var Channel = window.MessageChannel;
+	// If MessageChannel is not available and we are in a browser, implement
+	// an iframe based polyfill in browsers that have postMessage and
+	// document.addEventListener. The latter excludes IE8 because it has a
+	// synchronous postMessage implementation.
+	if (typeof Channel === 'undefined' && typeof window !== 'undefined' &&
+		window.postMessage && window.addEventListener) {
+		/** @constructor */
+		Channel = function() {
+			// Make an empty, invisible iframe.
+			var iframe = document.createElement('iframe');
+			iframe.style.display = 'none';
+			iframe.src = '';
+			document.documentElement.appendChild(iframe);
+			var win = iframe.contentWindow;
+			var doc = win.document;
+			doc.open();
+			doc.write('');
+			doc.close();
+			var message = 'callImmediate' + Math.random();
+			var origin = win.location.protocol + '//' + win.location.host;
+			var onmessage = function(e) {
+				// Validate origin and message to make sure that this message was
+				// intended for us.
+				if (e.origin !== origin && e.data !== message) {
+					return;
+				}
+				this.port1.onmessage();
+			}.bind(this);
+			win.addEventListener('message', onmessage, false);
+			this.port1 = {};
+			this.port2 = {
+				postMessage: function() {
+					win.postMessage(message, origin);
+				}
+			};
+		};
+	}
+	if (typeof Channel !== 'undefined') {
+		var channel = new Channel();
+		// Use a fifo linked list to call callbacks in the right order.
+		var head = {};
+		var tail = head;
+		channel.port1.onmessage = function() {
+			head = head.next;
+			var cb = head.cb;
+			head.cb = null;
+			cb();
+		};
+		return function(cb) {
+			tail.next = {
+				cb: cb
+			};
+			tail = tail.next;
+			channel.port2.postMessage(0);
+		};
+	}
+	// Implementation for IE6-8: Script elements fire an asynchronous
+	// onreadystatechange event when inserted into the DOM.
+	if (typeof document !== 'undefined' && 'onreadystatechange' in
+			document.createElement('script')) {
+		return function(cb) {
+			var script = document.createElement('script');
+			script.onreadystatechange = function() {
+				// Clean up and call the callback.
+				script.onreadystatechange = null;
+				script.parentNode.removeChild(script);
+				script = null;
+				cb();
+				cb = null;
+			};
+			document.documentElement.appendChild(script);
+		};
+	}
+	// Fall back to setTimeout with 0. In browsers this creates a delay of 5ms
+	// or more.
+	return function(cb) {
+		setTimeout(cb, 0);
+	};
 };
 
 
@@ -230,7 +230,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
  * @private
  */
 async.nextTick.wrapCallback_ = function(opt_returnValue) {
-  return opt_returnValue;
+	return opt_returnValue;
 };
 
 export default async;

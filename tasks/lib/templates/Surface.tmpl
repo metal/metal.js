@@ -4,16 +4,16 @@
  * @param id
  */
 {deltemplate <%= moduleName %>.<%= surfaceName %>}
-  {delcall <%= moduleName %>.<%= surfaceName %> variant="'element'" data="all"}
-    {param elementContent kind="html"}
-      {if not $ij.skipSurfaceContents}
-        {delcall Surface}
-          {param content kind="html"}
-            {call .<%= surfaceName %> data="all" /}
-          {/param}
-          {param id: $id + '-<%= surfaceName %>' /}
-        {/delcall}
-      {/if}
-    {/param}
-  {/delcall}
+	{delcall <%= moduleName %>.<%= surfaceName %> variant="'element'" data="all"}
+		{param elementContent kind="html"}
+			{if not $ij.skipSurfaceContents}
+				{delcall Surface}
+					{param content kind="html"}
+						{call .<%= surfaceName %> data="all" /}
+					{/param}
+					{param id: $id + '-<%= surfaceName %>' /}
+				{/delcall}
+			{/if}
+		{/param}
+	{/delcall}
 {/deltemplate}

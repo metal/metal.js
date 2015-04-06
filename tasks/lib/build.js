@@ -32,8 +32,8 @@ module.exports = function(options) {
         compact: false
       })).on('error', handleError)
       .pipe(plugins.wrapper({
-        header: ';(function() {',
-        footer: '}());'
+        header: ';(function() {\n',
+        footer: '\n}());'
       }))
       .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest(options.buildDest));

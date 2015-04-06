@@ -43,7 +43,7 @@ The **Attribute** class provides a way of defining attributes for the classes th
 The following example is a class that extends from Attribute and defines an attribute named `foo` on itself:
 
 ```javascript
-class TestAttributes extend Attribute {
+class TestAttributes extends Attribute {
 	constructor(opt_config) {
 		super(opt_config);
 	}

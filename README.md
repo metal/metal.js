@@ -43,6 +43,8 @@ The **Attribute** class provides a way of defining attributes for the classes th
 The following example is a class that extends from Attribute and defines an attribute named `foo` on itself:
 
 ```js
+import Attribute from '../bower_components/metaljs/src/attribute/Attribute';
+
 class MyAttributes extends Attribute {
 	constructor(opt_config) {
 		super(opt_config);
@@ -88,6 +90,8 @@ Building a widget with SoyComponent is simple, you just need to create two files
 So, for example, let's say we want to create a widget called **MyWidget**, that has a body and a footer with content. The JavaScript file would look like this:
 
 ```js
+import SoyComponent from '../bower_components/metaljs/src/soy/SoyComponent';
+
 class MyWidget extends SoyComponent {
 	constructor(opt_config) {
 		super(opt_config);

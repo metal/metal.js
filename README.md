@@ -146,7 +146,7 @@ SoyComponent's logic for updating the widget's contents automatically is very sm
 Finally, to render an instance of MyWidget, just call `render`, passing any attribute values that you want to initialize:
 
 ```js
-var testWidget = new MyWidget({headerContent: 'My Header'}).render(parentElement);
+new MyWidget({headerContent: 'My Header'}).render(parentElement);
 ```
 
 For a more complete and working example, take a look at the [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate) repo. Among other things, it lists all optional lifecycle functions that can be implemented for SoyComponent.

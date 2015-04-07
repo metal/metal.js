@@ -14,9 +14,7 @@ Metal's main classes are [Attribute](#attribute) and **Component**. Component ac
 
 One thing that can be really useful for a developer when building a component, is to separate the rendering logic from the business logic. This can be achieved on Metal by modules built on top of Component, that integrate with template engines. Metal already provides such an implementation for integration with [soy templates](http://developers.google.com/closure/templates), called [SoyComponent](#soycomponent).
 
-<center>
 ![Architecture Chart](http://f.cl.ly/items/1y1K2d1724253I372w2p/architecture.png)
-</center>
 
 ## Setup
 
@@ -187,7 +185,11 @@ It's important to note that building components with SoyComponent also helps wit
 
 ## Performance
 
-TODO
+Metal was built from the first with performance in mind. We've run performance tests to compare Metal with other libraries and got really good results that show the benefits of using Metal.
+
+In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render that widget with 1000 items on different situations. On the chart below you can see the results we obtained. Note that Metal is represented by the blue bars, YUI by the red bars and React by the yellow ones.
+
+![Performance Chart - Simple](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,47.8,45.4|82.8,55.6,62.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400)
 
 ## Browser
 

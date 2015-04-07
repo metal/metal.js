@@ -176,6 +176,19 @@ modal.components.ok // The instance for the 'Ok' button
 modal.components.cancel // The instance for the 'Cancel' button
 ```
 
+## Inline events
+Another feature Metal has that can be very useful is the ability to declare events inside templates, directly on the desired element. Besides being simple and intuitive, this feature allows Metal to handle attaching events itself, and so this can be done in the best way possible, with [delegates](https://learn.jquery.com/events/event-delegation/) for example, without the user having worry about that at all.
+
+By using SoyComponent, for example, you can add inline listeners like this:
+
+```
+{template .button}
+	<button data-onclick="handleClick"></button>
+{/template}
+```
+
+Then, you just need to define a `handleClick` method on your component, and it will be called whenever the event is triggered.
+
 ## Decorate
 
 [Progressive enhancement](http://en.wikipedia.org/wiki/Progressive_enhancement) is a feature that is very important for a lot of people. Knowing about this, Metal is prepared to deal with content that already comes rendered from the server. In that case, instead of calling `render` the developer can call `decorate` instead. This will skip the rendering phase of the component, running only the code that enhances it with JavaScript behavior instead.

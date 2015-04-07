@@ -1,8 +1,8 @@
-Metal.js
-===============
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/liferay/metal)
+# Metal.js
 
-## About
+[![Build Status](http://img.shields.io/travis/liferay/metal/master.svg?style=flat)](https://travis-ci.org/liferay/metal)
+[![Dependencies Status](http://img.shields.io/david/liferay/metal.svg?style=flat)](https://david-dm.org/liferay/metal#info=dependencies)
+[![DevDependencies Status](http://img.shields.io/david/dev/liferay/metal.svg?style=flat)](https://david-dm.org/liferay/metal#info=devDependencies)
 
 Metal is a JavaScript library for building from simple widgets to full scale applications.
 
@@ -277,3 +277,7 @@ Generates some soy templates that are necessary for integration with the SoyComp
 * `soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
 * `soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.
 * `soySrc` The glob expression that defines the location of the soy files. Default: **src/\*\*/\*.soy**.
+
+## Browser Support
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/liferay/metal)

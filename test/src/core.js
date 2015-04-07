@@ -117,6 +117,17 @@ describe('core', function() {
 			assert.ok(core.isFunction(function() {}));
 		});
 
+		it('should check if var is object', function() {
+			assert.ok(!core.isObject(1));
+			assert.ok(!core.isObject(''));
+			assert.ok(!core.isObject(null));
+			assert.ok(!core.isObject(undefined));
+
+			assert.ok(core.isObject({}));
+			assert.ok(core.isObject([]));
+			assert.ok(core.isObject(function() {}));
+		});
+
 		it('should check if var is string', function() {
 			assert.ok(!core.isString(1));
 			assert.ok(!core.isString({}));

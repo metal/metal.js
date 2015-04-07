@@ -185,18 +185,23 @@ It's important to note that building components with SoyComponent also helps wit
 
 ## Performance
 
-Metal was built from the first with performance in mind. We've run performance tests to compare Metal with other libraries and got really good results that show the benefits of using Metal.
+Metal was built from the first with performance in mind. We've run performance tests to compare it with other libraries and got really good results that show the benefits of using it.
 
-In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render that widget with 1000 items on three different situations:
+In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render those widgets with 1000 items each on three different situations:
 
 * **First Render** - Creating and rendering the list for the first time, on a blank element.
 * **Decorate** - Creating and decorating a list that was previously rendered on the DOM.
 * **Update** - Changing the contents of the first item of the list, causing a rerender.
 
-On the chart below you can see the results we obtained.
+The chart below shows the results we obtained on Safari:
 
+![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,47.8,45.4|82.8,55.6,62.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,85,20&chxp=2,50&chtt=Performance%20Test%20-%20List)
 
-![Performance Chart - Simple](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,47.8,45.4|82.8,55.6,62.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,85,20&chxp=2,50)
+In this previous test, the list widget was built on all three libraries as a single component that renders each list item itself. We also did another similar test, with a list widget that was built using [nested components](#nested-components) instead, on which the list component renders other components that represent list items. Since YUI doesn't have this concept of nested components, this test was only done for Metal and React.
+
+Once again, the chart below shows the results we obtained on Safari:
+
+![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:81.6,48.6,30.2|181.6,99.4,98.6&chds=0,190&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,F4B400&chbh=r,0.25,1.5&chdl=Metal|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,190,30&chxp=2,50&chtt=Performance%20Test%20-%20List%20with%20nested%20components)
 
 ## Browser
 

@@ -32,7 +32,7 @@ import core from 'bower_components/metaljs/src/core';
 core.isString('Hello World');
 ```
 
-Note that Metal is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal on a website. See the [Browser](#browser) section for more details.
+Note that Metal is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal on a website. See the [Build Tasks](#build-tasks) section for more details.
 
 ## Attribute
 
@@ -89,6 +89,7 @@ So, for example, let's say we want to create a widget called **MyWidget**, that 
 
 ```js
 import SoyComponent from '../bower_components/metaljs/src/soy/SoyComponent';
+import from './myWidget.soy.js';
 
 class MyWidget extends SoyComponent {
 	constructor(opt_config) {
@@ -106,7 +107,7 @@ MyWidget.ATTRS = {
 };
 ```
 
-This file just defines a class named MyWidget, makes it extend from SoyComponent and defines two [attributes](#attribute). Now we just need a soy file for MyWidget's rendering logic. It would look like this:
+This file just defines a class named MyWidget, makes it extend from SoyComponent, imports the compiled soy templates and defines two [attributes](#attribute). Now we just need a soy file for MyWidget's rendering logic. It would look like this:
 
 ```
 {namespace Templates.MyWidget}
@@ -203,6 +204,63 @@ Once again, the chart below shows the results we obtained on Safari:
 
 ![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:81.6,48.6,30.2|181.6,99.4,98.6&chds=0,190&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,F4B400&chbh=r,0.25,1.5&chdl=Metal|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,190,30&chxp=2,50&chtt=Performance%20Test%20-%20List%20with%20nested%20components)
 
-## Browser
+## Tools
 
-TODO
+Metal comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To use them, just install Metal through [npm](https://www.npmjs.com/package/metaljs) and register the tasks on your gulpfile like this:
+
+```js
+var metaljs = require('metaljs');
+metaljs(options);
+```
+
+As you can see, the metaljs function receives an optional object to customize the registered functions. Each task has its own options, but the `taskPrefix` option affects all task, registering them all with the provided prefix before the original names.
+
+After calling the metaljs function, several tasks will then be available to run on gulp. These can be broken in different categories, so we'll explain each separately.
+
+### Build Tasks
+
+As we've mentioned before, Metal is written in ES6. Since browsers don't yet implement ES6, the original code won't run on them. There are several different ways to solve this, such as adding a ES6 polyfill like [traceur](https://github.com/google/traceur-compiler). That means adding more code to the page though as well as compiling the code at run time.
+
+Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to built to. Metal provides a few tasks as build options that can be used out of the box.
+
+#### build:globals
+Builds ES6 code to ES5, bundling all modules into a single file and publishing each to a global variable. The following options can be passed to the metaljs function for customizing this task:
+* `buildDest` The directory where the final bundle file should be placed. Default: **build**.
+* `buildSrc` The glob expression that defines which files should be built. Default: **src/\*\*/\*.js**.
+* `bundleFileName` The name of the final bundle file. Default: **metal.js**.
+* `globalName` The name of the global variable that should hold the exported values of the modules. Default: **metal**.
+
+#### watch:globals
+Watches for changes on the source files, rebuilding the code to the globals format automatically when that happens.
+
+### Test Tasks
+
+Metal also provides gulp tasks to help with testing modules built with Metal. The tasks assume that tests are written in [karma](http://karma-runner.github.io/0.12/index.html), and so there should be a **karma.conf.js** file. A sample karma.conf.js file can be found at [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate/blob/master/karma.conf.js), which works well with Metal, including correct coverage reports.
+
+#### test
+Runs all tests once.
+
+#### test:coverage
+Runs all tests once, and opens the coverage html file on the default browser.
+
+#### test:browsers
+Runs all tests once, on the following browsers: Chrome, Firefox, Safari, IE9, IE10 and IE11.
+
+#### test:saucelabs
+Runs all tests once on Saucelabs. Both username and access key need to be previously specified as environemnt variables for this to work. See [karma-sauce-launcher](https://github.com/karma-runner/karma-sauce-launcher) for more details.
+
+#### test:watch
+Watches for changes to source files, rerunning tests automatically when that happens.
+
+### Soy Tasks
+
+Finally, Metal provides an important task for developing with SoyComponent. If your code is using it, you'll need this task for the templates to be correctly handled and integrated with your javascript file.
+
+#### soy
+Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metaljs function for customizing this task:
+
+`corePathFromSoy` The path from the soy files location to Metal's core module. Default: **../bower_components/metaljs/src**.
+`soyDest` The directory where the compiled soy files should be placed. Default: **src**.
+`soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
+`soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.
+`soySrc` The glob expression that defines the location of the soy files. Default: **src/\*\*/\*.soy**.

@@ -236,40 +236,40 @@ As we've mentioned before, Metal is written in ES6. Since browsers don't yet imp
 
 Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to build to. Metal provides a few tasks as build options that can be used out of the box.
 
-#### build:globals
+#### `gulp build:globals`
 Builds ES6 code to ES5, bundling all modules into a single file and publishing each to a global variable. The following options can be passed to the metaljs function for customizing this task:
 * `buildDest` The directory where the final bundle file should be placed. Default: **build**.
 * `bundleFileName` The name of the final bundle file. Default: **metal.js**.
 * `buildSrc` The glob expression that defines which files should be built. Default: **src/\*\*/\*.js**.
 * `globalName` The name of the global variable that should hold the exported values of the modules. Default: **metal**.
 
-#### watch:globals
+#### `gulp watch:globals`
 Watches for changes on the source files, rebuilding the code to the globals format automatically when that happens.
 
 ### Test Tasks
 
 Metal also provides gulp tasks to help with testing modules built with Metal. The tasks assume that tests are written in [karma](http://karma-runner.github.io/0.12/index.html), and so there should be a **karma.conf.js** file. A sample karma.conf.js file can be found at [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate/blob/master/karma.conf.js), which works well with Metal, including correct coverage reports.
 
-#### test
+#### `gulp test`
 Runs all tests once.
 
-#### test:coverage
+#### `gulp test:coverage`
 Runs all tests once and then opens the coverage html file on the default browser.
 
-#### test:browsers
+#### `gulp test:browsers`
 Runs all tests once on the following browsers: Chrome, Firefox, Safari, IE9, IE10 and IE11.
 
-#### test:saucelabs
+#### `gulp test:saucelabs`
 Runs all tests once on Saucelabs. Both username and access key need to be previously specified as environemnt variables for this to work. See [karma-sauce-launcher](https://github.com/karma-runner/karma-sauce-launcher) for more details.
 
-#### test:watch
+#### `gulp test:watch`
 Watches for changes to source files, rerunning tests automatically when that happens.
 
 ### Soy Tasks
 
 Finally, Metal provides an important task for developing with SoyComponent. If your code is using it, you'll need this task for the templates to be correctly handled and integrated with your javascript file.
 
-#### soy
+#### `gulp soy`
 Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metaljs function for customizing this task:
 
 * `corePathFromSoy` The path from the soy files location to Metal's core module. Default: **../bower_components/metaljs/src**.

@@ -110,6 +110,26 @@ describe('Component', function() {
 			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 		});
 
+		it('should not throw error if component doesn\'t implement lifecycle methods', function() {
+			class CustomComponent extends Component {
+				constructor(opt_config) {
+					super(opt_config);
+				}
+			}
+			CustomComponent.SURFACES = {
+				body: {}
+			};
+
+			assert.doesNotThrow(function() {
+				var custom = new CustomComponent();
+				custom.render();
+				custom.detach();
+
+				custom = new CustomComponent();
+				custom.decorate();
+			});
+		});
+
 		it('should overwrite component element tagName', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ELEMENT_TAG_NAME = 'span';
@@ -747,8 +767,6 @@ describe('Component', function() {
 			assert.strictEqual('<div>static</div>', custom.getSurfaceElement('body').innerHTML);
 			assert.strictEqual('<div>static</div>', custom.getSurfaceElement('bottom').innerHTML);
 
-			sinon.spy(dom, 'append');
-
 			custom.renderSurfacesContent_({
 				header: true,
 				body: true,
@@ -757,8 +775,6 @@ describe('Component', function() {
 			assert.ok(!custom.getSurface('header').cacheMiss);
 			assert.ok(!custom.getSurface('body').cacheMiss);
 			assert.ok(custom.getSurface('bottom').cacheMiss);
-
-			dom.append.restore();
 		});
 
 		it('should return component instance from surface methods', function() {
@@ -768,6 +784,12 @@ describe('Component', function() {
 			assert.strictEqual(custom, custom.addSurface('header'));
 			assert.strictEqual(custom, custom.addSurfaces({}));
 			assert.strictEqual(custom, custom.removeSurface('header'));
+		});
+
+		it('should extract component id from surface element id', function() {
+			assert.strictEqual('comp', Component.extractComponentId('comp'));
+			assert.strictEqual('comp', Component.extractComponentId('comp-header'));
+			assert.strictEqual('comp-modal', Component.extractComponentId('comp-modal-header'));
 		});
 	});
 

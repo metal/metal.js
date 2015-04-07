@@ -189,7 +189,7 @@ Metal was built from the first with performance in mind. We've run performance t
 
 In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render that widget with 1000 items on different situations. On the chart below you can see the results we obtained.
 
-![Performance Chart - Simple](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,47.8,45.4|82.8,55.6,62.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React)
+![Performance Chart - Simple](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,47.8,45.4|82.8,55.6,62.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,x,y,y&chxr=2,0,85,20&chxp=3,50&chxl=3:|%28ms%29|)
 
 ## Browser
 

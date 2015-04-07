@@ -3,7 +3,7 @@
 function normalizeOptions(options) {
 	options = options || {};
 	options.bundleFileName = options.bundleFileName || 'metal.js';
-	options.corePathFromSoy = options.corePathFromSoy || '../bower_components/metaljs/src';
+	options.corePathFromSoy = options.corePathFromSoy || 'metaljs/src';
 	options.buildDest = options.buildDest || 'build';
 	options.buildSrc = options.buildSrc || 'src/**/*.js';
 	options.globalName = options.globalName || 'metal';

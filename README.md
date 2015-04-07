@@ -6,7 +6,7 @@ Metal.js
 
 Metal is a JavaScript library for building from simple widgets to full scale applications.
 
-Even though it's powerful, Metal is very small, being only around 9kb after compressed with gzip. It's also really well tested, currently with 99% coverage of unit tests.
+Even though it's powerful, Metal is very small, being only around 9kb after compressed with gzip. It's also really well tested, currently with 99% coverage of unit tests, besides having great [performance](#performance).
 
 ## Architecture
 
@@ -187,7 +187,13 @@ It's important to note that building components with SoyComponent also helps wit
 
 Metal was built from the first with performance in mind. We've run performance tests to compare Metal with other libraries and got really good results that show the benefits of using Metal.
 
-In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render that widget with 1000 items on different situations. On the chart below you can see the results we obtained.
+In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render that widget with 1000 items on three different situations:
+
+* **First Render** - Creating and rendering the list for the first time, on a blank element.
+* **Decorate** - Creating and decorating a list that was previously rendered on the DOM.
+* **Update** - Changing the contents of the first item of the list, causing a rerender.
+
+On the chart below you can see the results we obtained.
 
 
 ![Performance Chart - Simple](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,47.8,45.4|82.8,55.6,62.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,85,20&chxp=2,50)

@@ -241,10 +241,10 @@ Metal also provides gulp tasks to help with testing modules built with Metal. Th
 Runs all tests once.
 
 #### test:coverage
-Runs all tests once, and then opens the coverage html file on the default browser.
+Runs all tests once and then opens the coverage html file on the default browser.
 
 #### test:browsers
-Runs all tests once, on the following browsers: Chrome, Firefox, Safari, IE9, IE10 and IE11.
+Runs all tests once on the following browsers: Chrome, Firefox, Safari, IE9, IE10 and IE11.
 
 #### test:saucelabs
 Runs all tests once on Saucelabs. Both username and access key need to be previously specified as environemnt variables for this to work. See [karma-sauce-launcher](https://github.com/karma-runner/karma-sauce-launcher) for more details.
@@ -259,8 +259,8 @@ Finally, Metal provides an important task for developing with SoyComponent. If y
 #### soy
 Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metaljs function for customizing this task:
 
-`corePathFromSoy` The path from the soy files location to Metal's core module. Default: **../bower_components/metaljs/src**.
-`soyDest` The directory where the compiled soy files should be placed. Default: **src**.
-`soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
-`soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.
-`soySrc` The glob expression that defines the location of the soy files. Default: **src/\*\*/\*.soy**.
+* `corePathFromSoy` The path from the soy files location to Metal's core module. Default: **../bower_components/metaljs/src**.
+* `soyDest` The directory where the compiled soy files should be placed. Default: **src**.
+* `soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
+* `soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.
+* `soySrc` The glob expression that defines the location of the soy files. Default: **src/\*\*/\*.soy**.

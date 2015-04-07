@@ -1,12 +1,15 @@
 'use strict';
 
+var bowerDirectory = require('bower-directory');
 var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
 var normalizeOptions = require('./options');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
+var rename = require('gulp-es6-imports-renamer');
 var runSequence = require('run-sequence');
 var transpile = require('gulp-es6-module-transpiler');
+var path = require('path');
 var plugins = require('gulp-load-plugins')();
 
 module.exports = function(options) {
@@ -20,6 +23,10 @@ module.exports = function(options) {
 	gulp.task(taskPrefix + 'globals', function() {
 		return gulp.src(options.buildSrc)
 			.pipe(sourcemaps.init())
+			.pipe(rename({
+				basePath: process.cwd(),
+				renameFn: renameFn
+			})).on('error', handleError)
 			.pipe(transpile({
 				basePath: process.cwd(),
 				bundleFileName: options.bundleFileName,
@@ -50,4 +57,13 @@ function handleError(error) {
 	console.error(error.toString());
 
 	this.emit('end'); // jshint ignore:line
+}
+
+var bowerDirectory = bowerDirectory.sync();
+function renameFn(originalPath, parentName, callback) {
+	if (originalPath[0] === '.') {
+		callback(path.resolve(path.dirname(parentName), originalPath));
+	} else {
+		callback(path.join(bowerDirectory, originalPath));
+	}
 }

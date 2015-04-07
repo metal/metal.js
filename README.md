@@ -272,7 +272,7 @@ Finally, Metal provides an important task for developing with SoyComponent. If y
 #### `gulp soy`
 Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metaljs function for customizing this task:
 
-* `corePathFromSoy` The path from the soy files location to Metal's core module. Default: **../bower_components/metaljs/src**.
+* `corePathFromSoy` The path from the soy files location to Metal's core module. Default: **metaljs/src**.
 * `soyDest` The directory where the compiled soy files should be placed. Default: **src**.
 * `soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
 * `soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.

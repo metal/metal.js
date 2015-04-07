@@ -219,15 +219,15 @@ After calling the metaljs function, several tasks will then be available to run 
 
 ### Build Tasks
 
-As we've mentioned before, Metal is written in ES6. Since browsers don't yet implement ES6, the original code won't run on them. There are several different ways to solve this, such as adding a ES6 polyfill like [traceur](https://github.com/google/traceur-compiler). That means adding more code to the page though as well as compiling the code at run time.
+As we've mentioned before, Metal is written in ES6. Since browsers don't yet implement ES6, the original code won't run on them. There are several different ways to solve this, such as adding a ES6 polyfill like [traceur](https://github.com/google/traceur-compiler). That means adding more code to the page though, as well as compiling the code at run time.
 
-Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to built to. Metal provides a few tasks as build options that can be used out of the box.
+Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to build to. Metal provides a few tasks as build options that can be used out of the box.
 
 #### build:globals
 Builds ES6 code to ES5, bundling all modules into a single file and publishing each to a global variable. The following options can be passed to the metaljs function for customizing this task:
 * `buildDest` The directory where the final bundle file should be placed. Default: **build**.
-* `buildSrc` The glob expression that defines which files should be built. Default: **src/\*\*/\*.js**.
 * `bundleFileName` The name of the final bundle file. Default: **metal.js**.
+* `buildSrc` The glob expression that defines which files should be built. Default: **src/\*\*/\*.js**.
 * `globalName` The name of the global variable that should hold the exported values of the modules. Default: **metal**.
 
 #### watch:globals
@@ -241,7 +241,7 @@ Metal also provides gulp tasks to help with testing modules built with Metal. Th
 Runs all tests once.
 
 #### test:coverage
-Runs all tests once, and opens the coverage html file on the default browser.
+Runs all tests once, and then opens the coverage html file on the default browser.
 
 #### test:browsers
 Runs all tests once, on the following browsers: Chrome, Firefox, Safari, IE9, IE10 and IE11.

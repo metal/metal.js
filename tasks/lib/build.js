@@ -25,6 +25,7 @@ module.exports = function(options) {
 			.pipe(sourcemaps.init())
 			.pipe(rename({
 				basePath: process.cwd(),
+				renameDependencies: true,
 				renameFn: renameFn
 			})).on('error', handleError)
 			.pipe(transpile({

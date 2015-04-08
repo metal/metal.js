@@ -51,7 +51,7 @@
     "browserify": "^9.0.3",
     "browserify-istanbul": "^0.2.0",
     "chai": "^2.2.0",
-    "gulp-es6-imports-renamer": "^0.1.4",
+    "gulp-es6-imports-renamer": "^0.1.5",
     "isparta": "^2.2.0",
     "karma": "^0.12.31",
     "karma-browserify": "^4.0.0",

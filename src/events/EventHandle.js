@@ -16,6 +16,8 @@ import Disposable from '../disposable/Disposable';
  */
 class EventHandle extends Disposable {
 	constructor(emitter, event, listener) {
+		super();
+
 		/**
 		 * The EventEmitter instance that the event was subscribed to.
 		 * @type {EventEmitter}

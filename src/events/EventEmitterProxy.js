@@ -20,6 +20,8 @@ import Disposable from '../disposable/Disposable';
  */
 class EventEmitterProxy extends Disposable {
 	constructor(originEmitter, targetEmitter, opt_blacklist, opt_whitelist) {
+		super();
+
 		/**
 		 * Map of events that should not be proxied.
 		 * @type {Object}

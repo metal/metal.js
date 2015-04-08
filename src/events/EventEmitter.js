@@ -11,6 +11,8 @@ import EventHandle from '../events/EventHandle';
  */
 class EventEmitter extends Disposable {
 	constructor() {
+		super();
+
 		/**
 		 * Holds event listeners scoped by event type.
 		 * @type {!Object<string, !Array<!function()>>}

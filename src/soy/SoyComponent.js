@@ -30,6 +30,8 @@ var originalSurfaceTemplate = ComponentRegistry.Templates.SoyComponent.surface;
  */
 class SoyComponent extends Component {
 	constructor(opt_config) {
+		super(opt_config);
+
 		core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
 
 		/**
@@ -77,8 +79,6 @@ class SoyComponent extends Component {
 		 * @protected
 		 */
 		this.recentlyAddedComponents_ = [];
-
-		super(opt_config);
 
 		this.addSurfacesFromTemplates_();
 	}

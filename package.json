@@ -52,7 +52,7 @@
     "browserify": "^9.0.3",
     "browserify-istanbul": "^0.2.0",
     "chai": "^2.2.0",
-    "isparta": "^2.2.0",
+    "isparta": "^3.0.3",
     "karma": "^0.12.31",
     "karma-browserify": "^4.0.0",
     "karma-chai": "^0.1.0",

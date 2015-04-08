@@ -4,15 +4,15 @@
 [![Dependencies Status](http://img.shields.io/david/liferay/metal.svg?style=flat)](https://david-dm.org/liferay/metal#info=dependencies)
 [![DevDependencies Status](http://img.shields.io/david/dev/liferay/metal.svg?style=flat)](https://david-dm.org/liferay/metal#info=devDependencies)
 
-Metal is a JavaScript library for building from simple widgets to full scale applications.
+Metal.js is a JavaScript library for building from simple widgets to full scale applications.
 
-Even though it's powerful, Metal is very small, being only around 9kb after compressed with gzip. It's also really well tested, currently with 99% coverage of unit tests, besides having great [performance](#performance).
+Even though it's powerful, Metal.js is very small, being only around 9kb after compressed with gzip. It's also really well tested, currently with 99% coverage of unit tests, besides having great [performance](#performance).
 
 ## Architecture
 
-Metal's main classes are [Attribute](#attribute) and **Component**. Component actually extends from Attribute, thus containing all its features. The main difference between the two is that Component's extra features are related to rendering. So you could just use Attribute directly if your module doesn't do any rendering. But if your module does need rendering logic though, then Component will work better for you.
+Metal.js's main classes are [Attribute](#attribute) and **Component**. Component actually extends from Attribute, thus containing all its features. The main difference between the two is that Component's extra features are related to rendering. So you could just use Attribute directly if your module doesn't do any rendering. But if your module does need rendering logic though, then Component will work better for you.
 
-One thing that can be really useful for a developer when building a component, is to separate the rendering logic from the business logic. This can be achieved on Metal by modules built on top of Component, that integrate with template engines. Metal already provides such an implementation for integration with [soy templates](http://developers.google.com/closure/templates), called [SoyComponent](#soycomponent).
+One thing that can be really useful for a developer when building a component, is to separate the rendering logic from the business logic. This can be achieved on Metal.js by modules built on top of Component, that integrate with template engines. Metal.js already provides such an implementation for integration with [soy templates](http://developers.google.com/closure/templates), called [SoyComponent](#soycomponent).
 
 ![Architecture Chart](http://f.cl.ly/items/1y1K2d1724253I372w2p/architecture.png)
 
@@ -23,16 +23,16 @@ One thing that can be really useful for a developer when building a component, i
 
 ## Usage
 
-With the code already available, you can use Metal by just importing the desired module on your js file and calling what you wish on it. For example:
+With the code already available, you can use Metal.js by just importing the desired module on your js file and calling what you wish on it. For example:
 
 ```js
 import core from 'bower_components/metaljs/src/core';
 
-// You can now call any function from Metal's core module.
+// You can now call any function from Metal.js's core module.
 core.isString('Hello World');
 ```
 
-Note that Metal is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal on a website. See the [Build Tasks](#build-tasks) section for more details.
+Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal.js on a website. See the [Build Tasks](#build-tasks) section for more details.
 
 ## Attribute
 
@@ -81,7 +81,7 @@ To see all features of the Attribute class, take a look at its [unit tests](http
 
 ## SoyComponent
 
-This section will explain how to build rich widgets on Metal, by taking advantage of the **SoyComponent** class. By using SoyComponent, you'll be able to easily separate business logic from rendering logic, as it provides an integration with [soy templates](http://developers.google.com/closure/templates).
+This section will explain how to build rich widgets on Metal.js, by taking advantage of the **SoyComponent** class. By using SoyComponent, you'll be able to easily separate business logic from rendering logic, as it provides an integration with [soy templates](http://developers.google.com/closure/templates).
 
 Building a widget with SoyComponent is simple, you just need to create two files: one with your soy templates, and the other with your JavaScript logic.
 
@@ -177,7 +177,7 @@ modal.components.cancel // The instance for the 'Cancel' button
 ```
 
 ## Inline events
-Another feature Metal has that can be very useful is the ability to declare events inside templates, directly on the desired element. Besides being simple and intuitive, this feature allows Metal to handle attaching events itself, and so this can be done in the best way possible, with [delegates](https://learn.jquery.com/events/event-delegation/) for example, without the user having worry about that at all.
+Another feature Metal.js has that can be very useful is the ability to declare events inside templates, directly on the desired element. Besides being simple and intuitive, this feature allows Metal.js to handle attaching events itself, and so this can be done in the best way possible, with [delegates](https://learn.jquery.com/events/event-delegation/) for example, without the user having worry about that at all.
 
 By using SoyComponent, for example, you can add inline listeners like this:
 
@@ -191,7 +191,7 @@ Then, you just need to define a `handleClick` method on your component, and it w
 
 ## Decorate
 
-[Progressive enhancement](http://en.wikipedia.org/wiki/Progressive_enhancement) is a feature that is very important for a lot of people. Knowing about this, Metal is prepared to deal with content that already comes rendered from the server. In that case, instead of calling `render` the developer can call `decorate` instead. This will skip the rendering phase of the component, running only the code that enhances it with JavaScript behavior instead.
+[Progressive enhancement](http://en.wikipedia.org/wiki/Progressive_enhancement) is a feature that is very important for a lot of people. Knowing about this, Metal.js is prepared to deal with content that already comes rendered from the server. In that case, instead of calling `render` the developer can call `decorate` instead. This will skip the rendering phase of the component, running only the code that enhances it with JavaScript behavior instead.
 
 For SoyComponent, this means that the template won't be rendered, but the `attached` lifecycle method will still be called.
 
@@ -199,9 +199,9 @@ It's important to note that building components with SoyComponent also helps wit
 
 ## Performance
 
-Metal was built from the first with performance in mind. We've run performance tests to compare it with other libraries and got really good results that show the benefits of using it.
+Metal.js was built from the first with performance in mind. We've run performance tests to compare it with other libraries and got really good results that show the benefits of using it.
 
-In one of the tests we made, we built a simple list widget on three different libraries: Metal, YUI and React. We then measured the time it took to render those widgets with 1000 items each on three different situations:
+In one of the tests we made, we built a simple list widget on three different libraries: Metal.js, YUI and React. We then measured the time it took to render those widgets with 1000 items each on three different situations:
 
 * **First Render** - Creating and rendering the list for the first time, on a blank element.
 * **Decorate** - Creating and decorating a list that was previously rendered on the DOM.
@@ -211,7 +211,7 @@ The chart below shows the results we obtained on Safari:
 
 ![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,63.5,54.4|82.8,78.6,72.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,85,20&chxp=2,50&chtt=Performance%20Test%20-%20List)
 
-In this previous test, the list widget was built on all three libraries as a single component that renders each list item itself. We also did another similar test, with a list widget that was built using [nested components](#nested-components) instead, on which the list component renders other components that represent list items. Since YUI doesn't have this concept of nested components, this test was only done for Metal and React.
+In this previous test, the list widget was built on all three libraries as a single component that renders each list item itself. We also did another similar test, with a list widget that was built using [nested components](#nested-components) instead, on which the list component renders other components that represent list items. Since YUI doesn't have this concept of nested components, this test was only done for Metal.js and React.
 
 Once again, the chart below shows the results we obtained on Safari:
 
@@ -219,7 +219,7 @@ Once again, the chart below shows the results we obtained on Safari:
 
 ## Tools
 
-Metal comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To use them, just install Metal through [npm](https://www.npmjs.com/package/metaljs) and register the tasks on your gulpfile like this:
+Metal.js comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To use them, just install Metal.js through [npm](https://www.npmjs.com/package/metaljs) and register the tasks on your gulpfile like this:
 
 ```js
 var metaljs = require('metaljs');
@@ -232,9 +232,9 @@ After calling the metaljs function, several tasks will then be available to run 
 
 ### Build Tasks
 
-As we've mentioned before, Metal is written in ES6. Since browsers don't yet implement ES6, the original code won't run on them. There are several different ways to solve this, such as adding a ES6 polyfill like [traceur](https://github.com/google/traceur-compiler). That means adding more code to the page though, as well as compiling the code at run time.
+As we've mentioned before, Metal.js is written in ES6. Since browsers don't yet implement ES6, the original code won't run on them. There are several different ways to solve this, such as adding a ES6 polyfill like [traceur](https://github.com/google/traceur-compiler). That means adding more code to the page though, as well as compiling the code at run time.
 
-Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to build to. Metal provides a few tasks as build options that can be used out of the box.
+Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to build to. Metal.js provides a few tasks as build options that can be used out of the box.
 
 #### `gulp build:globals`
 Builds ES6 code to ES5, bundling all modules into a single file and publishing each to a global variable. The following options can be passed to the metaljs function for customizing this task:
@@ -248,7 +248,7 @@ Watches for changes on the source files, rebuilding the code to the globals form
 
 ### Test Tasks
 
-Metal also provides gulp tasks to help with testing modules built with Metal. The tasks assume that tests are written in [karma](http://karma-runner.github.io/0.12/index.html), and so there should be a **karma.conf.js** file. A sample karma.conf.js file can be found at [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate/blob/master/karma.conf.js), which works well with Metal, including correct coverage reports.
+Metal.js also provides gulp tasks to help with testing modules built with Metal.js. The tasks assume that tests are written in [karma](http://karma-runner.github.io/0.12/index.html), and so there should be a **karma.conf.js** file. A sample karma.conf.js file can be found at [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate/blob/master/karma.conf.js), which works well with Metal.js, including correct coverage reports.
 
 #### `gulp test`
 Runs all tests once.
@@ -267,12 +267,12 @@ Watches for changes to source files, rerunning tests automatically when that hap
 
 ### Soy Tasks
 
-Finally, Metal provides an important task for developing with SoyComponent. If your code is using it, you'll need this task for the templates to be correctly handled and integrated with your javascript file.
+Finally, Metal.js provides an important task for developing with SoyComponent. If your code is using it, you'll need this task for the templates to be correctly handled and integrated with your javascript file.
 
 #### `gulp soy`
 Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metaljs function for customizing this task:
 
-* `corePathFromSoy` The path from the soy files location to Metal's core module. Default: **metaljs/src**.
+* `corePathFromSoy` The path from the soy files location to Metal.js's core module. Default: **metaljs/src**.
 * `soyDest` The directory where the compiled soy files should be placed. Default: **src**.
 * `soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
 * `soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.

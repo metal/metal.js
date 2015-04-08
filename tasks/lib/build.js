@@ -1,6 +1,5 @@
 'use strict';
 
-var bowerDirectory = require('bower-directory');
 var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
 var gulp = require('gulp');
 var normalizeOptions = require('./options');
@@ -9,8 +8,8 @@ var babel = require('gulp-babel');
 var rename = require('gulp-es6-imports-renamer');
 var runSequence = require('run-sequence');
 var transpile = require('gulp-es6-module-transpiler');
-var path = require('path');
 var plugins = require('gulp-load-plugins')();
+var renameAlias = require('./renameAlias');
 
 module.exports = function(options) {
 	options = normalizeOptions(options);
@@ -26,7 +25,7 @@ module.exports = function(options) {
 			.pipe(rename({
 				basePath: process.cwd(),
 				renameDependencies: true,
-				renameFn: renameFn
+				renameFn: renameAlias
 			})).on('error', handleError)
 			.pipe(transpile({
 				basePath: process.cwd(),
@@ -58,13 +57,4 @@ function handleError(error) {
 	console.error(error.toString());
 
 	this.emit('end'); // jshint ignore:line
-}
-
-var bowerDirectory = bowerDirectory.sync();
-function renameFn(originalPath, parentName, callback) {
-	if (originalPath[0] === '.') {
-		callback(path.resolve(path.dirname(parentName), originalPath));
-	} else {
-		callback(path.join(bowerDirectory, originalPath));
-	}
 }

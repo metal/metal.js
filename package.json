@@ -19,6 +19,7 @@
     "library"
   ],
   "dependencies": {
+    "bower-directory": "^1.0.0",
     "closure-templates": "^20141017.0.0",
     "del": "^1.1.1",
     "engine-lodash": "^0.5.0",
@@ -48,7 +49,6 @@
   },
   "devDependencies": {
     "babel": "^4.7.3",
-    "bower-directory": "^1.0.0",
     "browserify": "^9.0.3",
     "browserify-istanbul": "^0.2.0",
     "chai": "^2.2.0",

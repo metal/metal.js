@@ -163,7 +163,7 @@ This can already be done with SoyComponent. For example, let's say we have the M
 		{param label: 'Ok' /}
 	{/delcall}
 	{delcall Button}
-	{param id: 'cancel' /}
+		{param id: 'cancel' /}
 		{param label: 'Cancel' /}
 	{/delcall}
 {/template}

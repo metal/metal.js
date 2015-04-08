@@ -1,8 +1,8 @@
 # Metal.js
 
-[![Build Status](http://img.shields.io/travis/liferay/metal/master.svg?style=flat)](https://travis-ci.org/liferay/metal)
-[![Dependencies Status](http://img.shields.io/david/liferay/metal.svg?style=flat)](https://david-dm.org/liferay/metal#info=dependencies)
-[![DevDependencies Status](http://img.shields.io/david/dev/liferay/metal.svg?style=flat)](https://david-dm.org/liferay/metal#info=devDependencies)
+[![Build Status](http://img.shields.io/travis/liferay/metal.js/master.svg?style=flat)](https://travis-ci.org/liferay/metal.js)
+[![Dependencies Status](http://img.shields.io/david/liferay/metal.js.svg?style=flat)](https://david-dm.org/liferay/metal.js#info=dependencies)
+[![DevDependencies Status](http://img.shields.io/david/dev/liferay/metal.js.svg?style=flat)](https://david-dm.org/liferay/metal.js#info=devDependencies)
 
 Metal.js is a JavaScript library for building from simple widgets to full scale applications.
 

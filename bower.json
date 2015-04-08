@@ -1,6 +1,6 @@
 {
 	"name": "metaljs",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"main": "src/core.js",
 	"description": "A solid foundation for UI components",
 	"keywords": [

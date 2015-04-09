@@ -1,6 +1,6 @@
 'use strict';
 
-import Bar from './Bar.js';
+import Bar from './Bar';
 
 class Foo extends Bar {
 	hello() {

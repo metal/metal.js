@@ -1,14 +1,10 @@
 'use strict';
 
-var GlobalsFormatter = require('es6-module-transpiler-globals-formatter');
+var babelGlobals = require('gulp-babel-globals');
 var gulp = require('gulp');
 var normalizeOptions = require('./options');
 var sourcemaps = require('gulp-sourcemaps');
-var babel = require('gulp-babel');
-var rename = require('gulp-es6-imports-renamer');
 var runSequence = require('run-sequence');
-var transpile = require('gulp-es6-module-transpiler');
-var plugins = require('gulp-load-plugins')();
 var renameAlias = require('./renameAlias');
 
 module.exports = function(options) {
@@ -22,26 +18,15 @@ module.exports = function(options) {
 	gulp.task(taskPrefix + 'build:globals:js', function() {
 		return gulp.src(options.buildSrc)
 			.pipe(sourcemaps.init())
-			.pipe(rename({
-				basePath: process.cwd(),
-				renameDependencies: true,
-				renameFn: renameAlias
-			})).on('error', handleError)
-			.pipe(transpile({
-				basePath: process.cwd(),
+			.pipe(babelGlobals({
+				babelOptions: {
+					compact: false,
+					resolveModuleSource: renameAlias.renameAliasSync,
+					sourceMaps: true
+				},
 				bundleFileName: options.bundleFileName,
-				formatter: new GlobalsFormatter({
-					globalName: options.globalName
-				})
+				globalName: options.globalName
 			})).on('error', handleError)
-			.pipe(babel({
-				blacklist: 'useStrict',
-				compact: false
-			})).on('error', handleError)
-			.pipe(plugins.wrapper({
-				header: ';(function() {\n',
-				footer: '\n}());'
-			}))
 			.pipe(sourcemaps.write('./'))
 			.pipe(gulp.dest(options.buildDest));
 	});

@@ -5,11 +5,16 @@ var path = require('path');
 
 var bowerDir = bowerDirectory.sync();
 function renameAlias(originalPath, parentName, callback) {
+	callback(null, renameAliasSync(originalPath, parentName));
+}
+
+function renameAliasSync(originalPath, parentName) {
 	if (originalPath[0] === '.') {
-		callback(null, path.resolve(path.dirname(parentName), originalPath));
+		return path.resolve(path.dirname(parentName), originalPath);
 	} else {
-		callback(null, path.join(bowerDir, originalPath));
+		return path.join(bowerDir, originalPath);
 	}
 }
 
 module.exports = renameAlias;
+module.exports.renameAliasSync = renameAliasSync;

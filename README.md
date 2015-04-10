@@ -209,13 +209,13 @@ In one of the tests we made, we built a simple list widget on three different li
 
 The chart below shows the results we obtained on Safari:
 
-![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:10,12,7|12.8,63.5,54.4|82.8,78.6,72.2&chds=0,85&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,85,20&chxp=2,50&chtt=Performance%20Test%20-%20List)
+![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:7,12,7|9,63.5,54.4|11,12,12&chds=0,65&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,DB4437,F4B400&chbh=r,0.25,1.5&chdl=Metal|YUI|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,65,10&chxp=2,50&chtt=Performance%20Test%20-%20List)
 
 In this previous test, the list widget was built on all three libraries as a single component that renders each list item itself. We also did another similar test, with a list widget that was built using [nested components](#nested-components) instead, on which the list component renders other components that represent list items. Since YUI doesn't have this concept of nested components, this test was only done for Metal.js and React.
 
 Once again, the chart below shows the results we obtained on Safari:
 
-![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:81.6,48.6,30.2|181.6,99.4,98.6&chds=0,190&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,F4B400&chbh=r,0.25,1.5&chdl=Metal|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,190,30&chxp=2,50&chtt=Performance%20Test%20-%20List%20with%20nested%20components)
+![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:70,46,30.2|40,13,13.6&chds=0,80&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,F4B400&chbh=r,0.25,1.5&chdl=Metal|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,80,20&chxp=2,50&chtt=Performance%20Test%20-%20List%20with%20nested%20components)
 
 ## Tools
 

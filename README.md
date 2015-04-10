@@ -56,7 +56,7 @@ MyAttributes.ATTRS = {
 }
 ```
 
-If you're familiar with [YUI](http://yuilibrary.com/), you'll notice that this is very similar to how attributes are defined there. You basically just need to list all attributes you'll be using on the ATTRS static variable, and provide their configuration options, like initial value and validator. For a list of all valid options, take a look at Attribute's [docs](https://github.com/liferay/metal/blob/master/src/attribute/Attribute.js#L45).
+If you're familiar with [YUI](http://yuilibrary.com/), you'll notice that this is very similar to how attributes are defined there. You basically just need to list all attributes you'll be using on the ATTRS static variable, and provide their configuration options, like initial value and validator. For a list of all valid options, take a look at Attribute's [docs](https://github.com/liferay/metal.js/blob/master/src/attribute/Attribute.js#L45).
 
 You can access or change an object's attributes in the same way you'd access or change any object property.
 
@@ -77,7 +77,7 @@ obj.on('fooChanged', function(event) {
 });
 ```
 
-To see all features of the Attribute class, take a look at its [unit tests](https://github.com/liferay/metal/blob/master/test/src/attribute/Attribute.js).
+To see all features of the Attribute class, take a look at its [unit tests](https://github.com/liferay/metal.js/blob/master/test/src/attribute/Attribute.js).
 
 ## SoyComponent
 

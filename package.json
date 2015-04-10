@@ -26,7 +26,7 @@
     "es6-module-transpiler-globals-formatter": "^0.1.1",
     "gulp": "^3.8.11",
     "gulp-babel": "^4.0.0",
-    "gulp-es6-imports-renamer": "^0.1.5",
+    "gulp-es6-imports-renamer": "^0.1.7",
     "gulp-es6-module-transpiler": "git://github.com/mairatma/gulp-es6-module-transpiler#bundle",
     "gulp-header": "^1.0.2",
     "gulp-if": "^1.2.5",

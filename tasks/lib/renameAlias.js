@@ -6,9 +6,9 @@ var path = require('path');
 var bowerDirectory = bowerDirectory.sync();
 function renameAlias(originalPath, parentName, callback) {
 	if (originalPath[0] === '.') {
-		callback(path.resolve(path.dirname(parentName), originalPath));
+		callback(null, path.resolve(path.dirname(parentName), originalPath));
 	} else {
-		callback(path.join(bowerDirectory, originalPath));
+		callback(null, path.join(bowerDirectory, originalPath));
 	}
 }
 

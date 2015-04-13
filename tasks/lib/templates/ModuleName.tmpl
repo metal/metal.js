@@ -5,7 +5,7 @@
  * @param id
  */
 {deltemplate <%= moduleName %>}
-	{delcall Component data="all"}
+	{call Templates.SoyComponent.component data="all"}
 		{param componentName: '<%= moduleName %>' /}
-	{/delcall}
+	{/call}
 {/deltemplate}

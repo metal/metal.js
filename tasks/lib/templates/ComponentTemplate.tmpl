@@ -4,7 +4,7 @@
  * @param id
  */
 {deltemplate ComponentTemplate variant="'<%= moduleName %>'"}
-	{delcall ComponentElement variant="'<%= moduleName %>'"}
+	{delcall <%= moduleName %> variant="'element'"}
 		{param elementClasses: $elementClasses /}
 		{param elementContent kind="html"}
 			{call .content data="all" /}

@@ -7,12 +7,12 @@
 	{delcall <%= moduleName %>.<%= surfaceName %> variant="'element'"}
 		{param elementContent kind="html"}
 			{if not $ij.skipSurfaceContents}
-				{delcall Surface}
+				{call Templates.SoyComponent.surface}
 					{param content kind="html"}
 						{call .<%= surfaceName %> data="all" /}
 					{/param}
 					{param id: $id + '-<%= surfaceName %>' /}
-				{/delcall}
+				{/call}
 			{/if}
 		{/param}
 		{param id: $id /}

@@ -51,13 +51,12 @@ function addTemplateParam(filePath, namespace, templateName, param) {
 }
 
 function createComponentElementSoy(moduleName, hasElementTemplate) {
-	var data = {
-		className: moduleName.toLowerCase(),
-		moduleName: moduleName
-	};
-	var soy = lodash.renderSync(templates.ComponentElement, data);
+	var soy = '';
 	if (!hasElementTemplate) {
-		soy += lodash.renderSync(templates.ModuleNameElement, data);
+		soy += lodash.renderSync(templates.ModuleNameElement, {
+			className: moduleName.toLowerCase(),
+			moduleName: moduleName
+		});
 	}
 	return soy;
 }

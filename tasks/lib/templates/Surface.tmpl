@@ -4,7 +4,7 @@
  * @param id
  */
 {deltemplate <%= moduleName %>.<%= surfaceName %>}
-	{delcall <%= moduleName %>.<%= surfaceName %> variant="'element'" data="all"}
+	{delcall <%= moduleName %>.<%= surfaceName %> variant="'element'"}
 		{param elementContent kind="html"}
 			{if not $ij.skipSurfaceContents}
 				{delcall Surface}
@@ -15,5 +15,6 @@
 				{/delcall}
 			{/if}
 		{/param}
+		{param id: $id /}
 	{/delcall}
 {/deltemplate}

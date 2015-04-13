@@ -1,10 +1,14 @@
 
 /**
+ * @param? elementClasses
+ * @param id
  */
 {deltemplate ComponentTemplate variant="'<%= moduleName %>'"}
-	{delcall ComponentElement data="all" variant="'<%= moduleName %>'"}
+	{delcall ComponentElement variant="'<%= moduleName %>'"}
+		{param elementClasses: $elementClasses /}
 		{param elementContent kind="html"}
 			{call .content data="all" /}
 		{/param}
+		{param id: $id /}
 	{/delcall}
 {/deltemplate}

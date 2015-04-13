@@ -174,12 +174,12 @@ class core {
 	 * @param {function(*, *):*=} opt_mergeFn Function that receives an array filled
 	 *   with the values of the property for the current class and all its super classes.
 	 *   Should return the merged value to be stored on the current class.
-	 * @return {*} The value of the merged property.
+	 * @return {boolean} Returns true if merge happens, false otherwise.
 	 */
 	static mergeSuperClassesProperty(constructor, propertyName, opt_mergeFn) {
 		var mergedName = propertyName + '_MERGED';
 		if (constructor.hasOwnProperty(mergedName)) {
-			return constructor[mergedName];
+			return false;
 		}
 
 		var merged = core.collectSuperClassesProperty(constructor, propertyName);
@@ -187,7 +187,7 @@ class core {
 			merged = opt_mergeFn(merged);
 		}
 		constructor[mergedName] = merged;
-		return constructor[mergedName];
+		return true;
 	}
 
 	/**

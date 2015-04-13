@@ -45,14 +45,16 @@ describe('core', function() {
 			class Test3 extends Test2 {}
 			Test3.FOO = 3;
 
-			var merged = core.mergeSuperClassesProperty(Test3, 'FOO');
-			assert.deepEqual([3, 2, 1], merged);
+			core.mergeSuperClassesProperty(Test3, 'FOO');
 			assert.deepEqual([3, 2, 1], Test3.FOO_MERGED);
 			assert.strictEqual(undefined, Test2.FOO_MERGED);
 			assert.strictEqual(undefined, Test1.FOO_MERGED);
 
-			assert.deepEqual([2, 1], core.mergeSuperClassesProperty(Test2, 'FOO'));
-			assert.deepEqual([1], core.mergeSuperClassesProperty(Test1, 'FOO'));
+			core.mergeSuperClassesProperty(Test2, 'FOO');
+			core.mergeSuperClassesProperty(Test1, 'FOO');
+
+			assert.deepEqual([2, 1], Test2.FOO_MERGED);
+			assert.deepEqual([1], Test1.FOO_MERGED);
 		});
 
 		it('should reuse existing merged static property', function() {
@@ -61,9 +63,10 @@ describe('core', function() {
 			class Test2 extends Test1 {}
 			Test2.FOO = 2;
 
-			var merged = core.mergeSuperClassesProperty(Test2, 'FOO');
-
-			assert.strictEqual(merged, core.mergeSuperClassesProperty(Test2, 'FOO'));
+			assert.ok(core.mergeSuperClassesProperty(Test2, 'FOO'));
+			var merged = Test2.FOO_MERGED;
+			assert.ok(!core.mergeSuperClassesProperty(Test2, 'FOO'));
+			assert.strictEqual(merged, Test2.FOO_MERGED);
 		});
 
 		it('should call merge function when given', function() {
@@ -74,12 +77,12 @@ describe('core', function() {
 			class Test3 extends Test2 {}
 			Test3.FOO = 3;
 
-			var merged = core.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
+			core.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
 				return values.reduce(function(prev, curr) {
 					return Math.max(prev, curr);
 				});
 			});
-			assert.strictEqual(3, merged);
+			assert.strictEqual(3, Test3.FOO_MERGED);
 		});
 	});
 

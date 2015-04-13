@@ -73,8 +73,12 @@ class Attribute extends EventEmitter {
 	 * @param {!Object.<string, *>} initialValues An object that maps the names of
 	 *   attributes to their initial values. These values have higher precedence than the
 	 *   default values specified in the attribute configurations.
+	 * @param {boolean|Object=} opt_defineContext If value is false
+	 *     `Object.defineProperties` will not be called. If value is a valid
+	 *     context it will be used as definition context, otherwise `this`
+	 *     will be the context.
 	 */
-	addAttrs(configs, initialValues) {
+	addAttrs(configs, initialValues, opt_defineContext) {
 		initialValues = initialValues || {};
 		var names = Object.keys(configs);
 
@@ -85,7 +89,9 @@ class Attribute extends EventEmitter {
 			props[name] = this.buildAttrPropertyDef_(name);
 		}
 
-		Object.defineProperties(this, props);
+		if (opt_defineContext !== false) {
+			Object.defineProperties(opt_defineContext || this, props);
+		}
 	}
 
 	/**
@@ -95,8 +101,12 @@ class Attribute extends EventEmitter {
 	 * @protected
 	 */
 	addAttrsFromStaticHint_(config) {
-		core.mergeSuperClassesProperty(this.constructor, 'ATTRS', this.mergeAttrs_);
-		this.addAttrs(this.constructor.ATTRS_MERGED, config);
+		var ctor = this.constructor;
+		var defineContext = false;
+		if (core.mergeSuperClassesProperty(ctor, 'ATTRS', this.mergeAttrs_)) {
+			defineContext = ctor.prototype;
+		}
+		this.addAttrs(ctor.ATTRS_MERGED, config, defineContext);
 	}
 
 	/**
@@ -137,8 +147,12 @@ class Attribute extends EventEmitter {
 	buildAttrPropertyDef_(name) {
 		return {
 			configurable: true,
-			get: this.getAttrValue_.bind(this, name),
-			set: this.setAttrValue_.bind(this, name)
+			get: function() {
+				return this.getAttrValue_(name);
+			},
+			set: function(val) {
+				this.setAttrValue_(name, val);
+			}
 		};
 	}
 

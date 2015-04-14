@@ -35,7 +35,6 @@ describe('Soy Task', function() {
 			assert.ok(soy.$$getDelegateFn('Simple', ''));
 			assert.ok(soy.$$getDelegateFn('Simple', 'element'));
 			assert.ok(soy.$$getDelegateFn('ComponentTemplate', 'Simple'));
-			assert.ok(soy.$$getDelegateFn('ComponentElement', 'Simple'));
 			assert.ok(soy.$$getDelegateFn('Simple.hello', ''));
 			assert.ok(soy.$$getDelegateFn('Simple.hello', 'element'));
 

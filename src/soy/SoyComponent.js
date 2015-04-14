@@ -6,18 +6,16 @@ import dom from '../dom/dom';
 import object from '../object/object';
 import Component from '../component/Component';
 import ComponentCollector from '../component/ComponentCollector';
-import ComponentRegistry from '../component/ComponentRegistry';
 import EventsCollector from '../component/EventsCollector';
 
 import './SoyComponent.soy.js';
 
 /**
- * We need to listen to calls to the SoyComponent template so we can use them to
+ * We need to listen to calls to soy deltemplates so we can use them to
  * properly instantiate and update child components defined through soy.
  * TODO: Switch to using proper AOP.
  */
-var originalTemplate = ComponentRegistry.Templates.SoyComponent.component;
-var originalSurfaceTemplate = ComponentRegistry.Templates.SoyComponent.surface;
+var originalGetDelegateFn = soy.$$getDelegateFn;
 
 /**
  * Special Component class that handles a better integration between soy templates
@@ -344,39 +342,70 @@ class SoyComponent extends Component {
 	}
 
 	/**
+	 * Handles a call to the soy function for getting delegate functions.
+	 * @param {string} delTemplateId
+	 * @param {string|number} delTemplateVariant
+	 * @param {boolean} allowsEmptyDefault
+	 * @return {!function}
+	 * @protected
+	 */
+	handleGetDelegateFnCall_(delTemplateId, delTemplateVariant, allowsEmptyDefault) {
+		var delegateFn = originalGetDelegateFn(delTemplateId, delTemplateVariant, allowsEmptyDefault);
+		if (delTemplateVariant !== 'content') {
+			return delegateFn;
+		}
+
+		var splitId = delTemplateId.split('.');
+		var componentName = splitId[0];
+		var surfaceName = splitId[1];
+		if (surfaceName) {
+			return this.handleSurfaceCall_.bind(this, delegateFn, surfaceName);
+		} else {
+			return this.handleTemplateCall_.bind(this, delegateFn, componentName);
+		}
+	}
+
+	/**
 	 * Handles a call to the SoyComponent surface template.
+	 * @param {!function} templateFn The original surface template function.
+	 * @param {string} surfaceName The surface's name.
 	 * @param {!Object} data The data the template was called with.
 	 * @param {(null|undefined)=} ignored Second argument for soy templates.
 	 * @param {Object.<string, *>=} ijData Optional injected data.
-	 * @return {string} The original return value of the template.
+	 * @return {string} A placeholder to be rendered instead of the content the template
+	 *   function would have returned.
 	 * @protected
 	 */
-	handleSurfaceCall_(data, ignored, ijData) {
-		var rendered = originalSurfaceTemplate(data, ignored, ijData);
-		this.renderedTemplates_[data.id] = {
+	handleSurfaceCall_(templateFn, surfaceName, data, ignored, ijData) {
+		var elementId = data.id + '-' + surfaceName;
+		var rendered = templateFn(data, ignored, ijData);
+		this.renderedTemplates_[elementId] = {
 			content: rendered.content,
 			isSurface: true
 		};
-		return '%%%%~surface-' + data.id + '~%%%%';
+		return '%%%%~surface-' + elementId + '~%%%%';
 	}
 
 	/**
 	 * Handles a call to the SoyComponent component template.
+	 * @param {!function} templateFn The original component template function.
+	 * @param {string} componentName The component's name.
 	 * @param {!Object} data The data the template was called with.
 	 * @param {(null|undefined)=} ignored Second argument for soy templates.
 	 * @param {Object.<string, *>=} ijData Optional injected data.
-	 * @return {string} The original return value of the template.
+	 * @return {string} A placeholder to be rendered instead of the content the template
+	 *   function would have returned.
 	 * @protected
 	 */
-	handleTemplateCall_(data, ignored, ijData) {
+	handleTemplateCall_(templateFn, componentName, data, ignored, ijData) {
 		var config = this.buildComponentConfigData_(data);
-		var component = SoyComponent.componentsCollector.createOrUpdateComponent(data.componentName, config);
+		var component = SoyComponent.componentsCollector.createOrUpdateComponent(componentName, config);
 		this.componentInProcess_.addComponentRef(data.id, component);
 
 		var prevComponentInProcess = this.componentInProcess_;
 		this.componentInProcess_ = component;
 		var newData = this.buildTemplateData_(component, data);
-		var renderedComponent = originalTemplate(newData, ignored, ijData);
+		var renderedComponent = templateFn(newData, ignored, ijData);
 		this.renderedTemplates_[data.id] = renderedComponent;
 		this.componentInProcess_ = prevComponentInProcess;
 
@@ -477,11 +506,9 @@ class SoyComponent extends Component {
 	 * @return {string} The template's result content.
 	 */
 	renderTemplate_(templateFn, opt_injectedData) {
-		ComponentRegistry.Templates.SoyComponent.component = this.handleTemplateCall_.bind(this);
-		ComponentRegistry.Templates.SoyComponent.surface = this.handleSurfaceCall_.bind(this);
+		soy.$$getDelegateFn = this.handleGetDelegateFnCall_.bind(this);
 		var content = templateFn(this, null, opt_injectedData || {}).content;
-		ComponentRegistry.Templates.SoyComponent.component = originalTemplate;
-		ComponentRegistry.Templates.SoyComponent.surface = originalSurfaceTemplate;
+		soy.$$getDelegateFn = originalGetDelegateFn; 
 		return content;
 	}
 
@@ -499,7 +526,7 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Replaces all string placeholders added to the given content by `handleTemplateCall_`
+	 * Replaces all string placeholders added to the given content by `handleGetDelegateFnCall_`
 	 * with the real component content that should have been inserted there instead.
 	 * @param {string} content
 	 * @return {string} The content string with the replaced placeholders.

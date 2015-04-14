@@ -65,10 +65,6 @@ function createComponentSoy(moduleName) {
 	return lodash.renderSync(templates.ModuleName, {moduleName: moduleName});
 }
 
-function createComponentTemplateSoy(moduleName) {
-	return lodash.renderSync(templates.ComponentTemplate, {moduleName: moduleName});
-}
-
 function createSurfaceElementSoy(moduleName, surfaceName, hasElementTemplate) {
 	if (!hasElementTemplate) {
 		return lodash.renderSync(templates.SurfaceElement, {
@@ -89,7 +85,7 @@ function createSurfaceSoy(moduleName, surfaceName) {
 function generateDelTemplate(namespace, templateName, hasElementTemplate) {
 	var moduleName = namespace.substr(10);
 	if (templateName === 'content') {
-		return createComponentSoy(moduleName) + createComponentTemplateSoy(moduleName) +
+		return createComponentSoy(moduleName) +
 			createComponentElementSoy(moduleName, hasElementTemplate);
 	} else {
 		return createSurfaceElementSoy(moduleName, templateName, hasElementTemplate) +

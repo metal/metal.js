@@ -215,7 +215,7 @@ In this previous test, the list widget was built on all three libraries as a sin
 
 Once again, the chart below shows the results we obtained on Safari:
 
-![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:70,46,30.2|40,13,13.6&chds=0,80&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,F4B400&chbh=r,0.25,1.5&chdl=Metal|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,80,20&chxp=2,50&chtt=Performance%20Test%20-%20List%20with%20nested%20components)
+![Performance Test - List](https://chart.googleapis.com/chart?cht=bvg&chd=t:50,35,20|35,13,13.6&chds=0,50&chs=500x200&chl=First%20Render|Decorate|Update&chco=4285F4,F4B400&chbh=r,0.25,1.5&chdl=Metal|React&chxt=x,y,y&chxl=2:|%28ms%29|&chxr=1,0,50,10&chxp=2,50&chtt=Performance%20Test%20-%20List%20with%20nested%20components)
 
 ## Tools
 

@@ -5,7 +5,20 @@
  * @param id
  */
 {deltemplate <%= moduleName %>}
-	{call Templates.SoyComponent.component data="all"}
-		{param componentName: '<%= moduleName %>' /}
-	{/call}
+	{delcall <%= moduleName %> variant="'element'"}
+		{param elementClasses: $elementClasses /}
+		{param elementContent kind="html"}
+			{delcall <%= moduleName %> variant="'content'" data="all" /}
+		{/param}
+		{param id: $id /}
+	{/delcall}
+{/deltemplate}
+
+/**
+ * @param? elementContent
+ * @param? elementClasses
+ * @param id
+ */
+{deltemplate <%= moduleName %> variant="'content'"}
+	{call .content data="all" /}
 {/deltemplate}

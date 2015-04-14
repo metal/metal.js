@@ -7,7 +7,6 @@ var Templates = ComponentRegistry.Templates;
 /**
  * @fileoverview Templates in namespace Templates.SoyComponent.
  * @hassoydeltemplate {ComponentChildren}
- * @hassoydelcall {ComponentTemplate}
  */
 
 if (typeof Templates.SoyComponent == 'undefined') { Templates.SoyComponent = {}; }
@@ -20,42 +19,12 @@ if (typeof Templates.SoyComponent == 'undefined') { Templates.SoyComponent = {};
  * @return {!soydata.SanitizedHtml}
  * @suppress {checkTypes}
  */
-Templates.SoyComponent.component = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$getDelegateFn(soy.$$getDelTemplateId('ComponentTemplate'), opt_data.componentName, true)(opt_data, null, opt_ijData));
-};
-if (goog.DEBUG) {
-  Templates.SoyComponent.component.soyTemplateName = 'Templates.SoyComponent.component';
-}
-
-
-/**
- * @param {Object.<string, *>=} opt_data
- * @param {(null|undefined)=} opt_ignored
- * @param {Object.<string, *>=} opt_ijData
- * @return {!soydata.SanitizedHtml}
- * @suppress {checkTypes}
- */
-Templates.SoyComponent.surface = function(opt_data, opt_ignored, opt_ijData) {
-  return soydata.VERY_UNSAFE.ordainSanitizedHtml(soy.$$escapeHtml(opt_data.content));
-};
-if (goog.DEBUG) {
-  Templates.SoyComponent.surface.soyTemplateName = 'Templates.SoyComponent.surface';
-}
-
-
-/**
- * @param {Object.<string, *>=} opt_data
- * @param {(null|undefined)=} opt_ignored
- * @param {Object.<string, *>=} opt_ijData
- * @return {!soydata.SanitizedHtml}
- * @suppress {checkTypes}
- */
-Templates.SoyComponent.__deltemplate_s6_26860e4b = function(opt_data, opt_ignored, opt_ijData) {
+Templates.SoyComponent.__deltemplate_s2_26860e4b = function(opt_data, opt_ignored, opt_ijData) {
   return soydata.VERY_UNSAFE.ordainSanitizedHtml('<div id="' + soy.$$escapeHtmlAttribute(opt_data.id) + '-children-placeholder" data-component-children="">' + ((opt_data.children) ? soy.$$escapeHtml(opt_data.children) : '') + '</div>');
 };
 if (goog.DEBUG) {
-  Templates.SoyComponent.__deltemplate_s6_26860e4b.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s6_26860e4b';
+  Templates.SoyComponent.__deltemplate_s2_26860e4b.soyTemplateName = 'Templates.SoyComponent.__deltemplate_s2_26860e4b';
 }
-soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentChildren'), '', 0, Templates.SoyComponent.__deltemplate_s6_26860e4b);
+soy.$$registerDelegateFn(soy.$$getDelTemplateId('ComponentChildren'), '', 0, Templates.SoyComponent.__deltemplate_s2_26860e4b);
 
 /* jshint ignore:end */

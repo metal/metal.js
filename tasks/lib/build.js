@@ -15,11 +15,11 @@ module.exports = function(options) {
 	options = normalizeOptions(options);
 	var taskPrefix = options.taskPrefix;
 
-	gulp.task(taskPrefix + 'build:globals', [taskPrefix + 'soy'], function(done) {
-		runSequence(taskPrefix + 'soy', taskPrefix + 'globals', done);
+	gulp.task(taskPrefix + 'build:globals', function(done) {
+		runSequence(taskPrefix + 'soy', taskPrefix + 'build:globals:js', done);
 	});
 
-	gulp.task(taskPrefix + 'globals', function() {
+	gulp.task(taskPrefix + 'build:globals:js', function() {
 		return gulp.src(options.buildSrc)
 			.pipe(sourcemaps.init())
 			.pipe(rename({
@@ -47,7 +47,7 @@ module.exports = function(options) {
 	});
 
 	gulp.task(taskPrefix + 'watch:globals', function(done) { // jshint ignore:line
-		gulp.watch(options.buildSrc, [taskPrefix + 'globals']);
+		gulp.watch(options.buildSrc, [taskPrefix + 'build:globals:js']);
 		gulp.watch(options.soySrc, [taskPrefix + 'soy']);
 	});
 };

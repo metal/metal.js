@@ -63,7 +63,7 @@ describe('Build Tasks', function() {
 		gulp.start('watch:globals', function() {
 			assert.strictEqual(2, gulp.watch.callCount);
 			assert.strictEqual('src/**/*.js', gulp.watch.args[0][0]);
-			assert.deepEqual(['globals'], gulp.watch.args[0][1]);
+			assert.deepEqual(['build:globals:js'], gulp.watch.args[0][1]);
 			assert.strictEqual('src/**/*.soy', gulp.watch.args[1][0]);
 			assert.deepEqual(['soy'], gulp.watch.args[1][1]);
 

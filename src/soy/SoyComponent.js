@@ -41,13 +41,6 @@ class SoyComponent extends Component {
 		this.components = {};
 
 		/**
-		 * Helper responsible for extracting components from strings and config data.
-		 * @type {!ComponentCollector}
-		 * @protected
-		 */
-		this.componentsCollector_ = new ComponentCollector();
-
-		/**
 		 * Holds events that were listened through the element.
 		 * @type {!EventHandler}
 		 * @protected
@@ -291,7 +284,7 @@ class SoyComponent extends Component {
 	 */
 	extractComponents_(val) {
 		if (this.hasSubcomponents_(val)) {
-			return this.componentsCollector_.extractComponentsFromString(val);
+			return SoyComponent.componentsCollector.extractComponentsFromString(val);
 		}
 		return val;
 	}
@@ -375,7 +368,7 @@ class SoyComponent extends Component {
 	 */
 	handleTemplateCall_(data, ignored, ijData) {
 		var config = this.buildComponentConfigData_(data);
-		var component = this.componentsCollector_.createOrUpdateComponent(data.componentName, config);
+		var component = SoyComponent.componentsCollector.createOrUpdateComponent(data.componentName, config);
 		this.componentInProcess_.addComponentRef(data.id, component);
 
 		var prevComponentInProcess = this.componentInProcess_;
@@ -590,6 +583,14 @@ class SoyComponent extends Component {
 		return super.valueIdFn_();
 	}
 }
+
+/**
+ * Helper responsible for extracting components from strings and config data.
+ * @type {!ComponentCollector}
+ * @protected
+ * @static
+ */
+SoyComponent.componentsCollector = new ComponentCollector();
 
 /**
  * SoyComponent attributes definition.

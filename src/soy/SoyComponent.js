@@ -296,7 +296,9 @@ class SoyComponent extends Component {
 	 */
 	finishProcessingRenderedTemplates_() {
 		ComponentCollector.components[this.id] = this;
-		for (var id in this.renderedTemplates_) {
+		var ids = Object.keys(this.renderedTemplates_);
+		for (var i = 0; i < ids.length; i++) {
+			var id = ids[i];
 			var componentId = id;
 			if (this.renderedTemplates_[id].isSurface) {
 				componentId = Component.extractComponentId(id);

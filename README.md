@@ -12,7 +12,7 @@ Even though it's powerful, Metal.js is very small, being only around 9kb after c
 
 Metal.js's main classes are [Attribute](#attribute) and **Component**. Component actually extends from Attribute, thus containing all its features. The main difference between the two is that Component's extra features are related to rendering. So you could just use Attribute directly if your module doesn't do any rendering. But if your module does need rendering logic though, then Component will work better for you.
 
-One thing that can be really useful for a developer when building a component, is to separate the rendering logic from the business logic. This can be achieved on Metal.js by modules built on top of Component, that integrate with template engines. Metal.js already provides such an implementation for integration with [soy templates](http://developers.google.com/closure/templates), called [SoyComponent](#soycomponent).
+One thing that can be really useful for a developer when building a component, is to separate the rendering logic from the business logic. This can be achieved on Metal.js by modules built on top of Component, that integrate with template engines. Metal.js already provides an implementation called [SoyComponent](#soycomponent) that integrates with [Soy Templates](http://developers.google.com/closure/templates), also referred to as Closure Templates.
 
 ![Architecture Chart](http://f.cl.ly/items/1y1K2d1724253I372w2p/architecture.png)
 

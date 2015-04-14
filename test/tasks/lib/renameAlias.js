@@ -9,7 +9,7 @@ var path = require('path');
 var bowerDir = path.resolve('assets/bower_components');
 var renameAlias;
 
-describe.only('renameAlias', function() {
+describe('renameAlias', function() {
 	before(function() {
 		sinon.stub(bowerDirectory, 'sync').returns(bowerDir);
 

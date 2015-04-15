@@ -16,6 +16,11 @@ One thing that can be really useful for a developer when building a component, i
 
 ![Architecture Chart](http://f.cl.ly/items/1y1K2d1724253I372w2p/architecture.png)
 
+## Dependencies
+
+* For build tooling, you'll need Node.js v0.10 or newer.
+* For Soy templates compilation, you'll need Java SDK v1.7 or newer.
+
 ## Setup
 
 1. Install [Bower](http://bower.io/), if you don't have it yet.

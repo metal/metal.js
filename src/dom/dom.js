@@ -99,7 +99,7 @@ class dom {
 	 */
 	static delegate(element, eventName, selector, callback) {
 		var customConfig = dom.customEvents[eventName];
-		if (customConfig) {
+		if (customConfig && customConfig.delegate) {
 			eventName = customConfig.originalEvent;
 			callback = customConfig.handler.bind(customConfig, callback);
 		}
@@ -251,7 +251,7 @@ class dom {
 	 */
 	static on(element, eventName, callback) {
 		var customConfig = dom.customEvents[eventName];
-		if (customConfig) {
+		if (customConfig && customConfig.event) {
 			eventName = customConfig.originalEvent;
 			callback = customConfig.handler.bind(customConfig, callback);
 		}
@@ -397,7 +397,26 @@ class dom {
 }
 
 var elementsByTag = {};
-
 dom.customEvents = {};
+
+var eventMap = {
+	mouseenter: 'mouseover',
+	mouseleave: 'mouseout',
+	pointerenter: 'pointerover',
+	pointerleave: 'pointerout'
+};
+Object.keys(eventMap).forEach(function(eventName) {
+	dom.registerCustomEvent(eventName, {
+		delegate: true,
+		handler: function(callback, event) {
+			var related = event.relatedTarget;
+			var target = event.delegateTarget || event.target;
+			if (!related || (related !== target && !target.contains(related))) {
+				return callback(event);
+			}
+		},
+		originalEvent: eventMap[eventName]
+	});
+});
 
 export default dom;

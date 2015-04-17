@@ -442,6 +442,32 @@ describe('dom', function() {
 			assert.strictEqual(1, listener.callCount);
 		});
 
+		it('should handle delegate for registered custom events', function() {
+			var element = document.createElement('div');
+			dom.addClasses(element, ['mine']);
+			dom.append(document.body, element);
+
+			var myElement = document.createElement('div');
+			dom.addClasses(myElement, ['mine', 'foo']);
+			dom.append(element, myElement);
+
+			var fooElement = document.createElement('div');
+			dom.addClasses(fooElement, ['foo']);
+			dom.append(element, fooElement);
+
+			var listener = sinon.stub();
+			dom.delegate(element, 'myClick', '.foo', listener);
+
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(0, listener.callCount);
+
+			dom.triggerEvent(fooElement, 'click');
+			assert.strictEqual(0, listener.callCount);
+
+			dom.triggerEvent(myElement, 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
+
 		it('should return true when supportsEvent is called for registered custom event', function() {
 			assert.ok(dom.supportsEvent(document.createElement('div'), 'myClick'));
 			assert.ok(!dom.supportsEvent(document.createElement('div'), 'yourClick'));

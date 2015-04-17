@@ -98,6 +98,11 @@ class dom {
 	 * @return {!DomEventHandle} Can be used to remove the listener.
 	 */
 	static delegate(element, eventName, selector, callback) {
+		var customConfig = dom.customEvents[eventName];
+		if (customConfig) {
+			eventName = customConfig.originalEvent;
+			callback = customConfig.handler.bind(customConfig, callback);
+		}
 		return dom.on(
 			element,
 			eventName,

@@ -38,6 +38,23 @@ describe('EventsCollector', function() {
 		assert.strictEqual(1, custom.handleClick.callCount);
 	});
 
+	it('should attach event listener with single quotes', function() {
+		var CustomComponent = createCustomComponent(
+			'<div data-onclick=\'handleClick\'></div><div></div>'
+		);
+		CustomComponent.prototype.handleClick = sinon.stub();
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		collector.attachListeners(custom.element.innerHTML, 'group');
+
+		assert.strictEqual(0, custom.handleClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[1], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+	});
+
 	it('should attach multiple event listeners', function() {
 		var CustomComponent = createCustomComponent(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'

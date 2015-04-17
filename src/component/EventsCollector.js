@@ -79,7 +79,7 @@ class EventsCollector extends Disposable {
 		if (content.indexOf('data-on') === -1) {
 			return;
 		}
-		var regex = /data-on([a-z]+)=['|"](\w+)['|"]/g;
+		var regex = /data-on([a-z]+)=['|"](\w+)['"]/g;
 		var match = regex.exec(content);
 		while(match) {
 			this.attachListener_(match[1], match[2], groupName);

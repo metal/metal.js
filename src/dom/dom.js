@@ -245,8 +245,23 @@ class dom {
 	 * @return {!DomEventHandle} Can be used to remove the listener.
 	 */
 	static on(element, eventName, callback) {
+		var customConfig = dom.customEvents[eventName];
+		if (customConfig) {
+			eventName = customConfig.originalEvent;
+			callback = customConfig.handler.bind(customConfig, callback);
+		}
 		element.addEventListener(eventName, callback);
 		return new DomEventHandle(element, eventName, callback);
+	}
+
+	/**
+	 * Registers a custom event.
+	 * @param {string} eventName The name of the custom event.
+	 * @param {!Object} customConfig An object with information about how the event
+	 *   should be handled.
+	 */
+	static registerCustomEvent(eventName, customConfig) {
+		dom.customEvents[eventName] = customConfig;
 	}
 
 	/**
@@ -326,6 +341,10 @@ class dom {
 	 * @return {boolean}
 	 */
 	static supportsEvent(element, eventName) {
+		if (dom.customEvents[eventName]) {
+			return true;
+		}
+
 		if (core.isString(element)) {
 			if (!elementsByTag[element]) {
 				elementsByTag[element] = document.createElement(element);
@@ -373,5 +392,7 @@ class dom {
 }
 
 var elementsByTag = {};
+
+dom.customEvents = {};
 
 export default dom;

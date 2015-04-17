@@ -416,6 +416,38 @@ describe('dom', function() {
 		});
 	});
 
+	describe('registerCustomEvent', function() {
+		before(function() {
+			dom.registerCustomEvent('myClick', {
+				handler: function(listener, event) {
+					if (dom.hasClass(event.target, 'mine')) {
+						listener(event);
+					}
+				},
+				originalEvent: 'click'
+			});
+		});
+
+		it('should handle registered custom events', function() {
+			var listener = sinon.stub();
+			var element = document.createElement('div');
+			dom.append(document.body, element);
+
+			dom.on(element, 'myClick', listener);
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(0, listener.callCount);
+
+			dom.addClasses(element, ['mine']);
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should return true when supportsEvent is called for registered custom event', function() {
+			assert.ok(dom.supportsEvent(document.createElement('div'), 'myClick'));
+			assert.ok(!dom.supportsEvent(document.createElement('div'), 'yourClick'));
+		});
+	});
+
 	function getClassNames(element) {
 		return element.className.trim().split(' ');
 	}

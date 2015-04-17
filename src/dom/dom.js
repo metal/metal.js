@@ -412,6 +412,7 @@ Object.keys(eventMap).forEach(function(eventName) {
 			var related = event.relatedTarget;
 			var target = event.delegateTarget || event.target;
 			if (!related || (related !== target && !target.contains(related))) {
+				event.customType = eventName;
 				return callback(event);
 			}
 		},

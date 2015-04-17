@@ -499,6 +499,7 @@ describe('dom', function() {
 			assert.strictEqual(0, listener.callCount);
 			dom.triggerEvent(this.element2, 'mouseover', {relatedTarget: this.element1});
 			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual('mouseenter', listener.args[0][0].customType);
 			dom.triggerEvent(this.element2, 'mouseover', {relatedTarget: this.element3});
 			assert.strictEqual(1, listener.callCount);
 		});
@@ -511,6 +512,7 @@ describe('dom', function() {
 			assert.strictEqual(0, listener.callCount);
 			dom.triggerEvent(this.element2, 'mouseout', {relatedTarget: this.element1});
 			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual('mouseleave', listener.args[0][0].customType);
 			dom.triggerEvent(this.element2, 'mouseout', {relatedTarget: this.element3});
 			assert.strictEqual(1, listener.callCount);
 		});
@@ -523,6 +525,7 @@ describe('dom', function() {
 			assert.strictEqual(0, listener.callCount);
 			dom.triggerEvent(this.element2, 'pointerover', {relatedTarget: this.element1});
 			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual('pointerenter', listener.args[0][0].customType);
 			dom.triggerEvent(this.element2, 'pointerover', {relatedTarget: this.element3});
 			assert.strictEqual(1, listener.callCount);
 		});
@@ -535,6 +538,7 @@ describe('dom', function() {
 			assert.strictEqual(0, listener.callCount);
 			dom.triggerEvent(this.element2, 'pointerout', {relatedTarget: this.element1});
 			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual('pointerleave', listener.args[0][0].customType);
 			dom.triggerEvent(this.element2, 'pointerout', {relatedTarget: this.element3});
 			assert.strictEqual(1, listener.callCount);
 		});

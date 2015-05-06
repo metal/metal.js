@@ -138,11 +138,11 @@ class SoyComponent extends Component {
 	 */
 	attachNestedComponent_(component, placeholder) {
 		var replacedPlaceholder = false;
-		if (placeholder !== component.element) {
+		var componentElement = component.element;
+		if (placeholder !== componentElement) {
 			// If the component's element is not the placeholder, we need to replace
 			// the placeholder with the real element.
-			placeholder.parentNode.insertBefore(component.element, placeholder);
-			placeholder.parentNode.removeChild(placeholder);
+			dom.replace(placeholder, componentElement);
 			replacedPlaceholder = true;
 		}
 
@@ -152,7 +152,7 @@ class SoyComponent extends Component {
 				// If we had to replace the placeholder with the component's element,
 				// we'll need to copy the html over so we don't have to run soy again
 				// to render it.
-				dom.append(component.element, placeholder.innerHTML);
+				dom.append(componentElement, placeholder.innerHTML);
 			}
 			component.decorateAsSubComponent();
 		}

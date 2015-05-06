@@ -322,6 +322,16 @@ class dom {
 	}
 
 	/**
+	 * Replaces the first element with the second.
+	 * @param {!Element} element1
+	 * @param {!Element} element2
+	 */
+	static replace(element1, element2) {
+		element1.parentNode.insertBefore(element2, element1);
+		element1.parentNode.removeChild(element1);
+	}
+
+	/**
 	 * The function that replaces `stopImmediatePropagation_` for events.
 	 * @protected
 	 */

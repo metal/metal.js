@@ -806,6 +806,98 @@ describe('Component', function() {
 		});
 	});
 
+	describe('Nested Surfaces', function() {
+		beforeEach(function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {
+				foo: {}
+			};
+			CustomComponent.SURFACES = {
+				header: {
+					renderAttrs: ['foo']
+				}
+			};
+			CustomComponent.prototype.renderInternal = function() {
+				this.element.appendChild(this.getSurfaceElement('header'));
+			};
+			this.CustomComponent = CustomComponent;
+		});
+
+		it('should replace surface placeholders with their real content', function() {
+			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'header':
+						return '%%%%~surface-item1~%%%%%%%%~surface-item2~%%%%';
+					case 'item1':
+						return 'Item 1%%%%~surface-item1-name~%%%%';
+					case 'item1-name':
+						return 'Item 1 Name';
+					case 'item2':
+						return 'Item 2';
+				}
+			};
+
+			var custom = new this.CustomComponent({id: 'custom'}).render();
+			var listElement = custom.getSurfaceElement('header');
+			var item1Element = custom.getSurfaceElement('item1');
+			assert.strictEqual(2, listElement.childNodes.length);
+			assert.strictEqual(item1Element, listElement.childNodes[0]);
+			assert.strictEqual(2, item1Element.childNodes.length);
+			assert.strictEqual('Item 1', item1Element.childNodes[0].textContent);
+			assert.strictEqual(custom.getSurfaceElement('item1-name'), item1Element.childNodes[1]);
+			assert.strictEqual(custom.getSurfaceElement('item2'), listElement.childNodes[1]);
+		});
+
+		it('should update nested and parent surfaces when their contents change', function(done) {
+			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'header':
+						return '<div class="headerInner">' + this.foo + '</div>%%%%~surface-foo~%%%%';
+					case 'foo':
+						return 'Header ' + this.foo;
+				}
+			};
+
+			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var headerInnerElement = custom.element.querySelector('.headerInner');
+			var surfaceElement = custom.getSurfaceElement('foo');
+
+			custom.foo = 'bar';
+			custom.on('attrsChanged', function() {
+				var currentHeaderInner = custom.element.querySelector('.headerInner');
+				assert.strictEqual('bar', currentHeaderInner.textContent);
+				assert.notStrictEqual(headerInnerElement, currentHeaderInner);
+
+				assert.strictEqual('Header bar', surfaceElement.textContent);
+				assert.strictEqual(surfaceElement, custom.element.querySelector('#custom-foo'));
+				done();
+			});
+		});
+
+		it('should only update nested surface when only its contents change', function(done) {
+			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'header':
+						return '<div class="headerInner"></div>%%%%~surface-foo~%%%%';
+					case 'foo':
+						return 'Header ' + this.foo;
+				}
+			};
+
+			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var headerInnerElement = custom.element.querySelector('.headerInner');
+			var surfaceElement = custom.getSurfaceElement('foo');
+
+			custom.foo = 'bar';
+			custom.on('attrsChanged', function() {
+				assert.strictEqual('Header bar', surfaceElement.textContent);
+				assert.strictEqual(surfaceElement, custom.element.querySelector('#custom-foo'));
+				assert.strictEqual(headerInnerElement, custom.element.querySelector('.headerInner'));
+				done();
+			});
+		});
+	});
+
 	function createCustomComponentClass() {
 		class CustomComponent extends Component {
 			constructor(opt_config) {

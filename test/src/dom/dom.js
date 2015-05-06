@@ -62,6 +62,16 @@ describe('dom', function() {
 			assert.strictEqual(parent, child.parentNode);
 		});
 
+		it('should replace an element with a requested element', function() {
+			var element1 = document.createElement('div');
+			var element2 = document.createElement('div');
+			dom.append(document.body, element1);
+
+			dom.replace(element1, element2);
+			assert.strictEqual(element2, document.body.childNodes[0]);
+			assert.ok(!element1.parentNode);
+		});
+
 		it('should node enter document', function() {
 			var element = document.createElement('div');
 			dom.enterDocument(element);

@@ -268,6 +268,18 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Compares cache states.
+	 * @param {number} currentCacheState
+	 * @param {number} previousCacheState
+	 * @return {boolean} True if there's a cache hit, or false for cache miss.
+	 */
+	compareCacheStates_(currentCacheState, previousCacheState) {
+		return currentCacheState !== Component.Cache.NOT_INITIALIZED &&
+			currentCacheState !== Component.Cache.NOT_CACHEABLE &&
+			currentCacheState === previousCacheState;
+	}
+
+	/**
 	 * Computes the cache state for the surface content. If value is string, the
 	 * cache state is represented by its hashcode.
 	 * @param {Object} value The value to calculate the cache state.
@@ -722,12 +734,7 @@ class Component extends Attribute {
 			var surface = this.getSurface(surfaceId);
 			var previousCacheState = surface.cacheState;
 			this.cacheSurfaceContent(surfaceId, content);
-
-			var cacheState = surface.cacheState;
-			surface.cacheMiss = cacheState === Component.Cache.NOT_INITIALIZED ||
-				cacheState === Component.Cache.NOT_CACHEABLE ||
-				cacheState !== previousCacheState;
-			if (surface.cacheMiss) {
+			if (!this.compareCacheStates_(surface.cacheState, previousCacheState)) {
 				this.replaceSurfaceContent_(surfaceId, content);
 			}
 		}

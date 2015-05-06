@@ -776,18 +776,18 @@ describe('Component', function() {
 			custom.addSurface('bottom');
 			custom.render();
 
-			assert.strictEqual('<div>static</div>', custom.getSurfaceElement('header').innerHTML);
-			assert.strictEqual('<div>static</div>', custom.getSurfaceElement('body').innerHTML);
-			assert.strictEqual('<div>static</div>', custom.getSurfaceElement('bottom').innerHTML);
+			var headerContent = custom.getSurfaceElement('header').childNodes[0];
+			var bodyContent = custom.getSurfaceElement('body').childNodes[0];
+			var bottomContent = custom.getSurfaceElement('bottom').childNodes[0];
 
 			custom.renderSurfacesContent_({
 				header: true,
 				body: true,
 				bottom: true
 			});
-			assert.ok(!custom.getSurface('header').cacheMiss);
-			assert.ok(!custom.getSurface('body').cacheMiss);
-			assert.ok(custom.getSurface('bottom').cacheMiss);
+			assert.strictEqual(headerContent, custom.getSurfaceElement('header').childNodes[0]);
+			assert.strictEqual(bodyContent, custom.getSurfaceElement('body').childNodes[0]);
+			assert.notStrictEqual(bottomContent, custom.getSurfaceElement('bottom').childNodes[0]);
 		});
 
 		it('should return component instance from surface methods', function() {

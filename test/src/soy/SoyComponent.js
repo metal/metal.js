@@ -274,10 +274,11 @@ describe('SoyComponent', function() {
 		it('should not rerender own surface if only nested component contents changed', function(done) {
 			var NestedTestComponent = createNestedTestComponentClass();
 			var custom = new NestedTestComponent({id: 'nested'}).render();
+			var surfaceContent = custom.getSurfaceElement('components').childNodes[0];
 
 			custom.foo = 'bar2';
 			custom.on('attrsChanged', function() {
-				assert.ok(!custom.getSurface('components').cacheMiss);
+				assert.strictEqual(surfaceContent, custom.getSurfaceElement('components').childNodes[0]);
 				done();
 			});
 		});
@@ -560,7 +561,7 @@ describe('SoyComponent', function() {
 			assert.strictEqual(0, component.components.nestedMyChild0.setAttrs.callCount);
 		});
 
-		it('should not need to update surfaces when main component is decorated', function() {
+		it('should not need to update content when main component is decorated', function() {
 			var content = '<div id="nested-components" >' +
 				'<div id="nestedMyChild0" class="childrentestcomponent component" data-component="">' +
 				'<div id="nestedMyChild0-children">bar' +
@@ -573,9 +574,10 @@ describe('SoyComponent', function() {
 			element.id = 'nested';
 			dom.append(element, content);
 
+			sinon.spy(dom, 'append');
 			var NestedTestComponent = createNestedTestComponentClass();
-			var component = new NestedTestComponent({element: element}).decorate();
-			assert.ok(!component.getSurface('components').cacheMiss);
+			new NestedTestComponent({element: element}).decorate();
+			assert.strictEqual(0, dom.append.callCount);
 		});
 	});
 

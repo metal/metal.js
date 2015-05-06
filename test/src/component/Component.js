@@ -396,6 +396,19 @@ describe('Component', function() {
 			assert.strictEqual(document.body, custom.element.parentNode);
 		});
 
+		it('should render component on specified default parent if no parent is specified', function() {
+			var defaultParent = document.createElement('div');
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.created = function() {
+				this.DEFAULT_ELEMENT_PARENT = defaultParent;
+			};
+			var custom = new CustomComponent();
+			custom.render();
+
+			assert.strictEqual(defaultParent, custom.element.parentNode);
+		});
+
 		it('should render component on requested parent', function() {
 			var container = document.createElement('div');
 			document.body.appendChild(container);

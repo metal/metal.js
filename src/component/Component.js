@@ -119,6 +119,14 @@ class Component extends Attribute {
 		 */
 		this.wasDecorated = false;
 
+		/**
+		 * The component's element will be appended to the element this variable is
+		 * set to, unless the user specifies another parent when calling `render` or
+		 * `attach`.
+		 * @type {!Element}
+		 */
+		this.DEFAULT_ELEMENT_PARENT = document.body;
+
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
 		core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
@@ -687,7 +695,7 @@ class Component extends Attribute {
 		var element = this.element;
 		element.id = this.id;
 		if (opt_siblingElement || !element.parentNode) {
-			var parent = dom.toElement(opt_parentElement) || document.body;
+			var parent = dom.toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 			parent.insertBefore(element, dom.toElement(opt_siblingElement));
 		}
 	}

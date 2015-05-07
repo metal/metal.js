@@ -88,6 +88,17 @@ describe('Component', function() {
 			sinon.assert.callCount(CustomComponent.prototype.attached, 2);
 		});
 
+		it('should render the content returned by getElementContent', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '<div>My content</div>';
+			};
+			var custom = new CustomComponent();
+			custom.render();
+
+			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
+		});
+
 		it('should throw error when component renders and it was already rendered', function() {
 			var CustomComponent = createCustomComponentClass();
 			var custom = new CustomComponent();
@@ -806,6 +817,23 @@ describe('Component', function() {
 		});
 	});
 
+	describe('Surface Placeholders', function() {
+		it('should replace surface placeholders with their real content', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return 'My surface: %%%%~surface-foo~%%%%';
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return 'foo';
+			};
+
+			var custom = new CustomComponent({id: 'custom'}).render();
+			var expected = 'My surface: <div id="custom-foo">foo</div>';
+			assert.strictEqual(expected, custom.element.innerHTML);
+			assert.strictEqual(custom.getSurfaceElement('foo'), custom.element.childNodes[1]);
+		});
+	});
+
 	describe('Nested Surfaces', function() {
 		beforeEach(function() {
 			var CustomComponent = createCustomComponentClass();
@@ -823,7 +851,7 @@ describe('Component', function() {
 			this.CustomComponent = CustomComponent;
 		});
 
-		it('should replace surface placeholders with their real content', function() {
+		it('should replace nested surface placeholders with their real content', function() {
 			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -868,7 +896,7 @@ describe('Component', function() {
 				assert.strictEqual('bar', currentHeaderInner.textContent);
 				assert.notStrictEqual(headerInnerElement, currentHeaderInner);
 
-				assert.strictEqual('Header bar', surfaceElement.textContent);
+				assert.strictEqual('Header bar', surfaceElement.innerHTML);
 				assert.strictEqual(surfaceElement, custom.element.querySelector('#custom-foo'));
 				done();
 			});
@@ -905,12 +933,12 @@ describe('Component', function() {
 			}
 		}
 
-		CustomComponent.prototype.created = sinon.spy();
-		CustomComponent.prototype.decorateInternal = sinon.spy();
-		CustomComponent.prototype.getSurfaceContent = sinon.spy();
-		CustomComponent.prototype.attached = sinon.spy();
-		CustomComponent.prototype.detached = sinon.spy();
-		CustomComponent.prototype.renderInternal = sinon.spy();
+		sinon.spy(CustomComponent.prototype, 'created');
+		sinon.spy(CustomComponent.prototype, 'decorateInternal');
+		sinon.spy(CustomComponent.prototype, 'getSurfaceContent');
+		sinon.spy(CustomComponent.prototype, 'attached');
+		sinon.spy(CustomComponent.prototype, 'detached');
+		sinon.spy(CustomComponent.prototype, 'renderInternal');
 
 		return CustomComponent;
 	}

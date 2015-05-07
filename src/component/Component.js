@@ -526,6 +526,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Gets the content that should be rendered in the component's main element.
+	 * Should be implemented by subclasses.
+	 * @return {Object|string} The content to be rendered. If the content is a
+	 *   string, surfaces can be represented by placeholders in the format specified
+	 *   by Component.SURFACE_REGEX.
+	 */
+	getElementContent() {
+	}
+
+	/**
 	 * Gets surfaces that got modified by the specified attributes changes.
 	 * @param {Object.<string, Object>} changes Object containing the attribute
 	 *     name as key and an object with newVal and prevVal as value.
@@ -559,7 +569,9 @@ class Component extends Attribute {
 	/**
 	 * Gets the content for the requested surface. Should be implemented by subclasses.
 	 * @param {string} surfaceId The surface id.
-	 * @return {Object|string} The content to be rendered.
+	 * @return {Object|string} The content to be rendered. If the content is a
+	 *   string, surfaces can be represented by placeholders in the format specified
+	 *   by Component.SURFACE_REGEX.
 	 */
 	getSurfaceContent() {
 	}
@@ -599,13 +611,14 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Gets the html that should be used to build a nested surface's main element.
+	 * Gets the html that should be used to build a surface's main element with its
+	 * content.
 	 * @param {string} surfaceId
 	 * @param {string} content
 	 * @return {string}
 	 * @protected
 	 */
-	getNestedSurfaceHtml_(surfaceId, content) {
+	getSurfaceHtml_(surfaceId, content) {
 		var surfaceElementId = this.makeSurfaceId_(surfaceId);
 		return '<' + this.constructor.SURFACE_TAG_NAME_MERGED + ' id="' + surfaceElementId +
 			'">' + content + '</' + this.constructor.SURFACE_TAG_NAME_MERGED + '>';
@@ -758,10 +771,37 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Expands the given content, replacing placeholders with real surface elements,
+	 * and renders it inside the given container.
+	 * @param {!Element} container
+	 * @param {string} content
+	 * @protected
+	 */
+	renderExpandedContent_(container, content) {
+		var childSurfaceList = [];
+		if (core.isString(content)) {
+			content = this.replaceSurfacePlaceholders_(content, function(childId, expandedContent) {
+				childSurfaceList.push({
+					expandedContent: expandedContent,
+					surfaceId: childId
+				});
+			});
+		}
+
+		dom.append(container, content);
+
+		childSurfaceList.forEach(this.updatePlaceholderSurface_.bind(this));
+	}
+
+	/**
 	 * Lifecycle. Internal implementation for rendering. Any extra operation
 	 * necessary to prepare the component DOM must be implemented in this phase.
 	 */
 	renderInternal() {
+		var content = this.getElementContent();
+		if (content) {
+			this.renderExpandedContent_(this.element, content);
+		}
 	}
 
 	/**
@@ -772,9 +812,7 @@ class Component extends Attribute {
 	 * method directly since surface content can be provided by
 	 * `getSurfaceContent(surfaceId)`.
 	 * @param {string} surfaceId The surface id.
-	 * @param {(Object|string)?} opt_content The content to be rendered. If the
-	 *   content is a string that has nested surfaces, those should be represented
-	 *   by placeholders in the format specified by Component.SURFACE_REGEX.
+	 * @param {(Object|string)?} opt_content The content to be rendered.
 	 */
 	renderSurfaceContent(surfaceId, opt_content) {
 		var content = opt_content || this.getSurfaceContent_(surfaceId);
@@ -805,27 +843,13 @@ class Component extends Attribute {
 	/**
 	 * Replaces the content of a surface with a new one.
 	 * @param {string} surfaceId The surface id.
-	 * @param {Element|string} content The content to be rendered. If the
-	 *   content is a string that has nested surfaces, those should be represented
-	 *   by placeholders in the format specified by Component.SURFACE_REGEX.
+	 * @param {Element|string} content The content to be rendered.
 	 * @protected
 	 */
 	replaceSurfaceContent_(surfaceId, content) {
-		var childSurfaceList = [];
-		if (core.isString(content)) {
-			content = this.replaceSurfacePlaceholders_(content, function(childId, expandedContent) {
-				childSurfaceList.push({
-					expandedContent: expandedContent,
-					surfaceId: childId
-				});
-			});
-		}
-
 		var el = this.getSurfaceElement(surfaceId);
 		dom.removeChildren(el);
-		dom.append(el, content);
-
-		childSurfaceList.forEach(this.updateNestedSurface_.bind(this));
+		this.renderExpandedContent_(el, content);
 	}
 
 	/**
@@ -840,10 +864,10 @@ class Component extends Attribute {
 	replaceSurfacePlaceholders_(content, callback) {
 		var instance = this;
 		return content.replace(Component.SURFACE_REGEX, function(match, id) {
-			var surfaceContent = instance.getNestedSurfaceHtml_(id, instance.getSurfaceContent(id));
-			var expandedContent = instance.replaceSurfacePlaceholders_(surfaceContent, callback);
+			var expandedContent = instance.replaceSurfacePlaceholders_(instance.getSurfaceContent(id), callback);
+			var surfaceHtml = instance.getSurfaceHtml_(id, expandedContent);
 			callback(id, expandedContent);
-			return expandedContent;
+			return surfaceHtml;
 		});
 	}
 
@@ -878,11 +902,11 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Updates a nested surface after it has been rendered by a parent.
+	 * Updates a surface after it has been rendered through placeholders.
 	 * @param {!{surfaceId: string, expandedContent: string}} surfaceInfo
 	 * @protected
 	 */
-	updateNestedSurface_(surfaceInfo) {
+	updatePlaceholderSurface_(surfaceInfo) {
 		var surfaceId = surfaceInfo.surfaceId;
 		var surface = this.getSurface(surfaceId, true);
 		if (surface.element) {

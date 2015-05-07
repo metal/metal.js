@@ -72,6 +72,14 @@ describe('dom', function() {
 			assert.ok(!element1.parentNode);
 		});
 
+		it('should not remove element from parent if replacing it with itself', function() {
+			var element = document.createElement('div');
+			dom.append(document.body, element);
+
+			dom.replace(element, element);
+			assert.strictEqual(element, document.body.childNodes[0]);
+		});
+
 		it('should node enter document', function() {
 			var element = document.createElement('div');
 			dom.enterDocument(element);

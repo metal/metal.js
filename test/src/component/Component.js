@@ -3,6 +3,8 @@
 import async from '../../../src/async/async';
 import dom from '../../../src/dom/dom';
 import Component from '../../../src/component/Component';
+import ComponentCollector from '../../../src/component/ComponentCollector';
+import ComponentRegistry from '../../../src/component/ComponentRegistry';
 
 describe('Component', function() {
 	afterEach(function() {
@@ -880,24 +882,25 @@ describe('Component', function() {
 			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
-						return '<div class="headerInner">' + this.foo + '</div>%%%%~surface-foo~%%%%';
+						return '<div class="headerInner">' + this.foo + '%%%%~surface-bar~%%%%</div>';
+					case 'bar':
+						return '<div class="barInner">' + this.foo + '%%%%~surface-foo~%%%%</div>';
 					case 'foo':
-						return 'Header ' + this.foo;
+						return '<div class="fooInner">' + this.foo + '</div>';
 				}
 			};
 
 			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
 			var headerInnerElement = custom.element.querySelector('.headerInner');
-			var surfaceElement = custom.getSurfaceElement('foo');
+			var barInnerElement = custom.element.querySelector('.barInner');
+			var fooInnerElement = custom.element.querySelector('.fooInner');
 
 			custom.foo = 'bar';
 			custom.on('attrsChanged', function() {
-				var currentHeaderInner = custom.element.querySelector('.headerInner');
-				assert.strictEqual('bar', currentHeaderInner.textContent);
-				assert.notStrictEqual(headerInnerElement, currentHeaderInner);
-
-				assert.strictEqual('Header bar', surfaceElement.innerHTML);
-				assert.strictEqual(surfaceElement, custom.element.querySelector('#custom-foo'));
+				assert.notStrictEqual(headerInnerElement, custom.element.querySelector('.headerInner'));
+				assert.notStrictEqual(barInnerElement, custom.element.querySelector('.barInner'));
+				assert.notStrictEqual(fooInnerElement, custom.element.querySelector('.fooInner'));
+				assert.strictEqual('bar', custom.getSurfaceElement('foo').textContent);
 				done();
 			});
 		});
@@ -906,23 +909,159 @@ describe('Component', function() {
 			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
-						return '<div class="headerInner"></div>%%%%~surface-foo~%%%%';
+						return '<div class="headerInner">%%%%~surface-bar~%%%%</div>';
+					case 'bar':
+						return '<div class="barInner">%%%%~surface-foo~%%%%</div>';
 					case 'foo':
-						return 'Header ' + this.foo;
+						return '<div class="fooInner">' + this.foo + '</div>';
 				}
 			};
 
 			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
 			var headerInnerElement = custom.element.querySelector('.headerInner');
-			var surfaceElement = custom.getSurfaceElement('foo');
+			var barInnerElement = custom.element.querySelector('.barInner');
+			var fooInnerElement = custom.element.querySelector('.fooInner');
 
 			custom.foo = 'bar';
 			custom.on('attrsChanged', function() {
-				assert.strictEqual('Header bar', surfaceElement.textContent);
-				assert.strictEqual(surfaceElement, custom.element.querySelector('#custom-foo'));
 				assert.strictEqual(headerInnerElement, custom.element.querySelector('.headerInner'));
+				assert.strictEqual(barInnerElement, custom.element.querySelector('.barInner'));
+				assert.notStrictEqual(fooInnerElement, custom.element.querySelector('.fooInner'));
+				assert.strictEqual('bar', custom.getSurfaceElement('foo').textContent);
 				done();
 			});
+		});
+
+		it('should reposition nested surfaces correctly after rerendering parent', function(done) {
+			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'header':
+						return '<div class="headerInner">' + this.foo + ': %%%%~surface-bar~%%%%</div>';
+					case 'bar':
+						return '<div class="barInner">%%%%~surface-foo~%%%%</div>';
+					case 'foo':
+						return '<div class="fooInner">' + this.foo + '</div>';
+				}
+			};
+
+			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var headerInnerElement = custom.element.querySelector('.headerInner');
+			var barInnerElement = custom.element.querySelector('.barInner');
+			var fooInnerElement = custom.element.querySelector('.fooInner');
+			var headerElement = custom.getSurfaceElement('header');
+			var barElement = custom.getSurfaceElement('bar');
+			var fooElement = custom.getSurfaceElement('foo');
+
+			custom.foo = 'bar';
+			custom.on('attrsChanged', function() {
+				assert.strictEqual('bar: bar', custom.element.textContent);
+				assert.notStrictEqual(headerInnerElement, custom.element.querySelector('.headerInner'));
+				assert.strictEqual(barInnerElement, custom.element.querySelector('.barInner'));
+				assert.notStrictEqual(fooInnerElement, custom.element.querySelector('.fooInner'));
+
+				assert.strictEqual(headerElement, custom.element.childNodes[0]);
+				assert.strictEqual(barElement, headerElement.querySelector('.headerInner').childNodes[1]);
+				assert.strictEqual(fooElement, barInnerElement.childNodes[0]);
+				done();
+			});
+		});
+	});
+
+	describe('Sub Components', function() {
+		beforeEach(function() {
+			document.body.innerHTML = '';
+			ComponentCollector.components = {};
+
+			this.ChildComponent = createCustomComponentClass();
+			this.ChildComponent.prototype.getElementContent = function() {
+				return 'Child %%%%~surface-foo~%%%%';
+			};
+			this.ChildComponent.prototype.getSurfaceContent = function() {
+				return this.foo;
+			};
+			this.ChildComponent.ATTRS = {foo: {value: 'default'}};
+			this.ChildComponent.SURFACES = {foo: {renderAttrs: ['foo']}};
+			ComponentRegistry.register('ChildComponent', this.ChildComponent);
+		});
+
+		it('should instantiate sub component from placeholder', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-ChildComponent-child~%%%%';
+			};
+
+			var custom = new CustomComponent({id: 'custom'}).render();
+			assert.ok(custom.components.child);
+
+			var child = custom.components.child;
+			assert.strictEqual(child.element, custom.element.querySelector('#child'));
+			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
+			assert.strictEqual('Child default', child.element.textContent);
+		});
+
+		it('should instantiate sub component from placeholder passing defined config data', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-ChildComponent-child~%%%%';
+			};
+			CustomComponent.prototype.getSubComponentData = function() {
+				return {foo: this.foo, id: 'child'};
+			};
+
+			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
+			assert.ok(custom.components.child);
+
+			var child = custom.components.child;
+			assert.strictEqual(child.element, custom.element.querySelector('#child'));
+			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
+			assert.strictEqual('foo', child.foo);
+			assert.strictEqual('Child foo', child.element.textContent);
+		});
+
+		it('should update existing component from placeholder', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.SURFACES = {foo: {renderAttrs: ['foo']}};
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~surface-foo~%%%%';
+			};
+			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				return surfaceId === 'foo' ? '%%%%~comp-ChildComponent-child~%%%%' : '';
+			};
+			CustomComponent.prototype.getSubComponentData = function() {
+				return {foo: this.foo, id: 'child'};
+			};
+
+			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
+			custom.foo = 'bar';
+			custom.once('attrsChanged', function() {
+				var child = custom.components.child;
+				assert.strictEqual(child.element, custom.element.querySelector('#child'));
+				assert.strictEqual(child.element, custom.getSurfaceElement('child'));
+				assert.strictEqual('bar', child.foo);
+
+				child.once('attrsChanged', function() {
+					assert.strictEqual('Child bar', child.element.textContent);
+					done();
+				});
+			});
+		});
+
+		it('should instantiate sub component from surface definition', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.SURFACES = {child: {componentName: 'ChildComponent'}};
+			CustomComponent.prototype.renderInternal = function() {
+				dom.append(this.element, this.getSurfaceElement('child'));
+			};
+
+			var custom = new CustomComponent({id: 'custom'}).render();
+			assert.ok(custom.components.child);
+
+			var child = custom.components.child;
+			assert.strictEqual(child.element, custom.element.querySelector('#child'));
+			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
+			assert.strictEqual('Child default', child.element.textContent);
 		});
 	});
 

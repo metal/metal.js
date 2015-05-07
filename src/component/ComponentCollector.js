@@ -10,6 +10,24 @@ class ComponentCollector extends Disposable {
 
 	/**
 	 * Creates the appropriate component from the given config data if it doesn't
+	 * exist yet.
+	 * @param {string} componentName The name of the component to be extracted.
+	 * @param {!Object} data The component's config data.
+	 * @return {!Component} The component instance.
+	 */
+	createComponent(componentName, data) {
+		var component = ComponentCollector.components[data.id];
+		if (!component) {
+			var ConstructorFn = ComponentRegistry.getConstructor(componentName);
+			data.element = '#' + data.id;
+			component = new ConstructorFn(data);
+			ComponentCollector.components[data.id] = component;
+		}
+		return component;
+	}
+
+	/**
+	 * Creates the appropriate component from the given config data if it doesn't
 	 * exist yet, or updates an existing instance with the new attributes.
 	 * @param {string} componentName The name of the component to be extracted.
 	 * @param {!Object} data The component's config data.
@@ -20,10 +38,7 @@ class ComponentCollector extends Disposable {
 		if (component) {
 			component.setAttrs(data);
 		} else {
-			var ConstructorFn = ComponentRegistry.getConstructor(componentName);
-			data.element = '#' + data.id;
-			component = new ConstructorFn(data);
-			ComponentCollector.components[data.id] = component;
+			component = this.createComponent(componentName, data);
 		}
 		return component;
 	}

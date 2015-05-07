@@ -33,12 +33,6 @@ class SoyComponent extends Component {
 		core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
 
 		/**
-		 * Gets all nested components.
-		 * @type {!Array<!Component>}
-		 */
-		this.components = {};
-
-		/**
 		 * Holds events that were listened through the element.
 		 * @type {!EventHandler}
 		 * @protected
@@ -76,7 +70,7 @@ class SoyComponent extends Component {
 
 	/**
 	 * Adds a component reference to the `components` variable.
-	 * @param {string} ref Key that should be used to reference the give component.
+	 * @param {string} ref Key that should be used to reference the given component.
 	 * @param {!Component} component Component instance to be referenced.
 	 */
 	addComponentRef(ref, component) {
@@ -282,7 +276,7 @@ class SoyComponent extends Component {
 	 */
 	extractComponents_(val) {
 		if (this.hasSubcomponents_(val)) {
-			return SoyComponent.componentsCollector.extractComponentsFromString(val);
+			return Component.componentsCollector.extractComponentsFromString(val);
 		}
 		return val;
 	}
@@ -399,7 +393,7 @@ class SoyComponent extends Component {
 	 */
 	handleTemplateCall_(templateFn, componentName, data, ignored, ijData) {
 		var config = this.buildComponentConfigData_(data);
-		var component = SoyComponent.componentsCollector.createOrUpdateComponent(componentName, config);
+		var component = Component.componentsCollector.createOrUpdateComponent(componentName, config);
 		this.componentInProcess_.addComponentRef(data.id, component);
 
 		var prevComponentInProcess = this.componentInProcess_;
@@ -612,14 +606,6 @@ class SoyComponent extends Component {
 		return super.valueIdFn_();
 	}
 }
-
-/**
- * Helper responsible for extracting components from strings and config data.
- * @type {!ComponentCollector}
- * @protected
- * @static
- */
-SoyComponent.componentsCollector = new ComponentCollector();
 
 /**
  * SoyComponent attributes definition.

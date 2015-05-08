@@ -9,6 +9,7 @@ function normalizeOptions(options) {
 	options.globalName = options.globalName || 'metal';
 	options.soyBase = options.soyBase;
 	options.soyDest = options.soyDest || 'src';
+	options.soyGeneratedDest = options.soyGeneratedDest || options.buildDest;
 	options.soyGeneratedOutputGlob = options.soyGeneratedOutputGlob === undefined ? '*.soy' : options.soyGeneratedOutputGlob;
 	options.soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
 	options.soySrc = options.soySrc || 'src/**/*.soy';

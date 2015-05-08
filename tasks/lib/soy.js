@@ -23,7 +23,7 @@ module.exports = function(options) {
 
 		gulp.src(options.soySrc, {base: options.soyBase})
 			.pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
-			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.buildDest)))
+			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.soyGeneratedDest)))
 			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
 			.pipe(plugins.soynode({
 				loadCompiledTemplates: false,

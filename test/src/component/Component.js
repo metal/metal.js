@@ -1063,6 +1063,29 @@ describe('Component', function() {
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 			assert.strictEqual('Child default', child.element.textContent);
 		});
+
+		it('should correctly position nested component even its element had already been set', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-ChildComponent-child~%%%%';
+			};
+
+			var childElement;
+			this.ChildComponent.prototype.created = function() {
+				childElement = this.element;
+			};
+			sinon.spy(this.ChildComponent.prototype, 'decorateAsSubComponent');
+
+			var custom = new CustomComponent({id: 'custom'}).render();
+			assert.ok(custom.components.child);
+
+			var child = custom.components.child;
+			assert.strictEqual(child.element, childElement);
+			assert.strictEqual(child.element, custom.element.querySelector('#child'));
+			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
+			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual(1, child.decorateAsSubComponent.callCount);
+		});
 	});
 
 	function createCustomComponentClass() {

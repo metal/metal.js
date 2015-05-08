@@ -562,6 +562,16 @@ describe('dom', function() {
 		});
 	});
 
+	describe('Helpers', function() {
+		it('should check if element is empty', function() {
+			var element = document.createElement('div');
+			assert.ok(dom.isEmpty(element));
+
+			element.innerHTML = 'foo';
+			assert.ok(!dom.isEmpty(element));
+		});
+	});
+
 	function getClassNames(element) {
 		return element.className.trim().split(' ');
 	}

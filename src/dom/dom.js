@@ -193,6 +193,15 @@ class dom {
 	}
 
 	/**
+	 * Checks if the given element is empty or not.
+	 * @param {!Element} element
+	 * @return {boolean}
+	 */
+	static isEmpty(element) {
+		return element.childNodes.length === 0;
+	}
+
+	/**
 	 * Check if an element matches a given selector.
 	 * @param {Element} element
 	 * @param {string} selector

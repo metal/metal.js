@@ -244,20 +244,6 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Decorates this component as a subcomponent, meaning that no rendering is
-	 * needed since it was already rendered by the parent component.
-	 */
-	decorateAsSubComponent() {
-		this.decoratingAsSubcomponent_ = true;
-
-		this.syncAttrs_();
-		this.attach();
-
-		this.wasRendered = true;
-		this.decoratingAsSubcomponent_ = false;
-	}
-
-	/**
 	 * @inheritDoc
 	 * @override
 	 */

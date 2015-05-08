@@ -384,6 +384,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Decorates this component as a subcomponent, meaning that no rendering is
+	 * needed since it was already rendered by the parent component.
+	 */
+	decorateAsSubComponent() {
+		this.syncAttrs_();
+		this.attach();
+		this.wasRendered = true;
+	}
+
+	/**
 	 * Lifecycle. Internal implementation for decoration. Any extra operation
 	 * necessary to prepare the component DOM must be implemented in this phase.
 	 */
@@ -572,6 +582,14 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Calls `getElementContent` and replaces all placeholders in the returned content.
+	 * @return {string} The content with all placeholders already replaced.
+	 */
+	getElementExtendedContent() {
+		return this.replaceSurfacePlaceholders_(this.getElementContent());
+	}
+
+	/**
 	 * Gets surfaces that got modified by the specified attributes changes.
 	 * @param {Object.<string, Object>} changes Object containing the attribute
 	 *     name as key and an object with newVal and prevVal as value.
@@ -633,7 +651,12 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	getSurfaceContent_(surfaceId) {
-		return this.getSurfaceContent(surfaceId);
+		var surface = this.getSurface(surfaceId);
+		if (surface.componentName) {
+			return this.components[surfaceId].getElementExtendedContent();
+		} else {
+			return this.getSurfaceContent(surfaceId);
+		}
 	}
 
 	/**
@@ -663,17 +686,42 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Gets the html that should be used to build this component's main element with
+	 * some content.
+	 * @param {string} content
+	 * @return {string}
+	 */
+	getComponentHtml(content) {
+		return this.getWrapperHtml_(this.constructor.ELEMENT_TAG_NAME_MERGED, this.id, content);
+	}
+
+	/**
 	 * Gets the html that should be used to build a surface's main element with its
 	 * content.
 	 * @param {string} surfaceId
 	 * @param {string} content
 	 * @return {string}
+	 */
+	getSurfaceHtml(surfaceId, content) {
+		var surface = this.getSurface(surfaceId);
+		if (surface.componentName) {
+			return this.components[surfaceId].getComponentHtml(content);
+		} else {
+			var surfaceElementId = this.makeSurfaceId_(surfaceId);
+			return this.getWrapperHtml_(this.constructor.SURFACE_TAG_NAME_MERGED, surfaceElementId, content);
+		}
+	}
+
+	/**
+	 * Gets the html of an element.
+	 * @param {string} tag
+	 * @param {string} id
+	 * @param {string} content
+	 * @return {string}
 	 * @protected
 	 */
-	getSurfaceHtml_(surfaceId, content) {
-		var surfaceElementId = this.getSurfaceElementId_(surfaceId);
-		return '<' + this.constructor.SURFACE_TAG_NAME_MERGED + ' id="' + surfaceElementId +
-			'">' + (content || '') + '</' + this.constructor.SURFACE_TAG_NAME_MERGED + '>';
+	getWrapperHtml_(tag, id, content) {
+		return '<' + tag + ' id="' + id + '">' + content + '</' + tag + '>';
 	}
 
 	/**
@@ -817,13 +865,26 @@ class Component extends Attribute {
 	/**
 	 * Renders a surface that holds a component.
 	 * @param {string} surfaceId
+	 * @param {(Object|string)?} opt_content The content to be rendered.
 	 * @protected
 	 */
-	renderComponentSurface_(surfaceId) {
+	renderComponentSurface_(surfaceId, opt_content) {
 		var component = this.components[surfaceId];
 		component.setAttrs(this.getSubComponentData(surfaceId));
 		if (!component.wasRendered) {
-			component.render();
+			if (opt_content) {
+				var element = component.element;
+				if (dom.isEmpty(element)) {
+					// If we have the rendered content for this component, but it hasn't
+					// been rendered in its element yet, we render it manually here. That
+					// can happen if the subcomponent's element is set before the parent
+					// element renders its content.
+					dom.append(element, opt_content);
+				}
+				component.decorateAsSubComponent();
+			} else {
+				component.render();
+			}
 		}
 	}
 
@@ -851,9 +912,8 @@ class Component extends Attribute {
 	 * necessary to prepare the component DOM must be implemented in this phase.
 	 */
 	renderInternal() {
-		var content = this.getElementContent();
+		var content = this.getElementExtendedContent();
 		if (content) {
-			content = this.replaceSurfacePlaceholders_(content);
 			dom.append(this.element, content);
 		}
 	}
@@ -873,7 +933,7 @@ class Component extends Attribute {
 	renderSurfaceContent(surfaceId, opt_content, opt_cacheContent) {
 		var surface = this.getSurface(surfaceId);
 		if (surface.componentName) {
-			this.renderComponentSurface_(surfaceId);
+			this.renderComponentSurface_(surfaceId, opt_content);
 			return;
 		}
 
@@ -937,9 +997,9 @@ class Component extends Attribute {
 			var surface = instance.getSurface(id, true, {componentName: componentName});
 			surface.handled = true;
 
-			var surfaceContent = instance.getSurfaceContent(id) || '';
+			var surfaceContent = instance.getSurfaceContent_(id);
 			var expandedContent = instance.replaceSurfacePlaceholders_(surfaceContent);
-			var surfaceHtml = instance.getSurfaceHtml_(id, expandedContent);
+			var surfaceHtml = instance.getSurfaceHtml(id, expandedContent);
 			instance.collectedSurfaces_.push({cacheContent: surfaceContent, content: expandedContent, surfaceId: id});
 
 			return surfaceHtml;

@@ -6,7 +6,6 @@ import dom from '../dom/dom';
 import object from '../object/object';
 import Component from '../component/Component';
 import ComponentCollector from '../component/ComponentCollector';
-import EventsCollector from '../component/EventsCollector';
 
 import './SoyComponent.soy.js';
 
@@ -31,13 +30,6 @@ class SoyComponent extends Component {
 		super(opt_config);
 
 		core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeTemplates_);
-
-		/**
-		 * Holds events that were listened through the element.
-		 * @type {!EventHandler}
-		 * @protected
-		 */
-		this.eventsCollector_ = new EventsCollector(this);
 
 		/**
 		 * The component that should receive extracted component references when a
@@ -105,15 +97,6 @@ class SoyComponent extends Component {
 	 * @override
 	 */
 	attach(opt_parentElement, opt_siblingElement) {
-		if (this.decorating_) {
-			// We need to call the element soy template function when the component
-			// is being decorated, even though we won't use its results. This call is
-			// only needed in order for us to intercept the call data for nested components
-			// that are outside surfaces.
-			var templateContent = this.renderElementTemplate({skipSurfaceContents: true});
-			this.renderedTemplates_[this.id] = {content: templateContent};
-		}
-
 		super.attach(opt_parentElement, opt_siblingElement);
 
 		if (!this.wasRendered) {
@@ -248,7 +231,6 @@ class SoyComponent extends Component {
 	 * @override
 	 */
 	detach() {
-		this.eventsCollector_.detachAllListeners();
 		super.detach();
 		return this;
 	}
@@ -282,7 +264,6 @@ class SoyComponent extends Component {
 				componentId = Component.extractComponentId(id);
 			}
 			var componentInProcess = ComponentCollector.components[componentId];
-			componentInProcess.getEventsCollector().attachListeners(this.renderedTemplates_[id].content, id);
 
 			if (this.renderedTemplates_[id].isSurface) {
 				var surfaceId = id.substr(componentId.length + 1);
@@ -290,14 +271,6 @@ class SoyComponent extends Component {
 			}
 		}
 		this.renderedTemplates_ = {};
-	}
-
-	/**
-	 * Gets this component's `EventsCollector` instance.
-	 * @return {!EventsCollector}
-	 */
-	getEventsCollector() {
-		return this.eventsCollector_;
 	}
 
 	/**
@@ -475,7 +448,6 @@ class SoyComponent extends Component {
 		}
 		if (this.inDocument) {
 			this.attachNestedComponents_();
-			this.eventsCollector_.detachUnusedListeners();
 		}
 	}
 
@@ -520,16 +492,6 @@ class SoyComponent extends Component {
 			content = content.replace(regex, this.replaceComponentStringPlaceholder_.bind(this));
 		} while (previousContent !== content);
 		return content;
-	}
-
-	/**
-	 * @inheritDoc
-	 * @override
-	 */
-	replaceSurfaceContent_(surfaceId, content) {
-		var id = this.makeSurfaceId_(surfaceId);
-		this.eventsCollector_.attachListeners(this.renderedTemplates_[id].content, id);
-		super.replaceSurfaceContent_(surfaceId, content);
 	}
 
 	/**

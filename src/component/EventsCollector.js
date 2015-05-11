@@ -1,5 +1,6 @@
 'use strict';
 
+import core from '../core';
 import Disposable from '../disposable/Disposable';
 
 /**
@@ -65,6 +66,9 @@ class EventsCollector extends Disposable {
 	 * @param {boolean} groupName
 	 */
 	attachListeners(content, groupName) {
+		if (!core.isString(content)) {
+			return;
+		}
 		this.groupHasListener_[groupName] = {};
 		this.attachListenersFromHtml_(content, groupName);
 	}

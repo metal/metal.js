@@ -11,6 +11,16 @@ describe('EventsCollector', function() {
 		});
 	});
 
+	it('should not throw error if content is not a string', function() {
+		var CustomComponent = createCustomComponent('<div></div><div></div>');
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+
+		assert.doesNotThrow(function() {
+			collector.attachListeners(custom.element, 'group');
+		});
+	});
+
 	it('should not throw error if no listeners are found', function() {
 		var CustomComponent = createCustomComponent('<div></div><div></div>');
 		var custom = new CustomComponent().render();

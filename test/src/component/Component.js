@@ -1088,6 +1088,120 @@ describe('Component', function() {
 		});
 	});
 
+	describe('Inline Events', function() {
+		beforeEach(function() {
+			var EventsTestComponent = createCustomComponentClass();
+			EventsTestComponent.ATTRS = {count: {value: 1}};
+			EventsTestComponent.SURFACES = {foo: {renderAttrs: ['count']}};
+			EventsTestComponent.prototype.getElementContent = function() {
+				return '<button class="elementButton" data-onclick="handleClick"></button>' +
+					'%%%%~surface-foo~%%%%';
+			};
+			EventsTestComponent.prototype.getSurfaceContent = function() {
+				var content = '';
+				for (var i = 0; i < this.count; i++) {
+					content += '<button class="fooButton" data-onmouseover="handleMouseOver"></button>';
+				}
+				return content;
+			};
+			EventsTestComponent.prototype.handleClick = sinon.stub();
+			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
+			this.EventsTestComponent = EventsTestComponent;
+		});
+
+		it('should attach listeners from element content', function() {
+			var custom = new this.EventsTestComponent().render();
+			var button = custom.element.querySelector('.elementButton');
+			dom.triggerEvent(button, 'click');
+			assert.strictEqual(1, custom.handleClick.callCount);
+		});
+
+		it('should attach listeners from surface content', function() {
+			var custom = new this.EventsTestComponent().render();
+			var button = custom.element.querySelector('.fooButton');
+			dom.triggerEvent(button, 'mouseover');
+			assert.strictEqual(1, custom.handleMouseOver.callCount);
+		});
+
+		it('should attach listeners from element content after decorating', function() {
+			var content = '<button class="elementButton" data-onclick="handleClick"></button>' +
+				'<div id="events-foo"><button class="fooButton" data-onmouseover="handleMouseOver"></button></div>';
+			var element = document.createElement('div');
+			element.id = 'events';
+			dom.append(element, content);
+			dom.append(document.body, element);
+
+			var custom = new this.EventsTestComponent({element: '#events'}).decorate();
+			var button = custom.element.querySelector('.elementButton');
+			dom.triggerEvent(button, 'click');
+			assert.strictEqual(1, custom.handleClick.callCount);
+		});
+
+		it('should attach listeners from surface content after decorating', function() {
+			var content = '<button class="elementButton" data-onclick="handleClick"></button>' +
+				'<div id="events-foo"><button class="fooButton" data-onmouseover="handleMouseOver"></button></div>';
+			var element = document.createElement('div');
+			element.id = 'events';
+			dom.append(element, content);
+			dom.append(document.body, element);
+
+			var custom = new this.EventsTestComponent({element: '#events'}).decorate();
+			var button = custom.element.querySelector('.fooButton');
+			dom.triggerEvent(button, 'mouseover');
+			assert.strictEqual(1, custom.handleMouseOver.callCount);
+		});
+
+		it('should attach listeners when component is decorated as sub component', function() {
+			ComponentRegistry.register('EventsTestComponent', this.EventsTestComponent);
+			ComponentCollector.components = {};
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-EventsTestComponent-child~%%%%';
+			};
+
+			var custom = new CustomComponent().render();
+			var button = custom.element.querySelector('.elementButton');
+			dom.triggerEvent(button, 'click');
+			assert.strictEqual(1, custom.components.child.handleClick.callCount);
+
+			button = custom.element.querySelector('.fooButton');
+			dom.triggerEvent(button, 'mouseover');
+			assert.strictEqual(1, custom.components.child.handleMouseOver.callCount);
+		});
+
+		it('should detach unused listeners after surface update', function(done) {
+			var custom = new this.EventsTestComponent({count: 1}).render();
+			sinon.spy(custom.element, 'removeEventListener');
+			custom.count = 0;
+			custom.on('attrsChanged', function() {
+				assert.strictEqual(1, custom.element.removeEventListener.callCount);
+				assert.strictEqual('mouseover', custom.element.removeEventListener.args[0][0]);
+				done();
+			});
+		});
+
+		it('should not detach listeners that are still useful after surface update', function(done) {
+			var custom = new this.EventsTestComponent({count: 1}).render();
+			sinon.spy(custom.element, 'removeEventListener');
+			custom.count = 2;
+			custom.on('attrsChanged', function() {
+				assert.strictEqual(0, custom.element.removeEventListener.callCount);
+				done();
+			});
+		});
+
+		it('should detach all listeners when element is detached', function() {
+			var custom = new this.EventsTestComponent({count: 1}).render();
+			sinon.spy(custom.element, 'removeEventListener');
+			custom.detach();
+
+			assert.strictEqual(2, custom.element.removeEventListener.callCount);
+			assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
+			assert.strictEqual('mouseover', custom.element.removeEventListener.args[1][0]);
+		});
+	});
+
 	function createCustomComponentClass() {
 		class CustomComponent extends Component {
 			constructor(opt_config) {

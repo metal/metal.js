@@ -11,7 +11,7 @@ import './assets/CustomTestComponent.soy.js';
 import './assets/EventsTestComponent.soy.js';
 import './assets/NestedTestComponent.soy.js';
 
-describe('SoyComponent', function() {
+describe.skip('SoyComponent', function() {
 	beforeEach(function() {
 		document.body.innerHTML = '';
 	});

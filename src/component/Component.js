@@ -11,6 +11,7 @@ import Attribute from '../attribute/Attribute';
 import ComponentCollector from '../component/ComponentCollector';
 import EventEmitterProxy from '../events/EventEmitterProxy';
 import EventHandler from '../events/EventHandler';
+import EventsCollector from './EventsCollector';
 
 /**
  * Component collects common behaviors to be followed by UI components, such
@@ -107,6 +108,13 @@ class Component extends Attribute {
 		 * @protected
 		 */
 		this.elementEventProxy_ = null;
+
+		/**
+		 * Collects inline events from html contents.
+		 * @type {!EventsCollector}
+		 * @protected
+		 */
+		this.eventsCollector_ = new EventsCollector(this);
 
 		/**
 		 * Whether the element is in document.
@@ -241,6 +249,15 @@ class Component extends Attribute {
 			this.attached();
 		}
 		return this;
+	}
+
+	/**
+	 * Attaches inline listeners that are found on the element's string content.
+	 * @protected
+	 */
+	attachInlineListeners_() {
+		this.eventsCollector_.attachListeners(this.elementContent_ || this.getElementContent_());
+		this.elementContent_ = null;
 	}
 
 	/**
@@ -388,6 +405,7 @@ class Component extends Attribute {
 	 * needed since it was already rendered by the parent component.
 	 */
 	decorateAsSubComponent() {
+		this.attachInlineListeners_();
 		this.syncAttrs_();
 		this.attach();
 		this.wasRendered = true;
@@ -428,6 +446,7 @@ class Component extends Attribute {
 			this.inDocument = false;
 			this.detached();
 		}
+		this.eventsCollector_.detachAllListeners();
 		return this;
 	}
 
@@ -472,6 +491,8 @@ class Component extends Attribute {
 		this.decorating_ = true;
 
 		this.decorateInternal();
+		this.attachInlineListeners_();
+
 		this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
 		this.renderSurfacesContent_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
@@ -582,11 +603,22 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Internal function for getting the component element's content. Stores the
+	 * result in a variable so it can be accessed later without building it again.
+	 * @return {Object|string}
+	 * @protected
+	 */
+	getElementContent_() {
+		this.elementContent_ = this.getElementContent();
+		return this.elementContent_;
+	}
+
+	/**
 	 * Calls `getElementContent` and replaces all placeholders in the returned content.
 	 * @return {string} The content with all placeholders already replaced.
 	 */
 	getElementExtendedContent() {
-		return this.replaceSurfacePlaceholders_(this.getElementContent());
+		return this.replaceSurfacePlaceholders_(this.getElementContent_());
 	}
 
 	/**
@@ -850,6 +882,8 @@ class Component extends Attribute {
 		}
 
 		this.renderInternal();
+		this.attachInlineListeners_();
+
 		this.clearSurfacesCache_();
 		this.renderSurfacesContent_(this.surfaces_);
 
@@ -940,8 +974,14 @@ class Component extends Attribute {
 		var content = opt_content || this.getSurfaceContent_(surfaceId);
 		if (core.isDefAndNotNull(content)) {
 			var previousCacheState = surface.cacheState;
-			this.cacheSurfaceContent(surfaceId, opt_cacheContent || content);
-			if (this.compareCacheStates_(surface.cacheState, previousCacheState)) {
+			var cacheContent = opt_cacheContent || content;
+			this.cacheSurfaceContent(surfaceId, cacheContent);
+
+			var cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
+			if (this.decorating_ || !cacheHit) {
+				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
+			}
+			if (cacheHit) {
 				this.loopSurfacePlaceholders_(content, this.renderSurfaceContent.bind(this));
 			} else {
 				this.replaceSurfaceContent_(surfaceId, content);
@@ -963,6 +1003,7 @@ class Component extends Attribute {
 		}
 		if (this.wasRendered) {
 			this.updatePlaceholderSurfaces_();
+			this.eventsCollector_.detachUnusedListeners();
 		}
 	}
 
@@ -1057,6 +1098,7 @@ class Component extends Attribute {
 			// to replace the rendered element. Let's just cache the content for
 			// future use.
 			this.cacheSurfaceContent(surfaceId, collectedData.cacheContent);
+			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceId);
 		}
 	}
 

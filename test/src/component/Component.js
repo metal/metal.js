@@ -1035,24 +1035,29 @@ describe('Component', function() {
 				return '%%%%~surface-foo~%%%%';
 			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
-				return surfaceId === 'foo' ? '%%%%~comp-ChildComponent-child~%%%%' : '';
+				return surfaceId === 'foo' ? 'Surface ' + this.foo + ': %%%%~comp-ChildComponent-child~%%%%' : '';
 			};
 			CustomComponent.prototype.created = function() {
+				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
 				this.on('fooChanged', function() {
 					Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
 				});
 			};
 
 			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var child = custom.components.child;
+			assert.strictEqual('Child foo', child.element.textContent);
+			assert.strictEqual('Surface foo: Child foo', custom.element.textContent);
+
 			custom.foo = 'bar';
 			custom.once('attrsChanged', function() {
-				var child = custom.components.child;
 				assert.strictEqual(child.element, custom.element.querySelector('#child'));
 				assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 				assert.strictEqual('bar', child.foo);
 
 				child.once('attrsChanged', function() {
 					assert.strictEqual('Child bar', child.element.textContent);
+					assert.strictEqual('Surface bar: Child bar', custom.element.textContent);
 					done();
 				});
 			});

@@ -172,11 +172,12 @@ class SoyComponent extends Component {
 			templateName += '.' + opt_surfaceId;
 		}
 		var templateFn = soy.$$getDelegateFn(templateName, 'element', true);
-		return this.renderTemplate_(templateFn, {
+		var data = {
 			elementClasses: this.elementClasses,
 			elementContent: soydata.VERY_UNSAFE.ordainSanitizedHtml(content || ''),
 			id: this.id || this.makeId_()
-		});
+		};
+		return templateFn(data, null, {}).content;
 	}
 
 	/**

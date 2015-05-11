@@ -12,10 +12,12 @@
  * @param id
  */
 {template .components}
+	<div class="componentsWrapper">
 	{for $index in range($count)}
 		{delcall CustomTestComponent}
 			{param headerContent: $foo /}
 			{param id: $id + 'MyChild' + $index /}
 		{/delcall}
 	{/for}
+	</div>
 {/template}

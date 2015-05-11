@@ -125,7 +125,7 @@ describe('SoyComponent', function() {
 			assert.strictEqual('foo', child.headerContent);
 		});
 
-		it('should render nested component inside parent', function() {
+		it('should render nested components inside parent', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
 			var custom = new NestedTestComponent({id: 'nested'}).render();
 
@@ -149,6 +149,18 @@ describe('SoyComponent', function() {
 				assert.strictEqual('bar', child.headerContent);
 				assert.ok(custom.element.querySelector('#' + child.id));
 
+				done();
+			});
+		});
+
+		it('should not update parent if only child components change', function(done) {
+			var NestedTestComponent = createNestedTestComponentClass();
+			var custom = new NestedTestComponent({count: 2}).render();
+
+			var wrapper = custom.element.querySelector('.componentsWrapper');
+			custom.foo = 'bar';
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(wrapper, custom.element.querySelector('.componentsWrapper'));
 				done();
 			});
 		});

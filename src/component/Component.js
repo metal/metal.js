@@ -682,7 +682,11 @@ class Component extends Attribute {
 	getSurfaceContent_(surfaceId) {
 		var surface = this.getSurface(surfaceId);
 		if (surface.componentName) {
-			return this.components[surfaceId].getElementExtendedContent();
+			if (this.components[surfaceId].wasRendered) {
+				return '';
+			} else {
+				return this.components[surfaceId].getElementExtendedContent();
+			}
 		} else {
 			return this.getSurfaceContent(surfaceId);
 		}

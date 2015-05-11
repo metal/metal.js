@@ -6,64 +6,67 @@ import Disposable from '../disposable/Disposable';
 class ComponentCollector extends Disposable {
 	constructor() {
 		super();
+
+		/**
+		 * Holds the data that should be passed to a component, mapped by component id.
+		 * @type {!Object<string, Object>}
+		 */
+		this.nextComponentData_ = {};
 	}
 
 	/**
 	 * Creates the appropriate component from the given config data if it doesn't
 	 * exist yet.
-	 * @param {string} componentName The name of the component to be extracted.
-	 * @param {!Object} data The component's config data.
+	 * @param {string} componentName The name of the component to be created.
+	 * @param {string} id The id of the component to be created.
 	 * @return {!Component} The component instance.
 	 */
-	createComponent(componentName, data) {
-		var component = ComponentCollector.components[data.id];
+	createComponent(componentName, id) {
+		var component = ComponentCollector.components[id];
 		if (!component) {
 			var ConstructorFn = ComponentRegistry.getConstructor(componentName);
-			data.element = '#' + data.id;
+			var data = this.getNextComponentData(id);
+			data.element = '#' + id;
 			component = new ConstructorFn(data);
-			ComponentCollector.components[data.id] = component;
+			ComponentCollector.components[id] = component;
 		}
 		return component;
 	}
 
 	/**
-	 * Creates the appropriate component from the given config data if it doesn't
-	 * exist yet, or updates an existing instance with the new attributes.
-	 * @param {string} componentName The name of the component to be extracted.
-	 * @param {!Object} data The component's config data.
-	 * @return {!Component} The extracted component instance.
+	 * Gets the data that should be passed to the next creation or update of a
+	 * component with the given id.
+	 * @param {string} id
+	 * @param {Object} data
 	 */
-	createOrUpdateComponent(componentName, data) {
-		var component = ComponentCollector.components[data.id];
+	getNextComponentData(id) {
+		var data = this.nextComponentData_[id] || {};
+		data.id = id;
+		return data;
+	}
+
+	/**
+	 * Sets the data that should be passed to the next creation or update of a
+	 * component with the given id.
+	 * @param {string} id
+	 * @param {Object} data
+	 */
+	setNextComponentData(id, data) {
+		this.nextComponentData_[id] = data;
+	}
+
+	/**
+	 * Updates an existing component instance with new attributes.
+	 * @param {string} id The id of the component to be created or updated.
+	 * @return {Component} The extracted component instance.
+	 */
+	updateComponent(id) {
+		var component = ComponentCollector.components[id];
 		if (component) {
+			var data = this.getNextComponentData(id);
 			component.setAttrs(data);
-		} else {
-			component = this.createComponent(componentName, data);
 		}
 		return component;
-	}
-
-	/**
-	 * Handles the given string of rendered templates, converting them to
-	 * component instances.
-	 * @param {string} renderedComponents Rendered components.
-	 * @return {!Array<!Component>}
-	 */
-	extractComponentsFromString(renderedComponents) {
-		var components = [];
-		var regex = /\%\%\%\%~comp-([^~]+)~\%\%\%\%/g;
-		var match = regex.exec(renderedComponents);
-		while(match) {
-			if (match && match.length === 2) {
-				var id = match[1];
-				var component = ComponentCollector.components[id];
-				if (component) {
-					components.push(component);
-				}
-				match = regex.exec(renderedComponents);
-			}
-		}
-		return components;
 	}
 }
 

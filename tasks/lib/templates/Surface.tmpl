@@ -6,18 +6,8 @@
 {deltemplate <%= moduleName %>.<%= surfaceName %>}
 	{delcall <%= moduleName %>.<%= surfaceName %> variant="'element'"}
 		{param elementContent kind="html"}
-			{if not $ij.skipSurfaceContents}
-				{delcall <%= moduleName %>.<%= surfaceName %> variant="'content'" data="all" /}
-			{/if}
+			{call .<%= surfaceName %> data="all" /}
 		{/param}
 		{param id: $id /}
 	{/delcall}
-{/deltemplate}
-
-/**
- * @param? elementContent
- * @param id
- */
-{deltemplate <%= moduleName %>.<%= surfaceName %> variant="'content'"}
-	{call .<%= surfaceName %> data="all" /}
 {/deltemplate}

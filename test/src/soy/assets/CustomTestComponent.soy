@@ -27,7 +27,7 @@
  * @param id
  */
 {deltemplate CustomTestComponent variant="'element'"}
-	<custom id="{$id}" class="btn {$elementClasses ? $elementClasses : ''}" data-component>
+	<custom id="{$id}" class="btn component{$elementClasses ? ' ' + $elementClasses : ''}" data-component="">
 		{$elementContent}
 	</custom>
 {/deltemplate}

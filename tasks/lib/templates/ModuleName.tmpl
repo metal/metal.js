@@ -8,17 +8,8 @@
 	{delcall <%= moduleName %> variant="'element'"}
 		{param elementClasses: $elementClasses /}
 		{param elementContent kind="html"}
-			{delcall <%= moduleName %> variant="'content'" data="all" /}
+			{call .content data="all" /}
 		{/param}
 		{param id: $id /}
 	{/delcall}
-{/deltemplate}
-
-/**
- * @param? elementContent
- * @param? elementClasses
- * @param id
- */
-{deltemplate <%= moduleName %> variant="'content'"}
-	{call .content data="all" /}
 {/deltemplate}

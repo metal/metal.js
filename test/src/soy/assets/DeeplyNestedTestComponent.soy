@@ -10,7 +10,6 @@
  * @param bar
  * @param footerButtons
  * @param id
- * @param invert
  */
 {template .components}
 	{let $child2 kind="html"}
@@ -35,13 +34,8 @@
 	{delcall ChildrenTestComponent}
 		{param bar: $bar /}
 		{param children kind="html"}
-			{if $invert}
-				{$child3}{$child2}
-			{else}
-				{$child2}{$child3}
-			{/if}
+			{$child2}{$child3}
 		{/param}
 		{param id: $id + '-main' /}
 	{/delcall}
-	%%%%~comp-nonExisting~%%%%
 {/template}

@@ -80,6 +80,16 @@ describe('dom', function() {
 			assert.strictEqual(element, document.body.childNodes[0]);
 		});
 
+		it('should not throw error if null as passed as one of the elements for "replace"', function() {
+			var element = document.createElement('div');
+			dom.append(document.body, element);
+
+			assert.doesNotThrow(function() {
+				dom.replace(element, null);
+				dom.replace(null, element);
+			});
+		});
+
 		it('should node enter document', function() {
 			var element = document.createElement('div');
 			dom.enterDocument(element);

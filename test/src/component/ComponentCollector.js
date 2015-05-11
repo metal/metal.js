@@ -32,15 +32,35 @@ describe('ComponentCollector', function() {
 		dom.append(document.body, element);
 
 		var collector = new ComponentCollector();
-		var data = {
-			bar: 1,
-			id: 'comp'
-		};
-		var component = collector.createOrUpdateComponent('TestComponent', data);
+		var component = collector.createComponent('TestComponent', 'comp');
+
+		assert.ok(component instanceof TestComponent);
+		assert.strictEqual(element, component.element);
+	});
+
+	it('should instantiate a new component, passing requested data', function() {
+		var element = document.createElement('div');
+		element.setAttribute('id', 'comp');
+		dom.append(document.body, element);
+
+		var collector = new ComponentCollector();
+		collector.setNextComponentData('comp', {bar: 1});
+		var component = collector.createComponent('TestComponent', 'comp');
 
 		assert.ok(component instanceof TestComponent);
 		assert.strictEqual(1, component.bar);
 		assert.strictEqual(element, component.element);
+	});
+
+	it('should not throw error if trying to create existing component', function() {
+		var collector = new ComponentCollector();
+		collector.setNextComponentData('comp', {bar: 1});
+		var component = collector.createComponent('TestComponent', 'comp');
+
+		assert.doesNotThrow(function() {
+			var newComponent = collector.createComponent('TestComponent', 'comp');
+			assert.strictEqual(component, newComponent);
+		});
 	});
 
 	it('should update an existing component', function() {
@@ -49,30 +69,23 @@ describe('ComponentCollector', function() {
 		dom.append(document.body, element);
 
 		var collector = new ComponentCollector();
-		var data = {
-			bar: 1,
-			id: 'comp'
-		};
-		var component = collector.createOrUpdateComponent('TestComponent', data);
+		collector.setNextComponentData('comp', {bar: 1});
+		var component = collector.createComponent('TestComponent', 'comp');
 
-		data.bar = 2;
-		var updatedComponent = collector.createOrUpdateComponent('TestComponent', data);
+		collector.setNextComponentData('comp', {bar: 2});
+		var updatedComponent = collector.updateComponent('comp');
 
 		assert.strictEqual(component, updatedComponent);
 		assert.strictEqual(2, component.bar);
 		assert.strictEqual(element, component.element);
 	});
 
-	it('should extract components from a string', function() {
+	it('should not throw error if trying to update non existing component', function() {
 		var collector = new ComponentCollector();
-		var child1 = collector.createOrUpdateComponent('TestComponent', {id: 'child1'});
-		var child2 = collector.createOrUpdateComponent('TestComponent', {id: 'child2'});
 
-		var childrenString = '%%%%~comp-child1~%%%%%%%%~comp-child2~%%%%';
-		var components = collector.extractComponentsFromString(childrenString);
-
-		assert.strictEqual(2, components.length);
-		assert.ok(child1, components[0]);
-		assert.ok(child2, components[1]);
+		assert.doesNotThrow(function() {
+			var component = collector.updateComponent('TestComponent', 'comp');
+			assert.ok(!component);
+		});
 	});
 });

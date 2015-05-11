@@ -355,17 +355,6 @@ describe('Component', function() {
 			sinon.assert.callCount(custom.syncBar, 1);
 		});
 
-		it('should not allow defining attribute named componentName', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {
-				componentName: {}
-			};
-
-			assert.throws(function() {
-				new CustomComponent();
-			});
-		});
-
 		it('should not allow defining attribute named components', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {
@@ -381,17 +370,6 @@ describe('Component', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {
 				elementContent: {}
-			};
-
-			assert.throws(function() {
-				new CustomComponent();
-			});
-		});
-
-		it('should not allow defining attribute named ref', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {
-				ref: {}
 			};
 
 			assert.throws(function() {
@@ -811,12 +789,6 @@ describe('Component', function() {
 			assert.strictEqual(custom, custom.addSurfaces({}));
 			assert.strictEqual(custom, custom.removeSurface('header'));
 		});
-
-		it('should extract component id from surface element id', function() {
-			assert.strictEqual('comp', Component.extractComponentId('comp'));
-			assert.strictEqual('comp', Component.extractComponentId('comp-header'));
-			assert.strictEqual('comp-modal', Component.extractComponentId('comp-modal-header'));
-		});
 	});
 
 	describe('Surface Placeholders', function() {
@@ -971,6 +943,7 @@ describe('Component', function() {
 		beforeEach(function() {
 			document.body.innerHTML = '';
 			ComponentCollector.components = {};
+			Component.componentsCollector.nextComponentData_ = {};
 
 			this.ChildComponent = createCustomComponentClass();
 			this.ChildComponent.prototype.getElementContent = function() {
@@ -999,14 +972,29 @@ describe('Component', function() {
 			assert.strictEqual('Child default', child.element.textContent);
 		});
 
+		it('should instantiate sub component that has hifen on id from placeholder', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-ChildComponent-my-child~%%%%';
+			};
+
+			var custom = new CustomComponent({id: 'custom'}).render();
+			assert.ok(custom.components['my-child']);
+
+			var child = custom.components['my-child'];
+			assert.strictEqual(child.element, custom.element.querySelector('#my-child'));
+			assert.strictEqual(child.element, custom.getSurfaceElement('my-child'));
+			assert.strictEqual('Child default', child.element.textContent);
+		});
+
 		it('should instantiate sub component from placeholder passing defined config data', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {foo: {}};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~comp-ChildComponent-child~%%%%';
 			};
-			CustomComponent.prototype.getSubComponentData = function() {
-				return {foo: this.foo, id: 'child'};
+			CustomComponent.prototype.created = function() {
+				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
 			};
 
 			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
@@ -1019,6 +1007,26 @@ describe('Component', function() {
 			assert.strictEqual('Child foo', child.element.textContent);
 		});
 
+		it('should instantiate sub components when parent is decorated', function() {
+			var element = document.createElement('div');
+			element.id = 'custom';
+			dom.append(element, '<div id="child">Child <div id="child-foo">default</div></div>');
+			dom.append(document.body, element);
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-ChildComponent-child~%%%%';
+			};
+
+			var custom = new CustomComponent({element: '#custom'}).decorate();
+			assert.ok(custom.components.child);
+
+			var child = custom.components.child;
+			assert.strictEqual(child.element, custom.element.querySelector('#child'));
+			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
+			assert.strictEqual('Child default', child.element.textContent);
+		});
+
 		it('should update existing component from placeholder', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {foo: {}};
@@ -1029,8 +1037,10 @@ describe('Component', function() {
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				return surfaceId === 'foo' ? '%%%%~comp-ChildComponent-child~%%%%' : '';
 			};
-			CustomComponent.prototype.getSubComponentData = function() {
-				return {foo: this.foo, id: 'child'};
+			CustomComponent.prototype.created = function() {
+				this.on('fooChanged', function() {
+					Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+				});
 			};
 
 			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
@@ -1064,6 +1074,40 @@ describe('Component', function() {
 			assert.strictEqual('Child default', child.element.textContent);
 		});
 
+		it('should reposition previously rendered component instances', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {invert: {}};
+			CustomComponent.SURFACES = {foo: {renderAttrs: ['invert']}};
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~surface-foo~%%%%';
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				if (this.invert) {
+					return '%%%%~comp-ChildComponent-child2~%%%%%%%%~comp-ChildComponent-child1~%%%%';
+				} else {
+					return '%%%%~comp-ChildComponent-child1~%%%%%%%%~comp-ChildComponent-child2~%%%%';
+				}
+			};
+
+			var custom = new CustomComponent({id: 'custom'}).render();
+			var child1 = custom.components.child1;
+			var child2 = custom.components.child2;
+			var childElements = custom.getSurfaceElement('foo').querySelectorAll('.component');
+			assert.strictEqual(childElements[0], child1.element);
+			assert.strictEqual(childElements[1], child2.element);
+
+			custom.invert = true;
+			custom.on('attrsChanged', function() {
+				assert.strictEqual(child1, custom.components.child1);
+				assert.strictEqual(child2, custom.components.child2);
+
+				childElements = custom.getSurfaceElement('foo').querySelectorAll('.component');
+				assert.strictEqual(childElements[0], child2.element);
+				assert.strictEqual(childElements[1], child1.element);
+				done();
+			});
+		});
+
 		it('should correctly position nested component even its element had already been set', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
@@ -1085,6 +1129,21 @@ describe('Component', function() {
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 			assert.strictEqual('Child default', child.element.textContent);
 			assert.strictEqual(1, child.decorateAsSubComponent.callCount);
+		});
+
+		it('should render nested component correctly when element is not on document', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~comp-ChildComponent-child~%%%%';
+			};
+
+			var element = document.createElement('div');
+			var custom = new CustomComponent({id: 'custom'}).render(element);
+
+			var child = custom.components.child;
+			assert.ok(child);
+			assert.strictEqual(this.ChildComponent, child.constructor);
+			assert.strictEqual(custom.element.querySelector('#child'), child.element);
 		});
 	});
 

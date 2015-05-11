@@ -137,12 +137,6 @@ class Component extends Attribute {
 		this.wasRendered = false;
 
 		/**
-		 * Whether the element was decorated.
-		 * @type {boolean}
-		 */
-		this.wasDecorated = false;
-
-		/**
 		 * The component's element will be appended to the element this variable is
 		 * set to, unless the user specifies another parent when calling `render` or
 		 * `attach`.
@@ -215,7 +209,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	addSurfacesFromStaticHint_() {
-		core.mergeSuperClassesProperty(this.constructor, 'SURFACES', this.mergeSurfaces_);
+		core.mergeSuperClassesProperty(this.constructor, 'SURFACES', this.mergeObjects_);
 		this.surfaces_ = {};
 		this.surfacesRenderAttrs_ = {};
 
@@ -256,7 +250,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	attachInlineListeners_() {
-		this.eventsCollector_.attachListeners(this.elementContent_ || this.getElementContent_());
+		this.eventsCollector_.attachListeners(this.getElementContent_());
 		this.elementContent_ = null;
 	}
 
@@ -344,7 +338,9 @@ class Component extends Attribute {
 	 */
 	computeSurfacesCacheStateFromDom_() {
 		for (var surfaceId in this.surfaces_) {
-			this.cacheSurfaceContent(surfaceId, html.compress(this.getSurfaceElement(surfaceId).innerHTML));
+			if (!this.getSurface(surfaceId).componentName) {
+				this.cacheSurfaceContent(surfaceId, html.compress(this.getSurfaceElement(surfaceId).innerHTML));
+			}
 		}
 	}
 
@@ -382,8 +378,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	createSubComponent_(componentName, componentId) {
-		var data = this.getSubComponentData(componentId);
-		this.components[componentId] = Component.componentsCollector.createComponent(componentName, data);
+		this.components[componentId] = Component.componentsCollector.createComponent(componentName, componentId);
 		return this.components[componentId];
 	}
 
@@ -491,6 +486,10 @@ class Component extends Attribute {
 		this.decorating_ = true;
 
 		this.decorateInternal();
+
+		// Need to go through all surface placeholders on decorate to make sure they are
+		// properly created for the first time.
+		this.replaceSurfacePlaceholders_(this.getElementContent_());
 		this.attachInlineListeners_();
 
 		this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
@@ -501,7 +500,6 @@ class Component extends Attribute {
 		this.attach();
 
 		this.decorating_ = false;
-		this.wasDecorated = true;
 		this.wasRendered = true;
 
 		return this;
@@ -525,16 +523,6 @@ class Component extends Attribute {
 		this.surfaces_ = null;
 		this.surfacesRenderAttrs_ = null;
 		super.disposeInternal();
-	}
-
-	/**
-	 * Extracts the surfaceId from the elementId.
-	 * @param {Element} element
-	 * @return {?string}
-	 */
-	static extractComponentId(surfaceElementId) {
-		var index = surfaceElementId.lastIndexOf('-');
-		return index === -1 ? surfaceElementId : surfaceElementId.substring(0, index);
 	}
 
 	/**
@@ -563,8 +551,7 @@ class Component extends Attribute {
 	/**
 	 * Finds the element that matches the given id on this component. This searches
 	 * on the document first, for performance. If the element is not found, it's
-	 * searched in the component's element directly, as the component may not have
-	 * been attached to the document yet.
+	 * searched in the component's element directly.
 	 * @param {string} id
 	 * @return {Element}
 	 * @protected
@@ -593,6 +580,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Gets the html that should be used to build this component's main element with
+	 * some content.
+	 * @param {string} content
+	 * @return {string}
+	 */
+	getComponentHtml(content) {
+		return this.getWrapperHtml_(this.constructor.ELEMENT_TAG_NAME_MERGED, this.id, content);
+	}
+
+	/**
 	 * Gets the content that should be rendered in the component's main element.
 	 * Should be implemented by subclasses.
 	 * @return {Object|string} The content to be rendered. If the content is a
@@ -609,7 +606,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	getElementContent_() {
-		this.elementContent_ = this.getElementContent();
+		this.elementContent_ = this.elementContent_ || this.getElementContent();
 		return this.elementContent_;
 	}
 
@@ -637,14 +634,14 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Gets data to be used for creating or updating a sub component that was
-	 * rendered through string placeholders. Can be overridden by subclasses to
-	 * add custom behavior.
-	 * @param  {string} componentId
-	 * @return {Object} The component's config data.
+	 * Same as `getSurfaceHtml`, but only called for non component surfaces.
+	 * @param {string} surfaceId
+	 * @param {string} content
+	 * @return {string}
 	 */
-	getSubComponentData(componentId) {
-		return {id: componentId};
+	getNonComponentSurfaceHtml(surfaceId, content) {
+		var surfaceElementId = this.makeSurfaceId_(surfaceId);
+		return this.getWrapperHtml_(this.constructor.SURFACE_TAG_NAME_MERGED, surfaceElementId, content);
 	}
 
 	/**
@@ -718,16 +715,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Gets the html that should be used to build this component's main element with
-	 * some content.
-	 * @param {string} content
-	 * @return {string}
-	 */
-	getComponentHtml(content) {
-		return this.getWrapperHtml_(this.constructor.ELEMENT_TAG_NAME_MERGED, this.id, content);
-	}
-
-	/**
 	 * Gets the html that should be used to build a surface's main element with its
 	 * content.
 	 * @param {string} surfaceId
@@ -739,8 +726,7 @@ class Component extends Attribute {
 		if (surface.componentName) {
 			return this.components[surfaceId].getComponentHtml(content);
 		} else {
-			var surfaceElementId = this.makeSurfaceId_(surfaceId);
-			return this.getWrapperHtml_(this.constructor.SURFACE_TAG_NAME_MERGED, surfaceElementId, content);
+			return this.getNonComponentSurfaceHtml(surfaceId, content);
 		}
 	}
 
@@ -754,17 +740,6 @@ class Component extends Attribute {
 	 */
 	getWrapperHtml_(tag, id, content) {
 		return '<' + tag + ' id="' + id + '">' + content + '</' + tag + '>';
-	}
-
-	/**
-	 * Gets the element id of a surface.
-	 * @param {string} surfaceId
-	 * @return {string}
-	 * @protected
-	 */
-	getSurfaceElementId_(surfaceId) {
-		var surface = this.getSurface(surfaceId);
-		return (surface && surface.componentName) ? surfaceId : this.makeSurfaceId_(surfaceId);
 	}
 
 	/**
@@ -834,12 +809,13 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Merges an array of values for the SURFACES property into a single object.
+	 * Merges an array of objects into a single object. Used by the SURFACES static
+	 * variable.
 	 * @param {!Array} values The values to be merged.
 	 * @return {!Object} The merged value.
 	 * @protected
 	 */
-	mergeSurfaces_(values) {
+	mergeObjects_(values) {
 		return object.mixin.apply(null, [{}].concat(values.reverse()));
 	}
 
@@ -904,21 +880,20 @@ class Component extends Attribute {
 	 */
 	renderComponentSurface_(surfaceId, opt_content) {
 		var component = this.components[surfaceId];
-		component.setAttrs(this.getSubComponentData(surfaceId));
-		if (!component.wasRendered) {
-			if (opt_content) {
-				var element = component.element;
-				if (dom.isEmpty(element)) {
-					// If we have the rendered content for this component, but it hasn't
-					// been rendered in its element yet, we render it manually here. That
-					// can happen if the subcomponent's element is set before the parent
-					// element renders its content.
-					dom.append(element, opt_content);
-				}
-				component.decorateAsSubComponent();
-			} else {
-				component.render();
+		if (component.wasRendered) {
+			Component.componentsCollector.updateComponent(surfaceId);
+		} else if (opt_content) {
+			var element = component.element;
+			if (dom.isEmpty(element)) {
+				// If we have the rendered content for this component, but it hasn't
+				// been rendered in its element yet, we render it manually here. That
+				// can happen if the subcomponent's element is set before the parent
+				// element renders its content.
+				dom.append(element, opt_content);
 			}
+			component.decorateAsSubComponent();
+		} else {
+			component.render();
 		}
 	}
 
@@ -1087,16 +1062,18 @@ class Component extends Attribute {
 	updatePlaceholderSurface_(collectedData) {
 		var surfaceId = collectedData.surfaceId;
 		var surface = this.getSurface(surfaceId);
-		if (surface.element || surface.componentName) {
+		if (this.decorating_ || surface.element || surface.componentName) {
 			// This surface already has an element, so it needs to replace the rendered
-			// element and receive the new content.
-			var placeholder = this.findElementById_(this.getSurfaceElementId_(surfaceId));
+			// element.
+			var elementId = surface.componentName ? surfaceId : this.makeSurfaceId_(surfaceId);
+			var placeholder = this.findElementById_(elementId);
 			dom.replace(placeholder, this.getSurfaceElement(surfaceId));
-			this.renderSurfaceContent(surfaceId, collectedData.content, collectedData.cacheContent);
+
+			var cacheContent = this.decorating_ ? null : collectedData.cacheContent;
+			this.renderSurfaceContent(surfaceId, collectedData.content, cacheContent);
 		} else {
 			// This surface's element hasn't been created yet, so it doesn't need
-			// to replace the rendered element. Let's just cache the content for
-			// future use.
+			// to replace the rendered element. Let's cache the content so it won't rerender.
 			this.cacheSurfaceContent(surfaceId, collectedData.cacheContent);
 			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceId);
 		}
@@ -1159,7 +1136,8 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	valueIdFn_() {
-		return this.element.id || this.makeId_();
+		var element = this.element;
+		return (element && element.id) ? element.id : this.makeId_();
 	}
 }
 
@@ -1233,7 +1211,7 @@ Component.ELEMENT_TAG_NAME = 'div';
  * @type {RegExp}
  * @static
  */
-Component.SURFACE_REGEX = /\%\%\%\%~(surface|comp-([^~]+))-([^~]+)~\%\%\%\%/g;
+Component.SURFACE_REGEX = /\%\%\%\%~(surface|comp-([^~-]+))-([^~]+)~\%\%\%\%/g;
 
 /**
  * Surface tag name is a string that specifies the type of element to be
@@ -1278,6 +1256,6 @@ Component.Error = {
  * A list with attribute names that will automatically be rejected as invalid.
  * @type {!Array<string>}
  */
-Component.INVALID_ATTRS = ['componentName', 'components', 'elementContent', 'ref'];
+Component.INVALID_ATTRS = ['components', 'elementContent'];
 
 export default Component;

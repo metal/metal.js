@@ -102,12 +102,11 @@ module.exports = function(options) {
 			reporters: ['coverage', 'progress', 'saucelabs'],
 
 			sauceLabs: {
-				testName: 'AlloyUI tests',
+				testName: 'MetalJS tests',
 				recordScreenshots: false,
 				startConnect: true,
 				connectOptions: {
 					port: 5757,
-					'selenium-version': '2.41.0',
 					logfile: 'sauce_connect.log'
 				}
 			}

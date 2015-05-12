@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-	- '0.12'
+  - '0.12'
 addons:
-	sauce_connect: true
+  sauce_connect: true
 script: gulp test:saucelabs
 env:
-	global:
-	- secure: nGC6fcKHhzU4QPiA+6ozOqDPZ+x6vN5di7JlwK/HraWxN2o1CvhWOsVjYaSma/qjBQtnxp75bTyPRZhUKA+rQJftU+DO4goi3q7Rp3zcbFjTEhZ6OLzgSyMgSW86WH4waoUN8JG77WWkswj8nHrkzXoQZOQL6QHrqCKuVL6TktI=
-	- secure: ktay4HmZr28wffIdxPyrFEbR2WezQHg5U2xAaq5jEqfihjqdVH2hGHvfDeASPELmZQwFPch0SO2OPwdiYFvCQDCxd7R9WozecOSWjNOdjyDR8Pn2NCL/N9fQ48alEi+BjgM5ei0T9U9xZnTbonrKch1kaipmJdAE4PsOdLDdoCg=
+  global:
+  - secure: nGC6fcKHhzU4QPiA+6ozOqDPZ+x6vN5di7JlwK/HraWxN2o1CvhWOsVjYaSma/qjBQtnxp75bTyPRZhUKA+rQJftU+DO4goi3q7Rp3zcbFjTEhZ6OLzgSyMgSW86WH4waoUN8JG77WWkswj8nHrkzXoQZOQL6QHrqCKuVL6TktI=
+  - secure: ktay4HmZr28wffIdxPyrFEbR2WezQHg5U2xAaq5jEqfihjqdVH2hGHvfDeASPELmZQwFPch0SO2OPwdiYFvCQDCxd7R9WozecOSWjNOdjyDR8Pn2NCL/N9fQ48alEi+BjgM5ei0T9U9xZnTbonrKch1kaipmJdAE4PsOdLDdoCg=

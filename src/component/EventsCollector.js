@@ -1,6 +1,7 @@
 'use strict';
 
 import core from '../core';
+import ComponentCollector from '../component/ComponentCollector';
 import Disposable from '../disposable/Disposable';
 
 /**
@@ -54,7 +55,7 @@ class EventsCollector extends Disposable {
 		this.groupHasListener_[groupName][selector] = true;
 
 		if (!this.eventHandles_[selector]) {
-			var fn = this.component_[fnName].bind(this.component_);
+			var fn = this.getListenerFn_(fnName);
 			this.eventHandles_[selector] = this.component_.delegate(eventType, selector, fn);
 		}
 	}
@@ -83,7 +84,7 @@ class EventsCollector extends Disposable {
 		if (content.indexOf('data-on') === -1) {
 			return;
 		}
-		var regex = /data-on([a-z]+)=['|"](\w+)['"]/g;
+		var regex = /data-on([a-z]+)=['|"](\w+:?\w+)['"]/g;
 		var match = regex.exec(content);
 		while(match) {
 			this.attachListener_(match[1], match[2], groupName);
@@ -130,6 +131,31 @@ class EventsCollector extends Disposable {
 	disposeInternal() {
 		this.detachAllListeners();
 		this.component_ = null;
+	}
+
+	/**
+	 * Gets the listener function from its name. If the name is prefixed with a
+	 * component id, the function will be called on that specified component. Otherwise
+	 * it will be called on this event collector's component instead.
+	 * @param {string} fnName
+	 * @return {!function()}
+	 * @protected
+	 */
+	getListenerFn_(fnName) {
+		var fnComponent;
+		var split = fnName.split(':');
+		if (split.length === 2) {
+			fnName = split[1];
+			fnComponent = ComponentCollector.components[split[0]];
+			if (!fnComponent) {
+				console.error('No component with the id ' + split[0] + ' has been collected' +
+					'yet. Make sure that you specify an id for an existing component when ' +
+					'adding inline listeners.'
+				);
+			}
+		}
+		fnComponent = fnComponent || this.component_;
+		return fnComponent[fnName].bind(fnComponent);
 	}
 }
 

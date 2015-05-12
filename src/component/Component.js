@@ -490,11 +490,11 @@ class Component extends Attribute {
 		// Need to go through all surface placeholders on decorate to make sure they are
 		// properly created for the first time.
 		this.replaceSurfacePlaceholders_(this.getElementContent_());
-		this.attachInlineListeners_();
 
 		this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
 		this.renderSurfacesContent_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
 
+		this.attachInlineListeners_();
 		this.syncAttrs_();
 
 		this.attach();
@@ -862,11 +862,11 @@ class Component extends Attribute {
 		}
 
 		this.renderInternal();
-		this.attachInlineListeners_();
 
 		this.clearSurfacesCache_();
 		this.renderSurfacesContent_(this.surfaces_);
 
+		this.attachInlineListeners_();
 		this.syncAttrs_();
 
 		this.attach(opt_parentElement, opt_siblingElement);

@@ -2,6 +2,7 @@
 
 import dom from '../../../src/dom/dom';
 import Component from '../../../src/component/Component';
+import ComponentCollector from '../../../src/component/ComponentCollector';
 import EventsCollector from '../../../src/component/EventsCollector';
 
 describe('EventsCollector', function() {
@@ -63,6 +64,50 @@ describe('EventsCollector', function() {
 		assert.strictEqual(1, custom.handleClick.callCount);
 		dom.triggerEvent(custom.element.childNodes[1], 'click');
 		assert.strictEqual(1, custom.handleClick.callCount);
+	});
+
+	it('should attach event listener with a function from another component', function() {
+		var AnotherComponent = createCustomComponent('');
+		AnotherComponent.prototype.handleClick = sinon.stub();
+		var CustomComponent = createCustomComponent(
+			'<div data-onclick="another:handleClick"></div><div></div>'
+		);
+		CustomComponent.prototype.handleClick = sinon.stub();
+
+		var another = new AnotherComponent().render();
+		ComponentCollector.components.another = another;
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		collector.attachListeners(custom.element.innerHTML, 'group');
+
+		assert.strictEqual(0, custom.handleClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(0, custom.handleClick.callCount);
+		assert.strictEqual(1, another.handleClick.callCount);
+	});
+
+	it('should print error if trying to attach function from non existing component', function() {
+		var NonExistingComponent = createCustomComponent('');
+		NonExistingComponent.prototype.handleClick = sinon.stub();
+		var CustomComponent = createCustomComponent(
+			'<div data-onclick="nonExisting:handleClick"></div><div></div>'
+		);
+		CustomComponent.prototype.handleClick = sinon.stub();
+
+		var nonExisting = new NonExistingComponent().render();
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+
+		sinon.stub(console, 'error');
+		collector.attachListeners(custom.element.innerHTML, 'group');
+		assert.strictEqual(1, console.error.callCount);
+
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(0, nonExisting.handleClick.callCount);
+
+		console.error.restore();
 	});
 
 	it('should attach multiple event listeners', function() {

@@ -127,9 +127,13 @@ function generateTemplatesAndExtractParams() {
 	});
 }
 
+function getFilenameNoLocale(filename) {
+	return filename.replace(/_[^.]+\.soy/, '.soy');
+}
+
 function getFooterContent(file) {
 	var footer = '';
-	var fileParams = templateParams[file.relative];
+	var fileParams = templateParams[getFilenameNoLocale(file.relative)];
 	for (var templateName in fileParams) {
 		footer += '\n' + templateName + '.params = ' + JSON.stringify(fileParams[templateName]) + ';';
 	}

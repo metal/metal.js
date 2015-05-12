@@ -27,6 +27,8 @@ module.exports = function(options) {
 			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
 			.pipe(plugins.soynode({
 				loadCompiledTemplates: false,
+				locales: options.soyLocales,
+				messageFilePathFormat: options.soyMessageFilePathFormat,
 				shouldDeclareTopLevelNamespaces: false
 			}))
 			.pipe(plugins.ignore.exclude('*.soy'))

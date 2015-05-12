@@ -18,17 +18,17 @@ describe('dom', function() {
 			}
 
 			var element = document.createElement('div');
-			dom.addClasses(element, ['class1', 'class2']);
+			dom.addClasses(element, 'class1 class2');
 			assertClassesAdded();
 
 			element.className = '';
-			dom.addClassesWithoutNative_(element, ['class1', 'class2']);
+			dom.addClassesWithoutNative_(element, 'class1 class2');
 			assertClassesAdded();
 		});
 
 		it('should check if an element has the requested css class', function() {
 			var element = document.createElement('div');
-			dom.addClasses(element, ['class1', 'class2']);
+			dom.addClasses(element, 'class1 class2');
 
 			assert.ok(dom.hasClass(element, 'class1'));
 			assert.ok(dom.hasClassWithoutNative_(element, 'class1'));
@@ -42,13 +42,13 @@ describe('dom', function() {
 
 		it('should check if css classes are being removed', function() {
 			var element = document.createElement('div');
-			dom.addClasses(element, ['class1', 'class2']);
+			dom.addClasses(element, 'class1 class2');
 
-			dom.removeClasses(element, ['class1']);
+			dom.removeClasses(element, 'class1');
 			assert.ok(!dom.hasClass(element, 'class1'));
 			assert.ok(dom.hasClass(element, 'class2'));
 
-			dom.removeClassesWithoutNative_(element, ['class2']);
+			dom.removeClassesWithoutNative_(element, 'class2');
 			assert.ok(!dom.hasClass(element, 'class2'));
 		});
 	});
@@ -467,22 +467,22 @@ describe('dom', function() {
 			dom.triggerEvent(element, 'click');
 			assert.strictEqual(0, listener.callCount);
 
-			dom.addClasses(element, ['mine']);
+			dom.addClasses(element, 'mine');
 			dom.triggerEvent(element, 'click');
 			assert.strictEqual(1, listener.callCount);
 		});
 
 		it('should handle delegate for registered custom events', function() {
 			var element = document.createElement('div');
-			dom.addClasses(element, ['mine']);
+			dom.addClasses(element, 'mine');
 			dom.append(document.body, element);
 
 			var myElement = document.createElement('div');
-			dom.addClasses(myElement, ['mine', 'foo']);
+			dom.addClasses(myElement, 'mine foo');
 			dom.append(element, myElement);
 
 			var fooElement = document.createElement('div');
-			dom.addClasses(fooElement, ['foo']);
+			dom.addClasses(fooElement, 'foo');
 			dom.append(element, fooElement);
 
 			var listener = sinon.stub();
@@ -509,7 +509,7 @@ describe('dom', function() {
 			var element1 = document.createElement('div');
 			dom.append(document.body, element1);
 			var element2 = document.createElement('div');
-			dom.addClasses(element2, ['inner']);
+			dom.addClasses(element2, 'inner');
 			dom.append(element1, element2);
 			var element3 = document.createElement('div');
 			dom.append(element2, element3);

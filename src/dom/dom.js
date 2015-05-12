@@ -8,7 +8,7 @@ class dom {
 	/**
 	 * Adds the requested CSS classes to an element.
 	 * @param {!Element} element The element to add CSS classes to.
-	 * @param {!Array<string>} classes CSS classes to add.
+	 * @param {string} classes CSS classes to add.
 	 */
 	static addClasses(element, classes) {
 		if ('classList' in element) {
@@ -21,11 +21,11 @@ class dom {
 	/**
 	 * Adds the requested CSS classes to an element using classList.
 	 * @param {!Element} element The element to add CSS classes to.
-	 * @param {!Array<string>} classes CSS classes to add.
+	 * @param {string} classes CSS classes to add.
 	 * @protected
 	 */
 	static addClassesWithNative_(element, classes) {
-		classes.forEach(function(className) {
+		classes.split(' ').forEach(function(className) {
 			element.classList.add(className);
 		});
 	}
@@ -33,12 +33,14 @@ class dom {
 	/**
 	 * Adds the requested CSS classes to an element without using classList.
 	 * @param {!Element} element The element to add CSS classes to.
-	 * @param {!Array<string>} classes CSS classes to add.
+	 * @param {string} classes CSS classes to add.
 	 * @protected
 	 */
 	static addClassesWithoutNative_(element, classes) {
 		var elementClassName = ' ' + element.className + ' ';
 		var classesToAppend = '';
+
+		classes = classes.split( ' ');
 
 		for (var i = 0; i < classes.length; i++) {
 			var className = classes[i];
@@ -292,7 +294,7 @@ class dom {
 	/**
 	 * Removes the requested CSS classes from an element.
 	 * @param {!Element} element The element to remove CSS classes from.
-	 * @param {!Array<string>} classes CSS classes to remove.
+	 * @param {string} classes CSS classes to remove.
 	 */
 	static removeClasses(element, classes) {
 		if ('classList' in element) {
@@ -305,11 +307,11 @@ class dom {
 	/**
 	 * Removes the requested CSS classes from an element using classList.
 	 * @param {!Element} element The element to remove CSS classes from.
-	 * @param {!Array<string>} classes CSS classes to remove.
+	 * @param {string} classes CSS classes to remove.
 	 * @protected
 	 */
 	static removeClassesWithNative_(element, classes) {
-		classes.forEach(function(className) {
+		classes.split(' ').forEach(function(className) {
 			element.classList.remove(className);
 		});
 	}
@@ -317,11 +319,13 @@ class dom {
 	/**
 	 * Removes the requested CSS classes from an element without using classList.
 	 * @param {!Element} element The element to remove CSS classes from.
-	 * @param {!Array<string>} classes CSS classes to remove.
+	 * @param {string} classes CSS classes to remove.
 	 * @protected
 	 */
 	static removeClassesWithoutNative_(element, classes) {
 		var elementClassName = ' ' + element.className + ' ';
+
+		classes = classes.split(' ');
 
 		for (var i = 0; i < classes.length; i++) {
 			elementClassName = elementClassName.replace(' ' + classes[i] + ' ', ' ');

@@ -1051,9 +1051,9 @@ class Component extends Attribute {
 			classesToAdd = classesToAdd + ' ' + newVal;
 		}
 		if (prevVal) {
-			dom.removeClasses(this.element, prevVal.split(' '));
+			dom.removeClasses(this.element, prevVal);
 		}
-		dom.addClasses(this.element, classesToAdd.split(' '));
+		dom.addClasses(this.element, classesToAdd);
 	}
 
 	/**

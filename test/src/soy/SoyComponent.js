@@ -4,10 +4,12 @@ import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyComponent from '../../../src/soy/SoyComponent';
 
-import './assets/DeeplyNestedTestComponent.soy.js';
 import './assets/ChildrenTestComponent.soy.js';
 import './assets/CustomTestComponent.soy.js';
+import './assets/DeeplyNestedTestComponent.soy.js';
 import './assets/EventsTestComponent.soy.js';
+import './assets/NestedNoIdTestComponent.soy.js';
+import './assets/NestedSurfacesTestComponent.soy.js';
 import './assets/NestedTestComponent.soy.js';
 
 describe('SoyComponent', function() {
@@ -96,6 +98,42 @@ describe('SoyComponent', function() {
 		});
 	});
 
+	describe('Nested Surfaces', function() {
+		it('should correctly render nested surfaces', function() {
+			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
+			NestedSurfacesTestComponent.ATTRS = {items: {}};
+
+			var custom = new NestedSurfacesTestComponent({id: 'custom', items: ['Item1', 'Item2']}).render();
+			var element = custom.element;
+			assert.strictEqual(custom.getSurfaceElement('title'), element.querySelector('#custom-title'));
+			assert.strictEqual(custom.getSurfaceElement('list-s1'), element.querySelector('#custom-list-s1'));
+			assert.strictEqual(custom.getSurfaceElement('list-s2'), element.querySelector('#custom-list-s2'));
+		});
+
+		it('should correctly update nested surfaces', function(done) {
+			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
+			NestedSurfacesTestComponent.ATTRS = {items: {}};
+
+			var custom = new NestedSurfacesTestComponent({id: 'custom', items: ['Item1', 'Item2']}).render();
+			var element = custom.element;
+			var titleElement = custom.getSurfaceElement('title');
+			var listS1Element = custom.getSurfaceElement('list-s1');
+			var listS2Element = custom.getSurfaceElement('list-s2');
+			assert.strictEqual(2, custom.element.querySelector('.items').childNodes.length);
+
+			custom.items = ['New Item1', 'New Item2', 'New Item3'];
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(3, custom.element.querySelector('.items').childNodes.length);
+				assert.strictEqual(titleElement, element.querySelector('#custom-title'));
+				assert.strictEqual(listS1Element, element.querySelector('#custom-list-s1'));
+				assert.strictEqual('New Item1', listS1Element.textContent);
+				assert.strictEqual(listS2Element, element.querySelector('#custom-list-s2'));
+				assert.strictEqual('New Item2', listS2Element.textContent);
+				done();
+			});
+		});
+	});
+
 	describe('Nested Components', function() {
 		beforeEach(function() {
 			ComponentRegistry.components_ = {};
@@ -123,6 +161,14 @@ describe('SoyComponent', function() {
 			assert.ok(child);
 			assert.strictEqual(this.CustomTestComponent, child.constructor);
 			assert.strictEqual('foo', child.headerContent);
+		});
+
+		it('should instantiate rendered child component without id', function() {
+			var NestedNoIdTestComponent = createCustomTestComponentClass('NestedNoIdTestComponent');
+			var custom = new NestedNoIdTestComponent({id: 'nested'}).render();
+
+			assert.ok(custom.components['nested-c1']);
+			assert.ok(custom.components['nested-foo-c1']);
 		});
 
 		it('should render nested components inside parent', function() {

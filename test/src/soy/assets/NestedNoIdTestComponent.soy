@@ -1,0 +1,14 @@
+{namespace Templates.NestedNoIdTestComponent}
+
+/**
+ */
+{template .content}
+	{delcall CustomTestComponent}{/delcall}
+	{delcall NestedNoIdTestComponent.foo data="all" /}
+{/template}
+
+/**
+ */
+{template .foo}
+	{delcall CustomTestComponent}{/delcall}
+{/template}

@@ -117,6 +117,13 @@ class Component extends Attribute {
 		this.eventsCollector_ = new EventsCollector(this);
 
 		/**
+		 * Holds the number of generated ids for each surface's contents.
+		 * @type {!Object}
+		 * @protected
+		 */
+		this.generatedIdCount_ = {};
+
+		/**
 		 * Whether the element is in document.
 		 * @type {boolean}
 		 */
@@ -265,6 +272,18 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Builds the data that should be used to create a surface that was found via
+	 * a string placeholder.
+	 * @param {string} type The surface type (either "s" or "c").
+	 * @param {string} extra String with extra information about the surface.
+	 * @return {!Object}
+	 * @protected
+	 */
+	buildPlaceholderSurfaceData_(type, extra) {
+		return {componentName: type === Component.SurfaceType.COMPONENT ? extra : null};
+	}
+
+	/**
 	 * Caches the given content for the surface with the requested id.
 	 * @param {string} surfaceId
 	 * @param {string} content
@@ -368,6 +387,24 @@ class Component extends Attribute {
 	 * attach phase.
 	 */
 	created() {
+	}
+
+	/**
+	 * Creates a surface that was found via a string placeholder.
+	 * @param {string?} surfaceId
+	 * @param {string} type The surface type (either "s" or "c").
+	 * @param {string?} extra String with extra information about the surface.
+	 * @param {string=} opt_parentSurfaceId The id of the surface that contains
+	 *   the surface to be created, or undefined if there is none.
+	 * @return {string} The id of the created surface.
+	 * @protected
+	 */
+	createPlaceholderSurface_(surfaceId, type, extra, opt_parentSurfaceId) {
+		surfaceId = surfaceId || this.generateSurfaceId_(type, opt_parentSurfaceId);
+		if (!this.getSurface(surfaceId)) {
+			this.addSurface(surfaceId, this.buildPlaceholderSurfaceData_(type, extra));
+		}
+		return surfaceId;
 	}
 
 	/**
@@ -520,6 +557,7 @@ class Component extends Attribute {
 		this.delegateEventHandler_ = null;
 
 		this.components = null;
+		this.generatedIdCount_ = null;
 		this.surfaces_ = null;
 		this.surfacesRenderAttrs_ = null;
 		super.disposeInternal();
@@ -577,6 +615,22 @@ class Component extends Attribute {
 			}
 			fn.call(this, opt_change.newVal, opt_change.prevVal);
 		}
+	}
+
+	/**
+	 * Generates an id for a surface that was found inside the contents of the main
+	 * element or of a parent surface.
+	 * @param {string} type Either "comp" or "surface", to indicate the surface's type.
+	 * @param {string=} opt_parentSurfaceId The id of the parent surface, or undefined
+	 *   if there is none.
+	 * @return {string} The generated id.
+	 */
+	generateSurfaceId_(type, opt_parentSurfaceId) {
+		var parentSurfaceId = opt_parentSurfaceId || '';
+		var parentSurfacePrefix = parentSurfaceId ? parentSurfaceId + '-' : '';
+		this.generatedIdCount_[parentSurfaceId] = (this.generatedIdCount_[parentSurfaceId] || 0) + 1;
+		var id = parentSurfacePrefix + type + this.generatedIdCount_[parentSurfaceId];
+		return (type === Component.SurfaceType.COMPONENT) ? this.makeSurfaceId_(id) : id;
 	}
 
 	/**
@@ -648,17 +702,10 @@ class Component extends Attribute {
 	 * Gets surface configuration object. If surface is not registered returns
 	 * null.
 	 * @param {string} surfaceId The surface id.
-	 * @param {boolean=} opt_create If true, will create the surface if it doesn't exist.
-	 * @param {Object=} opt_config Optional surface configuration.
 	 * @return {?Object} The surface configuration object.
 	 */
-	getSurface(surfaceId, opt_create, opt_config) {
-		var surface = this.surfaces_[surfaceId];
-		if (opt_create && !surface) {
-			this.addSurface(surfaceId, opt_config);
-			surface = this.surfaces_[surfaceId];
-		}
-		return surface || null;
+	getSurface(surfaceId) {
+		return this.surfaces_[surfaceId] || null;
 	}
 
 	/**
@@ -765,20 +812,6 @@ class Component extends Attribute {
 			this.renderSurfacesContent_(this.getModifiedSurfacesFromChanges_(event.changes));
 		}
 		this.syncAttrsFromChanges_(event.changes);
-	}
-
-	/**
-	 * Loops through all the surface placeholders found in the given content.
-	 * @param {string} content
-	 * @param {!function(string)} loopFn The function that should be run for
-	 *   each placeholder. The function will receive the surface's id.
-	 * @protected
-	 */
-	loopSurfacePlaceholders_(content, loopFn) {
-		content.replace(Component.SURFACE_REGEX, function(match, type, componentName, surfaceId) {
-			loopFn(surfaceId);
-			return match;
-		});
 	}
 
 	/**
@@ -932,6 +965,21 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Renders the contents of all the surface placeholders found in the given content.
+	 * @param {string} content
+	 * @param {string} surfaceId The id of surface the content is from.
+	 * @protected
+	 */
+	renderPlaceholderSurfaceContents_(content, surfaceId) {
+		var instance = this;
+		content.replace(Component.SURFACE_REGEX, function(match, type, id) {
+			id = id || instance.generateSurfaceId_(type, surfaceId);
+			instance.renderSurfaceContent(id);
+			return match;
+		});
+	}
+
+	/**
 	 * Render content into a surface. If the specified content is the same of
 	 * the current surface content, nothing happens. If the surface cache state
 	 * is not initialized or the content is not eligible for cache or content is
@@ -961,7 +1009,7 @@ class Component extends Attribute {
 				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
 			}
 			if (cacheHit) {
-				this.loopSurfacePlaceholders_(content, this.renderSurfaceContent.bind(this));
+				this.renderPlaceholderSurfaceContents_(content, surfaceId);
 			} else {
 				this.replaceSurfaceContent_(surfaceId, content);
 			}
@@ -975,6 +1023,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	renderSurfacesContent_(surfaces) {
+		this.generatedIdCount_ = {};
 		for (var surfaceId in surfaces) {
 			if (!this.getSurface(surfaceId).handled) {
 				this.renderSurfaceContent(surfaceId);
@@ -993,7 +1042,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	replaceSurfaceContent_(surfaceId, content) {
-		content = this.replaceSurfacePlaceholders_(content);
+		content = this.replaceSurfacePlaceholders_(content, surfaceId);
 		var el = this.getSurfaceElement(surfaceId);
 		dom.removeChildren(el);
 		dom.append(el, content);
@@ -1002,23 +1051,25 @@ class Component extends Attribute {
 	/**
 	 * Replaces the given content's surface placeholders with their real contents.
 	 * @param {string|Element} content
+	 * @param {string=} opt_surfaceId The id of the surface that contains the given
+	 *   content, or undefined if the content is from the main element.
 	 * @return {string} The final string with replaced placeholders.
 	 * @protected
 	 */
-	replaceSurfacePlaceholders_(content) {
+	replaceSurfacePlaceholders_(content, opt_surfaceId) {
 		if (!core.isString(content)) {
 			return content;
 		}
 
 		var instance = this;
-		return content.replace(Component.SURFACE_REGEX, function(match, type, componentName, id) {
+		return content.replace(Component.SURFACE_REGEX, function(match, type, id, extra) {
 			// Surfaces should already have been created before being rendered so they can be
 			// accessed from their getSurfaceContent calls.
-			var surface = instance.getSurface(id, true, {componentName: componentName});
-			surface.handled = true;
+			id = instance.createPlaceholderSurface_(id, type, extra, opt_surfaceId);
+			instance.getSurface(id).handled = true;
 
 			var surfaceContent = instance.getSurfaceContent_(id);
-			var expandedContent = instance.replaceSurfacePlaceholders_(surfaceContent);
+			var expandedContent = instance.replaceSurfacePlaceholders_(surfaceContent, id);
 			var surfaceHtml = instance.getSurfaceHtml(id, expandedContent);
 			instance.collectedSurfaces_.push({cacheContent: surfaceContent, content: expandedContent, surfaceId: id});
 
@@ -1215,7 +1266,7 @@ Component.ELEMENT_TAG_NAME = 'div';
  * @type {RegExp}
  * @static
  */
-Component.SURFACE_REGEX = /\%\%\%\%~(surface|comp-([^~-]+))-([^~]+)~\%\%\%\%/g;
+Component.SURFACE_REGEX = /\%\%\%\%~(s|c)(?:-([^~:]+))?(?::([^~]+))?~\%\%\%\%/g;
 
 /**
  * Surface tag name is a string that specifies the type of element to be
@@ -1254,6 +1305,15 @@ Component.Error = {
 	 * is made.
 	 */
 	ALREADY_RENDERED: 'Component already rendered'
+};
+
+/**
+ * Valid surface types that can be used for string placeholders.
+ * @enum {string}
+ */
+Component.SurfaceType = {
+	COMPONENT: 'c',
+	NORMAL: 's'
 };
 
 /**

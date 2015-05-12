@@ -2,9 +2,9 @@
 /**
  * @param? elementContent
  * @param id
+ * @param? surfaceId
  */
 {deltemplate <%= moduleName %>.<%= surfaceName %> variant="'element'"}
-	<div id="{$id}-<%= surfaceName %>">
-		{$elementContent}
-	</div>
+	{let $elementId: $id + '-' + ($surfaceId ? $surfaceId : '<%= surfaceName %>') /}
+	<div id="{$elementId}">{$elementContent}</div>
 {/deltemplate}

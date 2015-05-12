@@ -28,9 +28,24 @@ class SoyComponent extends Component {
 		this.addSurfacesFromTemplates_();
 
 		/**
+		 * Indicates which surface is currently being rendered, or null if none is.
+		 * @type {boolean}
+		 * @protected
+		 */
+		this.surfaceBeingRendered_ = null;
+
+		/**
+		 * Flags indicating which surface names have already been found on this component's content.
+		 * @type {!Object<string, boolean>}
+		 * @protected
+		 */
+		this.firstSurfaceFound_ = {};
+
+		/**
 		 * Holds the data that should be passed to the next template call for a surface,
 		 * mapped by surface id.
 		 * @type {!Object<string, Object>}
+		 * @protected
 		 */
 		this.nextSurfaceCallData_ = {};
 	}
@@ -59,16 +74,46 @@ class SoyComponent extends Component {
 	/**
 	 * Builds the config data for a component from the data that was passed to its
 	 * soy template function.
+	 * @param {string} id The id of the component.
 	 * @param {!Object} templateData
 	 * @return {!Object} The component's config data.
 	 * @protected
 	 */
-	buildComponentConfigData_(templateData) {
-		var config = {};
+	buildComponentConfigData_(id, templateData) {
+		var config = {id: id};
 		for (var key in templateData) {
 			config[key] = templateData[key];
 		}
 		return config;
+	}
+
+	/**
+	 * Adds the template name to the creation data for placeholder surfaces.
+	 * @param {string} type The surface type (either "s" or "c").
+	 * @param {string} extra String with extra information about the surface.
+	 * @return {!Object}
+	 * @protected
+	 */
+	buildPlaceholderSurfaceData_(type, extra) {
+		var data = super.buildPlaceholderSurfaceData_(type, extra);
+		if (type === Component.SurfaceType.NORMAL) {
+			data.templateName = extra;
+		}
+		return data;
+	}
+
+	/**
+	 * Generates the id for a surface that was found by a soy template call.
+	 * @param {string} templateName
+	 * @return {string}
+	 */
+	generateSoySurfaceId_(templateName) {
+		if (!this.surfaceBeingRendered_ && !this.firstSurfaceFound_[templateName]) {
+			this.firstSurfaceFound_[templateName] = true;
+			return templateName;
+		} else {
+			return this.generateSurfaceId_(Component.SurfaceType.NORMAL, this.surfaceBeingRendered_);
+		}
 	}
 
 	/**
@@ -89,6 +134,7 @@ class SoyComponent extends Component {
 	 *   template doesn't exist.
 	 */
 	getElementContent() {
+		this.surfaceBeingRendered_ = null;
 		return this.renderTemplateByName_('content', this);
 	}
 
@@ -114,6 +160,7 @@ class SoyComponent extends Component {
 		var surface = this.getSurface(surfaceId);
 		var data = this.nextSurfaceCallData_[surfaceId];
 		this.nextSurfaceCallData_[surfaceId] = null;
+		this.surfaceBeingRendered_ = surfaceId;
 		return this.renderTemplateByName_(surface.templateName, data);
 	}
 
@@ -141,23 +188,23 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleSurfaceCall_(surfaceName, data) {
-		var surfaceId = data.surfaceId || surfaceName;
+		var surfaceId = data.surfaceId || this.generateSoySurfaceId_(surfaceName);
 		this.nextSurfaceCallData_[surfaceId] = data;
-		return '%%%%~surface-' + surfaceId + '~%%%%';
+		return '%%%%~s-' + surfaceId + ':' + surfaceName + '~%%%%';
 	}
 
 	/**
 	 * Handles a call to the SoyComponent component template.
 	 * @param {string} componentName The component's name.
-	 * @param {!Object} data The data the template was called with.
+	 * @param {Object} data The data the template was called with.
 	 * @return {string} A placeholder to be rendered instead of the content the template
 	 *   function would have returned.
 	 * @protected
 	 */
 	handleTemplateCall_(componentName, data) {
-		var id = data.id;
-		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(data));
-		return '%%%%~comp-' + componentName + '-' + id + '~%%%%';
+		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, this.surfaceBeingRendered_);
+		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
+		return '%%%%~c-' + id + ':' + componentName + '~%%%%';
 	}
 
 	/**
@@ -169,13 +216,14 @@ class SoyComponent extends Component {
 	renderElementDelTemplate_(content, opt_surfaceId) {
 		var templateName = this.constructor.NAME;
 		if (opt_surfaceId) {
-			templateName += '.' + opt_surfaceId;
+			templateName += '.' + this.getSurface(opt_surfaceId).templateName;
 		}
 		var templateFn = soy.$$getDelegateFn(templateName, 'element', true);
 		var data = {
 			elementClasses: this.elementClasses,
 			elementContent: soydata.VERY_UNSAFE.ordainSanitizedHtml(content || ''),
-			id: this.id || this.makeId_()
+			id: this.id || this.makeId_(),
+			surfaceId: opt_surfaceId
 		};
 		return templateFn(data, null, {}).content;
 	}

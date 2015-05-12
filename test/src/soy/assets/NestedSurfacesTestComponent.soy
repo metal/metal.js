@@ -1,0 +1,37 @@
+{namespace Templates.NestedSurfacesTestComponent}
+
+/**
+ * @param id
+ */
+{template .content}
+	{delcall NestedSurfacesTestComponent.list data="all" /}
+{/template}
+
+/**
+ * @param id
+ * @param items
+ */
+{template .list}
+	<div class="title">
+		{delcall NestedSurfacesTestComponent.item}
+			{param id: $id /}
+			{param surfaceId: 'title' /}
+			{param text: 'My List' /}
+		{/delcall}
+	</div>
+	<div class="items">
+	{foreach $item in $items}
+			{delcall NestedSurfacesTestComponent.item}
+				{param id: $id /}
+				{param text: $item /}
+			{/delcall}
+		{/foreach}
+	</div>
+{/template}
+
+/**
+ * @param text
+ */
+{template .item}
+	{$text}
+{/template}

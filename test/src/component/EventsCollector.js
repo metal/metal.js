@@ -70,12 +70,12 @@ describe('EventsCollector', function() {
 		var AnotherComponent = createCustomComponent('');
 		AnotherComponent.prototype.handleClick = sinon.stub();
 		var CustomComponent = createCustomComponent(
-			'<div data-onclick="another:handleClick"></div><div></div>'
+			'<div data-onclick="another-comp:handleClick"></div><div></div>'
 		);
 		CustomComponent.prototype.handleClick = sinon.stub();
 
 		var another = new AnotherComponent().render();
-		ComponentCollector.components.another = another;
+		ComponentCollector.components['another-comp'] = another;
 
 		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
@@ -91,7 +91,7 @@ describe('EventsCollector', function() {
 		var NonExistingComponent = createCustomComponent('');
 		NonExistingComponent.prototype.handleClick = sinon.stub();
 		var CustomComponent = createCustomComponent(
-			'<div data-onclick="nonExisting:handleClick"></div><div></div>'
+			'<div data-onclick="non-existing:handleClick"></div><div></div>'
 		);
 		CustomComponent.prototype.handleClick = sinon.stub();
 

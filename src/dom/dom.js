@@ -11,6 +11,10 @@ class dom {
 	 * @param {string} classes CSS classes to add.
 	 */
 	static addClasses(element, classes) {
+		if (!core.isObject(element) || !core.isString(classes)) {
+			return;
+		}
+
 		if ('classList' in element) {
 			dom.addClassesWithNative_(element, classes);
 		} else {
@@ -297,6 +301,10 @@ class dom {
 	 * @param {string} classes CSS classes to remove.
 	 */
 	static removeClasses(element, classes) {
+		if (!core.isObject(element) || !core.isString(classes)) {
+			return;
+		}
+
 		if ('classList' in element) {
 			dom.removeClassesWithNative_(element, classes);
 		} else {

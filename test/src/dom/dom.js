@@ -51,6 +51,18 @@ describe('dom', function() {
 			dom.removeClassesWithoutNative_(element, 'class2');
 			assert.ok(!dom.hasClass(element, 'class2'));
 		});
+
+		it('should do nothing if element or classes are not object and string', function() {
+			var element = document.createElement('div');
+			assert.doesNotThrow(function() {
+				dom.addClasses(element);
+			});
+			assert.strictEqual(element.className, '');
+
+			assert.doesNotThrow(function() {
+				dom.removeClasses(null, 'class1');
+			});
+		});
 	});
 
 	describe('manipulation', function() {

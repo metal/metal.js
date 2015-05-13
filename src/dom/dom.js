@@ -414,6 +414,64 @@ class dom {
 	}
 
 	/**
+	 * Adds or removes one or more classes from an element. If any of the classes
+	 * is present, it will be removed from the element, or added otherwise.
+	 * @param {!Element} element The element which classes will be toggled.
+	 * @param {string} classes The classes which have to added or removed from the element.
+	 */
+	static toggleClasses(element, classes) {
+		if (!core.isObject(element) || !core.isString(classes)) {
+			return;
+		}
+
+		if ('classList' in element) {
+			dom.toggleClassesWithNative_(element, classes);
+		} else {
+			dom.toggleClassesWithoutNative_(element, classes);
+		}
+	}
+
+	/**
+	 * Adds or removes one or more classes from an element using classList.
+	 * If any of the classes is present, it will be removed from the element,
+	 * or added otherwise.
+	 * @param {!Element} element The element which classes will be toggled.
+	 * @param {string} classes The classes which have to added or removed from the element.
+	 */
+	static toggleClassesWithNative_(element, classes) {
+		classes.split(' ').forEach(function(className) {
+			element.classList.toggle(className);
+		});
+	}
+
+	/**
+	 * Adds or removes one or more classes from an element without using classList.
+	 * If any of the classes is present, it will be removed from the element,
+	 * or added otherwise.
+	 * @param {!Element} element The element which classes will be toggled.
+	 * @param {string} classes The classes which have to added or removed from the element.
+	 */
+	static toggleClassesWithoutNative_(element, classes) {
+		var elementClassName = ' ' + element.className + ' ';
+
+		classes = classes.split(' ');
+
+		for (var i = 0; i < classes.length; i++) {
+			var className = ' ' + classes[i] + ' ';
+			var classIndex = elementClassName.indexOf(className);
+
+			if (classIndex === -1) {
+				elementClassName = elementClassName + classes[i] + ' ';
+			} else {
+				elementClassName = elementClassName.substring(0, classIndex) + ' ' +
+					elementClassName.substring(classIndex + className.length);
+			}
+		}
+
+		element.className = elementClassName.trim();
+	}
+
+	/**
 	 * Triggers the specified event on the given element.
 	 * NOTE: This should mostly be used for testing, not on real code.
 	 * @param {!Element} element The node that should trigger the event.

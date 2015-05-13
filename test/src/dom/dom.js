@@ -52,7 +52,7 @@ describe('dom', function() {
 			assert.ok(!dom.hasClass(element, 'class2'));
 		});
 
-		it('should do nothing if element or classes are not object and string', function() {
+		it('should do nothing if element or classes are not object and string in add/remove classes', function() {
 			var element = document.createElement('div');
 			assert.doesNotThrow(function() {
 				dom.addClasses(element);
@@ -62,6 +62,46 @@ describe('dom', function() {
 			assert.doesNotThrow(function() {
 				dom.removeClasses(null, 'class1');
 			});
+		});
+
+		it('should do nothing if element or classes are not object and string in toggle classes', function() {
+			var element = document.createElement('div');
+			assert.doesNotThrow(function() {
+				dom.toggleClasses(element);
+			});
+			assert.strictEqual(element.className, '');
+
+			assert.doesNotThrow(function() {
+				dom.toggleClasses(null, 'class1');
+			});
+		});
+
+		it('should toggle classes in an element', function() {
+			var element = document.createElement('div');
+
+			element.className = 'lorem';
+			dom.toggleClasses(element, 'lorem');
+			assert.strictEqual('', element.className);
+
+			element.className = '';
+			dom.toggleClasses(element, 'lorem');
+			assert.strictEqual('lorem', element.className);
+
+			element.className = 'lorem ipsum';
+			dom.toggleClasses(element, 'lorem ipsum');
+			assert.strictEqual('', element.className);
+
+			element.className = '';
+			dom.toggleClasses(element, 'lorem ipsum');
+			assert.strictEqual('lorem ipsum', element.className);
+
+			element.className = 'lorem ipsum dolor sit amet';
+			dom.toggleClasses(element, 'lorem sit consectetur adipiscing elit');
+			assert.strictEqual('ipsum dolor amet consectetur adipiscing elit', element.className);
+
+			element.className = 'lorem ipsum dolor sit amet';
+			dom.toggleClasses(element, 'adipiscing elit lorem sit consectetur');
+			assert.strictEqual('ipsum dolor amet adipiscing elit consectetur', element.className);
 		});
 	});
 

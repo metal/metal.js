@@ -107,12 +107,14 @@ MyWidget.ATTRS = {
 		value: 'Initial body content.'
 	},
 	footerContent: {
-		value: 'Initial footer content.'
+		value: SoyComponent.sanitizeHtml('<footer>Initial footer content.</footer>')
 	}
 };
 ```
 
-This file just defines a class named MyWidget, makes it extend from SoyComponent, imports the compiled soy templates and defines two [attributes](#attribute). Now we just need a soy file for MyWidget's rendering logic. It would look like this:
+This file just defines a class named MyWidget, makes it extend from SoyComponent, imports the compiled soy templates and defines two [attributes](#attribute). Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.
+
+Now we just need a soy file for MyWidget's rendering logic. It would look like this:
 
 ```
 {namespace Templates.MyWidget}

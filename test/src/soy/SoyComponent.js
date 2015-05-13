@@ -17,6 +17,11 @@ describe('SoyComponent', function() {
 		document.body.innerHTML = '';
 	});
 
+	it('should sanitize html for use on soy templates', function() {
+		var sanitized = SoyComponent.sanitizeHtml('<div></div>');
+		assert.ok(sanitized instanceof soydata.SanitizedHtml);
+	});
+
 	it('should render element content with surfaces automatically from template', function() {
 		var CustomTestComponent = createCustomTestComponentClass();
 		CustomTestComponent.ATTRS = {

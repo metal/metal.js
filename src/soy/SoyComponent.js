@@ -221,7 +221,7 @@ class SoyComponent extends Component {
 		var templateFn = soy.$$getDelegateFn(templateName, 'element', true);
 		var data = {
 			elementClasses: this.elementClasses,
-			elementContent: soydata.VERY_UNSAFE.ordainSanitizedHtml(content || ''),
+			elementContent: SoyComponent.sanitizeHtml(content || ''),
 			id: this.id || this.makeId_(),
 			surfaceId: opt_surfaceId
 		};
@@ -252,6 +252,17 @@ class SoyComponent extends Component {
 		if (core.isFunction(elementTemplate)) {
 			return this.renderTemplate_(elementTemplate, opt_data);
 		}
+	}
+
+	/**
+	 * Sanitizes the given html string, so it can skip escaping when passed to a
+	 * soy template.
+	 * @param {string} html
+	 * @return {soydata.SanitizedHtml}
+	 * @protected
+	 */
+	static sanitizeHtml(html) {
+		return soydata.VERY_UNSAFE.ordainSanitizedHtml(html);
 	}
 
 	/**

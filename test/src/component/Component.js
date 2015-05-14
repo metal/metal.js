@@ -1013,7 +1013,7 @@ describe('Component', function() {
 				return 'Child %%%%~s-foo~%%%%';
 			};
 			this.ChildComponent.prototype.getSurfaceContent = function() {
-				return this.foo;
+				return '<span>' + this.foo + '</span>';
 			};
 			this.ChildComponent.ATTRS = {foo: {value: 'default'}};
 			this.ChildComponent.SURFACES = {foo: {renderAttrs: ['foo']}};
@@ -1089,7 +1089,7 @@ describe('Component', function() {
 		it('should instantiate sub components when parent is decorated', function() {
 			var element = document.createElement('div');
 			element.id = 'custom';
-			dom.append(element, '<div id="child">Child <div id="child-foo">default</div></div>');
+			dom.append(element, '<div id="child">Child <div id="child-foo"><span>default</span></div></div>');
 			dom.append(document.body, element);
 
 			var CustomComponent = createCustomComponentClass();
@@ -1104,6 +1104,50 @@ describe('Component', function() {
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 			assert.strictEqual('Child default', child.element.textContent);
+		});
+
+		it('should update sub components when parent is decorated and html is not correct', function() {
+			var element = document.createElement('div');
+			element.id = 'custom';
+			dom.append(element, '<div id="child">Child <div id="child-foo"><span>default</span></div></div>');
+			dom.append(document.body, element);
+			var fooElement = document.body.querySelector('span');
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~c-child:ChildComponent~%%%%';
+			};
+			CustomComponent.prototype.created = function() {
+				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+			};
+
+			var custom = new CustomComponent({element: '#custom', foo: 'foo'}).decorate();
+
+			var child = custom.components.child;
+			assert.notStrictEqual(fooElement, child.element.querySelector('span'));
+		});
+
+		it('should not update sub components when parent is decorated and html is correct', function() {
+			var element = document.createElement('div');
+			element.id = 'custom';
+			dom.append(element, '<div id="child">Child <div id="child-foo"><span>foo</span></div></div>');
+			dom.append(document.body, element);
+			var fooElement = document.body.querySelector('span');
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~c-child:ChildComponent~%%%%';
+			};
+			CustomComponent.prototype.created = function() {
+				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+			};
+
+			var custom = new CustomComponent({element: '#custom', foo: 'foo'}).decorate();
+
+			var child = custom.components.child;
+			assert.strictEqual(fooElement, child.element.querySelector('span'));
 		});
 
 		it('should update existing component from placeholder', function(done) {
@@ -1202,7 +1246,7 @@ describe('Component', function() {
 			this.ChildComponent.prototype.created = function() {
 				childElement = this.element;
 			};
-			sinon.spy(this.ChildComponent.prototype, 'decorateAsSubComponent');
+			sinon.spy(this.ChildComponent.prototype, 'renderAsSubComponent');
 
 			var custom = new CustomComponent({id: 'custom'}).render();
 			assert.ok(custom.components.child);
@@ -1212,7 +1256,7 @@ describe('Component', function() {
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 			assert.strictEqual('Child default', child.element.textContent);
-			assert.strictEqual(1, child.decorateAsSubComponent.callCount);
+			assert.strictEqual(1, child.renderAsSubComponent.callCount);
 		});
 
 		it('should render nested component correctly when element is not on document', function() {

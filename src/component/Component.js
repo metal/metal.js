@@ -434,13 +434,15 @@ class Component extends Attribute {
 
 	/**
 	 * Decorates this component as a subcomponent, meaning that no rendering is
-	 * needed since it was already rendered by the parent component.
+	 * needed since it was already rendered by the parent component. Handles the
+	 * same logics that `renderAsSubComponent`, but also makes sure that the
+	 * surfaces content is updated if the html is incorrect for the given data.
 	 */
 	decorateAsSubComponent() {
-		this.attachInlineListeners_();
-		this.syncAttrs_();
-		this.attach();
-		this.wasRendered = true;
+		this.decorating_ = true;
+		this.computeSurfacesCacheStateFromDom_();
+		this.renderAsSubComponent();
+		this.decorating_ = false;
 	}
 
 	/**
@@ -910,6 +912,18 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Renders this component as a subcomponent, meaning that no actual rendering is
+	 * needed since it was already rendered by the parent component. This just handles
+	 * other logics from the rendering lifecycle, like attaching event listeners.
+	 */
+	renderAsSubComponent() {
+		this.attachInlineListeners_();
+		this.syncAttrs_();
+		this.attach();
+		this.wasRendered = true;
+	}
+
+	/**
 	 * Renders a surface that holds a component.
 	 * @param {string} surfaceId
 	 * @param {(Object|string)?} opt_content The content to be rendered.
@@ -928,7 +942,11 @@ class Component extends Attribute {
 				// element renders its content.
 				dom.append(element, opt_content);
 			}
-			component.decorateAsSubComponent();
+			if (this.decorating_) {
+				component.decorateAsSubComponent();
+			} else {
+				component.renderAsSubComponent();
+			}
 		} else {
 			component.render();
 		}

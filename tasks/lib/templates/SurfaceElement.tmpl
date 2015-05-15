@@ -5,6 +5,6 @@
  * @param? surfaceId
  */
 {deltemplate <%= moduleName %>.<%= surfaceName %> variant="'element'"}
-	{let $elementId: $id + '-' + ($surfaceId ? $surfaceId : '<%= surfaceName %>') /}
+	{let $elementId: $id + '-' + (isNonnull($surfaceId) ? $surfaceId : '<%= surfaceName %>') /}
 	<div id="{$elementId}">{$elementContent}</div>
 {/deltemplate}

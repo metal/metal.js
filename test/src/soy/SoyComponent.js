@@ -111,6 +111,7 @@ describe('SoyComponent', function() {
 			var custom = new NestedSurfacesTestComponent({id: 'custom', items: ['Item1', 'Item2']}).render();
 			var element = custom.element;
 			assert.strictEqual(custom.getSurfaceElement('title'), element.querySelector('#custom-title'));
+			assert.strictEqual(custom.getSurfaceElement('0'), element.querySelector('#custom-0'));
 			assert.strictEqual(custom.getSurfaceElement('list-s1'), element.querySelector('#custom-list-s1'));
 			assert.strictEqual(custom.getSurfaceElement('list-s2'), element.querySelector('#custom-list-s2'));
 		});
@@ -122,6 +123,7 @@ describe('SoyComponent', function() {
 			var custom = new NestedSurfacesTestComponent({id: 'custom', items: ['Item1', 'Item2']}).render();
 			var element = custom.element;
 			var titleElement = custom.getSurfaceElement('title');
+			var zeroElement = custom.getSurfaceElement('0');
 			var listS1Element = custom.getSurfaceElement('list-s1');
 			var listS2Element = custom.getSurfaceElement('list-s2');
 			assert.strictEqual(2, custom.element.querySelector('.items').childNodes.length);
@@ -130,6 +132,8 @@ describe('SoyComponent', function() {
 			custom.once('attrsChanged', function() {
 				assert.strictEqual(3, custom.element.querySelector('.items').childNodes.length);
 				assert.strictEqual(titleElement, element.querySelector('#custom-title'));
+				assert.strictEqual(zeroElement, element.querySelector('#custom-0'));
+				assert.strictEqual('0', zeroElement.textContent);
 				assert.strictEqual(listS1Element, element.querySelector('#custom-list-s1'));
 				assert.strictEqual('New Item1', listS1Element.textContent);
 				assert.strictEqual(listS2Element, element.querySelector('#custom-list-s2'));

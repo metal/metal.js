@@ -19,6 +19,11 @@
 			{param text: 'My List' /}
 		{/delcall}
 	</div>
+	{delcall NestedSurfacesTestComponent.item}
+		{param id: $id /}
+		{param surfaceId: 0 /}
+		{param text: '0' /}
+	{/delcall}
 	<div class="items">
 	{foreach $item in $items}
 			{delcall NestedSurfacesTestComponent.item}

@@ -188,7 +188,10 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleSurfaceCall_(surfaceName, data) {
-		var surfaceId = data.surfaceId || this.generateSoySurfaceId_(surfaceName);
+		var surfaceId = data.surfaceId;
+		if (!core.isDefAndNotNull(surfaceId)) {
+			surfaceId = this.generateSoySurfaceId_(surfaceName);
+		}
 		this.nextSurfaceCallData_[surfaceId] = data;
 		return '%%%%~s-' + surfaceId + ':' + surfaceName + '~%%%%';
 	}

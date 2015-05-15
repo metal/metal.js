@@ -171,11 +171,11 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleGetDelegateFnCall_(delTemplateId) {
-		var splitId = delTemplateId.split('.');
-		if (splitId[1]) {
-			return this.handleSurfaceCall_.bind(this, splitId[1]);
+		var index = delTemplateId.indexOf('.');
+		if (index === -1) {
+			return this.handleTemplateCall_.bind(this, delTemplateId);
 		} else {
-			return this.handleTemplateCall_.bind(this, splitId[0]);
+			return this.handleSurfaceCall_.bind(this, delTemplateId.substr(index + 1));
 		}
 	}
 

@@ -1020,15 +1020,23 @@ class Component extends Attribute {
 		if (core.isDefAndNotNull(content)) {
 			var previousCacheState = surface.cacheState;
 			var cacheContent = opt_cacheContent || content;
-			this.cacheSurfaceContent(surfaceId, cacheContent);
 
+			// We cache the entire original content first when decorating so we can compare
+			// with the full content we got from the dom. After comparing, we cache the correct
+			// value so updates can work as expected for this surface.
+			this.cacheSurfaceContent(surfaceId, this.decorating_ ? content : cacheContent);
 			var cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
-			if (this.decorating_ || !cacheHit) {
-				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
+			if (this.decorating_) {
+				this.cacheSurfaceContent(surfaceId, cacheContent);
 			}
+
 			if (cacheHit) {
+				if (this.decorating_) {
+					this.eventsCollector_.attachListeners(cacheContent, surfaceId);
+				}
 				this.renderPlaceholderSurfaceContents_(content, surfaceId);
 			} else {
+				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
 				this.replaceSurfaceContent_(surfaceId, content);
 			}
 		}
@@ -1141,9 +1149,7 @@ class Component extends Attribute {
 			var elementId = surface.componentName ? surfaceId : this.makeSurfaceId_(surfaceId);
 			var placeholder = this.findElementById_(elementId);
 			dom.replace(placeholder, this.getSurfaceElement(surfaceId));
-
-			var cacheContent = this.decorating_ ? null : collectedData.cacheContent;
-			this.renderSurfaceContent(surfaceId, collectedData.content, cacheContent);
+			this.renderSurfaceContent(surfaceId, collectedData.content, collectedData.cacheContent);
 		} else {
 			// This surface's element hasn't been created yet, so it doesn't need
 			// to replace the rendered element. Let's cache the content so it won't rerender.

@@ -1277,6 +1277,8 @@ describe('Component', function() {
 
 	describe('Inline Events', function() {
 		beforeEach(function() {
+			ComponentCollector.components = {};
+
 			var EventsTestComponent = createCustomComponentClass();
 			EventsTestComponent.ATTRS = {count: {value: 1}};
 			EventsTestComponent.SURFACES = {foo: {renderAttrs: ['count']}};
@@ -1293,6 +1295,7 @@ describe('Component', function() {
 			};
 			EventsTestComponent.prototype.handleClick = sinon.stub();
 			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
+			ComponentRegistry.register('EventsTestComponent', EventsTestComponent);
 			this.EventsTestComponent = EventsTestComponent;
 		});
 
@@ -1338,16 +1341,39 @@ describe('Component', function() {
 			assert.strictEqual(1, custom.handleMouseOver.callCount);
 		});
 
-		it('should attach listeners when component is decorated as sub component', function() {
-			ComponentRegistry.register('EventsTestComponent', this.EventsTestComponent);
-			ComponentCollector.components = {};
-
+		it('should attach listeners when component is rendered as sub component', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:EventsTestComponent~%%%%';
 			};
 
 			var custom = new CustomComponent().render();
+			var button = custom.element.querySelector('.elementButton');
+			dom.triggerEvent(button, 'click');
+			assert.strictEqual(1, custom.components.child.handleClick.callCount);
+
+			button = custom.element.querySelector('.fooButton');
+			dom.triggerEvent(button, 'mouseover');
+			assert.strictEqual(1, custom.components.child.handleMouseOver.callCount);
+		});
+
+		it('should attach listeners when component is decorated as sub component', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~s-foo~%%%%';
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return '%%%%~c-child:EventsTestComponent~%%%%';
+			};
+
+			var content = '<div id="events-foo"><div id="child"><button class="elementButton" data-onclick="handleClick"></button>' +
+				'<div id="events-foo"><button class="fooButton" data-onmouseover="handleMouseOver"></button></div></div></div>';
+			var element = document.createElement('div');
+			element.id = 'events';
+			dom.append(element, content);
+			dom.append(document.body, element);
+
+			var custom = new CustomComponent({element: '#events'}).decorate();
 			var button = custom.element.querySelector('.elementButton');
 			dom.triggerEvent(button, 'click');
 			assert.strictEqual(1, custom.components.child.handleClick.callCount);

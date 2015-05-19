@@ -22,7 +22,8 @@ module.exports = function(options) {
 				babelOptions: {
 					compact: false,
 					resolveModuleSource: renameAlias.renameAliasSync,
-					sourceMaps: true
+					sourceMaps: true,
+					stage: 0,
 				},
 				bundleFileName: options.bundleFileName,
 				globalName: options.globalName

@@ -43,7 +43,6 @@
     "through2": "^0.6.5"
   },
   "devDependencies": {
-    "babel": "^5.2.17",
     "chai": "^2.3.0",
     "isparta": "^3.0.3",
     "karma": "^0.12.31",

@@ -152,8 +152,6 @@ class Component extends Attribute {
 		this.DEFAULT_ELEMENT_PARENT = document.body;
 
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
-		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
-		core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
 		this.addSurfacesFromStaticHint_();
 
 		this.delegateEventHandler_ = new EventHandler();
@@ -174,7 +172,7 @@ class Component extends Attribute {
 	 */
 	addSingleListener_(event, listener, opt_origin) {
 		if (!this.elementEventProxy_ &&
-				dom.supportsEvent(this.constructor.ELEMENT_TAG_NAME_MERGED, event)) {
+				dom.supportsEvent(this.constructor.ELEMENT_TAG_NAME, event)) {
 			this.elementEventProxy_ = new EventEmitterProxy(this.element, this);
 		}
 		super.addSingleListener_(event, listener, opt_origin);
@@ -427,7 +425,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	createSurfaceElement_(surfaceElementId) {
-		var el = document.createElement(this.constructor.SURFACE_TAG_NAME_MERGED);
+		var el = document.createElement(this.constructor.SURFACE_TAG_NAME);
 		el.id = surfaceElementId;
 		return el;
 	}
@@ -642,7 +640,7 @@ class Component extends Attribute {
 	 * @return {string}
 	 */
 	getComponentHtml(content) {
-		return this.getWrapperHtml_(this.constructor.ELEMENT_TAG_NAME_MERGED, this.id, content);
+		return this.getWrapperHtml_(this.constructor.ELEMENT_TAG_NAME, this.id, content);
 	}
 
 	/**
@@ -697,7 +695,7 @@ class Component extends Attribute {
 	 */
 	getNonComponentSurfaceHtml(surfaceId, content) {
 		var surfaceElementId = this.makeSurfaceId_(surfaceId);
-		return this.getWrapperHtml_(this.constructor.SURFACE_TAG_NAME_MERGED, surfaceElementId, content);
+		return this.getWrapperHtml_(this.constructor.SURFACE_TAG_NAME, surfaceElementId, content);
 	}
 
 	/**
@@ -1206,7 +1204,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	valueElementFn_() {
-		return document.createElement(this.constructor.ELEMENT_TAG_NAME_MERGED);
+		return document.createElement(this.constructor.ELEMENT_TAG_NAME);
 	}
 
 	/**

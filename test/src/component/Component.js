@@ -143,6 +143,14 @@ describe('Component', function() {
 			});
 		});
 
+		it('should use div as the default tagName for the component element', function() {
+			var CustomComponent = createCustomComponentClass();
+
+			var custom = new CustomComponent();
+			custom.render();
+			assert.strictEqual('div', custom.element.tagName.toLowerCase());
+		});
+
 		it('should overwrite component element tagName', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ELEMENT_TAG_NAME = 'span';
@@ -533,6 +541,15 @@ describe('Component', function() {
 			assert.strictEqual(headerSurfaceConfig, custom.getSurface('header'));
 			assert.deepEqual(['header', 'bottom'], Object.keys(custom.getSurfaces()));
 			assert.strictEqual(null, custom.getSurface('unknown'));
+		});
+
+		it('should use div as the default tagName for surface elements', function() {
+			var CustomComponent = createCustomComponentClass();
+
+			var custom = new CustomComponent();
+			custom.addSurface('header');
+			custom.render();
+			assert.strictEqual('div', custom.getSurfaceElement('header').tagName.toLowerCase());
 		});
 
 		it('should overwrite surface element tagName', function() {

@@ -31,13 +31,25 @@ One thing that can be really useful for a developer when building a component, i
 With the code already available, you can use Metal.js by just importing the desired module on your js file and calling what you wish on it. For example:
 
 ```js
-import core from 'bower_components/metaljs/src/core';
+import core from './bower_components/metaljs/src/core';
 
 // You can now call any function from Metal.js's core module.
 core.isString('Hello World');
 ```
 
 Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal.js on a website. See the [Build Tasks](#build-tasks) section for more details.
+
+## Alias
+
+Having to supply the relative path to bower_components is not cool and, besides that, it may cause problems when a module doing that is imported later as a bower dependency of another project.
+
+Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using their names instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's [build tools](#build-tasks) or adding a similar logic to your build process yourself (though we provide a [helper function](https://github.com/liferay/metal.js/blob/master/tasks/lib/renameAlias.js) on Metal.js's npm package).
+
+With aliases, the previous example can be rewritten like this:
+
+```js
+import core from 'metaljs/src/core';
+```
 
 ## Attribute
 

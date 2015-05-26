@@ -194,9 +194,7 @@ class core {
 	 * Null function used for default values of callbacks, etc.
 	 * @return {void} Nothing.
 	 */
-	static nullFunction() {
-
-	}
+	static nullFunction() {}
 }
 
 /**

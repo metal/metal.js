@@ -71,10 +71,14 @@ describe('Attribute', function() {
 	it('should get an attribute\'s config object', function() {
 		var attr = new Attribute();
 		attr.addAttrs({
-			attr1: {a: 2}
+			attr1: {
+				a: 2
+			}
 		});
 
-		assert.deepEqual({a: 2}, attr.getAttrConfig('attr1'));
+		assert.deepEqual({
+			a: 2
+		}, attr.getAttrConfig('attr1'));
 	});
 
 	it('should return null if requesting config object of non existing attribute', function() {

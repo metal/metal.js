@@ -86,7 +86,7 @@ class EventsCollector extends Disposable {
 		}
 		var regex = /data-on([a-z]+)=['"]([^'"]+)['"]/g;
 		var match = regex.exec(content);
-		while(match) {
+		while (match) {
 			this.attachListener_(match[1], match[2], groupName);
 			match = regex.exec(content);
 		}

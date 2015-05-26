@@ -54,7 +54,7 @@ class array {
 	 * @return {boolean} True if an element was removed.
 	 * @template T
 	 */
-	 static remove(arr, obj) {
+	static remove(arr, obj) {
 		var i = arr.indexOf(obj);
 		var rv;
 		if ( (rv = i >= 0) ) {

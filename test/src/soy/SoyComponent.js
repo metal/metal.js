@@ -61,8 +61,14 @@ describe('SoyComponent', function() {
 
 	it('should not throw error if surface template is not defined', function() {
 		var CustomTestComponent = createCustomTestComponentClass();
-		CustomTestComponent.ATTRS = {body: {}};
-		CustomTestComponent.SURFACES = {body: {renderAttrs: ['body']}};
+		CustomTestComponent.ATTRS = {
+			body: {}
+		};
+		CustomTestComponent.SURFACES = {
+			body: {
+				renderAttrs: ['body']
+			}
+		};
 
 		var custom = new CustomTestComponent();
 
@@ -106,9 +112,14 @@ describe('SoyComponent', function() {
 	describe('Nested Surfaces', function() {
 		it('should correctly render nested surfaces', function() {
 			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
-			NestedSurfacesTestComponent.ATTRS = {items: {}};
+			NestedSurfacesTestComponent.ATTRS = {
+				items: {}
+			};
 
-			var custom = new NestedSurfacesTestComponent({id: 'custom', items: ['Item1', 'Item2']}).render();
+			var custom = new NestedSurfacesTestComponent({
+				id: 'custom',
+				items: ['Item1', 'Item2']
+			}).render();
 			var element = custom.element;
 			assert.strictEqual(custom.getSurfaceElement('title'), element.querySelector('#custom-title'));
 			assert.strictEqual(custom.getSurfaceElement('0'), element.querySelector('#custom-0'));
@@ -118,9 +129,14 @@ describe('SoyComponent', function() {
 
 		it('should correctly update nested surfaces', function(done) {
 			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
-			NestedSurfacesTestComponent.ATTRS = {items: {}};
+			NestedSurfacesTestComponent.ATTRS = {
+				items: {}
+			};
 
-			var custom = new NestedSurfacesTestComponent({id: 'custom', items: ['Item1', 'Item2']}).render();
+			var custom = new NestedSurfacesTestComponent({
+				id: 'custom',
+				items: ['Item1', 'Item2']
+			}).render();
 			var element = custom.element;
 			var titleElement = custom.getSurfaceElement('title');
 			var zeroElement = custom.getSurfaceElement('0');
@@ -156,7 +172,11 @@ describe('SoyComponent', function() {
 			this.CustomTestComponent = CustomTestComponent;
 
 			var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
-			EventsTestComponent.ATTRS = {footerButtons: {value: []}};
+			EventsTestComponent.ATTRS = {
+				footerButtons: {
+					value: []
+				}
+			};
 			EventsTestComponent.prototype.handleClick = sinon.stub();
 			EventsTestComponent.prototype.handleMouseDown = sinon.stub();
 			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
@@ -164,7 +184,9 @@ describe('SoyComponent', function() {
 
 		it('should instantiate rendered child component', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({id: 'nested'}).render();
+			var custom = new NestedTestComponent({
+				id: 'nested'
+			}).render();
 
 			var child = custom.components.nestedMyChild0;
 			assert.ok(child);
@@ -174,7 +196,9 @@ describe('SoyComponent', function() {
 
 		it('should instantiate rendered child component without id', function() {
 			var NestedNoIdTestComponent = createCustomTestComponentClass('NestedNoIdTestComponent');
-			var custom = new NestedNoIdTestComponent({id: 'nested'}).render();
+			var custom = new NestedNoIdTestComponent({
+				id: 'nested'
+			}).render();
 
 			assert.ok(custom.components['nested-c1']);
 			assert.ok(custom.components['nested-foo-c1']);
@@ -182,7 +206,9 @@ describe('SoyComponent', function() {
 
 		it('should render nested components inside parent', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({id: 'nested'}).render();
+			var custom = new NestedTestComponent({
+				id: 'nested'
+			}).render();
 
 			var childPlaceholder = custom.element.querySelector('#nestedMyChild0');
 			var child = custom.components.nestedMyChild0;
@@ -194,7 +220,9 @@ describe('SoyComponent', function() {
 		it('should update rendered child component', function(done) {
 			var test = this;
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({id: 'nested'}).render();
+			var custom = new NestedTestComponent({
+				id: 'nested'
+			}).render();
 
 			custom.foo = 'bar';
 			custom.on('attrsChanged', function() {
@@ -210,7 +238,9 @@ describe('SoyComponent', function() {
 
 		it('should not update parent if only child components change', function(done) {
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({count: 2}).render();
+			var custom = new NestedTestComponent({
+				count: 2
+			}).render();
 
 			var wrapper = custom.element.querySelector('.componentsWrapper');
 			custom.foo = 'bar';
@@ -222,10 +252,17 @@ describe('SoyComponent', function() {
 
 		it('should pass children to nested components through surface attributes', function() {
 			var ChildrenTestComponent = createCustomTestComponentClass('ChildrenTestComponent');
-			ChildrenTestComponent.ATTRS = {bar: 'bar', children: {value: ''}};
+			ChildrenTestComponent.ATTRS = {
+				bar: 'bar',
+				children: {
+					value: ''
+				}
+			};
 
 			var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
-			var component = new DeeplyNestedTestComponent({id: 'nested'}).render();
+			var component = new DeeplyNestedTestComponent({
+				id: 'nested'
+			}).render();
 
 			var comps = component.components;
 			var nestedMain = comps['nested-main'];
@@ -279,7 +316,9 @@ describe('SoyComponent', function() {
 				value: 'bar'
 			},
 			footerButtons: {
-				value: [{label: 'Ok'}]
+				value: [{
+					label: 'Ok'
+				}]
 			}
 		};
 		return DeeplyNestedTestComponent;

@@ -80,7 +80,9 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	buildComponentConfigData_(id, templateData) {
-		var config = {id: id};
+		var config = {
+			id: id
+		};
 		for (var key in templateData) {
 			config[key] = templateData[key];
 		}
@@ -240,7 +242,7 @@ class SoyComponent extends Component {
 	renderTemplate_(templateFn, opt_data) {
 		soy.$$getDelegateFn = this.handleGetDelegateFnCall_.bind(this);
 		var content = templateFn(opt_data || this, null, {}).content;
-		soy.$$getDelegateFn = originalGetDelegateFn; 
+		soy.$$getDelegateFn = originalGetDelegateFn;
 		return content;
 	}
 

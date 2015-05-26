@@ -200,7 +200,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	// Implementation for IE6-8: Script elements fire an asynchronous
 	// onreadystatechange event when inserted into the DOM.
 	if (typeof document !== 'undefined' && 'onreadystatechange' in
-			document.createElement('script')) {
+		document.createElement('script')) {
 		return function(cb) {
 			var script = document.createElement('script');
 			script.onreadystatechange = function() {

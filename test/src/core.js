@@ -38,11 +38,14 @@ describe('core', function() {
 		});
 
 		it('should merge properties', function() {
-			class Test1 {}
+			class Test1 {
+			}
 			Test1.FOO = 1;
-			class Test2 extends Test1 {}
+			class Test2 extends Test1 {
+			}
 			Test2.FOO = 2;
-			class Test3 extends Test2 {}
+			class Test3 extends Test2 {
+			}
 			Test3.FOO = 3;
 
 			core.mergeSuperClassesProperty(Test3, 'FOO');
@@ -58,9 +61,11 @@ describe('core', function() {
 		});
 
 		it('should reuse existing merged static property', function() {
-			class Test1 {}
+			class Test1 {
+			}
 			Test1.FOO = 1;
-			class Test2 extends Test1 {}
+			class Test2 extends Test1 {
+			}
 			Test2.FOO = 2;
 
 			assert.ok(core.mergeSuperClassesProperty(Test2, 'FOO'));
@@ -70,11 +75,14 @@ describe('core', function() {
 		});
 
 		it('should call merge function when given', function() {
-			class Test1 {}
+			class Test1 {
+			}
 			Test1.FOO = 1;
-			class Test2 extends Test1 {}
+			class Test2 extends Test1 {
+			}
 			Test2.FOO = 2;
-			class Test3 extends Test2 {}
+			class Test3 extends Test2 {
+			}
 			Test3.FOO = 3;
 
 			core.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
@@ -171,8 +179,8 @@ describe('core', function() {
 				nodeType: 9
 			}));
 			assert.ok(!core.isDocument({
-				nodeType: 1
-			}));
+					nodeType: 1
+				}));
 			assert.ok(!core.isDocument({}));
 			assert.ok(!core.isDocument(null));
 			assert.ok(!core.isDocument(true));
@@ -180,11 +188,11 @@ describe('core', function() {
 
 		it('should check if var is window', function() {
 			assert.ok(!core.isWindow({
-				nodeType: 9
-			}));
+					nodeType: 9
+				}));
 			assert.ok(!core.isWindow({
-				nodeType: 1
-			}));
+					nodeType: 1
+				}));
 			assert.ok(core.isWindow(window));
 			assert.ok(!core.isWindow(null));
 			assert.ok(!core.isWindow(true));

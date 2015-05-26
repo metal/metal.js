@@ -174,7 +174,7 @@ class Component extends Attribute {
 	 */
 	addSingleListener_(event, listener, opt_origin) {
 		if (!this.elementEventProxy_ &&
-				dom.supportsEvent(this.constructor.ELEMENT_TAG_NAME_MERGED, event)) {
+			dom.supportsEvent(this.constructor.ELEMENT_TAG_NAME_MERGED, event)) {
 			this.elementEventProxy_ = new EventEmitterProxy(this.element, this);
 		}
 		super.addSingleListener_(event, listener, opt_origin);
@@ -268,8 +268,7 @@ class Component extends Attribute {
 	 * times, therefore the undo behavior for any action performed in this phase
 	 * must be implemented on the detach phase.
 	 */
-	attached() {
-	}
+	attached() {}
 
 	/**
 	 * Builds the data that should be used to create a surface that was found via
@@ -280,7 +279,9 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	buildPlaceholderSurfaceData_(type, extra) {
-		return {componentName: type === Component.SurfaceType.COMPONENT ? extra : null};
+		return {
+			componentName: type === Component.SurfaceType.COMPONENT ? extra : null
+		};
 	}
 
 	/**
@@ -386,8 +387,7 @@ class Component extends Attribute {
 	 * events in this phase, in contrast to DOM events that must be bind on
 	 * attach phase.
 	 */
-	created() {
-	}
+	created() {}
 
 	/**
 	 * Creates a surface that was found via a string placeholder.
@@ -449,8 +449,7 @@ class Component extends Attribute {
 	 * Lifecycle. Internal implementation for decoration. Any extra operation
 	 * necessary to prepare the component DOM must be implemented in this phase.
 	 */
-	decorateInternal() {
-	}
+	decorateInternal() {}
 
 	/**
 	 * Listens to a delegate event on the component's element.
@@ -491,8 +490,7 @@ class Component extends Attribute {
 	 * times, therefore the undo behavior for any action performed in this phase
 	 * must be implemented on the attach phase.
 	 */
-	detached() {
-	}
+	detached() {}
 
 	/**
 	 * Internal implementation for the creation phase of the component.
@@ -652,8 +650,7 @@ class Component extends Attribute {
 	 *   string, surfaces can be represented by placeholders in the format specified
 	 *   by Component.SURFACE_REGEX.
 	 */
-	getElementContent() {
-	}
+	getElementContent() {}
 
 	/**
 	 * Internal function for getting the component element's content. Stores the
@@ -717,8 +714,7 @@ class Component extends Attribute {
 	 *   string, surfaces can be represented by placeholders in the format specified
 	 *   by Component.SURFACE_REGEX.
 	 */
-	getSurfaceContent() {
-	}
+	getSurfaceContent() {}
 
 	/**
 	 * Gets the content for the requested surface. By default this just calls
@@ -1097,7 +1093,11 @@ class Component extends Attribute {
 			var surfaceContent = instance.getSurfaceContent_(id);
 			var expandedContent = instance.replaceSurfacePlaceholders_(surfaceContent, id);
 			var surfaceHtml = instance.getSurfaceHtml(id, expandedContent);
-			instance.collectedSurfaces_.push({cacheContent: surfaceContent, content: expandedContent, surfaceId: id});
+			instance.collectedSurfaces_.push({
+				cacheContent: surfaceContent,
+				content: expandedContent,
+				surfaceId: id
+			});
 
 			return surfaceHtml;
 		});

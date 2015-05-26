@@ -27,7 +27,7 @@ class EventEmitterProxy extends Disposable {
 		 * @type {Object}
 		 * @protected
 		 */
-	 this.blacklist_ = opt_blacklist || {};
+		this.blacklist_ = opt_blacklist || {};
 
 		/**
 		 * The origin emitter. This emitter's events will be proxied through the
@@ -52,12 +52,11 @@ class EventEmitterProxy extends Disposable {
 		 */
 		this.targetEmitter_ = targetEmitter;
 
-		 /**
-			* Map of events that should be proxied. If whitelist is set blacklist is
-			* ignored.
-			* @type {Object}
-			* @protected
-			*/
+		/**
+		 * Map of events that should be proxied. If whitelist is set blacklist is ignored.
+		 * @type {Object}
+		 * @protected
+		 */
 		this.whitelist_ = opt_whitelist;
 
 		this.startProxy_();
@@ -111,7 +110,7 @@ class EventEmitterProxy extends Disposable {
 		}
 		return !this.proxiedEvents_[event] &&
 			(!(this.originEmitter_.removeEventListener || this.originEmitter_.addEventListener) ||
-					dom.supportsEvent(this.originEmitter_, event));
+			dom.supportsEvent(this.originEmitter_, event));
 	}
 
 	/**

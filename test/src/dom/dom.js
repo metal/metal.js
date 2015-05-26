@@ -246,10 +246,10 @@ describe('dom', function() {
 		it('should trigger delegate listener for matched elements', function() {
 			var element = document.createElement('div');
 			element.innerHTML = '<div class="nomatch">' +
-			'<div class="match">' +
-			'<div class="nomatch">' +
-			'<div class="match">' +
-			'</div></div></div></div>';
+				'<div class="match">' +
+				'<div class="nomatch">' +
+				'<div class="match">' +
+				'</div></div></div></div>';
 			document.body.appendChild(element);
 			var matchedElements = element.querySelectorAll('.match');
 
@@ -268,10 +268,10 @@ describe('dom', function() {
 		it('should only trigger delegate event starting from initial target', function() {
 			var element = document.createElement('div');
 			element.innerHTML = '<div class="nomatch">' +
-			'<div class="match">' +
-			'<div class="nomatch">' +
-			'<div class="match">' +
-			'</div></div></div></div>';
+				'<div class="match">' +
+				'<div class="nomatch">' +
+				'<div class="match">' +
+				'</div></div></div></div>';
 			document.body.appendChild(element);
 			var matchedElements = element.querySelectorAll('.match');
 
@@ -286,10 +286,10 @@ describe('dom', function() {
 		it('should stop triggering event if stopPropagation is called', function() {
 			var element = document.createElement('div');
 			element.innerHTML = '<div class="nomatch">' +
-			'<div class="match">' +
-			'<div class="nomatch">' +
-			'<div class="match">' +
-			'</div></div></div></div>';
+				'<div class="match">' +
+				'<div class="nomatch">' +
+				'<div class="match">' +
+				'</div></div></div></div>';
 			document.body.appendChild(element);
 			var matchedElements = element.querySelectorAll('.match');
 
@@ -308,10 +308,10 @@ describe('dom', function() {
 		it('should stop triggering event if stopImmediatePropagation is called', function() {
 			var element = document.createElement('div');
 			element.innerHTML = '<div class="nomatch">' +
-			'<div class="match">' +
-			'<div class="nomatch">' +
-			'<div class="match">' +
-			'</div></div></div></div>';
+				'<div class="match">' +
+				'<div class="nomatch">' +
+				'<div class="match">' +
+				'</div></div></div></div>';
 			document.body.appendChild(element);
 			var matchedElements = element.querySelectorAll('.match');
 
@@ -577,10 +577,14 @@ describe('dom', function() {
 
 			dom.triggerEvent(this.element1, 'mouseover');
 			assert.strictEqual(0, listener.callCount);
-			dom.triggerEvent(this.element2, 'mouseover', {relatedTarget: this.element1});
+			dom.triggerEvent(this.element2, 'mouseover', {
+				relatedTarget: this.element1
+			});
 			assert.strictEqual(1, listener.callCount);
 			assert.strictEqual('mouseenter', listener.args[0][0].customType);
-			dom.triggerEvent(this.element2, 'mouseover', {relatedTarget: this.element3});
+			dom.triggerEvent(this.element2, 'mouseover', {
+				relatedTarget: this.element3
+			});
 			assert.strictEqual(1, listener.callCount);
 		});
 
@@ -590,10 +594,14 @@ describe('dom', function() {
 
 			dom.triggerEvent(this.element1, 'mouseout');
 			assert.strictEqual(0, listener.callCount);
-			dom.triggerEvent(this.element2, 'mouseout', {relatedTarget: this.element1});
+			dom.triggerEvent(this.element2, 'mouseout', {
+				relatedTarget: this.element1
+			});
 			assert.strictEqual(1, listener.callCount);
 			assert.strictEqual('mouseleave', listener.args[0][0].customType);
-			dom.triggerEvent(this.element2, 'mouseout', {relatedTarget: this.element3});
+			dom.triggerEvent(this.element2, 'mouseout', {
+				relatedTarget: this.element3
+			});
 			assert.strictEqual(1, listener.callCount);
 		});
 
@@ -603,10 +611,14 @@ describe('dom', function() {
 
 			dom.triggerEvent(this.element1, 'pointerover');
 			assert.strictEqual(0, listener.callCount);
-			dom.triggerEvent(this.element2, 'pointerover', {relatedTarget: this.element1});
+			dom.triggerEvent(this.element2, 'pointerover', {
+				relatedTarget: this.element1
+			});
 			assert.strictEqual(1, listener.callCount);
 			assert.strictEqual('pointerenter', listener.args[0][0].customType);
-			dom.triggerEvent(this.element2, 'pointerover', {relatedTarget: this.element3});
+			dom.triggerEvent(this.element2, 'pointerover', {
+				relatedTarget: this.element3
+			});
 			assert.strictEqual(1, listener.callCount);
 		});
 
@@ -616,10 +628,14 @@ describe('dom', function() {
 
 			dom.triggerEvent(this.element1, 'pointerout');
 			assert.strictEqual(0, listener.callCount);
-			dom.triggerEvent(this.element2, 'pointerout', {relatedTarget: this.element1});
+			dom.triggerEvent(this.element2, 'pointerout', {
+				relatedTarget: this.element1
+			});
 			assert.strictEqual(1, listener.callCount);
 			assert.strictEqual('pointerleave', listener.args[0][0].customType);
-			dom.triggerEvent(this.element2, 'pointerout', {relatedTarget: this.element3});
+			dom.triggerEvent(this.element2, 'pointerout', {
+				relatedTarget: this.element3
+			});
 			assert.strictEqual(1, listener.callCount);
 		});
 	});

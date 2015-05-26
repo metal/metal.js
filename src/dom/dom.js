@@ -44,7 +44,7 @@ class dom {
 		var elementClassName = ' ' + element.className + ' ';
 		var classesToAppend = '';
 
-		classes = classes.split( ' ');
+		classes = classes.split(' ');
 
 		for (var i = 0; i < classes.length; i++) {
 			var className = classes[i];

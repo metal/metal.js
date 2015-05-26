@@ -21,8 +21,10 @@ describe('ComponentRegistry', function() {
 	});
 
 	it('should return constructor of registered components', function() {
-		class MyComponent1 {}
-		class MyComponent2 {}
+		class MyComponent1 {
+		}
+		class MyComponent2 {
+		}
 
 		ComponentRegistry.register('MyComponent1', MyComponent1);
 		ComponentRegistry.register('MyComponent2', MyComponent2);
@@ -38,7 +40,8 @@ describe('ComponentRegistry', function() {
 	it('should set TEMPLATES variable on component with its templates', function() {
 		ComponentRegistry.Templates.TemplateComponent = {};
 
-		class TemplateComponent {}
+		class TemplateComponent {
+		}
 		ComponentRegistry.register('TemplateComponent', TemplateComponent);
 
 		assert.strictEqual(ComponentRegistry.Templates.TemplateComponent, TemplateComponent.TEMPLATES);

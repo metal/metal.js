@@ -21,7 +21,10 @@ module.exports = function(options) {
 	gulp.task(options.taskPrefix + 'soy', function(done) {
 		templateParams = {};
 
-		gulp.src(options.soySrc, {base: options.soyBase})
+		var gulpOpts = {
+			base: options.soyBase
+		};
+		gulp.src(options.soySrc, gulpOpts)
 			.pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
 			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.soyGeneratedDest)))
 			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
@@ -64,7 +67,9 @@ function createComponentElementSoy(moduleName, hasElementTemplate) {
 }
 
 function createComponentSoy(moduleName) {
-	return lodash.renderSync(templates.ModuleName, {moduleName: moduleName});
+	return lodash.renderSync(templates.ModuleName, {
+		moduleName: moduleName
+	});
 }
 
 function createSurfaceElementSoy(moduleName, surfaceName, hasElementTemplate) {

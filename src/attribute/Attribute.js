@@ -454,7 +454,7 @@ class Attribute extends EventEmitter {
 	shouldInformChange_(name, prevVal) {
 		var info = this.attrsInfo_[name];
 		return (info.state === Attribute.States.INITIALIZED) &&
-		(core.isObject(prevVal) || prevVal !== this[name]);
+			(core.isObject(prevVal) || prevVal !== this[name]);
 	}
 
 	/**

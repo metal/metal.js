@@ -44,7 +44,9 @@ describe('ComponentCollector', function() {
 		dom.append(document.body, element);
 
 		var collector = new ComponentCollector();
-		collector.setNextComponentData('comp', {bar: 1});
+		collector.setNextComponentData('comp', {
+			bar: 1
+		});
 		var component = collector.createComponent('TestComponent', 'comp');
 
 		assert.ok(component instanceof TestComponent);
@@ -54,7 +56,9 @@ describe('ComponentCollector', function() {
 
 	it('should not throw error if trying to create existing component', function() {
 		var collector = new ComponentCollector();
-		collector.setNextComponentData('comp', {bar: 1});
+		collector.setNextComponentData('comp', {
+			bar: 1
+		});
 		var component = collector.createComponent('TestComponent', 'comp');
 
 		assert.doesNotThrow(function() {
@@ -69,10 +73,14 @@ describe('ComponentCollector', function() {
 		dom.append(document.body, element);
 
 		var collector = new ComponentCollector();
-		collector.setNextComponentData('comp', {bar: 1});
+		collector.setNextComponentData('comp', {
+			bar: 1
+		});
 		var component = collector.createComponent('TestComponent', 'comp');
 
-		collector.setNextComponentData('comp', {bar: 2});
+		collector.setNextComponentData('comp', {
+			bar: 2
+		});
 		var updatedComponent = collector.updateComponent('comp');
 
 		assert.strictEqual(component, updatedComponent);

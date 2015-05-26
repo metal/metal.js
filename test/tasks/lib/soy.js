@@ -52,11 +52,15 @@ describe('Soy Task', function() {
 
 			var templateFn = soy.$$getDelegateFn('DefinedElement.hello', 'element');
 			assert.ok(templateFn);
-			assert.notStrictEqual(-1, templateFn({id: 'id'}).indexOf('<button'));
+			assert.notStrictEqual(-1, templateFn({
+				id: 'id'
+			}).indexOf('<button'));
 
 			templateFn = soy.$$getDelegateFn('DefinedElement', 'element');
 			assert.ok(templateFn);
-			assert.notStrictEqual(-1, templateFn({id: 'id'}).indexOf('<button'));
+			assert.notStrictEqual(-1, templateFn({
+				id: 'id'
+			}).indexOf('<button'));
 
 			done();
 		});

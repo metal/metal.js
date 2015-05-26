@@ -818,7 +818,9 @@ describe('Component', function() {
 				return 'foo';
 			};
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			var expected = 'My surface: <div id="custom-foo">foo</div>';
 			assert.strictEqual(expected, custom.element.innerHTML);
 			assert.strictEqual(custom.getSurfaceElement('foo'), custom.element.childNodes[1]);
@@ -856,7 +858,9 @@ describe('Component', function() {
 				}
 			};
 
-			var custom = new this.CustomComponent({id: 'custom'}).render();
+			var custom = new this.CustomComponent({
+				id: 'custom'
+			}).render();
 			var listElement = custom.getSurfaceElement('header');
 			var item1Element = custom.getSurfaceElement('item1');
 			assert.strictEqual(2, listElement.childNodes.length);
@@ -879,7 +883,10 @@ describe('Component', function() {
 				}
 			};
 
-			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var custom = new this.CustomComponent({
+				foo: 'foo',
+				id: 'custom'
+			}).render();
 			var headerInnerElement = custom.element.querySelector('.headerInner');
 			var barInnerElement = custom.element.querySelector('.barInner');
 			var fooInnerElement = custom.element.querySelector('.fooInner');
@@ -906,7 +913,10 @@ describe('Component', function() {
 				}
 			};
 
-			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var custom = new this.CustomComponent({
+				foo: 'foo',
+				id: 'custom'
+			}).render();
 			var headerInnerElement = custom.element.querySelector('.headerInner');
 			var barInnerElement = custom.element.querySelector('.barInner');
 			var fooInnerElement = custom.element.querySelector('.fooInner');
@@ -933,7 +943,10 @@ describe('Component', function() {
 				}
 			};
 
-			var custom = new this.CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var custom = new this.CustomComponent({
+				foo: 'foo',
+				id: 'custom'
+			}).render();
 			var headerInnerElement = custom.element.querySelector('.headerInner');
 			var barInnerElement = custom.element.querySelector('.barInner');
 			var fooInnerElement = custom.element.querySelector('.fooInner');
@@ -958,8 +971,15 @@ describe('Component', function() {
 		describe('Generated Ids', function() {
 			beforeEach(function() {
 				this.CustomComponent = createCustomComponentClass();
-				this.CustomComponent.ATTRS = {count: {}, foo: {}};
-				this.CustomComponent.SURFACES = {s1: {renderAttrs: ['count', 'foo']}};
+				this.CustomComponent.ATTRS = {
+					count: {},
+					foo: {}
+				};
+				this.CustomComponent.SURFACES = {
+					s1: {
+						renderAttrs: ['count', 'foo']
+					}
+				};
 				this.CustomComponent.prototype.getElementContent = function() {
 					return '%%%%~s~%%%%';
 				};
@@ -978,7 +998,10 @@ describe('Component', function() {
 			});
 
 			it('should render nested surfaces with generated ids', function() {
-				var custom = new this.CustomComponent({count: 2, id: 'custom'}).render();
+				var custom = new this.CustomComponent({
+					count: 2,
+					id: 'custom'
+				}).render();
 				assert.strictEqual(1, custom.element.childNodes.length);
 
 				var s1Element = custom.getSurfaceElement('s1');
@@ -993,7 +1016,10 @@ describe('Component', function() {
 			});
 
 			it('should reuse deeply nested surfaces with generated ids', function(done) {
-				var custom = new this.CustomComponent({count: 1, id: 'custom'}).render();
+				var custom = new this.CustomComponent({
+					count: 1,
+					id: 'custom'
+				}).render();
 				var s1S1Element = custom.getSurfaceElement('s1-s1');
 
 				custom.count = 2;
@@ -1004,7 +1030,11 @@ describe('Component', function() {
 			});
 
 			it('should only update nested surface when only its contents change', function(done) {
-				var custom = new this.CustomComponent({count: 1, foo: 'foo', id: 'custom'}).render();
+				var custom = new this.CustomComponent({
+					count: 1,
+					foo: 'foo',
+					id: 'custom'
+				}).render();
 				var s1InnerElement = custom.element.querySelector('.s1Inner');
 				var nestedInnerElement = custom.element.querySelector('.nestedInner');
 
@@ -1032,8 +1062,16 @@ describe('Component', function() {
 			this.ChildComponent.prototype.getSurfaceContent = function() {
 				return '<span>' + this.foo + '</span>';
 			};
-			this.ChildComponent.ATTRS = {foo: {value: 'default'}};
-			this.ChildComponent.SURFACES = {foo: {renderAttrs: ['foo']}};
+			this.ChildComponent.ATTRS = {
+				foo: {
+					value: 'default'
+				}
+			};
+			this.ChildComponent.SURFACES = {
+				foo: {
+					renderAttrs: ['foo']
+				}
+			};
 			ComponentRegistry.register('ChildComponent', this.ChildComponent);
 		});
 
@@ -1043,7 +1081,9 @@ describe('Component', function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
 			};
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			assert.ok(custom.components.child);
 
 			var child = custom.components.child;
@@ -1058,7 +1098,9 @@ describe('Component', function() {
 				return '%%%%~c-my-child:ChildComponent~%%%%';
 			};
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			assert.ok(custom.components['my-child']);
 
 			var child = custom.components['my-child'];
@@ -1073,7 +1115,9 @@ describe('Component', function() {
 				return '%%%%~c:ChildComponent~%%%%';
 			};
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			assert.ok(custom.components['custom-c1']);
 
 			var child = custom.components['custom-c1'];
@@ -1085,15 +1129,22 @@ describe('Component', function() {
 
 		it('should instantiate sub component from placeholder passing defined config data', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.ATTRS = {
+				foo: {}
+			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
 			};
 			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+				Component.componentsCollector.setNextComponentData('child', {
+					foo: this.foo
+				});
 			};
 
-			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var custom = new CustomComponent({
+				foo: 'foo',
+				id: 'custom'
+			}).render();
 			assert.ok(custom.components.child);
 
 			var child = custom.components.child;
@@ -1114,7 +1165,9 @@ describe('Component', function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
 			};
 
-			var custom = new CustomComponent({element: '#custom'}).decorate();
+			var custom = new CustomComponent({
+				element: '#custom'
+			}).decorate();
 			assert.ok(custom.components.child);
 
 			var child = custom.components.child;
@@ -1131,15 +1184,22 @@ describe('Component', function() {
 			var fooElement = document.body.querySelector('span');
 
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.ATTRS = {
+				foo: {}
+			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
 			};
 			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+				Component.componentsCollector.setNextComponentData('child', {
+					foo: this.foo
+				});
 			};
 
-			var custom = new CustomComponent({element: '#custom', foo: 'foo'}).decorate();
+			var custom = new CustomComponent({
+				element: '#custom',
+				foo: 'foo'
+			}).decorate();
 
 			var child = custom.components.child;
 			assert.notStrictEqual(fooElement, child.element.querySelector('span'));
@@ -1153,15 +1213,22 @@ describe('Component', function() {
 			var fooElement = document.body.querySelector('span');
 
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {foo: {}};
+			CustomComponent.ATTRS = {
+				foo: {}
+			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
 			};
 			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+				Component.componentsCollector.setNextComponentData('child', {
+					foo: this.foo
+				});
 			};
 
-			var custom = new CustomComponent({element: '#custom', foo: 'foo'}).decorate();
+			var custom = new CustomComponent({
+				element: '#custom',
+				foo: 'foo'
+			}).decorate();
 
 			var child = custom.components.child;
 			assert.strictEqual(fooElement, child.element.querySelector('span'));
@@ -1169,8 +1236,14 @@ describe('Component', function() {
 
 		it('should update existing component from placeholder', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {foo: {}};
-			CustomComponent.SURFACES = {foo: {renderAttrs: ['foo']}};
+			CustomComponent.ATTRS = {
+				foo: {}
+			};
+			CustomComponent.SURFACES = {
+				foo: {
+					renderAttrs: ['foo']
+				}
+			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~s-foo~%%%%';
 			};
@@ -1178,13 +1251,20 @@ describe('Component', function() {
 				return surfaceId === 'foo' ? 'Surface ' + this.foo + ': %%%%~c-child:ChildComponent~%%%%' : '';
 			};
 			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+				Component.componentsCollector.setNextComponentData('child', {
+					foo: this.foo
+				});
 				this.on('fooChanged', function() {
-					Component.componentsCollector.setNextComponentData('child', {foo: this.foo});
+					Component.componentsCollector.setNextComponentData('child', {
+						foo: this.foo
+					});
 				});
 			};
 
-			var custom = new CustomComponent({foo: 'foo', id: 'custom'}).render();
+			var custom = new CustomComponent({
+				foo: 'foo',
+				id: 'custom'
+			}).render();
 			var child = custom.components.child;
 			assert.strictEqual('Child foo', child.element.textContent);
 			assert.strictEqual('Surface foo: Child foo', custom.element.textContent);
@@ -1205,12 +1285,18 @@ describe('Component', function() {
 
 		it('should instantiate sub component from surface definition', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.SURFACES = {child: {componentName: 'ChildComponent'}};
+			CustomComponent.SURFACES = {
+				child: {
+					componentName: 'ChildComponent'
+				}
+			};
 			CustomComponent.prototype.renderInternal = function() {
 				dom.append(this.element, this.getSurfaceElement('child'));
 			};
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			assert.ok(custom.components.child);
 
 			var child = custom.components.child;
@@ -1221,8 +1307,14 @@ describe('Component', function() {
 
 		it('should reposition previously rendered component instances', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {invert: {}};
-			CustomComponent.SURFACES = {foo: {renderAttrs: ['invert']}};
+			CustomComponent.ATTRS = {
+				invert: {}
+			};
+			CustomComponent.SURFACES = {
+				foo: {
+					renderAttrs: ['invert']
+				}
+			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~s-foo~%%%%';
 			};
@@ -1234,7 +1326,9 @@ describe('Component', function() {
 				}
 			};
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			var child1 = custom.components.child1;
 			var child2 = custom.components.child2;
 			var childElements = custom.getSurfaceElement('foo').querySelectorAll('.component');
@@ -1265,7 +1359,9 @@ describe('Component', function() {
 			};
 			sinon.spy(this.ChildComponent.prototype, 'renderAsSubComponent');
 
-			var custom = new CustomComponent({id: 'custom'}).render();
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
 			assert.ok(custom.components.child);
 
 			var child = custom.components.child;
@@ -1283,7 +1379,9 @@ describe('Component', function() {
 			};
 
 			var element = document.createElement('div');
-			var custom = new CustomComponent({id: 'custom'}).render(element);
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render(element);
 
 			var child = custom.components.child;
 			assert.ok(child);
@@ -1297,8 +1395,16 @@ describe('Component', function() {
 			ComponentCollector.components = {};
 
 			var EventsTestComponent = createCustomComponentClass();
-			EventsTestComponent.ATTRS = {count: {value: 1}};
-			EventsTestComponent.SURFACES = {foo: {renderAttrs: ['count']}};
+			EventsTestComponent.ATTRS = {
+				count: {
+					value: 1
+				}
+			};
+			EventsTestComponent.SURFACES = {
+				foo: {
+					renderAttrs: ['count']
+				}
+			};
 			EventsTestComponent.prototype.getElementContent = function() {
 				return '<button class="elementButton" data-onclick="handleClick"></button>' +
 					'%%%%~s-foo~%%%%';
@@ -1338,7 +1444,9 @@ describe('Component', function() {
 			dom.append(element, content);
 			dom.append(document.body, element);
 
-			var custom = new this.EventsTestComponent({element: '#events'}).decorate();
+			var custom = new this.EventsTestComponent({
+				element: '#events'
+			}).decorate();
 			var button = custom.element.querySelector('.elementButton');
 			dom.triggerEvent(button, 'click');
 			assert.strictEqual(1, custom.handleClick.callCount);
@@ -1352,7 +1460,9 @@ describe('Component', function() {
 			dom.append(element, content);
 			dom.append(document.body, element);
 
-			var custom = new this.EventsTestComponent({element: '#events'}).decorate();
+			var custom = new this.EventsTestComponent({
+				element: '#events'
+			}).decorate();
 			var button = custom.element.querySelector('.fooButton');
 			dom.triggerEvent(button, 'mouseover');
 			assert.strictEqual(1, custom.handleMouseOver.callCount);
@@ -1390,7 +1500,9 @@ describe('Component', function() {
 			dom.append(element, content);
 			dom.append(document.body, element);
 
-			var custom = new CustomComponent({element: '#events'}).decorate();
+			var custom = new CustomComponent({
+				element: '#events'
+			}).decorate();
 			var button = custom.element.querySelector('.elementButton');
 			dom.triggerEvent(button, 'click');
 			assert.strictEqual(1, custom.components.child.handleClick.callCount);
@@ -1401,7 +1513,9 @@ describe('Component', function() {
 		});
 
 		it('should detach unused listeners after surface update', function(done) {
-			var custom = new this.EventsTestComponent({count: 1}).render();
+			var custom = new this.EventsTestComponent({
+				count: 1
+			}).render();
 			sinon.spy(custom.element, 'removeEventListener');
 			custom.count = 0;
 			custom.on('attrsChanged', function() {
@@ -1412,7 +1526,9 @@ describe('Component', function() {
 		});
 
 		it('should not detach listeners that are still useful after surface update', function(done) {
-			var custom = new this.EventsTestComponent({count: 1}).render();
+			var custom = new this.EventsTestComponent({
+				count: 1
+			}).render();
 			sinon.spy(custom.element, 'removeEventListener');
 			custom.count = 2;
 			custom.on('attrsChanged', function() {
@@ -1422,7 +1538,9 @@ describe('Component', function() {
 		});
 
 		it('should detach all listeners when element is detached', function() {
-			var custom = new this.EventsTestComponent({count: 1}).render();
+			var custom = new this.EventsTestComponent({
+				count: 1
+			}).render();
 			sinon.spy(custom.element, 'removeEventListener');
 			custom.detach();
 

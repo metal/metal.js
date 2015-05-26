@@ -9,10 +9,10 @@ describe('object', function() {
 		var mixin = object.mixin(original, {
 			a: 1
 		}, {
-				b: 1
-			}, {
-				b: 2
-			}, null);
+			b: 1
+		}, {
+			b: 2
+		}, null);
 
 		assert.strictEqual(original, mixin);
 		assert.strictEqual(1, mixin.a);

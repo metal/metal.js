@@ -32,8 +32,7 @@ class Disposable {
 	 * disposing logic (like clearing references and calling `dispose` on other
 	 * disposables).
 	 */
-	disposeInternal() {
-	}
+	disposeInternal() {}
 
 	/**
 	 * Checks if this instance has already been disposed.

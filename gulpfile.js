@@ -33,7 +33,9 @@ gulp.task('build:min', ['build:globals'], function() {
 	return gulp.src('build/metal.js')
 		.pipe(plugins.rename('metal-min.js'))
 		.pipe(plugins.uglify({
-			compress: {drop_console: true},
+			compress: {
+				drop_console: true
+			},
 			preserveComments: 'some'
 		}))
 		.pipe(banner())
@@ -44,10 +46,32 @@ gulp.task('clean', function(done) {
 	del(['build'], done);
 });
 
+var codeFileGlobs = [
+	'src/**/*.js',
+	'tasks/**/*.js',
+	'test/**/*.js',
+	'gulpfile.js',
+	'!test/**/build/**/*.js',
+	'!test/**/assets/**/*.js'
+];
+
 gulp.task('lint', function() {
-	return gulp.src(['src/**/*.js', 'tasks/**/*.js', 'test/**/*.js', '!test/**/build/**/*.js', '!test/**/assets/**/*.js'])
+	return gulp.src(codeFileGlobs)
 		.pipe(plugins.jshint())
 		.pipe(plugins.jshint.reporter(require('jshint-stylish')));
+});
+
+gulp.task('format', function() {
+	var gulpOpts = {
+		base: process.cwd()
+	};
+	return gulp.src(codeFileGlobs, gulpOpts)
+		.pipe(plugins.esformatter({
+			indent: {
+				value: '	'
+			}
+		}))
+		.pipe(gulp.dest(process.cwd()));
 });
 
 gulp.task('test:tasks', function(done) {
@@ -56,7 +80,10 @@ gulp.task('test:tasks', function(done) {
 	// necessary for testing gulp tasks.
 	var args = ['test/tasks/*.js', 'test/tasks/lib/*.js', '-c', '--slow', '1000', '--timeout', '3000'];
 	var localMocha = path.join(process.cwd(), 'node_modules', '.bin', 'mocha');
-	var child = execFile(localMocha, args, {stdio: 'inherit'}, function() {
+	var options = {
+		stdio: 'inherit'
+	};
+	var child = execFile(localMocha, args, options, function() {
 		done();
 	});
 	child.stdout.pipe(process.stdout);

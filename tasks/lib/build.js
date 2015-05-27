@@ -21,7 +21,7 @@ module.exports = function(options) {
 			.pipe(babelGlobals({
 				babelOptions: {
 					compact: false,
-					resolveModuleSource: renameAlias.renameAliasSync,
+					resolveModuleSource: renameAlias,
 					sourceMaps: true
 				},
 				bundleFileName: options.bundleFileName,

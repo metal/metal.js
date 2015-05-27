@@ -4,15 +4,17 @@ var bowerDirectory = require('bower-directory');
 var path = require('path');
 
 var bowerDir = bowerDirectory.sync();
-function renameAlias(originalPath, parentName, callback) {
-	callback(null, renameAliasSync(originalPath, parentName));
+function renameAlias(originalPath, parentPath, callback) {
+	callback(null, renameAliasSync(originalPath, parentPath));
 }
 
-function renameAliasSync(originalPath, parentName) {
+function renameAliasSync(originalPath, parentPath) {
 	if (originalPath[0] === '.') {
-		return path.resolve(path.dirname(parentName), originalPath);
+		return path.resolve(path.dirname(parentPath), originalPath);
+	} else if (originalPath.substr(0, 6) === 'bower:') {
+		return path.join(bowerDir, originalPath.substr(6));
 	} else {
-		return path.join(bowerDir, originalPath);
+		return originalPath;
 	}
 }
 

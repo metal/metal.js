@@ -2,37 +2,24 @@
 
 var assert = require('assert');
 var bowerDirectory = require('bower-directory');
-var sinon = require('sinon');
-var mockery = require('mockery');
 var path = require('path');
+var renameAlias = require('../../../tasks/lib/renameAlias');
 
-var bowerDir = path.resolve('assets/bower_components');
-var renameAlias;
+var bowerDir = bowerDirectory.sync();
 
 describe('renameAlias', function() {
-	before(function() {
-		sinon.stub(bowerDirectory, 'sync').returns(bowerDir);
-
-		mockery.enable({
-			useCleanCache: true,
-			warnOnReplace: false,
-			warnOnUnregistered: false
-		});
-		mockery.registerMock('bower-directory', bowerDirectory);
-
-		// We need to delay requiring `renameAlias` until mockery has already been
-		// enabled and prepared.
-		renameAlias = require('../../../tasks/lib/renameAlias');
-	});
-
-	after(function() {
-		mockery.disable();
-	});
-
-	it('should rename non relative paths to be relative to bower_components', function(done) {
+	it('should rename paths with "bower:" prefix to be relative to bower_components', function(done) {
 		var parentPath = path.resolve('assets/src/metal-modal/modal.js');
-		renameAlias('metal-tooltip/tooltip', parentPath, function(error, renamedPath) {
+		renameAlias('bower:metal-tooltip/tooltip', parentPath, function(error, renamedPath) {
 			assert.strictEqual(path.join(bowerDir, 'metal-tooltip/tooltip'), renamedPath);
+			done();
+		});
+	});
+
+	it('should not rename absolute paths', function(done) {
+		var parentPath = path.resolve('assets/src/metal-modal/modal.js');
+		renameAlias('/metal-tooltip/tooltip', parentPath, function(error, renamedPath) {
+			assert.strictEqual('/metal-tooltip/tooltip', renamedPath);
 			done();
 		});
 	});

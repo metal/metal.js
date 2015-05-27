@@ -43,12 +43,12 @@ Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.
 
 Having to supply the relative path to bower_components is not cool and, besides that, it may cause problems when a module doing that is imported later as a bower dependency of another project.
 
-Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using their names instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's [build tools](#build-tasks) or adding a similar logic to your build process yourself (though we provide a [helper function](https://github.com/liferay/metal.js/blob/master/tasks/lib/renameAlias.js) on Metal.js's npm package).
+Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using a prefix instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's [build tools](#build-tasks) or adding a similar logic to your build process yourself (though we provide a [helper function](https://github.com/liferay/metal.js/blob/master/tasks/lib/renameAlias.js) on Metal.js's npm package).
 
 With aliases, the previous example can be rewritten like this:
 
 ```js
-import core from 'metaljs/src/core';
+import core from 'bower:metaljs/src/core';
 ```
 
 ## Attribute

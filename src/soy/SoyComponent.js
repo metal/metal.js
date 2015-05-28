@@ -9,7 +9,11 @@ import Component from '../component/Component';
  * properly instantiate and update child components defined through soy.
  * TODO: Switch to using proper AOP.
  */
-var originalGetDelegateFn = soy.$$getDelegateFn;
+ var originalGetDelegateFn;
+
+ if (typeof soy === 'object') {
+   originalGetDelegateFn = soy.$$getDelegateFn;
+ }
 
 /**
  * Special Component class that handles a better integration between soy templates

@@ -32,9 +32,6 @@ import EventsCollector from './EventsCollector';
  *     super(config);
  *   }
  *
- *   created() {
- *   }
- *
  *   decorateInternal() {
  *   }
  *
@@ -379,17 +376,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Lifecycle. Creation phase of the component happens once after the
-	 * component is instantiated, therefore its the initial phase of the
-	 * component Lifecycle. Be conscious about actions performed in this phase
-	 * to not compromise instantiation time with operations that can be
-	 * postponed to further phases. It's recommended to bind component custom
-	 * events in this phase, in contrast to DOM events that must be bind on
-	 * attach phase.
-	 */
-	created() {}
-
-	/**
 	 * Creates a surface that was found via a string placeholder.
 	 * @param {string?} surfaceId
 	 * @param {string} type The surface type (either "s" or "c").
@@ -498,7 +484,6 @@ class Component extends Attribute {
 	 */
 	created_() {
 		this.on('attrsChanged', this.handleAttributesChanges_);
-		this.created();
 	}
 
 	/**

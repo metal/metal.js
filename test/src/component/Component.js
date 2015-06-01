@@ -24,13 +24,11 @@ describe('Component', function() {
 			custom.render();
 
 			sinon.assert.callOrder(
-				CustomComponent.prototype.created,
 				CustomComponent.prototype.renderInternal,
 				CustomComponent.prototype.getSurfaceContent,
 				CustomComponent.prototype.attached
 			);
 
-			sinon.assert.callCount(CustomComponent.prototype.created, 1);
 			sinon.assert.callCount(CustomComponent.prototype.renderInternal, 1);
 			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 
@@ -54,12 +52,10 @@ describe('Component', function() {
 			custom.decorate();
 
 			sinon.assert.callOrder(
-				CustomComponent.prototype.created,
 				CustomComponent.prototype.decorateInternal,
 				CustomComponent.prototype.getSurfaceContent,
 				CustomComponent.prototype.attached);
 
-			sinon.assert.callCount(CustomComponent.prototype.created, 1);
 			sinon.assert.callCount(CustomComponent.prototype.decorateInternal, 1);
 			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 
@@ -398,10 +394,12 @@ describe('Component', function() {
 		it('should render component on specified default parent if no parent is specified', function() {
 			var defaultParent = document.createElement('div');
 
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.created = function() {
-				this.DEFAULT_ELEMENT_PARENT = defaultParent;
-			};
+			class CustomComponent extends Component {
+				constructor(opt_config) {
+					super(opt_config);
+					this.DEFAULT_ELEMENT_PARENT = defaultParent;
+				}
+			}
 			var custom = new CustomComponent();
 			custom.render();
 
@@ -1128,17 +1126,19 @@ describe('Component', function() {
 		});
 
 		it('should instantiate sub component from placeholder passing defined config data', function() {
-			var CustomComponent = createCustomComponentClass();
+			class CustomComponent extends Component {
+				constructor(opt_config) {
+					super(opt_config);
+					Component.componentsCollector.setNextComponentData('child', {
+						foo: this.foo
+					});
+				}
+			}
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
-			};
-			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {
-					foo: this.foo
-				});
 			};
 
 			var custom = new CustomComponent({
@@ -1183,17 +1183,19 @@ describe('Component', function() {
 			dom.append(document.body, element);
 			var fooElement = document.body.querySelector('span');
 
-			var CustomComponent = createCustomComponentClass();
+			class CustomComponent extends Component {
+				constructor(opt_config) {
+					super(opt_config);
+					Component.componentsCollector.setNextComponentData('child', {
+						foo: this.foo
+					});
+				}
+			}
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
-			};
-			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {
-					foo: this.foo
-				});
 			};
 
 			var custom = new CustomComponent({
@@ -1212,17 +1214,19 @@ describe('Component', function() {
 			dom.append(document.body, element);
 			var fooElement = document.body.querySelector('span');
 
-			var CustomComponent = createCustomComponentClass();
+			class CustomComponent extends Component {
+				constructor(opt_config) {
+					super(opt_config);
+					Component.componentsCollector.setNextComponentData('child', {
+						foo: this.foo
+					});
+				}
+			}
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
 				return '%%%%~c-child:ChildComponent~%%%%';
-			};
-			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {
-					foo: this.foo
-				});
 			};
 
 			var custom = new CustomComponent({
@@ -1235,7 +1239,19 @@ describe('Component', function() {
 		});
 
 		it('should update existing component from placeholder', function(done) {
-			var CustomComponent = createCustomComponentClass();
+			class CustomComponent extends Component {
+				constructor(opt_config) {
+					super(opt_config);
+					Component.componentsCollector.setNextComponentData('child', {
+						foo: this.foo
+					});
+					this.on('fooChanged', function() {
+						Component.componentsCollector.setNextComponentData('child', {
+							foo: this.foo
+						});
+					});
+				}
+			}
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
@@ -1249,16 +1265,6 @@ describe('Component', function() {
 			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				return surfaceId === 'foo' ? 'Surface ' + this.foo + ': %%%%~c-child:ChildComponent~%%%%' : '';
-			};
-			CustomComponent.prototype.created = function() {
-				Component.componentsCollector.setNextComponentData('child', {
-					foo: this.foo
-				});
-				this.on('fooChanged', function() {
-					Component.componentsCollector.setNextComponentData('child', {
-						foo: this.foo
-					});
-				});
 			};
 
 			var custom = new CustomComponent({
@@ -1554,10 +1560,12 @@ describe('Component', function() {
 		class CustomComponent extends Component {
 			constructor(opt_config) {
 				super(opt_config);
+				if (this.created) {
+					this.created();
+				}
 			}
 		}
 
-		sinon.spy(CustomComponent.prototype, 'created');
 		sinon.spy(CustomComponent.prototype, 'decorateInternal');
 		sinon.spy(CustomComponent.prototype, 'getSurfaceContent');
 		sinon.spy(CustomComponent.prototype, 'attached');

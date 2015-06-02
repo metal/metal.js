@@ -1,16 +1,19 @@
 'use strict';
 
 var normalizeOptions = require('./lib/options');
-var registerBuildTask = require('./lib/build');
 var renameAlias = require('./lib/renameAlias');
-var registerSoyTask = require('./lib/soy');
-var registerTestTasks = require('./lib/test');
 
 var metaljs = function(options) {
 	options = normalizeOptions(options);
-	registerSoyTask(options);
-	registerTestTasks(options);
-	registerBuildTask(options);
+	if (options.registerSoyTasks) {
+		require('./lib/soy')(options);
+	}
+	if (options.registerTestTasks) {
+		require('./lib/test')(options);
+	}
+	if (options.registerBuildTasks) {
+		require('./lib/build')(options);
+	}
 };
 metaljs.renameAlias = renameAlias;
 

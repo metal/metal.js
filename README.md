@@ -1,8 +1,8 @@
 # Metal.js
 
-[![Build Status](http://img.shields.io/travis/liferay/metal.js/master.svg?style=flat)](https://travis-ci.org/liferay/metal.js)
-[![Dependencies Status](http://img.shields.io/david/liferay/metal.js.svg?style=flat)](https://david-dm.org/liferay/metal.js#info=dependencies)
-[![DevDependencies Status](http://img.shields.io/david/dev/liferay/metal.js.svg?style=flat)](https://david-dm.org/liferay/metal.js#info=devDependencies)
+[![Build Status](http://img.shields.io/travis/metal/metal.js/master.svg?style=flat)](https://travis-ci.org/metal/metal.js)
+[![Dependencies Status](http://img.shields.io/david/metal/metal.js.svg?style=flat)](https://david-dm.org/metal/metal.js#info=dependencies)
+[![DevDependencies Status](http://img.shields.io/david/dev/metal/metal.js.svg?style=flat)](https://david-dm.org/metal/metal.js#info=devDependencies)
 
 Metal.js is a JavaScript library for building from simple widgets to full scale applications.
 
@@ -24,14 +24,14 @@ One thing that can be really useful for a developer when building a component, i
 ## Setup
 
 1. Install [Bower](http://bower.io/), if you don't have it yet.
-2. Run `bower install metaljs`. The code will be available at `bower_components/metaljs`.
+2. Run `bower install metal`. The code will be available at `bower_components/metal`.
 
 ## Usage
 
 With the code already available, you can use Metal.js by just importing the desired module on your js file and calling what you wish on it. For example:
 
 ```js
-import core from './bower_components/metaljs/src/core';
+import core from './bower_components/metal/src/core';
 
 // You can now call any function from Metal.js's core module.
 core.isString('Hello World');
@@ -43,12 +43,12 @@ Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.
 
 Having to supply the relative path to bower_components is not cool and, besides that, it may cause problems when a module doing that is imported later as a bower dependency of another project.
 
-Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using a prefix instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's [build tools](#build-tasks) or adding a similar logic to your build process yourself (though we provide a [helper function](https://github.com/liferay/metal.js/blob/master/tasks/lib/renameAlias.js) on Metal.js's npm package).
+Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using a prefix instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's [build tools](#build-tasks) or adding a similar logic to your build process yourself (though we provide a [helper function](https://github.com/metal/metal.js/blob/master/tasks/lib/renameAlias.js) on Metal.js's npm package).
 
 With aliases, the previous example can be rewritten like this:
 
 ```js
-import core from 'bower:metaljs/src/core';
+import core from 'bower:metal/src/core';
 ```
 
 ## Attribute
@@ -58,7 +58,7 @@ The **Attribute** class provides a way of defining attributes for the classes th
 The following example is a class that extends from Attribute and defines an attribute named `foo` on itself:
 
 ```js
-import Attribute from '../bower_components/metaljs/src/attribute/Attribute';
+import Attribute from '../bower_components/metal/src/attribute/Attribute';
 
 class MyAttributes extends Attribute {
 	constructor(opt_config) {
@@ -73,7 +73,7 @@ MyAttributes.ATTRS = {
 }
 ```
 
-If you're familiar with [YUI](http://yuilibrary.com/), you'll notice that this is very similar to how attributes are defined there. You basically just need to list all attributes you'll be using on the ATTRS static variable, and provide their configuration options, like initial value and validator. For a list of all valid options, take a look at Attribute's [docs](https://github.com/liferay/metal.js/blob/master/src/attribute/Attribute.js#L45).
+If you're familiar with [YUI](http://yuilibrary.com/), you'll notice that this is very similar to how attributes are defined there. You basically just need to list all attributes you'll be using on the ATTRS static variable, and provide their configuration options, like initial value and validator. For a list of all valid options, take a look at Attribute's [docs](https://github.com/metal/metal.js/blob/master/src/attribute/Attribute.js#L45).
 
 You can access or change an object's attributes in the same way you'd access or change any object property.
 
@@ -94,7 +94,7 @@ obj.on('fooChanged', function(event) {
 });
 ```
 
-To see all features of the Attribute class, take a look at its [unit tests](https://github.com/liferay/metal.js/blob/master/test/src/attribute/Attribute.js).
+To see all features of the Attribute class, take a look at its [unit tests](https://github.com/metal/metal.js/blob/master/test/src/attribute/Attribute.js).
 
 ## SoyComponent
 
@@ -105,7 +105,7 @@ Building a widget with SoyComponent is simple, you just need to create two files
 So, for example, let's say we want to create a widget called **MyWidget**, that has a body and a footer with content. The JavaScript file would look like this:
 
 ```js
-import SoyComponent from '../bower_components/metaljs/src/soy/SoyComponent';
+import SoyComponent from '../bower_components/metal/src/soy/SoyComponent';
 import from './myWidget.soy.js';
 
 class MyWidget extends SoyComponent {
@@ -168,7 +168,7 @@ Finally, to render an instance of MyWidget, just call `render`, passing any attr
 new MyWidget({headerContent: 'My Header'}).render(parentElement);
 ```
 
-For a more complete and working example, take a look at the [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate) repo. Among other things, it lists all optional lifecycle functions that can be implemented for SoyComponent.
+For a more complete and working example, take a look at the [metal-boilerplate](https://github.com/metal/metal-boilerplate) repo. Among other things, it lists all optional lifecycle functions that can be implemented for SoyComponent.
 
 ## Nested Components
 Since we want to be able to separate business logic from rendering, it'd be really useful to be able to reference components on the template files. That would make it easier to correctly place the child component at the right position inside the parent, and would make the template more complete so it would be able to render the whole component by itself (see [Decorate](#decorate)).
@@ -238,16 +238,16 @@ Once again, the chart below shows the results we obtained on Safari:
 
 ## Tools
 
-Metal.js comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To use them, just install Metal.js through [npm](https://www.npmjs.com/package/metaljs) and register the tasks on your gulpfile like this:
+Metal.js comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To use them, just install Metal.js through [npm](https://www.npmjs.com/package/metal) and register the tasks on your gulpfile like this:
 
 ```js
-var metaljs = require('metaljs');
-metaljs(options);
+var metal = require('metal');
+metal(options);
 ```
 
-As you can see, the metaljs function receives an optional object to customize the registered functions. Each task has its own options, but the `taskPrefix` option affects all task, registering them all with the provided prefix before the original names.
+As you can see, the metal function receives an optional object to customize the registered functions. Each task has its own options, but the `taskPrefix` option affects all task, registering them all with the provided prefix before the original names.
 
-After calling the metaljs function, several tasks will then be available to run on gulp. These can be broken in different categories, so we'll explain each separately.
+After calling the metal function, several tasks will then be available to run on gulp. These can be broken in different categories, so we'll explain each separately.
 
 ### Build Tasks
 
@@ -256,7 +256,7 @@ As we've mentioned before, Metal.js is written in ES6. Since browsers don't yet 
 Another option is to previously build the ES6 files to ES5 equivalents. Again, there are lots of ways to do this, and lots of formats to build to. Metal.js provides a few tasks as build options that can be used out of the box.
 
 #### `gulp build:globals`
-Builds ES6 code to ES5, bundling all modules into a single file and publishing each to a global variable. The following options can be passed to the metaljs function for customizing this task:
+Builds ES6 code to ES5, bundling all modules into a single file and publishing each to a global variable. The following options can be passed to the metal function for customizing this task:
 * `buildDest` The directory where the final bundle file should be placed. Default: **build**.
 * `bundleFileName` The name of the final bundle file. Default: **metal.js**.
 * `buildSrc` The glob expression that defines which files should be built. Default: **src/\*\*/\*.js**.
@@ -267,7 +267,7 @@ Watches for changes on the source files, rebuilding the code to the globals form
 
 ### Test Tasks
 
-Metal.js also provides gulp tasks to help with testing modules built with Metal.js. The tasks assume that tests are written in [karma](http://karma-runner.github.io/0.12/index.html), and so there should be a **karma.conf.js** file. A sample karma.conf.js file can be found at [metal-boilerplate](https://github.com/eduardolundgren/metal-boilerplate/blob/master/karma.conf.js), which works well with Metal.js, including correct coverage reports.
+Metal.js also provides gulp tasks to help with testing modules built with Metal.js. The tasks assume that tests are written in [karma](http://karma-runner.github.io/0.12/index.html), and so there should be a **karma.conf.js** file. A sample karma.conf.js file can be found at [metal-boilerplate](https://github.com/metal/metal-boilerplate/blob/master/karma.conf.js), which works well with Metal.js, including correct coverage reports.
 
 #### `gulp test`
 Runs all tests once.
@@ -289,9 +289,9 @@ Watches for changes to source files, rerunning tests automatically when that hap
 Finally, Metal.js provides an important task for developing with SoyComponent. If your code is using it, you'll need this task for the templates to be correctly handled and integrated with your javascript file.
 
 #### `gulp soy`
-Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metaljs function for customizing this task:
+Generates some soy templates that are necessary for integration with the SoyComponent module, and compiles them to javascript. The following options can be passed to the metal function for customizing this task:
 
-* `corePathFromSoy` The path from the soy files location to Metal.js's core module. Default: **metaljs/src**.
+* `corePathFromSoy` The path from the soy files location to Metal.js's core module. Default: **metal/src**.
 * `soyDest` The directory where the compiled soy files should be placed. Default: **src**.
 * `soyGeneratedOutputGlob` The glob expression that defines which soy files should output their final generated version to the build directory. Default **\*.soy**.
 * `soyGenerationGlob` The glob expression that defines which soy files should go through the template generation phase of the task. Default: **\*.soy**.
@@ -299,4 +299,4 @@ Generates some soy templates that are necessary for integration with the SoyComp
 
 ## Browser Support
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/liferay/metal)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/metal/metal.js)

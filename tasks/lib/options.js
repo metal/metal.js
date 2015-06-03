@@ -6,7 +6,7 @@ function normalizeOptions(options) {
 	options.registerTestTasks = options.registerTestTasks === undefined ? true : options.registerTestTasks;
 	options.registerBuildTasks = options.registerBuildTasks === undefined ? true : options.registerBuildTasks;
 	options.bundleFileName = options.bundleFileName || 'metal.js';
-	options.corePathFromSoy = options.corePathFromSoy || 'bower:metaljs/src';
+	options.corePathFromSoy = options.corePathFromSoy || 'bower:metal/src';
 	options.buildDest = options.buildDest || 'build';
 	options.buildSrc = options.buildSrc || 'src/**/*.js';
 	options.globalName = options.globalName || 'metal';

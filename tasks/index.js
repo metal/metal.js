@@ -4,7 +4,7 @@ var buildLazyPipes = require('./lib/buildLazyPipes');
 var normalizeOptions = require('./lib/options');
 var renameAlias = require('./lib/renameAlias');
 
-var metaljs = function(options) {
+var metal = function(options) {
 	options = normalizeOptions(options);
 	if (options.registerSoyTasks) {
 		require('./lib/soy')(options);
@@ -16,7 +16,7 @@ var metaljs = function(options) {
 		require('./lib/build')(options);
 	}
 };
-metaljs.buildLazyPipes = buildLazyPipes;
-metaljs.renameAlias = renameAlias;
+metal.buildLazyPipes = buildLazyPipes;
+metal.renameAlias = renameAlias;
 
-module.exports = metaljs;
+module.exports = metal;

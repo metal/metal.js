@@ -4,6 +4,7 @@ var buildLazyPipes = require('./buildLazyPipes');
 var gulp = require('gulp');
 var normalizeOptions = require('./options');
 var runSequence = require('run-sequence');
+var sourcemaps = require('gulp-sourcemaps');
 
 module.exports = function(options) {
 	options = normalizeOptions(options);
@@ -15,8 +16,9 @@ module.exports = function(options) {
 
 	gulp.task(taskPrefix + 'build:globals:js', function() {
 		return gulp.src(options.buildSrc)
-			.pipe(buildLazyPipes.buildGlobals(options)())
-			.on('error', handleError)
+			.pipe(sourcemaps.init())
+			.pipe(buildLazyPipes.buildGlobals(options)()).on('error', handleError)
+			.pipe(sourcemaps.write('./'))
 			.pipe(gulp.dest(options.buildDest));
 	});
 

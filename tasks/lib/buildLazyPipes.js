@@ -3,7 +3,6 @@
 var babelGlobals = require('gulp-babel-globals');
 var lazypipe = require('lazypipe');
 var renameAlias = require('./renameAlias');
-var sourcemaps = require('gulp-sourcemaps');
 
 function buildGlobals(options) {
 	var babelGlobalsOptions = {
@@ -16,8 +15,6 @@ function buildGlobals(options) {
 		globalName: options.globalName
 	};
 	return lazypipe()
-		.pipe(sourcemaps.init)
-		.pipe(babelGlobals, babelGlobalsOptions)
-		.pipe(sourcemaps.write, './');
+		.pipe(babelGlobals, babelGlobalsOptions);
 }
 module.exports.buildGlobals = buildGlobals;

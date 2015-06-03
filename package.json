@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "A solid foundation for UI components",
   "license": "BSD",
-  "repository": "liferay/metal",
+  "repository": "metal/metal.js",
   "author": {
     "name": "Eduardo Lundgren",
     "email": "eduardo.lundgren@liferay.com"

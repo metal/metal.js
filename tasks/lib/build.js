@@ -16,7 +16,8 @@ module.exports = function(options) {
 	gulp.task(taskPrefix + 'build:globals:js', function() {
 		return gulp.src(options.buildSrc)
 			.pipe(buildLazyPipes.buildGlobals(options)())
-			.on('error', handleError);
+			.on('error', handleError)
+			.pipe(gulp.dest(options.buildDest));
 	});
 
 	gulp.task(taskPrefix + 'watch:globals', function(done) { // jshint ignore:line

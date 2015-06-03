@@ -36,6 +36,7 @@
     "gulp-uglify": "^1.2.0",
     "gulp-wrapper": "^1.0.0",
     "jshint-stylish": "^1.0.2",
+    "lazypipe": "^0.2.3",
     "merge": "^1.2.0",
     "open": "0.0.5",
     "run-sequence": "^1.1.0",

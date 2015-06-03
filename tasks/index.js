@@ -1,5 +1,6 @@
 'use strict';
 
+var buildLazyPipes = require('./lib/buildLazyPipes');
 var normalizeOptions = require('./lib/options');
 var renameAlias = require('./lib/renameAlias');
 
@@ -15,6 +16,7 @@ var metaljs = function(options) {
 		require('./lib/build')(options);
 	}
 };
+metaljs.buildLazyPipes = buildLazyPipes;
 metaljs.renameAlias = renameAlias;
 
 module.exports = metaljs;

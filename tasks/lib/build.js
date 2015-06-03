@@ -1,11 +1,9 @@
 'use strict';
 
-var babelGlobals = require('gulp-babel-globals');
+var buildLazyPipes = require('./buildLazyPipes');
 var gulp = require('gulp');
 var normalizeOptions = require('./options');
-var sourcemaps = require('gulp-sourcemaps');
 var runSequence = require('run-sequence');
-var renameAlias = require('./renameAlias');
 
 module.exports = function(options) {
 	options = normalizeOptions(options);
@@ -17,18 +15,8 @@ module.exports = function(options) {
 
 	gulp.task(taskPrefix + 'build:globals:js', function() {
 		return gulp.src(options.buildSrc)
-			.pipe(sourcemaps.init())
-			.pipe(babelGlobals({
-				babelOptions: {
-					compact: false,
-					resolveModuleSource: renameAlias,
-					sourceMaps: true
-				},
-				bundleFileName: options.bundleFileName,
-				globalName: options.globalName
-			})).on('error', handleError)
-			.pipe(sourcemaps.write('./'))
-			.pipe(gulp.dest(options.buildDest));
+			.pipe(buildLazyPipes.buildGlobals(options)())
+			.on('error', handleError);
 	});
 
 	gulp.task(taskPrefix + 'watch:globals', function(done) { // jshint ignore:line

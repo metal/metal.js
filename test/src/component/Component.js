@@ -297,6 +297,24 @@ describe('Component', function() {
 			assert.strictEqual('component', getClassNames(custom.element)[2]);
 		});
 
+		it('should update element display value according to visible attr', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			var custom = new CustomComponent().render();
+
+			assert.ok(custom.visible);
+			assert.strictEqual('', custom.element.style.display);
+
+			custom.visible = false;
+			custom.once('attrsChanged', function() {
+				assert.strictEqual('none', custom.element.style.display);
+				custom.visible = true;
+				custom.once('attrsChanged', function() {
+					assert.strictEqual('', custom.element.style.display);
+					done();
+				});
+			});
+		});
+
 		it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {

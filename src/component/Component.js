@@ -1119,6 +1119,15 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Attribute synchronization logic for `visible` attribute.
+	 * Updates the element's display value according to its visibility.
+	 * @param {boolean} newVal
+	 */
+	syncVisible(newVal) {
+		this.element.style.display = newVal ? '' : 'none';
+	}
+
+	/**
 	 * Updates a surface after it has been rendered through placeholders.
 	 * @param {!{content: string, cacheContent: string, surfaceId: string}} collectedData
 	 *   Data about the collected surface. Should have the surface's id, content and the
@@ -1248,6 +1257,15 @@ Component.ATTRS = {
 		validator: 'validatorIdFn_',
 		valueFn: 'valueIdFn_',
 		writeOnce: true
+	},
+
+	/**
+	 * Indicates if the component is visible or not.
+	 * @type {boolean}
+	 */
+	visible: {
+		validator: core.isBoolean,
+		value: true
 	}
 };
 

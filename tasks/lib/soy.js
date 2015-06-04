@@ -29,7 +29,7 @@ module.exports = function(options) {
 			.pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
 			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.soyGeneratedDest)))
 			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
-			.pipe(compileSoy(options)())
+			.pipe(plugins.if(!options.soySkipCompilation, compileSoy(options)()))
 			.on('end', function() {
 				del('temp', done);
 			});

@@ -15,6 +15,7 @@ function normalizeOptions(options) {
 	options.soyGeneratedDest = options.soyGeneratedDest || options.buildDest;
 	options.soyGeneratedOutputGlob = options.soyGeneratedOutputGlob === undefined ? '*.soy' : options.soyGeneratedOutputGlob;
 	options.soyGenerationGlob = options.soyGenerationGlob === undefined ? '*.soy' : options.soyGenerationGlob;
+	options.soySkipCompilation = !!options.soySkipCompilation;
 	options.soyLocales = options.soyLocales;
 	options.soyMessageFilePathFormat = options.soyMessageFilePathFormat;
 	options.soySrc = options.soySrc || 'src/**/*.soy';

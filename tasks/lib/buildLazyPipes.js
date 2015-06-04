@@ -6,7 +6,7 @@ var renameAlias = require('./renameAlias');
 
 function buildGlobals(options) {
 	var babelGlobalsOptions = {
-		babelOptions: {
+		babel: {
 			compact: false,
 			resolveModuleSource: renameAlias,
 			sourceMaps: true

@@ -2,6 +2,7 @@
 
 var del = require('del');
 var gulp = require('gulp');
+var lazypipe = require('lazypipe');
 var lodash = require('engine-lodash');
 var normalizeOptions = require('./options');
 var path = require('path');
@@ -28,18 +29,7 @@ module.exports = function(options) {
 			.pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
 			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.soyGeneratedDest)))
 			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
-			.pipe(plugins.soynode({
-				loadCompiledTemplates: false,
-				locales: options.soyLocales,
-				messageFilePathFormat: options.soyMessageFilePathFormat,
-				shouldDeclareTopLevelNamespaces: false
-			}))
-			.pipe(plugins.ignore.exclude('*.soy'))
-			.pipe(plugins.wrapper({
-				header: getHeaderContent(options.corePathFromSoy),
-				footer: getFooterContent
-			}))
-			.pipe(gulp.dest(options.soyDest))
+			.pipe(compileSoy(options)())
 			.on('end', function() {
 				del('temp', done);
 			});
@@ -53,6 +43,22 @@ function addTemplateParam(filePath, namespace, templateName, param) {
 	templateParams[soyJsPath] = templateParams[soyJsPath] || {};
 	templateParams[soyJsPath][templateName] = templateParams[soyJsPath][templateName] || [];
 	templateParams[soyJsPath][templateName].push(param);
+}
+
+function compileSoy(options) {
+	return lazypipe()
+		.pipe(plugins.soynode, {
+			loadCompiledTemplates: false,
+			locales: options.soyLocales,
+			messageFilePathFormat: options.soyMessageFilePathFormat,
+			shouldDeclareTopLevelNamespaces: false
+		})
+		.pipe(plugins.ignore.exclude, '*.soy')
+		.pipe(plugins.wrapper, {
+			header: getHeaderContent(options.corePathFromSoy),
+			footer: getFooterContent
+		})
+		.pipe(gulp.dest, options.soyDest);
 }
 
 function createComponentElementSoy(moduleName, hasElementTemplate) {

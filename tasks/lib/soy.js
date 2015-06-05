@@ -25,14 +25,20 @@ module.exports = function(options) {
 		var gulpOpts = {
 			base: options.soyBase
 		};
-		gulp.src(options.soySrc, gulpOpts)
+		var soyPipe = gulp.src(options.soySrc, gulpOpts)
 			.pipe(plugins.if(soyGenerationGlob, generateTemplatesAndExtractParams()))
-			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.soyGeneratedDest)))
-			.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
-			.pipe(plugins.if(!options.soySkipCompilation, compileSoy(options)()))
-			.on('end', function() {
-				del('temp', done);
-			});
+			.pipe(plugins.if(soyGeneratedOutputGlob, gulp.dest(options.soyGeneratedDest)));
+
+		if (options.soySkipCompilation) {
+			return soyPipe;
+		} else {
+			soyPipe
+				.pipe(plugins.if(!soyGeneratedOutputGlob, plugins.if(soyGenerationGlob, gulp.dest('temp'))))
+				.pipe(compileSoy(options)())
+				.on('end', function() {
+					del('temp', done);
+				});
+		}
 	});
 };
 

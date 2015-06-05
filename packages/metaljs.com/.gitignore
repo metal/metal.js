@@ -1,1 +1,4 @@
-node_modules
+.sass-cache/
+dist/
+node_modules/
+src/public/vendor/

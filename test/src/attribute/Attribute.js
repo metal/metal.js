@@ -26,6 +26,18 @@ describe('Attribute', function() {
 		assert.strictEqual('attr2', attrNames[1]);
 	});
 
+	it('should make attributes enumerable', function() {
+		var attr = new Attribute();
+		attr.addAttrs({
+			attr1: {},
+			attr2: {}
+		});
+
+		var keys = Object.keys(attr);
+		assert.notStrictEqual(-1, keys.indexOf('attr1'));
+		assert.notStrictEqual(-1, keys.indexOf('attr2'));
+	});
+
 	it('should not allow adding attribute named "attrs"', function() {
 		var attr = new Attribute();
 

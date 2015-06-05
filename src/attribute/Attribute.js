@@ -58,12 +58,7 @@ class Attribute extends EventEmitter {
 	 */
 	addAttr(name, config, initialValue) {
 		this.buildAttrInfo_(name, config, initialValue);
-
-		Object.defineProperty(this, name, {
-			configurable: true,
-			get: this.getAttrValue_.bind(this, name),
-			set: this.setAttrValue_.bind(this, name)
-		});
+		Object.defineProperty(this, name, this.buildAttrPropertyDef_(name));
 	}
 
 	/**
@@ -147,6 +142,7 @@ class Attribute extends EventEmitter {
 	buildAttrPropertyDef_(name) {
 		return {
 			configurable: true,
+			enumerable: true,
 			get: function() {
 				return this.getAttrValue_(name);
 			},

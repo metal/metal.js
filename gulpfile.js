@@ -2,7 +2,7 @@
 
 var gulp = require('gulp');
 var path = require('path');
-var metalTasks = require('metal-tasks');
+var metal = require('gulp-metal');
 var runSequence = require('run-sequence');
 
 var codeFileGlobs = [
@@ -12,7 +12,7 @@ var codeFileGlobs = [
 	'!test/**/assets/**/*.js'
 ];
 
-metalTasks.registerTasks({
+metal.registerTasks({
 	corePathFromSoy: function(file) {
 		return path.relative(path.dirname(file.path), path.resolve('src'));
 	},

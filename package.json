@@ -24,6 +24,7 @@
   "devDependencies": {
     "chai": "^2.3.0",
     "gulp": "^3.9.0",
+    "gulp-metal": "^0.1.0",
     "isparta": "^3.0.3",
     "karma": "^0.12.31",
     "karma-babel-preprocessor": "^5.1.0",
@@ -39,7 +40,6 @@
     "karma-sauce-launcher": "^0.2.11",
     "karma-sinon": "^1.0.4",
     "karma-source-map-support": "^1.0.0",
-    "metal-tasks": "git://github.com/metal/metal-tasks",
     "mocha": "^2.2.4",
     "mockery": "^1.4.0",
     "run-sequence": "^1.1.0",

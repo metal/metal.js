@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var compass = require('gulp-compass');
+var connect = require('gulp-connect');
 var soynode = require('gulp-soynode');
 
 gulp.task('soy', function() {
@@ -19,3 +20,16 @@ gulp.task('styles', function() {
 		}))
 		.pipe(gulp.dest('dist/public/styles'));
 });
+
+gulp.task('connect', function() {
+	connect.server({
+		root: 'dist/public'
+	});
+});
+
+gulp.task('watch', function () {
+	gulp.watch('src/**/*.soy', ['soy']);
+	gulp.watch('src/public/styles/*.scss', ['styles']);
+});
+
+gulp.task('default', ['connect', 'watch']);

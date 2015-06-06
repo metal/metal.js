@@ -24,4 +24,8 @@ body {
 	text-size-adjust: 100%;
 }
 
+@mixin anim($property) {
+	transition: $property .3s ease-in-out;
+}
+
 @import "header";

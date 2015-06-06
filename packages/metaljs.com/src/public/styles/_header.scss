@@ -50,13 +50,19 @@
 }
 
 .topbar-menu-link {
+	@include anim(color);
 	color: white;
 	font-size: 15px;
 	font-weight: 500;
 	text-decoration: none;
 }
 
+.topbar-menu-link:hover {
+	color: $primaryColor;
+}
+
 .topbar-menu-github {
+	@include anim(opacity);
 	background: $primaryColor;
 	border-radius: 50%;
 	display: block;
@@ -64,6 +70,10 @@
 	text-align: center;
 	width: 36px;
 	line-height: 36px;
+}
+
+.topbar-menu-github:hover {
+	opacity: 0.8;
 }
 
 /* Tagline

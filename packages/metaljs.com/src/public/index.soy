@@ -8,11 +8,12 @@
 {template .soyweb}
 {call main.page}
 	{param content kind="html"}
-		<div class="header-container">
+		<header class="header">
 			<div class="container">
 				{call header.navbar}{/call}
+				{call header.tagline}{/call}
 			</div>
-		</div>
+		</header>
 	{/param}
 {/call}
 {/template}

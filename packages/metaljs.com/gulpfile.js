@@ -1,12 +1,23 @@
 var gulp = require('gulp');
 var compass = require('gulp-compass');
 var connect = require('gulp-connect');
+var ghpages = require('gulp-gh-pages');
 var soynode = require('gulp-soynode');
 
 gulp.task('connect', function() {
 	connect.server({
 		root: 'dist/public'
 	});
+});
+
+gulp.task('cname', function() {
+	return gulp.src('src/public/CNAME')
+		.pipe(gulp.dest('dist/public'));
+});
+
+gulp.task('deploy', ['cname', 'build'], function() {
+	return gulp.src('dist/public/**/*')
+		.pipe(ghpages());
 });
 
 gulp.task('images', function() {
@@ -38,4 +49,5 @@ gulp.task('watch', function () {
 	gulp.watch('src/**/*.soy', ['soy']);
 });
 
-gulp.task('default', ['soy', 'styles', 'connect', 'watch']);
+gulp.task('build', ['images', 'soy', 'styles']);
+gulp.task('default', ['build', 'connect', 'watch']);

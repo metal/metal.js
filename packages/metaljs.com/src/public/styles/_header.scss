@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.header-container {
+	background: $secondaryColor;
+}
+
+/* Topbar
+   ========================================================================== */
+
+.topbar {
+	height: 36px;
+	line-height: 30px;
+	padding: 53px 0;
+}
+
+.topbar-logo {
+	float: left;
+}
+
+.topbar-logo-img {
+	float: left;
+}
+
+.topbar-logo-txt {
+	color: #fff;
+	display: inline-block;
+	font-family: $secondaryFont;
+	font-size: 17px;
+	font-weight: $boldFont;
+	margin: 0 0 0 20px;
+}
+
+.topbar-menu {
+	float: right;
+	list-style: none;
+	margin: 0;
+}
+
+.topbar-menu-item {
+	display: inline-block;
+	margin: 0 19px;
+}
+
+.topbar-menu-item:last-child {
+	margin-right: 0;
+}
+
+.topbar-menu-link {
+	color: #fff;
+	font-size: 15px;
+	font-weight: $mediumFont;
+	text-decoration: none;
+}
+
+.topbar-menu-github {
+	background: $primaryColor;
+	border-radius: 50%;
+	display: block;
+	height: 36px;
+	text-align: center;
+	width: 36px;
+	line-height: 36px;
+}

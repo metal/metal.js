@@ -3,12 +3,15 @@ var compass = require('gulp-compass');
 var connect = require('gulp-connect');
 var soynode = require('gulp-soynode');
 
-gulp.task('soy', function() {
-	return gulp.src('src/**/*.soy')
-		.pipe(soynode({
-			renderSoyWeb: true
-		}))
-		.pipe(gulp.dest('dist'));
+gulp.task('connect', function() {
+	connect.server({
+		root: 'dist/public'
+	});
+});
+
+gulp.task('images', function() {
+	return gulp.src('src/public/images/**')
+		.pipe(gulp.dest('dist/public/images'));
 });
 
 gulp.task('styles', function() {
@@ -21,15 +24,18 @@ gulp.task('styles', function() {
 		.pipe(gulp.dest('dist/public/styles'));
 });
 
-gulp.task('connect', function() {
-	connect.server({
-		root: 'dist/public'
-	});
+gulp.task('soy', function() {
+	return gulp.src('src/**/*.soy')
+		.pipe(soynode({
+			renderSoyWeb: true
+		}))
+		.pipe(gulp.dest('dist'));
 });
 
 gulp.task('watch', function () {
-	gulp.watch('src/**/*.soy', ['soy']);
+	gulp.watch('src/public/images/**', ['images']);
 	gulp.watch('src/public/styles/*.scss', ['styles']);
+	gulp.watch('src/**/*.soy', ['soy']);
 });
 
-gulp.task('default', ['connect', 'watch']);
+gulp.task('default', ['soy', 'styles', 'connect', 'watch']);

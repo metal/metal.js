@@ -3,12 +3,12 @@
    ========================================================================== */
 
 @import "variables";
-@import "../vendor/bootstrap-sass/assets/stylesheets/bootstrap/variables";
 
 /* ==========================================================================
    Dependencies
    ========================================================================== */
 
+@import "../vendor/bootstrap-sass/assets/stylesheets/bootstrap/variables";
 @import "../vendor/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
 @import "../vendor/bootstrap-sass/assets/stylesheets/bootstrap/normalize";
 @import "../vendor/bootstrap-sass/assets/stylesheets/bootstrap/grid";
@@ -33,4 +33,4 @@ body {
 }
 
 @import "header";
-@import "features";
+@import "home";

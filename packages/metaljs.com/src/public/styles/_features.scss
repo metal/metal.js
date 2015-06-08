@@ -1,0 +1,30 @@
+.feature {
+	text-align: center;
+	margin: 110px 0;
+}
+
+.feature-image {
+	display: block;
+	margin: 0 auto 42px;
+}
+
+.feature-title {
+	color: rgba($secondaryColor, 0.8);
+	font-size: 20px;
+	font-weight: 400;
+	margin: 0 0 34px;
+}
+
+.feature-description {
+	color: rgba($secondaryColor, 0.6);
+	font-size: 16px;
+	font-weight: 400;
+	margin: 0 0 34px;
+}
+
+.feature-link {
+	color: $primaryColor;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+}

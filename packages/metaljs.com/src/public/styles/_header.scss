@@ -73,7 +73,9 @@
 }
 
 .topbar-menu-link:hover {
-	color: white;
+	// color: white;
+	color: rgba(white, 0.6);
+	text-decoration: none;
 }
 
 .topbar-menu-github {
@@ -87,9 +89,9 @@
 	line-height: 37px;
 }
 
-.topbar-menu-github:hover {
-	opacity: 0.8;
-}
+// .topbar-menu-github:hover {
+// 	opacity: 0.8;
+// }
 
 @media (max-width: $screen-xs-max) {
 	.topbar-logo-text {

@@ -4,6 +4,20 @@
 
 .header {
 	background: $secondaryColor;
+	overflow: hidden;
+}
+
+.header .container {
+	position: relative;
+}
+
+.header-bg {
+	background: url(../images/logo_bg.png) no-repeat;
+	height: 916px;
+	position: absolute;
+	right: -700px;
+	width: 1145px;
+	top: 180px;
 }
 
 /* Topbar
@@ -11,7 +25,7 @@
 
 .topbar {
 	height: 36px;
-	padding: 53px 0 0;
+	padding: 45px 0;
 }
 
 .topbar-logo {
@@ -51,14 +65,15 @@
 
 .topbar-menu-link {
 	@include anim(color);
-	color: white;
+	color: rgba(white, 0.6);
+	font-family: $secondaryFont;
 	font-size: 15px;
 	font-weight: 500;
 	text-decoration: none;
 }
 
 .topbar-menu-link:hover {
-	color: $primaryColor;
+	color: white;
 }
 
 .topbar-menu-github {
@@ -69,7 +84,7 @@
 	height: 36px;
 	text-align: center;
 	width: 36px;
-	line-height: 36px;
+	line-height: 37px;
 }
 
 .topbar-menu-github:hover {
@@ -80,7 +95,7 @@
 	 ========================================================================== */
 
 .tagline {
-	margin: 170px 0 216px 0;
+	margin: 110px 0 216px 0;
 }
 
 .tagline-title {
@@ -89,7 +104,7 @@
 	font-size: 72px;
 	font-weight: 200;
 	line-height: 96px;
-	margin: 0 0 82px;
+	margin: 0 0 80px;
 }
 
 .tagline-button {
@@ -114,7 +129,7 @@
 }
 
 .tagline-button:last-child {
-	margin-left: 24px;
+	margin-left: 30px;
 }
 
 .tagline-button:focus {
@@ -127,8 +142,9 @@
 
 .tagline-button.tagline-button-inverted {
 	background: none;
-	color: white;
 	border: 1px solid rgba(white, 0.6);
+	color: white;
+	font-weight: 400;
 }
 
 .tagline-button::before,
@@ -152,10 +168,6 @@
 
 .tagline-button::after {
 	background: rgba(white, 0.1);
-}
-
-.tagline-button:hover {
-	color: white;
 }
 
 .tagline-button:hover::before,
@@ -189,7 +201,7 @@
 	}
 
 	.tagline {
-		margin: 53px 0 53px 0;
+		margin: 45px 0 53px 0;
 	}
 
 	.tagline-title {

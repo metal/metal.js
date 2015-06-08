@@ -180,3 +180,43 @@
 .architecture-image-secondary {
 	margin-left: 120px;
 }
+
+/* Collection
+   ========================================================================== */
+
+.collection {
+	height: 552px;
+}
+
+.collection-button {
+	display: block;
+	font-family: $secondaryFont;
+	font-size: 72px;
+	font-weight: 200;
+	padding: 50px 0;
+	text-align: center;
+	width: 400px;
+	margin: 192px auto 0;
+}
+
+.collection-button:hover {
+	text-decoration: none;
+}
+
+.collection-primary {
+	background: $secondaryColor url(../images/alloy_logo.png) no-repeat center center;
+}
+
+.collection-primary .collection-button {
+	border: 1px solid white;
+	color: white;
+}
+
+.collection-secondary {
+	background: #f0f1f2 url(../images/crystal_logo.png) no-repeat center center;
+}
+
+.collection-secondary .collection-button {
+	border: 1px solid rgba($secondaryColor, 0.4);
+	color: rgba($secondaryColor, 0.5);
+}

@@ -1,0 +1,76 @@
+{namespace home}
+
+/**
+ * Tagline
+ */
+{template .tagline}
+	<section class="tagline">
+		<div class="row">
+  		<div class="col-md-8 col-md-offset-2">
+  			<h2 class="tagline-title">Build ES6 Components in a solid, flexible way.</h2>
+  			<button class="tagline-button">Download Metal</button>
+				<button class="tagline-button tagline-button-inverted">Learn More</button>
+  		</div>
+		</div>
+	</section>
+{/template}
+
+/**
+ * Features
+ */
+{template .features}
+	<div class="container">
+		<div class="row">
+			<section class="feature col-md-2 col-md-offset-1 col-xs-12">
+				<img class="feature-image" src="/images/speedometer_icon.svg" alt="Speedometer icon" width="48">
+				<h3 class="feature-title">Performance First</h3>
+				<p class="feature-description">You can run performance tests against the most popular libraries and have really good.</p>
+				<a class="feature-link" href="#">Learn More</a>
+			</section>
+			<section class="feature col-md-2 col-md-offset-2 col-xs-12">
+				<img class="feature-image" src="/images/module_icon.svg" alt="Module icon" width="48">
+				<h3 class="feature-title">Modular Design</h3>
+				<p class="feature-description">It allows you to build small pieces of functionality which can be developed and tested independently.</p>
+				<a class="feature-link" href="#">Learn More</a>
+			</section>
+			<section class="feature col-md-2 col-md-offset-2 col-xs-12">
+				<img class="feature-image" src="/images/circle_arrow_icon.svg" alt="Circle arrow icon" width="48">
+				<h3 class="feature-title">Future Ready</h3>
+				<p class="feature-description">Our code is easy as pie to update. It was written in ES6, allowing us to deliver the best of JavaScript.</p>
+				<a class="feature-link" href="#">Learn More</a>
+			</section>
+		</div>
+	</div>
+{/template}
+
+/**
+ * Architecture
+ */
+{template .architecture}
+	<div class="architecture">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4 col-md-offset-1 col-xs-12">
+					<h3 class="architecture-title">Our Architecture</h3>
+					<p class="architecture-description">Metal.js' main classes are Attribute and Component. Component actually extends from Attribute, thus containing all its features. The main difference between the two is that Component's extra features are related to rendering. So you could just use Attribute directly if your module doesn't do any rendering. But if your module does need rendering logic though, then Component will work better for you.</p>
+					<p class="architecture-description">One thing that can be really useful for a developer when building a component, is to separate the rendering logic from the business logic. This can be achieved on Metal.js by modules built on top of Component, that integrate with template engines. Metal.js already provides an implementation called SoyComponent that integrates with Soy Templates, also referred to as Closure Templates.</p>
+				</div>
+				<div class="col-md-6 col-md-offset-1 col-xs-12">
+					<img class="architecture-image-primary" src="images/metal_architecture.png" alt="Architecture">
+					<img class="architecture-image-secondary" src="images/shadow_metal_architecture.png" alt="Shadow">
+				</div>
+			</div>
+		</div>
+	</div>
+{/template}
+
+/**
+ * Call to action
+ */
+{template .callToAction}
+	<div class="call-to-action">
+		<div class="container">
+			<h4>Start building today. Are you Ready?</h4>
+		</div>
+	</div>
+{/template}

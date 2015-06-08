@@ -122,7 +122,8 @@
 
 .feature {
 	text-align: center;
-	margin: 110px 0;
+	margin-top: 110px;
+	margin-bottom: 110px;
 }
 
 .feature-image {
@@ -151,3 +152,31 @@
 	text-decoration: none;
 }
 
+/* Architecture
+	 ========================================================================== */
+
+.architecture {
+	background: rgba($secondaryColor, 0.05);
+}
+
+.architecture-title {
+	color: rgba($secondaryColor, 0.7);
+	font-family: $secondaryFont;
+	font-size: 30px;
+	font-weight: 300;
+	margin: 74px 0 58px;
+}
+
+.architecture-description {
+	color: rgba($secondaryColor, 0.6);
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.architecture-image-primary {
+	margin-top: -30px;
+}
+
+.architecture-image-secondary {
+	margin-left: 120px;
+}

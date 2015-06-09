@@ -212,6 +212,23 @@
 	height: 552px;
 }
 
+.collection-headline {
+	color: rgba($secondaryColor, 0.7);
+	font-family: $secondaryFont;
+	font-size: 24px;
+	font-weight: 300;
+	margin: 54px 0 42px;
+	text-align: center;
+}
+
+.collection-headline p {
+	margin: 0;
+}
+
+.collection-headline strong {
+	font-weight: 500;
+}
+
 .collection-button {
 	display: block;
 	font-family: $secondaryFont;

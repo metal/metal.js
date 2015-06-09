@@ -4,4 +4,35 @@
 
 .footer {
 	background: $secondaryColor;
+	height: 144px;
+}
+
+.footer-credits,
+.footer-license {
+	color: white;
+	font-size: 12px;
+	font-weight: 400;
+	height: 36px;
+	line-height: 36px;
+	margin: 55px 0;
+}
+
+.footer-license {
+	text-align: right;
+}
+
+.footer-link {
+	color: #9552ef;
+	font-weight: 700;
+}
+
+.footer-link:hover {
+	color: #9552ef;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.footer-icon-liferay {
+	background: white;
+	margin-right: 12px;
 }

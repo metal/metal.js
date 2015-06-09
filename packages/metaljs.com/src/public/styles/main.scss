@@ -33,6 +33,20 @@ body {
 	transition: $property .3s ease-in-out;
 }
 
+.rounded-icon {
+	@include anim(opacity);
+	border-radius: 50%;
+	display: inline-block;
+	height: 36px;
+	line-height: 36px;
+	text-align: center;
+	width: 36px;
+}
+
+// .rounded-icon:hover {
+// 	opacity: 0.8;
+// }
+
 @import "header";
 @import "footer";
 @import "home";

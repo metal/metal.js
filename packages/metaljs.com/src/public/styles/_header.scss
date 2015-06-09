@@ -78,20 +78,10 @@
 	text-decoration: none;
 }
 
-.topbar-menu-github {
-	@include anim(opacity);
+.topbar-icon-github {
 	background: $primaryColor;
-	border-radius: 50%;
-	display: block;
-	height: 36px;
-	text-align: center;
-	width: 36px;
 	line-height: 37px;
 }
-
-// .topbar-menu-github:hover {
-// 	opacity: 0.8;
-// }
 
 @media (max-width: $screen-xs-max) {
 	.topbar-logo-text {

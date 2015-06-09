@@ -20,7 +20,7 @@
 				<a class="topbar-menu-link" href="#">API</a>
 			</li>
 			<li class="topbar-menu-item">
-				<a class="topbar-menu-github" target="_blank" href="https://github.com/metal/metal.js">
+				<a class="rounded-icon topbar-icon-github" target="_blank" href="https://github.com/metal/metal.js">
 					<img src="/images/github_icon.svg" alt="GitHub Icon" width="16">
 				</a>
 			</li>
@@ -32,16 +32,21 @@
  * Footer
  */
 {template .footer}
-	<div class="footer">
-		// <div class="container">
+	<footer class="footer">
+		<div class="container">
 			<div class="row">
 				<div class="col-md-6">
-					<p>Brought to you by <a href="http://liferay.com/">Liferay, Inc</a>.</p>
+					<p class="footer-credits">
+						<a class="rounded-icon footer-icon-liferay" target="_blank" href="http://liferay.com/">
+							<img src="/images/liferay_icon.svg" alt="Liferay Icon" width="16">
+						</a>
+						Brought to you by <a class="footer-link" href="http://liferay.com/">Liferay, Inc</a>.
+					</p>
 				</div>
 				<div class="col-md-6">
-					<p><a href="http://liferay.com/">BSD</a> License.</p>
+					<p class="footer-license"><a class="footer-link" href="http://liferay.com/">BSD</a> License.</p>
 				</div>
 			</div>
-		// </div>
-	</div>
+		</div>
+	</footer>
 {/template}

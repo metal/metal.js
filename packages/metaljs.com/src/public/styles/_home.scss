@@ -261,3 +261,41 @@
 	border: 1px solid rgba($secondaryColor, 0.4);
 	color: rgba($secondaryColor, 0.5);
 }
+
+/* Call to action
+   ========================================================================== */
+
+.calltoaction {
+	background: $primaryColor;
+	height: 432px;
+	padding: 120px 0 144px;
+	text-align: center;
+}
+
+.calltoaction-title {
+	color: white;
+	font-family: $secondaryFont;
+	font-size: 32px;
+	font-weight: 300;
+	margin: 0;
+}
+
+.calltoaction-button {
+	background: $primaryColor;
+	border: 1px solid white;
+	border-radius: 8px;
+	color: white;
+	display: block;
+	font-family: $secondaryFont;
+	font-size: 18px;
+	font-weight: 400;
+	height: 72px;
+	margin: 65px auto 0;
+	width: 276px;
+	line-height: 72px;
+}
+
+.calltoaction-button:hover {
+	color: white;
+	text-decoration: none;
+}

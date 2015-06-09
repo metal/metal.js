@@ -25,7 +25,8 @@
 
 .topbar {
 	height: 36px;
-	padding: 45px 0;
+	line-height: 36px;
+	margin: 53px 0;
 }
 
 .topbar-logo {
@@ -44,7 +45,6 @@
 	font-size: 17px;
 	font-weight: 700;
 	margin: 0 0 0 20px;
-	padding: 8px 0;
 }
 
 .topbar-menu {
@@ -72,7 +72,8 @@
 	text-decoration: none;
 }
 
-.topbar-menu-link:hover {
+.topbar-menu-link:hover,
+.topbar-menu-link:focus {
 	// color: white;
 	color: rgba(white, 0.6);
 	text-decoration: none;
@@ -80,14 +81,13 @@
 
 .topbar-icon-github {
 	background: $primaryColor;
-	line-height: 37px;
 }
 
 @media (max-width: $screen-xs-max) {
 	.topbar-logo-text {
 		margin: 0 0 0 10px;
 		font-size: 14px;
-		padding: 10px 0;
+		// padding: 10px 0;
 	}
 
 	.topbar-menu-item {

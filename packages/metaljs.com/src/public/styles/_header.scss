@@ -12,7 +12,8 @@
 }
 
 .header-bg {
-	background: url(../images/logo_bg.png) no-repeat;
+	background: url(../images/background_header_logo@2x.png) no-repeat;
+	background-size: 1145px 916px;
 	display: none;
 	height: 916px;
 	position: absolute;
@@ -49,7 +50,7 @@
 
 .topbar-logo-image {
 	float: left;
-	padding: 4px 0;
+	margin: 4px 0;
 }
 
 .topbar-logo-text {

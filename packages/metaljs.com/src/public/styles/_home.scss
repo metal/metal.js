@@ -191,6 +191,7 @@
 
 .architecture {
 	background: rgba($secondaryColor, 0.05);
+	overflow: hidden;
 }
 
 .architecture-title {
@@ -231,7 +232,6 @@
 .architecture-image-primary,
 .architecture-image-secondary {
 	display: none;
-	max-width: 100%;
 }
 
 .architecture-image-primary {
@@ -244,12 +244,6 @@
 		display: block;
 	}
 
-	.architecture-image-secondary {
-		margin: 30px 0 0 60px;
-	}
-}
-
-@media (min-width: $screen-md-min) {
 	.architecture-image-secondary {
 		margin: 30px 0 0 120px;
 	}
@@ -337,7 +331,8 @@
 }
 
 .collection-primary {
-	background: $secondaryColor url(../images/alloy_logo.png) no-repeat center center;
+	background: $secondaryColor url(../images/alloy_logo@2x.png) no-repeat center center;
+	background-size: 713px 620px;
 }
 
 .collection-primary .collection-button {
@@ -346,7 +341,8 @@
 }
 
 .collection-secondary {
-	background: #f0f1f2 url(../images/crystal_logo.png) no-repeat center center;
+	background: #f0f1f2 url(../images/crystal_logo@2x.png) no-repeat center center;
+	background-size: 729px 677px;
 }
 
 .collection-secondary .collection-button {

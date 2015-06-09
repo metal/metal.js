@@ -1,7 +1,7 @@
 {
   "name": "metal",
-  "version": "0.3.1",
-  "description": "A solid foundation for UI components",
+  "version": "1.0.0-alpha",
+  "description": "Build UI components in a solid, flexible way",
   "license": "BSD",
   "repository": "metal/metal.js",
   "author": {

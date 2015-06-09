@@ -56,7 +56,7 @@ class EventsCollector extends Disposable {
 
 		if (!this.eventHandles_[selector]) {
 			var fn = this.getListenerFn_(fnName);
-			this.eventHandles_[selector] = this.component_.delegate(eventType, selector, fn);
+			this.eventHandles_[selector] = this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn));
 		}
 	}
 
@@ -156,6 +156,24 @@ class EventsCollector extends Disposable {
 		}
 		fnComponent = fnComponent || this.component_;
 		return fnComponent[fnName].bind(fnComponent);
+	}
+
+	/**
+	 * Fires when an event that was registered by this collector is triggered. Makes
+	 * sure that the event was meant for this component and calls the appropriate
+	 * listener function for it.
+	 * @param {!function(!Object)} fn
+	 * @param {!Object} event
+	 * @return {*} The return value of the call to the listener function, or undefined
+	 *   if no function was called.
+	 * @protected
+	 */
+	onEvent_(fn, event) {
+		// This check prevents parent components from handling their child inline listeners.
+		if (!event.handledByComponent || event.handledByComponent === this.component_) {
+			event.handledByComponent = this.component_;
+			return fn(event);
+		}
 	}
 }
 

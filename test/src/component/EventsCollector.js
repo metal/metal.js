@@ -144,6 +144,33 @@ describe('EventsCollector', function() {
 		assert.strictEqual(2, custom.handleClick.callCount);
 	});
 
+	it('should not trigger sub component listeners on parent components', function() {
+		var SubComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
+		SubComponent.prototype.handleClick = sinon.stub();
+
+		var child;
+		var CustomComponent = createCustomComponent();
+		CustomComponent.prototype.renderInternal = function() {
+			dom.append(this.element, '<div data-onclick="handleClick"></div>');
+			child = new SubComponent().render(this.element);
+		};
+		CustomComponent.prototype.handleClick = sinon.stub();
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		collector.attachListeners(custom.element.innerHTML, 'group');
+		var childCollector = new EventsCollector(child);
+		childCollector.attachListeners(child.element.innerHTML, 'group');
+
+		dom.triggerEvent(child.element.childNodes[0], 'click');
+		assert.strictEqual(0, custom.handleClick.callCount);
+		assert.strictEqual(1, child.handleClick.callCount);
+
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, child.handleClick.callCount);
+	});
+
 	it('should detach listeners that are unused', function() {
 		var CustomComponent = createCustomComponent(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'

@@ -1,6 +1,6 @@
 {
 	"name": "metal",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"main": "src/core.js",
 	"description": "A solid foundation for UI components",
 	"keywords": [

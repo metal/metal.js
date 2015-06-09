@@ -13,11 +13,18 @@
 
 .header-bg {
 	background: url(../images/logo_bg.png) no-repeat;
+	display: none;
 	height: 916px;
 	position: absolute;
 	right: -700px;
-	width: 1145px;
 	top: 180px;
+	width: 1145px;
+}
+
+@media (min-width: $screen-sm-min) {
+	.header-bg {
+		display: block;
+	}
 }
 
 /* Topbar
@@ -27,6 +34,13 @@
 	height: 36px;
 	line-height: 36px;
 	margin: 53px 0;
+}
+
+@media (max-width: $screen-xs-min) {
+	.topbar {
+		margin: 53px auto;
+		width: 276px;
+	}
 }
 
 .topbar-logo {
@@ -42,9 +56,16 @@
 	color: white;
 	display: inline-block;
 	font-family: $secondaryFont;
-	font-size: 17px;
+	font-size: 14px;
 	font-weight: 700;
-	margin: 0 0 0 20px;
+	margin: 0 0 0 10px;
+}
+
+@media (min-width: $screen-sm-min) {
+	.topbar-logo-text {
+		font-size: 17px;
+		margin: 0 0 0 20px;
+	}
 }
 
 .topbar-menu {
@@ -56,7 +77,13 @@
 
 .topbar-menu-item {
 	display: inline-block;
-	margin: 0 19px;
+	margin: 0 7px;
+}
+
+@media (min-width: $screen-sm-min) {
+	.topbar-menu-item {
+		margin: 0 19px;
+	}
 }
 
 .topbar-menu-item:last-child {
@@ -67,9 +94,15 @@
 	@include anim(color);
 	color: rgba(white, 0.6);
 	font-family: $secondaryFont;
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 500;
 	text-decoration: none;
+}
+
+@media (min-width: $screen-sm-min) {
+	.topbar-menu-link {
+		font-size: 15px;
+	}
 }
 
 .topbar-menu-link:hover,
@@ -83,18 +116,12 @@
 	background: $primaryColor;
 }
 
-@media (max-width: $screen-xs-max) {
-	.topbar-logo-text {
-		margin: 0 0 0 10px;
-		font-size: 14px;
-		// padding: 10px 0;
+@media (max-width: $screen-xs-min) {
+	.topbar-menu-item:nth-child(3) {
+		margin-right: 0;
 	}
 
-	.topbar-menu-item {
-		margin: 0 7px;
-	}
-
-	.topbar-menu-link {
-		font-size: 14px;
+	.topbar-icon-github {
+		display: none;
 	}
 }

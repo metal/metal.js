@@ -34,3 +34,9 @@
 	background: white;
 	margin-right: 12px;
 }
+
+@media (max-width: $screen-xs-min) {
+	.footer-icon-liferay {
+		display: none;
+	}
+}

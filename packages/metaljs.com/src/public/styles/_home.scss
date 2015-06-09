@@ -6,7 +6,13 @@
 	 ========================================================================== */
 
 .tagline {
-	margin: 147px 0 216px 0;
+	margin: 45px 0 53px 0;
+}
+
+@media (min-width: $screen-sm-min) {
+	.tagline {
+		margin: 147px 0 216px 0;
+	}
 }
 
 .tagline-title {
@@ -18,7 +24,25 @@
 	margin: 0 0 76px;
 }
 
+@media (min-width: $screen-xs-min) and (max-width: $screen-sm-min) {
+	.tagline-title {
+		font-size: 48px;
+		line-height: 64px;
+		margin: 0 0 53px;
+	}
+}
+
+@media (max-width: $screen-xs-min) {
+	.tagline-title {
+		font-size: 44px;
+		line-height: 52px;
+		margin: 0 auto 53px;
+		width: 276px;
+	}
+}
+
 .tagline-button {
+	-webkit-transition: color 0.3s;
 	background: $primaryColor;
 	border-radius: 8px;
 	border: none;
@@ -37,11 +61,30 @@
 	vertical-align: middle;
 	width: 276px;
 	z-index: 1;
-	-webkit-transition: color 0.3s;
+}
+
+@media (min-width: $screen-xs-min) and (max-width: $screen-sm-min) {
+	.tagline-button {
+		width: 215px;
+	}
+}
+
+@media (max-width: $screen-xs-min) {
+	.tagline-button {
+		margin: 20px auto;
+		float: none;
+		width: 276px;
+	}
 }
 
 .tagline-button:last-child {
-	margin-left: 24px;
+	margin: 0 0 0 24px;
+}
+
+@media (max-width: $screen-xs-min) {
+	.tagline-button:last-child {
+		margin: 20px auto;
+	}
 }
 
 .tagline-button:focus {
@@ -93,31 +136,6 @@
 // 	transition-delay: 0.175s;
 // }
 
-@media (max-width: $screen-xs-max) {
-	.tagline {
-		margin: 45px 0 53px 0;
-	}
-
-	.tagline-title {
-		font-size: 38px;
-		line-height: 52px;
-		margin: 0 0 53px;
-		text-align: center;
-	}
-
-	.tagline-button {
-		float: none;
-		font-size: 16px;
-		height: 50px;
-		margin: 20px auto;
-		width: 200px;
-	}
-
-	.tagline-button:last-child {
-		margin: 20px auto;
-	}
-}
-
 /* Features
 	 ========================================================================== */
 
@@ -125,6 +143,16 @@
 	text-align: center;
 	margin: 108px auto 116px;
 	width: 224px;
+}
+
+@media (max-width: $screen-xs-max) {
+	.features {
+		margin: 48px 0 0;
+	}
+
+	.feature {
+		margin: 0 auto 48px;
+	}
 }
 
 .feature-image {
@@ -170,7 +198,13 @@
 	font-family: $secondaryFont;
 	font-size: 30px;
 	font-weight: 300;
-	margin: 64px 0 44px;
+	margin: 64px 24px 44px;
+}
+
+@media (min-width: $screen-sm-min) {
+	.architecture-title {
+		margin: 64px 0 44px;
+	}
 }
 
 .architecture-description {
@@ -178,16 +212,47 @@
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 24px;
-	margin-bottom: 24px;
-	width: 386px;
+	margin: 0 24px 24px;
+	width: auto;
+}
+
+@media (min-width: $screen-lg-min) {
+	.architecture-description {
+		width: 386px;
+	}
+}
+
+@media (min-width: $screen-sm-min) {
+	.architecture-description {
+		margin: 0 0 24px;
+	}
+}
+
+.architecture-image-primary,
+.architecture-image-secondary {
+	display: none;
+	max-width: 100%;
 }
 
 .architecture-image-primary {
 	margin-top: -31px;
 }
 
-.architecture-image-secondary {
-	margin: 30px 0 0 120px;
+@media (min-width: $screen-sm-min) {
+	.architecture-image-primary,
+	.architecture-image-secondary {
+		display: block;
+	}
+
+	.architecture-image-secondary {
+		margin: 30px 0 0 60px;
+	}
+}
+
+@media (min-width: $screen-md-min) {
+	.architecture-image-secondary {
+		margin: 30px 0 0 120px;
+	}
 }
 
 .architecture-link {
@@ -199,9 +264,15 @@
 	font-size: 15px;
 	height: 48px;
 	line-height: 48px;
-	margin: 42px 0 96px;
+	margin: 42px auto 96px;
 	text-align: center;
 	width: 182px;
+}
+
+@media (min-width: $screen-sm-min) {
+	.architecture-link {
+		margin: 42px 0 96px;
+	}
 }
 
 .architecture-link:hover {
@@ -214,6 +285,12 @@
 
 .collection {
 	height: 552px;
+}
+
+@media (max-width: $screen-xs-min) {
+	.collection {
+		height: 264px;
+	}
 }
 
 .collection-headline {
@@ -244,6 +321,15 @@
 	padding: 47px 0;
 	text-align: center;
 	width: 440px;
+}
+
+@media (max-width: $screen-xs-min) {
+	.collection-button {
+		font-size: 56px;
+		line-height: 56px;
+		width: 276px;
+		margin: 56px auto 0;
+	}
 }
 
 .collection-button:hover {
@@ -284,6 +370,12 @@
 	font-weight: 300;
 	line-height: 32px;
 	margin: 0;
+}
+
+@media (max-width: $screen-xs-min) {
+	.calltoaction-title {
+		line-height: 48px;
+	}
 }
 
 .calltoaction-button {

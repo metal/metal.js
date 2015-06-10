@@ -45,7 +45,12 @@
 }
 
 .topbar-logo {
+	@include anim(opacity);
 	float: left;
+}
+
+.topbar-logo:hover {
+	opacity: 0.6;
 }
 
 .topbar-logo-image {
@@ -108,8 +113,7 @@
 
 .topbar-menu-link:hover,
 .topbar-menu-link:focus {
-	// color: white;
-	color: rgba(white, 0.6);
+	color: white;
 	text-decoration: none;
 }
 

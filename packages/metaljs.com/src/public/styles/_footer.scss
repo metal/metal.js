@@ -20,13 +20,13 @@
 }
 
 .footer-link {
-	color: #9552ef;
+	@include anim(color);
+	color: rgba(white, 0.4);
 	font-weight: 700;
 }
 
 .footer-link:hover {
-	color: #9552ef;
-	font-weight: 700;
+	color: white;
 	text-decoration: none;
 }
 

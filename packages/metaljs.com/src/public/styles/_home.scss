@@ -176,13 +176,14 @@
 }
 
 .feature-link {
+	@include anim(color);
 	color: $primaryColor;
 	font-size: 14px;
 	font-weight: 600;
 }
 
 .feature-link:hover {
-	color: $primaryColor;
+	color: rgba($primaryColor, 0.6);
 	text-decoration: none;
 }
 

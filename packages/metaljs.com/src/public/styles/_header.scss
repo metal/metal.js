@@ -49,7 +49,8 @@
 	float: left;
 }
 
-.topbar-logo:hover {
+.topbar-logo:hover,
+.topbar-logo:focus {
 	opacity: 0.6;
 }
 

@@ -25,7 +25,8 @@
 	font-weight: 700;
 }
 
-.footer-link:hover {
+.footer-link:hover,
+.footer-link:focus {
 	color: white;
 	text-decoration: none;
 }

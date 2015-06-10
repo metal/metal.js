@@ -1,4 +1,4 @@
-.button {
+.btn {
 	display: block;
 	float: left;
 	position: relative;
@@ -7,11 +7,11 @@
 	z-index: 1;
 }
 
-.button:focus {
+.btn:focus {
 	outline: none;
 }
 
-.button > span {
+.btn > span {
 	vertical-align: middle;
 }
 
@@ -161,4 +161,43 @@
 .button-calltoaction {
 	float: none;
 	margin: 68px auto 0;
+}
+
+/* Button - Collection
+   ========================================================================== */
+
+.button-collection {
+	display: block;
+	font-family: $secondaryFont;
+	font-size: 72px;
+	font-weight: 200;
+	line-height: 72px;
+	margin: 192px auto 0;
+	padding: 47px 0;
+	text-align: center;
+	width: 440px;
+}
+
+@media (max-width: $screen-xs-min) {
+	.button-collection {
+		font-size: 56px;
+		line-height: 56px;
+		width: 276px;
+		margin: 56px auto 0;
+	}
+}
+
+.button-collection:hover,
+.button-collection:focus {
+	text-decoration: none;
+}
+
+.button-collection-primary {
+	border: 1px solid white;
+	color: white;
+}
+
+.button-collection-secondary {
+	border: 1px solid rgba($secondaryColor, 0.4);
+	color: rgba($secondaryColor, 0.5);
 }

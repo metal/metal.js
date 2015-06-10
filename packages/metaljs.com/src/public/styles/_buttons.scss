@@ -1,0 +1,164 @@
+.button {
+	display: block;
+	float: left;
+	position: relative;
+	text-align: center;
+	vertical-align: middle;
+	z-index: 1;
+}
+
+.button:focus {
+	outline: none;
+}
+
+.button > span {
+	vertical-align: middle;
+}
+
+/* Button - Winona
+   ========================================================================== */
+
+.button-winona {
+	overflow: hidden;
+	padding: 0;
+	-webkit-transition: border-color 0.3s, background-color 0.3s;
+	transition: border-color 0.3s, background-color 0.3s;
+	-webkit-transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+	transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.button-winona::after {
+	content: attr(data-text);
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	-webkit-transform: translate3d(0, 25%, 0);
+	transform: translate3d(0, 25%, 0);
+}
+
+.button-winona > span {
+	display: block;
+}
+
+.button-winona::after,
+.button-winona > span {
+	-webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
+	transition: transform 0.3s, opacity 0.3s;
+	-webkit-transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+	transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.button-winona:hover::after,
+.button-winona:focus::after {
+	opacity: 1;
+	-webkit-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+.button-winona:hover > span,
+.button-winona:focus > span {
+	opacity: 0;
+	-webkit-transform: translate3d(0, -25%, 0);
+	transform: translate3d(0, -25%, 0);
+}
+
+/* Button - Tagline
+   ========================================================================== */
+
+.button-tagline-primary,
+.button-tagline-secondary,
+.button-calltoaction {
+	border-radius: 8px;
+	color: white;
+	font-family: $secondaryFont;
+	font-size: 18px;
+	height: 72px;
+	line-height: 72px;
+	width: 276px;
+}
+
+.button-tagline-primary {
+	background: $primaryColor;
+	font-weight: 500;
+}
+
+.button-tagline-secondary {
+	margin: 0 0 0 24px;
+}
+
+.button-tagline-secondary,
+.button-calltoaction {
+	background: none;
+	border: 1px solid rgba(white, 0.6);
+	font-weight: 400;
+}
+
+.button-tagline-primary:hover,
+.button-tagline-primary:focus {
+	background: rgba($primaryColor, 0.6);
+	color: white;
+	text-decoration: none;
+}
+
+.button-tagline-secondary:hover,
+.button-tagline-secondary:focus,
+.button-calltoaction:hover,
+.button-calltoaction:focus {
+	background: rgba(white, 0.05);
+	color: white;
+	text-decoration: none;
+}
+
+@media (min-width: $screen-xs-min) and (max-width: $screen-sm-min) {
+	.button-tagline-primary,
+	.button-tagline-secondary {
+		width: 215px;
+	}
+}
+
+@media (max-width: $screen-xs-min) {
+	.button-tagline-primary,
+	.button-tagline-secondary {
+		margin: 20px auto;
+		float: none;
+		width: 276px;
+	}
+}
+
+/* Button - Architecture
+   ========================================================================== */
+
+.button-architecture {
+	border-radius: 24px;
+	border: 1px solid $primaryColor;
+	color: $primaryColor;
+	font-size: 15px;
+	height: 48px;
+	line-height: 48px;
+	margin: 42px auto 96px;
+	width: 182px;
+}
+
+@media (min-width: $screen-sm-min) {
+	.button-architecture {
+		margin: 42px 0 96px;
+	}
+}
+
+.button-architecture:hover,
+.button-architecture:focus {
+	color: $primaryColor;
+	background: rgba($primaryColor, 0.2);
+	text-decoration: none;
+}
+
+/* Button - Call to action
+   ========================================================================== */
+
+.button-calltoaction {
+	float: none;
+	margin: 68px auto 0;
+}

@@ -232,20 +232,32 @@
 .architecture-image-primary,
 .architecture-image-secondary {
 	display: none;
+	transition: transform 500ms ease;
+	-webkit-transition: transform 500ms ease;
 }
 
 .architecture-image-primary {
 	margin-top: -31px;
+	transform: translate(0px, 0px);
+}
+
+.architecture-image-secondary {
+	margin: 30px 0 0 120px;
+	transform: scale(1, 1);
+}
+
+.architecture-image:hover .architecture-image-primary {
+	transform: translate(0px, -15px);
+}
+
+.architecture-image:hover .architecture-image-secondary {
+	transform: scale(0.9, 0.9);
 }
 
 @media (min-width: $screen-sm-min) {
 	.architecture-image-primary,
 	.architecture-image-secondary {
 		display: block;
-	}
-
-	.architecture-image-secondary {
-		margin: 30px 0 0 120px;
 	}
 }
 

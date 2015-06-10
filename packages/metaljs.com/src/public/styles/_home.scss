@@ -201,50 +201,14 @@
 	font-weight: 500;
 }
 
-.collection-button {
-	display: block;
-	font-family: $secondaryFont;
-	font-size: 72px;
-	font-weight: 200;
-	line-height: 72px;
-	margin: 192px auto 0;
-	padding: 47px 0;
-	text-align: center;
-	width: 440px;
-}
-
-@media (max-width: $screen-xs-min) {
-	.collection-button {
-		font-size: 56px;
-		line-height: 56px;
-		width: 276px;
-		margin: 56px auto 0;
-	}
-}
-
-.collection-button:hover,
-.collection-button:focus {
-	text-decoration: none;
-}
-
 .collection-primary {
 	background: $secondaryColor url(../images/alloy_logo@2x.png) no-repeat center center;
 	background-size: 713px 620px;
 }
 
-.collection-primary .collection-button {
-	border: 1px solid white;
-	color: white;
-}
-
 .collection-secondary {
 	background: #f0f1f2 url(../images/crystal_logo@2x.png) no-repeat center center;
 	background-size: 729px 677px;
-}
-
-.collection-secondary .collection-button {
-	border: 1px solid rgba($secondaryColor, 0.4);
-	color: rgba($secondaryColor, 0.5);
 }
 
 /* Call to action

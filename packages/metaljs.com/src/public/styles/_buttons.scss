@@ -46,15 +46,16 @@
 .btn-size-large {
 	font-size: 72px;
 	font-weight: 200;
-	line-height: 72px;
-	padding: 47px 0;
+	height: 168px;
+	line-height: 168px;
 	width: 440px;
 }
 
 @media (max-width: $screen-xs-min) {
 	.btn-size-large {
-		font-size: 56px;
-		line-height: 56px;
+		font-size: 42px;
+		height: 100px;
+		line-height: 100px;
 		width: 276px;
 	}
 }
@@ -115,6 +116,7 @@
 .btn-architecture {
 	border: 1px solid $primaryColor;
 	color: $primaryColor;
+	float: none;
 	margin: 42px auto 96px;
 }
 
@@ -161,7 +163,7 @@
 @media (max-width: $screen-xs-min) {
 	.btn-collection-primary,
 	.btn-collection-secondary {
-		margin: 56px auto 0;
+		margin: 78px auto 0;
 	}
 }
 
@@ -223,4 +225,110 @@
 	opacity: 0;
 	-webkit-transform: translate3d(0, -25%, 0);
 	transform: translate3d(0, -25%, 0);
+}
+
+/* Button Effect - Secondary
+   ========================================================================== */
+
+.btn-effect-secondary {
+	overflow: hidden;
+	-webkit-transition: background-color 0.3s;
+	transition: background-color 0.3s;
+}
+
+.btn-effect-secondary > span {
+	display: inline-block;
+	margin: -10px 0 0 0;
+	opacity: 0;
+	-webkit-transform: translate3d(0, -10px, 0);
+	transform: translate3d(0, -10px, 0);
+	-webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
+	transition: transform 0.3s, opacity 0.3s;
+	-webkit-transition-timing-function: cubic-bezier(0.75, 0, 0.125, 1);
+	transition-timing-function: cubic-bezier(0.75, 0, 0.125, 1);
+}
+
+.btn-effect-secondary::before {
+	content: attr(data-text);
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
+	transition: transform 0.3s, opacity 0.3s;
+	-webkit-transition-timing-function: cubic-bezier(0.75, 0, 0.125, 1);
+	transition-timing-function: cubic-bezier(0.75, 0, 0.125, 1);
+}
+
+.btn-effect-secondary:hover::before {
+	opacity: 0;
+	-webkit-transform: translate3d(0, 100%, 0);
+	transform: translate3d(0, 100%, 0);
+}
+
+.btn-effect-secondary:hover > span {
+	opacity: 1;
+	-webkit-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+.btn-effect-secondary:hover > span:nth-child(1) {
+	-webkit-transition-delay: 0.045s;
+	transition-delay: 0.045s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(2) {
+	-webkit-transition-delay: 0.09s;
+	transition-delay: 0.09s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(3) {
+	-webkit-transition-delay: 0.135s;
+	transition-delay: 0.135s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(4) {
+	-webkit-transition-delay: 0.18s;
+	transition-delay: 0.18s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(5) {
+	-webkit-transition-delay: 0.225s;
+	transition-delay: 0.225s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(6) {
+	-webkit-transition-delay: 0.27s;
+	transition-delay: 0.27s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(7) {
+	-webkit-transition-delay: 0.315s;
+	transition-delay: 0.315s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(8) {
+	-webkit-transition-delay: 0.36s;
+	transition-delay: 0.36s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(9) {
+	-webkit-transition-delay: 0.405s;
+	transition-delay: 0.405s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(10) {
+	-webkit-transition-delay: 0.45s;
+	transition-delay: 0.45s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(11) {
+	-webkit-transition-delay: 0.495s;
+	transition-delay: 0.495s;
+}
+
+.btn-effect-secondary:hover > span:nth-child(12) {
+	-webkit-transition-delay: 0.54s;
+	transition-delay: 0.54s;
 }

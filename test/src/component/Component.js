@@ -323,6 +323,111 @@ describe('Component', function() {
 			});
 		});
 
+		describe('events', function() {
+			it('should attach events to specified functions', function() {
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var CustomComponent = createCustomComponentClass();
+
+				var custom = new CustomComponent({
+					events: {
+						event1: listener1,
+						event2: listener2
+					}
+				});
+
+				custom.emit('event1');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+
+				custom.emit('event2');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+			});
+
+			it('should attach events to specified function names', function() {
+				var CustomComponent = createCustomComponentClass();
+				CustomComponent.prototype.listener1 = sinon.stub();
+
+				var custom = new CustomComponent({
+					events: {
+						event1: 'listener1'
+					}
+				});
+
+				custom.emit('event1');
+				assert.strictEqual(1, custom.listener1.callCount);
+			});
+
+			it('should warn if trying to attach event to unexisting function name', function() {
+				var CustomComponent = createCustomComponentClass();
+
+				sinon.stub(console, 'error');
+				new CustomComponent({
+					events: {
+						event1: 'listener1'
+					}
+				});
+
+				assert.strictEqual(1, console.error.callCount);
+				console.error.restore();
+			});
+
+			it('should attach events to specified function name on another component', function() {
+				var CustomComponent = createCustomComponentClass();
+				var AnotherComponent = createCustomComponentClass();
+				AnotherComponent.prototype.listener1 = sinon.stub();
+
+				var another = new AnotherComponent({
+					id: 'another'
+				});
+				var custom = new CustomComponent({
+					events: {
+						event1: 'another:listener1'
+					}
+				});
+
+				custom.emit('event1');
+				assert.strictEqual(1, another.listener1.callCount);
+			});
+
+			it('should warn if trying to attach event to unexisting other component', function() {
+				var CustomComponent = createCustomComponentClass();
+				CustomComponent.prototype.listener1 = sinon.stub();
+
+				sinon.stub(console, 'error');
+				new CustomComponent({
+					events: {
+						event1: 'unexisting:listener1'
+					}
+				});
+
+				assert.strictEqual(1, console.error.callCount);
+				console.error.restore();
+			});
+
+			it('should detach unused events when value of the "events" attribute is changed', function() {
+				var CustomComponent = createCustomComponentClass();
+				CustomComponent.prototype.listener1 = sinon.stub();
+				CustomComponent.prototype.listener2 = sinon.stub();
+
+				var custom = new CustomComponent({
+					events: {
+						event1: 'listener1'
+					}
+				});
+				custom.events = {
+					event2: 'listener2'
+				};
+
+				custom.emit('event1');
+				assert.strictEqual(0, custom.listener1.callCount);
+
+				custom.emit('event2');
+				assert.strictEqual(1, custom.listener2.callCount);
+			});
+		});
+
 		it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {

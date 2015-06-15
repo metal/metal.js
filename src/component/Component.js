@@ -107,6 +107,13 @@ class Component extends Attribute {
 		this.elementEventProxy_ = null;
 
 		/**
+		 * The `EventHandler` instance for events attached from the `events` attribute.
+		 * @type {!EventHandler}
+		 * @protected
+		 */
+		this.eventsAttrHandler_ = new EventHandler();
+
+		/**
 		 * Collects inline events from html contents.
 		 * @type {!EventsCollector}
 		 * @protected
@@ -156,6 +163,24 @@ class Component extends Attribute {
 		this.delegateEventHandler_ = new EventHandler();
 
 		this.created_();
+	}
+
+	/**
+	 * Adds the listeners specified in the given object.
+	 * @param {Object} events
+	 * @protected
+	 */
+	addListenersFromObj_(events) {
+		var eventNames = Object.keys(events || {});
+		for (var i = 0; i < eventNames.length; i++) {
+			var fn = events[eventNames[i]];
+			if (core.isString(fn)) {
+				fn = this.eventsCollector_.getListenerFn(fn);
+			}
+			if (fn) {
+				this.eventsAttrHandler_.add(this.on(eventNames[i], fn));
+			}
+		}
 	}
 
 	/**
@@ -483,6 +508,9 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	created_() {
+		this.on('eventsChanged', this.onEventsChanged_);
+		this.addListenersFromObj_(this.events);
+
 		this.on('attrsChanged', this.handleAttributesChanges_);
 		Component.componentsCollector.addComponent(this);
 	}
@@ -799,6 +827,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Fired when the `events` attribute value is changed.
+	 * @param {!Object} event
+	 * @protected
+	 */
+	onEventsChanged_(event) {
+		this.eventsAttrHandler_.removeAllListeners();
+		this.addListenersFromObj_(event.newVal);
+	}
+
+	/**
 	 * Makes an unique id for the component.
 	 * @return {string} Unique id.
 	 * @protected
@@ -1104,7 +1142,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Attribute synchronization logic for elementClasses attribute.
+	 * Attribute synchronization logic for the `elementClasses` attribute.
 	 * @param {string} newVal
 	 * @param {string} prevVal
 	 */
@@ -1178,7 +1216,7 @@ class Component extends Attribute {
 	/**
 	 * Validator logic for elementClasses attribute.
 	 * @param {string} val
-	 * @return {Boolean} True if val is a valid element classes.
+	 * @return {boolean} True if val is a valid element classes.
 	 * @protected
 	 */
 	validatorElementClassesFn_(val) {
@@ -1186,9 +1224,19 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Validator logic for id attribute.
+	 * Validator logic for the `events` attribute.
+	 * @param {Object} val
+	 * @return {boolean}
+	 * @protected
+	 */
+	validatorEventsFn_(val) {
+		return !core.isDefAndNotNull(val) || core.isObject(val);
+	}
+
+	/**
+	 * Validator logic for the `id` attribute.
 	 * @param {string} val
-	 * @return {Boolean} True if val is a valid id.
+	 * @return {boolean} True if val is a valid id.
 	 * @protected
 	 */
 	validatorIdFn_(val) {
@@ -1247,6 +1295,17 @@ Component.ATTRS = {
 	 */
 	elementClasses: {
 		validator: 'validatorElementClassesFn_'
+	},
+
+	/**
+	 * Listeners that should be attached to this component. Should be provided as an object,
+	 * where the keys are event names and the values are the listener functions (or function
+	 * names).
+	 * @type {Object<string, (function()|string)>}
+	 */
+	events: {
+		validator: 'validatorEventsFn_',
+		value: null
 	},
 
 	/**

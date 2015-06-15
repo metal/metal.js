@@ -55,7 +55,7 @@ class EventsCollector extends Disposable {
 		this.groupHasListener_[groupName][selector] = true;
 
 		if (!this.eventHandles_[selector]) {
-			var fn = this.getListenerFn_(fnName);
+			var fn = this.getListenerFn(fnName);
 			if (fn) {
 				this.eventHandles_[selector] = this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn));
 			}
@@ -141,9 +141,8 @@ class EventsCollector extends Disposable {
 	 * it will be called on this event collector's component instead.
 	 * @param {string} fnName
 	 * @return {function()}
-	 * @protected
 	 */
-	getListenerFn_(fnName) {
+	getListenerFn(fnName) {
 		var fnComponent;
 		var split = fnName.split(':');
 		if (split.length === 2) {

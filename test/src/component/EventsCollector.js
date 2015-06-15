@@ -110,6 +110,21 @@ describe('EventsCollector', function() {
 		console.error.restore();
 	});
 
+	it('should print error if trying to attach unexisting function', function() {
+		var CustomComponent = createCustomComponent(
+			'<div data-onclick="handleClick"></div><div></div>'
+		);
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+
+		sinon.stub(console, 'error');
+		collector.attachListeners(custom.element.innerHTML);
+		assert.strictEqual(1, console.error.callCount);
+
+		console.error.restore();
+	});
+
 	it('should attach multiple event listeners', function() {
 		var CustomComponent = createCustomComponent(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'

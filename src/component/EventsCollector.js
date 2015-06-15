@@ -56,7 +56,9 @@ class EventsCollector extends Disposable {
 
 		if (!this.eventHandles_[selector]) {
 			var fn = this.getListenerFn_(fnName);
-			this.eventHandles_[selector] = this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn));
+			if (fn) {
+				this.eventHandles_[selector] = this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn));
+			}
 		}
 	}
 
@@ -138,7 +140,7 @@ class EventsCollector extends Disposable {
 	 * component id, the function will be called on that specified component. Otherwise
 	 * it will be called on this event collector's component instead.
 	 * @param {string} fnName
-	 * @return {!function()}
+	 * @return {function()}
 	 * @protected
 	 */
 	getListenerFn_(fnName) {
@@ -148,14 +150,21 @@ class EventsCollector extends Disposable {
 			fnName = split[1];
 			fnComponent = ComponentCollector.components[split[0]];
 			if (!fnComponent) {
-				console.error('No component with the id ' + split[0] + ' has been collected' +
+				console.error('No component with the id "' + split[0] + '" has been collected' +
 					'yet. Make sure that you specify an id for an existing component when ' +
 					'adding inline listeners.'
 				);
 			}
 		}
 		fnComponent = fnComponent || this.component_;
-		return fnComponent[fnName].bind(fnComponent);
+		if (core.isFunction(fnComponent[fnName])) {
+			return fnComponent[fnName].bind(fnComponent);
+		} else {
+			console.error('No function named "' + fnName + '" was found in the component with id "' +
+				fnComponent.id + '". Make sure that you specify valid function names when adding ' +
+				'inline listeners.'
+			);
+		}
 	}
 
 	/**

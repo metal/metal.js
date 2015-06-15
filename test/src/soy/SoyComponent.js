@@ -1,5 +1,6 @@
 'use strict';
 
+import dom from '../../../src/dom/dom';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyComponent from '../../../src/soy/SoyComponent';
@@ -278,6 +279,25 @@ describe('SoyComponent', function() {
 
 			var child1 = child2.components['nested-child1'];
 			assert.ok(child1);
+		});
+
+		it('should attach listeners to parent component when its id is the listener name\'s prefix', function() {
+			var ChildrenTestComponent = createCustomTestComponentClass('ChildrenTestComponent');
+			ChildrenTestComponent.ATTRS = {
+				bar: 'bar',
+				children: {
+					value: ''
+				}
+			};
+
+			var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
+			var component = new DeeplyNestedTestComponent({
+				id: 'nested'
+			}).render();
+
+			var parentButton = component.element.querySelector('.parentButton');
+			dom.triggerEvent(parentButton, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
 		});
 	});
 

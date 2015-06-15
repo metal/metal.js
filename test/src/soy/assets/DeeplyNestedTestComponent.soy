@@ -34,6 +34,7 @@
 	{delcall ChildrenTestComponent}
 		{param bar: $bar /}
 		{param children kind="html"}
+			<button type="button" class="parentButton" data-onclick="{$id}:handleClick"></button>
 			{$child2}{$child3}
 		{/param}
 		{param id: $id + '-main' /}

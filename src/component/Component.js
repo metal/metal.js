@@ -484,6 +484,7 @@ class Component extends Attribute {
 	 */
 	created_() {
 		this.on('attrsChanged', this.handleAttributesChanges_);
+		Component.componentsCollector.addComponent(this);
 	}
 
 	/**

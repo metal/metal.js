@@ -183,6 +183,14 @@ describe('Component', function() {
 			assert.strictEqual(custom, custom.attach());
 		});
 
+		it('should add component to ComponentCollector after it\'s created', function() {
+			var CustomComponent = createCustomComponentClass();
+			var custom = new CustomComponent({
+				id: 'custom'
+			});
+			assert.strictEqual(custom, ComponentCollector.components.custom);
+		});
+
 		it('should dispose component', function() {
 			var CustomComponent = createCustomComponentClass();
 			var custom = new CustomComponent();

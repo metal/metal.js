@@ -15,6 +15,14 @@ class ComponentCollector extends Disposable {
 	}
 
 	/**
+	 * Adds a component to this collector.
+	 * @param {Component} component
+	 */
+	addComponent(component) {
+		ComponentCollector.components[component.id] = component;
+	}
+
+	/**
 	 * Creates the appropriate component from the given config data if it doesn't
 	 * exist yet.
 	 * @param {string} componentName The name of the component to be created.
@@ -28,7 +36,6 @@ class ComponentCollector extends Disposable {
 			var data = this.getNextComponentData(id);
 			data.element = '#' + id;
 			component = new ConstructorFn(data);
-			ComponentCollector.components[id] = component;
 		}
 		return component;
 	}

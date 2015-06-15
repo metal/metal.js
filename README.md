@@ -28,10 +28,10 @@ npm install metal
 With the code already available, you can use Metal.js by just importing the desired module on your js file and calling what you wish on it. For example:
 
 ```js
-import metal from 'bower:metal/metal.js';
+import core from './bower_components/metal/src/core';
 
 // You can now call any function from Metal.js's core module.
-metal.isString('Hello World');
+core.isString('Hello World');
 ```
 
 Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal.js on a website.

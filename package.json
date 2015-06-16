@@ -22,7 +22,7 @@
     "closure-templates": "^20141017.0.1"
   },
   "devDependencies": {
-    "chai": "^2.3.0",
+    "chai": "^3.0.0",
     "gulp": "^3.9.0",
     "gulp-metal": "^0.1.5",
     "isparta": "^3.0.3",
@@ -31,7 +31,7 @@
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.10",
     "karma-commonjs": "0.0.13",
-    "karma-coverage": "^0.3.1",
+    "karma-coverage": "^0.4.2",
     "karma-firefox-launcher": "^0.1.5",
     "karma-html2js-preprocessor": "^0.1.0",
     "karma-ievms": "0.0.4",

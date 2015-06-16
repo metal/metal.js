@@ -233,6 +233,8 @@ class Attribute extends EventEmitter {
 
 	/**
 	 * Returns the value of the requested attribute.
+	 * Note: this can and should be accomplished by accessing the attribute as a regular property.
+	 * This should only be used in cases where a function is actually needed.
 	 * @param {string} name
 	 * @return {*}
 	 */
@@ -384,6 +386,8 @@ class Attribute extends EventEmitter {
 
 	/**
 	 * Sets the value of the requested attribute.
+	 * Note: this can and should be accomplished by setting the attribute as a regular property.
+	 * This should only be used in cases where a function is actually needed.
 	 * @param {string} name
 	 * @param {*} value
 	 * @return {*}

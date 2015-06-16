@@ -417,7 +417,7 @@ describe('EventEmitter Tests', function() {
 		sinon.assert.calledWithExactly(listener, 'arg1', 2);
 	});
 
-	it('should pass facade as first argument when requested', function() {
+	it('should pass facade as last argument when requested', function() {
 		var listener = sinon.stub();
 
 		this.emitter.setShouldUseFacade(true);
@@ -426,11 +426,12 @@ describe('EventEmitter Tests', function() {
 
 		sinon.assert.calledWithExactly(
 			listener,
-			sinon.match({
-				type: 'event'
-			}),
 			'arg1',
-			2
+			2,
+			sinon.match({
+				target: this.emitter,
+				type: 'event'
+			})
 		);
 	});
 

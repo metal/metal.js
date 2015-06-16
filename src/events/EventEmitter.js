@@ -107,9 +107,10 @@ class EventEmitter extends Disposable {
 
 		if (this.getShouldUseFacade()) {
 			var facade = {
+				target: this,
 				type: event
 			};
-			args = [facade].concat(args);
+			args.push(facade);
 		}
 
 		for (var i = 0; i < listeners.length; i++) {

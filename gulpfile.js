@@ -28,3 +28,7 @@ metal.registerTasks({
 	soyGeneratedDest: false,
 	soySrc: ['src/**/*.soy', 'test/**/*.soy']
 });
+
+gulp.task('build:all:js', function(done) {
+	runSequence(['build:globals', 'build:amd'], done);
+});

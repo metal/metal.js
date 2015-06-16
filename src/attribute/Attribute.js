@@ -33,6 +33,7 @@ class Attribute extends EventEmitter {
 		 */
 		this.attrsInfo_ = {};
 
+		this.setShouldUseFacade(true);
 		this.mergeInvalidAttrs_();
 		this.addAttrsFromStaticHint_(opt_config);
 	}

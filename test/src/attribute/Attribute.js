@@ -423,6 +423,10 @@ describe('Attribute', function() {
 		assert.strictEqual('attr1', listener.args[0][0].attrName);
 		assert.strictEqual(10, listener.args[0][0].prevVal);
 		assert.strictEqual(2, listener.args[0][0].newVal);
+		assert.deepEqual(listener.args[0][1], {
+			target: attr,
+			type: 'attr1Changed'
+		});
 	});
 
 	it('should not emit events when attribute doesn\'t change', function() {
@@ -470,12 +474,16 @@ describe('Attribute', function() {
 	it('should emit a batch event with all attribute changes for the cycle', function(done) {
 		var attr = createAttributeInstance();
 
-		attr.on('attrsChanged', function(data) {
+		attr.on('attrsChanged', function(data, facade) {
 			assert.strictEqual(2, Object.keys(data.changes).length);
 			assert.strictEqual(undefined, data.changes.attr1.prevVal);
 			assert.strictEqual(12, data.changes.attr1.newVal);
 			assert.strictEqual(undefined, data.changes.attr2.prevVal);
 			assert.strictEqual(21, data.changes.attr2.newVal);
+			assert.deepEqual(facade, {
+				target: attr,
+				type: 'attrsChanged'
+			});
 			done();
 		});
 

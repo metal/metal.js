@@ -19,7 +19,7 @@
     "library"
   ],
   "dependencies": {
-    "closure-templates": "^20141017.0.1"
+    "closure-templates": "^20150605.0.0"
   },
   "devDependencies": {
     "chai": "^3.0.0",

@@ -1,13 +1,16 @@
 {
-	"name": "metal",
-	"version": "1.0.0-alpha",
-	"main": "src/core.js",
-	"description": "Build UI components in a solid, flexible way",
-	"keywords": [
-		"metal"
-	],
-	"ignore": [
-		"*",
-		"!src/**/*"
-	]
+  "name": "metal",
+  "version": "1.0.0-alpha",
+  "main": "src/core.js",
+  "description": "Build UI components in a solid, flexible way",
+  "keywords": [
+    "metal"
+  ],
+  "ignore": [
+    "*",
+    "!src/**/*"
+  ],
+  "dependencies": {
+    "soyutils": "2014.04.22"
+  }
 }

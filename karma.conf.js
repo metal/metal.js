@@ -6,7 +6,7 @@ module.exports = function (config) {
 
 		files: [
 			'test/src/html/fixture/*.html',
-			'node_modules/closure-templates/soyutils.js',
+			'bower_components/soyutils/soyutils.js',
 			'src/**/*.js',
 			'test/src/**/*.js'
 		],

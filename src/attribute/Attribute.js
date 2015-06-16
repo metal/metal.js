@@ -231,6 +231,15 @@ class Attribute extends EventEmitter {
 	}
 
 	/**
+	 * Returns the value of the requested attribute.
+	 * @param {string} name
+	 * @return {*}
+	 */
+	get(name) {
+		return this[name];
+	}
+
+	/**
 	 * Gets the config object for the requested attribute.
 	 * @param {string} name The attribute's name.
 	 * @return {!Object}
@@ -370,6 +379,16 @@ class Attribute extends EventEmitter {
 		} else {
 			changes[name] = attrChangeData;
 		}
+	}
+
+	/**
+	 * Sets the value of the requested attribute.
+	 * @param {string} name
+	 * @param {*} value
+	 * @return {*}
+	 */
+	set(name, value) {
+		this[name] = value;
 	}
 
 	/**

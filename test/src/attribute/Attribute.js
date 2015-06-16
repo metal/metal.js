@@ -115,6 +115,29 @@ describe('Attribute', function() {
 		assert.strictEqual(2, attr.attr2);
 	});
 
+	it('should get attribute value through "get" method', function() {
+		var attr = new Attribute();
+		attr.addAttrs({
+			attr1: {
+				value: 2
+			}
+		});
+
+		assert.strictEqual(2, attr.get('attr1'));
+	});
+
+	it('should set attribute value through "set" method', function() {
+		var attr = new Attribute();
+		attr.addAttrs({
+			attr1: {
+				value: 2
+			}
+		});
+
+		attr.set('attr1', 3);
+		assert.strictEqual(3, attr.attr1);
+	});
+
 	it('should set default attribute value', function() {
 		var attr = createAttributeInstance();
 

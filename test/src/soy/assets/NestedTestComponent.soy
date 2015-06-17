@@ -14,7 +14,7 @@
 {template .components}
 	<div class="componentsWrapper">
 	{for $index in range($count)}
-		{delcall CustomTestComponent}
+		{delcall CustomTestComponent data="all"}
 			{param headerContent: $foo /}
 			{param id: $id + 'MyChild' + $index /}
 		{/delcall}

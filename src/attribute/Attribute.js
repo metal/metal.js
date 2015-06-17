@@ -253,12 +253,14 @@ class Attribute extends EventEmitter {
 	}
 
 	/**
-	 * Returns an object that maps all attribute names to their values.
+	 * Returns an object that maps attribute names to their values.
+	 * @param {Array<string>=} opt_names A list of names of the attributes that should be
+	 *   returned. If none is given, all attributes will be returned.
 	 * @return {Object.<string, *>}
 	 */
-	getAttrs() {
+	getAttrs(opt_names) {
 		var attrsMap = {};
-		var names = this.getAttrNames();
+		var names = opt_names || this.getAttrNames();
 
 		for (var i = 0; i < names.length; i++) {
 			attrsMap[names[i]] = this[names[i]];

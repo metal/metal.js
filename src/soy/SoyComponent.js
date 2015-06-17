@@ -109,6 +109,20 @@ class SoyComponent extends Component {
 	}
 
 	/**
+	 * Builds the data object that should be passed to a template from this component.
+	 * @return {!Object}
+	 * @protected
+	 */
+	buildTemplateData_() {
+		var names = this.getAttrNames().filter(function(name) {
+			// Get all attribute values except for "element", since it helps performance and this
+			// attribute shouldn't be referenced inside a soy template anyway.
+			return name !== 'element';
+		});
+		return this.getAttrs(names);
+	}
+
+	/**
 	 * Generates the id for a surface that was found by a soy template call.
 	 * @param {string} templateName
 	 * @return {string}
@@ -245,7 +259,7 @@ class SoyComponent extends Component {
 	 */
 	renderTemplate_(templateFn, opt_data) {
 		soy.$$getDelegateFn = this.handleGetDelegateFnCall_.bind(this);
-		var content = templateFn(opt_data || this, null, {}).content;
+		var content = templateFn(opt_data || this.buildTemplateData_(), null, {}).content;
 		soy.$$getDelegateFn = originalGetDelegateFn;
 		return content;
 	}

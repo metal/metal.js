@@ -193,6 +193,7 @@ describe('SoyComponent', function() {
 			assert.ok(child);
 			assert.strictEqual(this.CustomTestComponent, child.constructor);
 			assert.strictEqual('foo', child.headerContent);
+			assert.strictEqual('footer', child.footerContent);
 		});
 
 		it('should instantiate rendered child component without id', function() {
@@ -320,6 +321,9 @@ describe('SoyComponent', function() {
 			},
 			foo: {
 				value: 'foo'
+			},
+			footerContent: {
+				value: 'footer'
 			}
 		};
 		return NestedTestComponent;

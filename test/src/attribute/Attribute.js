@@ -515,6 +515,16 @@ describe('Attribute', function() {
 		assert.strictEqual(2, attrsMap.attr2);
 	});
 
+	it('should get specified attribute values', function() {
+		var attr = createAttributeInstance();
+
+		attr.attr1 = 10;
+
+		var attrsMap = attr.getAttrs(['attr1']);
+		assert.strictEqual(1, Object.keys(attrsMap).length);
+		assert.strictEqual(10, attrsMap.attr1);
+	});
+
 	it('should set all attribute values', function() {
 		var attr = createAttributeInstance();
 		attr.setAttrs({

@@ -1,5 +1,3 @@
-var isparta = require('isparta');
-
 module.exports = function (config) {
 	config.set({
 		frameworks: ['mocha', 'chai', 'sinon', 'source-map-support', 'commonjs'],

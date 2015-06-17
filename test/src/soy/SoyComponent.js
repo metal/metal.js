@@ -196,6 +196,19 @@ describe('SoyComponent', function() {
 			assert.strictEqual('footer', child.footerContent);
 		});
 
+		it('should instantiate rendered child component when decorating main component', function() {
+			var NestedTestComponent = createNestedTestComponentClass();
+			var custom = new NestedTestComponent({
+				id: 'nested'
+			}).decorate();
+
+			var child = custom.components.nestedMyChild0;
+			assert.ok(child);
+			assert.strictEqual(this.CustomTestComponent, child.constructor);
+			assert.strictEqual('foo', child.headerContent);
+			assert.strictEqual('footer', child.footerContent);
+		});
+
 		it('should instantiate rendered child component without id', function() {
 			var NestedNoIdTestComponent = createCustomTestComponentClass('NestedNoIdTestComponent');
 			var custom = new NestedNoIdTestComponent({

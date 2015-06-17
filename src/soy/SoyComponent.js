@@ -155,7 +155,7 @@ class SoyComponent extends Component {
 	 */
 	getElementContent() {
 		this.surfaceBeingRendered_ = null;
-		return this.renderTemplateByName_('content', this);
+		return this.renderTemplateByName_('content');
 	}
 
 	/**

@@ -113,16 +113,18 @@ class EventsCollector extends Disposable {
 	 */
 	detachUnusedListeners() {
 		for (var selector in this.eventHandles_) {
-			var unused = true;
-			for (var groupName in this.groupHasListener_) {
-				if (this.groupHasListener_[groupName][selector]) {
-					unused = false;
-					break;
+			if (this.eventHandles_[selector]) {
+				var unused = true;
+				for (var groupName in this.groupHasListener_) {
+					if (this.groupHasListener_[groupName][selector]) {
+						unused = false;
+						break;
+					}
 				}
-			}
-			if (unused) {
-				this.eventHandles_[selector].removeListener();
-				this.eventHandles_[selector] = null;
+				if (unused) {
+					this.eventHandles_[selector].removeListener();
+					this.eventHandles_[selector] = null;
+				}
 			}
 		}
 	}

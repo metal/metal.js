@@ -208,6 +208,28 @@ describe('EventsCollector', function() {
 		assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
 	});
 
+	it('should not throw error when detaching unused listeners twice', function() {
+		var CustomComponent = createCustomComponent(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		CustomComponent.prototype.handleClick = sinon.stub();
+		CustomComponent.prototype.handleKeyDown = sinon.stub();
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		collector.attachListeners(custom.element.innerHTML, 'group');
+
+		var trigger = custom.element.childNodes[0];
+		trigger.removeAttribute('data-onclick');
+
+		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.detachUnusedListeners();
+
+		assert.doesNotThrow(function() {
+			collector.detachUnusedListeners();
+		});
+	});
+
 	it('should detach all listeners when detachAllListeners is called', function() {
 		var CustomComponent = createCustomComponent(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'

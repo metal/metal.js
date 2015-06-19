@@ -99,7 +99,7 @@ class Attribute extends EventEmitter {
 	addAttrsFromStaticHint_(config) {
 		var ctor = this.constructor;
 		var defineContext = false;
-		if (core.mergeSuperClassesProperty(ctor, 'ATTRS', this.mergeAttrs_)) {
+		if (Attribute.mergeAttrsStatic(ctor)) {
 			defineContext = ctor.prototype;
 		}
 		this.addAttrs(ctor.ATTRS_MERGED, config, defineContext);
@@ -333,10 +333,21 @@ class Attribute extends EventEmitter {
 	 * Merges an array of values for the ATTRS property into a single object.
 	 * @param {!Array} values The values to be merged.
 	 * @return {!Object} The merged value.
+	 * @static
 	 * @protected
 	 */
-	mergeAttrs_(values) {
+	static mergeAttrs_(values) {
 		return object.mixin.apply(null, [{}].concat(values.reverse()));
+	}
+
+	/**
+	 * Merges the ATTRS static variable for the given constructor function.
+	 * @param  {!Function} ctor Constructor function.
+	 * @return {boolean} Returns true if merge happens, false otherwise.
+	 * @static
+	 */
+	static mergeAttrsStatic(ctor) {
+		return core.mergeSuperClassesProperty(ctor, 'ATTRS', Attribute.mergeAttrs_);
 	}
 
 	/**

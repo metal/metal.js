@@ -637,6 +637,45 @@ describe('Attribute', function() {
 			assert.strictEqual(2, test.attr2);
 			assert.strictEqual(undefined, test.attr3);
 		});
+
+		it('should merge ATTRS variable of given constructor', function() {
+			var Test = createTestClass();
+			Test.ATTRS = {
+				attr1: {
+					value: 1
+				},
+				attr2: {
+					value: 2
+				}
+			};
+
+			class ChildTest extends Test {
+				constructor(opt_config) {
+					super(opt_config);
+				}
+			}
+			ChildTest.ATTRS = {
+				attr1: {
+					value: -1
+				},
+				attr3: {
+					value: 3
+				}
+			};
+
+			Attribute.mergeAttrsStatic(ChildTest);
+			assert.deepEqual({
+				attr1: {
+					value: -1
+				},
+				attr2: {
+					value: 2
+				},
+				attr3: {
+					value: 3
+				}
+			}, ChildTest.ATTRS_MERGED);
+		});
 	});
 });
 

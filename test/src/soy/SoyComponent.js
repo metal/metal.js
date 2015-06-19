@@ -315,6 +315,113 @@ describe('SoyComponent', function() {
 		});
 	});
 
+	describe('createComponentFromTemplate', function() {
+		it('should create and instantiate soy component using given template', function() {
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var comp = SoyComponent.createComponentFromTemplate(templateFn);
+			assert.ok(comp instanceof SoyComponent);
+
+			comp.render();
+			assert.strictEqual('undefined', comp.element.innerHTML);
+		});
+
+		it('should pass given data as attributes to created component', function() {
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var comp = SoyComponent.createComponentFromTemplate(templateFn, {
+				headerContent: 'My Header'
+			});
+			assert.strictEqual('My Header', comp.headerContent);
+
+			comp.render();
+			assert.strictEqual('My Header', comp.element.innerHTML);
+		});
+	});
+
+	describe('renderFromTemplate', function() {
+		afterEach(function() {
+			ComponentRegistry.components_ = {};
+			ComponentCollector.components = {};
+		});
+
+		it('should render the given template in the specified element', function() {
+			var element = document.createElement('div');
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			SoyComponent.renderFromTemplate(templateFn, element);
+			assert.strictEqual('undefined', element.innerHTML);
+		});
+
+		it('should render the given template with the given data', function() {
+			var element = document.createElement('div');
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var data = {
+				headerContent: 'My Header'
+			};
+			SoyComponent.renderFromTemplate(templateFn, element, data);
+			assert.strictEqual('My Header', element.innerHTML);
+		});
+
+		it('should render the given template in the element with the specified id', function() {
+			var element = document.createElement('div');
+			element.id = 'comp';
+			dom.enterDocument(element);
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var data = {
+				headerContent: 'My Header'
+			};
+			SoyComponent.renderFromTemplate(templateFn, '#comp', data);
+			assert.strictEqual('My Header', element.innerHTML);
+		});
+
+		it('should return a SoyComponent instance', function() {
+			var element = document.createElement('div');
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var comp = SoyComponent.renderFromTemplate(templateFn, element);
+			assert.ok(comp instanceof SoyComponent);
+		});
+
+		it('should instantiate component inside rendered template', function() {
+			var CustomTestComponent = createCustomTestComponentClass();
+			CustomTestComponent.ATTRS = {
+				headerContent: {}
+			};
+			sinon.spy(CustomTestComponent.prototype, 'renderAsSubComponent');
+
+			var element = document.createElement('div');
+			var templateFn = ComponentRegistry.Templates.NestedTestComponent.components;
+			var data = {
+				count: 2,
+				id: 'nested',
+				foo: 'foo'
+			};
+			var comp = SoyComponent.renderFromTemplate(templateFn, element, data);
+			assert.ok(comp.components.nestedMyChild0 instanceof CustomTestComponent);
+			assert.ok(comp.components.nestedMyChild1 instanceof CustomTestComponent);
+			assert.strictEqual(2, CustomTestComponent.prototype.renderAsSubComponent.callCount);
+		});
+	});
+
+	describe('decorateFromTemplate', function() {
+		it('should call decorateAsSubComponent for components inside given template', function() {
+			var CustomTestComponent = createCustomTestComponentClass();
+			CustomTestComponent.ATTRS = {
+				headerContent: {}
+			};
+			sinon.spy(CustomTestComponent.prototype, 'decorateAsSubComponent');
+
+			var element = document.createElement('div');
+			var templateFn = ComponentRegistry.Templates.NestedTestComponent.components;
+			var data = {
+				count: 2,
+				id: 'nested',
+				foo: 'foo'
+			};
+			var comp = SoyComponent.decorateFromTemplate(templateFn, element, data);
+			assert.ok(comp.components.nestedMyChild0 instanceof CustomTestComponent);
+			assert.ok(comp.components.nestedMyChild1 instanceof CustomTestComponent);
+			assert.strictEqual(2, CustomTestComponent.prototype.decorateAsSubComponent.callCount);
+		});
+	});
+
 	function createCustomTestComponentClass(name) {
 		name = name || 'CustomTestComponent';
 		class CustomTestComponent extends SoyComponent {

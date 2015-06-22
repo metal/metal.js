@@ -23,3 +23,20 @@ Object.keys(mouseEventMap).forEach(function(eventName) {
 		originalEvent: mouseEventMap[eventName]
 	});
 });
+
+var animationEventMap = {
+	animation: 'animationend',
+	transition: 'transitionend'
+};
+Object.keys(animationEventMap).forEach(function(eventType) {
+	var eventName = animationEventMap[eventType];
+	dom.registerCustomEvent(eventName, {
+		event: true,
+		delegate: true,
+		handler: function(callback, event) {
+			event.customType = eventName;
+			return callback(event);
+		},
+		originalEvent: features.checkAnimationEventName()[eventType]
+	});
+});

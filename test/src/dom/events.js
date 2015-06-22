@@ -85,4 +85,20 @@ describe('Custom Events', function() {
 		});
 		assert.strictEqual(1, listener.callCount);
 	});
+
+	it('should handle transitionend event', function() {
+		var listener = sinon.stub();
+		dom.on(this.element1, 'transitionend', listener);
+		dom.triggerEvent(this.element1, 'transitionend');
+		assert.strictEqual(1, listener.callCount);
+		assert.strictEqual('transitionend', listener.args[0][0].customType);
+	});
+
+	it('should handle animationend event', function() {
+		var listener = sinon.stub();
+		dom.on(this.element1, 'animationend', listener);
+		dom.triggerEvent(this.element1, 'animationend');
+		assert.strictEqual(1, listener.callCount);
+		assert.strictEqual('animationend', listener.args[0][0].customType);
+	});
 });

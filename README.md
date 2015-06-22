@@ -40,6 +40,10 @@ Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.
 
 Metal.js comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To learn more about them and use them, take a look at [gulp-metal](https://github.com/metal/gulp-metal).
 
+## Browser Support
+ 		 
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/metal/metal.js)
+
 ## License
 
 [BSD License](https://github.com/metal/metal.js/blob/master/LICENSE.md) © Liferay, Inc.

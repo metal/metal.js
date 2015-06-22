@@ -1,6 +1,7 @@
 'use strict';
 
 import dom from '../../../src/dom/dom';
+import features from '../../../src/dom/features';
 import '../../../src/dom/events';
 
 describe('Custom Events', function() {
@@ -89,7 +90,7 @@ describe('Custom Events', function() {
 	it('should handle transitionend event', function() {
 		var listener = sinon.stub();
 		dom.on(this.element1, 'transitionend', listener);
-		dom.triggerEvent(this.element1, 'transitionend');
+		dom.triggerEvent(this.element1, features.checkAnimationEventName().transition);
 		assert.strictEqual(1, listener.callCount);
 		assert.strictEqual('transitionend', listener.args[0][0].customType);
 	});
@@ -97,7 +98,7 @@ describe('Custom Events', function() {
 	it('should handle animationend event', function() {
 		var listener = sinon.stub();
 		dom.on(this.element1, 'animationend', listener);
-		dom.triggerEvent(this.element1, 'animationend');
+		dom.triggerEvent(this.element1, features.checkAnimationEventName().animation);
 		assert.strictEqual(1, listener.callCount);
 		assert.strictEqual('animationend', listener.args[0][0].customType);
 	});

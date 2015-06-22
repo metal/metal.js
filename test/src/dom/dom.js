@@ -213,6 +213,31 @@ describe('dom', function() {
 		});
 	});
 
+	describe('once', function() {
+		it('should listen once to event on requested element', function() {
+			var element = document.createElement('div');
+			var listener = sinon.stub();
+			dom.once(element, 'myEvent', listener);
+			assert.strictEqual(0, listener.callCount);
+
+			dom.triggerEvent(element, 'myEvent');
+			dom.triggerEvent(element, 'myEvent');
+			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should be able to remove listener from return value of "once"', function() {
+			var element = document.createElement('div');
+			var listener = sinon.stub();
+
+			var handle = dom.once(element, 'myEvent', listener);
+			assert.ok(handle instanceof DomEventHandle);
+
+			handle.removeListener();
+			dom.triggerEvent(element, 'myEvent');
+			assert.strictEqual(0, listener.callCount);
+		});
+	});
+
 	describe('triggerEvent', function() {
 		it('should trigger dom event', function() {
 			var listener = sinon.stub();

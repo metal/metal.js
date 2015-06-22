@@ -275,6 +275,24 @@ class dom {
 	}
 
 	/**
+	 * Listens to the specified event on the given DOM element once. This
+	 * function normalizes DOM event payloads and functions so they'll work the
+	 * same way on all supported browsers.
+	 * @param {!Element} element The DOM element to listen to the event on.
+	 * @param {string} eventName The name of the event to listen to.
+	 * @param {!function(!Object)} callback Function to be called when the event
+	 *   is triggered. It will receive the normalized event object.
+	 * @return {!DomEventHandle} Can be used to remove the listener.
+	 */
+	static once(element, eventName, callback) {
+		var domEventHandle = this.on(element, eventName, function() {
+			callback.apply(this, arguments);
+			domEventHandle.removeListener();
+		});
+		return domEventHandle;
+	}
+
+	/**
 	 * Registers a custom event.
 	 * @param {string} eventName The name of the custom event.
 	 * @param {!Object} customConfig An object with information about how the event

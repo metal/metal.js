@@ -286,8 +286,8 @@ class dom {
 	 */
 	static once(element, eventName, callback) {
 		var domEventHandle = this.on(element, eventName, function() {
-			callback.apply(this, arguments);
 			domEventHandle.removeListener();
+			return callback.apply(this, arguments);
 		});
 		return domEventHandle;
 	}

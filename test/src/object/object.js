@@ -28,4 +28,11 @@ describe('object', function() {
 		assert.strictEqual(original, mixin);
 		assert.deepEqual([1, 2, 3], mixin);
 	});
+
+	it('should get object by name', function() {
+		window.Foo = {
+			Bar: 1
+		};
+		assert.strictEqual(1, object.getObjectByName('Foo.Bar'));
+	});
 });

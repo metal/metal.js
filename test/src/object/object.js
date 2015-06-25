@@ -34,5 +34,6 @@ describe('object', function() {
 			Bar: 1
 		};
 		assert.strictEqual(1, object.getObjectByName('Foo.Bar'));
+		assert.strictEqual(null, object.getObjectByName('Foo.Bar.None'));
 	});
 });

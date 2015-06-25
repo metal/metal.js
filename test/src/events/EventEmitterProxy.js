@@ -1,10 +1,14 @@
 'use strict';
 
 import dom from '../../../src/dom/dom';
+import features from '../../../src/dom/features';
 import EventEmitter from '../../../src/events/EventEmitter';
 import EventEmitterProxy from '../../../src/events/EventEmitterProxy';
 
 describe('EventEmitterProxy', function() {
+	afterEach(function() {
+		document.body.innerHTML = '';
+	});
 
 	it('should proxy event from origin to target', function() {
 		var origin = new EventEmitter();
@@ -34,6 +38,20 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(1, listener.callCount);
 		assert.ok(listener.args[0][0]);
 		document.body.removeChild(origin);
+	});
+
+	it('should proxy custom event from dom element origin to target', function() {
+		var origin = document.createElement('div');
+		document.body.appendChild(origin);
+
+		var target = new EventEmitter();
+		new EventEmitterProxy(origin, target);
+
+		var listener = sinon.stub();
+		target.on('transitionend', listener);
+		dom.triggerEvent(origin, features.checkAnimationEventName().transition);
+
+		assert.strictEqual(1, listener.callCount);
 	});
 
 	it('should not proxy unsupported dom event from dom element', function() {

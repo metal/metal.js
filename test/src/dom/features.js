@@ -39,6 +39,7 @@ describe('features', function() {
 		});
 
 		afterEach(function() {
+			features.animationEventName_ = undefined;
 			features.animationElement_ = this.animationElement;
 		});
 

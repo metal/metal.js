@@ -1525,6 +1525,21 @@ describe('Component', function() {
 			assert.strictEqual(this.ChildComponent, child.constructor);
 			assert.strictEqual(custom.element.querySelector('#child'), child.element);
 		});
+
+		it('should dispose sub components when parent component is disposed', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~c-child:ChildComponent~%%%%';
+			};
+
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
+
+			var child = custom.components.child;
+			custom.dispose();
+			assert.ok(child.isDisposed());
+		});
 	});
 
 	describe('Inline Events', function() {

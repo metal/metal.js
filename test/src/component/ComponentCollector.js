@@ -26,6 +26,25 @@ describe('ComponentCollector', function() {
 		console.warn.restore();
 	});
 
+	it('should add component to the collector', function() {
+		var collector = new ComponentCollector();
+		var comp = new TestComponent({
+			id: 'test'
+		});
+		collector.addComponent(comp);
+		assert.strictEqual(comp, ComponentCollector.components.test);
+	});
+
+	it('should remove component from the collector', function() {
+		var collector = new ComponentCollector();
+		var comp = new TestComponent({
+			id: 'test'
+		});
+		collector.addComponent(comp);
+		collector.removeComponent(comp);
+		assert.ok(!ComponentCollector.components.test);
+	});
+
 	it('should instantiate a new component', function() {
 		var element = document.createElement('div');
 		element.setAttribute('id', 'comp');

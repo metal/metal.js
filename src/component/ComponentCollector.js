@@ -16,7 +16,7 @@ class ComponentCollector extends Disposable {
 
 	/**
 	 * Adds a component to this collector.
-	 * @param {Component} component
+	 * @param {!Component} component
 	 */
 	addComponent(component) {
 		ComponentCollector.components[component.id] = component;
@@ -50,6 +50,14 @@ class ComponentCollector extends Disposable {
 		var data = this.nextComponentData_[id] || {};
 		data.id = id;
 		return data;
+	}
+
+	/**
+	 * Removes the given component from this collector.
+	 * @param {!Component} component
+	 */
+	removeComponent(component) {
+		delete ComponentCollector.components[component.id];
 	}
 
 	/**

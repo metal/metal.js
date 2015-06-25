@@ -557,6 +557,20 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Calls `dispose` on all subcomponents.
+	 * @protected
+	 */
+	disposeSubComponents_() {
+		var ids = Object.keys(this.components);
+		for (var i = 0; i < ids.length; i++) {
+			var component = this.components[ids[i]];
+			Component.componentsCollector.removeComponent(component);
+			component.dispose();
+		}
+		this.components = null;
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	disposeInternal() {
@@ -570,7 +584,7 @@ class Component extends Attribute {
 		this.delegateEventHandler_.removeAllListeners();
 		this.delegateEventHandler_ = null;
 
-		this.components = null;
+		this.disposeSubComponents_();
 		this.generatedIdCount_ = null;
 		this.surfaces_ = null;
 		this.surfacesRenderAttrs_ = null;

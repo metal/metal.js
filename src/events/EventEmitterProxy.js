@@ -1,5 +1,6 @@
 'use strict';
 
+import core from '../core';
 import dom from '../dom/dom';
 import Disposable from '../disposable/Disposable';
 
@@ -91,8 +92,11 @@ class EventEmitterProxy extends Disposable {
 			self.targetEmitter_.emit.apply(self.targetEmitter_, args);
 		};
 
-		var addFnName = this.originEmitter_.addEventListener ? 'addEventListener' : 'on';
-		this.originEmitter_[addFnName](event, this.proxiedEvents_[event]);
+		if (core.isElement(this.originEmitter_)) {
+			dom.on(this.originEmitter_, event, this.proxiedEvents_[event]);
+		} else {
+			this.originEmitter_.on(event, this.proxiedEvents_[event]);
+		}
 	}
 
 	/**

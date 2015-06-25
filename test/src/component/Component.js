@@ -2,6 +2,7 @@
 
 import async from '../../../src/async/async';
 import dom from '../../../src/dom/dom';
+import features from '../../../src/dom/features';
 import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
@@ -632,6 +633,18 @@ describe('Component', function() {
 
 			custom.dispose();
 			dom.triggerEvent(fooElement, 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should listen to custom events on the element', function() {
+			var CustomComponent = createCustomComponentClass();
+			var custom = new CustomComponent();
+			custom.render();
+
+			var listener = sinon.stub();
+			custom.on('transitionend', listener);
+
+			dom.triggerEvent(custom.element, features.checkAnimationEventName().transition);
 			assert.strictEqual(1, listener.callCount);
 		});
 	});

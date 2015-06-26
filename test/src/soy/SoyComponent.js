@@ -345,6 +345,21 @@ describe('SoyComponent', function() {
 			comp.render();
 			assert.strictEqual('My Header', element.innerHTML);
 		});
+
+		it('should pass correct params to soy template', function() {
+			sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var data = {
+				headerContent: 'My Header'
+			};
+			var comp = SoyComponent.createComponentFromTemplate(templateFn, null, data);
+
+			comp.render();
+			assert.strictEqual(1, templateFn.callCount);
+			assert.strictEqual(data, templateFn.args[0][0]);
+			assert.ok(!templateFn.args[0][1]);
+			assert.deepEqual({}, templateFn.args[0][2]);
+		});
 	});
 
 	describe('renderFromTemplate', function() {

@@ -137,7 +137,7 @@ class SoyComponent extends Component {
 		class TemplateComponent extends SoyComponent {
 		}
 		TemplateComponent.TEMPLATES = {
-			content: function(opt_ignored, opt_ijData) {
+			content: function(opt_attrs, opt_ignored, opt_ijData) {
 				return templateFn(opt_data || {}, opt_ignored, opt_ijData);
 			}
 		};

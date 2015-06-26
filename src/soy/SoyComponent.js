@@ -2,8 +2,6 @@
 
 import core from '../core';
 import dom from '../dom/dom';
-import object from '../object/object';
-import Attribute from '../attribute/Attribute';
 import Component from '../component/Component';
 
 /**
@@ -129,32 +127,30 @@ class SoyComponent extends Component {
 	 * main content template. All keys present in the config object, if one is given, will be
 	 * attributes of this component, and the object itself will be passed to the constructor.
 	 * @param {!function()} templateFn
-	 * @param {Object=} opt_config
+	 * @param {(Element|string)=} opt_element The element that should be decorated. If none is given,
+	 *   one will be created and appended to the document body.
+	 * @param {Object=} opt_data Data to be passed to the soy template when it's called.
 	 * @return {!SoyComponent}
 	 * @static
 	 */
-	static createComponentFromTemplate(templateFn, opt_config) {
+	static createComponentFromTemplate(templateFn, opt_element, opt_data) {
 		class TemplateComponent extends SoyComponent {
 		}
 		TemplateComponent.TEMPLATES = {
-			content: templateFn
-		};
-		TemplateComponent.ATTRS = {
-		};
-		Attribute.mergeAttrsStatic(SoyComponent);
-		Object.keys(opt_config || {}).forEach(function(name) {
-			if (!SoyComponent.ATTRS_MERGED[name]) {
-				TemplateComponent.ATTRS[name] = {};
+			content: function(opt_ignored, opt_ijData) {
+				return templateFn(opt_data || {}, opt_ignored, opt_ijData);
 			}
+		};
+		return new TemplateComponent({
+			element: opt_element
 		});
-		return new TemplateComponent(opt_config);
 	}
 
 	/**
 	 * Decorates html rendered by the given soy template function, instantiating any referenced
 	 * components in it.
 	 * @param {!function()} templateFn
-	 * @param {Element=} opt_element The element that should be decorated. If none is given,
+	 * @param {(Element|string)=} opt_element The element that should be decorated. If none is given,
 	 *   one will be created and appended to the document body.
 	 * @param {Object=} opt_data Data to be passed to the soy template when it's called.
 	 * @return {!SoyComponent} The component that was created for this action. Contains
@@ -162,10 +158,7 @@ class SoyComponent extends Component {
 	 * @static
 	 */
 	static decorateFromTemplate(templateFn, opt_element, opt_data) {
-		var config = object.mixin({
-			element: opt_element
-		}, opt_data);
-		return SoyComponent.createComponentFromTemplate(templateFn, config).decorate();
+		return SoyComponent.createComponentFromTemplate(templateFn, opt_element, opt_data).decorate();
 	}
 
 	/**
@@ -300,18 +293,15 @@ class SoyComponent extends Component {
 	/**
 	 * Renders the given soy template function, instantiating any referenced components in it.
 	 * @param {!function()} templateFn
-	 * @param {Element=} opt_element The element where the template should be rendered. If
-	 *    none is given, one will be created and appended to the document body.
+	 * @param {(Element|string)=} opt_element The element that should be decorated. If none is given,
+	 *   one will be created and appended to the document body.
 	 * @param {Object=} opt_data Data to be passed to the soy template when it's called.
 	 * @return {!SoyComponent} The component that was created for this action. Contains
 	 *   references to components that were rendered by the given template function.
 	 * @static
 	 */
 	static renderFromTemplate(templateFn, opt_element, opt_data) {
-		var config = object.mixin({
-			element: opt_element
-		}, opt_data);
-		return SoyComponent.createComponentFromTemplate(templateFn, config).render();
+		return SoyComponent.createComponentFromTemplate(templateFn, opt_element, opt_data).render();
 	}
 
 	/**

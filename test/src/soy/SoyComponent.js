@@ -325,15 +325,25 @@ describe('SoyComponent', function() {
 			assert.strictEqual('undefined', comp.element.innerHTML);
 		});
 
-		it('should pass given data as attributes to created component', function() {
+		it('should render component contents inside given element', function() {
 			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
-			var comp = SoyComponent.createComponentFromTemplate(templateFn, {
-				headerContent: 'My Header'
-			});
-			assert.strictEqual('My Header', comp.headerContent);
+			var element = document.createElement('div');
+			var comp = SoyComponent.createComponentFromTemplate(templateFn, element);
 
 			comp.render();
-			assert.strictEqual('My Header', comp.element.innerHTML);
+			assert.strictEqual(element, comp.element);
+			assert.strictEqual('undefined', element.innerHTML);
+		});
+
+		it('should pass given data when rendering given template', function() {
+			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var element = document.createElement('div');
+			var comp = SoyComponent.createComponentFromTemplate(templateFn, element, {
+				headerContent: 'My Header'
+			});
+
+			comp.render();
+			assert.strictEqual('My Header', element.innerHTML);
 		});
 	});
 
@@ -379,7 +389,7 @@ describe('SoyComponent', function() {
 			assert.ok(comp instanceof SoyComponent);
 		});
 
-		it('should instantiate component inside rendered template', function() {
+		it('should instantiate components inside rendered template', function() {
 			var CustomTestComponent = createCustomTestComponentClass();
 			CustomTestComponent.ATTRS = {
 				headerContent: {}

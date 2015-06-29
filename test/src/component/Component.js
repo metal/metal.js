@@ -186,8 +186,7 @@ describe('Component', function() {
 		it('should use tag static variable if getComponentHtml doesn\'t return anything', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ELEMENT_TAG_NAME = 'div';
-			CustomComponent.prototype.getComponentHtml = function() {
-			};
+			CustomComponent.prototype.getComponentHtml = function() {};
 
 			var custom = new CustomComponent().render();
 			assert.strictEqual('div', custom.element.tagName.toLowerCase());

@@ -108,7 +108,7 @@ describe('SoyComponent', function() {
 
 			var custom = new CustomTestComponent();
 			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['header', 'footer'], Object.keys(surfaces));
+			assert.deepEqual(['footer', 'header'], Object.keys(surfaces).sort());
 		});
 
 		it('should set surface renderAttrs to its template params', function() {

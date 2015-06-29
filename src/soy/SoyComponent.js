@@ -14,6 +14,9 @@ if (typeof soy === 'object') {
 	originalGetDelegateFn = soy.$$getDelegateFn;
 }
 
+// The injected data that will be passed to soy templates.
+var ijData = {};
+
 /**
  * Special Component class that handles a better integration between soy templates
  * and the components. It allows for automatic rendering of surfaces that have soy
@@ -286,7 +289,7 @@ class SoyComponent extends Component {
 			id: this.id || this.makeId_(),
 			surfaceId: opt_surfaceId
 		};
-		return templateFn(data, null, {}).content;
+		return templateFn(data, null, ijData).content;
 	}
 
 	/**
@@ -311,7 +314,7 @@ class SoyComponent extends Component {
 	 */
 	renderTemplate_(templateFn, opt_data) {
 		soy.$$getDelegateFn = this.handleGetDelegateFnCall_.bind(this);
-		var content = templateFn(opt_data || this.buildTemplateData_(), null, {}).content;
+		var content = templateFn(opt_data || this.buildTemplateData_(), null, ijData).content;
 		soy.$$getDelegateFn = originalGetDelegateFn;
 		return content;
 	}
@@ -334,10 +337,19 @@ class SoyComponent extends Component {
 	 * soy template.
 	 * @param {string} html
 	 * @return {soydata.SanitizedHtml}
-	 * @protected
+	 * @static
 	 */
 	static sanitizeHtml(html) {
 		return soydata.VERY_UNSAFE.ordainSanitizedHtml(html);
+	}
+
+	/**
+	 * Sets the injected data object that should be passed to templates.
+	 * @param {Object} data
+	 * @static
+	 */
+	static setInjectedData(data) {
+		ijData = data || {};
 	}
 }
 /**

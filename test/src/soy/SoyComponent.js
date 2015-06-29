@@ -46,8 +46,7 @@ describe('SoyComponent', function() {
 	it('should render element tag according to its template when defined', function() {
 		var CustomTestComponent = createCustomTestComponentClass();
 
-		var custom = new CustomTestComponent();
-		custom.render();
+		var custom = new CustomTestComponent().render();
 		assert.strictEqual('CUSTOM', custom.element.tagName);
 	});
 
@@ -76,6 +75,31 @@ describe('SoyComponent', function() {
 		assert.doesNotThrow(function() {
 			custom.decorate();
 		});
+	});
+
+	it('should pass requested injected data to soy templates', function() {
+		var ijData = {
+			foo: 'foo'
+		};
+		SoyComponent.setInjectedData(ijData);
+
+		var CustomTestComponent = createCustomTestComponentClass();
+		sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
+		new CustomTestComponent().render();
+		assert.strictEqual(ijData, ComponentRegistry.Templates.CustomTestComponent.header.args[0][2]);
+
+		ComponentRegistry.Templates.CustomTestComponent.header.restore();
+	});
+
+	it('should pass an empty object as injected data if it\'s set to falsey value', function() {
+		SoyComponent.setInjectedData(null);
+
+		var CustomTestComponent = createCustomTestComponentClass();
+		sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
+		new CustomTestComponent().render();
+		assert.deepEqual({}, ComponentRegistry.Templates.CustomTestComponent.header.args[0][2]);
+
+		ComponentRegistry.Templates.CustomTestComponent.header.restore();
 	});
 
 	describe('Surfaces', function() {

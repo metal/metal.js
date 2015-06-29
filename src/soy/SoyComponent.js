@@ -1,7 +1,6 @@
 'use strict';
 
 import core from '../core';
-import dom from '../dom/dom';
 import Component from '../component/Component';
 
 /**
@@ -339,26 +338,6 @@ class SoyComponent extends Component {
 	 */
 	static sanitizeHtml(html) {
 		return soydata.VERY_UNSAFE.ordainSanitizedHtml(html);
-	}
-
-	/**
-	 * Provides the default value for element attribute.
-	 * @return {Element} The element.
-	 * @protected
-	 */
-	valueElementFn_() {
-		var rendered = this.getComponentHtml();
-		if (rendered) {
-			var frag = dom.buildFragment(rendered);
-			var element = frag.childNodes[0];
-			// Remove element from fragment, so it won't have a parent. Otherwise,
-			// the `attach` method will think that the element has already been
-			// attached.
-			frag.removeChild(element);
-			return element;
-		}
-
-		return super.valueElementFn_();
 	}
 }
 /**

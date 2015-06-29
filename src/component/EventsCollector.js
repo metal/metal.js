@@ -169,6 +169,16 @@ class EventsCollector extends Disposable {
 	}
 
 	/**
+	 * Checks if this EventsCollector instance has already attached listeners for the given
+	 * group before.
+	 * @param  {string} group
+	 * @return {boolean}
+	 */
+	hasAttachedForGroup(group) {
+		return !!this.groupHasListener_.hasOwnProperty(group);
+	}
+
+	/**
 	 * Fires when an event that was registered by this collector is triggered. Makes
 	 * sure that the event was meant for this component and calls the appropriate
 	 * listener function for it.

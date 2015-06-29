@@ -279,7 +279,8 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	attachInlineListeners_() {
-		this.eventsCollector_.attachListeners(this.getElementContent_());
+		this.eventsCollector_.attachListeners(this.getElementContent_(''));
+		this.eventsCollector_.attachListeners(this.getComponentHtml(''), 'element');
 		this.elementContent_ = null;
 	}
 
@@ -291,6 +292,22 @@ class Component extends Attribute {
 	 * must be implemented on the detach phase.
 	 */
 	attached() {}
+
+	/**
+	 * Attaches inline listeners that are found on the given surface.
+	 * @param {string} surfaceId
+	 * @param {string} content
+	 * @protected
+	 */
+	attachSurfaceListeners_(surfaceId, content) {
+		this.eventsCollector_.attachListeners(content, surfaceId);
+		if (this.eventsCollector_.hasAttachedForGroup(surfaceId)) {
+			this.eventsCollector_.attachListeners(
+				this.getSurfaceHtml(surfaceId, ''),
+				surfaceId + '-element'
+			);
+		}
+	}
 
 	/**
 	 * Builds the data that should be used to create a surface that was found via
@@ -1068,11 +1085,11 @@ class Component extends Attribute {
 
 			if (cacheHit) {
 				if (this.decorating_) {
-					this.eventsCollector_.attachListeners(cacheContent, surfaceId);
+					this.attachSurfaceListeners_(surfaceId, cacheContent);
 				}
 				this.renderPlaceholderSurfaceContents_(content, surfaceId);
 			} else {
-				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
+				this.attachSurfaceListeners_(surfaceId, cacheContent);
 				this.replaceSurfaceContent_(surfaceId, content);
 			}
 		}
@@ -1203,7 +1220,7 @@ class Component extends Attribute {
 			// This surface's element hasn't been created yet, so it doesn't need
 			// to replace the rendered element. Let's cache the content so it won't rerender.
 			this.cacheSurfaceContent(surfaceId, collectedData.cacheContent);
-			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceId);
+			this.attachSurfaceListeners_(surfaceId, collectedData.cacheContent);
 		}
 	}
 
@@ -1265,6 +1282,17 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	valueElementFn_() {
+		var rendered = this.getComponentHtml('');
+		if (rendered) {
+			var frag = dom.buildFragment(rendered);
+			var element = frag.childNodes[0];
+			// Remove element from fragment, so it won't have a parent. Otherwise,
+			// the `attach` method will think that the element has already been
+			// attached.
+			frag.removeChild(element);
+			return element;
+		}
+
 		return document.createElement(this.constructor.ELEMENT_TAG_NAME_MERGED);
 	}
 

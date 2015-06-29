@@ -167,9 +167,30 @@ describe('Component', function() {
 				}
 			}
 
-			var custom = new ChildComponent();
-			custom.render();
+			var custom = new ChildComponent().render();
 			assert.strictEqual('span', custom.element.tagName.toLowerCase());
+		});
+
+		it('should build component element according to the return value of getComponentHtml', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ELEMENT_TAG_NAME = 'div';
+			CustomComponent.prototype.getComponentHtml = function(content) {
+				return '<span data-foo="foo">' + content + '</span>';
+			};
+
+			var custom = new CustomComponent().render();
+			assert.strictEqual('span', custom.element.tagName.toLowerCase());
+			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
+		});
+
+		it('should use tag static variable if getComponentHtml doesn\'t return anything', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ELEMENT_TAG_NAME = 'div';
+			CustomComponent.prototype.getComponentHtml = function() {
+			};
+
+			var custom = new CustomComponent().render();
+			assert.strictEqual('div', custom.element.tagName.toLowerCase());
 		});
 
 		it('should return component instance from lifecycle methods', function() {
@@ -1621,11 +1642,34 @@ describe('Component', function() {
 			assert.strictEqual(1, custom.handleClick.callCount);
 		});
 
+		it('should attach listeners from element tag', function() {
+			this.EventsTestComponent.prototype.getComponentHtml = function(content) {
+				return '<div id="' + this.id + '" data-onclick="handleElementClicked">' + content + '</div>';
+			};
+			this.EventsTestComponent.prototype.handleElementClicked = sinon.stub();
+
+			var custom = new this.EventsTestComponent().render();
+			dom.triggerEvent(custom.element, 'click');
+			assert.strictEqual(1, custom.handleElementClicked.callCount);
+		});
+
 		it('should attach listeners from surface content', function() {
 			var custom = new this.EventsTestComponent().render();
 			var button = custom.element.querySelector('.fooButton');
 			dom.triggerEvent(button, 'mouseover');
 			assert.strictEqual(1, custom.handleMouseOver.callCount);
+		});
+
+		it('should attach listeners from surface element tag', function() {
+			this.EventsTestComponent.prototype.getNonComponentSurfaceHtml = function(surfaceId, content) {
+				var surfaceElementId = this.makeSurfaceId_(surfaceId);
+				return '<div id="' + surfaceElementId + '" data-onclick="handleSurfaceClicked">' + content + '</div>';
+			};
+			this.EventsTestComponent.prototype.handleSurfaceClicked = sinon.stub();
+
+			var custom = new this.EventsTestComponent().render();
+			dom.triggerEvent(custom.getSurfaceElement('foo'), 'click');
+			assert.strictEqual(1, custom.handleSurfaceClicked.callCount);
 		});
 
 		it('should attach listeners from element content after decorating', function() {

@@ -288,6 +288,18 @@ describe('EventsCollector', function() {
 		assert.strictEqual(0, custom.handleKeyDown.callCount);
 	});
 
+	it('should check if listeners have been attached for the given group before', function() {
+		var CustomComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
+		CustomComponent.prototype.handleClick = sinon.stub();
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		assert.ok(!collector.hasAttachedForGroup('group'));
+
+		collector.attachListeners(custom.element.innerHTML, 'group');
+		assert.ok(collector.hasAttachedForGroup('group'));
+	});
+
 	function createCustomComponent(content) {
 		class CustomComponent extends Component {
 			constructor(opt_config) {

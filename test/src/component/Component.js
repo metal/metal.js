@@ -902,6 +902,33 @@ describe('Component', function() {
 			});
 		});
 
+		it('should not throw error if attrs, that are not render attrs of a surface, change', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {
+				content: {
+					value: 'foo'
+				},
+				other: {
+					value: 'foo'
+				}
+			};
+			CustomComponent.SURFACES = {
+				main: {
+					renderAttrs: ['content']
+				}
+			};
+
+			var custom = new CustomComponent().render();
+			custom.other = 'bar'; // This attr is not a render attr of any surface
+			custom.content = 'bar'; // This attr is a render attr of the "main" surface
+			custom.once('attrsChanged', function() {
+				// Attributes should have been updated without any errors.
+				assert.strictEqual('bar', custom.other);
+				assert.strictEqual('bar', custom.content);
+				done();
+			});
+		});
+
 		it('should not cache surface content if not string', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.renderInternal = function() {

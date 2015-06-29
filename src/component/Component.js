@@ -709,7 +709,9 @@ class Component extends Attribute {
 	getModifiedSurfacesFromChanges_(changes) {
 		var surfaces = [];
 		for (var attr in changes) {
-			surfaces.push(this.surfacesRenderAttrs_[attr]);
+			if (this.surfacesRenderAttrs_[attr]) {
+				surfaces.push(this.surfacesRenderAttrs_[attr]);
+			}
 		}
 		return object.mixin.apply(null, surfaces);
 	}

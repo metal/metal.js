@@ -2,7 +2,7 @@
   "name": "metal",
   "version": "1.0.0-alpha",
   "description": "Build UI components in a solid, flexible way",
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "repository": "metal/metal.js",
   "author": {
     "name": "Eduardo Lundgren",

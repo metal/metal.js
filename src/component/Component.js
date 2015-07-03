@@ -581,8 +581,10 @@ class Component extends Attribute {
 		var ids = Object.keys(this.components);
 		for (var i = 0; i < ids.length; i++) {
 			var component = this.components[ids[i]];
-			Component.componentsCollector.removeComponent(component);
-			component.dispose();
+			if (!component.isDisposed()) {
+				Component.componentsCollector.removeComponent(component);
+				component.dispose();
+			}
 		}
 		this.components = null;
 	}

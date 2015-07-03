@@ -1600,6 +1600,29 @@ describe('Component', function() {
 			custom.dispose();
 			assert.ok(child.isDisposed());
 		});
+
+		it('should not throw error when disposing a component with shared sub components', function() {
+			var AnotherComponent = createCustomComponentClass();
+			AnotherComponent.prototype.getElementContent = function() {
+				return '%%%%~c-child:ChildComponent~%%%%';
+			};
+			ComponentRegistry.register('AnotherComponent', AnotherComponent);
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~c-child:ChildComponent~%%%%%%%%~c-another:AnotherComponent~%%%%';
+			};
+
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
+
+			var child = custom.components.child;
+			var another = custom.components.another;
+			custom.dispose();
+			assert.ok(child.isDisposed());
+			assert.ok(another.isDisposed());
+		});
 	});
 
 	describe('Inline Events', function() {

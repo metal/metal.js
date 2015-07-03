@@ -9,6 +9,7 @@ import './assets/ChildrenTestComponent.soy.js';
 import './assets/CustomTestComponent.soy.js';
 import './assets/DeeplyNestedTestComponent.soy.js';
 import './assets/EventsTestComponent.soy.js';
+import './assets/ExternalTemplateTestComponent.soy.js';
 import './assets/NestedNoIdTestComponent.soy.js';
 import './assets/NestedSurfacesTestComponent.soy.js';
 import './assets/NestedTestComponent.soy.js';
@@ -336,6 +337,22 @@ describe('SoyComponent', function() {
 			var parentButton = component.element.querySelector('.parentButton');
 			dom.triggerEvent(parentButton, 'click');
 			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
+		it('should render templates from other components', function() {
+			createNestedTestComponentClass();
+			var ExternalTemplateTestComponent = createCustomTestComponentClass('ExternalTemplateTestComponent');
+			ExternalTemplateTestComponent.ATTRS = {
+				count: {
+					value: 2
+				}
+			};
+			var component = new ExternalTemplateTestComponent({
+				id: 'nested'
+			}).render();
+
+			assert.ok(component.components.nestedMyChild0);
+			assert.ok(component.components.nestedMyChild1);
 		});
 	});
 

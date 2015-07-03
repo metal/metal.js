@@ -2,6 +2,7 @@
 
 import core from '../core';
 import Component from '../component/Component';
+import ComponentRegistry from '../component/ComponentRegistry';
 
 /**
  * We need to listen to calls to soy deltemplates so we can use them to
@@ -70,6 +71,7 @@ class SoyComponent extends Component {
 				if (!surface) {
 					this.addSurface(templateName, {
 						renderAttrs: templates[templateName].params,
+						templateComponentName: this.constructor.NAME,
 						templateName: templateName
 					});
 				}
@@ -105,7 +107,9 @@ class SoyComponent extends Component {
 	buildPlaceholderSurfaceData_(type, extra) {
 		var data = super.buildPlaceholderSurfaceData_(type, extra);
 		if (type === Component.SurfaceType.NORMAL) {
-			data.templateName = extra;
+			var split = extra.split('.');
+			data.templateComponentName = split[0];
+			data.templateName = split[1];
 		}
 		return data;
 	}
@@ -138,6 +142,7 @@ class SoyComponent extends Component {
 	static createComponentFromTemplate(templateFn, opt_element, opt_data) {
 		class TemplateComponent extends SoyComponent {
 		}
+		TemplateComponent.NAME = 'TemplateComponent';
 		TemplateComponent.TEMPLATES = {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
 				return templateFn(opt_data || {}, opt_ignored, opt_ijData);
@@ -165,11 +170,14 @@ class SoyComponent extends Component {
 
 	/**
 	 * Generates the id for a surface that was found by a soy template call.
+	 * @param {string} templateComponentName
 	 * @param {string} templateName
 	 * @return {string}
 	 */
-	generateSoySurfaceId_(templateName) {
-		if (!this.surfaceBeingRendered_ && !this.firstSurfaceFound_[templateName]) {
+	generateSoySurfaceId_(templateComponentName, templateName) {
+		if (!this.surfaceBeingRendered_ &&
+				!this.firstSurfaceFound_[templateName] &&
+				templateComponentName === this.constructor.NAME) {
 			this.firstSurfaceFound_[templateName] = true;
 			return templateName;
 		} else {
@@ -196,7 +204,7 @@ class SoyComponent extends Component {
 	 */
 	getElementContent() {
 		this.surfaceBeingRendered_ = null;
-		return this.renderTemplateByName_('content');
+		return this.renderTemplateByName_(this.constructor.NAME, 'content');
 	}
 
 	/**
@@ -222,7 +230,7 @@ class SoyComponent extends Component {
 		var data = this.nextSurfaceCallData_[surfaceId];
 		this.nextSurfaceCallData_[surfaceId] = null;
 		this.surfaceBeingRendered_ = surfaceId;
-		return this.renderTemplateByName_(surface.templateName, data);
+		return this.renderTemplateByName_(surface.templateComponentName, surface.templateName, data);
 	}
 
 	/**
@@ -232,29 +240,30 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleGetDelegateFnCall_(delTemplateId) {
-		var index = delTemplateId.indexOf('.');
-		if (index === -1) {
+		if (delTemplateId.indexOf('.') === -1) {
 			return this.handleTemplateCall_.bind(this, delTemplateId);
 		} else {
-			return this.handleSurfaceCall_.bind(this, delTemplateId.substr(index + 1));
+			var split = delTemplateId.split('.');
+			return this.handleSurfaceCall_.bind(this, split[0], split[1]);
 		}
 	}
 
 	/**
 	 * Handles a call to the SoyComponent surface template.
-	 * @param {string} surfaceName The surface's name.
+	 * @param {string} templateComponentName The name of the component that this template was belongs to.
+	 * @param {string} templateName The name of this template.
 	 * @param {!Object} data The data the template was called with.
 	 * @return {string} A placeholder to be rendered instead of the content the template
 	 *   function would have returned.
 	 * @protected
 	 */
-	handleSurfaceCall_(surfaceName, data) {
+	handleSurfaceCall_(templateComponentName, templateName, data) {
 		var surfaceId = data.surfaceId;
 		if (!core.isDefAndNotNull(surfaceId)) {
-			surfaceId = this.generateSoySurfaceId_(surfaceName);
+			surfaceId = this.generateSoySurfaceId_(templateComponentName, templateName);
 		}
 		this.nextSurfaceCallData_[surfaceId] = data;
-		return '%%%%~s-' + surfaceId + ':' + surfaceName + '~%%%%';
+		return '%%%%~s-' + surfaceId + ':' + templateComponentName + '.' + templateName + '~%%%%';
 	}
 
 	/**
@@ -280,7 +289,8 @@ class SoyComponent extends Component {
 	renderElementDelTemplate_(content, opt_surfaceId) {
 		var templateName = this.constructor.NAME;
 		if (opt_surfaceId) {
-			templateName += '.' + this.getSurface(opt_surfaceId).templateName;
+			var surface = this.getSurface(opt_surfaceId);
+			templateName = surface.templateComponentName + '.' + surface.templateName;
 		}
 		var templateFn = soy.$$getDelegateFn(templateName, 'element', true);
 		var data = {
@@ -321,12 +331,22 @@ class SoyComponent extends Component {
 
 	/**
 	 * Renders the template with the specified name.
+	 * @param {string} templateComponentName
 	 * @param {string} templateName
 	 * @param {Object=} opt_data
 	 * @return {string} The template's result content.
 	 */
-	renderTemplateByName_(templateName, opt_data) {
-		var elementTemplate = this.constructor.TEMPLATES_MERGED[templateName];
+	renderTemplateByName_(templateComponentName, templateName, opt_data) {
+		var elementTemplate;
+		if (templateComponentName === this.constructor.NAME) {
+			elementTemplate = this.constructor.TEMPLATES_MERGED[templateName];
+		} else {
+			var componentTemplates = ComponentRegistry.Templates[templateComponentName];
+			if (componentTemplates) {
+				elementTemplate = componentTemplates[templateName];
+			}
+		}
+
 		if (core.isFunction(elementTemplate)) {
 			return this.renderTemplate_(elementTemplate, opt_data);
 		}

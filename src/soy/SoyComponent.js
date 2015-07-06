@@ -31,7 +31,6 @@ class SoyComponent extends Component {
 	constructor(opt_config) {
 		super(opt_config);
 
-		core.mergeSuperClassesProperty(this.constructor, 'TEMPLATES', this.mergeObjects_);
 		this.addSurfacesFromTemplates_();
 
 		/**
@@ -62,7 +61,7 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	addSurfacesFromTemplates_() {
-		var templates = this.constructor.TEMPLATES_MERGED;
+		var templates = ComponentRegistry.Templates[this.constructor.NAME] || {};
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
@@ -140,10 +139,11 @@ class SoyComponent extends Component {
 	 * @static
 	 */
 	static createComponentFromTemplate(templateFn, opt_element, opt_data) {
+		var name = 'TemplateComponent' + core.getUid();
 		class TemplateComponent extends SoyComponent {
 		}
-		TemplateComponent.NAME = 'TemplateComponent';
-		TemplateComponent.TEMPLATES = {
+		ComponentRegistry.register(name, TemplateComponent);
+		ComponentRegistry.Templates[name] = {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
 				return templateFn(opt_data || {}, opt_ignored, opt_ijData);
 			}
@@ -176,8 +176,8 @@ class SoyComponent extends Component {
 	 */
 	generateSoySurfaceId_(templateComponentName, templateName) {
 		if (!this.surfaceBeingRendered_ &&
-				!this.firstSurfaceFound_[templateName] &&
-				templateComponentName === this.constructor.NAME) {
+			!this.firstSurfaceFound_[templateName] &&
+			templateComponentName === this.constructor.NAME) {
 			this.firstSurfaceFound_[templateName] = true;
 			return templateName;
 		} else {
@@ -338,13 +338,9 @@ class SoyComponent extends Component {
 	 */
 	renderTemplateByName_(templateComponentName, templateName, opt_data) {
 		var elementTemplate;
-		if (templateComponentName === this.constructor.NAME) {
-			elementTemplate = this.constructor.TEMPLATES_MERGED[templateName];
-		} else {
-			var componentTemplates = ComponentRegistry.Templates[templateComponentName];
-			if (componentTemplates) {
-				elementTemplate = componentTemplates[templateName];
-			}
+		var componentTemplates = ComponentRegistry.Templates[templateComponentName];
+		if (componentTemplates) {
+			elementTemplate = componentTemplates[templateName];
 		}
 
 		if (core.isFunction(elementTemplate)) {
@@ -372,14 +368,5 @@ class SoyComponent extends Component {
 		ijData = data || {};
 	}
 }
-/**
- * The soy templates for this component. Templates that have the same
- * name of a registered surface will be used for automatically rendering
- * it.
- * @type {Object<string, !function(Object):Object>}
- * @protected
- * @static
- */
-SoyComponent.TEMPLATES = {};
 
 export default SoyComponent;

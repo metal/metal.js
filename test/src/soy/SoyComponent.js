@@ -37,11 +37,12 @@ describe('SoyComponent', function() {
 		});
 		custom.render();
 
-		assert.strictEqual(2, custom.element.childNodes.length);
-		assert.strictEqual(custom.getSurfaceElement('header'), custom.element.childNodes[0]);
-		assert.strictEqual('My Header', custom.element.childNodes[0].innerHTML);
-		assert.strictEqual(custom.getSurfaceElement('footer'), custom.element.childNodes[1]);
-		assert.strictEqual('My Footer', custom.element.childNodes[1].innerHTML);
+		assert.strictEqual(3, custom.element.childNodes.length);
+		assert.strictEqual('My Title', custom.element.childNodes[0].textContent);
+		assert.strictEqual(custom.getSurfaceElement('header'), custom.element.childNodes[1]);
+		assert.strictEqual('My Header', custom.element.childNodes[1].innerHTML);
+		assert.strictEqual(custom.getSurfaceElement('footer'), custom.element.childNodes[2]);
+		assert.strictEqual('My Footer', custom.element.childNodes[2].innerHTML);
 	});
 
 	it('should render element tag according to its template when defined', function() {
@@ -104,7 +105,7 @@ describe('SoyComponent', function() {
 	});
 
 	describe('Surfaces', function() {
-		it('should automatically create surfaces for a component\'s templates', function() {
+		it('should automatically create surfaces for a component\'s non private templates', function() {
 			var CustomTestComponent = createCustomTestComponentClass();
 
 			var custom = new CustomTestComponent();
@@ -254,7 +255,7 @@ describe('SoyComponent', function() {
 			var child = custom.components.nestedMyChild0;
 
 			assert.strictEqual(childPlaceholder, child.element);
-			assert.strictEqual(2, childPlaceholder.childNodes.length);
+			assert.strictEqual(3, childPlaceholder.childNodes.length);
 		});
 
 		it('should update rendered child component', function(done) {

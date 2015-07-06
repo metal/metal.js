@@ -3,6 +3,9 @@
 /**
  */
 {template .content}
+	{call .title}
+		{param title: 'My Title' /}
+	{/call}
 	{delcall CustomTestComponent.header data="all" /}
 	{delcall CustomTestComponent.footer data="all" /}
 {/template}
@@ -19,6 +22,13 @@
  */
 {template .footer}
 	{$footerContent}
+{/template}
+
+/**
+ * @param title
+ */
+{template .title private="true"}
+	{$title}
 {/template}
 
 /**

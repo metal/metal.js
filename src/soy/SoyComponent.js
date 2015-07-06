@@ -65,7 +65,9 @@ class SoyComponent extends Component {
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
-			if (templateName !== 'content' && templateName.substr(0, 13) !== '__deltemplate') {
+			if (templateName !== 'content' &&
+				templateName.substr(0, 13) !== '__deltemplate' &&
+				templates[templateName].params) {
 				var surface = this.getSurface(templateName);
 				if (!surface) {
 					this.addSurface(templateName, {

@@ -1,6 +1,6 @@
 {
   "name": "metal",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha.1",
   "description": "Build UI components in a solid, flexible way",
   "license": "BSD-3-Clause",
   "repository": "metal/metal.js",

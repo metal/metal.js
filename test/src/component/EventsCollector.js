@@ -143,6 +143,27 @@ describe('EventsCollector', function() {
 		assert.strictEqual(1, custom.handleKeyDown.callCount);
 	});
 
+	it('should attach multiple listeners for the same element and event type', function() {
+		var CustomComponent = createCustomComponent(
+			'<div data-onclick="handleClick,handleAnotherClick"></div><div></div>'
+		);
+		CustomComponent.prototype.handleClick = sinon.stub();
+		CustomComponent.prototype.handleAnotherClick = sinon.stub();
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		collector.attachListeners(custom.element.innerHTML, 'group');
+
+		assert.strictEqual(0, custom.handleClick.callCount);
+		assert.strictEqual(0, custom.handleAnotherClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, custom.handleAnotherClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[1], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, custom.handleAnotherClick.callCount);
+	});
+
 	it('should trigger attached listener registered by multiple elements only once', function() {
 		var CustomComponent = createCustomComponent(
 			'<div data-onclick="handleClick"></div><div data-onclick="handleClick"></div>'

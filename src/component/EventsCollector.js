@@ -3,6 +3,7 @@
 import core from '../core';
 import ComponentCollector from '../component/ComponentCollector';
 import Disposable from '../disposable/Disposable';
+import EventHandler from '../events/EventHandler';
 
 /**
  * Collects inline events from a passed element, detaching previously
@@ -28,7 +29,7 @@ class EventsCollector extends Disposable {
 
 		/**
 		 * Holds the attached delegate event handles, indexed by the css selector.
-		 * @type {!Object<string, !DomEventHandle>}
+		 * @type {!Object<string, EventHandler>}
 		 * @protected
 		 */
 		this.eventHandles_ = {};
@@ -45,19 +46,23 @@ class EventsCollector extends Disposable {
 	 * Attaches the listener described by the given params, unless it has already
 	 * been attached.
 	 * @param {string} eventType
-	 * @param {string} fnName
+	 * @param {string} fnNamesString
 	 * @param {boolean} permanent
 	 * @protected
 	 */
-	attachListener_(eventType, fnName, groupName) {
-		var selector = '[data-on' + eventType + '="' + fnName + '"]';
+	attachListener_(eventType, fnNamesString, groupName) {
+		var selector = '[data-on' + eventType + '="' + fnNamesString + '"]';
 
 		this.groupHasListener_[groupName][selector] = true;
 
 		if (!this.eventHandles_[selector]) {
-			var fn = this.getListenerFn(fnName);
-			if (fn) {
-				this.eventHandles_[selector] = this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn));
+			this.eventHandles_[selector] = new EventHandler();
+			var fnNames = fnNamesString.split(',');
+			for (var i = 0; i < fnNames.length; i++) {
+				var fn = this.getListenerFn(fnNames[i]);
+				if (fn) {
+					this.eventHandles_[selector].add(this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn)));
+				}
 			}
 		}
 	}
@@ -100,7 +105,7 @@ class EventsCollector extends Disposable {
 	detachAllListeners() {
 		for (var selector in this.eventHandles_) {
 			if (this.eventHandles_[selector]) {
-				this.eventHandles_[selector].removeListener();
+				this.eventHandles_[selector].removeAllListeners();
 			}
 		}
 		this.eventHandles_ = {};
@@ -122,7 +127,7 @@ class EventsCollector extends Disposable {
 					}
 				}
 				if (unused) {
-					this.eventHandles_[selector].removeListener();
+					this.eventHandles_[selector].removeAllListeners();
 					this.eventHandles_[selector] = null;
 				}
 			}

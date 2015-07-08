@@ -45,8 +45,11 @@ describe('SoyComponent', function() {
 		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
 		CustomTagTestComponent.ELEMENT_TAG_NAME = 'custom';
 
-		var custom = new CustomTagTestComponent().render();
+		var custom = new CustomTagTestComponent({
+			elementClasses: 'myClass'
+		}).render();
 		assert.strictEqual('CUSTOM', custom.element.tagName);
+		assert.strictEqual('component myClass', custom.element.className);
 		assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 	});
 

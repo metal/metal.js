@@ -915,8 +915,14 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	mergeElementClasses_(values) {
+		var marked = {};
 		return values.filter(function(val) {
-			return val;
+			if (!val || marked[val]) {
+				return false;
+			} else {
+				marked[val] = true;
+				return true;
+			}
 		}).join(' ');
 	}
 

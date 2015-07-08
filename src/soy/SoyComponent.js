@@ -31,7 +31,7 @@ class SoyComponent extends Component {
 	constructor(opt_config) {
 		super(opt_config);
 
-		this.addSurfacesFromTemplates_();
+		this.addSurfacesFromTemplates_(opt_config);
 
 		/**
 		 * Indicates which surface is currently being rendered, or null if none is.
@@ -58,9 +58,10 @@ class SoyComponent extends Component {
 
 	/**
 	 * Adds surfaces for each registered template that is not named `element`.
+	 * @param {Object=} opt_config Optional component configuration.
 	 * @protected
 	 */
-	addSurfacesFromTemplates_() {
+	addSurfacesFromTemplates_(opt_config) {
 		var templates = ComponentRegistry.Templates[this.constructor.NAME] || {};
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
@@ -72,7 +73,7 @@ class SoyComponent extends Component {
 						renderAttrs: templates[templateName].params,
 						templateComponentName: this.constructor.NAME,
 						templateName: templateName
-					});
+					}, opt_config);
 				}
 			}
 		}

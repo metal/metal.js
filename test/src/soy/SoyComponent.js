@@ -26,11 +26,6 @@ describe('SoyComponent', function() {
 
 	it('should render element content with surfaces automatically from template', function() {
 		var CustomTestComponent = createCustomTestComponentClass();
-		CustomTestComponent.ATTRS = {
-			footerContent: {},
-			headerContent: {}
-		};
-
 		var custom = new CustomTestComponent({
 			footerContent: 'My Footer',
 			headerContent: 'My Header'
@@ -63,9 +58,6 @@ describe('SoyComponent', function() {
 
 	it('should not throw error if surface template is not defined', function() {
 		var CustomTestComponent = createCustomTestComponentClass();
-		CustomTestComponent.ATTRS = {
-			body: {}
-		};
 		CustomTestComponent.SURFACES = {
 			body: {
 				renderAttrs: ['body']
@@ -139,10 +131,6 @@ describe('SoyComponent', function() {
 	describe('Nested Surfaces', function() {
 		it('should correctly render nested surfaces', function() {
 			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
-			NestedSurfacesTestComponent.ATTRS = {
-				items: {}
-			};
-
 			var custom = new NestedSurfacesTestComponent({
 				id: 'custom',
 				items: ['Item1', 'Item2']
@@ -156,10 +144,6 @@ describe('SoyComponent', function() {
 
 		it('should correctly update nested surfaces', function(done) {
 			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
-			NestedSurfacesTestComponent.ATTRS = {
-				items: {}
-			};
-
 			var custom = new NestedSurfacesTestComponent({
 				id: 'custom',
 				items: ['Item1', 'Item2']
@@ -192,18 +176,9 @@ describe('SoyComponent', function() {
 			ComponentCollector.components = {};
 
 			var CustomTestComponent = createCustomTestComponentClass();
-			CustomTestComponent.ATTRS = {
-				footerContent: {},
-				headerContent: {}
-			};
 			this.CustomTestComponent = CustomTestComponent;
 
 			var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
-			EventsTestComponent.ATTRS = {
-				footerButtons: {
-					value: []
-				}
-			};
 			EventsTestComponent.prototype.handleClick = sinon.stub();
 			EventsTestComponent.prototype.handleMouseDown = sinon.stub();
 			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
@@ -448,9 +423,6 @@ describe('SoyComponent', function() {
 
 		it('should instantiate components inside rendered template', function() {
 			var CustomTestComponent = createCustomTestComponentClass();
-			CustomTestComponent.ATTRS = {
-				headerContent: {}
-			};
 			sinon.spy(CustomTestComponent.prototype, 'renderAsSubComponent');
 
 			var element = document.createElement('div');
@@ -470,9 +442,6 @@ describe('SoyComponent', function() {
 	describe('decorateFromTemplate', function() {
 		it('should call decorateAsSubComponent for components inside given template', function() {
 			var CustomTestComponent = createCustomTestComponentClass();
-			CustomTestComponent.ATTRS = {
-				headerContent: {}
-			};
 			sinon.spy(CustomTestComponent.prototype, 'decorateAsSubComponent');
 
 			var element = document.createElement('div');
@@ -492,9 +461,6 @@ describe('SoyComponent', function() {
 	function createCustomTestComponentClass(name) {
 		name = name || 'CustomTestComponent';
 		class CustomTestComponent extends SoyComponent {
-			constructor(opt_config) {
-				super(opt_config);
-			}
 		}
 		ComponentRegistry.register(name, CustomTestComponent);
 		return CustomTestComponent;

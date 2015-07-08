@@ -245,7 +245,7 @@ class Attribute extends EventEmitter {
 	/**
 	 * Gets the config object for the requested attribute.
 	 * @param {string} name The attribute's name.
-	 * @return {!Object}
+	 * @return {Object}
 	 * @protected
 	 */
 	getAttrConfig(name) {

@@ -856,6 +856,50 @@ describe('Component', function() {
 			assert.strictEqual('<span>bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
 		});
 
+		it('should automatically create attrs from render attrs of added surfaces', function() {
+			var CustomComponent = createCustomComponentClass();
+			var custom = new CustomComponent();
+			custom.addSurfaces({
+				header: {
+					renderAttrs: ['headerContent', 'fontSize']
+				}
+			});
+			assert.deepEqual({}, custom.getAttrConfig('headerContent'));
+			assert.deepEqual({}, custom.getAttrConfig('fontSize'));
+		});
+
+		it('should automatically create attrs from render attrs from SURFACES static variable', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.SURFACES = {
+				header: {
+					renderAttrs: ['headerContent', 'fontSize']
+				}
+			};
+			var custom = new CustomComponent({
+				headerContent: 'My Header'
+			});
+			assert.deepEqual({}, custom.getAttrConfig('headerContent'));
+			assert.strictEqual('My Header', custom.headerContent);
+			assert.deepEqual({}, custom.getAttrConfig('fontSize'));
+			assert.strictEqual(undefined, custom.fontSize);
+		});
+
+		it('should not override attr config when it already exists', function() {
+			var CustomComponent = createCustomComponentClass();
+			var custom = new CustomComponent();
+			var headerContentConfig = {
+				value: 'My Header Content'
+			};
+			custom.addAttr('headerContent', headerContentConfig);
+			custom.addSurfaces({
+				header: {
+					renderAttrs: ['headerContent', 'fontSize']
+				}
+			});
+			assert.strictEqual(headerContentConfig, custom.getAttrConfig('headerContent'));
+			assert.deepEqual({}, custom.getAttrConfig('fontSize'));
+		});
+
 		it('should render surface content when surface render attrs change', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.renderInternal = function() {

@@ -158,7 +158,7 @@ class Component extends Attribute {
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
 		core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
-		this.addSurfacesFromStaticHint_();
+		this.addSurfacesFromStaticHint_(opt_config);
 
 		this.delegateEventHandler_ = new EventHandler();
 
@@ -180,6 +180,18 @@ class Component extends Attribute {
 			if (fn) {
 				this.eventsAttrHandler_.add(this.on(eventNames[i], fn));
 			}
+		}
+	}
+
+	/**
+	 * Adds a simple attribute with the given name, if it doesn't exist yet.
+	 * @param {string} attrName
+	 * @param {Object=} opt_initialValue Optional initial value for the new attr.
+	 * @protected
+	 */
+	addMissingAttr_(attrName, initialValue) {
+		if (!this.getAttrConfig(attrName)) {
+			this.addAttr(attrName, {}, initialValue);
 		}
 	}
 
@@ -206,16 +218,17 @@ class Component extends Attribute {
 	 * Registers a surface to the component. Surface elements are not
 	 * automatically appended to the component element.
 	 * @param {string} surfaceId The surface id to be registered.
-	 * @param {Object=} opt_config Optional surface configuration.
+	 * @param {Object=} opt_surfaceConfig Optional surface configuration.
+	 * @param {Object=} opt_config Optional component configuration.
 	 * @chainable
 	 */
-	addSurface(surfaceId, opt_config) {
-		var config = opt_config || {};
+	addSurface(surfaceId, opt_surfaceConfig, opt_config) {
+		var config = opt_surfaceConfig || {};
 		this.surfaces_[surfaceId] = config;
 		if (config.componentName) {
 			this.createSubComponent_(config.componentName, surfaceId);
 		}
-		this.cacheSurfaceRenderAttrs_(surfaceId);
+		this.cacheSurfaceRenderAttrs_(surfaceId, opt_config);
 		return this;
 	}
 
@@ -235,16 +248,17 @@ class Component extends Attribute {
 
 	/**
 	 * Adds surfaces from super classes static hint.
+	 * @param {Object=} opt_config This component's configuration object.
 	 * @protected
 	 */
-	addSurfacesFromStaticHint_() {
+	addSurfacesFromStaticHint_(opt_config) {
 		core.mergeSuperClassesProperty(this.constructor, 'SURFACES', this.mergeObjects_);
 		this.surfaces_ = {};
 		this.surfacesRenderAttrs_ = {};
 
 		var configs = this.constructor.SURFACES_MERGED;
 		for (var surfaceId in configs) {
-			this.addSurface(surfaceId, object.mixin({}, configs[surfaceId]));
+			this.addSurface(surfaceId, object.mixin({}, configs[surfaceId]), opt_config);
 		}
 	}
 
@@ -339,12 +353,16 @@ class Component extends Attribute {
 	 * Relevant for performance to calculate the surfaces group that were
 	 * modified by attributes mutation.
 	 * @param {string} surfaceId The surface id to be cached into the flat map.
+	 * @param {Object=} opt_config Optional component configuration.
 	 * @protected
 	 */
-	cacheSurfaceRenderAttrs_(surfaceId) {
+	cacheSurfaceRenderAttrs_(surfaceId, opt_config) {
 		var attrs = this.getSurface(surfaceId).renderAttrs || [];
 		for (var i = 0; i < attrs.length; i++) {
-			this.surfacesRenderAttrs_[attrs[i]] = this.surfacesRenderAttrs_[attrs[i]] || {};
+			if (!this.surfacesRenderAttrs_[attrs[i]]) {
+				this.surfacesRenderAttrs_[attrs[i]] = {};
+				this.addMissingAttr_(attrs[i], opt_config ? opt_config[attrs[i]] : null);
+			}
 			this.surfacesRenderAttrs_[attrs[i]][surfaceId] = true;
 		}
 	}

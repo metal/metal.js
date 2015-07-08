@@ -65,9 +65,7 @@ class SoyComponent extends Component {
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
-			if (templateName !== 'content' &&
-				templateName.substr(0, 13) !== '__deltemplate' &&
-				templates[templateName].params) {
+			if (this.isSurfaceTemplate_(templateName, templates[templateName])) {
 				var surface = this.getSurface(templateName);
 				if (!surface) {
 					this.addSurface(templateName, {
@@ -280,6 +278,17 @@ class SoyComponent extends Component {
 		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, this.surfaceBeingRendered_);
 		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
 		return '%%%%~c-' + id + ':' + componentName + '~%%%%';
+	}
+
+	/**
+	 * Checks if a template is a surface template.
+	 * @param {string} templateName
+	 * @param {!function()} templateFn
+	 * @return {boolean}
+	 * @protected
+	 */
+	isSurfaceTemplate_(templateName, templateFn) {
+		return templateName !== 'content' && templateName.substr(0, 13) !== '__deltemplate' && templateFn.params;
 	}
 
 	/**

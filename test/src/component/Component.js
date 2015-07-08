@@ -87,10 +87,23 @@ describe('Component', function() {
 			sinon.assert.callCount(CustomComponent.prototype.attached, 2);
 		});
 
-		it('should render the content returned by getElementContent', function() {
+		it('should render the content string returned by getElementContent', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
 				return '<div>My content</div>';
+			};
+			var custom = new CustomComponent();
+			custom.render();
+
+			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
+		});
+
+		it('should render the content element returned by getElementContent', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				var element = document.createElement('div');
+				element.innerHTML = 'My content';
+				return element;
 			};
 			var custom = new CustomComponent();
 			custom.render();
@@ -171,25 +184,27 @@ describe('Component', function() {
 			assert.strictEqual('span', custom.element.tagName.toLowerCase());
 		});
 
-		it('should build component element according to the return value of getComponentHtml', function() {
+		it('should build element from getElementContent if it defines a wrapper with the component id', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ELEMENT_TAG_NAME = 'div';
-			CustomComponent.prototype.getComponentHtml = function(content) {
-				return '<span data-foo="foo">' + content + '</span>';
+			CustomComponent.prototype.getElementContent = function() {
+				return '<div id="' + this.id + '" data-foo="foo">My Content</span>';
 			};
 
 			var custom = new CustomComponent().render();
-			assert.strictEqual('span', custom.element.tagName.toLowerCase());
 			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 		});
 
-		it('should use tag static variable if getComponentHtml doesn\'t return anything', function() {
+		it('should throw error if ELEMENT_TAG_NAME is different from element tag returned by getElementContent', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ELEMENT_TAG_NAME = 'div';
-			CustomComponent.prototype.getComponentHtml = function() {};
+			CustomComponent.prototype.getElementContent = function() {
+				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
+			};
 
+			sinon.stub(console, 'error');
 			var custom = new CustomComponent().render();
-			assert.strictEqual('div', custom.element.tagName.toLowerCase());
+			assert.strictEqual('DIV', custom.element.tagName);
+			assert.strictEqual(1, console.error.callCount);
+			console.error.restore();
 		});
 
 		it('should return component instance from lifecycle methods', function() {
@@ -1325,6 +1340,26 @@ describe('Component', function() {
 			assert.strictEqual('Child default', child.element.textContent);
 		});
 
+		it('should render sub component\'s element according to its getElementContent method', function() {
+			this.ChildComponent.prototype.getElementContent = function() {
+				return '<span id="' + this.id + '" data-foo="foo">Child %%%%~s-foo~%%%%</span>';
+			};
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '%%%%~c-child:ChildComponent~%%%%';
+			};
+
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
+
+			var child = custom.components.child;
+			assert.strictEqual('SPAN', child.element.tagName);
+			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
+			assert.strictEqual('Child default', child.element.textContent);
+		});
+
 		it('should instantiate sub component that has hifen on id from placeholder', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
@@ -1709,8 +1744,8 @@ describe('Component', function() {
 		});
 
 		it('should attach listeners from element tag', function() {
-			this.EventsTestComponent.prototype.getComponentHtml = function(content) {
-				return '<div id="' + this.id + '" data-onclick="handleElementClicked">' + content + '</div>';
+			this.EventsTestComponent.prototype.getElementContent = function() {
+				return '<div id="' + this.id + '" data-onclick="handleElementClicked"></div>';
 			};
 			this.EventsTestComponent.prototype.handleElementClicked = sinon.stub();
 

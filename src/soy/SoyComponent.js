@@ -187,17 +187,6 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Overrides Component's original behavior so the component's html may be rendered
-	 * by its template.
-	 * @param {string} content
-	 * @return {string}
-	 * @override
-	 */
-	getComponentHtml(content) {
-		return this.renderElementDelTemplate_(content);
-	}
-
-	/**
 	 * Gets the content that should be rendered in the component's main element by
 	 * rendering the `content` soy template.
 	 * @return {?string} The template's result content, or undefined if the
@@ -293,23 +282,20 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Renders the element deltemplate for this component or for one of its surfaces.
+	 * Renders the element deltemplate for a surface.
 	 * @param {?string} content
-	 * @param {string=} opt_surfaceId
+	 * @param {string=} surfaceId
 	 * @return {string}
 	 */
-	renderElementDelTemplate_(content, opt_surfaceId) {
-		var templateName = this.constructor.NAME;
-		if (opt_surfaceId) {
-			var surface = this.getSurface(opt_surfaceId);
-			templateName = surface.templateComponentName + '.' + surface.templateName;
-		}
+	renderElementDelTemplate_(content, surfaceId) {
+		var surface = this.getSurface(surfaceId);
+		var templateName = surface.templateComponentName + '.' + surface.templateName;
 		var templateFn = soy.$$getDelegateFn(templateName, 'element', true);
 		var data = {
 			elementClasses: this.elementClasses,
 			elementContent: SoyComponent.sanitizeHtml(content || ''),
-			id: this.id || this.makeId_(),
-			surfaceId: opt_surfaceId
+			id: this.id,
+			surfaceId: surfaceId
 		};
 		return templateFn(data, null, ijData).content;
 	}

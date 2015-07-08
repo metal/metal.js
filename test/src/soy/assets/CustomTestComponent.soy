@@ -1,6 +1,8 @@
 {namespace Templates.CustomTestComponent}
 
 /**
+ * @param id
+ * @param elementClasses
  */
 {template .content}
 	{call .title}
@@ -30,14 +32,3 @@
 {template .title private="true"}
 	{$title}
 {/template}
-
-/**
- * @param? elementContent
- * @param? elementClasses
- * @param? id
- */
-{deltemplate CustomTestComponent variant="'element'"}
-	<custom id="{$id}" class="btn component{$elementClasses ? ' ' + $elementClasses : ''}">
-		{$elementContent}
-	</custom>
-{/deltemplate}

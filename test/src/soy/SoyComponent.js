@@ -6,6 +6,7 @@ import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyComponent from '../../../src/soy/SoyComponent';
 
 import './assets/ChildrenTestComponent.soy.js';
+import './assets/CustomTagTestComponent.soy.js';
 import './assets/CustomTestComponent.soy.js';
 import './assets/DeeplyNestedTestComponent.soy.js';
 import './assets/EventsTestComponent.soy.js';
@@ -41,10 +42,12 @@ describe('SoyComponent', function() {
 	});
 
 	it('should render element tag according to its template when defined', function() {
-		var CustomTestComponent = createCustomTestComponentClass();
+		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
+		CustomTagTestComponent.ELEMENT_TAG_NAME = 'custom';
 
-		var custom = new CustomTestComponent().render();
+		var custom = new CustomTagTestComponent().render();
 		assert.strictEqual('CUSTOM', custom.element.tagName);
+		assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 	});
 
 	it('should not throw error if element template is not defined', function() {

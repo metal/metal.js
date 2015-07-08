@@ -294,7 +294,6 @@ class Component extends Attribute {
 	 */
 	attachInlineListeners_() {
 		this.eventsCollector_.attachListeners(this.getElementContent_(''));
-		this.eventsCollector_.attachListeners(this.getComponentHtml(''), 'element');
 		this.elementContent_ = null;
 	}
 
@@ -705,7 +704,7 @@ class Component extends Attribute {
 	 * @return {string}
 	 */
 	getComponentHtml(content) {
-		return this.getWrapperHtml_(this.constructor.ELEMENT_TAG_NAME_MERGED, this.id, content);
+		return this.wrapContentIfNecessary(content, this.id, this.constructor.ELEMENT_TAG_NAME_MERGED);
 	}
 
 	/**
@@ -713,7 +712,8 @@ class Component extends Attribute {
 	 * Should be implemented by subclasses.
 	 * @return {Object|string} The content to be rendered. If the content is a
 	 *   string, surfaces can be represented by placeholders in the format specified
-	 *   by Component.SURFACE_REGEX.
+	 *   by Component.SURFACE_REGEX. Also, if the string content's main wrapper has
+	 *   the component's id, then it will be used to render the main element tag.
 	 */
 	getElementContent() {}
 
@@ -761,7 +761,7 @@ class Component extends Attribute {
 	 */
 	getNonComponentSurfaceHtml(surfaceId, content) {
 		var surfaceElementId = this.makeSurfaceId_(surfaceId);
-		return this.getWrapperHtml_(this.constructor.SURFACE_TAG_NAME_MERGED, surfaceElementId, content);
+		return this.getWrapperHtml_(content, surfaceElementId, this.constructor.SURFACE_TAG_NAME_MERGED);
 	}
 
 	/**
@@ -848,13 +848,13 @@ class Component extends Attribute {
 
 	/**
 	 * Gets the html of an element.
-	 * @param {string} tag
-	 * @param {string} id
 	 * @param {string} content
+	 * @param {string} id
+	 * @param {string} tag
 	 * @return {string}
 	 * @protected
 	 */
-	getWrapperHtml_(tag, id, content) {
+	getWrapperHtml_(content, id, tag) {
 		return '<' + tag + ' id="' + id + '">' + content + '</' + tag + '>';
 	}
 
@@ -1026,6 +1026,29 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Renders the given content in the component's element.
+	 * @param {string} content The content to be rendered.
+	 * @protected
+	 */
+	renderContent_(content) {
+		var element = this.element;
+		if (core.isString(content)) {
+			content = dom.buildFragment(this.getComponentHtml(content));
+			var firstElement = content.childNodes[0];
+			this.updateElementAttributes_(element, firstElement);
+			if (element.tagName !== firstElement.tagName) {
+				console.error(
+					'Changing the component element\'s tag name is not allowed. Make sure ' +
+					'to always return the same tag name for the component element on getElementContent, ' +
+					'as well as to set the static variable ELEMENT_TAG_NAME to the chosen value.'
+				);
+			}
+			content = firstElement.childNodes;
+		}
+		dom.append(element, content);
+	}
+
+	/**
 	 * Renders the component element into the DOM.
 	 * @param {(string|Element)=} opt_parentElement Optional parent element
 	 *     to render the component.
@@ -1051,7 +1074,7 @@ class Component extends Attribute {
 	renderInternal() {
 		var content = this.getElementExtendedContent();
 		if (content) {
-			dom.append(this.element, content);
+			this.renderContent_(content);
 		}
 	}
 
@@ -1220,6 +1243,23 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Sets the attributes from the second element to the first element.
+	 * @param {!Element} element
+	 * @param {!Element} newElement
+	 * @protected
+	 */
+	updateElementAttributes_(element, newElement) {
+		var attrs = newElement.attributes;
+		for (var i = 0; i < attrs.length; i++) {
+			// The "id" and "class" html attributes are already synced via the "id"
+			// and "elementClasses" component attributes, respectively.
+			if (attrs[i].name !== 'id' && attrs[i].name !== 'class') {
+				element.setAttribute(attrs[i].name, attrs[i].value);
+			}
+		}
+	}
+
+	/**
 	 * Updates a surface after it has been rendered through placeholders.
 	 * @param {!{content: string, cacheContent: string, surfaceId: string}} collectedData
 	 *   Data about the collected surface. Should have the surface's id, content and the
@@ -1302,17 +1342,6 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	valueElementFn_() {
-		var rendered = this.getComponentHtml('');
-		if (rendered) {
-			var frag = dom.buildFragment(rendered);
-			var element = frag.childNodes[0];
-			// Remove element from fragment, so it won't have a parent. Otherwise,
-			// the `attach` method will think that the element has already been
-			// attached.
-			frag.removeChild(element);
-			return element;
-		}
-
 		return document.createElement(this.constructor.ELEMENT_TAG_NAME_MERGED);
 	}
 
@@ -1324,6 +1353,22 @@ class Component extends Attribute {
 	valueIdFn_() {
 		var element = this.element;
 		return (element && element.id) ? element.id : this.makeId_();
+	}
+
+	/**
+	 * Wraps the content with the given tag, unless the content already has an element with the
+	 * correct id.
+	 * @param {string} content
+	 * @param {string} id
+	 * @param {string} tag
+	 * @return {string}
+	 * @protected
+	 */
+	wrapContentIfNecessary(content, id, tag) {
+		if (content.indexOf(' id="' + id + '"') === -1) {
+			content = this.getWrapperHtml_(content, id, tag);
+		}
+		return content;
 	}
 }
 

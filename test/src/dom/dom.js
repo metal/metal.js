@@ -106,12 +106,31 @@ describe('dom', function() {
 	});
 
 	describe('manipulation', function() {
+		it('should append html string to parent element', function() {
+			var parent = document.createElement('div');
+			var childHtml = '<div class="myChild"></div>';
+
+			dom.append(parent, childHtml);
+			assert.strictEqual(childHtml, parent.innerHTML);
+			assert.strictEqual('myChild', parent.childNodes[0].className);
+		});
+
 		it('should append element to parent element', function() {
 			var parent = document.createElement('div');
 			var child = document.createElement('div');
 
 			dom.append(parent, child);
 			assert.strictEqual(parent, child.parentNode);
+		});
+
+		it('should append node list to parent element', function() {
+			var parent = document.createElement('div');
+			var childFrag = dom.buildFragment('<div class="myChild"></div><div class="myChild2"></div>');
+
+			dom.append(parent, childFrag.childNodes);
+			assert.strictEqual(2, parent.childNodes.length);
+			assert.strictEqual('myChild', parent.childNodes[0].className);
+			assert.strictEqual('myChild2', parent.childNodes[1].className);
 		});
 
 		it('should replace an element with a requested element', function() {

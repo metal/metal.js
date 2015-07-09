@@ -53,6 +53,19 @@ describe('SoyComponent', function() {
 		assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 	});
 
+	it('should render surface element tag according to its template when defined', function() {
+		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
+		CustomTagTestComponent.ELEMENT_TAG_NAME = 'custom';
+
+		var custom = new CustomTagTestComponent({
+			elementClasses: 'myClass'
+		}).render();
+		var surfaceElement = custom.getSurfaceElement('footer');
+		assert.strictEqual('FOOTER', surfaceElement.tagName);
+		assert.strictEqual('myFooter', surfaceElement.className);
+		assert.strictEqual('bar', surfaceElement.getAttribute('data-bar'));
+	});
+
 	it('should not throw error if element template is not defined', function() {
 		var NoTemplateTestComponent = createCustomTestComponentClass('NoTemplateTestComponent');
 		var custom = new NoTemplateTestComponent();
@@ -155,22 +168,16 @@ describe('SoyComponent', function() {
 				items: ['Item1', 'Item2']
 			}).render();
 			var element = custom.element;
-			var titleElement = custom.getSurfaceElement('title');
-			var zeroElement = custom.getSurfaceElement('0');
-			var listS1Element = custom.getSurfaceElement('list-s1');
-			var listS2Element = custom.getSurfaceElement('list-s2');
 			assert.strictEqual(2, custom.element.querySelector('.items').childNodes.length);
 
 			custom.items = ['New Item1', 'New Item2', 'New Item3'];
 			custom.once('attrsChanged', function() {
-				assert.strictEqual(3, custom.element.querySelector('.items').childNodes.length);
-				assert.strictEqual(titleElement, element.querySelector('#custom-title'));
-				assert.strictEqual(zeroElement, element.querySelector('#custom-0'));
-				assert.strictEqual('0', zeroElement.textContent);
-				assert.strictEqual(listS1Element, element.querySelector('#custom-list-s1'));
-				assert.strictEqual('New Item1', listS1Element.textContent);
-				assert.strictEqual(listS2Element, element.querySelector('#custom-list-s2'));
-				assert.strictEqual('New Item2', listS2Element.textContent);
+				assert.strictEqual(3, element.querySelector('.items').childNodes.length);
+				assert.strictEqual('My List', element.querySelector('#custom-title').textContent);
+				assert.strictEqual('0', element.querySelector('#custom-0').textContent);
+				assert.strictEqual('New Item1', element.querySelector('#custom-list-s1').textContent);
+				assert.strictEqual('New Item2', element.querySelector('#custom-list-s2').textContent);
+				assert.strictEqual('New Item3', element.querySelector('#custom-list-s3').textContent);
 				done();
 			});
 		});

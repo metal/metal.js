@@ -198,17 +198,6 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Overrides Component's original behavior so surface's html may be rendered by
-	 * their templates.
-	 * @param {string} surfaceId
-	 * @param {string} content
-	 * @return {string}
-	 */
-	getNonComponentSurfaceHtml(surfaceId, content) {
-		return this.renderElementDelTemplate_(content, surfaceId);
-	}
-
-	/**
 	 * Makes the default behavior of rendering surfaces automatically render the
 	 * appropriate soy template when one exists.
 	 * @param {string} surfaceId The surface id.
@@ -279,25 +268,6 @@ class SoyComponent extends Component {
 	 */
 	isSurfaceTemplate_(templateName, templateFn) {
 		return templateName !== 'content' && templateName.substr(0, 13) !== '__deltemplate' && templateFn.params;
-	}
-
-	/**
-	 * Renders the element deltemplate for a surface.
-	 * @param {?string} content
-	 * @param {string=} surfaceId
-	 * @return {string}
-	 */
-	renderElementDelTemplate_(content, surfaceId) {
-		var surface = this.getSurface(surfaceId);
-		var templateName = surface.templateComponentName + '.' + surface.templateName;
-		var templateFn = soy.$$getDelegateFn(templateName, 'element', true);
-		var data = {
-			elementClasses: this.elementClasses,
-			elementContent: SoyComponent.sanitizeHtml(content || ''),
-			id: this.id,
-			surfaceId: surfaceId
-		};
-		return templateFn(data, null, ijData).content;
 	}
 
 	/**

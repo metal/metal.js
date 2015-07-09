@@ -307,22 +307,6 @@ class Component extends Attribute {
 	attached() {}
 
 	/**
-	 * Attaches inline listeners that are found on the given surface.
-	 * @param {string} surfaceId
-	 * @param {string} content
-	 * @protected
-	 */
-	attachSurfaceListeners_(surfaceId, content) {
-		this.eventsCollector_.attachListeners(content, surfaceId);
-		if (this.eventsCollector_.hasAttachedForGroup(surfaceId)) {
-			this.eventsCollector_.attachListeners(
-				this.getSurfaceHtml(surfaceId, ''),
-				surfaceId + '-element'
-			);
-		}
-	}
-
-	/**
 	 * Builds the data that should be used to create a surface that was found via
 	 * a string placeholder.
 	 * @param {string} type The surface type (either "s" or "c").
@@ -364,6 +348,17 @@ class Component extends Attribute {
 			}
 			this.surfacesRenderAttrs_[attrs[i]][surfaceId] = true;
 		}
+	}
+
+	/**
+	 * Checks if the given content has an element tag with the given id.
+	 * @param {string} content
+	 * @param {string} id
+	 * @return {boolean}
+	 * @protected
+	 */
+	checkHasElementTag_(content, id) {
+		return content.indexOf(' id="' + id + '"') !== -1;
 	}
 
 	/**
@@ -415,7 +410,7 @@ class Component extends Attribute {
 	computeSurfacesCacheStateFromDom_() {
 		for (var surfaceId in this.surfaces_) {
 			if (!this.getSurface(surfaceId).componentName) {
-				this.cacheSurfaceContent(surfaceId, html.compress(this.getSurfaceElement(surfaceId).innerHTML));
+				this.cacheSurfaceContent(surfaceId, html.compress(this.getSurfaceElement(surfaceId).outerHTML));
 			}
 		}
 	}
@@ -761,7 +756,7 @@ class Component extends Attribute {
 	 */
 	getNonComponentSurfaceHtml(surfaceId, content) {
 		var surfaceElementId = this.makeSurfaceId_(surfaceId);
-		return this.getWrapperHtml_(content, surfaceElementId, this.constructor.SURFACE_TAG_NAME_MERGED);
+		return this.wrapContentIfNecessary(content, surfaceElementId, this.constructor.SURFACE_TAG_NAME_MERGED);
 	}
 
 	/**
@@ -844,18 +839,6 @@ class Component extends Attribute {
 		} else {
 			return this.getNonComponentSurfaceHtml(surfaceId, content);
 		}
-	}
-
-	/**
-	 * Gets the html of an element.
-	 * @param {string} content
-	 * @param {string} id
-	 * @param {string} tag
-	 * @return {string}
-	 * @protected
-	 */
-	getWrapperHtml_(content, id, tag) {
-		return '<' + tag + ' id="' + id + '">' + content + '</' + tag + '>';
 	}
 
 	/**
@@ -1134,11 +1117,11 @@ class Component extends Attribute {
 
 			if (cacheHit) {
 				if (this.decorating_) {
-					this.attachSurfaceListeners_(surfaceId, cacheContent);
+					this.eventsCollector_.attachListeners(cacheContent, surfaceId);
 				}
 				this.renderPlaceholderSurfaceContents_(content, surfaceId);
 			} else {
-				this.attachSurfaceListeners_(surfaceId, cacheContent);
+				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
 				this.replaceSurfaceContent_(surfaceId, content);
 			}
 		}
@@ -1170,10 +1153,19 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	replaceSurfaceContent_(surfaceId, content) {
-		content = this.replaceSurfacePlaceholders_(content, surfaceId);
+		var elementId = this.makeSurfaceId_(surfaceId);
 		var el = this.getSurfaceElement(surfaceId);
-		dom.removeChildren(el);
-		dom.append(el, content);
+		content = this.replaceSurfacePlaceholders_(content);
+		if (core.isString(content) && this.checkHasElementTag_(content, elementId)) {
+			var surface = this.getSurface(surfaceId);
+			surface.element = dom.buildFragment(content).childNodes[0];
+			if (el.parentNode) {
+				dom.replace(el, surface.element);
+			}
+		} else {
+			dom.removeChildren(el);
+			dom.append(el, content);
+		}
 	}
 
 	/**
@@ -1197,15 +1189,15 @@ class Component extends Attribute {
 			instance.getSurface(id).handled = true;
 
 			var surfaceContent = instance.getSurfaceContent_(id);
-			var expandedContent = instance.replaceSurfacePlaceholders_(surfaceContent, id);
-			var surfaceHtml = instance.getSurfaceHtml(id, expandedContent);
+			var surfaceHtml = instance.getSurfaceHtml(id, surfaceContent);
+			var expandedHtml = instance.replaceSurfacePlaceholders_(surfaceHtml, id);
 			instance.collectedSurfaces_.push({
 				cacheContent: surfaceContent,
-				content: expandedContent,
+				content: expandedHtml,
 				surfaceId: id
 			});
 
-			return surfaceHtml;
+			return expandedHtml;
 		});
 	}
 
@@ -1275,18 +1267,25 @@ class Component extends Attribute {
 	updatePlaceholderSurface_(collectedData) {
 		var surfaceId = collectedData.surfaceId;
 		var surface = this.getSurface(surfaceId);
-		if (this.decorating_ || surface.element || surface.componentName) {
-			// This surface already has an element, so it needs to replace the rendered
-			// element.
-			var elementId = surface.componentName ? surfaceId : this.makeSurfaceId_(surfaceId);
-			var placeholder = this.findElementById_(elementId);
-			dom.replace(placeholder, this.getSurfaceElement(surfaceId));
+		if (surface.componentName) {
+			// Elements of component surfaces are unchangeable, so we need to replace the
+			// rendered element with the component's.
+			dom.replace(this.findElementById_(surfaceId), this.getSurfaceElement(surfaceId));
+		}
+
+		if (this.decorating_ || surface.componentName) {
+			// Component surfaces need to be handled in case some internal details have changed.
+			// Also, if this component is being decorated, it needs to go through the regular flow
+			// to check if the cache matches.
 			this.renderSurfaceContent(surfaceId, collectedData.content, collectedData.cacheContent);
 		} else {
-			// This surface's element hasn't been created yet, so it doesn't need
-			// to replace the rendered element. Let's cache the content so it won't rerender.
+			// This surface's element has either changed or never been created yet. Let's just
+			// reset it to null, so it can be fetched from the dom again when necessary. Also,
+			// since there's no need to do cache checks or rerender, let's just attach its
+			// listeners and cache its content manually.
+			surface.element = null;
 			this.cacheSurfaceContent(surfaceId, collectedData.cacheContent);
-			this.attachSurfaceListeners_(surfaceId, collectedData.cacheContent);
+			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceId);
 		}
 	}
 
@@ -1371,8 +1370,8 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	wrapContentIfNecessary(content, id, tag) {
-		if (content.indexOf(' id="' + id + '"') === -1) {
-			content = this.getWrapperHtml_(content, id, tag);
+		if (!this.checkHasElementTag_(content, id)) {
+			content = '<' + tag + ' id="' + id + '">' + content + '</' + tag + '>';
 		}
 		return content;
 	}

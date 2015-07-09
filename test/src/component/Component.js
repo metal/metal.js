@@ -632,6 +632,56 @@ describe('Component', function() {
 		});
 	});
 
+	describe('Decorate', function() {
+		beforeEach(function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.SURFACES = {
+				footer: {
+					renderAttrs: ['footerContent']
+				}
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				return '<custom id="' + this.id + '">%%%%~s-footer~%%%%</custom>';
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return '<footer id="' + this.id + '-footer" class="myFooter" data-bar="bar">' + this.footerContent + '</footer>';
+			};
+			this.CustomComponent = CustomComponent;
+
+			document.body.innerHTML = '';
+		});
+
+		it('should not rerender surfaces when component is decorated and html is correct', function() {
+			dom.append(
+				document.body,
+				'<custom id="custom"><footer id="custom-footer" class="myFooter" data-bar="bar">My Footer</footer></custom>'
+			);
+			var footerElement = document.body.querySelector('#custom-footer');
+
+			var custom = new this.CustomComponent({
+				element: '#custom',
+				footerContent: 'My Footer'
+			}).decorate();
+
+			assert.strictEqual(footerElement, custom.getSurfaceElement('footer'));
+		});
+
+		it('should rerender surfaces when component is decorated and html is not correct', function() {
+			dom.append(
+				document.body,
+				'<custom id="custom"><footer id="custom-footer" class="myFooter" data-bar="bar">My Footer</footer></custom>'
+			);
+			var footerElement = document.body.querySelector('#custom-footer');
+
+			var custom = new this.CustomComponent({
+				element: '#custom',
+				footerContent: 'My Footer 2'
+			}).decorate();
+
+			assert.notStrictEqual(footerElement, custom.getSurfaceElement('footer'));
+		});
+	});
+
 	describe('Events', function() {
 		it('should listen to events on the element through Component\'s "on" function', function() {
 			var CustomComponent = createCustomComponentClass();
@@ -869,6 +919,35 @@ describe('Component', function() {
 			custom.render();
 			assert.strictEqual('<b>header</b>', custom.getSurfaceElement('header').innerHTML);
 			assert.strictEqual('<span>bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
+		});
+
+		it('should render surface element if it\'s defined in getSurfaceContent', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.renderInternal = function() {
+				this.element.appendChild(this.getSurfaceElement('header'));
+				this.element.appendChild(this.getSurfaceElement('bottom'));
+			};
+			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'header':
+						return '<header id="' + this.id + '-header" class="testHeader" data-foo="foo"><b>header</b></header>';
+					case 'bottom':
+						return '<bottom id="' + this.id + '-bottom" class="testBottom" data-bar="bar"><span>bottom</span></bottom>';
+				}
+			};
+			var custom = new CustomComponent();
+			custom.addSurface('header');
+			custom.addSurface('bottom');
+			custom.render();
+
+			var headerElement = custom.getSurfaceElement('header');
+			var bottomElement = custom.getSurfaceElement('bottom');
+			assert.strictEqual('HEADER', headerElement.tagName);
+			assert.strictEqual('testHeader', headerElement.className);
+			assert.strictEqual('foo', headerElement.getAttribute('data-foo'));
+			assert.strictEqual('BOTTOM', bottomElement.tagName);
+			assert.strictEqual('testBottom', bottomElement.className);
+			assert.strictEqual('bar', bottomElement.getAttribute('data-bar'));
 		});
 
 		it('should automatically create attrs from render attrs of added surfaces', function() {
@@ -1179,43 +1258,6 @@ describe('Component', function() {
 			});
 		});
 
-		it('should reposition nested surfaces correctly after rerendering parent', function(done) {
-			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
-				switch (surfaceId) {
-					case 'header':
-						return '<div class="headerInner">' + this.foo + ': %%%%~s-bar~%%%%</div>';
-					case 'bar':
-						return '<div class="barInner">%%%%~s-foo~%%%%</div>';
-					case 'foo':
-						return '<div class="fooInner">' + this.foo + '</div>';
-				}
-			};
-
-			var custom = new this.CustomComponent({
-				foo: 'foo',
-				id: 'custom'
-			}).render();
-			var headerInnerElement = custom.element.querySelector('.headerInner');
-			var barInnerElement = custom.element.querySelector('.barInner');
-			var fooInnerElement = custom.element.querySelector('.fooInner');
-			var headerElement = custom.getSurfaceElement('header');
-			var barElement = custom.getSurfaceElement('bar');
-			var fooElement = custom.getSurfaceElement('foo');
-
-			custom.foo = 'bar';
-			custom.on('attrsChanged', function() {
-				assert.strictEqual('bar: bar', custom.element.textContent);
-				assert.notStrictEqual(headerInnerElement, custom.element.querySelector('.headerInner'));
-				assert.strictEqual(barInnerElement, custom.element.querySelector('.barInner'));
-				assert.notStrictEqual(fooInnerElement, custom.element.querySelector('.fooInner'));
-
-				assert.strictEqual(headerElement, custom.element.childNodes[0]);
-				assert.strictEqual(barElement, headerElement.querySelector('.headerInner').childNodes[1]);
-				assert.strictEqual(fooElement, barInnerElement.childNodes[0]);
-				done();
-			});
-		});
-
 		describe('Generated Ids', function() {
 			beforeEach(function() {
 				this.CustomComponent = createCustomComponentClass();
@@ -1261,20 +1303,6 @@ describe('Component', function() {
 				var s1S2Element = custom.getSurfaceElement('s1-s2');
 				assert.strictEqual(s1InnerElement.childNodes[0], s1S1Element);
 				assert.strictEqual(s1InnerElement.childNodes[1], s1S2Element);
-			});
-
-			it('should reuse deeply nested surfaces with generated ids', function(done) {
-				var custom = new this.CustomComponent({
-					count: 1,
-					id: 'custom'
-				}).render();
-				var s1S1Element = custom.getSurfaceElement('s1-s1');
-
-				custom.count = 2;
-				custom.once('attrsChanged', function() {
-					assert.strictEqual(s1S1Element, custom.getSurfaceElement('s1-s1'));
-					done();
-				});
 			});
 
 			it('should only update nested surface when only its contents change', function(done) {
@@ -1762,8 +1790,10 @@ describe('Component', function() {
 		});
 
 		it('should attach listeners from surface element tag', function() {
-			this.EventsTestComponent.prototype.getNonComponentSurfaceHtml = function(surfaceId, content) {
+			var originalMethod = this.EventsTestComponent.prototype.getSurfaceContent;
+			this.EventsTestComponent.prototype.getSurfaceContent = function(surfaceId) {
 				var surfaceElementId = this.makeSurfaceId_(surfaceId);
+				var content = originalMethod.call(this);
 				return '<div id="' + surfaceElementId + '" data-onclick="handleSurfaceClicked">' + content + '</div>';
 			};
 			this.EventsTestComponent.prototype.handleSurfaceClicked = sinon.stub();

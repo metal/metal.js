@@ -98,6 +98,31 @@ describe('Component', function() {
 			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
 		});
 
+		it('should build element from getElementContent if its string defines a wrapper with the component id', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
+			};
+			CustomComponent.ELEMENT_TAG_NAME = 'span';
+
+			var custom = new CustomComponent().render();
+			assert.strictEqual('SPAN', custom.element.tagName);
+			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
+		});
+
+		it('should throw error if ELEMENT_TAG_NAME is different from element tag returned by getElementContent', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
+			};
+
+			sinon.stub(console, 'error');
+			var custom = new CustomComponent().render();
+			assert.strictEqual('DIV', custom.element.tagName);
+			assert.strictEqual(1, console.error.callCount);
+			console.error.restore();
+		});
+
 		it('should render the content element returned by getElementContent', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
@@ -108,6 +133,24 @@ describe('Component', function() {
 			var custom = new CustomComponent();
 			custom.render();
 
+			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
+		});
+
+		it('should build element from getElementContent if its element defines a wrapper with the component id', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				var element = document.createElement('span');
+				element.id = this.id;
+				element.setAttribute('data-foo', 'foo');
+				dom.append(element, '<div>My content</div>');
+				return element;
+			};
+			CustomComponent.ELEMENT_TAG_NAME = 'span';
+			var custom = new CustomComponent();
+			custom.render();
+
+			assert.strictEqual('SPAN', custom.element.tagName);
+			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
 		});
 
@@ -182,29 +225,6 @@ describe('Component', function() {
 
 			var custom = new ChildComponent().render();
 			assert.strictEqual('span', custom.element.tagName.toLowerCase());
-		});
-
-		it('should build element from getElementContent if it defines a wrapper with the component id', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getElementContent = function() {
-				return '<div id="' + this.id + '" data-foo="foo">My Content</span>';
-			};
-
-			var custom = new CustomComponent().render();
-			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
-		});
-
-		it('should throw error if ELEMENT_TAG_NAME is different from element tag returned by getElementContent', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getElementContent = function() {
-				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
-			};
-
-			sinon.stub(console, 'error');
-			var custom = new CustomComponent().render();
-			assert.strictEqual('DIV', custom.element.tagName);
-			assert.strictEqual(1, console.error.callCount);
-			console.error.restore();
 		});
 
 		it('should return component instance from lifecycle methods', function() {
@@ -899,7 +919,7 @@ describe('Component', function() {
 			});
 		});
 
-		it('should render surface content', function() {
+		it('should render surface content from string', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.renderInternal = function() {
 				this.element.appendChild(this.getSurfaceElement('header'));
@@ -921,7 +941,7 @@ describe('Component', function() {
 			assert.strictEqual('<span>bottom</span>', custom.getSurfaceElement('bottom').innerHTML);
 		});
 
-		it('should render surface element if it\'s defined in getSurfaceContent', function() {
+		it('should render surface element if it\'s defined in getSurfaceContent\'s string result', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.renderInternal = function() {
 				this.element.appendChild(this.getSurfaceElement('header'));
@@ -948,6 +968,43 @@ describe('Component', function() {
 			assert.strictEqual('BOTTOM', bottomElement.tagName);
 			assert.strictEqual('testBottom', bottomElement.className);
 			assert.strictEqual('bar', bottomElement.getAttribute('data-bar'));
+		});
+
+		it('should render surface content from element', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.renderInternal = function() {
+				this.element.appendChild(this.getSurfaceElement('header'));
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				var content = document.createElement('b');
+				content.innerHTML = 'header';
+				return content;
+			};
+			var custom = new CustomComponent();
+			custom.addSurface('header');
+			custom.render();
+			assert.strictEqual('<b>header</b>', custom.getSurfaceElement('header').innerHTML);
+		});
+
+		it('should render surface element if it\'s defined in getSurfaceContent\'s element result', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.renderInternal = function() {
+				this.element.appendChild(this.getSurfaceElement('header'));
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				var frag = dom.buildFragment(
+					'<header id="' + this.id + '-header" class="testHeader" data-foo="foo"><b>header</b></header>'
+				);
+				return frag.childNodes[0];
+			};
+			var custom = new CustomComponent();
+			custom.addSurface('header');
+			custom.render();
+
+			var headerElement = custom.getSurfaceElement('header');
+			assert.strictEqual('HEADER', headerElement.tagName);
+			assert.strictEqual('testHeader', headerElement.className);
+			assert.strictEqual('foo', headerElement.getAttribute('data-foo'));
 		});
 
 		it('should automatically create attrs from render attrs of added surfaces', function() {

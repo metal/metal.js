@@ -352,13 +352,13 @@ class Component extends Attribute {
 
 	/**
 	 * Checks if the given content has an element tag with the given id.
-	 * @param {string} content
+	 * @param {!Element|string} content
 	 * @param {string} id
 	 * @return {boolean}
 	 * @protected
 	 */
 	checkHasElementTag_(content, id) {
-		return content.indexOf(' id="' + id + '"') !== -1;
+		return core.isString(content) ? content.indexOf(' id="' + id + '"') !== -1 : content.id === id;
 	}
 
 	/**
@@ -1021,18 +1021,20 @@ class Component extends Attribute {
 	 */
 	renderContent_(content) {
 		var element = this.element;
+		var newElement;
+
 		if (core.isString(content)) {
-			content = dom.buildFragment(this.getComponentHtml(content));
-			var firstElement = content.childNodes[0];
-			this.updateElementAttributes_(element, firstElement);
-			if (element.tagName !== firstElement.tagName) {
-				console.error(
-					'Changing the component element\'s tag name is not allowed. Make sure ' +
-					'to always return the same tag name for the component element on getElementContent, ' +
-					'as well as to set the static variable ELEMENT_TAG_NAME to the chosen value.'
-				);
+			content = dom.buildFragment(content);
+			if (content.childNodes[0].id === this.id) {
+				newElement = content.childNodes[0];
 			}
-			content = firstElement.childNodes;
+		} else if (content.id === this.id) {
+			newElement = content;
+		}
+
+		if (newElement) {
+			this.updateElementAttributes_(element, newElement);
+			content = newElement.childNodes;
 		}
 		dom.append(element, content);
 	}
@@ -1156,9 +1158,12 @@ class Component extends Attribute {
 		var elementId = this.makeSurfaceId_(surfaceId);
 		var el = this.getSurfaceElement(surfaceId);
 		content = this.replaceSurfacePlaceholders_(content);
-		if (core.isString(content) && this.checkHasElementTag_(content, elementId)) {
+		if (this.checkHasElementTag_(content, elementId)) {
 			var surface = this.getSurface(surfaceId);
-			surface.element = dom.buildFragment(content).childNodes[0];
+			surface.element = content;
+			if (core.isString(content)) {
+				surface.element = dom.buildFragment(content).childNodes[0];
+			}
 			if (el.parentNode) {
 				dom.replace(el, surface.element);
 			}
@@ -1254,6 +1259,14 @@ class Component extends Attribute {
 			if (attrs[i].name !== 'id' && attrs[i].name !== 'class') {
 				element.setAttribute(attrs[i].name, attrs[i].value);
 			}
+		}
+
+		if (element.tagName !== newElement.tagName) {
+			console.error(
+				'Changing the component element\'s tag name is not allowed. Make sure ' +
+				'to always return the same tag name for the component element on getElementContent, ' +
+				'as well as to set the static variable ELEMENT_TAG_NAME to the chosen value.'
+			);
 		}
 	}
 

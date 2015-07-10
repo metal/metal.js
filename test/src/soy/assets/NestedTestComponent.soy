@@ -3,7 +3,7 @@
 /**
  */
 {template .content}
-	{delcall NestedTestComponent.components data="all" /}
+	{call .components data="all" /}
 {/template}
 
 /**
@@ -14,10 +14,10 @@
 {template .components}
 	<div class="componentsWrapper">
 	{for $index in range($count)}
-		{delcall CustomTestComponent data="all"}
+		{call Templates.CustomTestComponent.content data="all"}
 			{param headerContent: $foo /}
 			{param id: $id + 'MyChild' + $index /}
-		{/delcall}
+		{/call}
 	{/for}
 	</div>
 {/template}

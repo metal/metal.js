@@ -3,12 +3,12 @@
 /**
  */
 {template .content}
-	{delcall CustomTestComponent}{/delcall}
-	{delcall NestedNoIdTestComponent.foo data="all" /}
+	{call Templates.CustomTestComponent.content}{/call}
+	{call Templates.NestedNoIdTestComponent.foo data="all" /}
 {/template}
 
 /**
  */
 {template .foo}
-	{delcall CustomTestComponent}{/delcall}
+	{call Templates.CustomTestComponent.content}{/call}
 {/template}

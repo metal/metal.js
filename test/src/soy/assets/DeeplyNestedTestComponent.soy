@@ -3,7 +3,7 @@
 /**
  */
 {template .content}
-	{delcall DeeplyNestedTestComponent.components data="all" /}
+	{call .components data="all" /}
 {/template}
 
 /**
@@ -13,30 +13,30 @@
  */
 {template .components}
 	{let $child2 kind="html"}
-		{delcall ChildrenTestComponent}
+		{call Templates.ChildrenTestComponent.content}
 			{param bar: $bar /}
 			{param children kind="html"}
-				{delcall NestedTestComponent}
+				{call Templates.NestedTestComponent.content}
 					{param count: 1 /}
 					{param id: $id + '-child1' /}
-				{/delcall}
+				{/call}
 			{/param}
 			{param id: $id + '-child2' /}
-		{/delcall}
+		{/call}
 	{/let}
 	{let $child3 kind="html"}
-		{delcall EventsTestComponent}
+		{call Templates.EventsTestComponent.content}
 			{param footerButtons: $footerButtons /}
 			{param id: $id + '-child3' /}
-		{/delcall}
+		{/call}
 	{/let}
 
-	{delcall ChildrenTestComponent}
+	{call Templates.ChildrenTestComponent.content}
 		{param bar: $bar /}
 		{param children kind="html"}
 			<button type="button" class="parentButton" data-onclick="{$id}:handleClick"></button>
 			{$child2}{$child3}
 		{/param}
 		{param id: $id + '-main' /}
-	{/delcall}
+	{/call}
 {/template}

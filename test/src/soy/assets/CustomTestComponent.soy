@@ -1,15 +1,13 @@
 {namespace Templates.CustomTestComponent}
 
 /**
- * @param id
- * @param elementClasses
  */
 {template .content}
 	{call .title}
 		{param title: 'My Title' /}
 	{/call}
-	{delcall CustomTestComponent.header data="all" /}
-	{delcall CustomTestComponent.footer data="all" /}
+	{call .header data="all" /}
+	{call .footer data="all" /}
 {/template}
 
 /**

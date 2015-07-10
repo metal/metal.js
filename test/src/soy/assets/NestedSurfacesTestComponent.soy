@@ -4,7 +4,7 @@
  * @param id
  */
 {template .content}
-	{delcall NestedSurfacesTestComponent.list data="all" /}
+	{call .list data="all" /}
 {/template}
 
 /**
@@ -13,23 +13,23 @@
  */
 {template .list}
 	<div class="title">
-		{delcall NestedSurfacesTestComponent.item}
+		{call .item}
 			{param id: $id /}
 			{param surfaceId: 'title' /}
 			{param text: 'My List' /}
-		{/delcall}
+		{/call}
 	</div>
-	{delcall NestedSurfacesTestComponent.item}
+	{call .item}
 		{param id: $id /}
 		{param surfaceId: 0 /}
 		{param text: '0' /}
-	{/delcall}
+	{/call}
 	<div class="items">
 	{foreach $item in $items}
-			{delcall NestedSurfacesTestComponent.item}
+			{call .item}
 				{param id: $id /}
 				{param text: $item /}
-			{/delcall}
+			{/call}
 		{/foreach}
 	</div>
 {/template}

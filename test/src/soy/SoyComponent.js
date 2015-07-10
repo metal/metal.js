@@ -4,6 +4,7 @@ import dom from '../../../src/dom/dom';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyComponent from '../../../src/soy/SoyComponent';
+import SoyComponentAop from '../../../src/soy/SoyComponentAop';
 
 import './assets/ChildrenTestComponent.soy.js';
 import './assets/CustomTagTestComponent.soy.js';
@@ -109,10 +110,11 @@ describe('SoyComponent', function() {
 
 		var CustomTestComponent = createCustomTestComponentClass();
 		sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
+		var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
 		new CustomTestComponent().render();
-		assert.deepEqual({}, ComponentRegistry.Templates.CustomTestComponent.header.args[0][2]);
+		assert.deepEqual({}, templateFn.args[0][2]);
 
-		ComponentRegistry.Templates.CustomTestComponent.header.restore();
+		templateFn.restore();
 	});
 
 	describe('Surfaces', function() {
@@ -377,6 +379,9 @@ describe('SoyComponent', function() {
 		});
 
 		it('should pass correct params to soy template', function() {
+			ComponentRegistry.Templates.CustomTestComponent.header = SoyComponentAop.getOriginalFn(
+				ComponentRegistry.Templates.CustomTestComponent.header
+			);
 			sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
 			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
 			var data = {

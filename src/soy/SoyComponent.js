@@ -3,17 +3,7 @@
 import core from '../core';
 import Component from '../component/Component';
 import ComponentRegistry from '../component/ComponentRegistry';
-
-/**
- * We need to listen to calls to soy deltemplates so we can use them to
- * properly instantiate and update child components defined through soy.
- * TODO: Switch to using proper AOP.
- */
-var originalGetDelegateFn;
-
-if (typeof soy === 'object') {
-	originalGetDelegateFn = soy.$$getDelegateFn;
-}
+import SoyComponentAop from '../soy/SoyComponentAop';
 
 // The injected data that will be passed to soy templates.
 var ijData = {};
@@ -66,11 +56,12 @@ class SoyComponent extends Component {
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
-			if (this.isSurfaceTemplate_(templateName, templates[templateName])) {
+			var templateFn = SoyComponentAop.getOriginalFn(templates[templateName]);
+			if (this.isSurfaceTemplate_(templateName, templateFn)) {
 				var surface = this.getSurface(templateName);
 				if (!surface) {
 					this.addSurface(templateName, {
-						renderAttrs: templates[templateName].params,
+						renderAttrs: templateFn.params,
 						templateComponentName: this.constructor.NAME,
 						templateName: templateName
 					}, opt_config);
@@ -146,9 +137,10 @@ class SoyComponent extends Component {
 		ComponentRegistry.register(name, TemplateComponent);
 		ComponentRegistry.Templates[name] = {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
-				return templateFn(opt_data || {}, opt_ignored, opt_ijData);
+				return SoyComponentAop.getOriginalFn(templateFn)(opt_data || {}, opt_ignored, opt_ijData);
 			}
 		};
+		SoyComponentAop.registerTemplates(name);
 		return new TemplateComponent({
 			element: opt_element
 		});
@@ -213,17 +205,32 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Handles a call to the soy function for getting delegate functions.
-	 * @param {string} delTemplateId
-	 * @return {!function}
+	 * Handles a call to the SoyComponent component template.
+	 * @param {string} componentName The component's name.
+	 * @param {Object} data The data the template was called with.
+	 * @return {string} A placeholder to be rendered instead of the content the template
+	 *   function would have returned.
 	 * @protected
 	 */
-	handleGetDelegateFnCall_(delTemplateId) {
-		if (delTemplateId.indexOf('.') === -1) {
-			return this.handleTemplateCall_.bind(this, delTemplateId);
+	handleComponentCall_(componentName, data) {
+		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, this.surfaceBeingRendered_);
+		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
+		return '%%%%~c-' + id + ':' + componentName + '~%%%%';
+	}
+
+	/**
+	 * Handles a call to the soy function for getting delegate functions.
+	 * @param {string} templateComponentName The name of the component that this template was belongs to.
+	 * @param {string} templateName The name of this template.
+	 * @param {!Object} data The data the template was called with.
+	 * @return {string}
+	 * @protected
+	 */
+	handleInterceptedCall_(templateComponentName, templateName, data) {
+		if (templateName === 'content') {
+			return this.handleComponentCall_.call(this, templateComponentName, data);
 		} else {
-			var split = delTemplateId.split('.');
-			return this.handleSurfaceCall_.bind(this, split[0], split[1]);
+			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, data);
 		}
 	}
 
@@ -243,20 +250,6 @@ class SoyComponent extends Component {
 		}
 		this.nextSurfaceCallData_[surfaceId] = data;
 		return '%%%%~s-' + surfaceId + ':' + templateComponentName + '.' + templateName + '~%%%%';
-	}
-
-	/**
-	 * Handles a call to the SoyComponent component template.
-	 * @param {string} componentName The component's name.
-	 * @param {Object} data The data the template was called with.
-	 * @return {string} A placeholder to be rendered instead of the content the template
-	 *   function would have returned.
-	 * @protected
-	 */
-	handleTemplateCall_(componentName, data) {
-		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, this.surfaceBeingRendered_);
-		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
-		return '%%%%~c-' + id + ':' + componentName + '~%%%%';
 	}
 
 	/**
@@ -291,9 +284,10 @@ class SoyComponent extends Component {
 	 * @return {string} The template's result content.
 	 */
 	renderTemplate_(templateFn, opt_data) {
-		soy.$$getDelegateFn = this.handleGetDelegateFnCall_.bind(this);
+		SoyComponentAop.startInterception(this.handleInterceptedCall_.bind(this));
+		templateFn = SoyComponentAop.getOriginalFn(templateFn);
 		var content = templateFn(opt_data || this.buildTemplateData_(), null, ijData).content;
-		soy.$$getDelegateFn = originalGetDelegateFn;
+		SoyComponentAop.stopInterception();
 		return content;
 	}
 

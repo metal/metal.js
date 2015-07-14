@@ -65,6 +65,17 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(0, origin.addEventListener.callCount);
 	});
 
+	it('should proxy event from document to target', function() {
+		var target = new EventEmitter();
+		new EventEmitterProxy(document, target);
+
+		var listener = sinon.stub();
+		target.on('click', listener);
+		dom.triggerEvent(document, 'click');
+
+		assert.strictEqual(1, listener.callCount);
+	});
+
 	it('should not proxy blacklisted event', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

@@ -92,7 +92,7 @@ class EventEmitterProxy extends Disposable {
 			self.targetEmitter_.emit.apply(self.targetEmitter_, args);
 		};
 
-		if (core.isElement(this.originEmitter_)) {
+		if (core.isElement(this.originEmitter_) || core.isDocument(this.originEmitter_)) {
 			dom.on(this.originEmitter_, event, this.proxiedEvents_[event]);
 		} else {
 			this.originEmitter_.on(event, this.proxiedEvents_[event]);

@@ -50,7 +50,7 @@ describe('SoyComponent', function() {
 			elementClasses: 'myClass'
 		}).render();
 		assert.strictEqual('CUSTOM', custom.element.tagName);
-		assert.strictEqual('component myClass', custom.element.className);
+		assert.strictEqual('component myClass', custom.element.className.trim());
 		assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 	});
 

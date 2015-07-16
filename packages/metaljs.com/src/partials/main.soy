@@ -1,0 +1,47 @@
+{namespace main}
+
+/**
+ * Topbar
+ */
+{template .topbar}
+	<nav class="topbar">
+		<a class="topbar-logo" href="/">
+			<img class="topbar-logo-image" src="/images/logo_signature@2x.png" alt="Metal.js Logo" width="35" height="28">
+			<h1 class="topbar-logo-text">Metal.js</h1>
+		</a>
+		<ul class="topbar-menu">
+			<li class="topbar-menu-item">
+				<a class="topbar-menu-link" target="_blank" href="https://github.com/metal/metal.js/wiki/Creating-your-own-component">Intro</a>
+			</li>
+			<li class="topbar-menu-item">
+				<a class="topbar-menu-link" target="_blank" href="https://github.com/metal/metal.js/wiki">Guides</a>
+			</li>
+			<li class="topbar-menu-item">
+				<a class="rounded-icon topbar-icon-github" target="_blank" href="https://github.com/metal/metal.js">
+					<img src="/images/github_icon.svg" alt="GitHub Icon" width="16">
+				</a>
+			</li>
+		</ul>
+	</nav>
+{/template}
+
+/**
+ * Footer
+ */
+{template .footer}
+	<footer class="footer">
+		<div class="container">
+			<p class="footer-paragraph">
+				<span class="footer-credits">
+					<a class="rounded-icon footer-icon-liferay" target="_blank" href="http://liferay.com/">
+						<img src="/images/liferay_logo.svg" alt="Liferay Icon" width="19" height="19">
+					</a>
+					Brought to you by <a class="footer-link" target="_blank" href="http://liferay.com/">Liferay, Inc</a>.
+				</span>
+				<span class="footer-license">
+					<a class="footer-link" target="_blank" href="https://github.com/metal/metal.js/blob/master/LICENSE.md">BSD</a> License.
+				</span>
+			</p>
+		</div>
+	</footer>
+{/template}

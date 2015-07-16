@@ -1,0 +1,185 @@
+{namespace docs}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Creating your own component</h1>
+
+		<p>There are many different ways to create a new component using Metal.js. You can use <strong>SoyComponent</strong>, or extend directly from <strong>Component</strong>, or even build your own component abstraction on top of those and use it instead. You can build the ES6 code using babel, traceur or any other transpiler. You can test using karma, jasmine or any other test framework, and can use any directory structure for your project. To sum it up, you can customize everything to your own needs. The world is your oyster.</p>
+
+		<p>This guide will focus on a quick and easy way to get started with Metal.js, using <strong>SoyComponent</strong> as the component base class and <strong>generator-metal</strong> for the project structure and workflow.</p>
+
+		<h2>Dependencies</h2>
+
+		<ul>
+			<li>For importing the source code you'll need <a href="http://bower.io/">Bower</a>.</li>
+			<li>For build tooling, you'll need <a href="https://nodejs.org/download/">Node.js</a> v0.10 or newer.</li>
+			<li>For Soy templates compilation, you'll need Java SDK v1.7 or newer.</li>
+		</ul>
+
+		<h2>Creating the project structure</h2>
+
+		<p>We've built a <a href="https://www.npmjs.com/package/generator-metal">Yeoman generator</a> for creating the initial project structure together with some useful dependencies. To use it:</p>
+
+		<ol>
+			<li>Install Yeoman and <strong>generator-metal</strong>:<br><code>[sudo] npm i -g yo generator-metal</code></li>
+			<li>Open the folder that you want to use on your terminal and type:<br><code>yo metal</code></li>
+			<li>Answer the generator prompts</li>
+			<li>Wait for the generator to finish fetching dependencies</li>
+		</ol>
+
+		<p>So, for example, let's say you've decided to name your component <strong>MyComponent</strong>. After those steps you'll get a directory tree similar to this:</p>
+
+		<pre><code>{literal}
+		├── README.md
+		├── bower.json
+		├── bower_components
+		├── demos
+		│   └── index.html
+		├── gulpfile.js
+		├── karma.conf.js
+		├── node_modules
+		├── package.json
+		├── src
+		│   ├── MyComponent.js
+		│   ├── MyComponent.soy
+		│   └── myComponent.scss
+		└── test
+		    └── MyComponent.js
+		{/literal}</code></pre>
+
+		<p>Building your component is now just a matter of adding code to the correct files:</p>
+
+		<ul>
+			<li><code>src/MyComponent.js</code> - Main JavaScript logic</li>
+			<li><code>src/MyComponent.soy</code>- Soy templates</li>
+			<li><code>src/myComponent.scss</code> - CSS rules</li>
+			<li><code>test/MyComponent.js</code> - Test cases</li>
+			<li><code>demos/index.js</code> - Demo</li>
+		</ul>
+
+		<h2>SoyComponent</h2>
+
+		<p>Now we can actually start to code our new component. We'll be using the <strong>SoyComponent</strong> class, which enables you to easily separate business logic from rendering logic, as it provides an integration with <a href="http://developers.google.com/closure/templates">soy templates</a>.</p>
+
+		<p>So, for example, let's say that <strong>MyComponent</strong> should have a body and a footer with content. The JavaScript file (<code>src/MyComponent.js</code>) would look like this:</p>
+
+		<pre><code>{literal}
+		import ComponentRegister from '../bower_components/metal/src/component/ComponentRegister';
+		import SoyComponent from '../bower_components/metal/src/soy/SoyComponent';
+		import from './MyComponent.soy';
+
+		class MyComponent extends SoyComponent {
+		    constructor(opt_config) {
+		        super(opt_config);
+		    }
+		}
+
+		MyComponent.ATTRS = {
+		    bodyContent: {
+		        value: 'Initial body content.'
+		    },
+		    footerContent: {
+		        value: SoyComponent.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
+		    }
+		};
+
+		ComponentRegister.register('MyComponent', MyComponent);
+		{/literal}</code></pre>
+
+		<p>This file just defines a class named MyComponent, makes it extend from SoyComponent, imports the compiled soy templates and defines two attributes. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
+
+		<h2>Attributes</h2>
+
+		<p>But what are attributes? They're basically a way to better define and control your component's state.</p>
+
+		<p>If you're familiar with <a href="http://yuilibrary.com/">YUI</a>, you may recognize this feature and notice that it's very similar to how attributes are defined there. You basically just need to list all attributes you'll be using on the ATTRS static variable, and provide their configuration options, like initial value and validator. For a list of all valid options, take a look at Attribute's <a href="https://github.com/metal/metal.js/blob/master/src/attribute/Attribute.js#L45">docs</a>.</p>
+
+		<p>Your component's constructor can receive a configuration object with initial values to use for its attributes. You can access or change an object's attributes in the same way you'd access or change any object property.</p>
+
+		<pre><code>{literal}
+		var comp = new MyComponent({bodyContent: 'foo'});
+		console.log(comp.bodyContent); // Prints 'foo'
+
+		comp.bodyContent = 'bar';
+		console.log(comp.bodyContent); // Prints 'bar'
+		{/literal}</code></pre>
+
+		<p>You can also track attribute value changes by listening to the appropriate event.</p>
+
+		<pre><code>{literal}
+		comp.on('bodyContentChanged', function(event) {
+		    // event.prevVal has the previous value.
+		    // event.newVal has the new value.
+		});
+		{/literal}</code></pre>
+
+		<p>To see all features of the <strong>Attribute class</strong> (which <strong>SoyComponent</strong> extends), take a look at its <a href="https://github.com/metal/metal.js/blob/master/test/src/attribute/Attribute.js">unit tests</a>.</p>
+
+		<h2>Soy</h2>
+
+		<p>Now we just need a soy file for MyComponent's rendering logic. It would look like this:</p>
+
+		<pre><code>{literal}
+		&lbrace;namespace Templates.MyComponent&rbrace;
+
+		/**
+		 * This renders the component's whole content.
+		 * @param elementClasses
+		 * @param id
+		 */
+		&lbrace;template .content&rbrace;
+		  &lt;div id="&lbrace;$id&rbrace;" class="&lbrace;$elementClasses&rbrace;"&gt;
+		    &lbrace;call .body data="all" /&rbrace;
+		    &lbrace;call .footer data="all" /&rbrace;
+		  &lt;/div&gt;
+		&lbrace;/template&rbrace;
+
+		/**
+		 * This renders the body part of the component.
+		 * @param bodyContent
+		 * @param id
+		 */
+		&lbrace;template .body&rbrace;
+		  &lt;div id="&lbrace;$id&rbrace;-body"&gt;
+		    &lt;p&gt;&lbrace;$bodyContent&rbrace;&lt;/p&gt;
+		  &lt;/div&gt;
+		&lbrace;/template&rbrace;
+
+		/**
+		 * This renders the footer part of the component.
+		 * @param footerContent
+		 * @param id
+		 */
+		&lbrace;template .footer&rbrace;
+		  &lt;div id="&lbrace;$id&rbrace;-footer"&gt;
+		    &lt;footer&gt;&lbrace;$footerContent&rbrace;&lt;/footer&gt;
+		  &lt;/div&gt;
+		&lbrace;/template&rbrace;
+		{/literal}</code></pre>
+
+		<p>Looking at that you can see that it's just a basic soy file that defines some templates. For this soy file to work well with SoyComponent its namespace just needs to be in the format: <code>Templates.&lbrace;name of component&rbrace;</code>.</p>
+
+		<p>Note that, on the soy file, we have divided the main template into subtemplates, one for the body content and one for the footer. This is not necessary, but can be really helpful, as SoyComponent will handle these as special parts of the widget, automatically rerendering them when one of the attributes listed as params of a template changes. In MyComponent's case this means that whenever the value of the <code>bodyContent</code> attribute is changed, the <code>body</code> template will be called, and that part of the widget will be updated, even though there is no JavaScript code on MyComponent to handle this logic. The same goes for the <code>footerContent</code> attribute and the <code>footer</code> template.</p>
+
+		<p>SoyComponent's logic for updating the component's contents automatically is very smart, so it won't cause a rerender unless it's necessary. So if a change causes a template to be called again, but the resulting HTML from the template is the same that was rendered for the last time, it will be ignored. This is done by compressing and caching the hash code of a template's results when it's called, and later using it to compare with new results to decide if a new content should be rendered or not.</p>
+
+		<p>Finally, to render an instance of MyComponent, just call <code>render</code>, passing any attribute values that you want to initialize:</p>
+
+		<pre><code>{literal}
+		new MyComponent({headerContent: 'My Header'}).render(parentElement);
+		{/literal}</code></pre>
+
+		<h2>Next steps</h2>
+
+		<p>Now that you know how to create your own components, let's learn how to transpile the ES6 code and build its modules to a desired format.</p>
+
+		<p><strong><a href="http://github.com/metal/metal.js/wiki/Transpiling-and-building-your-component">↪ Transpiling and building your component</a></strong></p>
+	{/param}
+{/call}
+{/template}

@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Docs
+   ========================================================================== */
+
+.docs {
+	margin: 100px 0;
+}
+
+/* Navigation
+   ========================================================================== */
+
+.docs-nav-group {
+	color: rgba($secondaryColor, 0.4);
+	font-family: $secondaryFont;
+	font-size: 15px;
+	margin-bottom: 36px;
+}
+
+.docs-nav-list {
+	padding-left: 12px;
+	margin-bottom: 46px;
+}
+
+.docs-nav-item {
+	list-style: none;
+	margin-bottom: 10px;
+}
+
+.docs-nav-link {
+	@include anim(color);
+	color: rgba($secondaryColor, 0.4);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.docs-nav-link:hover {
+	color: $primaryColor;
+	text-decoration: none;
+}
+
+/* Content
+   ========================================================================== */
+
+.docs-content {
+	color: rgba($secondaryColor, 0.6);
+}
+
+.docs-content a {
+	@include anim(color);
+  color: $primaryColor;
+  font-weight: 600;
+}
+
+.docs-content a:hover,
+.docs-content a:focus {
+	color: rgba($primaryColor, 0.6);
+	text-decoration: none;
+}
+
+.docs-content h1,
+.docs-content h2,
+.docs-content h3,
+.docs-content h4,
+.docs-content h5,
+.docs-content h6 {
+	color: rgba($secondaryColor, 0.8);
+	font-family: $secondaryFont;
+	font-weight: 300;
+	margin: 64px 0 30px;
+}
+
+.docs-content h1 {
+	font-size: 30px;
+	margin: 0 0 52px;
+}
+
+.docs-content h2 {
+	font-size: 24px;
+}
+
+.docs-content h3 {
+	font-size: 22px;
+}
+
+.docs-content h4 {
+	font-size: 20px;
+}
+
+.docs-content h5 {
+	font-size: 18px;
+}
+
+.docs-content h6 {
+	font-size: 16px;
+}
+
+.docs-content p,
+.docs-content li,
+.docs-content pre {
+	font-size: 16px;
+	line-height: 24px;
+}
+
+.docs-content pre {
+	background-color: #fdfcff;
+	border-radius: 4px;
+	border: 1px solid rgba($primaryColor, 0.5);
+	line-height: 20px;
+	padding: 1px 0 1px 15px;
+}
+
+.docs-content pre code {
+	background-color: #fdfcff;
+	color: rgba($secondaryColor, 0.7);
+}
+
+.docs-content code {
+	background: rgba($primaryColor, 0.1);
+	color: $primaryColor;
+	padding: 2px;
+}

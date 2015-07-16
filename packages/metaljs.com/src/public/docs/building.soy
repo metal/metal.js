@@ -1,0 +1,78 @@
+{namespace docsBuilding}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Transpiling and building your component</h1>
+
+		<p>As we mentioned before, Metal.js components are written in ES6, which means that we need a transpiling process before using it on a website.
+		If you've followed the previous guide on how to create a component though, you'll already have access to multiple <a href="http://gulpjs.com/">gulp</a> tasks that enable you to achieve this. Those tasks are added to your project by <a href="https://www.npmjs.com/package/gulp-metal">gulp-metal</a>, which is automatically included by <strong>generator-metal</strong>. <strong>gulp-metal</strong> provides tasks for many different purposes, but this guide will focus on the tasks related to building your project.</p>
+
+		<h2>gulp-metal</h2>
+
+		<p>To run <strong>gulp-metal</strong> tasks you'll need to have <strong>gulp</strong> installed first. Just run:</p>
+
+		<pre><code>
+		[sudo] npm i -g gulp
+		</code></pre>
+
+		<p>To run a task, just call gulp with the task name. To run a task named <strong>foo</strong> for example you'd just need to do:</p>
+
+		<pre><code>
+		gulp foo
+		</code></pre>
+
+		<p>All tasks can be configured by going to the generated file called <code>gulpfile.js</code> on your project and passing different options to the <code>metal.registerTasks</code> function. The main build tasks and their options will be explained in more details below.</p>
+
+		<h2>gulp build</h2>
+
+		<p>This will transpile your source code and build it to the format of your choice. If you created your project through <strong>generator-metal</strong>, then this will be automatically configured to build to the format that was selected during the generator prompts.</p>
+
+		<p>You can still change the format you want to use after the project already exists though, you just need to pass the names of the build tasks you want to use as default to the <code>mainBuildJsTasks</code> option on your <code>gulpfile.js</code>. For example, if you wanted to start using the amd format you can do it like this:</p>
+
+		<pre><code>{literal}
+		metal.registerTasks({
+		  ... // Other options
+		  mainBuildJsTasks: ['build:amd']
+		});
+		{/literal}</code></pre>
+
+		<p>Besides transpiling ES6, the build task also handles soy and sass compilation for you. Built files are outputted to the <code>build</code> folder.</p>
+
+		<h2>gulp watch</h2>
+
+		<p>After running this task, any change you make to a js, soy or css file will trigger the build task automatically, so you don't have to keep doing this manually by yourself.</p>
+
+		<h2>gulp soy</h2>
+
+		<p>This handles only the soy compilation part of the build task. It's automatically called by <code>gulp build</code>.</p>
+
+		<h2>gulp css</h2>
+
+		<p>This handles only the css part of the build task. It's automatically called by <code>gulp build</code>.</p>
+
+		<h2>gulp build:globals</h2>
+
+		<p>This handles just the transpiling of ES6 modules to the globals format, meaning that all exported modules are exposed as global variables. This is the default value of the <code>mainBuildJsTasks</code> option, and so is the run called by <code>gulp build</code> if the option is not set to something else.</p>
+
+		<h2>gulp build:amd</h2>
+
+		<p>This handles just the transpiling of ES6 modules to the <a href="http://requirejs.org/docs/whyamd.html">AMD</a> format. It can be automatically called by <code>gulp build</code> if the <code>mainBuildJsTasks</code> option is set to it.</p>
+
+		<h2>gulp build:jquery</h2>
+
+		<p>This handles just the transpiling of ES6 modules to <a href="https://learn.jquery.com/plugins">jQuery plugins</a>. It can be automatically called by <code>gulp build</code> if the <code>mainBuildJsTasks</code> option is set to it.</p>
+
+		<h2>Next steps</h2>
+
+		<p>Now that you know how to transpile and use a metal component, let's learn how to test it.</p>
+
+		<p><strong><a href="https://github.com/metal/metal.js/wiki/Testing-your-component">↪ Testing your component</a></strong></p>
+	{/param}
+{/call}
+{/template}

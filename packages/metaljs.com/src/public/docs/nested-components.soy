@@ -1,0 +1,38 @@
+{namespace docsNestedComponents}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Nested Components</h1>
+
+		<p>Since we want to be able to separate business logic from rendering, it'd be really useful to be able to reference components on the template files. That would make it easier to correctly place the child component at the right position inside the parent, and would make the template more complete so it would be able to render the whole component by itself (see <a href="#decorate">Decorate</a>).</p>
+
+		<p>This can already be done with SoyComponent. For example, let's say we have the Modal and Button components, and the modal wants to render buttons on its footer. Inside <strong>modal.soy</strong> we'd see the following:</p>
+
+		<pre><code>{literal}
+		&lbrace;template .footer&rbrace;
+		    &lbrace;call Templates.Button.content&rbrace;
+		        &lbrace;param id: 'ok' /&rbrace;
+		        &lbrace;param label: 'Ok' /&rbrace;
+		    &lbrace;/call&rbrace;
+		    &lbrace;call Templates.Button.content&rbrace;
+		        &lbrace;param id: 'cancel' /&rbrace;
+		        &lbrace;param label: 'Cancel' /&rbrace;
+		    &lbrace;/call&rbrace;
+		&lbrace;/template&rbrace;
+		{/literal}</code></pre>
+
+		<p>When Modal is rendered, the two specified buttons will be rendered as well. Also, the button instances can be accessed from the <code>components</code> property inside the modal instance, indexed by their ids:</p>
+
+		<pre><code>{literal}
+		modal.components.ok // The instance for the 'Ok' button
+		modal.components.cancel // The instance for the 'Cancel' button
+		{/literal}</code></pre>
+	{/param}
+{/call}
+{/template}

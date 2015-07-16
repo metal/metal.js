@@ -1,0 +1,20 @@
+{namespace docsDecorate}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Decorate</h1>
+
+		<p><a href="http://en.wikipedia.org/wiki/Progressive_enhancement">Progressive enhancement</a> is a feature that is very important for a lot of people. Knowing about this, Metal.js is prepared to deal with content that already comes rendered from the server. In that case, instead of calling <code>render</code> the developer can call `decorate` instead. This will skip the rendering phase of the component, running only the code that enhances it with JavaScript behavior instead.</p>
+
+		<p>For SoyComponent, this means that the template won't be rendered, but the <code>attached</code> lifecycle method will still be called.</p>
+
+		<p>It's important to note that building components with SoyComponent also helps with progressive enhancement in another way: by providing a faithful template that can be run by the server without having to duplicate the rendering code or run JavaScript at all.</p>
+	{/param}
+{/call}
+{/template}

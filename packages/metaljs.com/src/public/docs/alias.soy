@@ -1,0 +1,23 @@
+{namespace docsAlias}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Alias</h1>
+
+		<p>Having to supply the relative path to bower_components is not cool and, besides that, it may cause problems when a module doing that is imported later as a bower dependency of another project.</p>
+
+		<p>Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using a prefix instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's <a href="#build-tasks">build tools</a> or adding a similar logic to your build process yourself (though we provide a <a href="https://github.com/metal/metal.js/blob/master/tasks/lib/renameAlias.js">helper function</a> on Metal.js's npm package).</p>
+
+		<p>With aliases, the previous example can be rewritten like this:</p>
+
+		<pre><code>import core from 'bower:metal/src/core';
+		</code></pre>
+	{/param}
+{/call}
+{/template}

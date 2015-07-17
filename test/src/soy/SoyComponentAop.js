@@ -40,14 +40,14 @@ describe('SoyComponentAop', function() {
 		ComponentRegistry.Templates.TestComponent.test(data, null, ijData);
 		assert.strictEqual('TestComponent', interceptor.args[0][0]);
 		assert.strictEqual('test', interceptor.args[0][1]);
-		assert.strictEqual(data, interceptor.args[0][2]);
-		assert.strictEqual(ijData, interceptor.args[0][4]);
+		assert.strictEqual(data, interceptor.args[0][3]);
+		assert.strictEqual(ijData, interceptor.args[0][5]);
 
 		ComponentRegistry.Templates.TestComponent2.test2(data, null, ijData);
 		assert.strictEqual('TestComponent2', interceptor.args[1][0]);
 		assert.strictEqual('test2', interceptor.args[1][1]);
-		assert.strictEqual(data, interceptor.args[1][2]);
-		assert.strictEqual(ijData, interceptor.args[1][4]);
+		assert.strictEqual(data, interceptor.args[1][3]);
+		assert.strictEqual(ijData, interceptor.args[1][5]);
 	});
 
 	it('should stop intercepting calls to template functions', function() {

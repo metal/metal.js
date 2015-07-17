@@ -118,7 +118,7 @@ describe('SoyComponent', function() {
 		templateFn.restore();
 	});
 
-	describe.only('Surfaces', function() {
+	describe('Surfaces', function() {
 		it('should automatically create surfaces for a component\'s non private templates', function() {
 			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
 
@@ -146,6 +146,14 @@ describe('SoyComponent', function() {
 			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
 			assert.deepEqual(['foo'], surfaces.notPrivate.renderAttrs);
+		});
+
+		it('should only create surfaces either from non private template calls or calls with surface id', function() {
+			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
+
+			var custom = new PrivateTemplateTestComponent().render();
+			var surfaces = custom.getSurfaces();
+			assert.deepEqual(['notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
 		});
 	});
 

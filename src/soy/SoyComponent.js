@@ -222,15 +222,18 @@ class SoyComponent extends Component {
 	 * Handles a call to the soy function for getting delegate functions.
 	 * @param {string} templateComponentName The name of the component that this template was belongs to.
 	 * @param {string} templateName The name of this template.
+	 * @param {!function()} originalFn The original template function that was intercepted.
 	 * @param {!Object} data The data the template was called with.
+	 * @param {*} opt_ignored
+	 * @param {Object} opt_ijData Template injected data object.
 	 * @return {string}
 	 * @protected
 	 */
-	handleInterceptedCall_(templateComponentName, templateName, data) {
+	handleInterceptedCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
 		if (templateName === 'content') {
 			return this.handleComponentCall_.call(this, templateComponentName, data);
 		} else {
-			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, data);
+			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);
 		}
 	}
 
@@ -238,14 +241,20 @@ class SoyComponent extends Component {
 	 * Handles a call to the SoyComponent surface template.
 	 * @param {string} templateComponentName The name of the component that this template was belongs to.
 	 * @param {string} templateName The name of this template.
+	 * @param {!function()} originalFn The original template function that was intercepted.
 	 * @param {!Object} data The data the template was called with.
+	 * @param {*} opt_ignored
+	 * @param {Object} opt_ijData Template injected data object.
 	 * @return {string} A placeholder to be rendered instead of the content the template
 	 *   function would have returned.
 	 * @protected
 	 */
-	handleSurfaceCall_(templateComponentName, templateName, data) {
+	handleSurfaceCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
 		var surfaceId = data.surfaceId;
 		if (!core.isDefAndNotNull(surfaceId)) {
+			if (originalFn.private) {
+				return originalFn.call(null, data, opt_ignored, opt_ijData);
+			}
 			surfaceId = this.generateSoySurfaceId_(templateComponentName, templateName);
 		}
 		this.nextSurfaceCallData_[surfaceId] = data;

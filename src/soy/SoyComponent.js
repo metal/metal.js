@@ -260,7 +260,7 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	isSurfaceTemplate_(templateName, templateFn) {
-		return templateName !== 'content' && templateName.substr(0, 13) !== '__deltemplate' && templateFn.params;
+		return templateName !== 'content' && templateName.substr(0, 13) !== '__deltemplate' && !templateFn.private;
 	}
 
 	/**

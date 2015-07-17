@@ -15,6 +15,7 @@ import './assets/ExternalTemplateTestComponent.soy.js';
 import './assets/NestedNoIdTestComponent.soy.js';
 import './assets/NestedSurfacesTestComponent.soy.js';
 import './assets/NestedTestComponent.soy.js';
+import './assets/PrivateTemplateTestComponent.soy.js';
 
 describe('SoyComponent', function() {
 	beforeEach(function() {
@@ -117,35 +118,34 @@ describe('SoyComponent', function() {
 		templateFn.restore();
 	});
 
-	describe('Surfaces', function() {
+	describe.only('Surfaces', function() {
 		it('should automatically create surfaces for a component\'s non private templates', function() {
-			var CustomTestComponent = createCustomTestComponentClass();
+			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
 
-			var custom = new CustomTestComponent();
+			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['footer', 'header'], Object.keys(surfaces).sort());
+			assert.deepEqual(['notPrivate'], Object.keys(surfaces));
 		});
 
 		it('should set surface renderAttrs to its template params', function() {
-			var CustomTestComponent = createCustomTestComponentClass();
+			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
 
-			var custom = new CustomTestComponent();
+			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['headerContent'], surfaces.header.renderAttrs);
-			assert.deepEqual(['footerContent'], surfaces.footer.renderAttrs);
+			assert.deepEqual(['text'], surfaces.notPrivate.renderAttrs);
 		});
 
 		it('should not override surface config when it already exists', function() {
-			var CustomTestComponent = createCustomTestComponentClass();
-			CustomTestComponent.SURFACES = {
-				header: {
+			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
+			PrivateTemplateTestComponent.SURFACES = {
+				notPrivate: {
 					renderAttrs: ['foo']
 				}
 			};
 
-			var custom = new CustomTestComponent();
+			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['foo'], surfaces.header.renderAttrs);
+			assert.deepEqual(['foo'], surfaces.notPrivate.renderAttrs);
 		});
 	});
 

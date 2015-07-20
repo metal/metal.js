@@ -35,12 +35,11 @@
 
 		<p>You can still change the format you want to use after the project already exists though, you just need to pass the names of the build tasks you want to use as default to the <code>mainBuildJsTasks</code> option on your <code>gulpfile.js</code>. For example, if you wanted to start using the amd format you can do it like this:</p>
 
-		<pre><code>{literal}
-		metal.registerTasks({
-		  ... // Other options
-		  mainBuildJsTasks: ['build:amd']
-		});
-		{/literal}</code></pre>
+		<textarea class="code" data-mode="javascript">{literal}
+metal.registerTasks({
+  ... // Other options
+  mainBuildJsTasks: ['build:amd']
+});{/literal}</textarea>
 
 		<p>Besides transpiling ES6, the build task also handles soy and sass compilation for you. Built files are outputted to the <code>build</code> folder.</p>
 

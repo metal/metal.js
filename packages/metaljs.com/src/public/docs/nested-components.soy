@@ -14,25 +14,24 @@
 
 		<p>This can already be done with SoyComponent. For example, let's say we have the Modal and Button components, and the modal wants to render buttons on its footer. Inside <strong>modal.soy</strong> we'd see the following:</p>
 
-		<pre><code>{literal}
-		&lbrace;template .footer&rbrace;
-		    &lbrace;call Templates.Button.content&rbrace;
-		        &lbrace;param id: 'ok' /&rbrace;
-		        &lbrace;param label: 'Ok' /&rbrace;
-		    &lbrace;/call&rbrace;
-		    &lbrace;call Templates.Button.content&rbrace;
-		        &lbrace;param id: 'cancel' /&rbrace;
-		        &lbrace;param label: 'Cancel' /&rbrace;
-		    &lbrace;/call&rbrace;
-		&lbrace;/template&rbrace;
-		{/literal}</code></pre>
+		<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;template .footer&rbrace;
+    &lbrace;call Templates.Button.content&rbrace;
+        &lbrace;param id: 'ok' /&rbrace;
+        &lbrace;param label: 'Ok' /&rbrace;
+    &lbrace;/call&rbrace;
+    &lbrace;call Templates.Button.content&rbrace;
+        &lbrace;param id: 'cancel' /&rbrace;
+        &lbrace;param label: 'Cancel' /&rbrace;
+    &lbrace;/call&rbrace;
+&lbrace;/template&rbrace;
+{/literal}</textarea>
 
 		<p>When Modal is rendered, the two specified buttons will be rendered as well. Also, the button instances can be accessed from the <code>components</code> property inside the modal instance, indexed by their ids:</p>
 
-		<pre><code>{literal}
-		modal.components.ok // The instance for the 'Ok' button
-		modal.components.cancel // The instance for the 'Cancel' button
-		{/literal}</code></pre>
+		<textarea class="code" data-mode="javascript">{literal}
+modal.components.ok // The instance for the 'Ok' button
+modal.components.cancel // The instance for the 'Cancel' button{/literal}</textarea>
 	{/param}
 {/call}
 {/template}

@@ -69,28 +69,27 @@
 
 		<p>So, for example, let's say that <strong>MyComponent</strong> should have a body and a footer with content. The JavaScript file (<code>src/MyComponent.js</code>) would look like this:</p>
 
-		<pre><code>{literal}
-		import ComponentRegister from 'bower:metal/src/component/ComponentRegister';
-		import SoyComponent from 'bower:metal/src/soy/SoyComponent';
-		import from './MyComponent.soy';
+		<textarea class="code" data-mode="javascript">{literal}
+import ComponentRegister from 'bower:metal/src/component/ComponentRegister';
+import SoyComponent from 'bower:metal/src/soy/SoyComponent';
+import from './MyComponent.soy';
 
-		class MyComponent extends SoyComponent {
-		    constructor(opt_config) {
-		        super(opt_config);
-		    }
-		}
+class MyComponent extends SoyComponent {
+    constructor(opt_config) {
+        super(opt_config);
+    }
+}
 
-		MyComponent.ATTRS = {
-		    bodyContent: {
-		        value: 'Initial body content.'
-		    },
-		    footerContent: {
-		        value: SoyComponent.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
-		    }
-		};
+MyComponent.ATTRS = {
+    bodyContent: {
+        value: 'Initial body content.'
+    },
+    footerContent: {
+        value: SoyComponent.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
+    }
+};
 
-		ComponentRegister.register('MyComponent', MyComponent);
-		{/literal}</code></pre>
+ComponentRegister.register('MyComponent', MyComponent);{/literal}</textarea>
 
 		<p>This file just defines a class named MyComponent, makes it extend from SoyComponent, imports the compiled soy templates and defines two attributes. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
 
@@ -102,22 +101,20 @@
 
 		<p>Your component's constructor can receive a configuration object with initial values to use for its attributes. You can access or change an object's attributes in the same way you'd access or change any object property.</p>
 
-		<pre><code>{literal}
-		var comp = new MyComponent({bodyContent: 'foo'});
-		console.log(comp.bodyContent); // Prints 'foo'
+		<textarea class="code" data-mode="javascript">{literal}
+var comp = new MyComponent({bodyContent: 'foo'});
+console.log(comp.bodyContent); // Prints 'foo'
 
-		comp.bodyContent = 'bar';
-		console.log(comp.bodyContent); // Prints 'bar'
-		{/literal}</code></pre>
+comp.bodyContent = 'bar';
+console.log(comp.bodyContent);// Prints 'bar'{/literal}</textarea>
 
 		<p>You can also track attribute value changes by listening to the appropriate event.</p>
 
-		<pre><code>{literal}
-		comp.on('bodyContentChanged', function(event) {
-		    // event.prevVal has the previous value.
-		    // event.newVal has the new value.
-		});
-		{/literal}</code></pre>
+		<textarea class="code" data-mode="javascript">{literal}
+comp.on('bodyContentChanged', function(event) {
+    // event.prevVal has the previous value.
+    // event.newVal has the new value.
+});{/literal}</textarea>
 
 		<p>To see all features of the <strong>Attribute class</strong> (which <strong>SoyComponent</strong> extends), take a look at its <a href="https://github.com/metal/metal.js/blob/master/test/src/attribute/Attribute.js">unit tests</a>.</p>
 
@@ -125,43 +122,42 @@
 
 		<p>Now we just need a soy file for MyComponent's rendering logic. It would look like this:</p>
 
-		<pre><code>{literal}
-		&lbrace;namespace Templates.MyComponent&rbrace;
+		<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;namespace Templates.MyComponent&rbrace;
 
-		/**
-		 * This renders the component's whole content.
-		 * @param elementClasses
-		 * @param id
-		 */
-		&lbrace;template .content&rbrace;
-		  &lt;div id="&lbrace;$id&rbrace;" class="&lbrace;$elementClasses&rbrace;"&gt;
-		    &lbrace;call .body data="all" /&rbrace;
-		    &lbrace;call .footer data="all" /&rbrace;
-		  &lt;/div&gt;
-		&lbrace;/template&rbrace;
+/**
+ * This renders the component's whole content.
+ * @param elementClasses
+ * @param id
+ */
+&lbrace;template .content&rbrace;
+  &lt;div id="&lbrace;$id&rbrace;" class="&lbrace;$elementClasses&rbrace;"&gt;
+    &lbrace;call .body data="all" /&rbrace;
+    &lbrace;call .footer data="all" /&rbrace;
+  &lt;/div&gt;
+&lbrace;/template&rbrace;
 
-		/**
-		 * This renders the body part of the component.
-		 * @param bodyContent
-		 * @param id
-		 */
-		&lbrace;template .body&rbrace;
-		  &lt;div id="&lbrace;$id&rbrace;-body"&gt;
-		    &lt;p&gt;&lbrace;$bodyContent&rbrace;&lt;/p&gt;
-		  &lt;/div&gt;
-		&lbrace;/template&rbrace;
+/**
+ * This renders the body part of the component.
+ * @param bodyContent
+ * @param id
+ */
+&lbrace;template .body&rbrace;
+  &lt;div id="&lbrace;$id&rbrace;-body"&gt;
+    &lt;p&gt;&lbrace;$bodyContent&rbrace;&lt;/p&gt;
+  &lt;/div&gt;
+&lbrace;/template&rbrace;
 
-		/**
-		 * This renders the footer part of the component.
-		 * @param footerContent
-		 * @param id
-		 */
-		&lbrace;template .footer&rbrace;
-		  &lt;div id="&lbrace;$id&rbrace;-footer"&gt;
-		    &lt;footer&gt;&lbrace;$footerContent&rbrace;&lt;/footer&gt;
-		  &lt;/div&gt;
-		&lbrace;/template&rbrace;
-		{/literal}</code></pre>
+/**
+ * This renders the footer part of the component.
+ * @param footerContent
+ * @param id
+ */
+&lbrace;template .footer&rbrace;
+  &lt;div id="&lbrace;$id&rbrace;-footer"&gt;
+    &lt;footer&gt;&lbrace;$footerContent&rbrace;&lt;/footer&gt;
+  &lt;/div&gt;
+&lbrace;/template&rbrace;{/literal}</textarea>
 
 		<p>Looking at that you can see that it's just a basic soy file that defines some templates. For this soy file to work well with SoyComponent its namespace just needs to be in the format: <code>Templates.&lbrace;name of component&rbrace;</code>.</p>
 
@@ -171,9 +167,10 @@
 
 		<p>Finally, to render an instance of MyComponent, just call <code>render</code>, passing any attribute values that you want to initialize:</p>
 
-		<pre><code>{literal}
-		new MyComponent({headerContent: 'My Header'}).render(parentElement);
-		{/literal}</code></pre>
+		<textarea class="code" data-mode="javascript">{literal}
+new MyComponent({
+	headerContent: 'My Header'
+}).render(parentElement);{/literal}</textarea>
 
 		<h2>Next steps</h2>
 

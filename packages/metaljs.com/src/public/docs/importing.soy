@@ -80,24 +80,21 @@
 			</li>
 		</ul>
 
-
 		<p>You can change this destination using the configuration options in a <code>.bowerrc</code> file.</p>
 
 		<h2>Importing a component</h2>
 
 		<p>With the code already available, let's create a <code>main.js</code> file that will import the <code>metal-position</code> module.</p>
 
-		<pre><code>
-		import position from 'bower:metal-position/src/position';
-		</code></pre>
+		<textarea class="code" data-mode="javascript">
+import position from 'bower:metal-position/src/position';</textarea>
 
 		<p>This means that you can now call any function from that module, in this example we'll get the viewport height.</p>
 
-		<pre><code>
-		var viewportHeight = position.getClientHeight(window);
+		<textarea class="code" data-mode="javascript">
+var viewportHeight = position.getClientHeight(window);
 
-		console.log(viewportHeight);
-		</code></pre>
+console.log(viewportHeight);</textarea>
 
 		<p>Metal components are written in ES6 (a.k.a ECMAScript 2015), so you can also use ES6 on your code like we did on the example. Since ES6 isn't fully implemented on browsers yet though, either a polyfill or a build process is necessary before using Metal on a website.</p>
 	{/param}

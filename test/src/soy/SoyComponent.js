@@ -289,6 +289,18 @@ describe('SoyComponent', function() {
 			});
 		});
 
+		it('should pass non attribute params to sub component templates', function() {
+			var NestedTestComponent = createNestedTestComponentClass();
+			NestedTestComponent.ATTRS.extra = {};
+			var custom = new NestedTestComponent({
+				count: 2,
+				extra: 'Extra'
+			}).render();
+			var extraElement = custom.element.querySelector('.extra');
+			assert.ok(extraElement);
+			assert.strictEqual('Extra', extraElement.textContent);
+		});
+
 		it('should pass children to nested components through surface attributes', function() {
 			var ChildrenTestComponent = createCustomTestComponentClass('ChildrenTestComponent');
 			ChildrenTestComponent.ATTRS = {

@@ -10,6 +10,7 @@
  * @param count
  * @param foo
  * @param id
+ * @param? extra
  */
 {template .components}
 	<div class="componentsWrapper">
@@ -17,6 +18,7 @@
 		{call Templates.CustomTestComponent.content data="all"}
 			{param headerContent: $foo /}
 			{param id: $id + 'MyChild' + $index /}
+			{param extra: $extra /}
 		{/call}
 	{/for}
 	</div>

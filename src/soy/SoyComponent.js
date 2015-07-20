@@ -1,6 +1,7 @@
 'use strict';
 
 import core from '../core';
+import object from '../object/object';
 import Component from '../component/Component';
 import ComponentRegistry from '../component/ComponentRegistry';
 import SoyComponentAop from '../soy/SoyComponentAop';
@@ -116,7 +117,10 @@ class SoyComponent extends Component {
 			// attribute shouldn't be referenced inside a soy template anyway.
 			return name !== 'element';
 		});
-		return this.getAttrs(names);
+		return object.mixin(
+			Component.componentsCollector.getNextComponentData(this.id),
+			this.getAttrs(names)
+		);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 {namespace Templates.CustomTestComponent}
 
 /**
+ * @param? extra
  */
 {template .content}
 	{call .title}
@@ -8,6 +9,9 @@
 	{/call}
 	{call .header data="all" /}
 	{call .footer data="all" /}
+	{if $extra}
+		<div class="extra">{$extra}</div>
+	{/if}
 {/template}
 
 /**

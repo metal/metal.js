@@ -115,11 +115,13 @@ describe('Component', function() {
 			CustomComponent.prototype.getElementContent = function() {
 				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
 			};
+			CustomComponent.NAME = 'CustomComponent';
 
 			sinon.stub(console, 'error');
 			var custom = new CustomComponent().render();
 			assert.strictEqual('DIV', custom.element.tagName);
 			assert.strictEqual(1, console.error.callCount);
+			assert.notStrictEqual(-1, console.error.args[0][0].indexOf('CustomComponent'));
 			console.error.restore();
 		});
 

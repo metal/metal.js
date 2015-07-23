@@ -1263,9 +1263,10 @@ class Component extends Attribute {
 
 		if (element.tagName !== newElement.tagName) {
 			console.error(
-				'Changing the component element\'s tag name is not allowed. Make sure ' +
-				'to always return the same tag name for the component element on getElementContent, ' +
-				'as well as to set the static variable ELEMENT_TAG_NAME to the chosen value.'
+				'The component named "' + this.constructor.NAME + '" tried to change the component ' +
+				'element\'s tag name, which is not allowed. Make sure to always return the same tag ' +
+				'name for the component element on getElementContent, as well as to set the static ' +
+				'variable ELEMENT_TAG_NAME to the chosen value.'
 			);
 		}
 	}

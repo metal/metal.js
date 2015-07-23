@@ -20,6 +20,15 @@
 &lbrace;/template&rbrace;{/literal}</textarea>
 
 		<p>Then, you just need to define a <code>handleClick</code> method on your component, and it will be called whenever the event is triggered.</p>
+
+		<p>It's also possible to add multiple functions to listen to the same event on the same element, by just separating them by commas. For example:</p>
+
+		<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;template .button&rbrace;
+	&lt;button id="&lbrace;$id&rbrace;-button" data-onclick="handleClick,anotherHandleClick"&gt;&lt;/button&gt;
+&lbrace;/template&rbrace;{/literal}</textarea>
+
+		<p>Now both the <code>handleClick</code> and the <code>anotherHandleClick</code> methods will be called on your component for each click on that button.</p>
 	{/param}
 {/call}
 {/template}

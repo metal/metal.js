@@ -14,82 +14,91 @@
 
 		<p>Building a widget with SoyComponent is simple, you just need to create two files: one with your soy templates, and the other with your JavaScript logic.</p>
 
-		<p>So, for example, let's say we want to create a widget called <strong>MyWidget</strong>, that has a body and a footer with content. The JavaScript file would look like this:</p>
+		<p>So, for example, let's say we want to create a component called <strong>MyComponent</strong>, that has a body and a footer with content. The JavaScript file would look like this:</p>
 
-		<textarea class="code" data-mode="javascript">{literal}
-import SoyComponent from 'bower:metal/src/soy/SoyComponent';
-import from './myWidget.soy.js';
+		{call .jsExample /}
 
-class MyWidget extends SoyComponent {
-    constructor(opt_config) {
-        super(opt_config);
-    }
-}
-
-MyWidget.ATTRS = {
-    bodyContent: {
-        value: 'Initial body content.'
-    },
-    footerContent: {
-        value: SoyComponent.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
-    }
-};{/literal}</textarea>
-
-		<p>This file just defines a class named MyWidget, makes it extend from SoyComponent, imports the compiled soy templates and defines two <a href="/docs/attributes.html">attributes</a>. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
-
-		<p>Now we just need a soy file for MyWidget's rendering logic. It would look like this:</p>
-
-		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;namespace Templates.MyWidget&rbrace;
-
-/**
- * This renders the component's whole content.
- * @param elementClasses
- * @param id
- */
-&lbrace;template .content&rbrace;
-  &lt;div id="&lbrace;$id&rbrace;" class="&lbrace;$elementClasses&rbrace;"&gt;
-    &lbrace;call .body data="all" /&rbrace;
-    &lbrace;call .footer data="all" /&rbrace;
-  &lt;/div&gt;
-&lbrace;/template&rbrace;
-
-/**
- * This renders the body part of the component.
- * @param bodyContent
- * @param id
- */
-&lbrace;template .body&rbrace;
-  &lt;div id="&lbrace;$id&rbrace;-body"&gt;
-    &lt;p&gt;&lbrace;$bodyContent&rbrace;&lt;/p&gt;
-  &lt;/div&gt;
-&lbrace;/template&rbrace;
-
-/**
- * This renders the footer part of the component.
- * @param footerContent
- * @param id
- */
-&lbrace;template .footer&rbrace;
-  &lt;div id="&lbrace;$id&rbrace;-footer"&gt;
-    &lt;footer&gt;&lbrace;$footerContent&rbrace;&lt;/footer&gt;
-  &lt;/div&gt;
-&lbrace;/template&rbrace;{/literal}</textarea>
-
-		<p>Looking at that you can see that it's just a basic soy file that defines some templates. For this soy file to work well with SoyComponent its namespace just needs to be in the format: <code>Templates.&lbrace;name of widget&rbrace;</code>.</p>
-
-		<p>Note that, on the soy file, we have divided the main template into subtemplates, one for the body content and one for the footer. This is not necessary, but can be really helpful, as SoyComponent will handle these as special parts of the widget, automatically rerendering them when one of the attributes listed as params of a template changes. In MyWidget's case this means that whenever the value of the <code>bodyContent</code> attribute is changed, the <code>body</code> template will be called, and that part of the widget will be updated, even though there is no JavaScript code on MyWidget to handle this logic. The same goes for the <code>footerContent</code> attribute and the <code>footer</code> template.</p>
-
-		<p>SoyComponent's logic for updating the widget's contents automatically is very smart, so it won't cause a rerender unless it's necessary. So if a change causes a template to be called again, but the resulting HTML from the template is the same that was rendered for the last time, it will be ignored. This is done by compressing and caching the hash code of a template's results when it's called, and later using it to compare with new results to decide if a new content should be rendered or not.</p>
-
-		<p>Finally, to render an instance of MyWidget, just call <code>render</code>, passing any attribute values that you want to initialize:</p>
-
-		<textarea class="code" data-mode="javascript">{literal}
-new MyWidget({
-	headerContent: 'My Header'
-}).render(parentElement);{/literal}</textarea>
-
-		<p>For a more complete and working example, take a look at the <a href="https://github.com/metal/metal-boilerplate">metal-boilerplate</a> repo. Among other things, it lists all optional lifecycle functions that can be implemented for SoyComponent.</p>
+		{call .soyExample /}
 	{/param}
 {/call}
+{/template}
+
+/**
+ * Example for the JS part of SoyComponent.
+ */
+{template .jsExample}
+	<textarea class="code" data-mode="javascript">{literal}
+import ComponentRegister from 'bower:metal/src/component/ComponentRegister';
+import SoyComponent from 'bower:metal/src/soy/SoyComponent';
+import from './MyComponent.soy';
+
+class MyComponent extends SoyComponent {
+  constructor(opt_config) {
+      super(opt_config);
+  }
+}
+
+MyComponent.ATTRS = {
+  bodyContent: {
+      value: 'Initial body content.'
+  },
+  footerContent: {
+      value: SoyComponent.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
+  }
+};
+
+ComponentRegister.register('MyComponent', MyComponent);{/literal}</textarea>
+
+	<p>This file just defines a class named MyComponent, makes it extend from SoyComponent, imports the compiled soy templates and defines two <a href="/docs/attributes.html">attributes</a>. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
+
+	<p>You may notice that the bower dependencies are not being imported as usual, through file paths. That's because Metal.js allows you to use aliases for bower dependencies. Check out the <a href="/docs/alias.html">Alias</a> guide for more details.</p>
+{/template}
+
+/**
+ * Example for the soy part of SoyComponent.
+ */
+{template .soyExample}
+	<p>Now we just need a soy file for MyComponent's rendering logic. It would look like this:</p>
+
+	<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;namespace Templates.MyComponent&rbrace;
+
+/**
+* This renders the component's whole content.
+*/
+&lbrace;template .content&rbrace;
+&lbrace;call .body data="all" /&rbrace;
+&lbrace;call .footer data="all" /&rbrace;
+&lbrace;/template&rbrace;
+
+/**
+* This renders the body part of the component.
+* @param bodyContent
+*/
+&lbrace;template .body&rbrace;
+&lt;p&gt;&lbrace;$bodyContent&rbrace;&lt;/p&gt;
+&lbrace;/template&rbrace;
+
+/**
+* This renders the footer part of the component.
+* @param footerContent
+*/
+&lbrace;template .footer&rbrace;
+&lt;footer&gt;&lbrace;$footerContent&rbrace;&lt;/footer&gt;
+&lbrace;/template&rbrace;{/literal}</textarea>
+
+	<p>Looking at that you can see that it's just a basic soy file that defines some templates. For this soy file to work well with SoyComponent its namespace just needs to be in the format: <code>Templates.&lbrace;name of component&rbrace;</code>.</p>
+
+	<p>Note that, on the soy file, we have divided the main template into subtemplates, one for the body content and one for the footer. This is not necessary, but can be really helpful, as SoyComponent will handle these as special parts of the component, automatically rerendering them when one of the attributes listed as params of a template changes. In MyComponent's case this means that whenever the value of the <code>bodyContent</code> attribute is changed, the <code>body</code> template will be called, and that part of the component will be updated, even though there is no JavaScript code on MyComponent to handle this logic. The same goes for the <code>footerContent</code> attribute and the <code>footer</code> template.</p>
+
+	<p>SoyComponent's logic for updating the component's contents automatically is very smart, so it won't cause a rerender unless it's necessary. So if a change causes a template to be called again, but the resulting HTML from the template is the same that was rendered for the last time, it will be ignored. This is done by compressing and caching the hash code of a template's results when it's called, and later using it to compare with new results to decide if a new content should be rendered or not.</p>
+
+	<p>It's also important to know that each of the parts of your component that are defined by templates will be automatically wrapped in another element when rendered. These wrapper elements are used by Metal.js to quickly find the parts of the component that need to be updated when attributes change. If you need your templates to render correctly on their own though (through Java for example), or if you want to customize this wrapper element, you can overwrite it in your template. For more details and instructions on how to do this, visit the section about <a href="/docs/overwriting-template-elements.html">overwriting template elements</a>.</p>
+
+	<p>Finally, to render an instance of MyComponent, just call <code>render</code>, passing any attribute values that you want to initialize:</p>
+
+	<textarea class="code" data-mode="javascript">{literal}
+new MyComponent({
+headerContent: 'My Header'
+}).render(parentElement);{/literal}</textarea>
 {/template}

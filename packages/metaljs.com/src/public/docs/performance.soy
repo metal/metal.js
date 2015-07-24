@@ -1,0 +1,34 @@
+{namespace docsPerformance}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Performance</h1>
+
+		<p>Metal.js was built from the first with performance in mind. We've run performance tests to compare it with other libraries and got really good results that show the benefits of using it.</p>
+
+		<p>In one of the tests we made, we built a simple list widget on three different libraries: Metal.js, YUI and React. We then measured the time it took to render those widgets with 1000 items each on three different situations:</p>
+
+		<ul>
+			<li><strong>First Render -</strong> Creating and rendering the list for the first time, on a blank element.</li>
+			<li><strong>Decorate -</strong> Creating and decorating a list that was previously rendered on the DOM.</li>
+			<li><strong>Update -</strong> Changing the contents of the first item of the list, causing a rerender.</li>
+		</ul>
+
+		<p>The chart below shows the results we obtained on Safari:</p>
+
+		<img src="https://camo.githubusercontent.com/10e3b7f4d9fb772d32b285677be6bcb09fbdac85/68747470733a2f2f63686172742e676f6f676c65617069732e636f6d2f63686172743f6368743d627667266368643d743a372c31322c37253743392c36332e352c35342e3425374331312c31322c313226636864733d302c3635266368733d353030783230302663686c3d466972737425323052656e6465722537434465636f72617465253743557064617465266368636f3d3432383546342c4442343433372c46344234303026636862683d722c302e32352c312e35266368646c3d4d6574616c253743595549253743526561637426636878743d782c792c79266368786c3d323a2537432532386d7325323925374326636878723d312c302c36352c313026636878703d322c353026636874743d506572666f726d616e6365253230546573742532302d2532304c697374" alt="Performance Test - List">
+
+		<p>In this previous test, the list widget was built on all three libraries as a single component that renders each list item itself. We also did another similar test, with a list widget that was built using <a href="/docs/nested-components.html">nested components</a> instead, on which the list component renders other components that represent list items. Since YUI doesn't have this concept of nested components, this test was only done for Metal.js and React.</p>
+
+		<p>Once again, the chart below shows the results we obtained on Safari:</p>
+
+		<img src="https://camo.githubusercontent.com/aa34a1f89405b45392920f2abf245e10fda5b647/68747470733a2f2f63686172742e676f6f676c65617069732e636f6d2f63686172743f6368743d627667266368643d743a34352c35302c3925374333352c31332c31332e3626636864733d302c3530266368733d353030783230302663686c3d466972737425323052656e6465722537434465636f72617465253743557064617465266368636f3d3432383546342c46344234303026636862683d722c302e32352c312e35266368646c3d4d6574616c253743526561637426636878743d782c792c79266368786c3d323a2537432532386d7325323925374326636878723d312c302c35302c313026636878703d322c353026636874743d506572666f726d616e6365253230546573742532302d2532304c697374253230776974682532306e6573746564253230636f6d706f6e656e7473" alt="Performance Test - List with nested components">
+	{/param}
+{/call}
+{/template}

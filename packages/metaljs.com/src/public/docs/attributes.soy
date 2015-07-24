@@ -57,11 +57,12 @@ MyAttributes.ATTRS = {
 
 	<p>You can also track attribute value changes by listening to the appropriate event.</p>
 
-	<textarea class="code" data-mode="javascript">{literal}
-obj.on('{{$attrName}}Changed', function(event) {
-  // event.prevVal has the previous value.
-  // event.newVal has the new value.
-});{/literal}</textarea>
+	<textarea class="code" data-mode="javascript">
+		obj.on('{{$attrName}}Changed', function(event) {lb}
+  {literal}
+// event.prevVal has the previous value.
+// event.newVal has the new value.
+{/literal}{rb});</textarea>
 
 	<p>To see all features of the <strong>Attribute</strong> class take a look at its <a href="https://github.com/metal/metal.js/blob/master/test/src/attribute/Attribute.js">unit tests</a>.</p>
 {/template}

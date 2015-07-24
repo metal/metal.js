@@ -28,9 +28,9 @@
  */
 {template .jsExample}
 	<textarea class="code" data-mode="javascript">{literal}
-import ComponentRegister from 'bower:metal/src/component/ComponentRegister';
+import ComponentRegistry from 'bower:metal/src/component/ComponentRegistry';
 import SoyComponent from 'bower:metal/src/soy/SoyComponent';
-import from './MyComponent.soy';
+import './MyComponent.soy';
 
 class MyComponent extends SoyComponent {
   constructor(opt_config) {
@@ -47,7 +47,7 @@ MyComponent.ATTRS = {
   }
 };
 
-ComponentRegister.register('MyComponent', MyComponent);{/literal}</textarea>
+ComponentRegistry.register('MyComponent', MyComponent);{/literal}</textarea>
 
 	<p>This file just defines a class named MyComponent, makes it extend from SoyComponent, imports the compiled soy templates and defines two <a href="/docs/attributes.html">attributes</a>. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
 

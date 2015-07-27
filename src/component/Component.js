@@ -173,12 +173,15 @@ class Component extends Attribute {
 	addListenersFromObj_(events) {
 		var eventNames = Object.keys(events || {});
 		for (var i = 0; i < eventNames.length; i++) {
-			var fn = events[eventNames[i]];
-			if (core.isString(fn)) {
-				fn = this.eventsCollector_.getListenerFn(fn);
-			}
-			if (fn) {
-				this.eventsAttrHandler_.add(this.on(eventNames[i], fn));
+			var info = this.extractListenerInfo_(events[eventNames[i]]);
+			if (info.fn) {
+				var handler;
+				if (info.selector) {
+					handler = this.delegate(eventNames[i], info.selector, info.fn);
+				} else {
+					handler = this.on(eventNames[i], info.fn);
+				}
+				this.eventsAttrHandler_.add(handler);
 			}
 		}
 	}
@@ -620,6 +623,26 @@ class Component extends Attribute {
 		this.surfaces_ = null;
 		this.surfacesRenderAttrs_ = null;
 		super.disposeInternal();
+	}
+
+	/**
+	 * Extracts listener info from the given value.
+	 * @param {function()|string|{selector:string,fn:function()|string}} value
+	 * @return {!{selector:string,fn:function()}}
+	 * @protected
+	 */
+	extractListenerInfo_(value) {
+		var info = {
+			fn: value
+		};
+		if (core.isObject(value) && !core.isFunction(value)) {
+			info.selector = value.selector;
+			info.fn = value.fn;
+		}
+		if (core.isString(info.fn)) {
+			info.fn = this.eventsCollector_.getListenerFn(info.fn);
+		}
+		return info;
 	}
 
 	/**
@@ -1429,7 +1452,7 @@ Component.ATTRS = {
 	 * Listeners that should be attached to this component. Should be provided as an object,
 	 * where the keys are event names and the values are the listener functions (or function
 	 * names).
-	 * @type {Object<string, (function()|string)>}
+	 * @type {Object<string, (function()|string|{selector: string, fn: function()|string})>}
 	 */
 	events: {
 		validator: 'validatorEventsFn_',

@@ -381,7 +381,7 @@ describe('Component', function() {
 			});
 		});
 
-		describe('events', function() {
+		describe('events attr', function() {
 			it('should attach events to specified functions', function() {
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
@@ -462,6 +462,28 @@ describe('Component', function() {
 
 				assert.strictEqual(1, console.error.callCount);
 				console.error.restore();
+			});
+
+			it('should attach delegate events with specified selector', function() {
+				var CustomComponent = createCustomComponentClass();
+				CustomComponent.prototype.getElementContent = function() {
+					return '<button class="testButton"></button>';
+				};
+				CustomComponent.prototype.listener1 = sinon.stub();
+
+				var custom = new CustomComponent({
+					events: {
+						click: {
+							fn: 'listener1',
+							selector: '.testButton'
+						}
+					}
+				}).render();
+
+				dom.triggerEvent(custom.element, 'click');
+				assert.strictEqual(0, custom.listener1.callCount);
+				dom.triggerEvent(custom.element.querySelector('.testButton'), 'click');
+				assert.strictEqual(1, custom.listener1.callCount);
 			});
 
 			it('should detach unused events when value of the "events" attribute is changed', function() {

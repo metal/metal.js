@@ -344,4 +344,13 @@ class SoyComponent extends Component {
 	}
 }
 
+var originalSanitizedHtmlFromFn = soydata.SanitizedHtml.from;
+soydata.SanitizedHtml.from = function(value) {
+	if (value && value.contentKind === 'HTML') {
+		value = SoyComponent.sanitizeHtml(value.content);
+	}
+	return originalSanitizedHtmlFromFn(value);
+};
+
+
 export default SoyComponent;

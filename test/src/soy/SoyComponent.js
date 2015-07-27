@@ -22,11 +22,6 @@ describe('SoyComponent', function() {
 		document.body.innerHTML = '';
 	});
 
-	it('should sanitize html for use on soy templates', function() {
-		var sanitized = SoyComponent.sanitizeHtml('<div></div>');
-		assert.ok(sanitized instanceof soydata.SanitizedHtml);
-	});
-
 	it('should render element content with surfaces automatically from template', function() {
 		var CustomTestComponent = createCustomTestComponentClass();
 		var custom = new CustomTestComponent({
@@ -116,6 +111,24 @@ describe('SoyComponent', function() {
 		assert.deepEqual({}, templateFn.args[0][2]);
 
 		templateFn.restore();
+	});
+
+	describe('Sanitize Html', function() {
+		it('should sanitize html for use on soy templates', function() {
+			var sanitized = SoyComponent.sanitizeHtml('<div>Content</div>');
+			assert.ok(sanitized instanceof soydata.SanitizedHtml);
+			assert.strictEqual('<div>Content</div>', sanitized.content);
+		});
+
+		it('should convert regular object with sanitized html to SanitizedHtml instance', function() {
+			var sanitizedObj = {
+				content: '<div>Content</div>',
+				contentKind: 'HTML'
+			};
+			var sanitized = soydata.SanitizedHtml.from(sanitizedObj);
+			assert.ok(sanitized instanceof soydata.SanitizedHtml);
+			assert.strictEqual('<div>Content</div>', sanitized.content);
+		});
 	});
 
 	describe('Surfaces', function() {

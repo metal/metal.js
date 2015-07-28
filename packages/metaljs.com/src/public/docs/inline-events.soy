@@ -16,7 +16,7 @@
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .button&rbrace;
-    &lt;button id="&lbrace;$id&rbrace;-button" data-onclick="handleClick"&gt;&lt;/button&gt;
+    &lt;button data-onclick="handleClick"&gt;&lt;/button&gt;
 &lbrace;/template&rbrace;{/literal}</textarea>
 
 		<p>Then, you just need to define a <code>handleClick</code> method on your component, and it will be called whenever the event is triggered.</p>
@@ -25,10 +25,48 @@
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .button&rbrace;
-	&lt;button id="&lbrace;$id&rbrace;-button" data-onclick="handleClick,anotherHandleClick"&gt;&lt;/button&gt;
+	&lt;button data-onclick="handleClick,anotherHandleClick"&gt;&lt;/button&gt;
 &lbrace;/template&rbrace;{/literal}</textarea>
 
 		<p>Now both the <code>handleClick</code> and the <code>anotherHandleClick</code> methods will be called on your component for each click on that button.</p>
+
+		<h2>Inline events for nested components</h2>
+
+		<p>When using <a href="/docs/nested-components.html">nested components</a> it's also possible to inline events by using the <strong>events</strong> attribute:</p>
+
+		<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;template .footer&rbrace;
+    &lbrace;call Templates.Button.content&rbrace;
+        &lbrace;param events: ['click': ['selector': 'button', 'fn': 'handleClick']] /&rbrace;
+        &lbrace;param label: 'Ok' /&rbrace;
+    &lbrace;/call&rbrace;
+&lbrace;/template&rbrace;
+{/literal}</textarea>
+
+		<p>This will cause the <code>handleClick</code> function from the sub component to be called whenever a click event triggers for the elements that match the given selector.</p>
+
+		<p>In case you want to listen to the event with a function from another component, like the parent, instead of from the sub component itself, you can just prefix the function name with the desired component's id. Note that this can also be done when using the <code>data-on&lt;event&gt;</code> format.</p>
+
+		<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;template .footer&rbrace;
+    &lbrace;call Templates.Button.content&rbrace;
+        &lbrace;param events: ['click': ['selector': 'button', 'fn': $compId + 'handleClick']] /&rbrace;
+        &lbrace;param label: 'Ok' /&rbrace;
+    &lbrace;/call&rbrace;
+   &lt;button data-onclick="&lbrace;$compId&rbrace;:handleClick"&gt;&lt;/button&gt;
+&lbrace;/template&rbrace;
+{/literal}</textarea>
+
+		<p>You can also listen to custom events from the sub component like this:</p>
+
+		<textarea class="code" data-mode="x-soy">{literal}
+&lbrace;template .footer&rbrace;
+    &lbrace;call Templates.Button.content&rbrace;
+        &lbrace;param events: ['labelChanged': 'handleLabelChanged'] /&rbrace;
+        &lbrace;param label: 'Ok' /&rbrace;
+    &lbrace;/call&rbrace;
+&lbrace;/template&rbrace;
+{/literal}</textarea>
 	{/param}
 {/call}
 {/template}

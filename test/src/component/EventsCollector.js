@@ -180,7 +180,7 @@ describe('EventsCollector', function() {
 		assert.strictEqual(2, custom.handleClick.callCount);
 	});
 
-	it('should not trigger sub component listeners on parent components', function() {
+	it('should not trigger sub component listeners on unrelated parent elements', function() {
 		var SubComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
 		SubComponent.prototype.handleClick = sinon.stub();
 
@@ -203,6 +203,29 @@ describe('EventsCollector', function() {
 		assert.strictEqual(1, child.handleClick.callCount);
 
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, child.handleClick.callCount);
+	});
+
+	it('should trigger listeners that bubbled from sub components to correct element', function() {
+		var SubComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
+		SubComponent.prototype.handleClick = sinon.stub();
+
+		var child;
+		var CustomComponent = createCustomComponent();
+		CustomComponent.prototype.renderInternal = function() {
+			dom.append(this.element, '<div data-onclick="handleClick"></div>');
+			child = new SubComponent().render(this.element.childNodes[0]);
+		};
+		CustomComponent.prototype.handleClick = sinon.stub();
+
+		var custom = new CustomComponent().render();
+		var collector = new EventsCollector(custom);
+		collector.attachListeners(custom.element.innerHTML, 'group');
+		var childCollector = new EventsCollector(child);
+		childCollector.attachListeners(child.element.innerHTML, 'group');
+
+		dom.triggerEvent(child.element.childNodes[0], 'click');
 		assert.strictEqual(1, custom.handleClick.callCount);
 		assert.strictEqual(1, child.handleClick.callCount);
 	});

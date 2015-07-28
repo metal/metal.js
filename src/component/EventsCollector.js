@@ -195,7 +195,8 @@ class EventsCollector extends Disposable {
 	 */
 	onEvent_(fn, event) {
 		// This check prevents parent components from handling their child inline listeners.
-		if (!event.handledByComponent || event.handledByComponent === this.component_) {
+		var eventComp = event.handledByComponent;
+		if (!eventComp || eventComp === this.component_ || event.delegateTarget.contains(eventComp.element)) {
 			event.handledByComponent = this.component_;
 			return fn(event);
 		}

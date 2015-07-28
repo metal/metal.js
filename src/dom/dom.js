@@ -164,6 +164,9 @@ class dom {
 				event.delegateTarget = currentElement;
 				returnValue &= callback(event);
 			}
+			if (currentElement === event.currentTarget) {
+				break;
+			}
 			currentElement = currentElement.parentNode;
 		}
 

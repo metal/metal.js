@@ -327,6 +327,20 @@ describe('dom', function() {
 			assert.strictEqual(matchedElements[0], listener.args[0][0].delegateTarget);
 		});
 
+		it('should not trigger delegate event for parents of given element', function() {
+			var element = document.createElement('div');
+			element.innerHTML = '<div class="nomatch"></div>';
+			element.className = 'match';
+			document.body.appendChild(element);
+
+			var childElement = element.childNodes[0];
+			var listener = sinon.stub();
+			dom.delegate(childElement, 'click', '.match', listener);
+
+			dom.triggerEvent(childElement, 'click');
+			assert.strictEqual(0, listener.callCount);
+		});
+
 		it('should stop triggering event if stopPropagation is called', function() {
 			var element = document.createElement('div');
 			element.innerHTML = '<div class="nomatch">' +

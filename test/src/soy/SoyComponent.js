@@ -180,7 +180,10 @@ describe('SoyComponent', function() {
 			var surfaces = custom.getSurfaces();
 			var nestedSurfaces = custom.components['nestedPrivate-child1'].getSurfaces();
 			assert.deepEqual(['nestedPrivate-child1', 'notPrivate'], Object.keys(surfaces).sort());
-			assert.deepEqual(['children', 'notPrivate', 'privateTemplate', 's1'], Object.keys(nestedSurfaces).sort());
+			assert.deepEqual(['children', 'children-s1', 'children-s2', 'privateTemplate'], Object.keys(nestedSurfaces).sort());
+			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-child1-children-s1').textContent);
+			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-child1-children-s2').textContent);
+			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-child1-privateTemplate').textContent);
 		});
 	});
 

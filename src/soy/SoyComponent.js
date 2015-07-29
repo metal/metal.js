@@ -37,14 +37,6 @@ class SoyComponent extends Component {
 		 * @protected
 		 */
 		this.firstSurfaceFound_ = {};
-
-		/**
-		 * Holds the data that should be passed to the next template call for a surface,
-		 * mapped by surface id.
-		 * @type {!Object<string, Object>}
-		 * @protected
-		 */
-		this.nextSurfaceCallData_ = {};
 	}
 
 	/**
@@ -98,12 +90,7 @@ class SoyComponent extends Component {
 	 */
 	buildPlaceholderSurfaceData_(type, extra) {
 		var data = super.buildPlaceholderSurfaceData_(type, extra);
-		if (type === Component.SurfaceType.NORMAL) {
-			var split = extra.split('.');
-			data.templateComponentName = split[0];
-			data.templateName = split[1];
-		}
-		return data;
+		return object.mixin(data, this.extractPlaceholderSurfaceInfo_(type, extra));
 	}
 
 	/**
@@ -166,19 +153,44 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Generates the id for a surface that was found by a soy template call.
-	 * @param {string} templateComponentName
-	 * @param {string} templateName
-	 * @return {string}
+	 * Extracts surface info from the placeholder surface's extra data.
+	 * @param {string} type Either "c" or "s", to indicate the surface's type.
+	 * @param {string} extra Extra data present in the surface placeholder.
+	 * @return {!Object}
+	 * @protected
 	 */
-	generateSoySurfaceId_(templateComponentName, templateName) {
-		if (!this.surfaceBeingRendered_ &&
-			!this.firstSurfaceFound_[templateName] &&
-			templateComponentName === this.constructor.NAME) {
-			this.firstSurfaceFound_[templateName] = true;
-			return templateName;
+	extractPlaceholderSurfaceInfo_(type, extra) {
+		if (type !== Component.SurfaceType.NORMAL) {
+			return {};
+		}
+		var templateAndCallId = extra.split(':');
+		var templateNames = templateAndCallId[0].split('.');
+		return {
+			callId: templateAndCallId[1],
+			templateComponentName: templateNames[0],
+			templateName: templateNames[1]
+		};
+	}
+
+	/**
+	 * Generates the id for a surface that was found by a soy template call.
+	 * @param {string} type Either "comp" or "surface", to indicate the surface's type.
+	 * @param {string} extra Extra data present in the surface placeholder.
+	 * @param {string=} opt_parentSurfaceId The id of the parent surface, or undefined
+	 *   if there is none.
+	 * @return {string} The generated id.
+	 * @override
+	 */
+	generateSurfaceId_(type, extra, opt_parentSurfaceId) {
+		var info = this.extractPlaceholderSurfaceInfo_(type, extra);
+		if (type === Component.SurfaceType.NORMAL &&
+			!opt_parentSurfaceId &&
+			!this.firstSurfaceFound_[info.templateName] &&
+			info.templateComponentName === this.constructor.NAME) {
+			this.firstSurfaceFound_[info.templateName] = true;
+			return info.templateName;
 		} else {
-			return this.generateSurfaceId_(Component.SurfaceType.NORMAL, this.surfaceBeingRendered_);
+			return super.generateSurfaceId_(type, extra, opt_parentSurfaceId);
 		}
 	}
 
@@ -202,8 +214,8 @@ class SoyComponent extends Component {
 	 */
 	getSurfaceContent(surfaceId) {
 		var surface = this.getSurface(surfaceId);
-		var data = this.nextSurfaceCallData_[surfaceId];
-		this.nextSurfaceCallData_[surfaceId] = null;
+		var data = nextSurfaceCallData_[surface.callId];
+		nextSurfaceCallData_[surface.callId] = null;
 		this.surfaceBeingRendered_ = surfaceId;
 		return this.renderTemplateByName_(surface.templateComponentName, surface.templateName, data);
 	}
@@ -217,7 +229,7 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleComponentCall_(componentName, data) {
-		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, this.surfaceBeingRendered_);
+		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, '', this.surfaceBeingRendered_);
 		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
 		return '%%%%~c-' + id + ':' + componentName + '~%%%%';
 	}
@@ -259,10 +271,11 @@ class SoyComponent extends Component {
 			if (originalFn.private) {
 				return originalFn.call(null, data, opt_ignored, opt_ijData);
 			}
-			surfaceId = this.generateSoySurfaceId_(templateComponentName, templateName);
 		}
-		this.nextSurfaceCallData_[surfaceId] = data;
-		return '%%%%~s-' + surfaceId + ':' + templateComponentName + '.' + templateName + '~%%%%';
+		var callId = nextCallId_++;
+		nextSurfaceCallData_[callId] = data;
+		var extra = templateComponentName + '.' + templateName + ':' + callId;
+		return '%%%%~s' + (core.isDefAndNotNull(surfaceId) ? ('-' + surfaceId) : '') + ':' + extra + '~%%%%';
 	}
 
 	/**
@@ -343,6 +356,21 @@ class SoyComponent extends Component {
 		ijData = data || {};
 	}
 }
+
+/**
+ * Holds the data that should be passed to the next template call for a surface,
+ * mapped by call id.
+ * @type {!Object<string, Object>}
+ * @private
+ */
+var nextSurfaceCallData_ = {};
+
+/**
+ * Holds the next available call id.
+ * @type {number}
+ * @private
+ */
+var nextCallId_ = 0;
 
 var originalSanitizedHtmlFromFn = soydata.SanitizedHtml.from;
 soydata.SanitizedHtml.from = function(value) {

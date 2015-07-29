@@ -443,9 +443,13 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	createPlaceholderSurface_(surfaceId, type, extra, opt_parentSurfaceId) {
-		surfaceId = surfaceId || this.generateSurfaceId_(type, opt_parentSurfaceId);
-		if (!this.getSurface(surfaceId)) {
-			this.addSurface(surfaceId, this.buildPlaceholderSurfaceData_(type, extra));
+		surfaceId = surfaceId || this.generateSurfaceId_(type, extra, opt_parentSurfaceId);
+		var surfaceData = this.buildPlaceholderSurfaceData_(type, extra);
+		var surface = this.getSurface(surfaceId);
+		if (surface) {
+			object.mixin(surface, surfaceData);
+		} else {
+			this.addSurface(surfaceId, surfaceData);
 		}
 		return surfaceId;
 	}
@@ -702,12 +706,13 @@ class Component extends Attribute {
 	/**
 	 * Generates an id for a surface that was found inside the contents of the main
 	 * element or of a parent surface.
-	 * @param {string} type Either "comp" or "surface", to indicate the surface's type.
+	 * @param {string} type Either "c" or "s", to indicate the surface's type.
+	 * @param {string} extra Extra data present in the surface placeholder.
 	 * @param {string=} opt_parentSurfaceId The id of the parent surface, or undefined
 	 *   if there is none.
 	 * @return {string} The generated id.
 	 */
-	generateSurfaceId_(type, opt_parentSurfaceId) {
+	generateSurfaceId_(type, extra, opt_parentSurfaceId) {
 		var parentSurfaceId = opt_parentSurfaceId || '';
 		var parentSurfacePrefix = parentSurfaceId ? parentSurfaceId + '-' : '';
 		this.generatedIdCount_[parentSurfaceId] = (this.generatedIdCount_[parentSurfaceId] || 0) + 1;
@@ -1100,8 +1105,8 @@ class Component extends Attribute {
 	 */
 	renderPlaceholderSurfaceContents_(content, surfaceId) {
 		var instance = this;
-		content.replace(Component.SURFACE_REGEX, function(match, type, id) {
-			id = id || instance.generateSurfaceId_(type, surfaceId);
+		content.replace(Component.SURFACE_REGEX, function(match, type, id, extra) {
+			id = id || instance.generateSurfaceId_(type, extra, surfaceId);
 			instance.renderSurfaceContent(id);
 			return match;
 		});
@@ -1180,7 +1185,7 @@ class Component extends Attribute {
 	replaceSurfaceContent_(surfaceId, content) {
 		var elementId = this.makeSurfaceId_(surfaceId);
 		var el = this.getSurfaceElement(surfaceId);
-		content = this.replaceSurfacePlaceholders_(content);
+		content = this.replaceSurfacePlaceholders_(content, surfaceId);
 		if (this.checkHasElementTag_(content, elementId)) {
 			var surface = this.getSurface(surfaceId);
 			surface.element = content;

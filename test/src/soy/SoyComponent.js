@@ -13,6 +13,7 @@ import './assets/DeeplyNestedTestComponent.soy.js';
 import './assets/EventsTestComponent.soy.js';
 import './assets/ExternalTemplateTestComponent.soy.js';
 import './assets/NestedNoIdTestComponent.soy.js';
+import './assets/NestedPrivateTemplateTestComponent.soy.js';
 import './assets/NestedSurfacesTestComponent.soy.js';
 import './assets/NestedTestComponent.soy.js';
 import './assets/PrivateTemplateTestComponent.soy.js';
@@ -167,6 +168,19 @@ describe('SoyComponent', function() {
 			var custom = new PrivateTemplateTestComponent().render();
 			var surfaces = custom.getSurfaces();
 			assert.deepEqual(['notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
+		});
+
+		it('should only create surfaces on nested components either from non private template calls or calls with surface id', function() {
+			createCustomTestComponentClass('ChildrenTestComponent');
+			var NestedPrivateTemplateTestComponent = createCustomTestComponentClass('NestedPrivateTemplateTestComponent');
+
+			var custom = new NestedPrivateTemplateTestComponent({
+				id: 'nestedPrivate'
+			}).render();
+			var surfaces = custom.getSurfaces();
+			var nestedSurfaces = custom.components['nestedPrivate-child1'].getSurfaces();
+			assert.deepEqual(['nestedPrivate-child1', 'notPrivate'], Object.keys(surfaces).sort());
+			assert.deepEqual(['children', 'notPrivate', 'privateTemplate', 's1'], Object.keys(nestedSurfaces).sort());
 		});
 	});
 

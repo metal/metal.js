@@ -82,18 +82,6 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Adds the template name to the creation data for placeholder surfaces.
-	 * @param {string} type The surface type (either "s" or "c").
-	 * @param {string} extra String with extra information about the surface.
-	 * @return {!Object}
-	 * @protected
-	 */
-	buildPlaceholderSurfaceData_(type, extra) {
-		var data = super.buildPlaceholderSurfaceData_(type, extra);
-		return object.mixin(data, this.extractPlaceholderSurfaceInfo_(type, extra));
-	}
-
-	/**
 	 * Builds the data object that should be passed to a template from this component.
 	 * @return {!Object}
 	 * @protected
@@ -153,44 +141,22 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Extracts surface info from the placeholder surface's extra data.
-	 * @param {string} type Either "c" or "s", to indicate the surface's type.
-	 * @param {string} extra Extra data present in the surface placeholder.
-	 * @return {!Object}
-	 * @protected
-	 */
-	extractPlaceholderSurfaceInfo_(type, extra) {
-		if (type !== Component.SurfaceType.NORMAL) {
-			return {};
-		}
-		var templateAndCallId = extra.split(':');
-		var templateNames = templateAndCallId[0].split('.');
-		return {
-			callId: templateAndCallId[1],
-			templateComponentName: templateNames[0],
-			templateName: templateNames[1]
-		};
-	}
-
-	/**
 	 * Generates the id for a surface that was found by a soy template call.
-	 * @param {string} type Either "comp" or "surface", to indicate the surface's type.
-	 * @param {string} extra Extra data present in the surface placeholder.
-	 * @param {string=} opt_parentSurfaceId The id of the parent surface, or undefined
+	 * @param {string?} parentSurfaceId The id of the parent surface, or undefined
 	 *   if there is none.
+	 * @param {!Object} data The placeholder data registered for this surface.
 	 * @return {string} The generated id.
 	 * @override
 	 */
-	generateSurfaceId_(type, extra, opt_parentSurfaceId) {
-		var info = this.extractPlaceholderSurfaceInfo_(type, extra);
-		if (type === Component.SurfaceType.NORMAL &&
-			!opt_parentSurfaceId &&
-			!this.firstSurfaceFound_[info.templateName] &&
-			info.templateComponentName === this.constructor.NAME) {
-			this.firstSurfaceFound_[info.templateName] = true;
-			return info.templateName;
+	generateSurfaceElementId_(parentSurfaceId, data) {
+		if (data.templateName &&
+			!parentSurfaceId &&
+			!this.firstSurfaceFound_[data.templateName] &&
+			data.templateComponentName === this.constructor.NAME) {
+			this.firstSurfaceFound_[data.templateName] = true;
+			return this.prefixSurfaceId_(data.templateName);
 		} else {
-			return super.generateSurfaceId_(type, extra, opt_parentSurfaceId);
+			return super.generateSurfaceElementId_(parentSurfaceId);
 		}
 	}
 
@@ -209,14 +175,15 @@ class SoyComponent extends Component {
 	 * Makes the default behavior of rendering surfaces automatically render the
 	 * appropriate soy template when one exists.
 	 * @param {string} surfaceId The surface id.
+	 * @param {string} surfaceElementId The surface element id.
 	 * @return {Object|string} The content to be rendered.
 	 * @override
 	 */
-	getSurfaceContent(surfaceId) {
+	getSurfaceContent(surfaceId, surfaceElementId) {
 		var surface = this.getSurface(surfaceId);
-		var data = nextSurfaceCallData_[surface.callId];
-		nextSurfaceCallData_[surface.callId] = null;
-		this.surfaceBeingRendered_ = surfaceId;
+		var data = surface.templateData;
+		surface.templateData = null;
+		this.surfaceBeingRendered_ = surfaceElementId;
 		return this.renderTemplateByName_(surface.templateComponentName, surface.templateName, data);
 	}
 
@@ -229,9 +196,12 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleComponentCall_(componentName, data) {
-		var id = (data || {}).id || this.generateSurfaceId_(Component.SurfaceType.COMPONENT, '', this.surfaceBeingRendered_);
+		var surfaceData = {
+			componentName: componentName
+		};
+		var id = (data || {}).id || this.generateSurfaceElementId_(this.surfaceBeingRendered_, surfaceData);
 		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
-		return '%%%%~c-' + id + ':' + componentName + '~%%%%';
+		return this.buildPlaceholder(id, surfaceData);
 	}
 
 	/**
@@ -266,16 +236,21 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleSurfaceCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
-		var surfaceId = data.surfaceId;
-		if (!core.isDefAndNotNull(surfaceId)) {
+		var surfaceData = {
+			templateComponentName: templateComponentName,
+			templateData: data,
+			templateName: templateName
+		};
+		var surfaceElementId;
+		if (core.isDefAndNotNull(data.surfaceId)) {
+			surfaceElementId = this.getSurfaceElementId_(data.surfaceId.toString());
+		} else {
 			if (originalFn.private) {
 				return originalFn.call(null, data, opt_ignored, opt_ijData);
 			}
+			surfaceElementId = this.generateSurfaceElementId_(this.surfaceBeingRendered_, surfaceData);
 		}
-		var callId = nextCallId_++;
-		nextSurfaceCallData_[callId] = data;
-		var extra = templateComponentName + '.' + templateName + ':' + callId;
-		return '%%%%~s' + (core.isDefAndNotNull(surfaceId) ? ('-' + surfaceId) : '') + ':' + extra + '~%%%%';
+		return this.buildPlaceholder(surfaceElementId, surfaceData);
 	}
 
 	/**
@@ -356,21 +331,6 @@ class SoyComponent extends Component {
 		ijData = data || {};
 	}
 }
-
-/**
- * Holds the data that should be passed to the next template call for a surface,
- * mapped by call id.
- * @type {!Object<string, Object>}
- * @private
- */
-var nextSurfaceCallData_ = {};
-
-/**
- * Holds the next available call id.
- * @type {number}
- * @private
- */
-var nextCallId_ = 0;
 
 var originalSanitizedHtmlFromFn = soydata.SanitizedHtml.from;
 soydata.SanitizedHtml.from = function(value) {

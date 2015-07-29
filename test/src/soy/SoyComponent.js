@@ -1,6 +1,7 @@
 'use strict';
 
 import dom from '../../../src/dom/dom';
+import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyComponent from '../../../src/soy/SoyComponent';
@@ -21,6 +22,7 @@ import './assets/PrivateTemplateTestComponent.soy.js';
 describe('SoyComponent', function() {
 	beforeEach(function() {
 		document.body.innerHTML = '';
+		Component.surfacesCollector.removeAllSurfaces();
 	});
 
 	it('should render element content with surfaces automatically from template', function() {
@@ -179,11 +181,11 @@ describe('SoyComponent', function() {
 			}).render();
 			var surfaces = custom.getSurfaces();
 			var nestedSurfaces = custom.components['nestedPrivate-child1'].getSurfaces();
-			assert.deepEqual(['nestedPrivate-child1', 'notPrivate'], Object.keys(surfaces).sort());
-			assert.deepEqual(['children', 'children-s1', 'children-s2', 'privateTemplate'], Object.keys(nestedSurfaces).sort());
-			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-child1-children-s1').textContent);
-			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-child1-children-s2').textContent);
-			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-child1-privateTemplate').textContent);
+			assert.deepEqual(['nestedPrivate-child1', 'notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
+			assert.deepEqual(['children'], Object.keys(nestedSurfaces).sort());
+			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-notPrivate').textContent);
+			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-privateTemplate').textContent);
+			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-s1').textContent);
 		});
 	});
 
@@ -269,8 +271,8 @@ describe('SoyComponent', function() {
 				id: 'nested'
 			}).render();
 
-			assert.ok(custom.components['nested-c1']);
-			assert.ok(custom.components['nested-foo-c1']);
+			assert.ok(custom.components['nested-s1']);
+			assert.ok(custom.components['nested-foo-s1']);
 		});
 
 		it('should render nested components inside parent', function() {
@@ -346,19 +348,14 @@ describe('SoyComponent', function() {
 			}).render();
 
 			var comps = component.components;
-			var nestedMain = comps['nested-main'];
-			assert.ok(nestedMain);
-			assert.ok(!comps['nested-child1']);
-			assert.ok(!comps['nested-child2']);
-			assert.ok(!comps['nested-child3']);
+			assert.ok(comps['nested-main']);
+			assert.ok(comps['nested-child1']);
+			assert.ok(comps['nested-child2']);
+			assert.ok(comps['nested-child3']);
 
-			var child2 = nestedMain.components['nested-child2'];
-			var child3 = nestedMain.components['nested-child3'];
-			assert.ok(child2);
-			assert.ok(child3);
-
-			var child1 = child2.components['nested-child1'];
-			assert.ok(child1);
+			assert.ok(comps['nested-main'].element.querySelector('#nested-child2'));
+			assert.ok(comps['nested-main'].element.querySelector('#nested-child3'));
+			assert.ok(comps['nested-child2'].element.querySelector('#nested-child1'));
 		});
 
 		it('should attach listeners to parent component when its id is the listener name\'s prefix', function() {

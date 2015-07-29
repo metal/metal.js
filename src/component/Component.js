@@ -12,6 +12,7 @@ import ComponentCollector from '../component/ComponentCollector';
 import EventEmitterProxy from '../events/EventEmitterProxy';
 import EventHandler from '../events/EventHandler';
 import EventsCollector from './EventsCollector';
+import SurfaceCollector from './SurfaceCollector';
 
 /**
  * Component collects common behaviors to be followed by UI components, such
@@ -40,7 +41,7 @@ import EventsCollector from './EventsCollector';
  *     this.element.appendChild(this.getSurfaceElement('bottom'));
  *   }
  *
- *   getSurfaceContent(surfaceId) {
+ *   getSurfaceContent(surfaceId, surfaceElementId) {
  *   }
  *
  *   attached() {
@@ -134,12 +135,11 @@ class Component extends Attribute {
 		this.inDocument = false;
 
 		/**
-		 * Maps that index the surfaces instances by the surface id.
-		 * @type {Object}
-		 * @default null
+		 * The ids of the surfaces registered by this component.
+		 * @type {!Object<string, boolean>}
 		 * @protected
 		 */
-		this.surfaces_ = null;
+		this.surfaceIds_ = {};
 
 		/**
 		 * Whether the element was rendered.
@@ -227,11 +227,16 @@ class Component extends Attribute {
 	 */
 	addSurface(surfaceId, opt_surfaceConfig, opt_config) {
 		var config = opt_surfaceConfig || {};
-		this.surfaces_[surfaceId] = config;
+		config.cacheState = Component.Cache.NOT_INITIALIZED;
+
+		var surfaceElementId = this.getSurfaceElementId_(surfaceId, config);
+		this.surfaceIds_[surfaceElementId] = true;
+		Component.surfacesCollector.addSurface(surfaceElementId, config);
+
 		if (config.componentName) {
-			this.createSubComponent_(config.componentName, surfaceId);
+			this.createSubComponent_(config.componentName, surfaceElementId);
 		}
-		this.cacheSurfaceRenderAttrs_(surfaceId, opt_config);
+		this.cacheSurfaceRenderAttrs_(surfaceElementId, opt_config);
 		return this;
 	}
 
@@ -256,7 +261,6 @@ class Component extends Attribute {
 	 */
 	addSurfacesFromStaticHint_(opt_config) {
 		core.mergeSuperClassesProperty(this.constructor, 'SURFACES', this.mergeObjects_);
-		this.surfaces_ = {};
 		this.surfacesRenderAttrs_ = {};
 
 		var configs = this.constructor.SURFACES_MERGED;
@@ -310,27 +314,27 @@ class Component extends Attribute {
 	attached() {}
 
 	/**
-	 * Builds the data that should be used to create a surface that was found via
-	 * a string placeholder.
-	 * @param {string} type The surface type (either "s" or "c").
-	 * @param {string} extra String with extra information about the surface.
-	 * @return {!Object}
-	 * @protected
+	 * Builds a surface placeholder, attaching it to the given data.
+	 * @param {string} surfaceElementId
+	 * @param {Object=} opt_data
+	 * @return {string}
 	 */
-	buildPlaceholderSurfaceData_(type, extra) {
-		return {
-			componentName: type === Component.SurfaceType.COMPONENT ? extra : null
-		};
+	buildPlaceholder(surfaceElementId, opt_data) {
+		if (surfaceElementId && opt_data) {
+			opt_data.surfaceElementId = surfaceElementId;
+			this.addSurface(surfaceElementId, opt_data);
+		}
+		return '%%%%~s' + (surfaceElementId ? '-' + surfaceElementId : '') + '~%%%%';
 	}
 
 	/**
 	 * Caches the given content for the surface with the requested id.
-	 * @param {string} surfaceId
+	 * @param {string} surfaceElementId
 	 * @param {string} content
 	 */
-	cacheSurfaceContent(surfaceId, content) {
+	cacheSurfaceContent(surfaceElementId, content) {
 		var cacheState = this.computeSurfaceCacheState_(content);
-		var surface = this.getSurface(surfaceId);
+		var surface = this.getSurface(surfaceElementId);
 		surface.cacheState = cacheState;
 	}
 
@@ -338,18 +342,18 @@ class Component extends Attribute {
 	 * Caches surface render attributes into a O(k) flat map representation.
 	 * Relevant for performance to calculate the surfaces group that were
 	 * modified by attributes mutation.
-	 * @param {string} surfaceId The surface id to be cached into the flat map.
+	 * @param {string} surfaceElementId The surface id to be cached into the flat map.
 	 * @param {Object=} opt_config Optional component configuration.
 	 * @protected
 	 */
-	cacheSurfaceRenderAttrs_(surfaceId, opt_config) {
-		var attrs = this.getSurface(surfaceId).renderAttrs || [];
+	cacheSurfaceRenderAttrs_(surfaceElementId, opt_config) {
+		var attrs = this.getSurface(surfaceElementId).renderAttrs || [];
 		for (var i = 0; i < attrs.length; i++) {
 			if (!this.surfacesRenderAttrs_[attrs[i]]) {
 				this.surfacesRenderAttrs_[attrs[i]] = {};
 				this.addMissingAttr_(attrs[i], opt_config ? opt_config[attrs[i]] : null);
 			}
-			this.surfacesRenderAttrs_[attrs[i]][surfaceId] = true;
+			this.surfacesRenderAttrs_[attrs[i]][surfaceElementId] = true;
 		}
 	}
 
@@ -362,16 +366,6 @@ class Component extends Attribute {
 	 */
 	checkHasElementTag_(content, id) {
 		return core.isString(content) ? content.indexOf(' id="' + id + '"') !== -1 : content.id === id;
-	}
-
-	/**
-	 * Clears the surfaces content cache.
-	 * @protected
-	 */
-	clearSurfacesCache_() {
-		for (var surfaceId in this.surfaces_) {
-			this.getSurface(surfaceId).cacheState = Component.Cache.NOT_INITIALIZED;
-		}
 	}
 
 	/**
@@ -404,21 +398,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Computes the cache state for the surface content based on the decorated
-	 * DOM element. The innerHTML of the surface element is read and compressed
-	 * in order to minimize mismatches caused by breaking spaces or HTML
-	 * formatting differences that does not affect the content structure.
-	 * @protected
-	 */
-	computeSurfacesCacheStateFromDom_() {
-		for (var surfaceId in this.surfaces_) {
-			if (!this.getSurface(surfaceId).componentName) {
-				this.cacheSurfaceContent(surfaceId, html.compress(this.getSurfaceElement(surfaceId).outerHTML));
-			}
-		}
-	}
-
-	/**
 	 * Converts the given html string to the format the current browser uses
 	 * when html is rendered. This is done by rendering the html in a temporary
 	 * element, and returning its resulting rendered html.
@@ -434,24 +413,24 @@ class Component extends Attribute {
 
 	/**
 	 * Creates a surface that was found via a string placeholder.
-	 * @param {string?} surfaceId
-	 * @param {string} type The surface type (either "s" or "c").
-	 * @param {string?} extra String with extra information about the surface.
-	 * @param {string=} opt_parentSurfaceId The id of the surface that contains
+	 * @param {string=} opt_surfaceElementId
+	 * @param {string=} opt_parentSurfaceElementId The id of the surface element that contains
 	 *   the surface to be created, or undefined if there is none.
-	 * @return {string} The id of the created surface.
+	 * @return {string} The element id of the created surface.
 	 * @protected
 	 */
-	createPlaceholderSurface_(surfaceId, type, extra, opt_parentSurfaceId) {
-		surfaceId = surfaceId || this.generateSurfaceId_(type, extra, opt_parentSurfaceId);
-		var surfaceData = this.buildPlaceholderSurfaceData_(type, extra);
-		var surface = this.getSurface(surfaceId);
-		if (surface) {
-			object.mixin(surface, surfaceData);
-		} else {
-			this.addSurface(surfaceId, surfaceData);
+	createPlaceholderSurface_(opt_surfaceElementId, opt_parentSurfaceElementId) {
+		var surfaceElementId = opt_surfaceElementId;
+		if (!core.isDefAndNotNull(surfaceElementId)) {
+			surfaceElementId = this.generateSurfaceElementId_(opt_parentSurfaceElementId);
 		}
-		return surfaceId;
+		var surface = this.getSurface(surfaceElementId);
+		if (!surface) {
+			this.addSurface(surfaceElementId, {
+				surfaceElementId: surfaceElementId
+			});
+		}
+		return surfaceElementId;
 	}
 
 	/**
@@ -487,7 +466,6 @@ class Component extends Attribute {
 	 */
 	decorateAsSubComponent() {
 		this.decorating_ = true;
-		this.computeSurfacesCacheStateFromDom_();
 		this.renderAsSubComponent();
 		this.decorating_ = false;
 	}
@@ -578,8 +556,7 @@ class Component extends Attribute {
 		// properly created for the first time.
 		this.replaceSurfacePlaceholders_(this.getElementContent_());
 
-		this.computeSurfacesCacheStateFromDom_(); // TODO(edu): This optimization seems worth it, analyze it.
-		this.renderSurfacesContent_(this.surfaces_); // TODO(edu): Sync surfaces on decorate?
+		this.renderSurfacesContent_(this.surfaceIds_); // TODO(edu): Sync surfaces on decorate?
 
 		this.attachInlineListeners_();
 		this.syncAttrs_();
@@ -624,8 +601,11 @@ class Component extends Attribute {
 
 		this.disposeSubComponents_();
 		this.generatedIdCount_ = null;
-		this.surfaces_ = null;
 		this.surfacesRenderAttrs_ = null;
+
+		Object.keys(this.surfaceIds_).forEach(surfaceId => this.removeSurface(surfaceId));
+		this.surfaceIds_ = null;
+
 		super.disposeInternal();
 	}
 
@@ -706,18 +686,14 @@ class Component extends Attribute {
 	/**
 	 * Generates an id for a surface that was found inside the contents of the main
 	 * element or of a parent surface.
-	 * @param {string} type Either "c" or "s", to indicate the surface's type.
-	 * @param {string} extra Extra data present in the surface placeholder.
-	 * @param {string=} opt_parentSurfaceId The id of the parent surface, or undefined
+	 * @param {string=} opt_parentSurfaceElementId The id of the parent surface, or undefined
 	 *   if there is none.
 	 * @return {string} The generated id.
 	 */
-	generateSurfaceId_(type, extra, opt_parentSurfaceId) {
-		var parentSurfaceId = opt_parentSurfaceId || '';
-		var parentSurfacePrefix = parentSurfaceId ? parentSurfaceId + '-' : '';
-		this.generatedIdCount_[parentSurfaceId] = (this.generatedIdCount_[parentSurfaceId] || 0) + 1;
-		var id = parentSurfacePrefix + type + this.generatedIdCount_[parentSurfaceId];
-		return (type === Component.SurfaceType.COMPONENT) ? this.makeSurfaceId_(id) : id;
+	generateSurfaceElementId_(opt_parentSurfaceElementId) {
+		var parentElementId = opt_parentSurfaceElementId || this.id;
+		this.generatedIdCount_[parentElementId] = (this.generatedIdCount_[parentElementId] || 0) + 1;
+		return parentElementId + '-s' + this.generatedIdCount_[parentElementId];
 	}
 
 	/**
@@ -778,28 +754,29 @@ class Component extends Attribute {
 
 	/**
 	 * Same as `getSurfaceHtml`, but only called for non component surfaces.
-	 * @param {string} surfaceId
+	 * @param {string} surfaceElementId
 	 * @param {string} content
 	 * @return {string}
 	 */
-	getNonComponentSurfaceHtml(surfaceId, content) {
-		var surfaceElementId = this.makeSurfaceId_(surfaceId);
+	getNonComponentSurfaceHtml(surfaceElementId, content) {
 		return this.wrapContentIfNecessary(content, surfaceElementId, this.constructor.SURFACE_TAG_NAME_MERGED);
 	}
 
 	/**
 	 * Gets surface configuration object. If surface is not registered returns
 	 * null.
-	 * @param {string} surfaceId The surface id.
-	 * @return {?Object} The surface configuration object.
+	 * @param {string} surfaceId The surface id or its element id.
+	 * @return {Object} The surface configuration object.
 	 */
 	getSurface(surfaceId) {
-		return this.surfaces_[surfaceId] || null;
+		var surface = Component.surfacesCollector.getSurface(this.getSurfaceElementId_(surfaceId));
+		return surface ? surface : Component.surfacesCollector.getSurface(surfaceId);
 	}
 
 	/**
 	 * Gets the content for the requested surface. Should be implemented by subclasses.
 	 * @param {string} surfaceId The surface id.
+	 * @param {string} surfaceElementId The surface element id
 	 * @return {Object|string} The content to be rendered. If the content is a
 	 *   string, surfaces can be represented by placeholders in the format specified
 	 *   by Component.SURFACE_REGEX.
@@ -810,20 +787,21 @@ class Component extends Attribute {
 	 * Gets the content for the requested surface. By default this just calls
 	 * `getSurfaceContent`, but can be overriden to add more behavior (check
 	 * `SoyComponent` for an example).
-	 * @param {string} surfaceId The surface id.
+	 * @param {string} surfaceElementId The surface element id.
 	 * @return {Object|string} The content to be rendered.
 	 * @protected
 	 */
-	getSurfaceContent_(surfaceId) {
-		var surface = this.getSurface(surfaceId);
+	getSurfaceContent_(surfaceElementId) {
+		var surface = this.getSurface(surfaceElementId);
 		if (surface.componentName) {
-			if (this.components[surfaceId].wasRendered) {
+			var component = ComponentCollector.components[surfaceElementId];
+			if (component.wasRendered) {
 				return '';
 			} else {
-				return this.components[surfaceId].getElementExtendedContent();
+				return component.getElementExtendedContent();
 			}
 		} else {
-			return this.getSurfaceContent(surfaceId);
+			return this.getSurfaceContent(this.getSurfaceId_(surfaceElementId, surface), surfaceElementId);
 		}
 	}
 
@@ -843,9 +821,9 @@ class Component extends Attribute {
 		}
 		if (!surface.element) {
 			if (surface.componentName) {
-				surface.element = this.components[surfaceId].element;
+				surface.element = ComponentCollector.components[surfaceId].element;
 			} else {
-				var surfaceElementId = this.makeSurfaceId_(surfaceId);
+				var surfaceElementId = this.getSurfaceElementId_(surfaceId, surface);
 				surface.element = this.findElementById_(surfaceElementId) ||
 					this.createSurfaceElement_(surfaceElementId);
 			}
@@ -854,18 +832,50 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Adds the component id as the prefix of the given surface id if necessary.
+	 * @param {string} surfaceId
+	 * @param {Object=} opt_surface The surface data.
+	 * @return {string}
+	 */
+	getSurfaceElementId_(surfaceId, opt_surface) {
+		var surface = opt_surface || {};
+		if (surface.surfaceElementId) {
+			return surface.surfaceElementId;
+		} else if (surface.componentName || this.hasComponentPrefix_(surfaceId)) {
+			return surfaceId;
+		} else {
+			return this.prefixSurfaceId_(surfaceId);
+		}
+	}
+
+	/**
 	 * Gets the html that should be used to build a surface's main element with its
 	 * content.
-	 * @param {string} surfaceId
+	 * @param {string} surfaceElementId
 	 * @param {string} content
 	 * @return {string}
 	 */
-	getSurfaceHtml(surfaceId, content) {
-		var surface = this.getSurface(surfaceId);
+	getSurfaceHtml(surfaceElementId, content) {
+		var surface = this.getSurface(surfaceElementId);
 		if (surface.componentName) {
-			return this.components[surfaceId].getComponentHtml(content);
+			return ComponentCollector.components[surfaceElementId].getComponentHtml(content);
 		} else {
-			return this.getNonComponentSurfaceHtml(surfaceId, content);
+			return this.getNonComponentSurfaceHtml(surfaceElementId, content);
+		}
+	}
+
+	/**
+	 * Gets the surface id for the given surface element id
+	 * @param {string} surfaceElementId
+	 * @param {!Object} surface
+	 * @return {string}
+	 * @protected
+	 */
+	getSurfaceId_(surfaceElementId, surface) {
+		if (surface.componentName || !this.hasComponentPrefix_(surfaceElementId)) {
+			return surfaceElementId;
+		} else {
+			return surfaceElementId.substr(this.id.length + 1);
 		}
 	}
 
@@ -874,7 +884,12 @@ class Component extends Attribute {
 	 * @return {!Object}
 	 */
 	getSurfaces() {
-		return this.surfaces_;
+		var surfaces = {};
+		Object.keys(this.surfaceIds_).forEach(function(surfaceElementId) {
+			var surface = Component.surfacesCollector.getSurface(surfaceElementId);
+			surfaces[this.getSurfaceId_(surfaceElementId, surface)] = surface;
+		}.bind(this));
+		return surfaces;
 	}
 
 	/**
@@ -888,6 +903,16 @@ class Component extends Attribute {
 			this.renderSurfacesContent_(this.getModifiedSurfacesFromChanges_(event.changes));
 		}
 		this.syncAttrsFromChanges_(event.changes);
+	}
+
+	/**
+	 * Checks if the given surface id has this component's prefix.
+	 * @param {string} surfaceId
+	 * @return {boolean}
+	 * @protected
+	 */
+	hasComponentPrefix_(surfaceId) {
+		return surfaceId.substr(0, this.id.length + 1) === this.id + '-';
 	}
 
 	/**
@@ -907,16 +932,6 @@ class Component extends Attribute {
 	 */
 	makeId_() {
 		return 'metal_c_' + core.getUid(this);
-	}
-
-	/**
-	 * Makes the id for the surface scoped by the component.
-	 * @param {string} surfaceId The surface id.
-	 * @return {string}
-	 * @protected
-	 */
-	makeSurfaceId_(surfaceId) {
-		return this.id + '-' + surfaceId;
 	}
 
 	/**
@@ -949,6 +964,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Prefixes the given surface id with this component's id.
+	 * @param {string} surfaceId
+	 * @return {string}
+	 * @protected
+	 */
+	prefixSurfaceId_(surfaceId) {
+		return this.id + '-' + surfaceId;
+	}
+
+	/**
 	 * Unregisters a surface and removes its element from the DOM.
 	 * @param {string} surfaceId The surface id.
 	 * @chainable
@@ -958,7 +983,9 @@ class Component extends Attribute {
 		if (el && el.parentNode) {
 			el.parentNode.removeChild(el);
 		}
-		delete this.surfaces_[surfaceId];
+		var surfaceElementId = this.getSurfaceElementId_(surfaceId, this.getSurface(surfaceId));
+		Component.surfacesCollector.removeSurface(surfaceElementId);
+		this.surfaceIds_[surfaceElementId] = false;
 		return this;
 	}
 
@@ -988,8 +1015,7 @@ class Component extends Attribute {
 
 		this.renderInternal();
 
-		this.clearSurfacesCache_();
-		this.renderSurfacesContent_(this.surfaces_);
+		this.renderSurfacesContent_(this.surfaceIds_);
 
 		this.attachInlineListeners_();
 		this.syncAttrs_();
@@ -1015,14 +1041,14 @@ class Component extends Attribute {
 
 	/**
 	 * Renders a surface that holds a component.
-	 * @param {string} surfaceId
+	 * @param {string} surfaceElementId
 	 * @param {(Object|string)?} opt_content The content to be rendered.
 	 * @protected
 	 */
-	renderComponentSurface_(surfaceId, opt_content) {
-		var component = this.components[surfaceId];
+	renderComponentSurface_(surfaceElementId, opt_content) {
+		var component = ComponentCollector.components[surfaceElementId];
 		if (component.wasRendered) {
-			Component.componentsCollector.updateComponent(surfaceId);
+			Component.componentsCollector.updateComponent(surfaceElementId);
 		} else if (opt_content) {
 			var element = component.element;
 			if (dom.isEmpty(element)) {
@@ -1100,14 +1126,13 @@ class Component extends Attribute {
 	/**
 	 * Renders the contents of all the surface placeholders found in the given content.
 	 * @param {string} content
-	 * @param {string} surfaceId The id of surface the content is from.
+	 * @param {string} surfaceElementId The id of surface element the content is from.
 	 * @protected
 	 */
-	renderPlaceholderSurfaceContents_(content, surfaceId) {
+	renderPlaceholderSurfaceContents_(content, surfaceElementId) {
 		var instance = this;
-		content.replace(Component.SURFACE_REGEX, function(match, type, id, extra) {
-			id = id || instance.generateSurfaceId_(type, extra, surfaceId);
-			instance.renderSurfaceContent(id);
+		content.replace(Component.SURFACE_REGEX, function(match, id) {
+			instance.renderSurfaceContent(instance.createPlaceholderSurface_(id, surfaceElementId));
 			return match;
 		});
 	}
@@ -1118,41 +1143,47 @@ class Component extends Attribute {
 	 * is not initialized or the content is not eligible for cache or content is
 	 * different, the surfaces re-renders. It's not recommended to use this
 	 * method directly since surface content can be provided by
-	 * `getSurfaceContent(surfaceId)`.
-	 * @param {string} surfaceId The surface id.
+	 * `getSurfaceContent(surfaceElementId)`.
+	 * @param {string} surfaceElementId The surface id.
 	 * @param {(Object|string)?} opt_content The content to be rendered.
 	 * @param {string?} opt_cacheContent The content that should be cached for
 	 *   this surface. If none is given, the rendered content will be used for this.
 	 */
-	renderSurfaceContent(surfaceId, opt_content, opt_cacheContent) {
-		var surface = this.getSurface(surfaceId);
+	renderSurfaceContent(surfaceElementId, opt_content, opt_cacheContent) {
+		var surface = this.getSurface(surfaceElementId);
 		if (surface.componentName) {
-			this.renderComponentSurface_(surfaceId, opt_content);
+			this.renderComponentSurface_(surfaceElementId, opt_content);
 			return;
 		}
 
-		var content = opt_content || this.getSurfaceContent_(surfaceId);
+		var content = opt_content || this.getSurfaceContent_(surfaceElementId);
 		if (core.isDefAndNotNull(content)) {
+			if (this.decorating_) {
+				this.cacheSurfaceContent(
+					surfaceElementId,
+					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
+				);
+			}
 			var previousCacheState = surface.cacheState;
 			var cacheContent = opt_cacheContent || content;
 
 			// We cache the entire original content first when decorating so we can compare
 			// with the full content we got from the dom. After comparing, we cache the correct
 			// value so updates can work as expected for this surface.
-			this.cacheSurfaceContent(surfaceId, this.decorating_ ? content : cacheContent);
+			this.cacheSurfaceContent(surfaceElementId, this.decorating_ ? content : cacheContent);
 			var cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
 			if (this.decorating_) {
-				this.cacheSurfaceContent(surfaceId, cacheContent);
+				this.cacheSurfaceContent(surfaceElementId, cacheContent);
 			}
 
 			if (cacheHit) {
 				if (this.decorating_) {
-					this.eventsCollector_.attachListeners(cacheContent, surfaceId);
+					this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
 				}
-				this.renderPlaceholderSurfaceContents_(content, surfaceId);
+				this.renderPlaceholderSurfaceContents_(content, surfaceElementId);
 			} else {
-				this.eventsCollector_.attachListeners(cacheContent, surfaceId);
-				this.replaceSurfaceContent_(surfaceId, content);
+				this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
+				this.replaceSurfaceContent_(surfaceElementId, content);
 			}
 		}
 	}
@@ -1165,9 +1196,9 @@ class Component extends Attribute {
 	 */
 	renderSurfacesContent_(surfaces) {
 		this.generatedIdCount_ = {};
-		for (var surfaceId in surfaces) {
-			if (!this.getSurface(surfaceId).handled) {
-				this.renderSurfaceContent(surfaceId);
+		for (var surfaceElementId in surfaces) {
+			if (!this.getSurface(surfaceElementId).handled) {
+				this.renderSurfaceContent(surfaceElementId);
 			}
 		}
 		if (this.wasRendered) {
@@ -1178,16 +1209,15 @@ class Component extends Attribute {
 
 	/**
 	 * Replaces the content of a surface with a new one.
-	 * @param {string} surfaceId The surface id.
+	 * @param {string} surfaceElementId The surface id.
 	 * @param {Element|string} content The content to be rendered.
 	 * @protected
 	 */
-	replaceSurfaceContent_(surfaceId, content) {
-		var elementId = this.makeSurfaceId_(surfaceId);
-		var el = this.getSurfaceElement(surfaceId);
-		content = this.replaceSurfacePlaceholders_(content, surfaceId);
-		if (this.checkHasElementTag_(content, elementId)) {
-			var surface = this.getSurface(surfaceId);
+	replaceSurfaceContent_(surfaceElementId, content) {
+		var el = this.getSurfaceElement(surfaceElementId);
+		content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+		if (this.checkHasElementTag_(content, surfaceElementId)) {
+			var surface = this.getSurface(surfaceElementId);
 			surface.element = content;
 			if (core.isString(content)) {
 				surface.element = dom.buildFragment(content).childNodes[0];
@@ -1204,21 +1234,21 @@ class Component extends Attribute {
 	/**
 	 * Replaces the given content's surface placeholders with their real contents.
 	 * @param {string|Element} content
-	 * @param {string=} opt_surfaceId The id of the surface that contains the given
-	 *   content, or undefined if the content is from the main element.
+	 * @param {string=} opt_surfaceElementId The id of the surface element that contains
+	 *   the given content, or undefined if the content is from the main element.
 	 * @return {string} The final string with replaced placeholders.
 	 * @protected
 	 */
-	replaceSurfacePlaceholders_(content, opt_surfaceId) {
+	replaceSurfacePlaceholders_(content, opt_surfaceElementId) {
 		if (!core.isString(content)) {
 			return content;
 		}
 
 		var instance = this;
-		return content.replace(Component.SURFACE_REGEX, function(match, type, id, extra) {
+		return content.replace(Component.SURFACE_REGEX, function(match, id) {
 			// Surfaces should already have been created before being rendered so they can be
 			// accessed from their getSurfaceContent calls.
-			id = instance.createPlaceholderSurface_(id, type, extra, opt_surfaceId);
+			id = instance.createPlaceholderSurface_(id, opt_surfaceElementId);
 			instance.getSurface(id).handled = true;
 
 			var surfaceContent = instance.getSurfaceContent_(id);
@@ -1227,7 +1257,7 @@ class Component extends Attribute {
 			instance.collectedSurfaces_.push({
 				cacheContent: surfaceContent,
 				content: expandedHtml,
-				surfaceId: id
+				surfaceElementId: id
 			});
 
 			return expandedHtml;
@@ -1301,33 +1331,33 @@ class Component extends Attribute {
 
 	/**
 	 * Updates a surface after it has been rendered through placeholders.
-	 * @param {!{content: string, cacheContent: string, surfaceId: string}} collectedData
+	 * @param {!{content: string, cacheContent: string, surfaceElementId: string}} collectedData
 	 *   Data about the collected surface. Should have the surface's id, content and the
 	 *   content that should be cached for it.
 	 * @protected
 	 */
 	updatePlaceholderSurface_(collectedData) {
-		var surfaceId = collectedData.surfaceId;
-		var surface = this.getSurface(surfaceId);
+		var surfaceElementId = collectedData.surfaceElementId;
+		var surface = this.getSurface(surfaceElementId);
 		if (surface.componentName) {
 			// Elements of component surfaces are unchangeable, so we need to replace the
 			// rendered element with the component's.
-			dom.replace(this.findElementById_(surfaceId), this.getSurfaceElement(surfaceId));
+			dom.replace(this.findElementById_(surfaceElementId), this.getSurfaceElement(surfaceElementId));
 		}
 
 		if (this.decorating_ || surface.componentName) {
 			// Component surfaces need to be handled in case some internal details have changed.
 			// Also, if this component is being decorated, it needs to go through the regular flow
 			// to check if the cache matches.
-			this.renderSurfaceContent(surfaceId, collectedData.content, collectedData.cacheContent);
+			this.renderSurfaceContent(surfaceElementId, collectedData.content, collectedData.cacheContent);
 		} else {
 			// This surface's element has either changed or never been created yet. Let's just
 			// reset it to null, so it can be fetched from the dom again when necessary. Also,
 			// since there's no need to do cache checks or rerender, let's just attach its
 			// listeners and cache its content manually.
 			surface.element = null;
-			this.cacheSurfaceContent(surfaceId, collectedData.cacheContent);
-			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceId);
+			this.cacheSurfaceContent(surfaceElementId, collectedData.cacheContent);
+			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceElementId);
 		}
 	}
 
@@ -1338,7 +1368,7 @@ class Component extends Attribute {
 	updatePlaceholderSurfaces_() {
 		for (var i = this.collectedSurfaces_.length - 1; i >= 0; i--) {
 			this.updatePlaceholderSurface_(this.collectedSurfaces_[i]);
-			this.getSurface(this.collectedSurfaces_[i].surfaceId).handled = false;
+			this.getSurface(this.collectedSurfaces_[i].surfaceElementId).handled = false;
 		}
 		this.collectedSurfaces_ = [];
 	}
@@ -1428,6 +1458,14 @@ class Component extends Attribute {
 Component.componentsCollector = new ComponentCollector();
 
 /**
+ * Helper responsible for temporarily holding surface data.
+ * @type {!SurfaceCollector}
+ * @protected
+ * @static
+ */
+Component.surfacesCollector = new SurfaceCollector();
+
+/**
  * Component attributes definition.
  * @type {Object}
  * @static
@@ -1509,7 +1547,7 @@ Component.ELEMENT_TAG_NAME = 'div';
  * @type {RegExp}
  * @static
  */
-Component.SURFACE_REGEX = /\%\%\%\%~(s|c)(?:-([^~:]+))?(?::([^~]+))?~\%\%\%\%/g;
+Component.SURFACE_REGEX = /\%\%\%\%~s(?:-([^~:]+))?~\%\%\%\%/g;
 
 /**
  * Surface tag name is a string that specifies the type of element to be
@@ -1548,15 +1586,6 @@ Component.Error = {
 	 * is made.
 	 */
 	ALREADY_RENDERED: 'Component already rendered'
-};
-
-/**
- * Valid surface types that can be used for string placeholders.
- * @enum {string}
- */
-Component.SurfaceType = {
-	COMPONENT: 'c',
-	NORMAL: 's'
 };
 
 /**

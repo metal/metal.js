@@ -821,7 +821,10 @@ class Component extends Attribute {
 		}
 		if (!surface.element) {
 			if (surface.componentName) {
-				surface.element = ComponentCollector.components[surfaceId].element;
+				var component = ComponentCollector.components[surfaceId];
+				if (component) {
+					surface.element = component.element;
+				}
 			} else {
 				var surfaceElementId = this.getSurfaceElementId_(surfaceId, surface);
 				surface.element = this.findElementById_(surfaceElementId) ||

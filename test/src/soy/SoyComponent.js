@@ -226,6 +226,7 @@ describe('SoyComponent', function() {
 	});
 
 	describe('Nested Components', function() {
+		var nestedComp;
 		beforeEach(function() {
 			ComponentRegistry.components_ = {};
 			ComponentCollector.components = {};
@@ -239,13 +240,19 @@ describe('SoyComponent', function() {
 			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 		});
 
+		afterEach(function() {
+			if (nestedComp) {
+				nestedComp.dispose();
+			}
+		});
+
 		it('should instantiate rendered child component', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({
+			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).render();
 
-			var child = custom.components.nestedMyChild0;
+			var child = nestedComp.components.nestedMyChild0;
 			assert.ok(child);
 			assert.strictEqual(this.CustomTestComponent, child.constructor);
 			assert.strictEqual('foo', child.headerContent);
@@ -254,11 +261,11 @@ describe('SoyComponent', function() {
 
 		it('should instantiate rendered child component when decorating main component', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({
+			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).decorate();
 
-			var child = custom.components.nestedMyChild0;
+			var child = nestedComp.components.nestedMyChild0;
 			assert.ok(child);
 			assert.strictEqual(this.CustomTestComponent, child.constructor);
 			assert.strictEqual('foo', child.headerContent);
@@ -267,22 +274,22 @@ describe('SoyComponent', function() {
 
 		it('should instantiate rendered child component without id', function() {
 			var NestedNoIdTestComponent = createCustomTestComponentClass('NestedNoIdTestComponent');
-			var custom = new NestedNoIdTestComponent({
+			nestedComp = new NestedNoIdTestComponent({
 				id: 'nested'
 			}).render();
 
-			assert.ok(custom.components['nested-s1']);
-			assert.ok(custom.components['nested-foo-s1']);
+			assert.ok(nestedComp.components['nested-s1']);
+			assert.ok(nestedComp.components['nested-foo-s1']);
 		});
 
 		it('should render nested components inside parent', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({
+			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).render();
 
-			var childPlaceholder = custom.element.querySelector('#nestedMyChild0');
-			var child = custom.components.nestedMyChild0;
+			var childPlaceholder = nestedComp.element.querySelector('#nestedMyChild0');
+			var child = nestedComp.components.nestedMyChild0;
 
 			assert.strictEqual(childPlaceholder, child.element);
 			assert.strictEqual(3, childPlaceholder.childNodes.length);
@@ -291,32 +298,36 @@ describe('SoyComponent', function() {
 		it('should update rendered child component', function(done) {
 			var test = this;
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({
+			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).render();
 
-			custom.foo = 'bar';
-			custom.on('attrsChanged', function() {
-				var child = custom.components.nestedMyChild0;
+			nestedComp.foo = 'bar';
+			nestedComp.on('attrsChanged', function() {
+				var child = nestedComp.components.nestedMyChild0;
 				assert.ok(child);
 				assert.strictEqual(test.CustomTestComponent, child.constructor);
 				assert.strictEqual('bar', child.headerContent);
-				assert.ok(custom.element.querySelector('#' + child.id));
+				assert.ok(nestedComp.element.querySelector('#' + child.id));
 
 				done();
 			});
 		});
 
 		it('should not update parent if only child components change', function(done) {
+			console.log('start test');
+			// HERE
 			var NestedTestComponent = createNestedTestComponentClass();
-			var custom = new NestedTestComponent({
+			nestedComp = new NestedTestComponent({
 				count: 2
 			}).render();
+			console.log('after render test');
 
-			var wrapper = custom.element.querySelector('.componentsWrapper');
-			custom.foo = 'bar';
-			custom.once('attrsChanged', function() {
-				assert.strictEqual(wrapper, custom.element.querySelector('.componentsWrapper'));
+			var wrapper = nestedComp.element.querySelector('.componentsWrapper');
+			nestedComp.foo = 'bar';
+			nestedComp.once('attrsChanged', function() {
+				assert.strictEqual(wrapper, nestedComp.element.querySelector('.componentsWrapper'));
+				console.log('end test');
 				done();
 			});
 		});
@@ -324,11 +335,11 @@ describe('SoyComponent', function() {
 		it('should pass non attribute params to sub component templates', function() {
 			var NestedTestComponent = createNestedTestComponentClass();
 			NestedTestComponent.ATTRS.extra = {};
-			var custom = new NestedTestComponent({
+			nestedComp = new NestedTestComponent({
 				count: 2,
 				extra: 'Extra'
 			}).render();
-			var extraElement = custom.element.querySelector('.extra');
+			var extraElement = nestedComp.element.querySelector('.extra');
 			assert.ok(extraElement);
 			assert.strictEqual('Extra', extraElement.textContent);
 		});
@@ -343,11 +354,11 @@ describe('SoyComponent', function() {
 			};
 
 			var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
-			var component = new DeeplyNestedTestComponent({
+			nestedComp = new DeeplyNestedTestComponent({
 				id: 'nested'
 			}).render();
 
-			var comps = component.components;
+			var comps = nestedComp.components;
 			assert.ok(comps['nested-main']);
 			assert.ok(comps['nested-child1']);
 			assert.ok(comps['nested-child2']);
@@ -368,13 +379,13 @@ describe('SoyComponent', function() {
 			};
 
 			var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
-			var component = new DeeplyNestedTestComponent({
+			nestedComp = new DeeplyNestedTestComponent({
 				id: 'nested'
 			}).render();
 
-			var parentButton = component.element.querySelector('.parentButton');
+			var parentButton = nestedComp.element.querySelector('.parentButton');
 			dom.triggerEvent(parentButton, 'click');
-			assert.strictEqual(1, component.handleClick.callCount);
+			assert.strictEqual(1, nestedComp.handleClick.callCount);
 		});
 
 		it('should render templates from other components', function() {
@@ -385,12 +396,12 @@ describe('SoyComponent', function() {
 					value: 2
 				}
 			};
-			var component = new ExternalTemplateTestComponent({
+			nestedComp = new ExternalTemplateTestComponent({
 				id: 'nested'
 			}).render();
 
-			assert.ok(component.components.nestedMyChild0);
-			assert.ok(component.components.nestedMyChild1);
+			assert.ok(nestedComp.components.nestedMyChild0);
+			assert.ok(nestedComp.components.nestedMyChild1);
 		});
 	});
 

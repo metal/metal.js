@@ -315,19 +315,16 @@ describe('SoyComponent', function() {
 		});
 
 		it('should not update parent if only child components change', function(done) {
-			console.log('start test');
 			// HERE
 			var NestedTestComponent = createNestedTestComponentClass();
 			nestedComp = new NestedTestComponent({
 				count: 2
 			}).render();
-			console.log('after render test');
 
 			var wrapper = nestedComp.element.querySelector('.componentsWrapper');
 			nestedComp.foo = 'bar';
 			nestedComp.once('attrsChanged', function() {
 				assert.strictEqual(wrapper, nestedComp.element.querySelector('.componentsWrapper'));
-				console.log('end test');
 				done();
 			});
 		});

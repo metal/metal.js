@@ -1507,19 +1507,15 @@ describe('Component', function() {
 		});
 
 		it('should instantiate sub component from placeholder passing defined config data', function() {
-			class CustomComponent extends Component {
-				constructor(opt_config) {
-					super(opt_config);
-					Component.componentsCollector.setNextComponentData('child', {
-						foo: this.foo
-					});
-				}
-			}
+			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
 				return this.buildPlaceholder('child', {
+					componentData: {
+						foo: this.foo
+					},
 					componentName: 'ChildComponent'
 				});
 			};
@@ -1568,19 +1564,15 @@ describe('Component', function() {
 			dom.append(document.body, element);
 			var fooElement = document.body.querySelector('span');
 
-			class CustomComponent extends Component {
-				constructor(opt_config) {
-					super(opt_config);
-					Component.componentsCollector.setNextComponentData('child', {
-						foo: this.foo
-					});
-				}
-			}
+			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
 				return this.buildPlaceholder('child', {
+					componentData: {
+						foo: this.foo
+					},
 					componentName: 'ChildComponent'
 				});
 			};
@@ -1601,19 +1593,15 @@ describe('Component', function() {
 			dom.append(document.body, element);
 			var fooElement = document.body.querySelector('span');
 
-			class CustomComponent extends Component {
-				constructor(opt_config) {
-					super(opt_config);
-					Component.componentsCollector.setNextComponentData('child', {
-						foo: this.foo
-					});
-				}
-			}
+			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
 				return this.buildPlaceholder('child', {
+					componentData: {
+						foo: this.foo
+					},
 					componentName: 'ChildComponent'
 				});
 			};
@@ -1628,19 +1616,7 @@ describe('Component', function() {
 		});
 
 		it('should update existing component from placeholder', function(done) {
-			class CustomComponent extends Component {
-				constructor(opt_config) {
-					super(opt_config);
-					Component.componentsCollector.setNextComponentData('child', {
-						foo: this.foo
-					});
-					this.on('fooChanged', function() {
-						Component.componentsCollector.setNextComponentData('child', {
-							foo: this.foo
-						});
-					});
-				}
-			}
+			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {
 				foo: {}
 			};
@@ -1654,6 +1630,9 @@ describe('Component', function() {
 			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				var placeholder = this.buildPlaceholder('child', {
+					componentData: {
+						foo: this.foo
+					},
 					componentName: 'ChildComponent'
 				});
 				return surfaceId === 'foo' ? 'Surface ' + this.foo + ': ' + placeholder : '';

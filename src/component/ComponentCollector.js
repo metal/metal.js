@@ -4,16 +4,6 @@ import ComponentRegistry from '../component/ComponentRegistry';
 import Disposable from '../disposable/Disposable';
 
 class ComponentCollector extends Disposable {
-	constructor() {
-		super();
-
-		/**
-		 * Holds the data that should be passed to a component, mapped by component id.
-		 * @type {!Object<string, Object>}
-		 */
-		this.nextComponentData_ = {};
-	}
-
 	/**
 	 * Adds a component to this collector.
 	 * @param {!Component} component
@@ -27,29 +17,19 @@ class ComponentCollector extends Disposable {
 	 * exist yet.
 	 * @param {string} componentName The name of the component to be created.
 	 * @param {string} id The id of the component to be created.
+	 * @param {Object=} opt_data
 	 * @return {!Component} The component instance.
 	 */
-	createComponent(componentName, id) {
+	createComponent(componentName, id, opt_data) {
 		var component = ComponentCollector.components[id];
 		if (!component) {
 			var ConstructorFn = ComponentRegistry.getConstructor(componentName);
-			var data = this.getNextComponentData(id);
+			var data = opt_data || {};
+			data.id = id;
 			data.element = '#' + id;
 			component = new ConstructorFn(data);
 		}
 		return component;
-	}
-
-	/**
-	 * Gets the data that should be passed to the next creation or update of a
-	 * component with the given id.
-	 * @param {string} id
-	 * @param {Object} data
-	 */
-	getNextComponentData(id) {
-		var data = this.nextComponentData_[id] || {};
-		data.id = id;
-		return data;
 	}
 
 	/**
@@ -61,25 +41,15 @@ class ComponentCollector extends Disposable {
 	}
 
 	/**
-	 * Sets the data that should be passed to the next creation or update of a
-	 * component with the given id.
-	 * @param {string} id
-	 * @param {Object} data
-	 */
-	setNextComponentData(id, data) {
-		this.nextComponentData_[id] = data;
-	}
-
-	/**
 	 * Updates an existing component instance with new attributes.
 	 * @param {string} id The id of the component to be created or updated.
+	 * @param {Object=} opt_data
 	 * @return {Component} The extracted component instance.
 	 */
-	updateComponent(id) {
+	updateComponent(id, opt_data) {
 		var component = ComponentCollector.components[id];
-		if (component) {
-			var data = this.getNextComponentData(id);
-			component.setAttrs(data);
+		if (component && opt_data) {
+			component.setAttrs(opt_data);
 		}
 		return component;
 	}

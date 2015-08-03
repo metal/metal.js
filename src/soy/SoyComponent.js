@@ -92,10 +92,9 @@ class SoyComponent extends Component {
 			// attribute shouldn't be referenced inside a soy template anyway.
 			return name !== 'element';
 		});
-		return object.mixin(
-			Component.componentsCollector.getNextComponentData(this.id),
-			this.getAttrs(names)
-		);
+		var surface = this.getSurface(this.id);
+		var data = surface ? surface.componentData : {};
+		return object.mixin(data, this.getAttrs(names));
 	}
 
 	/**
@@ -200,7 +199,7 @@ class SoyComponent extends Component {
 			componentName: componentName
 		};
 		var id = (data || {}).id || this.generateSurfaceElementId_(this.surfaceBeingRendered_, surfaceData);
-		Component.componentsCollector.setNextComponentData(id, this.buildComponentConfigData_(id, data));
+		surfaceData.componentData = this.buildComponentConfigData_(id, data);
 		return this.buildPlaceholder(id, surfaceData);
 	}
 

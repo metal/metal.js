@@ -441,7 +441,11 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	createSubComponent_(componentName, componentId) {
-		this.components[componentId] = Component.componentsCollector.createComponent(componentName, componentId);
+		this.components[componentId] = Component.componentsCollector.createComponent(
+			componentName,
+			componentId,
+			this.getSurface(componentId).componentData
+		);
 		return this.components[componentId];
 	}
 
@@ -1051,7 +1055,8 @@ class Component extends Attribute {
 	renderComponentSurface_(surfaceElementId, opt_content) {
 		var component = ComponentCollector.components[surfaceElementId];
 		if (component.wasRendered) {
-			Component.componentsCollector.updateComponent(surfaceElementId);
+			var surface = this.getSurface(surfaceElementId);
+			Component.componentsCollector.updateComponent(surfaceElementId, surface.componentData);
 		} else if (opt_content) {
 			var element = component.element;
 			if (dom.isEmpty(element)) {

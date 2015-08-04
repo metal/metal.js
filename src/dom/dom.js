@@ -169,6 +169,7 @@ class dom {
 			}
 			currentElement = currentElement.parentNode;
 		}
+		event.delegateTarget = null;
 
 		return returnValue;
 	}

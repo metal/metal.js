@@ -319,12 +319,15 @@ describe('dom', function() {
 			document.body.appendChild(element);
 			var matchedElements = element.querySelectorAll('.match');
 
-			var listener = sinon.stub();
+			var listenerTargets = [];
+			var listener = function(event) {
+				listenerTargets.push(event.delegateTarget);
+			};
 			dom.delegate(element, 'click', '.match', listener);
 
 			dom.triggerEvent(matchedElements[0], 'click');
-			assert.strictEqual(1, listener.callCount);
-			assert.strictEqual(matchedElements[0], listener.args[0][0].delegateTarget);
+			assert.strictEqual(1, listenerTargets.length);
+			assert.strictEqual(matchedElements[0], listenerTargets[0]);
 		});
 
 		it('should not trigger delegate event for parents of given element', function() {
@@ -383,6 +386,23 @@ describe('dom', function() {
 			dom.triggerEvent(matchedElements[1], 'click');
 			assert.strictEqual(1, listenerTargets.length);
 			assert.strictEqual(matchedElements[1], listenerTargets[0]);
+		});
+
+		it('should clear delegateTarget from event object after event is done', function() {
+			var element = document.createElement('div');
+			element.innerHTML = '<div class="nomatch">' +
+				'<div class="match">' +
+				'<div class="nomatch">' +
+				'<div class="match">' +
+				'</div></div></div></div>';
+			document.body.appendChild(element);
+			var matchedElements = element.querySelectorAll('.match');
+
+			var listener = sinon.stub();
+			dom.delegate(element, 'click', '.match', listener);
+
+			dom.triggerEvent(matchedElements[1], 'click');
+			assert.ok(!listener.args[0][0].delegateTarget);
 		});
 	});
 

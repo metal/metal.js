@@ -240,7 +240,6 @@ describe('dom', function() {
 			dom.on('.myClass', 'click', listener);
 			dom.triggerEvent(element, 'click');
 			assert.strictEqual(1, listener.callCount);
-			element.remove();
 		});
 	});
 

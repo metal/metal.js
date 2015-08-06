@@ -270,13 +270,17 @@ class dom {
 	 * Listens to the specified event on the given DOM element. This function normalizes
 	 * DOM event payloads and functions so they'll work the same way on all supported
 	 * browsers.
-	 * @param {!Element} element The DOM element to listen to the event on.
+	 * @param {!Element|string} element The DOM element to listen to the event on, or
+	 *   a selector that should be delegated on the entire document.
 	 * @param {string} eventName The name of the event to listen to.
 	 * @param {!function(!Object)} callback Function to be called when the event is
 	 *   triggered. It will receive the normalized event object.
 	 * @return {!DomEventHandle} Can be used to remove the listener.
 	 */
 	static on(element, eventName, callback) {
+		if (core.isString(element)) {
+			return dom.delegate(document, eventName, element, callback);
+		}
 		var customConfig = dom.customEvents[eventName];
 		if (customConfig && customConfig.event) {
 			eventName = customConfig.originalEvent;

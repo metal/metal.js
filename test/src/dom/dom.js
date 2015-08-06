@@ -230,6 +230,18 @@ describe('dom', function() {
 			dom.triggerEvent(element, 'myEvent');
 			assert.strictEqual(0, listener.callCount);
 		});
+
+		it('should listen to event on document if selector is passed instead of element', function() {
+			var element = document.createElement('div');
+			element.className = 'myClass';
+			dom.enterDocument(element);
+
+			var listener = sinon.stub();
+			dom.on('.myClass', 'click', listener);
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(1, listener.callCount);
+			element.remove();
+		});
 	});
 
 	describe('once', function() {

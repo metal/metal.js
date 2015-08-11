@@ -42,14 +42,17 @@ class EventEmitter extends Disposable {
 	 * Adds a listener to the end of the listeners array for the specified events.
 	 * @param {!(Array|string)} events
 	 * @param {!Function} listener
+	 * @param {boolean} opt_default Flag indicating if this listener is a default
+	 *   action for this event. Default actions are run last, and only if no previous
+	 *   listener call `preventDefault()` on the received event facade.
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
-	addListener(events, listener) {
+	addListener(events, listener, opt_default) {
 		this.validateListener_(listener);
 
 		events = this.normalizeEvents_(events);
 		for (var i = 0; i < events.length; i++) {
-			this.addSingleListener_(events[i], listener);
+			this.addSingleListener_(events[i], listener, opt_default);
 		}
 
 		return new EventHandle(this, events, listener);
@@ -59,17 +62,22 @@ class EventEmitter extends Disposable {
 	 * Adds a listener to the end of the listeners array for a single event.
 	 * @param {string} event
 	 * @param {!Function} listener
+	 * @param {boolean} opt_default Flag indicating if this listener is a default
+	 *   action for this event. Default actions are run last, and only if no previous
+	 *   listener call `preventDefault()` on the received event facade.
+	 * @return {!EventHandle} Can be used to remove the listener.
 	 * @param {Function=} opt_origin The original function that was added as a
 	 *   listener, if there is any.
 	 * @protected
 	 */
-	addSingleListener_(event, listener, opt_origin) {
+	addSingleListener_(event, listener, opt_default, opt_origin) {
 		this.emit('newListener', event, listener);
 
 		if (!this.events_[event]) {
 			this.events_[event] = [];
 		}
 		this.events_[event].push({
+			default: opt_default,
 			fn: listener,
 			origin: opt_origin
 		});
@@ -102,27 +110,40 @@ class EventEmitter extends Disposable {
 	 */
 	emit(event) {
 		var args = Array.prototype.slice.call(arguments, 1);
-		var listened = false;
-		var listeners = this.listeners(event);
+		var listeners = (this.events_[event] || []).concat();
 
+		var facade;
 		if (this.getShouldUseFacade()) {
-			var facade = {
+			facade = {
+				preventDefault: function() {
+					facade.preventedDefault = true;
+				},
 				target: this,
 				type: event
 			};
 			args.push(facade);
 		}
 
+		var defaultListeners = [];
 		for (var i = 0; i < listeners.length; i++) {
-			listeners[i].apply(this, args);
-			listened = true;
+			if (listeners[i].default) {
+				defaultListeners.push(listeners[i]);
+			} else {
+				listeners[i].fn.apply(this, args);
+			}
 		}
+		if (!facade || !facade.preventedDefault) {
+			for (var j = 0; j < defaultListeners.length; j++) {
+				defaultListeners[j].fn.apply(this, args);
+			}
+		}
+
 
 		if (event !== '*') {
 			this.emit.apply(this, ['*', event].concat(args));
 		}
 
-		return listened;
+		return listeners.length > 0;
 	}
 
 	/**
@@ -141,9 +162,7 @@ class EventEmitter extends Disposable {
 	 * @return {Array} Array of listeners.
 	 */
 	listeners(event) {
-		return (this.events_[event] || []).map(function(listener) {
-			return listener.fn;
-		});
+		return (this.events_[event] || []).map(listener => listener.fn);
 	}
 
 	/**
@@ -189,7 +208,7 @@ class EventEmitter extends Disposable {
 			listener.apply(self, arguments);
 		}
 
-		self.addSingleListener_(event, handlerInternal, listener);
+		self.addSingleListener_(event, handlerInternal, false, listener);
 	}
 
 	/**

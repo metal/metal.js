@@ -429,10 +429,59 @@ describe('EventEmitter Tests', function() {
 			'arg1',
 			2,
 			sinon.match({
+				preventDefault: sinon.match.func,
 				target: this.emitter,
 				type: 'event'
 			})
 		);
+	});
+
+	it('should set preventedDefault flag to true on facade when preventDefault is called', function() {
+		var listener = sinon.stub();
+
+		this.emitter.setShouldUseFacade(true);
+		this.emitter.once('event', function(event) {
+			assert.ok(!event.preventedDefault);
+			event.preventDefault();
+		});
+		this.emitter.once('event', listener);
+		this.emitter.emit('event');
+
+		assert.ok(listener.args[0][0].preventedDefault);
+	});
+
+	it('should emit listener marked as default last', function() {
+		var listener1 = sinon.stub();
+		var listener2 = sinon.stub();
+		var listenerDefault = sinon.spy(function() {
+			assert.strictEqual(1, listener1.callCount);
+			assert.strictEqual(1, listener2.callCount);
+		});
+
+		this.emitter.on('event', listenerDefault, true);
+		this.emitter.on('event', listener1);
+		this.emitter.on('event', listener2);
+		this.emitter.emit('event');
+
+		assert.strictEqual(1, listenerDefault.callCount);
+	});
+
+	it('should not call default listener if "preventDefault" is called', function() {
+		var listener1 = sinon.spy(function(event) {
+			event.preventDefault();
+		});
+		var listener2 = sinon.stub();
+		var listenerDefault = sinon.stub();
+
+		this.emitter.setShouldUseFacade(true);
+		this.emitter.on('event', listenerDefault, true);
+		this.emitter.on('event', listener1);
+		this.emitter.on('event', listener2);
+		this.emitter.emit('event');
+
+		assert.strictEqual(0, listenerDefault.callCount);
+		assert.strictEqual(1, listener1.callCount);
+		assert.strictEqual(1, listener2.callCount);
 	});
 
 	it('should remove all listeners on dispose', function() {

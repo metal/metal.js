@@ -423,10 +423,8 @@ describe('Attribute', function() {
 		assert.strictEqual('attr1', listener.args[0][0].attrName);
 		assert.strictEqual(10, listener.args[0][0].prevVal);
 		assert.strictEqual(2, listener.args[0][0].newVal);
-		assert.deepEqual(listener.args[0][1], {
-			target: attr,
-			type: 'attr1Changed'
-		});
+		assert.strictEqual(attr, listener.args[0][1].target);
+		assert.strictEqual('attr1Changed', listener.args[0][1].type);
 	});
 
 	it('should not emit events when attribute doesn\'t change', function() {
@@ -480,10 +478,8 @@ describe('Attribute', function() {
 			assert.strictEqual(12, data.changes.attr1.newVal);
 			assert.strictEqual(undefined, data.changes.attr2.prevVal);
 			assert.strictEqual(21, data.changes.attr2.newVal);
-			assert.deepEqual(facade, {
-				target: attr,
-				type: 'attrsChanged'
-			});
+			assert.strictEqual(attr, facade.target);
+			assert.strictEqual('attrsChanged', facade.type);
 			done();
 		});
 

@@ -227,16 +227,20 @@ class Component extends Attribute {
 	 */
 	addSurface(surfaceId, opt_surfaceConfig, opt_config) {
 		var config = opt_surfaceConfig || {};
-		config.cacheState = Component.Cache.NOT_INITIALIZED;
+		config.cacheState = config.cacheState || Component.Cache.NOT_INITIALIZED;
 
 		var surfaceElementId = this.getSurfaceElementId_(surfaceId, config);
-		this.surfaceIds_[surfaceElementId] = true;
-		Component.surfacesCollector.addSurface(surfaceElementId, config);
-
-		if (config.componentName) {
-			this.createSubComponent_(config.componentName, surfaceElementId);
+		if (this.surfaceIds_[surfaceElementId]) {
+			Component.surfacesCollector.updateSurface(surfaceElementId, config);
+		} else {
+			this.surfaceIds_[surfaceElementId] = true;
+			Component.surfacesCollector.addSurface(surfaceElementId, config);
+			if (config.componentName) {
+				this.createSubComponent_(config.componentName, surfaceElementId);
+			}
+			this.cacheSurfaceRenderAttrs_(surfaceElementId, opt_config);
 		}
-		this.cacheSurfaceRenderAttrs_(surfaceElementId, opt_config);
+
 		return this;
 	}
 
@@ -300,7 +304,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	attachInlineListeners_() {
-		this.eventsCollector_.attachListeners(this.getElementContent_(''));
+		this.eventsCollector_.attachListeners(this.getElementContent_());
 		this.elementContent_ = null;
 	}
 
@@ -666,6 +670,24 @@ class Component extends Attribute {
 	 */
 	findElementById_(id) {
 		return document.getElementById(id) || this.element.querySelector('#' + id);
+	}
+
+	/**
+	 * Finds the element with the given id in the given content, if there is one.
+	 * @param {string} id
+	 * @param {string} content
+	 * @return {Element}
+	 * @protected
+	 */
+	findElementInContent_(id, content) {
+		var element;
+		if (core.isString(content)) {
+			content = dom.buildFragment(content).childNodes[0];
+		}
+		if (content && content.id === id) {
+			element = content;
+		}
+		return element;
 	}
 
 	/**
@@ -1083,17 +1105,7 @@ class Component extends Attribute {
 	 */
 	renderContent_(content) {
 		var element = this.element;
-		var newElement;
-
-		if (core.isString(content)) {
-			content = dom.buildFragment(content);
-			if (content.childNodes[0].id === this.id) {
-				newElement = content.childNodes[0];
-			}
-		} else if (content.id === this.id) {
-			newElement = content;
-		}
-
+		var newElement = this.findElementInContent_(this.id, content);
 		if (newElement) {
 			this.updateElementAttributes_(element, newElement);
 			content = newElement.childNodes;
@@ -1331,8 +1343,8 @@ class Component extends Attribute {
 			console.error(
 				'The component named "' + this.constructor.NAME + '" tried to change the component ' +
 				'element\'s tag name, which is not allowed. Make sure to always return the same tag ' +
-				'name for the component element on getElementContent, as well as to set the static ' +
-				'variable ELEMENT_TAG_NAME to the chosen value.'
+				'name for the component element on getElementContent. This may also have been caused by ' +
+				'passing an element to this component with a different tag name from the one it uses.'
 			);
 		}
 	}
@@ -1423,11 +1435,22 @@ class Component extends Attribute {
 
 	/**
 	 * Provides the default value for element attribute.
-	 * @return {Element} The element.
+	 * @return {!Element} The element.
 	 * @protected
 	 */
 	valueElementFn_() {
-		return document.createElement(this.constructor.ELEMENT_TAG_NAME_MERGED);
+		if (!this.id) {
+			// This may happen because the default value of "id" depends on "element",
+			// and the default value of "element" depends on "id".
+			this.id = this.makeId_();
+		}
+		var element = this.findElementInContent_(this.id, this.getElementContent());
+		if (!element) {
+			element = this.findElementInContent_(this.id, this.getComponentHtml(''));
+		}
+		dom.removeChildren(element);
+		dom.exitDocument(element);
+		return element;
 	}
 
 	/**

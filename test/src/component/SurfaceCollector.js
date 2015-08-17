@@ -13,6 +13,27 @@ describe('SurfaceCollector', function() {
 		assert.strictEqual(data2, collector.getSurface('surface2'));
 	});
 
+	it('should update existing surface', function() {
+		var collector = new SurfaceCollector();
+		var data1 = {
+			bar: 'bar',
+			foo: 'foo'
+		};
+		collector.addSurface('surface1', data1);
+		collector.updateSurface('surface1', {
+			foo: 'newFoo',
+			foo2: 'foo2'
+		});
+
+		var expectedData = {
+			bar: 'bar',
+			foo: 'newFoo',
+			foo2: 'foo2'
+		};
+		assert.strictEqual(data1, collector.getSurface('surface1'));
+		assert.deepEqual(expectedData, data1);
+	});
+
 	it('should remove surface', function() {
 		var collector = new SurfaceCollector();
 		collector.addSurface('surface1', {});

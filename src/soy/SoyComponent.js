@@ -37,6 +37,13 @@ class SoyComponent extends Component {
 		 * @protected
 		 */
 		this.firstSurfaceFound_ = {};
+
+		/**
+		 * Flag indicating if inner calls to templates should be skipped.
+		 * @type {boolean}
+		 * @protected
+		 */
+		this.skipInnerCalls_ = false;
 	}
 
 	/**
@@ -215,7 +222,9 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	handleInterceptedCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
-		if (templateName === 'content') {
+		if (this.skipInnerCalls_) {
+			return '';
+		} else if (templateName === 'content') {
 			return this.handleComponentCall_.call(this, templateComponentName, data);
 		} else {
 			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);
@@ -328,6 +337,20 @@ class SoyComponent extends Component {
 	 */
 	static setInjectedData(data) {
 		ijData = data || {};
+	}
+
+	/**
+	 * Overrides the original method from `Component` so only the outer soy
+	 * template returns content, as we only need to render the parent tag here.
+	 * @return {!Element}
+	 * @protected
+	 * @override
+	 */
+	valueElementFn_() {
+		this.skipInnerCalls_ = true;
+		var element = super.valueElementFn_();
+		this.skipInnerCalls_ = false;
+		return element;
 	}
 }
 

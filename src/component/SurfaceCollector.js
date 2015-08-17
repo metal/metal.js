@@ -1,5 +1,6 @@
 'use strict';
 
+import object from '../object/object';
 import Disposable from '../disposable/Disposable';
 
 /**
@@ -55,6 +56,15 @@ class SurfaceCollector extends Disposable {
 	 */
 	removeSurface(surfaceElementId) {
 		this.surfaces_[surfaceElementId] = null;
+	}
+
+	/**
+	 * Updates a surface from this collector.
+	 * @param {string} surfaceElementId
+	 * @param {Object=} opt_data Surface data to update the existing data.
+	 */
+	updateSurface(surfaceElementId, opt_data) {
+		object.mixin(this.surfaces_[surfaceElementId], opt_data);
 	}
 }
 

@@ -43,7 +43,6 @@ describe('SoyComponent', function() {
 
 	it('should render element tag according to its template when defined', function() {
 		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
-		CustomTagTestComponent.ELEMENT_TAG_NAME = 'custom';
 
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'
@@ -55,7 +54,6 @@ describe('SoyComponent', function() {
 
 	it('should render surface element tag according to its template when defined', function() {
 		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
-		CustomTagTestComponent.ELEMENT_TAG_NAME = 'custom';
 
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'
@@ -445,10 +443,10 @@ describe('SoyComponent', function() {
 			var comp = SoyComponent.createComponentFromTemplate(templateFn, null, data);
 
 			comp.render();
-			assert.strictEqual(1, templateFn.callCount);
-			assert.strictEqual(data, templateFn.args[0][0]);
-			assert.ok(!templateFn.args[0][1]);
-			assert.deepEqual({}, templateFn.args[0][2]);
+			assert.strictEqual(2, templateFn.callCount);
+			assert.strictEqual(data, templateFn.args[1][0]);
+			assert.ok(!templateFn.args[1][1]);
+			assert.deepEqual({}, templateFn.args[1][2]);
 		});
 	});
 

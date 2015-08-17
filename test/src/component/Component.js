@@ -111,7 +111,7 @@ describe('Component', function() {
 			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 		});
 
-		it('should throw error if ELEMENT_TAG_NAME is different from element tag returned by getElementContent', function() {
+		it('should not throw error if ELEMENT_TAG_NAME is different from element tag returned by getElementContent', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
 				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
@@ -120,7 +120,24 @@ describe('Component', function() {
 
 			sinon.stub(console, 'error');
 			var custom = new CustomComponent().render();
+			assert.strictEqual('SPAN', custom.element.tagName);
+			assert.strictEqual(0, console.error.callCount);
+			console.error.restore();
+		});
+
+		it('should throw error if tag from given element is different from the one returned by getElementContent', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return '<span id="' + this.id + '" data-foo="foo">My Content</span>';
+			};
+			CustomComponent.NAME = 'CustomComponent';
+
+			sinon.stub(console, 'error');
+			var custom = new CustomComponent({
+				element: document.createElement('div')
+			}).render();
 			assert.strictEqual('DIV', custom.element.tagName);
+			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
 			assert.strictEqual(1, console.error.callCount);
 			assert.notStrictEqual(-1, console.error.args[0][0].indexOf('CustomComponent'));
 			console.error.restore();

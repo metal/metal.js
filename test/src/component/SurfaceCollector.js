@@ -34,6 +34,17 @@ describe('SurfaceCollector', function() {
 		assert.deepEqual(expectedData, data1);
 	});
 
+	it('should update surface instead of adding if it already exists', function() {
+		var collector = new SurfaceCollector();
+		var data = {};
+		collector.addSurface('surface', data);
+		collector.addSurface('surface', {
+			foo: 'foo'
+		});
+		assert.strictEqual(data, collector.getSurface('surface'));
+		assert.strictEqual('foo', data.foo);
+	});
+
 	it('should remove surface', function() {
 		var collector = new SurfaceCollector();
 		collector.addSurface('surface1', {});

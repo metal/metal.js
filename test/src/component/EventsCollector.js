@@ -13,8 +13,7 @@ describe('EventsCollector', function() {
 	});
 
 	it('should not throw error if content is not a string', function() {
-		var CustomComponent = createCustomComponent('<div></div><div></div>');
-		var custom = new CustomComponent().render();
+		var custom = createCustomComponentInstance('<div></div><div></div>');
 		var collector = new EventsCollector(custom);
 
 		assert.doesNotThrow(function() {
@@ -23,8 +22,7 @@ describe('EventsCollector', function() {
 	});
 
 	it('should not throw error if no listeners are found', function() {
-		var CustomComponent = createCustomComponent('<div></div><div></div>');
-		var custom = new CustomComponent().render();
+		var custom = createCustomComponentInstance('<div></div><div></div>');
 		var collector = new EventsCollector(custom);
 
 		assert.doesNotThrow(function() {
@@ -33,12 +31,11 @@ describe('EventsCollector', function() {
 	});
 
 	it('should attach event listener', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick"></div><div></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
+		custom.handleClick = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -50,12 +47,11 @@ describe('EventsCollector', function() {
 	});
 
 	it('should attach event listener with single quotes', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick=\'handleClick\'></div><div></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
+		custom.handleClick = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -67,17 +63,15 @@ describe('EventsCollector', function() {
 	});
 
 	it('should attach event listener with a function from another component', function() {
-		var AnotherComponent = createCustomComponent('');
-		AnotherComponent.prototype.handleClick = sinon.stub();
-		var CustomComponent = createCustomComponent(
-			'<div data-onclick="another-comp:handleClick"></div><div></div>'
-		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-
-		var another = new AnotherComponent().render();
+		var another = createCustomComponentInstance('');
+		another.handleClick = sinon.stub();
 		ComponentCollector.components['another-comp'] = another;
 
-		var custom = new CustomComponent().render();
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="another-comp:handleClick"></div><div></div>'
+		);
+		custom.handleClick = sinon.stub();
+
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -88,15 +82,13 @@ describe('EventsCollector', function() {
 	});
 
 	it('should print error if trying to attach function from non existing component', function() {
-		var NonExistingComponent = createCustomComponent('');
-		NonExistingComponent.prototype.handleClick = sinon.stub();
-		var CustomComponent = createCustomComponent(
+		var nonExisting = createCustomComponentInstance('');
+		nonExisting.handleClick = sinon.stub();
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="non-existing:handleClick"></div><div></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
+		custom.handleClick = sinon.stub();
 
-		var nonExisting = new NonExistingComponent().render();
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 
 		sinon.stub(console, 'error');
@@ -111,11 +103,9 @@ describe('EventsCollector', function() {
 	});
 
 	it('should print error if trying to attach unexisting function', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick"></div><div></div>'
 		);
-
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 
 		sinon.stub(console, 'error');
@@ -126,13 +116,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should attach multiple event listeners', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleKeyDown = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -144,13 +133,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should attach multiple listeners for the same element and event type', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick,handleAnotherClick"></div><div></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleAnotherClick = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleAnotherClick = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -165,12 +153,11 @@ describe('EventsCollector', function() {
 	});
 
 	it('should trigger attached listener registered by multiple elements only once', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick"></div><div data-onclick="handleClick"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
+		custom.handleClick = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -181,18 +168,13 @@ describe('EventsCollector', function() {
 	});
 
 	it('should not trigger sub component listeners on unrelated parent elements', function() {
-		var SubComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
-		SubComponent.prototype.handleClick = sinon.stub();
+		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		custom.handleClick = sinon.stub();
 
-		var child;
-		var CustomComponent = createCustomComponent();
-		CustomComponent.prototype.renderInternal = function() {
-			dom.append(this.element, '<div data-onclick="handleClick"></div>');
-			child = new SubComponent().render(this.element);
-		};
-		CustomComponent.prototype.handleClick = sinon.stub();
+		var child = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		child.handleClick = sinon.stub();
+		dom.append(custom.element, child.element);
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 		var childCollector = new EventsCollector(child);
@@ -208,18 +190,13 @@ describe('EventsCollector', function() {
 	});
 
 	it('should trigger listeners that bubbled from sub components to correct element', function() {
-		var SubComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
-		SubComponent.prototype.handleClick = sinon.stub();
+		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		custom.handleClick = sinon.stub();
 
-		var child;
-		var CustomComponent = createCustomComponent();
-		CustomComponent.prototype.renderInternal = function() {
-			dom.append(this.element, '<div data-onclick="handleClick"></div>');
-			child = new SubComponent().render(this.element.childNodes[0]);
-		};
-		CustomComponent.prototype.handleClick = sinon.stub();
+		var child = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		child.handleClick = sinon.stub();
+		dom.append(custom.element.childNodes[0], child.element);
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 		var childCollector = new EventsCollector(child);
@@ -231,13 +208,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should detach listeners that are unused', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleKeyDown = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -253,13 +229,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should not throw error when detaching unused listeners twice', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleKeyDown = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -275,13 +250,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should detach all listeners when detachAllListeners is called', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleKeyDown = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -293,13 +267,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should detach remaining listeners when detachAllListeners is called', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleKeyDown = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -315,13 +288,12 @@ describe('EventsCollector', function() {
 	});
 
 	it('should detach all listeners when collector is disposed', function() {
-		var CustomComponent = createCustomComponent(
+		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
-		CustomComponent.prototype.handleClick = sinon.stub();
-		CustomComponent.prototype.handleKeyDown = sinon.stub();
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		collector.attachListeners(custom.element.innerHTML, 'group');
 
@@ -333,10 +305,9 @@ describe('EventsCollector', function() {
 	});
 
 	it('should check if listeners have been attached for the given group before', function() {
-		var CustomComponent = createCustomComponent('<div data-onclick="handleClick"></div>');
-		CustomComponent.prototype.handleClick = sinon.stub();
+		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		custom.handleClick = sinon.stub();
 
-		var custom = new CustomComponent().render();
 		var collector = new EventsCollector(custom);
 		assert.ok(!collector.hasAttachedForGroup('group'));
 
@@ -344,15 +315,14 @@ describe('EventsCollector', function() {
 		assert.ok(collector.hasAttachedForGroup('group'));
 	});
 
-	function createCustomComponent(content) {
+	function createCustomComponentInstance(content) {
 		class CustomComponent extends Component {
 			constructor(opt_config) {
 				super(opt_config);
 			}
 		}
-		CustomComponent.prototype.renderInternal = function() {
-			dom.append(this.element, content);
-		};
-		return CustomComponent;
+		var comp = new CustomComponent().render();
+		dom.append(comp.element, content);
+		return comp;
 	}
 });

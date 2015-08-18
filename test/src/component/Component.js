@@ -26,19 +26,18 @@ describe('Component', function() {
 			custom.render();
 
 			sinon.assert.callOrder(
-				CustomComponent.prototype.renderInternal,
 				CustomComponent.prototype.getSurfaceContent,
 				CustomComponent.prototype.attached
 			);
 
-			sinon.assert.callCount(CustomComponent.prototype.renderInternal, 1);
 			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 
 			sinon.assert.callCount(CustomComponent.prototype.getSurfaceContent, 2);
 			assert.strictEqual('header', CustomComponent.prototype.getSurfaceContent.args[0][0]);
 			assert.strictEqual('bottom', CustomComponent.prototype.getSurfaceContent.args[1][0]);
 
-			sinon.assert.notCalled(CustomComponent.prototype.decorateInternal);
+			sinon.assert.called(CustomComponent.prototype.getElementContent);
+
 			sinon.assert.notCalled(CustomComponent.prototype.detached);
 		});
 
@@ -53,20 +52,7 @@ describe('Component', function() {
 			var custom = new CustomComponent();
 			custom.decorate();
 
-			sinon.assert.callOrder(
-				CustomComponent.prototype.decorateInternal,
-				CustomComponent.prototype.getSurfaceContent,
-				CustomComponent.prototype.attached);
-
-			sinon.assert.callCount(CustomComponent.prototype.decorateInternal, 1);
-			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
-
-			sinon.assert.callCount(CustomComponent.prototype.getSurfaceContent, 2);
-			assert.strictEqual('header', CustomComponent.prototype.getSurfaceContent.args[0][0]);
-			assert.strictEqual('bottom', CustomComponent.prototype.getSurfaceContent.args[1][0]);
-
-			sinon.assert.notCalled(CustomComponent.prototype.renderInternal);
-			sinon.assert.notCalled(CustomComponent.prototype.detached);
+			sinon.assert.callCount(CustomComponent.prototype.render, 1);
 		});
 
 		it('should be able to manually invoke detach/attach lifecycle', function() {
@@ -181,7 +167,6 @@ describe('Component', function() {
 			assert.throws(function() {
 				custom.render();
 			}, Error);
-			sinon.assert.callCount(CustomComponent.prototype.renderInternal, 1);
 			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 		});
 
@@ -192,7 +177,6 @@ describe('Component', function() {
 			assert.throws(function() {
 				custom.decorate();
 			}, Error);
-			sinon.assert.callCount(CustomComponent.prototype.decorateInternal, 1);
 			sinon.assert.callCount(CustomComponent.prototype.attached, 1);
 		});
 
@@ -253,6 +237,8 @@ describe('Component', function() {
 
 			assert.strictEqual(custom, custom.render());
 			assert.strictEqual(custom, custom.detach());
+
+			custom = new CustomComponent();
 			assert.strictEqual(custom, custom.decorate());
 
 			custom.detach();
@@ -765,8 +751,8 @@ describe('Component', function() {
 
 		it('should listen to delegate events on the element', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.innerHTML = '<div class="foo"></div>';
+			CustomComponent.prototype.getElementContent = function() {
+				return '<div class="foo"></div>';
 			};
 			var custom = new CustomComponent();
 			custom.render();
@@ -919,8 +905,8 @@ describe('Component', function() {
 			CustomComponent.SURFACES = {
 				header: {}
 			};
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(surface);
+			CustomComponent.prototype.getElementContent = function() {
+				return surface;
 			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				return 'Header';
@@ -943,9 +929,9 @@ describe('Component', function() {
 
 		it('should remove surface and its element from dom', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
+			CustomComponent.prototype.getElementContent = function() {
 				// Creates surface element and appends to component element
-				this.element.appendChild(this.getSurfaceElement('header'));
+				return this.getSurfaceElement('header');
 			};
 			var custom = new CustomComponent({
 				id: 'custom'
@@ -975,10 +961,6 @@ describe('Component', function() {
 
 		it('should render surface content from string', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
-				this.element.appendChild(this.getSurfaceElement('bottom'));
-			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -997,10 +979,6 @@ describe('Component', function() {
 
 		it('should render surface element if it\'s defined in getSurfaceContent\'s string result', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
-				this.element.appendChild(this.getSurfaceElement('bottom'));
-			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -1026,9 +1004,6 @@ describe('Component', function() {
 
 		it('should render surface content from element', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
-			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				var content = document.createElement('b');
 				content.innerHTML = 'header';
@@ -1042,9 +1017,6 @@ describe('Component', function() {
 
 		it('should render surface element if it\'s defined in getSurfaceContent\'s element result', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
-			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				var frag = dom.buildFragment(
 					'<header id="' + this.id + '-header" class="testHeader" data-foo="foo"><b>header</b></header>'
@@ -1107,10 +1079,6 @@ describe('Component', function() {
 
 		it('should render surface content when surface render attrs change', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
-				this.element.appendChild(this.getSurfaceElement('bottom'));
-			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -1200,10 +1168,6 @@ describe('Component', function() {
 
 		it('should not cache surface content if not string', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
-				this.element.appendChild(this.getSurfaceElement('bottom'));
-			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -1276,8 +1240,8 @@ describe('Component', function() {
 					renderAttrs: ['foo']
 				}
 			};
-			CustomComponent.prototype.renderInternal = function() {
-				this.element.appendChild(this.getSurfaceElement('header'));
+			CustomComponent.prototype.getElementContent = function() {
+				return this.getSurfaceElement('header');
 			};
 			this.CustomComponent = CustomComponent;
 		});
@@ -1684,8 +1648,8 @@ describe('Component', function() {
 					componentName: 'ChildComponent'
 				}
 			};
-			CustomComponent.prototype.renderInternal = function() {
-				dom.append(this.element, this.getSurfaceElement('child'));
+			CustomComponent.prototype.getElementContent = function() {
+				return this.getSurfaceElement('child');
 			};
 
 			var custom = new CustomComponent({
@@ -2041,11 +2005,11 @@ describe('Component', function() {
 			}
 		}
 
-		sinon.spy(CustomComponent.prototype, 'decorateInternal');
 		sinon.spy(CustomComponent.prototype, 'getSurfaceContent');
+		sinon.spy(CustomComponent.prototype, 'getElementContent');
+		sinon.spy(CustomComponent.prototype, 'render');
 		sinon.spy(CustomComponent.prototype, 'attached');
 		sinon.spy(CustomComponent.prototype, 'detached');
-		sinon.spy(CustomComponent.prototype, 'renderInternal');
 
 		return CustomComponent;
 	}

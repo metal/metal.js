@@ -33,12 +33,8 @@ import SurfaceCollector from './SurfaceCollector';
  *     super(config);
  *   }
  *
- *   decorateInternal() {
- *   }
- *
- *   renderInternal() {
- *     this.element.appendChild(this.getSurfaceElement('header'));
- *     this.element.appendChild(this.getSurfaceElement('bottom'));
+ *   getElementContent() {
+ *     return this.getSurfaceElement('header');
  *   }
  *
  *   getSurfaceContent(surfaceId, surfaceElementId) {
@@ -235,7 +231,7 @@ class Component extends Attribute {
 		} else {
 			this.surfaceIds_[surfaceElementId] = true;
 			Component.surfacesCollector.addSurface(surfaceElementId, config);
-			if (config.componentName) {
+			if (config.componentName && surfaceId !== this.id) {
 				this.createSubComponent_(config.componentName, surfaceElementId);
 			}
 			this.cacheSurfaceRenderAttrs_(surfaceElementId, opt_config);
@@ -300,15 +296,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Attaches inline listeners that are found on the element's string content.
-	 * @protected
-	 */
-	attachInlineListeners_() {
-		this.eventsCollector_.attachListeners(this.getElementContent_());
-		this.elementContent_ = null;
-	}
-
-	/**
 	 * Lifecycle. When attached, the component element is appended to the DOM
 	 * and any other action to be performed must be implemented in this method,
 	 * such as, binding DOM events. A component can be re-attached multiple
@@ -316,6 +303,17 @@ class Component extends Attribute {
 	 * must be implemented on the detach phase.
 	 */
 	attached() {}
+
+	/**
+	 * Builds the data for this component's main element's surface.
+	 * @return {!Object}
+	 * @protected
+	 */
+	buildElementSurfaceData_() {
+		return {
+			componentName: this.constructor.NAME
+		};
+	}
 
 	/**
 	 * Builds a surface placeholder, attaching it to the given data.
@@ -479,12 +477,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Lifecycle. Internal implementation for decoration. Any extra operation
-	 * necessary to prepare the component DOM must be implemented in this phase.
-	 */
-	decorateInternal() {}
-
-	/**
 	 * Listens to a delegate event on the component's element.
 	 * @param {string} eventName The name of the event to listen to.
 	 * @param {string} selector The selector that matches the child elements that
@@ -546,34 +538,18 @@ class Component extends Attribute {
 	 *
 	 * Decoration Lifecycle:
 	 *   decorate - Decorate is manually called.
-	 *   decorateInternal - Internal implementation for decoration happens.
-	 *   render surfaces - All surfaces content are rendered.
+	 *   retrieve existing html - The cache for all surfaces is filled with any
+	 *     existing html from the document.
+	 *   render surfaces - Surfaces that cause a cache miss are rendered, including
+	 *     the main content (`getElementContent`).
 	 *   attribute synchronization - All synchronization methods are called.
 	 *   attach - Attach Lifecycle is called.
 	 * @chainable
 	 */
 	decorate() {
-		if (this.inDocument) {
-			throw new Error(Component.Error.ALREADY_RENDERED);
-		}
 		this.decorating_ = true;
-
-		this.decorateInternal();
-
-		// Need to go through all surface placeholders on decorate to make sure they are
-		// properly created for the first time.
-		this.replaceSurfacePlaceholders_(this.getElementContent_());
-
-		this.renderSurfacesContent_(this.surfaceIds_); // TODO(edu): Sync surfaces on decorate?
-
-		this.attachInlineListeners_();
-		this.syncAttrs_();
-
-		this.attach();
-
+		this.render();
 		this.decorating_ = false;
-		this.wasRendered = true;
-
 		return this;
 	}
 
@@ -669,7 +645,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	findElementById_(id) {
-		return document.getElementById(id) || this.element.querySelector('#' + id);
+		return document.getElementById(id) || (this.element && this.element.querySelector('#' + id));
 	}
 
 	/**
@@ -743,22 +719,15 @@ class Component extends Attribute {
 	getElementContent() {}
 
 	/**
-	 * Internal function for getting the component element's content. Stores the
-	 * result in a variable so it can be accessed later without building it again.
-	 * @return {Object|string}
-	 * @protected
-	 */
-	getElementContent_() {
-		this.elementContent_ = this.elementContent_ || this.getElementContent();
-		return this.elementContent_;
-	}
-
-	/**
 	 * Calls `getElementContent` and replaces all placeholders in the returned content.
+	 * This is called when rendering sub components, so it also attaches listeners to
+	 * the original content.
 	 * @return {string} The content with all placeholders already replaced.
 	 */
 	getElementExtendedContent() {
-		return this.replaceSurfacePlaceholders_(this.getElementContent_());
+		var content = this.getElementContent();
+		this.eventsCollector_.attachListeners(content);
+		return this.replaceSurfacePlaceholders_(content);
 	}
 
 	/**
@@ -769,7 +738,7 @@ class Component extends Attribute {
 	 *     as key and true as value.
 	 */
 	getModifiedSurfacesFromChanges_(changes) {
-		var surfaces = [];
+		var surfaces = [{}];
 		for (var attr in changes) {
 			if (this.surfacesRenderAttrs_[attr]) {
 				surfaces.push(this.surfacesRenderAttrs_[attr]);
@@ -819,7 +788,9 @@ class Component extends Attribute {
 	 */
 	getSurfaceContent_(surfaceElementId) {
 		var surface = this.getSurface(surfaceElementId);
-		if (surface.componentName) {
+		if (surfaceElementId === this.id) {
+			return this.getElementContent();
+		} else if (surface.componentName) {
 			var component = ComponentCollector.components[surfaceElementId];
 			if (component.wasRendered) {
 				return '';
@@ -941,7 +912,8 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	hasComponentPrefix_(surfaceId) {
-		return surfaceId.substr(0, this.id.length + 1) === this.id + '-';
+		return surfaceId.substr(0, this.id.length) === this.id &&
+			(surfaceId.length === this.id.length || surfaceId[this.id.length] === '-');
 	}
 
 	/**
@@ -1024,8 +996,8 @@ class Component extends Attribute {
 	 *
 	 * Render Lifecycle:
 	 *   render - Decorate is manually called.
-	 *   renderInternal - Internal implementation for rendering happens.
-	 *   render surfaces - All surfaces content are rendered.
+	 *   render surfaces - All surfaces content are rendered, including the
+	 *     main content (`getElementContent`).
 	 *   attribute synchronization - All synchronization methods are called.
 	 *   attach - Attach Lifecycle is called.
 	 *
@@ -1042,11 +1014,9 @@ class Component extends Attribute {
 			throw new Error(Component.Error.ALREADY_RENDERED);
 		}
 
-		this.renderInternal();
-
+		this.addSurface(this.id, this.buildElementSurfaceData_());
 		this.renderSurfacesContent_(this.surfaceIds_);
 
-		this.attachInlineListeners_();
 		this.syncAttrs_();
 
 		this.attach(opt_parentElement, opt_siblingElement);
@@ -1062,7 +1032,7 @@ class Component extends Attribute {
 	 * other logics from the rendering lifecycle, like attaching event listeners.
 	 */
 	renderAsSubComponent() {
-		this.attachInlineListeners_();
+		this.addSurface(this.id, this.buildElementSurfaceData_());
 		this.syncAttrs_();
 		this.attach();
 		this.wasRendered = true;
@@ -1099,21 +1069,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Renders the given content in the component's element.
-	 * @param {string} content The content to be rendered.
-	 * @protected
-	 */
-	renderContent_(content) {
-		var element = this.element;
-		var newElement = this.findElementInContent_(this.id, content);
-		if (newElement) {
-			this.updateElementAttributes_(element, newElement);
-			content = newElement.childNodes;
-		}
-		dom.append(element, content);
-	}
-
-	/**
 	 * Renders the component element into the DOM.
 	 * @param {(string|Element)=} opt_parentElement Optional parent element
 	 *     to render the component.
@@ -1129,17 +1084,6 @@ class Component extends Attribute {
 		if (opt_siblingElement || !element.parentNode) {
 			var parent = dom.toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 			parent.insertBefore(element, dom.toElement(opt_siblingElement));
-		}
-	}
-
-	/**
-	 * Lifecycle. Internal implementation for rendering. Any extra operation
-	 * necessary to prepare the component DOM must be implemented in this phase.
-	 */
-	renderInternal() {
-		var content = this.getElementExtendedContent();
-		if (content) {
-			this.renderContent_(content);
 		}
 	}
 
@@ -1171,7 +1115,7 @@ class Component extends Attribute {
 	 */
 	renderSurfaceContent(surfaceElementId, opt_content, opt_cacheContent) {
 		var surface = this.getSurface(surfaceElementId);
-		if (surface.componentName) {
+		if (surface.componentName && surfaceElementId !== this.id) {
 			this.renderComponentSurface_(surfaceElementId, opt_content);
 			return;
 		}
@@ -1216,8 +1160,14 @@ class Component extends Attribute {
 	 */
 	renderSurfacesContent_(surfaces) {
 		this.generatedIdCount_ = {};
+
+		var id = this.id;
+		if (surfaces[id]) {
+			// Always render the main content surface first.
+			this.renderSurfaceContent(id);
+		}
 		for (var surfaceElementId in surfaces) {
-			if (!this.getSurface(surfaceElementId).handled) {
+			if (surfaceElementId !== id && !this.getSurface(surfaceElementId).handled) {
 				this.renderSurfaceContent(surfaceElementId);
 			}
 		}
@@ -1228,14 +1178,34 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Replaces the content of this component's element with the given one.
+	 * @param {string} content The content to be rendered.
+	 * @protected
+	 */
+	replaceElementContent_(content) {
+		var element = this.element;
+		var newElement = this.findElementInContent_(this.id, content);
+		if (newElement) {
+			this.updateElementAttributes_(element, newElement);
+			content = newElement.childNodes;
+		}
+		dom.append(element, content);
+	}
+
+	/**
 	 * Replaces the content of a surface with a new one.
 	 * @param {string} surfaceElementId The surface id.
 	 * @param {Element|string} content The content to be rendered.
 	 * @protected
 	 */
 	replaceSurfaceContent_(surfaceElementId, content) {
-		var el = this.getSurfaceElement(surfaceElementId);
 		content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+		if (surfaceElementId === this.id) {
+			this.replaceElementContent_(content);
+			return;
+		}
+
+		var el = this.getSurfaceElement(surfaceElementId);
 		if (this.checkHasElementTag_(content, surfaceElementId)) {
 			var surface = this.getSurface(surfaceElementId);
 			surface.element = content;

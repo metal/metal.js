@@ -24,7 +24,11 @@ class SurfaceCollector extends Disposable {
 	 * @param {Object=} opt_data Surface data to be stored.
 	 */
 	addSurface(surfaceElementId, opt_data) {
-		this.surfaces_[surfaceElementId] = opt_data;
+		if (this.surfaces_[surfaceElementId]) {
+			this.updateSurface(surfaceElementId, opt_data);
+		} else {
+			this.surfaces_[surfaceElementId] = opt_data;
+		}
 	}
 
 	/**

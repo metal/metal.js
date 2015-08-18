@@ -165,9 +165,11 @@ describe('SoyComponent', function() {
 		it('should only create surfaces either from non private template calls or calls with surface id', function() {
 			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
 
-			var custom = new PrivateTemplateTestComponent().render();
+			var custom = new PrivateTemplateTestComponent({
+				id: 'custom'
+			}).render();
 			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
+			assert.deepEqual(['custom', 'notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
 		});
 
 		it('should only create surfaces on nested components either from non private template calls or calls with surface id', function() {
@@ -179,8 +181,11 @@ describe('SoyComponent', function() {
 			}).render();
 			var surfaces = custom.getSurfaces();
 			var nestedSurfaces = custom.components['nestedPrivate-child1'].getSurfaces();
-			assert.deepEqual(['nestedPrivate-child1', 'notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
-			assert.deepEqual(['children'], Object.keys(nestedSurfaces).sort());
+			assert.deepEqual(
+				['nestedPrivate', 'nestedPrivate-child1', 'notPrivate', 'privateTemplate', 's1'],
+				Object.keys(surfaces).sort()
+			);
+			assert.deepEqual(['children', 'nestedPrivate-child1'], Object.keys(nestedSurfaces).sort());
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-notPrivate').textContent);
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-privateTemplate').textContent);
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-s1').textContent);

@@ -100,7 +100,7 @@ class SoyComponent extends Component {
 			return name !== 'element';
 		});
 		var surface = this.getSurface(this.id);
-		var data = surface ? surface.componentData : {};
+		var data = (surface && surface.componentData) ? surface.componentData : {};
 		return object.mixin(data, this.getAttrs(names));
 	}
 

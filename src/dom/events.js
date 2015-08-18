@@ -14,7 +14,7 @@ Object.keys(mouseEventMap).forEach(function(eventName) {
 		delegate: true,
 		handler: function(callback, event) {
 			var related = event.relatedTarget;
-			var target = event.delegateTarget || event.target;
+			var target = event.delegateTarget;
 			if (!related || (related !== target && !target.contains(related))) {
 				event.customType = eventName;
 				return callback(event);

@@ -689,7 +689,7 @@ describe('Component', function() {
 				}
 			};
 			CustomComponent.prototype.getElementContent = function() {
-				return '<custom id="' + this.id + '">' + this.buildPlaceholder(this.id + '-foo') + '</custom>';
+				return '<custom id="' + this.id + '">' + this.buildPlaceholder(this.id + '-footer') + '</custom>';
 			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				return '<footer id="' + this.id + '-footer" class="myFooter" data-bar="bar">' + this.footerContent + '</footer>';
@@ -1002,6 +1002,35 @@ describe('Component', function() {
 			assert.strictEqual('bar', bottomElement.getAttribute('data-bar'));
 		});
 
+		it('should replace surface element if its definition in getSurfaceContent changes', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.SURFACES = {
+				dynamic: {
+					renderAttrs: ['tag']
+				}
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				return this.getSurfaceElement('dynamic');
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return '<' + this.tag + ' id="' + this.id + '-dynamic"></' + this.tag + '>';
+			};
+			var custom = new CustomComponent({
+				tag: 'div'
+			}).render();
+
+			var surfaceElement = custom.getSurfaceElement('dynamic');
+			assert.strictEqual('DIV', surfaceElement.tagName);
+
+			custom.tag = 'span';
+			custom.once('attrsChanged', function() {
+				var newSurfaceElement = custom.getSurfaceElement('dynamic');
+				assert.notStrictEqual(surfaceElement, newSurfaceElement);
+				assert.strictEqual('SPAN', newSurfaceElement.tagName);
+				done();
+			});
+		});
+
 		it('should render surface content from element', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getSurfaceContent = function() {
@@ -1162,6 +1191,28 @@ describe('Component', function() {
 				// Attributes should have been updated without any errors.
 				assert.strictEqual('bar', custom.other);
 				assert.strictEqual('bar', custom.content);
+				done();
+			});
+		});
+
+		it('should rerender element content when its render attrs change', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.buildElementSurfaceData_ = function() {
+				var data = Component.prototype.buildElementSurfaceData_.call(this);
+				data.renderAttrs = ['foo'];
+				return data;
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				return '<div>' + this.foo + '</div>';
+			};
+			var custom = new CustomComponent({
+				foo: 'foo'
+			}).render();
+
+			assert.strictEqual('foo', custom.element.textContent);
+			custom.foo = 'bar';
+			async.nextTick(function() {
+				assert.strictEqual('bar', custom.element.textContent);
 				done();
 			});
 		});
@@ -1408,7 +1459,7 @@ describe('Component', function() {
 
 			this.ChildComponent = createCustomComponentClass();
 			this.ChildComponent.prototype.getElementContent = function() {
-				return 'Child ' + this.buildPlaceholder(this.id + '-foo');
+				return '<div id="' + this.id + '">Child-' + this.buildPlaceholder(this.id + '-foo') + '</div>';
 			};
 			this.ChildComponent.prototype.getSurfaceContent = function() {
 				return '<span>' + this.foo + '</span>';
@@ -1442,13 +1493,13 @@ describe('Component', function() {
 			var child = custom.components.child;
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
-			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual('Child-default', child.element.textContent);
 		});
 
 		it('should render sub component\'s element according to its getElementContent method', function() {
 			this.ChildComponent.prototype.getElementContent = function() {
 				var placeholder = this.buildPlaceholder(this.id + '-foo');
-				return '<span id="' + this.id + '" data-foo="foo">Child ' + placeholder + '</span>';
+				return '<span id="' + this.id + '" data-foo="foo">Child-' + placeholder + '</span>';
 			};
 
 			var CustomComponent = createCustomComponentClass();
@@ -1465,7 +1516,7 @@ describe('Component', function() {
 			var child = custom.components.child;
 			assert.strictEqual('SPAN', child.element.tagName);
 			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
-			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual('Child-default', child.element.textContent);
 		});
 
 		it('should instantiate sub component that has hifen on id from placeholder', function() {
@@ -1484,7 +1535,7 @@ describe('Component', function() {
 			var child = custom.components['my-child'];
 			assert.strictEqual(child.element, custom.element.querySelector('#my-child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('my-child'));
-			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual('Child-default', child.element.textContent);
 		});
 
 		it('should instantiate sub component from placeholder passing defined config data', function() {
@@ -1511,13 +1562,13 @@ describe('Component', function() {
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 			assert.strictEqual('foo', child.foo);
-			assert.strictEqual('Child foo', child.element.textContent);
+			assert.strictEqual('Child-foo', child.element.textContent);
 		});
 
 		it('should instantiate sub components when parent is decorated', function() {
 			var element = document.createElement('div');
 			element.id = 'custom';
-			dom.append(element, '<div id="child">Child <div id="child-foo"><span>default</span></div></div>');
+			dom.append(element, '<div id="child">Child-<div id="child-foo"><span>default</span></div></div>');
 			dom.append(document.body, element);
 
 			var CustomComponent = createCustomComponentClass();
@@ -1535,7 +1586,7 @@ describe('Component', function() {
 			var child = custom.components.child;
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
-			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual('Child-default', child.element.textContent);
 		});
 
 		it('should update sub components when parent is decorated and html is not correct', function() {
@@ -1570,7 +1621,7 @@ describe('Component', function() {
 		it('should not update sub components when parent is decorated and html is correct', function() {
 			var element = document.createElement('div');
 			element.id = 'custom';
-			dom.append(element, '<div id="child">Child <div id="child-foo"><span>foo</span></div></div>');
+			dom.append(element, '<div id="child">Child-<div id="child-foo"><span>foo</span></div></div>');
 			dom.append(document.body, element);
 			var fooElement = document.body.querySelector('span');
 
@@ -1579,12 +1630,13 @@ describe('Component', function() {
 				foo: {}
 			};
 			CustomComponent.prototype.getElementContent = function() {
-				return this.buildPlaceholder('child', {
+				var placeholder = this.buildPlaceholder('child', {
 					componentData: {
 						foo: this.foo
 					},
 					componentName: 'ChildComponent'
 				});
+				return '<div id="' + this.id + '">' + placeholder + '</div>';
 			};
 
 			var custom = new CustomComponent({
@@ -1624,8 +1676,8 @@ describe('Component', function() {
 				id: 'custom'
 			}).render();
 			var child = custom.components.child;
-			assert.strictEqual('Child foo', child.element.textContent);
-			assert.strictEqual('Surface foo: Child foo', custom.element.textContent);
+			assert.strictEqual('Child-foo', child.element.textContent);
+			assert.strictEqual('Surface foo: Child-foo', custom.element.textContent);
 
 			custom.foo = 'bar';
 			custom.once('attrsChanged', function() {
@@ -1634,8 +1686,8 @@ describe('Component', function() {
 				assert.strictEqual('bar', child.foo);
 
 				child.once('attrsChanged', function() {
-					assert.strictEqual('Child bar', child.element.textContent);
-					assert.strictEqual('Surface bar: Child bar', custom.element.textContent);
+					assert.strictEqual('Child-bar', child.element.textContent);
+					assert.strictEqual('Surface bar: Child-bar', custom.element.textContent);
 					done();
 				});
 			});
@@ -1660,7 +1712,7 @@ describe('Component', function() {
 			var child = custom.components.child;
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
-			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual('Child-default', child.element.textContent);
 		});
 
 		it('should reposition previously rendered component instances', function(done) {
@@ -1734,7 +1786,7 @@ describe('Component', function() {
 			assert.strictEqual(child.element, childElement);
 			assert.strictEqual(child.element, custom.element.querySelector('#child'));
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
-			assert.strictEqual('Child default', child.element.textContent);
+			assert.strictEqual('Child-default', child.element.textContent);
 			assert.strictEqual(1, child.renderAsSubComponent.callCount);
 		});
 

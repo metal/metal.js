@@ -22,14 +22,12 @@ class SoyComponent extends Component {
 	constructor(opt_config) {
 		super(opt_config);
 
-		this.addSurfacesFromTemplates_(opt_config);
-
 		/**
-		 * Indicates which surface is currently being rendered, or null if none is.
-		 * @type {boolean}
+		 * The parameters defined in this component's "content" soy template.
+		 * @type {Array}
 		 * @protected
 		 */
-		this.surfaceBeingRendered_ = null;
+		this.contentParams_ = null;
 
 		/**
 		 * Flags indicating which surface names have already been found on this component's content.
@@ -39,11 +37,20 @@ class SoyComponent extends Component {
 		this.firstSurfaceFound_ = {};
 
 		/**
+		 * Indicates which surface is currently being rendered, or null if none is.
+		 * @type {boolean}
+		 * @protected
+		 */
+		this.surfaceBeingRendered_ = null;
+
+		/**
 		 * Flag indicating if inner calls to templates should be skipped.
 		 * @type {boolean}
 		 * @protected
 		 */
 		this.skipInnerCalls_ = false;
+
+		this.addSurfacesFromTemplates_(opt_config);
 	}
 
 	/**
@@ -66,6 +73,8 @@ class SoyComponent extends Component {
 						templateName: templateName
 					}, opt_config);
 				}
+			} else if (templateName === 'content') {
+				this.contentParams_ = templateFn.params;
 			}
 		}
 	}
@@ -86,6 +95,18 @@ class SoyComponent extends Component {
 			config[key] = templateData[key];
 		}
 		return config;
+	}
+
+	/**
+	 * Overrides the original method from `Component` to include renderAttrs extracted
+	 * from the sou template.
+	 * @return {!Object}
+	 */
+	buildElementSurfaceData_() {
+		var data = super.buildElementSurfaceData_();
+		data.renderAttrs = this.contentParams_;
+		this.contentParams_ = null;
+		return data;
 	}
 
 	/**

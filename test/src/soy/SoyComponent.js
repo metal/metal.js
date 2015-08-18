@@ -8,6 +8,7 @@ import SoyComponent from '../../../src/soy/SoyComponent';
 import SoyComponentAop from '../../../src/soy/SoyComponentAop';
 
 import './assets/ChildrenTestComponent.soy.js';
+import './assets/ContentSurfaceTestComponent.soy.js';
 import './assets/CustomTagTestComponent.soy.js';
 import './assets/CustomTestComponent.soy.js';
 import './assets/DeeplyNestedTestComponent.soy.js';
@@ -189,6 +190,29 @@ describe('SoyComponent', function() {
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-notPrivate').textContent);
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-privateTemplate').textContent);
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-s1').textContent);
+		});
+
+		it('should set renderAttrs for main surface from the template params of the "content" template', function() {
+			var ContentSurfaceTestComponent = createCustomTestComponentClass('ContentSurfaceTestComponent');
+
+			var custom = new ContentSurfaceTestComponent().render();
+			var surfaces = custom.getSurfaces();
+			assert.deepEqual(['foo'], surfaces[custom.id].renderAttrs);
+		});
+
+		it('should update element content if param from "content" changes', function(done) {
+			var ContentSurfaceTestComponent = createCustomTestComponentClass('ContentSurfaceTestComponent');
+
+			var custom = new ContentSurfaceTestComponent({
+				foo: 'foo'
+			}).render();
+			assert.strictEqual('foo', custom.element.textContent);
+
+			custom.foo = 'bar';
+			custom.once('attrsChanged', function() {
+				assert.strictEqual('bar', custom.element.textContent);
+				done();
+			});
 		});
 	});
 

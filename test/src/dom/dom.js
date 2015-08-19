@@ -20,10 +20,6 @@ describe('dom', function() {
 			var element = document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
 			assertClassesAdded();
-
-			element.className = '';
-			dom.addClassesWithoutNative_(element, 'class1 class2');
-			assertClassesAdded();
 		});
 
 		it('should check if an element has the requested css class', function() {
@@ -31,13 +27,10 @@ describe('dom', function() {
 			dom.addClasses(element, 'class1 class2');
 
 			assert.ok(dom.hasClass(element, 'class1'));
-			assert.ok(dom.hasClassWithoutNative_(element, 'class1'));
 
 			assert.ok(dom.hasClass(element, 'class2'));
-			assert.ok(dom.hasClassWithoutNative_(element, 'class2'));
 
 			assert.ok(!dom.hasClass(element, 'class3'));
-			assert.ok(!dom.hasClassWithoutNative_(element, 'class3'));
 		});
 
 		it('should check if css classes are being removed', function() {
@@ -47,9 +40,6 @@ describe('dom', function() {
 			dom.removeClasses(element, 'class1');
 			assert.ok(!dom.hasClass(element, 'class1'));
 			assert.ok(dom.hasClass(element, 'class2'));
-
-			dom.removeClassesWithoutNative_(element, 'class2');
-			assert.ok(!dom.hasClass(element, 'class2'));
 		});
 
 		it('should do nothing if element or classes are not object and string in add/remove classes', function() {

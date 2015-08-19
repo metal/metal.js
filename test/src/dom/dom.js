@@ -22,6 +22,13 @@ describe('dom', function() {
 			assertClassesAdded();
 		});
 
+		it('should not add css classes twice to the same element', function() {
+			var element = document.createElement('div');
+			dom.addClasses(element, 'class1 class2');
+			dom.addClasses(element, 'class1 class2');
+			assert.strictEqual('class1 class2', element.className.trim());
+		});
+
 		it('should check if an element has the requested css class', function() {
 			var element = document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
@@ -162,6 +169,13 @@ describe('dom', function() {
 			dom.enterDocument(element);
 			dom.exitDocument(element);
 			assert.strictEqual(null, element.parentNode);
+		});
+
+		it('should not throw error if "exitDocument" is called on element without parent', function() {
+			var element = document.createElement('div');
+			assert.doesNotThrow(function() {
+				dom.exitDocument(element);
+			});
 		});
 
 		it('should append string as document fragment to parent element', function() {

@@ -927,6 +927,27 @@ describe('Component', function() {
 			assert.strictEqual(null, custom.getSurfaceElement('unknown'));
 		});
 
+		it('should get element for component surface', function() {
+			var CustomComponent = createCustomComponentClass();
+			ComponentRegistry.register('CustomComponent', CustomComponent);
+			var custom = new CustomComponent();
+			custom.addSurface('comp', {
+				componentName: 'CustomComponent'
+			});
+			assert.strictEqual(custom.components.comp.element, custom.getSurfaceElement('comp'));
+		});
+
+		it('should not throw error when getting element of component surface for component that isn\'t registered', function() {
+			var CustomComponent = createCustomComponentClass();
+			ComponentRegistry.register('CustomComponent', CustomComponent);
+			var custom = new CustomComponent();
+			custom.addSurface('comp', {
+				componentName: 'CustomComponent'
+			});
+			Component.componentsCollector.removeComponent(custom.components.comp);
+			assert.ok(!custom.getSurfaceElement('comp'));
+		});
+
 		it('should remove surface and its element from dom', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {

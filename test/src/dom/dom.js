@@ -102,6 +102,24 @@ describe('dom', function() {
 		});
 	});
 
+	describe('contains', function() {
+		it('should check if element contains another', function() {
+			var element1 = document.createElement('div');
+			var element2 = document.createElement('div');
+			var element3 = document.createElement('div');
+			dom.append(element1, element2);
+			dom.enterDocument(element3);
+
+			assert.ok(dom.contains(element1, element2));
+			assert.ok(dom.contains(document, element3));
+
+			assert.ok(!dom.contains(element1, element3));
+			assert.ok(!dom.contains(element2, element1));
+			assert.ok(!dom.contains(document, element1));
+			assert.ok(!dom.contains(document, element2));
+		});
+	});
+
 	describe('manipulation', function() {
 		it('should append html string to parent element', function() {
 			var parent = document.createElement('div');

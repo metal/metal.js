@@ -100,6 +100,21 @@ class dom {
 	}
 
 	/**
+	 * Checks if the first element contains the second one.
+	 * @param {!Element} element1
+	 * @param {!Element} element2
+	 * @return {boolean}
+	 */
+	static contains(element1, element2) {
+		if (core.isDocument(element1)) {
+			// document.contains is not defined on IE9, so call it on documentElement instead.
+			return element1.documentElement.contains(element2);
+		} else {
+			return element1.contains(element2);
+		}
+	}
+
+	/**
 	 * Listens to the specified event on the given DOM element, but only calls the
 	 * callback with the event when it triggered by elements that match the given
 	 * selector.

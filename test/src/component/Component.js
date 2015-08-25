@@ -818,6 +818,43 @@ describe('Component', function() {
 			assert.strictEqual(null, custom.getSurface('unknown'));
 		});
 
+		it('should emit "renderSurface" event for each surface that will be rendered', function() {
+			var CustomComponent = createCustomComponentClass();
+			ComponentRegistry.register('CustomComponent', CustomComponent);
+			var custom = new CustomComponent();
+			custom.addSurface('header');
+			custom.addSurface('bottom');
+
+			var listener = sinon.stub();
+			custom.on('renderSurface', listener);
+			custom.render();
+
+			assert.strictEqual(3, listener.callCount);
+			var surfaceIds = [listener.args[0][0].surfaceId, listener.args[1][0].surfaceId, listener.args[2][0].surfaceId];
+			assert.deepEqual(['bottom', 'header', custom.id], surfaceIds.sort());
+		});
+
+		it('should not render surfaces that had their "renderSurface" event prevented', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				return surfaceId;
+			};
+			ComponentRegistry.register('CustomComponent', CustomComponent);
+			var custom = new CustomComponent();
+			custom.addSurface('header');
+			custom.addSurface('bottom');
+
+			custom.on('renderSurface', function(data, event) {
+				if (data.surfaceId === 'header') {
+					event.preventDefault();
+				}
+			});
+			custom.render();
+
+			assert.strictEqual('bottom', custom.getSurfaceElement('bottom').textContent);
+			assert.notStrictEqual('header', custom.getSurfaceElement('header').textContent);
+		});
+
 		it('should use div as the default tagName for surface elements', function() {
 			var CustomComponent = createCustomComponentClass();
 
@@ -1186,6 +1223,43 @@ describe('Component', function() {
 						done();
 					});
 				});
+			});
+		});
+
+		it('should not render surface content when surface render attrs change but event is prevented', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return '<b style="font-size:' + this.fontSize + ';">' + this.headerContent + '</b>';
+			};
+			var custom = new CustomComponent();
+			custom.addAttrs({
+				headerContent: {
+					value: 'header'
+				},
+				fontSize: {
+					value: '10px'
+				}
+			});
+			custom.addSurfaces({
+				header: {
+					renderAttrs: ['headerContent', 'fontSize']
+				}
+			});
+			custom.render();
+
+			var listener = sinon.spy(function(data, event) {
+				event.preventDefault();
+			});
+			custom.once('renderSurface', listener);
+
+			custom.headerContent = 'modified';
+			custom.fontSize = '20px';
+			async.nextTick(function() {
+				assert.strictEqual('header', custom.getSurfaceElement('header').textContent);
+				assert.strictEqual(1, listener.callCount);
+				assert.strictEqual('header', listener.args[0][0].surfaceId);
+				assert.deepEqual(['headerContent', 'fontSize'], listener.args[0][0].renderAttrs);
+				done();
 			});
 		});
 

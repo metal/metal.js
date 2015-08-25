@@ -531,6 +531,8 @@ class Component extends Attribute {
 
 		this.on('attrsChanged', this.handleAttributesChanges_);
 		Component.componentsCollector.addComponent(this);
+
+		this.on('renderSurface', this.defaultRenderSurfaceFn_, true);
 	}
 
 	/**
@@ -555,6 +557,61 @@ class Component extends Attribute {
 		this.render();
 		this.decorating_ = false;
 		return this;
+	}
+
+	/**
+	 * The default implementation for the `renderSurface` event. Renders
+	 * content into a surface. If the specified content is the same of the
+	 * current surface content, nothing happens. If the surface cache state
+	 * is not initialized or the content is not eligible for cache or content
+	 * is different, the surfaces re-renders.
+	 * @param {!Object} data
+	 * @protected
+	 */
+	defaultRenderSurfaceFn_(data) {
+		var surfaceElementId = data.surfaceElementId;
+		var surface = this.getSurface(surfaceElementId);
+		if (surface.componentName && surfaceElementId !== this.id) {
+			this.renderComponentSurface_(surfaceElementId, data.content);
+			return;
+		}
+
+		var content = data.content || this.getSurfaceContent_(surfaceElementId);
+		if (core.isDefAndNotNull(content)) {
+			var cacheContent = data.cacheContent || content;
+
+			var firstCacheContent = cacheContent;
+			if (this.decorating_) {
+				// We cache the entire original content first when decorating so we can compare
+				// with the full content we got from the dom. After comparing, we cache the correct
+				// value so updates can work as expected for this surface.
+				this.cacheSurfaceContent(
+					surfaceElementId,
+					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
+				);
+				if (content === cacheContent) {
+					content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+				}
+				firstCacheContent = content;
+			}
+
+			var previousCacheState = surface.cacheState;
+			this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
+			var cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
+			if (this.decorating_) {
+				this.cacheSurfaceContent(surfaceElementId, cacheContent);
+			}
+
+			if (cacheHit) {
+				if (this.decorating_) {
+					this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
+				}
+				this.renderPlaceholderSurfaceContents_(content, surfaceElementId);
+			} else {
+				this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
+				this.replaceSurfaceContent_(surfaceElementId, content);
+			}
+		}
 	}
 
 	/**
@@ -595,6 +652,26 @@ class Component extends Attribute {
 		this.surfaceIds_ = null;
 
 		super.disposeInternal();
+	}
+
+	/**
+	 * Emits the `renderSurface` event, which will cause the specified surface to be
+	 * rendered, unless it's prevented.
+	 * @param {string} surfaceElementId
+	 * @param {string=} opt_content
+	 * @param {string=} opt_cacheContent
+	 * @param {Array<string>=} opt_renderAttrs The render attributes that caused the
+	 *   surface to be rerendered, or nothing if that wasn't the cause of the update.
+	 * @protected
+	 */
+	emitRenderSurfaceEvent_(surfaceElementId, opt_content, opt_cacheContent, opt_renderAttrs) {
+		this.emit('renderSurface', {
+			cacheContent: opt_cacheContent,
+			content: opt_content,
+			renderAttrs: opt_renderAttrs,
+			surfaceElementId: surfaceElementId,
+			surfaceId: this.getSurfaceId_(surfaceElementId, this.getSurface(surfaceElementId))
+		});
 	}
 
 	/**
@@ -742,13 +819,17 @@ class Component extends Attribute {
 	 *     as key and true as value.
 	 */
 	getModifiedSurfacesFromChanges_(changes) {
-		var surfaces = [{}];
+		var surfaces = {};
 		for (var attr in changes) {
-			if (this.surfacesRenderAttrs_[attr]) {
-				surfaces.push(this.surfacesRenderAttrs_[attr]);
+			var surfaceNames = Object.keys(this.surfacesRenderAttrs_[attr] || {});
+			for (var i = 0; i < surfaceNames.length; i++) {
+				if (!surfaces[surfaceNames[i]]) {
+					surfaces[surfaceNames[i]] = [];
+				}
+				surfaces[surfaceNames[i]].push(attr);
 			}
 		}
-		return object.mixin.apply(null, surfaces);
+		return surfaces;
 	}
 
 	/**
@@ -1100,85 +1181,36 @@ class Component extends Attribute {
 	renderPlaceholderSurfaceContents_(content, surfaceElementId) {
 		var instance = this;
 		content.replace(Component.SURFACE_REGEX, function(match, id) {
-			instance.renderSurfaceContent(instance.createPlaceholderSurface_(id, surfaceElementId));
+			instance.emitRenderSurfaceEvent_(instance.createPlaceholderSurface_(id, surfaceElementId));
 			return match;
 		});
 	}
 
 	/**
-	 * Render content into a surface. If the specified content is the same of
-	 * the current surface content, nothing happens. If the surface cache state
-	 * is not initialized or the content is not eligible for cache or content is
-	 * different, the surfaces re-renders. It's not recommended to use this
-	 * method directly since surface content can be provided by
-	 * `getSurfaceContent(surfaceElementId)`.
-	 * @param {string} surfaceElementId The surface id.
-	 * @param {(Object|string)?} opt_content The content to be rendered.
-	 * @param {string?} opt_cacheContent The content that should be cached for
-	 *   this surface. If none is given, the rendered content will be used for this.
-	 */
-	renderSurfaceContent(surfaceElementId, opt_content, opt_cacheContent) {
-		var surface = this.getSurface(surfaceElementId);
-		if (surface.componentName && surfaceElementId !== this.id) {
-			this.renderComponentSurface_(surfaceElementId, opt_content);
-			return;
-		}
-
-		var content = opt_content || this.getSurfaceContent_(surfaceElementId);
-		if (core.isDefAndNotNull(content)) {
-			var cacheContent = opt_cacheContent || content;
-
-			var firstCacheContent = cacheContent;
-			if (this.decorating_) {
-				// We cache the entire original content first when decorating so we can compare
-				// with the full content we got from the dom. After comparing, we cache the correct
-				// value so updates can work as expected for this surface.
-				this.cacheSurfaceContent(
-					surfaceElementId,
-					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
-				);
-				if (content === cacheContent) {
-					content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
-				}
-				firstCacheContent = content;
-			}
-
-			var previousCacheState = surface.cacheState;
-			this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
-			var cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
-			if (this.decorating_) {
-				this.cacheSurfaceContent(surfaceElementId, cacheContent);
-			}
-
-			if (cacheHit) {
-				if (this.decorating_) {
-					this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
-				}
-				this.renderPlaceholderSurfaceContents_(content, surfaceElementId);
-			} else {
-				this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
-				this.replaceSurfaceContent_(surfaceElementId, content);
-			}
-		}
-	}
-
-	/**
 	 * Renders all surfaces contents ignoring the cache.
-	 * @param {Object.<string, Object=>} surfaces Object map where the key is
-	 *     the surface id and value the optional surface configuration.
+	 * @param {Object.<string, Array=>} surfaces Object map where the key is
+	 *     the surface id and value the optional attributes list that caused
+	 *     the rerender.
 	 * @protected
 	 */
 	renderSurfacesContent_(surfaces) {
 		this.generatedIdCount_ = {};
 
-		var id = this.id;
-		if (surfaces[id]) {
-			// Always render the main content surface first.
-			this.renderSurfaceContent(id);
+		var surfaceElementIds = Object.keys(surfaces);
+		var idIndex = surfaceElementIds.indexOf(this.id);
+		if (idIndex !== -1) {
+			// Always render the main content surface first, for performance reasons.
+			surfaceElementIds.splice(idIndex, 1);
+			surfaceElementIds = [this.id].concat(surfaceElementIds);
 		}
-		for (var surfaceElementId in surfaces) {
-			if (surfaceElementId !== id && !this.getSurface(surfaceElementId).handled) {
-				this.renderSurfaceContent(surfaceElementId);
+
+		for (var i = 0; i < surfaceElementIds.length; i++) {
+			if (!this.getSurface(surfaceElementIds[i]).handled) {
+				var renderAttrs = surfaces[surfaceElementIds[i]];
+				if (!(renderAttrs instanceof Array)) {
+					renderAttrs = null;
+				}
+				this.emitRenderSurfaceEvent_(surfaceElementIds[i], null, null, renderAttrs);
 			}
 		}
 		if (this.wasRendered) {
@@ -1350,7 +1382,7 @@ class Component extends Attribute {
 			// Component surfaces need to be handled in case some internal details have changed.
 			// Also, if this component is being decorated, it needs to go through the regular flow
 			// to check if the cache matches.
-			this.renderSurfaceContent(surfaceElementId, collectedData.content, collectedData.cacheContent);
+			this.emitRenderSurfaceEvent_(surfaceElementId, collectedData.content, collectedData.cacheContent);
 		} else {
 			// This surface's element has either changed or never been created yet. Let's just
 			// reset it to null, so it can be fetched from the dom again when necessary. Also,

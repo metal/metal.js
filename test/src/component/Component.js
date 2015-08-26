@@ -23,7 +23,11 @@ describe('Component', function() {
 			};
 
 			var custom = new CustomComponent();
+			var renderListener = sinon.stub();
+			custom.on('render', renderListener);
 			custom.render();
+
+			sinon.assert.callCount(renderListener, 1);
 
 			sinon.assert.callOrder(
 				CustomComponent.prototype.getSurfaceContent,

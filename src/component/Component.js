@@ -1104,6 +1104,7 @@ class Component extends Attribute {
 
 		this.syncAttrs_();
 
+		this.emit('render');
 		this.attach(opt_parentElement, opt_siblingElement);
 
 		this.wasRendered = true;

@@ -1887,6 +1887,7 @@ describe('Component', function() {
 			assert.strictEqual(child.element, custom.getSurfaceElement('child'));
 			assert.strictEqual('Child-default', child.element.textContent);
 			assert.strictEqual(1, child.renderAsSubComponent.callCount);
+			assert.ok(!child.element.querySelector('#child'));
 		});
 
 		it('should render nested component correctly when element is not on document', function() {

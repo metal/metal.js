@@ -473,10 +473,12 @@ class Component extends Attribute {
 	 * needed since it was already rendered by the parent component. Handles the
 	 * same logics that `renderAsSubComponent`, but also makes sure that the
 	 * surfaces content is updated if the html is incorrect for the given data.
+	 * @param {string} opt_content The content that was already rendered for this
+	 *   component.
 	 */
-	decorateAsSubComponent() {
+	decorateAsSubComponent(opt_content) {
 		this.decorating_ = true;
-		this.renderAsSubComponent();
+		this.renderAsSubComponent(opt_content);
 		this.decorating_ = false;
 	}
 
@@ -1116,9 +1118,19 @@ class Component extends Attribute {
 	 * Renders this component as a subcomponent, meaning that no actual rendering is
 	 * needed since it was already rendered by the parent component. This just handles
 	 * other logics from the rendering lifecycle, like attaching event listeners.
+	 * @param {string} opt_content The content that has already been rendered for this
+	 *   component
 	 */
-	renderAsSubComponent() {
+	renderAsSubComponent(opt_content) {
 		this.addSurface(this.id, this.buildElementSurfaceData_());
+		if (opt_content && dom.isEmpty(this.element)) {
+			// If we have the rendered content for this component, but it hasn't
+			// been rendered in its element yet, we render it manually here. That
+			// can happen if the subcomponent's element is set before the parent
+			// element renders its content, making originally rendered content be
+			// set on the wrong place.
+			this.replaceElementContent_(opt_content);
+		}
 		this.syncAttrs_();
 		this.attach();
 		this.wasRendered = true;
@@ -1136,18 +1148,10 @@ class Component extends Attribute {
 			var surface = this.getSurface(surfaceElementId);
 			Component.componentsCollector.updateComponent(surfaceElementId, surface.componentData);
 		} else if (opt_content) {
-			var element = component.element;
-			if (dom.isEmpty(element)) {
-				// If we have the rendered content for this component, but it hasn't
-				// been rendered in its element yet, we render it manually here. That
-				// can happen if the subcomponent's element is set before the parent
-				// element renders its content.
-				dom.append(element, opt_content);
-			}
 			if (this.decorating_) {
-				component.decorateAsSubComponent();
+				component.decorateAsSubComponent(opt_content);
 			} else {
-				component.renderAsSubComponent();
+				component.renderAsSubComponent(opt_content);
 			}
 		} else {
 			component.render();

@@ -809,7 +809,7 @@ class Component extends Attribute {
 	 */
 	getElementExtendedContent() {
 		var content = this.getElementContent();
-		this.eventsCollector_.attachListeners(content);
+		this.eventsCollector_.attachListeners(content, this.id);
 		return this.replaceSurfacePlaceholders_(content);
 	}
 

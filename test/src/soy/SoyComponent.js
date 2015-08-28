@@ -204,13 +204,14 @@ describe('SoyComponent', function() {
 			var ContentSurfaceTestComponent = createCustomTestComponentClass('ContentSurfaceTestComponent');
 
 			var custom = new ContentSurfaceTestComponent({
-				foo: 'foo'
+				foo: 'foo',
+				id: 'custom'
 			}).render();
-			assert.strictEqual('foo', custom.element.textContent);
+			assert.strictEqual('foo<div id="custom-body">Body</div>', custom.element.innerHTML);
 
 			custom.foo = 'bar';
 			custom.once('attrsChanged', function() {
-				assert.strictEqual('bar', custom.element.textContent);
+				assert.strictEqual('bar<div id="custom-body">Body</div>', custom.element.innerHTML);
 				done();
 			});
 		});

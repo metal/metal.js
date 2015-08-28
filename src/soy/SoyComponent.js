@@ -51,6 +51,7 @@ class SoyComponent extends Component {
 		this.skipInnerCalls_ = false;
 
 		this.addSurfacesFromTemplates_(opt_config);
+		this.on('renderSurface', this.handleSoyComponentRenderSurface_);
 	}
 
 	/**
@@ -249,6 +250,19 @@ class SoyComponent extends Component {
 			return this.handleComponentCall_.call(this, templateComponentName, data);
 		} else {
 			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);
+		}
+	}
+
+	/**
+	 * Handles a `renderSurface` event. Clears the `firstSurfaceFound_` variable so we can
+	 * find the anonymous surfaces that should be named after their template names again,
+	 * once the main content surface is to be rerendered.
+	 * @param {!Object} data
+	 * @protected
+	 */
+	handleSoyComponentRenderSurface_(data) {
+		if (data.surfaceElementId === this.id) {
+			this.firstSurfaceFound_ = {};
 		}
 	}
 

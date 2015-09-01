@@ -375,6 +375,14 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Clears the cache of the specified surface.
+	 * @param {string} surfaceIds
+	 */
+	clearSurfaceCache(surfaceId) {
+		this.getSurface(surfaceId).cacheState = Component.Cache.NOT_INITIALIZED;
+	}
+
+	/**
 	 * Compares cache states.
 	 * @param {number} currentCacheState
 	 * @param {number} previousCacheState

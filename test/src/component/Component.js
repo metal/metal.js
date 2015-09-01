@@ -1267,6 +1267,27 @@ describe('Component', function() {
 			});
 		});
 
+		it('should rerender surface even when content doesn\'t change if its cache was cleared', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return 'Same Content';
+			};
+			CustomComponent.SURFACES = {
+				foo: {
+					renderAttrs: ['foo']
+				}
+			};
+			var custom = new CustomComponent().render();
+
+			custom.clearSurfaceCache('foo');
+			var surfaceContent = custom.getSurfaceElement('foo').childNodes[0];
+			custom.foo = 1;
+			custom.once('attrsChanged', function() {
+				assert.notStrictEqual(surfaceContent, custom.getSurfaceElement('foo').childNodes[0]);
+				done();
+			});
+		});
+
 		it('should not throw error if attrs, that are not render attrs of a surface, change', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {

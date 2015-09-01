@@ -541,6 +541,21 @@ describe('SoyComponent', function() {
 	});
 
 	describe('decorateFromTemplate', function() {
+		it('should decorate component with custom tag correctly', function() {
+			createCustomTestComponentClass('CustomTagTestComponent');
+			var element = document.createElement('custom');
+			var templateFn = ComponentRegistry.Templates.CustomTagTestComponent.content;
+			var data = {
+				count: 2,
+				id: 'custom',
+				footerContent: 'foo'
+			};
+
+			var comp = SoyComponent.decorateFromTemplate(templateFn, element, data);
+			assert.strictEqual(element, comp.element);
+			assert.strictEqual(element.childNodes[0], comp.getSurfaceElement('footer'));
+		});
+
 		it('should call decorateAsSubComponent for components inside given template', function() {
 			var CustomTestComponent = createCustomTestComponentClass();
 			sinon.spy(CustomTestComponent.prototype, 'decorateAsSubComponent');

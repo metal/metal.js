@@ -148,9 +148,9 @@ class SoyComponent extends Component {
 			}
 		};
 		SoyComponentAop.registerTemplates(name);
-		return new TemplateComponent({
+		return new TemplateComponent(object.mixin({}, opt_data, {
 			element: opt_element
-		});
+		}));
 	}
 
 	/**
@@ -179,8 +179,7 @@ class SoyComponent extends Component {
 	generateSurfaceElementId_(parentSurfaceId, data) {
 		if (data.templateName &&
 			!parentSurfaceId &&
-			!this.firstSurfaceFound_[data.templateName] &&
-			data.templateComponentName === this.constructor.NAME) {
+			!this.firstSurfaceFound_[data.templateName]) {
 			this.firstSurfaceFound_[data.templateName] = true;
 			return this.prefixSurfaceId_(data.templateName);
 		} else {

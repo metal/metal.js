@@ -304,7 +304,7 @@ class dom {
 			callback = customConfig.handler.bind(customConfig, callback);
 		}
 		element.addEventListener(eventName, callback, opt_capture);
-		return new DomEventHandle(element, eventName, callback);
+		return new DomEventHandle(element, eventName, callback, opt_capture);
 	}
 
 	/**

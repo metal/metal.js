@@ -278,6 +278,18 @@ describe('dom', function() {
 			dom.triggerEvent(element, 'click');
 			sinon.assert.callOrder(parentListener, listener);
 		});
+
+		it('should remove listener that was attached on capture phase', function() {
+			var element = document.createElement('div');
+			dom.enterDocument(element);
+
+			var listener = sinon.stub();
+			var handle = dom.on(element, 'click', listener, true);
+			handle.removeListener();
+
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(0, listener.callCount);
+		});
 	});
 
 	describe('once', function() {

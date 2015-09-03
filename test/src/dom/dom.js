@@ -268,6 +268,7 @@ describe('dom', function() {
 			var element = document.createElement('div');
 			var parentElement = document.createElement('div');
 			parentElement.appendChild(element);
+			dom.enterDocument(parentElement);
 
 			var listener = sinon.stub();
 			dom.on(element, 'click', listener);

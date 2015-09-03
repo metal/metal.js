@@ -263,6 +263,20 @@ describe('dom', function() {
 			dom.triggerEvent(element, 'click');
 			assert.strictEqual(1, listener.callCount);
 		});
+
+		it('should listen to event on capture phase', function() {
+			var element = document.createElement('div');
+			var parentElement = document.createElement('div');
+			parentElement.appendChild(element);
+
+			var listener = sinon.stub();
+			dom.on(element, 'click', listener);
+			var parentListener = sinon.stub();
+			dom.on(parentElement, 'click', parentListener, true);
+
+			dom.triggerEvent(element, 'click');
+			sinon.assert.callOrder(parentListener, listener);
+		});
 	});
 
 	describe('once', function() {

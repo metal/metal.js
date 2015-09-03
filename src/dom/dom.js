@@ -290,9 +290,11 @@ class dom {
 	 * @param {string} eventName The name of the event to listen to.
 	 * @param {!function(!Object)} callback Function to be called when the event is
 	 *   triggered. It will receive the normalized event object.
+	 * @param {boolean} opt_capture Flag indicating if listener should be triggered
+	 *   during capture phase, instead of during the bubbling phase. Defaults to false.
 	 * @return {!DomEventHandle} Can be used to remove the listener.
 	 */
-	static on(element, eventName, callback) {
+	static on(element, eventName, callback, opt_capture) {
 		if (core.isString(element)) {
 			return dom.delegate(document, eventName, element, callback);
 		}
@@ -301,7 +303,7 @@ class dom {
 			eventName = customConfig.originalEvent;
 			callback = customConfig.handler.bind(customConfig, callback);
 		}
-		element.addEventListener(eventName, callback);
+		element.addEventListener(eventName, callback, opt_capture);
 		return new DomEventHandle(element, eventName, callback);
 	}
 

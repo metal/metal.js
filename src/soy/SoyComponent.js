@@ -1,6 +1,7 @@
 'use strict';
 
 import core from '../core';
+import dom from '../dom/dom';
 import object from '../object/object';
 import Component from '../component/Component';
 import ComponentRegistry from '../component/ComponentRegistry';
@@ -138,19 +139,28 @@ class SoyComponent extends Component {
 	 * @static
 	 */
 	static createComponentFromTemplate(templateFn, opt_element, opt_data) {
+		var element = opt_element ? dom.toElement(opt_element) : null;
+		var data = object.mixin(
+			{
+				id: element ? element.id : null
+			},
+			opt_data,
+			{
+				element: element
+			}
+		);
+
 		var name = 'TemplateComponent' + core.getUid();
 		class TemplateComponent extends SoyComponent {
 		}
 		ComponentRegistry.register(name, TemplateComponent);
 		ComponentRegistry.Templates[name] = {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
-				return SoyComponentAop.getOriginalFn(templateFn)(opt_data || {}, opt_ignored, opt_ijData);
+				return SoyComponentAop.getOriginalFn(templateFn)(data, opt_ignored, opt_ijData);
 			}
 		};
 		SoyComponentAop.registerTemplates(name);
-		return new TemplateComponent(object.mixin({}, opt_data, {
-			element: opt_element
-		}));
+		return new TemplateComponent(data);
 	}
 
 	/**

@@ -474,7 +474,7 @@ describe('SoyComponent', function() {
 
 			comp.render();
 			assert.strictEqual(2, templateFn.callCount);
-			assert.strictEqual(data, templateFn.args[1][0]);
+			assert.strictEqual('My Header', templateFn.args[1][0].headerContent);
 			assert.ok(!templateFn.args[1][1]);
 			assert.deepEqual({}, templateFn.args[1][2]);
 		});
@@ -548,6 +548,21 @@ describe('SoyComponent', function() {
 			var data = {
 				count: 2,
 				id: 'custom',
+				footerContent: 'foo'
+			};
+
+			var comp = SoyComponent.decorateFromTemplate(templateFn, element, data);
+			assert.strictEqual(element, comp.element);
+			assert.strictEqual(element.childNodes[0], comp.getSurfaceElement('footer'));
+		});
+
+		it('should decorate component with custom tag correctly even without specifying id', function() {
+			createCustomTestComponentClass('CustomTagTestComponent');
+			var element = document.createElement('custom');
+			element.id = 'custom';
+			var templateFn = ComponentRegistry.Templates.CustomTagTestComponent.content;
+			var data = {
+				count: 2,
 				footerContent: 'foo'
 			};
 

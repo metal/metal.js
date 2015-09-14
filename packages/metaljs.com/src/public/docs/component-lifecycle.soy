@@ -1,0 +1,63 @@
+{namespace docsComponentLifecycle}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Component Lifecycle</h1>
+
+		<p>Components built with Metal.js provide lifecycle methods that can be called when needed. The following example lists all available lifecycle methods, in the order in which they're called</p>
+
+		<textarea class="code" data-mode="javascript">{literal}
+class MyComponent extends SoyComponent {
+	/**
+	 * Called when the component is initialized.
+	 */
+	constructor(opt_config) {
+		super(opt_config);
+	}
+
+	/**
+	 * Called when the component is attached to the
+	 * DOM. The component will automatically be
+	 * attached when `render` is called, but can
+	 * also be attached (without rendering the
+	 * component) by calling the `attach` method
+	 * directly. This is a good place to attach event
+	 * listeners, since the component is available
+	 * in the page.
+	 */
+	attached() {
+	}
+
+	/**
+	 * Called when the component is detached from the
+	 * DOM. The component will automatically be
+	 * detached when `dispose` is called, but can also
+	 * be detached (without disposing the component)
+	 * by calling the `detach` method directly. This
+	 * is a good place to detach event listeners,
+	 * since the component is not available in the
+	 * page anymore.
+	 */
+	detached() {
+	}
+
+	/**
+	 * Called when the component is disposed. This
+	 * should contain any necessary cleanup, like
+	 * detaching any remaining events and disposing
+	 * of sub components and local variables.
+	 */
+	disposeInternal() {
+		super.disposeInternal();
+	}
+}
+{/literal}</textarea>
+	{/param}
+{/call}
+{/template}

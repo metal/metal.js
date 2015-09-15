@@ -718,7 +718,22 @@ describe('Component', function() {
 			assert.strictEqual(footerElement, custom.getSurfaceElement('footer'));
 		});
 
-		it('should rerender surfaces when component is decorated and html is not correct', function() {
+		it('should rerender surfaces when component is decorated and main content html is not correct', function() {
+			dom.append(
+				document.body,
+				'<custom id="custom">wrong<footer id="custom-footer" class="myFooter" data-bar="bar">My Footer</footer></custom>'
+			);
+			var footerElement = document.body.querySelector('#custom-footer');
+
+			var custom = new this.CustomComponent({
+				element: '#custom',
+				footerContent: 'My Footer'
+			}).decorate();
+
+			assert.notStrictEqual(footerElement, custom.getSurfaceElement('footer'));
+		});
+
+		it('should rerender surfaces when component is decorated and surface html is not correct', function() {
 			dom.append(
 				document.body,
 				'<custom id="custom"><footer id="custom-footer" class="myFooter" data-bar="bar">My Footer</footer></custom>'

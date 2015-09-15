@@ -1389,12 +1389,8 @@ class Component extends Attribute {
 			// Elements of component surfaces are unchangeable, so we need to replace the
 			// rendered element with the component's.
 			dom.replace(this.findElementById_(surfaceElementId), this.getSurfaceElement(surfaceElementId));
-		}
 
-		if (this.decorating_ || surface.componentName) {
 			// Component surfaces need to be handled in case some internal details have changed.
-			// Also, if this component is being decorated, it needs to go through the regular flow
-			// to check if the cache matches.
 			this.emitRenderSurfaceEvent_(surfaceElementId, collectedData.content, collectedData.cacheContent);
 		} else {
 			// This surface's element has either changed or never been created yet. Let's just

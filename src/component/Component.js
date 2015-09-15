@@ -599,9 +599,7 @@ class Component extends Attribute {
 					surfaceElementId,
 					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
 				);
-				if (content === cacheContent) {
-					content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
-				}
+				content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
 				firstCacheContent = content;
 			}
 
@@ -615,8 +613,9 @@ class Component extends Attribute {
 			if (cacheHit) {
 				if (this.decorating_) {
 					this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
+				} else {
+					this.renderPlaceholderSurfaceContents_(cacheContent, surfaceElementId);
 				}
-				this.renderPlaceholderSurfaceContents_(content, surfaceElementId);
 			} else {
 				this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
 				this.replaceSurfaceContent_(surfaceElementId, content);

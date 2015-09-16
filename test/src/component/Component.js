@@ -7,7 +7,7 @@ import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 
-describe('Component', function() {
+describe('Component Tests', function() {
 	afterEach(function() {
 		document.body.innerHTML = '';
 		Component.surfacesCollector.removeAllSurfaces();
@@ -131,37 +131,6 @@ describe('Component', function() {
 			assert.strictEqual(1, console.error.callCount);
 			assert.notStrictEqual(-1, console.error.args[0][0].indexOf('CustomComponent'));
 			console.error.restore();
-		});
-
-		it('should render the content element returned by getElementContent', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getElementContent = function() {
-				var element = document.createElement('div');
-				element.innerHTML = 'My content';
-				return element;
-			};
-			var custom = new CustomComponent();
-			custom.render();
-
-			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
-		});
-
-		it('should build element from getElementContent if its element defines a wrapper with the component id', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getElementContent = function() {
-				var element = document.createElement('span');
-				element.id = this.id;
-				element.setAttribute('data-foo', 'foo');
-				dom.append(element, '<div>My content</div>');
-				return element;
-			};
-			CustomComponent.ELEMENT_TAG_NAME = 'span';
-			var custom = new CustomComponent();
-			custom.render();
-
-			assert.strictEqual('SPAN', custom.element.tagName);
-			assert.strictEqual('foo', custom.element.getAttribute('data-foo'));
-			assert.strictEqual('<div>My content</div>', custom.element.innerHTML);
 		});
 
 		it('should throw error when component renders and it was already rendered', function() {
@@ -969,29 +938,6 @@ describe('Component', function() {
 			assert.strictEqual(surface, custom.getSurfaceElement('header'));
 		});
 
-		it('should get surface element from element even if not on the document', function() {
-			var surface = document.createElement('div');
-			surface.id = 'custom-header';
-
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.SURFACES = {
-				header: {}
-			};
-			CustomComponent.prototype.getElementContent = function() {
-				return surface;
-			};
-			CustomComponent.prototype.getSurfaceContent = function() {
-				return 'Header';
-			};
-			var custom = new CustomComponent({
-				id: 'custom'
-			});
-			custom.render();
-
-			assert.strictEqual(surface, custom.getSurfaceElement('header'));
-			assert.strictEqual('Header', custom.getSurfaceElement('header').innerHTML);
-		});
-
 		it('should return null when element is requested for unknown surface', function() {
 			var CustomComponent = createCustomComponentClass();
 			var custom = new CustomComponent();
@@ -1023,13 +969,11 @@ describe('Component', function() {
 		it('should remove surface and its element from dom', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {
-				// Creates surface element and appends to component element
-				return this.getSurfaceElement('header');
+				return this.buildPlaceholder(this.id + '-header');
 			};
 			var custom = new CustomComponent({
 				id: 'custom'
 			});
-			custom.addSurface('header');
 			custom.render();
 			custom.removeSurface('header');
 			assert.strictEqual(null, custom.getSurface('header'));
@@ -1103,7 +1047,7 @@ describe('Component', function() {
 				}
 			};
 			CustomComponent.prototype.getElementContent = function() {
-				return this.getSurfaceElement('dynamic');
+				return this.buildPlaceholder(this.id + '-dynamic');
 			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				return '<' + this.tag + ' id="' + this.id + '-dynamic"></' + this.tag + '>';
@@ -1122,37 +1066,6 @@ describe('Component', function() {
 				assert.strictEqual('SPAN', newSurfaceElement.tagName);
 				done();
 			});
-		});
-
-		it('should render surface content from element', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getSurfaceContent = function() {
-				var content = document.createElement('b');
-				content.innerHTML = 'header';
-				return content;
-			};
-			var custom = new CustomComponent();
-			custom.addSurface('header');
-			custom.render();
-			assert.strictEqual('<b>header</b>', custom.getSurfaceElement('header').innerHTML);
-		});
-
-		it('should render surface element if it\'s defined in getSurfaceContent\'s element result', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getSurfaceContent = function() {
-				var frag = dom.buildFragment(
-					'<header id="' + this.id + '-header" class="testHeader" data-foo="foo"><b>header</b></header>'
-				);
-				return frag.childNodes[0];
-			};
-			var custom = new CustomComponent();
-			custom.addSurface('header');
-			custom.render();
-
-			var headerElement = custom.getSurfaceElement('header');
-			assert.strictEqual('HEADER', headerElement.tagName);
-			assert.strictEqual('testHeader', headerElement.className);
-			assert.strictEqual('foo', headerElement.getAttribute('data-foo'));
 		});
 
 		it('should automatically create attrs from render attrs of added surfaces', function() {
@@ -1417,42 +1330,6 @@ describe('Component', function() {
 			});
 		});
 
-		it('should not cache surface content if not string', function() {
-			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
-				switch (surfaceId) {
-					case 'header':
-						return '<div>static</div>';
-					case 'body':
-						return '<div>static</div>';
-					case 'bottom':
-						var bottom = document.createElement('div');
-						bottom.innerHTML = 'static';
-						return bottom;
-				}
-			};
-			var custom = new CustomComponent({
-				id: 'custom'
-			});
-			custom.addSurface('header');
-			custom.addSurface('body');
-			custom.addSurface('bottom');
-			custom.render();
-
-			var headerContent = custom.getSurfaceElement('header').childNodes[0];
-			var bodyContent = custom.getSurfaceElement('body').childNodes[0];
-			var bottomContent = custom.getSurfaceElement('bottom').childNodes[0];
-
-			custom.renderSurfacesContent_({
-				'custom-header': true,
-				'custom-body': true,
-				'custom-bottom': true
-			});
-			assert.strictEqual(headerContent, custom.getSurfaceElement('header').childNodes[0]);
-			assert.strictEqual(bodyContent, custom.getSurfaceElement('body').childNodes[0]);
-			assert.notStrictEqual(bottomContent, custom.getSurfaceElement('bottom').childNodes[0]);
-		});
-
 		it('should return component instance from surface methods', function() {
 			var CustomComponent = createCustomComponentClass();
 			var custom = new CustomComponent();
@@ -1494,7 +1371,7 @@ describe('Component', function() {
 				}
 			};
 			CustomComponent.prototype.getElementContent = function() {
-				return this.getSurfaceElement('header');
+				return this.buildPlaceholder(this.id + '-header');
 			};
 			this.CustomComponent = CustomComponent;
 		});
@@ -1618,6 +1495,30 @@ describe('Component', function() {
 				assert.strictEqual('bar', custom.getSurfaceElement('foo').textContent);
 				done();
 			});
+		});
+
+		it('should return whole content HTML when "getElementExtendedContent" is called', function() {
+			this.CustomComponent.prototype.getSurfaceContent = function() {
+				return 'Header';
+			};
+			var custom = new this.CustomComponent({
+				id: 'custom'
+			}).render();
+
+			assert.strictEqual(
+				'<div id="custom-header">Header</div>',
+				custom.getElementExtendedContent()
+			);
+		});
+
+		it('should not throw error if "getElementContent" doesn\'t return string when "getElementExtendedContent" is called', function() {
+			this.CustomComponent.prototype.getElementContent = function() {
+			};
+			var custom = new this.CustomComponent({
+				id: 'custom'
+			}).render();
+
+			assert.strictEqual('', custom.getElementExtendedContent());
 		});
 
 		describe('Generated Ids', function() {
@@ -1937,7 +1838,7 @@ describe('Component', function() {
 				}
 			};
 			CustomComponent.prototype.getElementContent = function() {
-				return this.getSurfaceElement('child');
+				return this.buildPlaceholder('child');
 			};
 
 			var custom = new CustomComponent({

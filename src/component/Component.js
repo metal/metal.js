@@ -375,13 +375,13 @@ class Component extends Attribute {
 
 	/**
 	 * Checks if the given content has an element tag with the given id.
-	 * @param {!Element|string} content
+	 * @param {string} content
 	 * @param {string} id
 	 * @return {boolean}
 	 * @protected
 	 */
 	checkHasElementTag_(content, id) {
-		return core.isString(content) ? content.indexOf(' id="' + id + '"') !== -1 : content.id === id;
+		return content.indexOf(' id="' + id + '"') !== -1;
 	}
 
 	/**
@@ -400,25 +400,22 @@ class Component extends Attribute {
 	 */
 	compareCacheStates_(currentCacheState, previousCacheState) {
 		return currentCacheState !== Component.Cache.NOT_INITIALIZED &&
-			currentCacheState !== Component.Cache.NOT_CACHEABLE &&
 			currentCacheState === previousCacheState;
 	}
 
 	/**
 	 * Computes the cache state for the surface content. If value is string, the
 	 * cache state is represented by its hashcode.
-	 * @param {Object} value The value to calculate the cache state.
+	 * @param {?string} value The value to calculate the cache state.
 	 * @return {Object} The computed cache state.
 	 * @protected
 	 */
 	computeSurfaceCacheState_(value) {
-		if (core.isString(value)) {
-			if (features.checkAttrOrderChange()) {
-				value = this.convertHtmlToBrowserFormat_(value);
-			}
-			return string.hashCode(value);
+		value = value || '';
+		if (features.checkAttrOrderChange()) {
+			value = this.convertHtmlToBrowserFormat_(value);
 		}
-		return Component.Cache.NOT_CACHEABLE;
+		return string.hashCode(value);
 	}
 
 	/**
@@ -492,7 +489,7 @@ class Component extends Attribute {
 	 * needed since it was already rendered by the parent component. Handles the
 	 * same logics that `renderAsSubComponent`, but also makes sure that the
 	 * surfaces content is updated if the html is incorrect for the given data.
-	 * @param {string} opt_content The content that was already rendered for this
+	 * @param {string=} opt_content The content that was already rendered for this
 	 *   component.
 	 */
 	decorateAsSubComponent(opt_content) {
@@ -598,41 +595,39 @@ class Component extends Attribute {
 		}
 
 		var content = data.content || this.getSurfaceContent_(surfaceElementId);
-		if (core.isDefAndNotNull(content)) {
-			var cacheContent = data.cacheContent || content;
-			var cacheHit = surface.static;
-			if (!surface.static) {
-				var firstCacheContent = cacheContent;
-				if (this.decorating_) {
-					// We cache the entire original content first when decorating so we can compare
-					// with the full content we got from the dom. After comparing, we cache the correct
-					// value so updates can work as expected for this surface.
-					this.cacheSurfaceContent(
-						surfaceElementId,
-						html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
-					);
-					content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
-					firstCacheContent = content;
-				}
-
-				var previousCacheState = surface.cacheState;
-				this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
-				cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
-				if (this.decorating_) {
-					this.cacheSurfaceContent(surfaceElementId, cacheContent);
-				}
+		var cacheContent = data.cacheContent || content;
+		var cacheHit = surface.static;
+		if (!surface.static) {
+			var firstCacheContent = cacheContent;
+			if (this.decorating_) {
+				// We cache the entire original content first when decorating so we can compare
+				// with the full content we got from the dom. After comparing, we cache the correct
+				// value so updates can work as expected for this surface.
+				this.cacheSurfaceContent(
+					surfaceElementId,
+					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
+				);
+				content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+				firstCacheContent = content;
 			}
 
-			if (cacheHit) {
-				if (this.decorating_) {
-					this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
-				} else {
-					this.renderPlaceholderSurfaceContents_(cacheContent, surfaceElementId);
-				}
-			} else {
+			var previousCacheState = surface.cacheState;
+			this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
+			cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
+			if (this.decorating_) {
+				this.cacheSurfaceContent(surfaceElementId, cacheContent);
+			}
+		}
+
+		if (cacheHit) {
+			if (this.decorating_) {
 				this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
-				this.replaceSurfaceContent_(surfaceElementId, content);
+			} else {
+				this.renderPlaceholderSurfaceContents_(cacheContent, surfaceElementId);
 			}
+		} else {
+			this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
+			this.replaceSurfaceContent_(surfaceElementId, content);
 		}
 	}
 
@@ -762,14 +757,10 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	findElementInContent_(id, content) {
-		var element;
-		if (core.isString(content)) {
-			content = dom.buildFragment(content).childNodes[0];
+		var firstChild = dom.buildFragment(content).childNodes[0];
+		if (firstChild && firstChild.id === id) {
+			return firstChild;
 		}
-		if (content && content.id === id) {
-			element = content;
-		}
-		return element;
 	}
 
 	/**
@@ -817,10 +808,10 @@ class Component extends Attribute {
 	/**
 	 * Gets the content that should be rendered in the component's main element.
 	 * Should be implemented by subclasses.
-	 * @return {Object|string} The content to be rendered. If the content is a
-	 *   string, surfaces can be represented by placeholders in the format specified
-	 *   by Component.SURFACE_REGEX. Also, if the string content's main wrapper has
-	 *   the component's id, then it will be used to render the main element tag.
+	 * @return {string} The content to be rendered, as a string. Surfaces can be
+	 *   represented by placeholders in the format specified by Component.SURFACE_REGEX.
+	 *   Also, if the string content's main wrapper has the component's id, then it
+	 *   will be used to render the main element tag.
 	 */
 	getElementContent() {}
 
@@ -844,7 +835,7 @@ class Component extends Attribute {
 	 * @return {string} The content with all placeholders already replaced.
 	 */
 	getElementExtendedContent() {
-		var content = this.getElementContent_();
+		var content = this.getElementContent_() || '';
 		this.eventsCollector_.attachListeners(content, this.id);
 		return this.replaceSurfacePlaceholders_(content);
 	}
@@ -895,24 +886,24 @@ class Component extends Attribute {
 	 * Gets the content for the requested surface. Should be implemented by subclasses.
 	 * @param {string} surfaceId The surface id.
 	 * @param {string} surfaceElementId The surface element id
-	 * @return {Object|string} The content to be rendered. If the content is a
-	 *   string, surfaces can be represented by placeholders in the format specified
-	 *   by Component.SURFACE_REGEX.
+	 * @return {string} The content to be rendered, as a string. Nested surfaces can be
+	 *   represented by placeholders in the format specified by Component.SURFACE_REGEX.
+	 *   Also, if the string content's main wrapper has the surface's id, then it
+	 *   will be used to render the main surface tag.
 	 */
 	getSurfaceContent() {}
 
 	/**
-	 * Gets the content for the requested surface. By default this just calls
-	 * `getSurfaceContent`, but can be overriden to add more behavior (check
-	 * `SoyComponent` for an example).
+	 * Gets the content for the requested surface. Calls `getSurfaceContent` for non
+	 * component surfaces, handling component surfaces automatically.
 	 * @param {string} surfaceElementId The surface element id.
-	 * @return {Object|string} The content to be rendered.
+	 * @return {string} The content to be rendered.
 	 * @protected
 	 */
 	getSurfaceContent_(surfaceElementId) {
 		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		if (surfaceElementId === this.id) {
-			return this.getElementContent_();
+			return this.getElementContent_() || '';
 		} else if (surface.componentName) {
 			var component = ComponentCollector.components[surfaceElementId];
 			if (component.wasRendered) {
@@ -921,7 +912,7 @@ class Component extends Attribute {
 				return component.getElementExtendedContent();
 			}
 		} else {
-			return this.getSurfaceContent(this.getSurfaceId_(surfaceElementId, surface), surfaceElementId);
+			return this.getSurfaceContent(this.getSurfaceId_(surfaceElementId, surface), surfaceElementId) || '';
 		}
 	}
 
@@ -1167,7 +1158,7 @@ class Component extends Attribute {
 	 * Renders this component as a subcomponent, meaning that no actual rendering is
 	 * needed since it was already rendered by the parent component. This just handles
 	 * other logics from the rendering lifecycle, like attaching event listeners.
-	 * @param {string} opt_content The content that has already been rendered for this
+	 * @param {string=} opt_content The content that has already been rendered for this
 	 *   component
 	 */
 	renderAsSubComponent(opt_content) {
@@ -1188,7 +1179,7 @@ class Component extends Attribute {
 	/**
 	 * Renders a surface that holds a component.
 	 * @param {string} surfaceElementId
-	 * @param {(Object|string)?} opt_content The content to be rendered.
+	 * @param {string=} opt_content The content to be rendered.
 	 * @protected
 	 */
 	renderComponentSurface_(surfaceElementId, opt_content) {
@@ -1196,14 +1187,10 @@ class Component extends Attribute {
 		if (component.wasRendered) {
 			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			Component.componentsCollector.updateComponent(surfaceElementId, surface.componentData);
-		} else if (opt_content) {
-			if (this.decorating_) {
-				component.decorateAsSubComponent(opt_content);
-			} else {
-				component.renderAsSubComponent(opt_content);
-			}
+		} else if (this.decorating_) {
+			component.decorateAsSubComponent(opt_content);
 		} else {
-			component.render();
+			component.renderAsSubComponent(opt_content);
 		}
 	}
 
@@ -1293,7 +1280,7 @@ class Component extends Attribute {
 	/**
 	 * Replaces the content of a surface with a new one.
 	 * @param {string} surfaceElementId The surface id.
-	 * @param {Element|string} content The content to be rendered.
+	 * @param {string} content The content to be rendered.
 	 * @protected
 	 */
 	replaceSurfaceContent_(surfaceElementId, content) {
@@ -1306,10 +1293,7 @@ class Component extends Attribute {
 		var el = this.getSurfaceElement(surfaceElementId);
 		if (this.checkHasElementTag_(content, surfaceElementId)) {
 			var surface = this.getSurfaceFromElementId(surfaceElementId);
-			surface.element = content;
-			if (core.isString(content)) {
-				surface.element = dom.buildFragment(content).childNodes[0];
-			}
+			surface.element = dom.buildFragment(content).childNodes[0];
 			if (el.parentNode) {
 				dom.replace(el, surface.element);
 			}
@@ -1321,17 +1305,13 @@ class Component extends Attribute {
 
 	/**
 	 * Replaces the given content's surface placeholders with their real contents.
-	 * @param {string|Element} content
+	 * @param {string} content
 	 * @param {string=} opt_surfaceElementId The id of the surface element that contains
 	 *   the given content, or undefined if the content is from the main element.
 	 * @return {string} The final string with replaced placeholders.
 	 * @protected
 	 */
 	replaceSurfacePlaceholders_(content, opt_surfaceElementId) {
-		if (!core.isString(content)) {
-			return content;
-		}
-
 		var instance = this;
 		return content.replace(Component.SURFACE_REGEX, function(match, id) {
 			// Surfaces should already have been created before being rendered so they can be
@@ -1508,7 +1488,7 @@ class Component extends Attribute {
 			// and the default value of "element" depends on "id".
 			this.id = this.makeId_();
 		}
-		var element = this.findElementInContent_(this.id, this.getElementContent_());
+		var element = this.findElementInContent_(this.id, this.getElementContent_() || '');
 		if (!element) {
 			element = this.findElementInContent_(this.id, this.getComponentHtml(''));
 		}
@@ -1660,11 +1640,6 @@ Component.SURFACE_TAG_NAME = 'div';
  * @enum {string}
  */
 Component.Cache = {
-	/**
-	 * Cache is not allowed for this state.
-	 */
-	NOT_CACHEABLE: -1,
-
 	/**
 	 * Cache not initialized.
 	 */

@@ -12,15 +12,6 @@ describe('EventsCollector', function() {
 		});
 	});
 
-	it('should not throw error if content is not a string', function() {
-		var custom = createCustomComponentInstance('<div></div><div></div>');
-		var collector = new EventsCollector(custom);
-
-		assert.doesNotThrow(function() {
-			collector.attachListeners(custom.element, 'group');
-		});
-	});
-
 	it('should not throw error if no listeners are found', function() {
 		var custom = createCustomComponentInstance('<div></div><div></div>');
 		var collector = new EventsCollector(custom);

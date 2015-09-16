@@ -74,9 +74,6 @@ class EventsCollector extends Disposable {
 	 * @param {boolean} groupName
 	 */
 	attachListeners(content, groupName) {
-		if (!core.isString(content)) {
-			return;
-		}
 		this.groupHasListener_[groupName] = {};
 		this.attachListenersFromHtml_(content, groupName);
 	}

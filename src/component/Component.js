@@ -607,7 +607,7 @@ class Component extends Attribute {
 					surfaceElementId,
 					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
 				);
-				content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+				content = this.replaceSurfacePlaceholders_(content, surfaceElementId, surface);
 				firstCacheContent = content;
 			}
 
@@ -627,7 +627,7 @@ class Component extends Attribute {
 			}
 		} else {
 			this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
-			this.replaceSurfaceContent_(surfaceElementId, content);
+			this.replaceSurfaceContent_(surfaceElementId, surface, content);
 		}
 	}
 
@@ -836,7 +836,7 @@ class Component extends Attribute {
 	getElementExtendedContent() {
 		var content = this.getElementContent_() || '';
 		this.eventsCollector_.attachListeners(content, this.id);
-		return this.replaceSurfacePlaceholders_(content, this.id);
+		return this.replaceSurfacePlaceholders_(content, this.id, this.getSurface(this.id));
 	}
 
 	/**
@@ -1269,11 +1269,12 @@ class Component extends Attribute {
 	/**
 	 * Replaces the content of a surface with a new one.
 	 * @param {string} surfaceElementId The surface id.
+	 * @param {!Object} surface The surface object.
 	 * @param {string} content The content to be rendered.
 	 * @protected
 	 */
-	replaceSurfaceContent_(surfaceElementId, content) {
-		content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+	replaceSurfaceContent_(surfaceElementId, surface, content) {
+		content = this.replaceSurfacePlaceholders_(content, surfaceElementId, surface);
 		if (surfaceElementId === this.id) {
 			this.replaceElementContent_(content);
 			return;
@@ -1281,7 +1282,6 @@ class Component extends Attribute {
 
 		var el = this.getSurfaceElement(surfaceElementId);
 		if (this.checkHasElementTag_(content, surfaceElementId)) {
-			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			surface.element = dom.buildFragment(content).childNodes[0];
 			dom.replace(el, surface.element);
 		} else {
@@ -1295,24 +1295,30 @@ class Component extends Attribute {
 	 * @param {string} content
 	 * @param {string} surfaceElementId The id of the surface element that contains
 	 *   the given content, or undefined if the content is from the main element.
+	 * @param {!Object} surface The surface object.
 	 * @return {string} The final string with replaced placeholders.
 	 * @protected
 	 */
-	replaceSurfacePlaceholders_(content, surfaceElementId) {
+	replaceSurfacePlaceholders_(content, surfaceElementId, surface) {
+		surface.children = [];
+
 		var instance = this;
 		return content.replace(Component.SURFACE_REGEX, function(match, id) {
 			// Surfaces should already have been created before being rendered so they can be
 			// accessed from their getSurfaceContent calls.
-			var surface = instance.createPlaceholderSurface_(surfaceElementId, id);
-			surface.handled = true;
+			var placeholderSurface = instance.createPlaceholderSurface_(surfaceElementId, id);
+			id = placeholderSurface.surfaceElementId;
+			placeholderSurface.handled = true;
+			placeholderSurface.parent = surfaceElementId;
+			surface.children.push(id);
 
-			var surfaceContent = instance.getSurfaceContent_(surface.surfaceElementId);
-			var surfaceHtml = instance.getSurfaceHtml_(surface, surfaceContent);
-			var expandedHtml = instance.replaceSurfacePlaceholders_(surfaceHtml, surface.surfaceElementId);
+			var surfaceContent = instance.getSurfaceContent_(id);
+			var surfaceHtml = instance.getSurfaceHtml_(placeholderSurface, surfaceContent);
+			var expandedHtml = instance.replaceSurfacePlaceholders_(surfaceHtml, id, placeholderSurface);
 			instance.collectedSurfaces_.push({
 				cacheContent: surfaceContent,
 				content: expandedHtml,
-				surface: surface
+				surface: placeholderSurface
 			});
 
 			return expandedHtml;

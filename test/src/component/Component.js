@@ -1300,6 +1300,9 @@ describe('Component', function() {
 
 		it('should rerender surface even when content doesn\'t change if its cache was cleared', function(done) {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-foo');
+			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				return 'Same Content';
 			};
@@ -1344,6 +1347,9 @@ describe('Component', function() {
 
 		it('should not throw error if attrs, that are not render attrs of a surface, change', function(done) {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-main');
+			};
 			CustomComponent.ATTRS = {
 				content: {
 					value: 'foo'
@@ -1389,6 +1395,58 @@ describe('Component', function() {
 				assert.strictEqual('bar', custom.element.textContent);
 				done();
 			});
+		});
+
+		it('should not rerender surface twice if both it and its parent change with render attrs', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-foo', {
+					renderAttrs: ['foo']
+				});
+			};
+			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'foo':
+						var config = {
+							renderAttrs: ['foo']
+						};
+						return this.foo + this.buildPlaceholder(this.id + '-nestedFoo', config);
+					case 'nestedFoo':
+						return this.foo;
+				}
+			};
+
+			var custom = new CustomComponent().render();
+			sinon.spy(custom, 'getSurfaceContent');
+
+			custom.foo = 'bar';
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(2, custom.getSurfaceContent.callCount);
+				assert.strictEqual('foo', custom.getSurfaceContent.args[0][0]);
+				assert.strictEqual('nestedFoo', custom.getSurfaceContent.args[1][0]);
+				done();
+			});
+		});
+
+		it('should have information about child and parent surfaces on surface object', function() {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-foo');
+			};
+			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'foo':
+						return this.buildPlaceholder(this.id + '-nestedFoo');
+					case 'nestedFoo':
+						return 'Nested';
+				}
+			};
+
+			var custom = new CustomComponent().render();
+			assert.deepEqual([custom.id + '-nestedFoo'], custom.getSurface('foo').children);
+			assert.strictEqual(custom.id, custom.getSurface('foo').parent);
+			assert.deepEqual([], custom.getSurface('nestedFoo').children);
+			assert.strictEqual(custom.id + '-foo', custom.getSurface('nestedFoo').parent);
 		});
 
 		it('should return component instance from surface methods', function() {

@@ -434,16 +434,16 @@ class Component extends Attribute {
 
 	/**
 	 * Creates a surface that was found via a string placeholder.
-	 * @param {string=} opt_surfaceElementId
-	 * @param {string=} opt_parentSurfaceElementId The id of the surface element that contains
+	 * @param {string} parentSurfaceElementId The id of the surface element that contains
 	 *   the surface to be created, or undefined if there is none.
+	 * @param {string=} opt_surfaceElementId
 	 * @return {!Object} The created surface.
 	 * @protected
 	 */
-	createPlaceholderSurface_(opt_surfaceElementId, opt_parentSurfaceElementId) {
+	createPlaceholderSurface_(parentSurfaceElementId, opt_surfaceElementId) {
 		var surfaceElementId = opt_surfaceElementId;
 		if (!core.isDefAndNotNull(surfaceElementId)) {
-			surfaceElementId = this.generateSurfaceElementId_(opt_parentSurfaceElementId);
+			surfaceElementId = this.generateSurfaceElementId_(parentSurfaceElementId);
 		}
 		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		if (!surface) {
@@ -785,14 +785,13 @@ class Component extends Attribute {
 	/**
 	 * Generates an id for a surface that was found inside the contents of the main
 	 * element or of a parent surface.
-	 * @param {string=} opt_parentSurfaceElementId The id of the parent surface, or undefined
+	 * @param {string} parentSurfaceElementId The id of the parent surface, or undefined
 	 *   if there is none.
 	 * @return {string} The generated id.
 	 */
-	generateSurfaceElementId_(opt_parentSurfaceElementId) {
-		var parentElementId = opt_parentSurfaceElementId || this.id;
-		this.generatedIdCount_[parentElementId] = (this.generatedIdCount_[parentElementId] || 0) + 1;
-		return parentElementId + '-s' + this.generatedIdCount_[parentElementId];
+	generateSurfaceElementId_(parentSurfaceElementId) {
+		this.generatedIdCount_[parentSurfaceElementId] = (this.generatedIdCount_[parentSurfaceElementId] || 0) + 1;
+		return parentSurfaceElementId + '-s' + this.generatedIdCount_[parentSurfaceElementId];
 	}
 
 	/**
@@ -837,7 +836,7 @@ class Component extends Attribute {
 	getElementExtendedContent() {
 		var content = this.getElementContent_() || '';
 		this.eventsCollector_.attachListeners(content, this.id);
-		return this.replaceSurfacePlaceholders_(content);
+		return this.replaceSurfacePlaceholders_(content, this.id);
 	}
 
 	/**
@@ -1218,7 +1217,7 @@ class Component extends Attribute {
 	renderPlaceholderSurfaceContents_(content, surfaceElementId) {
 		var instance = this;
 		content.replace(Component.SURFACE_REGEX, function(match, id) {
-			var surface = instance.createPlaceholderSurface_(id, surfaceElementId);
+			var surface = instance.createPlaceholderSurface_(surfaceElementId, id);
 			instance.emitRenderSurfaceEvent_(surface.surfaceElementId);
 			return match;
 		});
@@ -1294,17 +1293,17 @@ class Component extends Attribute {
 	/**
 	 * Replaces the given content's surface placeholders with their real contents.
 	 * @param {string} content
-	 * @param {string=} opt_surfaceElementId The id of the surface element that contains
+	 * @param {string} surfaceElementId The id of the surface element that contains
 	 *   the given content, or undefined if the content is from the main element.
 	 * @return {string} The final string with replaced placeholders.
 	 * @protected
 	 */
-	replaceSurfacePlaceholders_(content, opt_surfaceElementId) {
+	replaceSurfacePlaceholders_(content, surfaceElementId) {
 		var instance = this;
 		return content.replace(Component.SURFACE_REGEX, function(match, id) {
 			// Surfaces should already have been created before being rendered so they can be
 			// accessed from their getSurfaceContent calls.
-			var surface = instance.createPlaceholderSurface_(id, opt_surfaceElementId);
+			var surface = instance.createPlaceholderSurface_(surfaceElementId, id);
 			surface.handled = true;
 
 			var surfaceContent = instance.getSurfaceContent_(surface.surfaceElementId);

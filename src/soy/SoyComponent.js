@@ -180,7 +180,7 @@ class SoyComponent extends Component {
 
 	/**
 	 * Generates the id for a surface that was found by a soy template call.
-	 * @param {string?} parentSurfaceId The id of the parent surface, or undefined
+	 * @param {string} parentSurfaceId The id of the parent surface, or undefined
 	 *   if there is none.
 	 * @param {!Object} data The placeholder data registered for this surface.
 	 * @return {string} The generated id.
@@ -188,7 +188,7 @@ class SoyComponent extends Component {
 	 */
 	generateSurfaceElementId_(parentSurfaceId, data) {
 		if (data.templateName &&
-			!parentSurfaceId &&
+			parentSurfaceId === this.id &&
 			!this.firstSurfaceFound_[data.templateName]) {
 			this.firstSurfaceFound_[data.templateName] = true;
 			return this.prefixSurfaceId_(data.templateName);
@@ -205,8 +205,10 @@ class SoyComponent extends Component {
 	 */
 	getElementContent() {
 		this.firstSurfaceFound_ = {};
+		this.surfaceBeingRendered_ = this.id;
+		var content = this.renderTemplateByName_(this.constructor.NAME, 'content');
 		this.surfaceBeingRendered_ = null;
-		return this.renderTemplateByName_(this.constructor.NAME, 'content');
+		return content;
 	}
 
 	/**
@@ -222,7 +224,9 @@ class SoyComponent extends Component {
 		var data = surface.templateData;
 		surface.templateData = null;
 		this.surfaceBeingRendered_ = surfaceElementId;
-		return this.renderTemplateByName_(surface.templateComponentName, surface.templateName, data);
+		var content = this.renderTemplateByName_(surface.templateComponentName, surface.templateName, data);
+		this.surfaceBeingRendered_ = null;
+		return content;
 	}
 
 	/**

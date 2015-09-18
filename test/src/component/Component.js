@@ -3,6 +3,7 @@
 import async from '../../../src/async/async';
 import dom from '../../../src/dom/dom';
 import features from '../../../src/dom/features';
+import object from '../../../src/object/object';
 import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
@@ -1457,6 +1458,39 @@ describe('Component', function() {
 			assert.strictEqual(custom, custom.addSurfaces({}));
 			assert.strictEqual(custom, custom.removeSurface('header'));
 		});
+
+		it('should automatically remove unused surfaces after repaint', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.buildElementSurfaceData_ = function() {
+				var data = Component.prototype.buildElementSurfaceData_.call(this);
+				data.renderAttrs = ['count'];
+				return data;
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				var content = '';
+				for (var i = 0; i < this.count; i++) {
+					content += this.buildPlaceholder(this.id + '-surface' + i);
+				}
+				return content;
+			};
+
+			var custom = new CustomComponent({
+				count: 4
+			}).render();
+			assert.ok(custom.getSurface('surface0'));
+			assert.ok(custom.getSurface('surface1'));
+			assert.ok(custom.getSurface('surface2'));
+			assert.ok(custom.getSurface('surface3'));
+
+			custom.count = 2;
+			custom.once('attrsChanged', function() {
+				done();
+				assert.ok(custom.getSurface('surface0'));
+				assert.ok(custom.getSurface('surface1'));
+				assert.ok(!custom.getSurface('surface2'));
+				assert.ok(!custom.getSurface('surface3'));
+			});
+		});
 	});
 
 	describe('Surface Placeholders', function() {
@@ -2111,6 +2145,43 @@ describe('Component', function() {
 			custom.dispose();
 			assert.ok(child.isDisposed());
 			assert.ok(another.isDisposed());
+		});
+
+		it('should automatically dispose unused sub components after repaint', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.buildElementSurfaceData_ = function() {
+				var data = Component.prototype.buildElementSurfaceData_.call(this);
+				data.renderAttrs = ['count'];
+				return data;
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				var content = '';
+				for (var i = 0; i < this.count; i++) {
+					content += this.buildPlaceholder('comp' + i, {
+						componentName: 'ChildComponent'
+					});
+				}
+				return content;
+			};
+
+			var custom = new CustomComponent({
+				count: 4
+			}).render();
+			var comps = object.mixin({}, custom.components);
+			assert.strictEqual(4, Object.keys(comps).length);
+
+			custom.count = 2;
+			custom.once('attrsChanged', function() {
+				assert.ok(custom.components.comp0);
+				assert.ok(custom.components.comp1);
+				assert.ok(!custom.components.comp2);
+				assert.ok(!custom.components.comp3);
+				assert.ok(!comps.comp0.isDisposed());
+				assert.ok(!comps.comp1.isDisposed());
+				assert.ok(comps.comp2.isDisposed());
+				assert.ok(comps.comp3.isDisposed());
+				done();
+			});
 		});
 	});
 

@@ -138,6 +138,13 @@ class Component extends Attribute {
 		this.initialConfig_ = opt_config || {};
 
 		/**
+		 * The element ids of all surfaces that were removed on a repaint.
+		 * @type {!Array<string>}
+		 * @protected
+		 */
+		this.removedSurfaces_ = [];
+
+		/**
 		 * The ids of the surfaces registered by this component.
 		 * @type {!Object<string, boolean>}
 		 * @protected
@@ -280,6 +287,20 @@ class Component extends Attribute {
 		var configs = this.constructor.SURFACES_MERGED;
 		for (var surfaceId in configs) {
 			this.addSurface(surfaceId, object.mixin({}, configs[surfaceId]));
+		}
+	}
+
+	/**
+	 * Adds the given surface element ids to the list of removed surfaces,
+	 * removing their parent reference as well.
+	 * @param {!Array<string>} surfaceElementIds
+	 * @protected
+	 */
+	addToRemovedSurfaces_(surfaceElementIds) {
+		for (var i = 0; i < surfaceElementIds.length; i++) {
+			var surface = this.getSurface(surfaceElementIds[i]);
+			this.removedSurfaces_.push(surface);
+			surface.parent = null;
 		}
 	}
 
@@ -522,7 +543,9 @@ class Component extends Attribute {
 	 */
 	detach() {
 		if (this.inDocument) {
-			this.element.parentNode.removeChild(this.element);
+			if (this.element.parentNode) {
+				this.element.parentNode.removeChild(this.element);
+			}
 			this.inDocument = false;
 			this.detached();
 		}
@@ -633,18 +656,18 @@ class Component extends Attribute {
 
 	/**
 	 * Calls `dispose` on all subcomponents.
+	 * @param {!Array<string>} ids
 	 * @protected
 	 */
-	disposeSubComponents_() {
-		var ids = Object.keys(this.components);
+	disposeSubComponents_(ids) {
 		for (var i = 0; i < ids.length; i++) {
 			var component = this.components[ids[i]];
 			if (!component.isDisposed()) {
 				Component.componentsCollector.removeComponent(component);
 				component.dispose();
+				this.components[ids[i]] = null;
 			}
 		}
-		this.components = null;
 	}
 
 	/**
@@ -661,7 +684,8 @@ class Component extends Attribute {
 		this.delegateEventHandler_.removeAllListeners();
 		this.delegateEventHandler_ = null;
 
-		this.disposeSubComponents_();
+		this.disposeSubComponents_(Object.keys(this.components));
+		this.components = null;
 		this.generatedIdCount_ = null;
 		this.surfacesRenderAttrs_ = null;
 
@@ -1117,6 +1141,25 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Removes all surfaces that were removed during the repaint of their parents,
+	 * and weren't added back again. Component surfaces will be disposed.
+	 * @protected
+	 */
+	removeUnusedSurfaces_() {
+		var compIds = [];
+		for (var i = 0; i < this.removedSurfaces_.length; i++) {
+			var surface = this.removedSurfaces_[i];
+			if (!surface.parent) {
+				this.removeSurface(surface.surfaceElementId);
+				if (surface.componentName) {
+					compIds.push(surface.surfaceElementId);
+				}
+			}
+		}
+		this.disposeSubComponents_(compIds);
+	}
+
+	/**
 	 * Lifecycle. Renders the component into the DOM. Render phase replaces
 	 * decorate phase, without progressive enhancement support.
 	 *
@@ -1232,6 +1275,7 @@ class Component extends Attribute {
 	 */
 	renderSurfacesContent_(surfaces) {
 		this.generatedIdCount_ = {};
+		this.removedSurfaces_ = [];
 
 		var surfaceElementIds = Object.keys(surfaces);
 		var idIndex = surfaceElementIds.indexOf(this.id);
@@ -1248,6 +1292,7 @@ class Component extends Attribute {
 		}
 		this.updatePlaceholderSurfaces_();
 		this.eventsCollector_.detachUnusedListeners();
+		this.removeUnusedSurfaces_();
 	}
 
 	/**
@@ -1300,6 +1345,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	replaceSurfacePlaceholders_(content, surfaceElementId, surface) {
+		this.addToRemovedSurfaces_(surface.children || []);
 		surface.children = [];
 
 		var instance = this;

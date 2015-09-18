@@ -1142,15 +1142,11 @@ class Component extends Attribute {
 		}
 
 		this.addElementSurface_();
-		this.renderSurfacesContent_(this.surfaceIds_);
-
+		this.emitRenderSurfaceEvent_(this.id);
 		this.syncAttrs_();
-
 		this.emit('render');
 		this.attach(opt_parentElement, opt_siblingElement);
-
 		this.wasRendered = true;
-
 		return this;
 	}
 
@@ -1248,17 +1244,11 @@ class Component extends Attribute {
 
 		for (var i = 0; i < surfaceElementIds.length; i++) {
 			if (!this.getSurfaceFromElementId(surfaceElementIds[i]).handled) {
-				var renderAttrs = surfaces[surfaceElementIds[i]];
-				if (!(renderAttrs instanceof Array)) {
-					renderAttrs = null;
-				}
-				this.emitRenderSurfaceEvent_(surfaceElementIds[i], null, null, renderAttrs);
+				this.emitRenderSurfaceEvent_(surfaceElementIds[i], null, null, surfaces[surfaceElementIds[i]]);
 			}
 		}
-		if (this.wasRendered) {
-			this.updatePlaceholderSurfaces_();
-			this.eventsCollector_.detachUnusedListeners();
-		}
+		this.updatePlaceholderSurfaces_();
+		this.eventsCollector_.detachUnusedListeners();
 	}
 
 	/**
@@ -1294,9 +1284,7 @@ class Component extends Attribute {
 		if (this.checkHasElementTag_(content, surfaceElementId)) {
 			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			surface.element = dom.buildFragment(content).childNodes[0];
-			if (el.parentNode) {
-				dom.replace(el, surface.element);
-			}
+			dom.replace(el, surface.element);
 		} else {
 			dom.removeChildren(el);
 			dom.append(el, content);

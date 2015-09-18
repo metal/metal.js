@@ -7,7 +7,7 @@ import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 
-describe('Component Tests', function() {
+describe('Component', function() {
 	afterEach(function() {
 		document.body.innerHTML = '';
 		Component.surfacesCollector.removeAllSurfaces();
@@ -16,13 +16,17 @@ describe('Component Tests', function() {
 	describe('Lifecycle', function() {
 		it('should test component render lifecycle', function() {
 			var CustomComponent = createCustomComponentClass();
-
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header') + this.buildPlaceholder(this.id + '-bottom');
+			};
 			CustomComponent.SURFACES = {
 				header: {},
 				bottom: {}
 			};
+			sinon.spy(CustomComponent.prototype, 'getElementContent');
 
 			var custom = new CustomComponent();
+
 			var renderListener = sinon.stub();
 			custom.on('render', renderListener);
 			custom.render();
@@ -822,41 +826,82 @@ describe('Component Tests', function() {
 			assert.strictEqual(null, custom.getSurface('unknown'));
 		});
 
-		it('should emit "renderSurface" event for each surface that will be rendered', function() {
+		it('should emit "renderSurface" event for the main component surface on render', function() {
 			var CustomComponent = createCustomComponentClass();
 			ComponentRegistry.register('CustomComponent', CustomComponent);
 			var custom = new CustomComponent();
-			custom.addSurface('header');
-			custom.addSurface('bottom');
 
 			var listener = sinon.stub();
 			custom.on('renderSurface', listener);
 			custom.render();
 
-			assert.strictEqual(3, listener.callCount);
-			var surfaceIds = [listener.args[0][0].surfaceId, listener.args[1][0].surfaceId, listener.args[2][0].surfaceId];
-			assert.deepEqual(['bottom', 'header', custom.id], surfaceIds.sort());
+			assert.strictEqual(1, listener.callCount);
+			assert.deepEqual(custom.id, listener.args[0][0].surfaceId);
 		});
 
-		it('should not render surfaces that had their "renderSurface" event prevented', function() {
+		it('should emit "renderSurface" event for each surface that will be rendered on attr change', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
-				return surfaceId;
+			CustomComponent.SURFACES = {
+				header: {
+					renderAttrs: ['foo']
+				},
+				body: {
+					renderAttrs: ['bar']
+				},
+				bottom: {
+					renderAttrs: ['foo', 'bar']
+				}
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header') + this.buildPlaceholder(this.id + '-body') +
+					this.buildPlaceholder(this.id + '-bottom');
 			};
 			ComponentRegistry.register('CustomComponent', CustomComponent);
-			var custom = new CustomComponent();
-			custom.addSurface('header');
-			custom.addSurface('bottom');
+			var custom = new CustomComponent().render();
+
+			var listener = sinon.stub();
+			custom.on('renderSurface', listener);
+
+			custom.foo = 2;
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(2, listener.callCount);
+				var surfaceIds = [listener.args[0][0].surfaceId, listener.args[1][0].surfaceId];
+				assert.deepEqual(['bottom', 'header'], surfaceIds.sort());
+				done();
+			});
+		});
+
+		it('should not render surfaces that had their "renderSurface" event prevented', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.SURFACES = {
+				header: {
+					renderAttrs: ['foo']
+				},
+				bottom: {
+					renderAttrs: ['foo', 'bar']
+				}
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header') + this.buildPlaceholder(this.id + '-bottom');
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return this.foo;
+			};
+			ComponentRegistry.register('CustomComponent', CustomComponent);
+			var custom = new CustomComponent().render();
 
 			custom.on('renderSurface', function(data, event) {
 				if (data.surfaceId === 'header') {
 					event.preventDefault();
 				}
 			});
-			custom.render();
 
-			assert.strictEqual('bottom', custom.getSurfaceElement('bottom').textContent);
-			assert.notStrictEqual('header', custom.getSurfaceElement('header').textContent);
+			custom.foo = 'foo';
+			custom.once('attrsChanged', function() {
+				assert.strictEqual('foo', custom.getSurfaceElement('bottom').textContent);
+				assert.strictEqual('', custom.getSurfaceElement('header').textContent);
+				done();
+			});
 		});
 
 		it('should use div as the default tagName for surface elements', function() {
@@ -998,6 +1043,9 @@ describe('Component Tests', function() {
 
 		it('should render surface content from string', function() {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header') + this.buildPlaceholder(this.id + '-bottom');
+			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -1016,6 +1064,9 @@ describe('Component Tests', function() {
 
 		it('should render surface element if it\'s defined in getSurfaceContent\'s string result', function() {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header') + this.buildPlaceholder(this.id + '-bottom');
+			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -1114,6 +1165,9 @@ describe('Component Tests', function() {
 
 		it('should render surface content when surface render attrs change', function(done) {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header') + this.buildPlaceholder(this.id + '-bottom');
+			};
 			CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
 				switch (surfaceId) {
 					case 'header':
@@ -1176,6 +1230,10 @@ describe('Component Tests', function() {
 
 		it('should not repaint surface when its render attrs change but content stays the same', function(done) {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-oddsOrEven');
+			};
+
 			CustomComponent.prototype.getSurfaceContent = function() {
 				return this.number % 2 === 0 ? 'Even' : 'Odds';
 			};
@@ -1202,6 +1260,9 @@ describe('Component Tests', function() {
 
 		it('should not render surface content when surface render attrs change but event is prevented', function(done) {
 			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-header');
+			};
 			CustomComponent.prototype.getSurfaceContent = function() {
 				return '<b style="font-size:' + this.fontSize + ';">' + this.headerContent + '</b>';
 			};
@@ -1512,8 +1573,7 @@ describe('Component Tests', function() {
 		});
 
 		it('should not throw error if "getElementContent" doesn\'t return string when "getElementExtendedContent" is called', function() {
-			this.CustomComponent.prototype.getElementContent = function() {
-			};
+			this.CustomComponent.prototype.getElementContent = function() {};
 			var custom = new this.CustomComponent({
 				id: 'custom'
 			}).render();

@@ -166,6 +166,15 @@ describe('dom', function() {
 			assert.strictEqual(element, document.body.childNodes[0]);
 		});
 
+		it('should not throw error if trying to replace element that doesn\'t have a parent', function() {
+			var element1 = document.createElement('div');
+			var element2 = document.createElement('div');
+
+			assert.doesNotThrow(function() {
+				dom.replace(element1, element2);
+			});
+		});
+
 		it('should not throw error if null as passed as one of the elements for "replace"', function() {
 			var element = document.createElement('div');
 			dom.append(document.body, element);

@@ -590,8 +590,9 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			custom.on('attrsSynced', listener);
 			custom.foo = 1;
-			custom.once('attrsChanged', function() {
+			custom.once('attrsChanged', function(data) {
 				assert.strictEqual(1, listener.callCount);
+				assert.strictEqual(data, listener.args[0][0]);
 				done();
 			});
 		});

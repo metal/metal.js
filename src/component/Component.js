@@ -997,7 +997,7 @@ class Component extends Attribute {
 			this.renderSurfacesContent_(this.getModifiedSurfacesFromChanges_(event.changes));
 		}
 		this.syncAttrsFromChanges_(event.changes);
-		this.emit('attrsSynced');
+		this.emit('attrsSynced', event);
 	}
 
 	/**

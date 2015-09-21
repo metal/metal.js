@@ -578,6 +578,24 @@ describe('Component', function() {
 			sinon.assert.callCount(custom.syncBar, 1);
 		});
 
+		it('should emit "attrsSynced" event after attr changes update the component', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.ATTRS = {
+				foo: {
+					value: 0
+				}
+			};
+
+			var custom = new CustomComponent().render();
+			var listener = sinon.stub();
+			custom.on('attrsSynced', listener);
+			custom.foo = 1;
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(1, listener.callCount);
+				done();
+			});
+		});
+
 		it('should not allow defining attribute named components', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {

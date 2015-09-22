@@ -289,6 +289,7 @@ class SoyComponent extends Component {
 	 */
 	handleSurfaceCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
 		var surfaceData = {
+			static: originalFn.static,
 			templateComponentName: templateComponentName,
 			templateData: data,
 			templateName: templateName

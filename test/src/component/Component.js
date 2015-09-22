@@ -1322,6 +1322,29 @@ describe('Component', function() {
 			});
 		});
 
+		it('should not rerender surface even when content changes if surface is static', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return this.foo;
+			};
+			CustomComponent.SURFACES = {
+				foo: {
+					renderAttrs: ['foo'],
+					static: true
+				}
+			};
+			var custom = new CustomComponent({
+				foo: 'foo'
+			}).render();
+
+			var surfaceContent = custom.getSurfaceElement('foo').childNodes[0];
+			custom.foo = 'bar';
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(surfaceContent, custom.getSurfaceElement('foo').childNodes[0]);
+				done();
+			});
+		});
+
 		it('should not throw error if attrs, that are not render attrs of a surface, change', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.ATTRS = {

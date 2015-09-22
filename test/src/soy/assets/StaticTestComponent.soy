@@ -1,0 +1,15 @@
+{namespace Templates.StaticTestComponent}
+
+/**
+ */
+{template .content}
+	{call .inner data="all" /}
+{/template}
+
+/**
+ * @param text
+ * @static
+ */
+{template .inner}
+	{$text}
+{/template}

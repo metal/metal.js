@@ -215,6 +215,20 @@ describe('SoyComponent', function() {
 				done();
 			});
 		});
+
+		it('should not repaint surface if it has @static doc tag, even when its contents would change', function(done) {
+			var StaticTestComponent = createCustomTestComponentClass('StaticTestComponent');
+			var comp = new StaticTestComponent({
+				text: 'foo'
+			}).render();
+
+			var initialContent = comp.getSurfaceElement('inner').childNodes[0];
+			comp.text = 'bar';
+			comp.once('attrsChanged', function() {
+				assert.strictEqual(initialContent, comp.getSurfaceElement('inner').childNodes[0]);
+				done();
+			});
+		});
 	});
 
 	describe('Nested Surfaces', function() {

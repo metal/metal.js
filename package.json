@@ -21,7 +21,7 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "gulp": "^3.9.0",
-    "gulp-metal": "^0.3.4",
+    "gulp-metal": "^0.4.4",
     "isparta": "^3.0.3",
     "karma": "^0.13.9",
     "karma-babel-preprocessor": "^5.1.0",

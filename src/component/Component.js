@@ -589,25 +589,27 @@ class Component extends Attribute {
 		var content = data.content || this.getSurfaceContent_(surfaceElementId);
 		if (core.isDefAndNotNull(content)) {
 			var cacheContent = data.cacheContent || content;
+			var cacheHit = surface.static;
+			if (!surface.static) {
+				var firstCacheContent = cacheContent;
+				if (this.decorating_) {
+					// We cache the entire original content first when decorating so we can compare
+					// with the full content we got from the dom. After comparing, we cache the correct
+					// value so updates can work as expected for this surface.
+					this.cacheSurfaceContent(
+						surfaceElementId,
+						html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
+					);
+					content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
+					firstCacheContent = content;
+				}
 
-			var firstCacheContent = cacheContent;
-			if (this.decorating_) {
-				// We cache the entire original content first when decorating so we can compare
-				// with the full content we got from the dom. After comparing, we cache the correct
-				// value so updates can work as expected for this surface.
-				this.cacheSurfaceContent(
-					surfaceElementId,
-					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
-				);
-				content = this.replaceSurfacePlaceholders_(content, surfaceElementId);
-				firstCacheContent = content;
-			}
-
-			var previousCacheState = surface.cacheState;
-			this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
-			var cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
-			if (this.decorating_) {
-				this.cacheSurfaceContent(surfaceElementId, cacheContent);
+				var previousCacheState = surface.cacheState;
+				this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
+				cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
+				if (this.decorating_) {
+					this.cacheSurfaceContent(surfaceElementId, cacheContent);
+				}
 			}
 
 			if (cacheHit) {

@@ -679,7 +679,7 @@ class Component extends Attribute {
 		this.emit('renderSurface', {
 			cacheContent: opt_cacheContent,
 			content: opt_content,
-			renderAttrs: opt_renderAttrs,
+			renderAttrs: opt_renderAttrs || [],
 			surfaceElementId: surfaceElementId,
 			surfaceId: this.getSurfaceId_(surfaceElementId, this.getSurface(surfaceElementId))
 		});

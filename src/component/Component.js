@@ -239,13 +239,12 @@ class Component extends Attribute {
 	 */
 	addSurface(surfaceId, opt_surfaceConfig) {
 		var config = opt_surfaceConfig || {};
-		config.cacheState = config.cacheState || Component.Cache.NOT_INITIALIZED;
-
 		var surfaceElementId = this.getSurfaceElementId_(surfaceId, config);
 		if (this.surfaceIds_[surfaceElementId]) {
 			Component.surfacesCollector.updateSurface(surfaceElementId, config);
 		} else {
 			this.surfaceIds_[surfaceElementId] = true;
+			config.cacheState = config.cacheState || Component.Cache.NOT_INITIALIZED;
 			Component.surfacesCollector.addSurface(surfaceElementId, config);
 			if (config.componentName && surfaceId !== this.id) {
 				this.createSubComponent_(config.componentName, surfaceElementId);

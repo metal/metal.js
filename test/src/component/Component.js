@@ -1261,6 +1261,32 @@ describe('Component', function() {
 			});
 		});
 
+		it('should not repaint surface when its render attrs change but content stays the same', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return this.number % 2 === 0 ? 'Even' : 'Odds';
+			};
+			var custom = new CustomComponent();
+			custom.addAttrs({
+				number: {
+					value: 2
+				}
+			});
+			custom.addSurfaces({
+				oddsOrEven: {
+					renderAttrs: ['number']
+				}
+			});
+			custom.render();
+
+			var initialContent = custom.getSurfaceElement('oddsOrEven').childNodes[0];
+			custom.number = 4;
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(initialContent, custom.getSurfaceElement('oddsOrEven').childNodes[0]);
+				done();
+			});
+		});
+
 		it('should not render surface content when surface render attrs change but event is prevented', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getSurfaceContent = function() {
@@ -1524,6 +1550,40 @@ describe('Component', function() {
 				assert.notStrictEqual(barInnerElement, custom.element.querySelector('.barInner'));
 				assert.notStrictEqual(fooInnerElement, custom.element.querySelector('.fooInner'));
 				assert.strictEqual('bar', custom.getSurfaceElement('foo').textContent);
+				done();
+			});
+		});
+
+		it('should not repaint nested surface when its render attrs change but content stays the same', function(done) {
+			this.CustomComponent.prototype.getSurfaceContent = function(surfaceId) {
+				switch (surfaceId) {
+					case 'header':
+						return this.buildPlaceholder(this.id + '-title', {}) + this.buildPlaceholder(this.id + '-subtitle', {});
+					case 'title':
+						return this.foo.title;
+					case 'subtitle':
+						return this.foo.subtitle;
+				}
+			};
+			var custom = new this.CustomComponent({
+				foo: {
+					subtitle: 'My Subtitle',
+					title: 'My Title'
+				}
+			}).render();
+
+			var initialHeaderContent = custom.getSurfaceElement('header').childNodes[0];
+			var initialTitleContent = custom.getSurfaceElement('title').childNodes[0];
+			var initialSubtitleContent = custom.getSurfaceElement('subtitle').childNodes[0];
+
+			custom.foo = {
+				subtitle: 'My Subtitle',
+				title: 'New Title'
+			};
+			custom.once('attrsChanged', function() {
+				assert.strictEqual(initialHeaderContent, custom.getSurfaceElement('header').childNodes[0]);
+				assert.notStrictEqual(initialTitleContent, custom.getSurfaceElement('title').childNodes[0]);
+				assert.strictEqual(initialSubtitleContent, custom.getSurfaceElement('subtitle').childNodes[0]);
 				done();
 			});
 		});

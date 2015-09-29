@@ -221,6 +221,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Adds the surface for this component's main element, if it doesn't exist yet.
+	 * @protected
+	 */
+	addElementSurface_() {
+		if (!this.surfaceIds_[this.id]) {
+			this.addSurface(this.id, this.buildElementSurfaceData_());
+		}
+	}
+
+	/**
 	 * Registers a surface to the component. Surface elements are not
 	 * automatically appended to the component element.
 	 * @param {string} surfaceId The surface id to be registered.
@@ -811,13 +821,26 @@ class Component extends Attribute {
 	getElementContent() {}
 
 	/**
+	 * Calls `getElementContent` and creating its surface if it hasn't been created yet.
+	 * @return {Object|string} The content to be rendered. If the content is a
+	 *   string, surfaces can be represented by placeholders in the format specified
+	 *   by Component.SURFACE_REGEX. Also, if the string content's main wrapper has
+	 *   the component's id, then it will be used to render the main element tag.
+	 * @protected
+	 */
+	getElementContent_() {
+		this.addElementSurface_();
+		return this.getElementContent();
+	}
+
+	/**
 	 * Calls `getElementContent` and replaces all placeholders in the returned content.
 	 * This is called when rendering sub components, so it also attaches listeners to
 	 * the original content.
 	 * @return {string} The content with all placeholders already replaced.
 	 */
 	getElementExtendedContent() {
-		var content = this.getElementContent();
+		var content = this.getElementContent_();
 		this.eventsCollector_.attachListeners(content, this.id);
 		return this.replaceSurfacePlaceholders_(content);
 	}
@@ -885,7 +908,7 @@ class Component extends Attribute {
 	getSurfaceContent_(surfaceElementId) {
 		var surface = this.getSurface(surfaceElementId);
 		if (surfaceElementId === this.id) {
-			return this.getElementContent();
+			return this.getElementContent_();
 		} else if (surface.componentName) {
 			var component = ComponentCollector.components[surfaceElementId];
 			if (component.wasRendered) {
@@ -1111,7 +1134,7 @@ class Component extends Attribute {
 			throw new Error(Component.Error.ALREADY_RENDERED);
 		}
 
-		this.addSurface(this.id, this.buildElementSurfaceData_());
+		this.addElementSurface_();
 		this.renderSurfacesContent_(this.surfaceIds_);
 
 		this.syncAttrs_();
@@ -1132,7 +1155,7 @@ class Component extends Attribute {
 	 *   component
 	 */
 	renderAsSubComponent(opt_content) {
-		this.addSurface(this.id, this.buildElementSurfaceData_());
+		this.addElementSurface_();
 		if (opt_content && dom.isEmpty(this.element)) {
 			// If we have the rendered content for this component, but it hasn't
 			// been rendered in its element yet, we render it manually here. That
@@ -1468,7 +1491,7 @@ class Component extends Attribute {
 			// and the default value of "element" depends on "id".
 			this.id = this.makeId_();
 		}
-		var element = this.findElementInContent_(this.id, this.getElementContent());
+		var element = this.findElementInContent_(this.id, this.getElementContent_());
 		if (!element) {
 			element = this.findElementInContent_(this.id, this.getComponentHtml(''));
 		}

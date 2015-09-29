@@ -24,13 +24,6 @@ class SoyComponent extends Component {
 		super(opt_config);
 
 		/**
-		 * The parameters defined in this component's "content" soy template.
-		 * @type {Array}
-		 * @protected
-		 */
-		this.contentParams_ = null;
-
-		/**
 		 * Flags indicating which surface names have already been found on this component's content.
 		 * @type {!Object<string, boolean>}
 		 * @protected
@@ -50,17 +43,13 @@ class SoyComponent extends Component {
 		 * @protected
 		 */
 		this.skipInnerCalls_ = false;
-
-		this.addSurfacesFromTemplates_(opt_config);
-		this.on('renderSurface', this.handleSoyComponentRenderSurface_);
 	}
 
 	/**
 	 * Adds surfaces for each registered template that is not named `element`.
-	 * @param {Object=} opt_config Optional component configuration.
 	 * @protected
 	 */
-	addSurfacesFromTemplates_(opt_config) {
+	addSurfacesFromTemplates_() {
 		var templates = ComponentRegistry.Templates[this.constructor.NAME] || {};
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
@@ -73,10 +62,8 @@ class SoyComponent extends Component {
 						renderAttrs: templateFn.params,
 						templateComponentName: this.constructor.NAME,
 						templateName: templateName
-					}, opt_config);
+					});
 				}
-			} else if (templateName === 'content') {
-				this.contentParams_ = templateFn.params;
 			}
 		}
 	}
@@ -106,8 +93,10 @@ class SoyComponent extends Component {
 	 */
 	buildElementSurfaceData_() {
 		var data = super.buildElementSurfaceData_();
-		data.renderAttrs = this.contentParams_;
-		this.contentParams_ = null;
+		var templates = ComponentRegistry.Templates[this.constructor.NAME] || {};
+		if (templates.content) {
+			data.renderAttrs = SoyComponentAop.getOriginalFn(templates.content).params;
+		}
 		return data;
 	}
 
@@ -161,6 +150,18 @@ class SoyComponent extends Component {
 		};
 		SoyComponentAop.registerTemplates(name);
 		return new TemplateComponent(data);
+	}
+
+	/**
+	 * Overrides the original method from `Component` to add more behavior that should
+	 * happen before the creation lifecycle of the component.
+	 * @protected
+	 * @override
+	 */
+	created_() {
+		this.addSurfacesFromTemplates_();
+		this.on('renderSurface', this.handleSoyComponentRenderSurface_);
+		super.created_();
 	}
 
 	/**

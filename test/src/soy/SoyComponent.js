@@ -14,6 +14,7 @@ import './assets/CustomTestComponent.soy.js';
 import './assets/DeeplyNestedTestComponent.soy.js';
 import './assets/EventsTestComponent.soy.js';
 import './assets/ExternalTemplateTestComponent.soy.js';
+import './assets/ListTestComponent.soy.js';
 import './assets/NestedNoIdTestComponent.soy.js';
 import './assets/NestedPrivateTemplateTestComponent.soy.js';
 import './assets/NestedSurfacesTestComponent.soy.js';
@@ -89,6 +90,22 @@ describe('SoyComponent', function() {
 		});
 	});
 
+	it('should not throw error if template depends on array attr that was not defined on component', function() {
+		var ListTestComponent = createCustomTestComponentClass('ListTestComponent');
+		var custom = new ListTestComponent({
+			items: [1, 2, 3]
+		});
+
+		assert.doesNotThrow(function() {
+			custom.render();
+		});
+
+		assert.strictEqual(3, custom.element.childNodes.length);
+		assert.strictEqual('1', custom.element.childNodes[0].textContent);
+		assert.strictEqual('2', custom.element.childNodes[1].textContent);
+		assert.strictEqual('3', custom.element.childNodes[2].textContent);
+	});
+
 	it('should pass requested injected data to soy templates', function() {
 		var ijData = {
 			foo: 'foo'
@@ -139,7 +156,7 @@ describe('SoyComponent', function() {
 
 			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['notPrivate'], Object.keys(surfaces));
+			assert.deepEqual([custom.id, 'notPrivate'], Object.keys(surfaces));
 		});
 
 		it('should set surface renderAttrs to its template params', function() {

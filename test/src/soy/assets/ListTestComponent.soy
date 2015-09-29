@@ -1,0 +1,13 @@
+{namespace Templates.ListTestComponent}
+
+/**
+ * @param id
+ * @param items
+ */
+{template .content}
+	<ul id="{$id}">
+		{foreach $item in $items}
+			<li>{$item}</li>
+		{/foreach}
+	</ul>
+{/template}

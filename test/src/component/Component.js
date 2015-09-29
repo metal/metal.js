@@ -829,11 +829,8 @@ describe('Component', function() {
 			};
 
 			class ChildComponent extends ParentComponent {
-				constructor(opt_config) {
-					super(opt_config);
-				}
 			}
-
+			ChildComponent.NAME = 'ChildComponent';
 			ChildComponent.SURFACES = {
 				content: {}
 			};

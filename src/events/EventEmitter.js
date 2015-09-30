@@ -1,6 +1,7 @@
 'use strict';
 
 import core from '../core';
+import array from '../array/array';
 import Disposable from '../disposable/Disposable';
 import EventHandle from '../events/EventHandle';
 
@@ -109,7 +110,7 @@ class EventEmitter extends Disposable {
 	 * @return {boolean} Returns true if event had listeners, false otherwise.
 	 */
 	emit(event) {
-		var args = Array.prototype.slice.call(arguments, 1);
+		var args = array.slice(arguments, 1);
 		var listeners = (this.events_[event] || []).concat();
 
 		var facade;

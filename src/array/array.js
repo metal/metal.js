@@ -1,5 +1,7 @@
 'use strict';
 
+import core from '../core';
+
 class array {
 	/**
 	 * Checks if the given arrays have the same content.
@@ -71,6 +73,25 @@ class array {
 	 */
 	static removeAt(arr, i) {
 		return Array.prototype.splice.call(arr, i, 1).length === 1;
+	}
+
+	/**
+	 * Slices the given array, just like Array.prototype.slice, but this
+	 * is faster and working on all array-like objects (like arguments).
+	 * @param {!Object} arr Array-like object to slice.
+	 * @param {number} start The index that should start the slice.
+	 * @param {number=} opt_end The index where the slice should end, not
+	 *   included in the final array. If not given, all elements after the
+	 *   start index will be included.
+	 * @return {!Array}
+	 */
+	static slice(arr, start, opt_end) {
+		var sliced = [];
+		var end = core.isDef(opt_end) ? opt_end : arr.length;
+		for (var i = start; i < end; i++) {
+			sliced.push(arr[i]);
+		}
+		return sliced;
 	}
 }
 

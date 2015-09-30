@@ -67,4 +67,23 @@ describe('array', function() {
 			assert.ok(array.equal([1, obj], [1, obj]));
 		});
 	});
+
+	describe('slice', function() {
+		it('should slice given array starting from the specified index', function() {
+			var arr = [0, 1, 2, 3, 4, 5];
+			assert.deepEqual([3, 4, 5], array.slice(arr, 3));
+		});
+
+		it('should slice given array with the specified range', function() {
+			var arr = [0, 1, 2, 3, 4, 5];
+			assert.deepEqual([3, 4], array.slice(arr, 3, 5));
+		});
+
+		it('should slice arguments object', function() {
+			function sliceArgs() {
+				return array.slice(arguments, 3, 5);
+			}
+			assert.deepEqual([3, 4], sliceArgs(0, 1, 2, 3, 4, 5));
+		});
+	});
 });

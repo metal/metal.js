@@ -668,6 +668,9 @@ class Component extends Attribute {
 		this.generatedIdCount_ = null;
 		this.surfacesRenderAttrs_ = null;
 
+		this.eventsCollector_.dispose();
+		this.eventsCollector_ = null;
+
 		Object.keys(this.surfaceIds_).forEach(surfaceId => this.removeSurface(surfaceId));
 		this.surfaceIds_ = null;
 

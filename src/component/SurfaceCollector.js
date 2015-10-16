@@ -27,7 +27,8 @@ class SurfaceCollector extends Disposable {
 		if (this.surfaces_[surfaceElementId]) {
 			this.updateSurface(surfaceElementId, opt_data);
 		} else {
-			this.surfaces_[surfaceElementId] = opt_data;
+			this.surfaces_[surfaceElementId] = opt_data || {};
+			this.surfaces_[surfaceElementId].surfaceElementId = surfaceElementId;
 		}
 	}
 

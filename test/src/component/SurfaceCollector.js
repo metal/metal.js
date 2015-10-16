@@ -28,7 +28,8 @@ describe('SurfaceCollector', function() {
 		var expectedData = {
 			bar: 'bar',
 			foo: 'newFoo',
-			foo2: 'foo2'
+			foo2: 'foo2',
+			surfaceElementId: 'surface1'
 		};
 		assert.strictEqual(data1, collector.getSurface('surface1'));
 		assert.deepEqual(expectedData, data1);

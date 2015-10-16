@@ -1323,7 +1323,8 @@ class Component extends Attribute {
 			// Surfaces should already have been created before being rendered so they can be
 			// accessed from their getSurfaceContent calls.
 			id = instance.createPlaceholderSurface_(id, opt_surfaceElementId);
-			instance.getSurface(id).handled = true;
+			var surface = instance.getSurface(id);
+			surface.handled = true;
 
 			var surfaceContent = instance.getSurfaceContent_(id);
 			var surfaceHtml = instance.getSurfaceHtml(id, surfaceContent);
@@ -1331,7 +1332,7 @@ class Component extends Attribute {
 			instance.collectedSurfaces_.push({
 				cacheContent: surfaceContent,
 				content: expandedHtml,
-				surfaceElementId: id
+				surface: surface
 			});
 
 			return expandedHtml;
@@ -1411,8 +1412,8 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	updatePlaceholderSurface_(collectedData) {
-		var surfaceElementId = collectedData.surfaceElementId;
-		var surface = this.getSurface(surfaceElementId);
+		var surface = collectedData.surface;
+		var surfaceElementId = surface.surfaceElementId;
 		if (surface.componentName) {
 			// Elements of component surfaces are unchangeable, so we need to replace the
 			// rendered element with the component's.
@@ -1438,7 +1439,7 @@ class Component extends Attribute {
 	updatePlaceholderSurfaces_() {
 		for (var i = this.collectedSurfaces_.length - 1; i >= 0; i--) {
 			this.updatePlaceholderSurface_(this.collectedSurfaces_[i]);
-			this.getSurface(this.collectedSurfaces_[i].surfaceElementId).handled = false;
+			this.collectedSurfaces_[i].surface.handled = false;
 		}
 		this.collectedSurfaces_ = [];
 	}

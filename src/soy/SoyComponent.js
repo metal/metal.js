@@ -283,7 +283,9 @@ class SoyComponent extends Component {
 			templateName: templateName
 		};
 		var surfaceElementId;
-		if (core.isDefAndNotNull(data.surfaceId)) {
+		if (core.isDefAndNotNull(data.surfaceElementId)) {
+			surfaceElementId = data.surfaceElementId;
+		} else if (core.isDefAndNotNull(data.surfaceId)) {
 			surfaceElementId = this.getSurfaceElementId_(data.surfaceId.toString());
 		} else {
 			if (originalFn.private) {

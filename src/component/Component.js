@@ -870,7 +870,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Same as `getSurfaceHtml`, but only called for non component surfaces.
+	 * Same as `getSurfaceHtml_`, but only called for non component surfaces.
 	 * @param {string} surfaceElementId
 	 * @param {string} content
 	 * @return {string}
@@ -973,12 +973,13 @@ class Component extends Attribute {
 	/**
 	 * Gets the html that should be used to build a surface's main element with its
 	 * content.
-	 * @param {string} surfaceElementId
+	 * @param {!Object} surface
 	 * @param {string} content
 	 * @return {string}
+	 * @protected
 	 */
-	getSurfaceHtml(surfaceElementId, content) {
-		var surface = this.getSurface(surfaceElementId);
+	getSurfaceHtml_(surface, content) {
+		var surfaceElementId = surface.surfaceElementId;
 		if (surface.componentName) {
 			return ComponentCollector.components[surfaceElementId].getComponentHtml(content);
 		} else {
@@ -1327,7 +1328,7 @@ class Component extends Attribute {
 			surface.handled = true;
 
 			var surfaceContent = instance.getSurfaceContent_(id);
-			var surfaceHtml = instance.getSurfaceHtml(id, surfaceContent);
+			var surfaceHtml = instance.getSurfaceHtml_(surface, surfaceContent);
 			var expandedHtml = instance.replaceSurfacePlaceholders_(surfaceHtml, id);
 			instance.collectedSurfaces_.push({
 				cacheContent: surfaceContent,

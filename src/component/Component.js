@@ -350,7 +350,7 @@ class Component extends Attribute {
 	 */
 	cacheSurfaceContent(surfaceElementId, content) {
 		var cacheState = this.computeSurfaceCacheState_(content);
-		var surface = this.getSurface(surfaceElementId);
+		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		surface.cacheState = cacheState;
 	}
 
@@ -448,7 +448,7 @@ class Component extends Attribute {
 		if (!core.isDefAndNotNull(surfaceElementId)) {
 			surfaceElementId = this.generateSurfaceElementId_(opt_parentSurfaceElementId);
 		}
-		var surface = this.getSurface(surfaceElementId);
+		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		if (!surface) {
 			surface = {
 				surfaceElementId: surfaceElementId
@@ -469,7 +469,7 @@ class Component extends Attribute {
 		this.components[componentId] = Component.componentsCollector.createComponent(
 			componentName,
 			componentId,
-			this.getSurface(componentId).componentData
+			this.getSurfaceFromElementId(componentId).componentData
 		);
 		return this.components[componentId];
 	}
@@ -591,7 +591,7 @@ class Component extends Attribute {
 	 */
 	defaultRenderSurfaceFn_(data) {
 		var surfaceElementId = data.surfaceElementId;
-		var surface = this.getSurface(surfaceElementId);
+		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		if (surface.componentName && surfaceElementId !== this.id) {
 			this.renderComponentSurface_(surfaceElementId, data.content);
 			return;
@@ -695,7 +695,7 @@ class Component extends Attribute {
 			content: opt_content,
 			renderAttrs: opt_renderAttrs || [],
 			surfaceElementId: surfaceElementId,
-			surfaceId: this.getSurfaceId_(surfaceElementId, this.getSurface(surfaceElementId))
+			surfaceId: this.getSurfaceId_(surfaceElementId, this.getSurfaceFromElementId(surfaceElementId))
 		});
 	}
 
@@ -887,8 +887,8 @@ class Component extends Attribute {
 	 * @return {Object} The surface configuration object.
 	 */
 	getSurface(surfaceId) {
-		var surface = Component.surfacesCollector.getSurface(this.getSurfaceElementId_(surfaceId));
-		return surface ? surface : Component.surfacesCollector.getSurface(surfaceId);
+		var surface = this.getSurfaceFromElementId(this.getSurfaceElementId_(surfaceId));
+		return surface ? surface : this.getSurfaceFromElementId(surfaceId);
 	}
 
 	/**
@@ -910,7 +910,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	getSurfaceContent_(surfaceElementId) {
-		var surface = this.getSurface(surfaceElementId);
+		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		if (surfaceElementId === this.id) {
 			return this.getElementContent_();
 		} else if (surface.componentName) {
@@ -972,6 +972,17 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Gets surface configuration object. This is similar to `getSurface`, but
+	 * receives the surface's element id, while `getSurface` can also receive
+	 * a local surface id.
+	 * @param {string} surfaceElementId The surface's element id
+	 * @return {Object} The surface configuration object.
+	 */
+	getSurfaceFromElementId(surfaceElementId) {
+		return Component.surfacesCollector.getSurface(surfaceElementId);
+	}
+
+	/**
 	 * Gets the html that should be used to build a surface's main element with its
 	 * content.
 	 * @param {!Object} surface
@@ -1010,7 +1021,7 @@ class Component extends Attribute {
 	getSurfaces() {
 		var surfaces = {};
 		Object.keys(this.surfaceIds_).forEach(function(surfaceElementId) {
-			var surface = Component.surfacesCollector.getSurface(surfaceElementId);
+			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			surfaces[this.getSurfaceId_(surfaceElementId, surface)] = surface;
 		}.bind(this));
 		return surfaces;
@@ -1183,7 +1194,7 @@ class Component extends Attribute {
 	renderComponentSurface_(surfaceElementId, opt_content) {
 		var component = ComponentCollector.components[surfaceElementId];
 		if (component.wasRendered) {
-			var surface = this.getSurface(surfaceElementId);
+			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			Component.componentsCollector.updateComponent(surfaceElementId, surface.componentData);
 		} else if (opt_content) {
 			if (this.decorating_) {
@@ -1249,7 +1260,7 @@ class Component extends Attribute {
 		}
 
 		for (var i = 0; i < surfaceElementIds.length; i++) {
-			if (!this.getSurface(surfaceElementIds[i]).handled) {
+			if (!this.getSurfaceFromElementId(surfaceElementIds[i]).handled) {
 				var renderAttrs = surfaces[surfaceElementIds[i]];
 				if (!(renderAttrs instanceof Array)) {
 					renderAttrs = null;
@@ -1294,7 +1305,7 @@ class Component extends Attribute {
 
 		var el = this.getSurfaceElement(surfaceElementId);
 		if (this.checkHasElementTag_(content, surfaceElementId)) {
-			var surface = this.getSurface(surfaceElementId);
+			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			surface.element = content;
 			if (core.isString(content)) {
 				surface.element = dom.buildFragment(content).childNodes[0];

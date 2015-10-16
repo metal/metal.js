@@ -1431,7 +1431,9 @@ describe('Component', function() {
 						return bottom;
 				}
 			};
-			var custom = new CustomComponent();
+			var custom = new CustomComponent({
+				id: 'custom'
+			});
 			custom.addSurface('header');
 			custom.addSurface('body');
 			custom.addSurface('bottom');
@@ -1442,9 +1444,9 @@ describe('Component', function() {
 			var bottomContent = custom.getSurfaceElement('bottom').childNodes[0];
 
 			custom.renderSurfacesContent_({
-				header: true,
-				body: true,
-				bottom: true
+				'custom-header': true,
+				'custom-body': true,
+				'custom-bottom': true
 			});
 			assert.strictEqual(headerContent, custom.getSurfaceElement('header').childNodes[0]);
 			assert.strictEqual(bodyContent, custom.getSurfaceElement('body').childNodes[0]);

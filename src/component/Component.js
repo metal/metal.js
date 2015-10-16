@@ -440,7 +440,7 @@ class Component extends Attribute {
 	 * @param {string=} opt_surfaceElementId
 	 * @param {string=} opt_parentSurfaceElementId The id of the surface element that contains
 	 *   the surface to be created, or undefined if there is none.
-	 * @return {string} The element id of the created surface.
+	 * @return {!Object} The created surface.
 	 * @protected
 	 */
 	createPlaceholderSurface_(opt_surfaceElementId, opt_parentSurfaceElementId) {
@@ -450,11 +450,12 @@ class Component extends Attribute {
 		}
 		var surface = this.getSurface(surfaceElementId);
 		if (!surface) {
-			this.addSurface(surfaceElementId, {
+			surface = {
 				surfaceElementId: surfaceElementId
-			});
+			};
+			this.addSurface(surfaceElementId, surface);
 		}
-		return surfaceElementId;
+		return surface;
 	}
 
 	/**
@@ -1223,7 +1224,8 @@ class Component extends Attribute {
 	renderPlaceholderSurfaceContents_(content, surfaceElementId) {
 		var instance = this;
 		content.replace(Component.SURFACE_REGEX, function(match, id) {
-			instance.emitRenderSurfaceEvent_(instance.createPlaceholderSurface_(id, surfaceElementId));
+			var surface = instance.createPlaceholderSurface_(id, surfaceElementId);
+			instance.emitRenderSurfaceEvent_(surface.surfaceElementId);
 			return match;
 		});
 	}
@@ -1323,13 +1325,12 @@ class Component extends Attribute {
 		return content.replace(Component.SURFACE_REGEX, function(match, id) {
 			// Surfaces should already have been created before being rendered so they can be
 			// accessed from their getSurfaceContent calls.
-			id = instance.createPlaceholderSurface_(id, opt_surfaceElementId);
-			var surface = instance.getSurface(id);
+			var surface = instance.createPlaceholderSurface_(id, opt_surfaceElementId);
 			surface.handled = true;
 
-			var surfaceContent = instance.getSurfaceContent_(id);
+			var surfaceContent = instance.getSurfaceContent_(surface.surfaceElementId);
 			var surfaceHtml = instance.getSurfaceHtml_(surface, surfaceContent);
-			var expandedHtml = instance.replaceSurfacePlaceholders_(surfaceHtml, id);
+			var expandedHtml = instance.replaceSurfacePlaceholders_(surfaceHtml, surface.surfaceElementId);
 			instance.collectedSurfaces_.push({
 				cacheContent: surfaceContent,
 				content: expandedHtml,

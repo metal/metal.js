@@ -621,25 +621,9 @@ class Component extends Attribute {
 		var cacheContent = data.cacheContent || content;
 		var cacheHit = surface.static;
 		if (!surface.static) {
-			var firstCacheContent = cacheContent;
-			if (this.decorating_) {
-				// We cache the entire original content first when decorating so we can compare
-				// with the full content we got from the dom. After comparing, we cache the correct
-				// value so updates can work as expected for this surface.
-				this.cacheSurfaceContent(
-					surfaceElementId,
-					html.compress(this.getSurfaceElement(surfaceElementId).outerHTML)
-				);
-				content = this.replaceSurfacePlaceholders_(content, surfaceElementId, surface);
-				firstCacheContent = content;
-			}
-
 			var previousCacheState = surface.cacheState;
-			this.cacheSurfaceContent(surfaceElementId, firstCacheContent);
+			this.cacheSurfaceContent(surfaceElementId, cacheContent);
 			cacheHit = this.compareCacheStates_(surface.cacheState, previousCacheState);
-			if (this.decorating_) {
-				this.cacheSurfaceContent(surfaceElementId, cacheContent);
-			}
 		}
 
 		if (cacheHit) {
@@ -1184,7 +1168,7 @@ class Component extends Attribute {
 		}
 
 		this.addElementSurface_();
-		this.emitRenderSurfaceEvent_(this.id);
+		this.renderContent_();
 		this.syncAttrs_();
 		this.emit('render');
 		this.attach(opt_parentElement, opt_siblingElement);
@@ -1229,6 +1213,31 @@ class Component extends Attribute {
 			component.decorateAsSubComponent(opt_content);
 		} else {
 			component.renderAsSubComponent(opt_content);
+		}
+	}
+
+	/**
+	 * Renders this component's whole content. When decorating this will avoid
+	 * replacing the existing content if it's already correct.
+	 * @protected
+	 */
+	renderContent_() {
+		var id = this.id;
+		if (this.decorating_) {
+			var surface = this.getSurfaceFromElementId(id);
+			var content = this.getElementContent_() || '';
+			var expandedContent = this.replaceSurfacePlaceholders_(content, id, surface);
+
+			var htmlCacheState = this.computeSurfaceCacheState_(html.compress(this.element.outerHTML));
+			var newCacheState = this.computeSurfaceCacheState_(expandedContent);
+			if (!this.compareCacheStates_(htmlCacheState, newCacheState)) {
+				this.replaceElementContent_(expandedContent);
+			}
+
+			this.eventsCollector_.attachListeners(content, id);
+			this.cacheSurfaceContent(id, content);
+		} else {
+			this.emitRenderSurfaceEvent_(id);
 		}
 	}
 

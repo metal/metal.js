@@ -1982,6 +1982,52 @@ describe('Component', function() {
 			});
 		});
 
+		it('should not rerender sub component after update if its contents haven\'t changed', function(done) {
+			var OddsOrEvenComponent = createCustomComponentClass();
+			OddsOrEvenComponent.prototype.buildElementSurfaceData_ = function() {
+				return {
+					renderAttrs: ['count']
+				};
+			};
+			OddsOrEvenComponent.prototype.getElementContent = function() {
+				return this.count % 2 === 0 ? 'Even' : 'Odds';
+			};
+			ComponentRegistry.register('OddsOrEvenComponent', OddsOrEvenComponent);
+
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.SURFACES = {
+				child: {
+					renderAttrs: ['count']
+				}
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-child');
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return this.buildPlaceholder('child', {
+					componentData: {
+						count: this.count
+					},
+					componentName: 'OddsOrEvenComponent',
+					renderAttrs: ['count']
+				});
+			};
+
+			var custom = new CustomComponent({
+				count: 1
+			}).render();
+			var child = custom.components.child;
+			var chidlContentNode = child.element.childNodes[0];
+			assert.strictEqual('Odds', child.element.textContent);
+
+			custom.count = 3;
+			child.once('attrsChanged', function() {
+				assert.strictEqual('Odds', child.element.textContent);
+				assert.strictEqual(chidlContentNode, child.element.childNodes[0]);
+				done();
+			});
+		});
+
 		it('should instantiate sub component from surface definition', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.SURFACES = {

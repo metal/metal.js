@@ -844,6 +844,7 @@ class Component extends Attribute {
 	getElementExtendedContent() {
 		var content = this.getElementContent_() || '';
 		this.eventsCollector_.attachListeners(content, this.id);
+		this.cacheSurfaceContent(this.id, content);
 		return this.replaceSurfacePlaceholders_(content, this.id, this.getSurface(this.id));
 	}
 
@@ -930,10 +931,12 @@ class Component extends Attribute {
 	 * element will be represented by the id `gallery-pictures`. Surface
 	 * elements must also be appended to the component element.
 	 * @param {string} surfaceId The surface id.
+	 * @param {Object=} opt_surface The surface's config. If not given, it will
+	 *   be fetched.
 	 * @return {Element} The surface element or null if surface not registered.
 	 */
-	getSurfaceElement(surfaceId) {
-		var surface = this.getSurface(surfaceId);
+	getSurfaceElement(surfaceId, opt_surface) {
+		var surface = opt_surface || this.getSurface(surfaceId);
 		if (!surface) {
 			return null;
 		}
@@ -1458,7 +1461,7 @@ class Component extends Attribute {
 		if (surface.componentName) {
 			// Elements of component surfaces are unchangeable, so we need to replace the
 			// rendered element with the component's.
-			dom.replace(this.findElementById_(surfaceElementId), this.getSurfaceElement(surfaceElementId));
+			dom.replace(this.findElementById_(surfaceElementId), this.getSurfaceElement(surfaceElementId, surface));
 
 			// Component surfaces need to be handled in case some internal details have changed.
 			this.emitRenderSurfaceEvent_(surfaceElementId, collectedData.content, collectedData.cacheContent);

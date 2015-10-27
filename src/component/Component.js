@@ -649,7 +649,7 @@ class Component extends Attribute {
 			if (!component.isDisposed()) {
 				Component.componentsCollector.removeComponent(component);
 				component.dispose();
-				this.components[ids[i]] = null;
+				delete this.components[ids[i]];
 			}
 		}
 	}

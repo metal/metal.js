@@ -2286,6 +2286,34 @@ describe('Component', function() {
 				});
 			});
 		});
+
+		it('should not throw error when disposing after subcomponents have already been disposed', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.buildElementSurfaceData_ = function() {
+				var data = Component.prototype.buildElementSurfaceData_.call(this);
+				data.renderAttrs = ['count'];
+				return data;
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				var content = '';
+				for (var i = 0; i < this.count; i++) {
+					content += this.buildPlaceholder('comp' + i, {
+						componentName: 'ChildComponent'
+					});
+				}
+				return content;
+			};
+
+			var custom = new CustomComponent({
+				count: 4
+			}).render();
+
+			custom.count = 2;
+			custom.once('attrsChanged', function() {
+				assert.doesNotThrow(() => custom.dispose());
+				done();
+			});
+		});
 	});
 
 	describe('Inline Events', function() {

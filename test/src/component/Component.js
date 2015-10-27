@@ -2229,6 +2229,63 @@ describe('Component', function() {
 				done();
 			});
 		});
+
+		it('should automatically dispose unused sub components of sub components after repaint', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.buildElementSurfaceData_ = function() {
+				var data = Component.prototype.buildElementSurfaceData_.call(this);
+				data.renderAttrs = ['count'];
+				return data;
+			};
+			CustomComponent.prototype.getElementContent = function() {
+				var content = '';
+				for (var i = 0; i < this.count; i++) {
+					content += this.buildPlaceholder(this.id + '-comp' + i, {
+						componentName: 'ChildComponent'
+					});
+				}
+				return content;
+			};
+			ComponentRegistry.register('CustomComponent', CustomComponent);
+
+			var NestedComponent = createCustomComponentClass();
+			NestedComponent.prototype.buildElementSurfaceData_ = CustomComponent.prototype.buildElementSurfaceData_;
+			NestedComponent.prototype.getElementContent = function() {
+				var content = '';
+				for (var i = 0; i < this.count; i++) {
+					content += this.buildPlaceholder('custom' + i, {
+						componentData: {
+							count: this.count
+						},
+						componentName: 'CustomComponent'
+					});
+				}
+				return content;
+			};
+
+			var custom = new NestedComponent({
+				count: 2
+			}).render();
+			var comps = object.mixin({}, custom.components);
+			var nestedComps = object.mixin({}, comps.custom0.components);
+			assert.strictEqual(2, Object.keys(comps).length);
+
+			custom.count = 1;
+			custom.once('attrsChanged', function() {
+				assert.ok(custom.components.custom0);
+				assert.ok(!custom.components.custom1);
+				assert.ok(!comps.custom0.isDisposed());
+				assert.ok(comps.custom1.isDisposed());
+
+				comps.custom0.once('attrsChanged', function() {
+					assert.ok(comps.custom0.components['custom0-comp0']);
+					assert.ok(!comps.custom0.components['custom0-comp1']);
+					assert.ok(!nestedComps['custom0-comp0'].isDisposed());
+					assert.ok(nestedComps['custom0-comp1'].isDisposed());
+					done();
+				});
+			});
+		});
 	});
 
 	describe('Inline Events', function() {

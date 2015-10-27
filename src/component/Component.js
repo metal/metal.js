@@ -1357,8 +1357,10 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	replaceSurfacePlaceholders_(content, surfaceElementId, surface) {
-		this.addToRemovedSurfaces_(surface.children || []);
-		surface.children = [];
+		if (!surface.componentName || surfaceElementId === this.id) {
+			this.addToRemovedSurfaces_(surface.children || []);
+			surface.children = [];
+		}
 
 		var instance = this;
 		return content.replace(Component.SURFACE_REGEX, function(match, id) {

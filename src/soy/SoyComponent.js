@@ -50,7 +50,8 @@ class SoyComponent extends Component {
 	 * @protected
 	 */
 	addSurfacesFromTemplates_() {
-		var templates = ComponentRegistry.Templates[this.constructor.NAME] || {};
+		var name = this.getName();
+		var templates = ComponentRegistry.Templates[name] || {};
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
@@ -60,7 +61,7 @@ class SoyComponent extends Component {
 				if (!surface) {
 					this.addSurface(templateName, {
 						renderAttrs: templateFn.params,
-						templateComponentName: this.constructor.NAME,
+						templateComponentName: name,
 						templateName: templateName
 					});
 				}
@@ -93,7 +94,7 @@ class SoyComponent extends Component {
 	 */
 	buildElementSurfaceData_() {
 		var data = super.buildElementSurfaceData_();
-		var templates = ComponentRegistry.Templates[this.constructor.NAME] || {};
+		var templates = ComponentRegistry.Templates[this.getName()] || {};
 		if (templates.content) {
 			data.renderAttrs = SoyComponentAop.getOriginalFn(templates.content).params;
 		}
@@ -142,6 +143,7 @@ class SoyComponent extends Component {
 		var name = 'TemplateComponent' + core.getUid();
 		class TemplateComponent extends SoyComponent {
 		}
+		TemplateComponent.NAME = name;
 		ComponentRegistry.register(name, TemplateComponent);
 		ComponentRegistry.Templates[name] = {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
@@ -206,7 +208,7 @@ class SoyComponent extends Component {
 	getElementContent() {
 		this.firstSurfaceFound_ = {};
 		this.surfaceBeingRendered_ = this.id;
-		var content = this.renderTemplateByName_(this.constructor.NAME, 'content');
+		var content = this.renderTemplateByName_(this.getName(), 'content');
 		this.surfaceBeingRendered_ = null;
 		return content;
 	}

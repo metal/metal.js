@@ -346,7 +346,7 @@ class Component extends Attribute {
 	 */
 	buildElementSurfaceData_() {
 		return {
-			componentName: this.constructor.NAME
+			componentName: this.getName()
 		};
 	}
 
@@ -810,6 +810,16 @@ class Component extends Attribute {
 	 */
 	getComponentHtml(content) {
 		return this.wrapContentIfNecessary(content, this.id, this.constructor.ELEMENT_TAG_NAME_MERGED);
+	}
+
+	/**
+	 * Gets the name of this component. If the `NAME` static variable is set, this will
+	 * be the component's name. Otherwise, it will be formed from the constructor's
+	 * function name.
+	 * @return {string}
+	 */
+	getName() {
+		return this.constructor.NAME || core.getFunctionName(this.constructor);
 	}
 
 	/**
@@ -1442,7 +1452,7 @@ class Component extends Attribute {
 
 		if (element.tagName !== newElement.tagName) {
 			console.error(
-				'The component named "' + this.constructor.NAME + '" tried to change the component ' +
+				'The component named "' + this.getName() + '" tried to change the component ' +
 				'element\'s tag name, which is not allowed. Make sure to always return the same tag ' +
 				'name for the component element on getElementContent. This may also have been caused by ' +
 				'passing an element to this component with a different tag name from the one it uses.'

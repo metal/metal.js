@@ -624,6 +624,7 @@ describe('SoyComponent', function() {
 		name = name || 'CustomTestComponent';
 		class CustomTestComponent extends SoyComponent {
 		}
+		CustomTestComponent.NAME = name;
 		ComponentRegistry.register(name, CustomTestComponent);
 		return CustomTestComponent;
 	}

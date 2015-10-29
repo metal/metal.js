@@ -38,6 +38,21 @@ class core {
 	}
 
 	/**
+	 * Gets the name of the given function. If the current browser doesn't
+	 * support the `name` property, this will calculate it from the function's
+	 * content string.
+	 * @param {!function()} fn
+	 * @return {string}
+	 */
+	static getFunctionName(fn) {
+		if (!fn.name) {
+			var str = fn.toString();
+		  fn.name = str.substring(9, str.indexOf('('));
+		}
+		return fn.name;
+	}
+
+	/**
 	 * Gets an unique id. If `opt_object` argument is passed, the object is
 	 * mutated with an unique id. Consecutive calls with the same object
 	 * reference won't mutate the object again, instead the current object uid

@@ -228,4 +228,12 @@ describe('core', function() {
 			assert.strictEqual(undefined, core.nullFunction());
 		});
 	});
+
+	describe('getFunctionName', function() {
+		it('should return the name of the given function', function() {
+			function myFunction() {
+			}
+			assert.strictEqual('myFunction', core.getFunctionName(myFunction));
+		});
+	});
 });

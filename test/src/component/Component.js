@@ -1229,6 +1229,29 @@ describe('Component', function() {
 			});
 		});
 
+		it('should repaint surface when render attrs that were added later change', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			CustomComponent.prototype.getElementContent = function() {
+				return this.buildPlaceholder(this.id + '-foo');
+			};
+			CustomComponent.prototype.getSurfaceContent = function() {
+				return this.foo;
+			};
+
+			var custom = new CustomComponent();
+			custom.addSurface('foo');
+			custom.render();
+
+			custom.addSurface('foo', {
+				renderAttrs: ['foo']
+			});
+			custom.foo = 'foo';
+			custom.once('attrsChanged', function() {
+				assert.strictEqual('foo', custom.getSurfaceElement('foo').textContent);
+				done();
+			});
+		});
+
 		it('should not repaint surface when its render attrs change but content stays the same', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.prototype.getElementContent = function() {

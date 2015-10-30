@@ -256,8 +256,8 @@ class Component extends Attribute {
 			if (config.componentName && surfaceId !== this.id) {
 				this.createSubComponent_(config.componentName, surfaceElementId);
 			}
-			this.cacheSurfaceRenderAttrs_(surfaceElementId, config);
 		}
+		this.cacheSurfaceRenderAttrs_(surfaceElementId, config.renderAttrs);
 
 		return this;
 	}
@@ -380,11 +380,11 @@ class Component extends Attribute {
 	 * Relevant for performance to calculate the surfaces group that were
 	 * modified by attributes mutation.
 	 * @param {string} surfaceElementId The surface id to be cached into the flat map.
-	 * @param {!Object} surface The surface's config object.
+	 * @param {Array} renderAttrs The surface's render attrs.
 	 * @protected
 	 */
-	cacheSurfaceRenderAttrs_(surfaceElementId, surface) {
-		var attrs = surface.renderAttrs || [];
+	cacheSurfaceRenderAttrs_(surfaceElementId, renderAttrs) {
+		var attrs = renderAttrs || [];
 		for (var i = 0; i < attrs.length; i++) {
 			if (!this.surfacesRenderAttrs_[attrs[i]]) {
 				this.surfacesRenderAttrs_[attrs[i]] = {};

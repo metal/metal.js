@@ -233,7 +233,9 @@ class Component extends Attribute {
 	 */
 	addElementSurface_() {
 		if (!this.surfaceIds_[this.id]) {
-			this.addSurface(this.id, this.buildElementSurfaceData_());
+			this.addSurface(this.id, {
+				componentName: this.getName()
+			});
 		}
 	}
 
@@ -338,17 +340,6 @@ class Component extends Attribute {
 	 * must be implemented on the detach phase.
 	 */
 	attached() {}
-
-	/**
-	 * Builds the data for this component's main element's surface.
-	 * @return {!Object}
-	 * @protected
-	 */
-	buildElementSurfaceData_() {
-		return {
-			componentName: this.getName()
-		};
-	}
 
 	/**
 	 * Builds a surface placeholder, attaching it to the given data.

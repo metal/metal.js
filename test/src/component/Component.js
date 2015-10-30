@@ -1401,12 +1401,10 @@ describe('Component', function() {
 
 		it('should rerender element content when its render attrs change', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.buildElementSurfaceData_ = function() {
-				var data = Component.prototype.buildElementSurfaceData_.call(this);
-				data.renderAttrs = ['foo'];
-				return data;
-			};
 			CustomComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['foo']
+				});
 				return '<div>' + this.foo + '</div>';
 			};
 			var custom = new CustomComponent({
@@ -1484,12 +1482,10 @@ describe('Component', function() {
 
 		it('should automatically remove unused surfaces after repaint', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.buildElementSurfaceData_ = function() {
-				var data = Component.prototype.buildElementSurfaceData_.call(this);
-				data.renderAttrs = ['count'];
-				return data;
-			};
 			CustomComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['count']
+				});
 				var content = '';
 				for (var i = 0; i < this.count; i++) {
 					content += this.buildPlaceholder(this.id + '-surface' + i);
@@ -2007,12 +2003,10 @@ describe('Component', function() {
 
 		it('should not rerender sub component after update if its contents haven\'t changed', function(done) {
 			var OddsOrEvenComponent = createCustomComponentClass();
-			OddsOrEvenComponent.prototype.buildElementSurfaceData_ = function() {
-				return {
-					renderAttrs: ['count']
-				};
-			};
 			OddsOrEvenComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['count']
+				});
 				return this.count % 2 === 0 ? 'Even' : 'Odds';
 			};
 			ComponentRegistry.register('OddsOrEvenComponent', OddsOrEvenComponent);
@@ -2218,12 +2212,10 @@ describe('Component', function() {
 
 		it('should automatically dispose unused sub components after repaint', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.buildElementSurfaceData_ = function() {
-				var data = Component.prototype.buildElementSurfaceData_.call(this);
-				data.renderAttrs = ['count'];
-				return data;
-			};
 			CustomComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['count']
+				});
 				var content = '';
 				for (var i = 0; i < this.count; i++) {
 					content += this.buildPlaceholder('comp' + i, {
@@ -2255,12 +2247,10 @@ describe('Component', function() {
 
 		it('should automatically dispose unused sub components of sub components after repaint', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.buildElementSurfaceData_ = function() {
-				var data = Component.prototype.buildElementSurfaceData_.call(this);
-				data.renderAttrs = ['count'];
-				return data;
-			};
 			CustomComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['count']
+				});
 				var content = '';
 				for (var i = 0; i < this.count; i++) {
 					content += this.buildPlaceholder(this.id + '-comp' + i, {
@@ -2272,8 +2262,10 @@ describe('Component', function() {
 			ComponentRegistry.register('CustomComponent', CustomComponent);
 
 			var NestedComponent = createCustomComponentClass();
-			NestedComponent.prototype.buildElementSurfaceData_ = CustomComponent.prototype.buildElementSurfaceData_;
 			NestedComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['count']
+				});
 				var content = '';
 				for (var i = 0; i < this.count; i++) {
 					content += this.buildPlaceholder('custom' + i, {
@@ -2312,12 +2304,10 @@ describe('Component', function() {
 
 		it('should not throw error when disposing after subcomponents have already been disposed', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.prototype.buildElementSurfaceData_ = function() {
-				var data = Component.prototype.buildElementSurfaceData_.call(this);
-				data.renderAttrs = ['count'];
-				return data;
-			};
 			CustomComponent.prototype.getElementContent = function() {
+				this.addSurface(this.id, {
+					renderAttrs: ['count']
+				});
 				var content = '';
 				for (var i = 0; i < this.count; i++) {
 					content += this.buildPlaceholder('comp' + i, {

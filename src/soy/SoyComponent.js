@@ -88,20 +88,6 @@ class SoyComponent extends Component {
 	}
 
 	/**
-	 * Overrides the original method from `Component` to include renderAttrs extracted
-	 * from the sou template.
-	 * @return {!Object}
-	 */
-	buildElementSurfaceData_() {
-		var data = super.buildElementSurfaceData_();
-		var templates = ComponentRegistry.Templates[this.getName()] || {};
-		if (templates.content) {
-			data.renderAttrs = SoyComponentAop.getOriginalFn(templates.content).params;
-		}
-		return data;
-	}
-
-	/**
 	 * Builds the data object that should be passed to a template from this component.
 	 * @return {!Object}
 	 * @protected
@@ -266,6 +252,25 @@ class SoyComponent extends Component {
 			return this.handleComponentCall_.call(this, templateComponentName, data);
 		} else {
 			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);
+		}
+	}
+
+	/**
+	 * Handles a `render` event triggered by this component. Adds render attributes to the
+	 * content surface.
+	 * @protected
+	 */
+	addElementSurface_() {
+		if (this.surfaceIds_[this.id]) {
+			return;
+		}
+		super.addElementSurface_();
+
+		var templates = ComponentRegistry.Templates[this.getName()] || {};
+		if (templates.content) {
+			this.addSurface(this.id, {
+				renderAttrs: SoyComponentAop.getOriginalFn(templates.content).params
+			});
 		}
 	}
 

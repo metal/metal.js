@@ -9,6 +9,7 @@ import object from '../object/object';
 import string from '../string/string';
 import Attribute from '../attribute/Attribute';
 import ComponentCollector from '../component/ComponentCollector';
+import ComponentRenderer from '../component/ComponentRenderer';
 import EventEmitterProxy from '../events/EventEmitterProxy';
 import EventHandler from '../events/EventHandler';
 import EventsCollector from './EventsCollector';
@@ -23,7 +24,10 @@ import SurfaceCollector from './SurfaceCollector';
  * modified, representing render performance gains. For each surface, render
  * attributes could be associated, when the render context of a surface gets
  * modified the component Lifecycle re-paints the modified surface
- * automatically.
+ * automatically. Each component has a `ComponentRenderer`, which is in charge
+ * of rendering the surfaces. The renderer to be used is specified by the
+ * RENDERER static variable. An example of renderer is the SoyRenderer, which
+ * works with soy templates.
  *
  * Example:
  *
@@ -33,19 +37,14 @@ import SurfaceCollector from './SurfaceCollector';
  *     super(config);
  *   }
  *
- *   getElementContent() {
- *     return this.getSurfaceElement('header');
- *   }
- *
- *   getSurfaceContent(surfaceId, surfaceElementId) {
- *   }
- *
  *   attached() {
  *   }
  *
  *   detached() {
  *   }
  * }
+ *
+ * CustomComponent.RENDERER = MyRenderer;
  *
  * CustomComponent.ATTRS = {
  *   title: { value: 'Title' },
@@ -167,6 +166,7 @@ class Component extends Attribute {
 
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
+		core.mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
 		core.mergeSuperClassesProperty(this.constructor, 'SURFACE_TAG_NAME', array.firstDefinedValue);
 		this.addSurfacesFromStaticHint_();
 
@@ -814,16 +814,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Gets the content that should be rendered in the component's main element.
-	 * Should be implemented by subclasses.
-	 * @return {string} The content to be rendered, as a string. Surfaces can be
-	 *   represented by placeholders in the format specified by Component.SURFACE_REGEX.
-	 *   Also, if the string content's main wrapper has the component's id, then it
-	 *   will be used to render the main element tag.
-	 */
-	getElementContent() {}
-
-	/**
 	 * Calls `getElementContent` and creating its surface if it hasn't been created yet.
 	 * @return {Object|string} The content to be rendered. If the content is a
 	 *   string, surfaces can be represented by placeholders in the format specified
@@ -833,7 +823,7 @@ class Component extends Attribute {
 	 */
 	getElementContent_() {
 		this.addElementSurface_();
-		return this.getElementContent();
+		return this.getRenderer().getSurfaceContent(this.getSurface(this.id), this);
 	}
 
 	/**
@@ -881,6 +871,14 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Gets the `ComponentRenderer` object for this component.
+	 * @return {!ComponentRenderer}
+	 */
+	getRenderer() {
+		return this.constructor.RENDERER_MERGED;
+	}
+
+	/**
 	 * Gets surface configuration object. If surface is not registered returns
 	 * null.
 	 * @param {string} surfaceId The surface id or its element id.
@@ -892,17 +890,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Gets the content for the requested surface. Should be implemented by subclasses.
-	 * @param {string} surfaceId The surface id.
-	 * @param {string} surfaceElementId The surface element id
-	 * @return {string} The content to be rendered, as a string. Nested surfaces can be
-	 *   represented by placeholders in the format specified by Component.SURFACE_REGEX.
-	 *   Also, if the string content's main wrapper has the surface's id, then it
-	 *   will be used to render the main surface tag.
-	 */
-	getSurfaceContent() {}
-
-	/**
 	 * Gets the content for the requested surface. Calls `getSurfaceContent` for non
 	 * component surfaces, handling component surfaces automatically.
 	 * @param {string} surfaceElementId The surface element id.
@@ -911,9 +898,7 @@ class Component extends Attribute {
 	 */
 	getSurfaceContent_(surfaceElementId) {
 		var surface = this.getSurfaceFromElementId(surfaceElementId);
-		if (surfaceElementId === this.id) {
-			return this.getElementContent_() || '';
-		} else if (surface.componentName) {
+		if (surface.componentName && surfaceElementId !== this.id) {
 			var component = ComponentCollector.components[surfaceElementId];
 			if (component.wasRendered) {
 				return '';
@@ -921,7 +906,7 @@ class Component extends Attribute {
 				return component.getElementExtendedContent();
 			}
 		} else {
-			return this.getSurfaceContent(this.getSurfaceId(surface), surfaceElementId) || '';
+			return this.getRenderer().getSurfaceContent(surface, this) || '';
 		}
 	}
 
@@ -1169,6 +1154,7 @@ class Component extends Attribute {
 			throw new Error(Component.Error.ALREADY_RENDERED);
 		}
 
+		this.getRenderer().init(this);
 		this.addElementSurface_();
 		this.renderContent_();
 		this.syncAttrs_();
@@ -1662,6 +1648,15 @@ Component.ELEMENT_CLASSES = 'component';
  * @static
  */
 Component.ELEMENT_TAG_NAME = 'div';
+
+/**
+ * The `ComponentRenderer` that should be used. Components need to set this
+ * to a subclass of `ComponentRenderer` that has the rendering logic, like
+ * `SoyRenderer`.
+ * @type {!ComponentRenderer}
+ * @static
+ */
+Component.RENDERER = ComponentRenderer;
 
 /**
  * The regex used to search for surface placeholders.

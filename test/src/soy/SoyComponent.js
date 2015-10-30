@@ -21,7 +21,7 @@ import './assets/NestedSurfacesTestComponent.soy.js';
 import './assets/NestedTestComponent.soy.js';
 import './assets/PrivateTemplateTestComponent.soy.js';
 
-describe('SoyComponent', function() {
+describe.skip('SoyComponent', function() {
 	beforeEach(function() {
 		document.body.innerHTML = '';
 		Component.surfacesCollector.removeAllSurfaces();

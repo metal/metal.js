@@ -689,7 +689,7 @@ class Component extends Attribute {
 			content: opt_content,
 			renderAttrs: opt_renderAttrs || [],
 			surfaceElementId: surfaceElementId,
-			surfaceId: this.getSurfaceId(surfaceElementId, this.getSurfaceFromElementId(surfaceElementId))
+			surfaceId: this.getSurfaceId(this.getSurfaceFromElementId(surfaceElementId))
 		});
 	}
 
@@ -921,7 +921,7 @@ class Component extends Attribute {
 				return component.getElementExtendedContent();
 			}
 		} else {
-			return this.getSurfaceContent(this.getSurfaceId(surfaceElementId, surface), surfaceElementId) || '';
+			return this.getSurfaceContent(this.getSurfaceId(surface), surfaceElementId) || '';
 		}
 	}
 
@@ -1002,16 +1002,15 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Gets the surface id for the given surface element id
-	 * @param {string} surfaceElementId
+	 * Gets the surface id for the given surface.
 	 * @param {!Object} surface
 	 * @return {string}
 	 */
-	getSurfaceId(surfaceElementId, surface) {
-		if (surface.componentName || !this.hasComponentPrefix_(surfaceElementId)) {
-			return surfaceElementId;
+	getSurfaceId(surface) {
+		if (surface.componentName || !this.hasComponentPrefix_(surface.surfaceElementId)) {
+			return surface.surfaceElementId;
 		} else {
-			return surfaceElementId.substr(this.id.length + 1);
+			return surface.surfaceElementId.substr(this.id.length + 1);
 		}
 	}
 
@@ -1023,7 +1022,7 @@ class Component extends Attribute {
 		var surfaces = {};
 		Object.keys(this.surfaceIds_).forEach(function(surfaceElementId) {
 			var surface = this.getSurfaceFromElementId(surfaceElementId);
-			surfaces[this.getSurfaceId(surfaceElementId, surface)] = surface;
+			surfaces[this.getSurfaceId(surface)] = surface;
 		}.bind(this));
 		return surfaces;
 	}

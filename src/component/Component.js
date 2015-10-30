@@ -246,7 +246,7 @@ class Component extends Attribute {
 	 */
 	addSurface(surfaceId, opt_surfaceConfig) {
 		var config = opt_surfaceConfig || {};
-		var surfaceElementId = this.getSurfaceElementId_(surfaceId, config);
+		var surfaceElementId = this.getSurfaceElementId(surfaceId, config);
 		if (this.surfaceIds_[surfaceElementId]) {
 			Component.surfacesCollector.updateSurface(surfaceElementId, config);
 		} else {
@@ -896,7 +896,7 @@ class Component extends Attribute {
 	 * @return {Object} The surface configuration object.
 	 */
 	getSurface(surfaceId) {
-		var surface = this.getSurfaceFromElementId(this.getSurfaceElementId_(surfaceId));
+		var surface = this.getSurfaceFromElementId(this.getSurfaceElementId(surfaceId));
 		return surface ? surface : this.getSurfaceFromElementId(surfaceId);
 	}
 
@@ -957,7 +957,7 @@ class Component extends Attribute {
 					surface.element = component.element;
 				}
 			} else {
-				var surfaceElementId = this.getSurfaceElementId_(surfaceId, surface);
+				var surfaceElementId = this.getSurfaceElementId(surfaceId, surface);
 				surface.element = this.findElementById_(surfaceElementId) ||
 					this.createSurfaceElement_(surfaceElementId);
 			}
@@ -971,7 +971,7 @@ class Component extends Attribute {
 	 * @param {Object=} opt_surface The surface data.
 	 * @return {string}
 	 */
-	getSurfaceElementId_(surfaceId, opt_surface) {
+	getSurfaceElementId(surfaceId, opt_surface) {
 		var surface = opt_surface || {};
 		if (surface.surfaceElementId) {
 			return surface.surfaceElementId;
@@ -1131,7 +1131,7 @@ class Component extends Attribute {
 		if (el && el.parentNode) {
 			el.parentNode.removeChild(el);
 		}
-		var surfaceElementId = this.getSurfaceElementId_(surfaceId, this.getSurface(surfaceId));
+		var surfaceElementId = this.getSurfaceElementId(surfaceId, this.getSurface(surfaceId));
 		Component.surfacesCollector.removeSurface(surfaceElementId);
 		this.surfaceIds_[surfaceElementId] = false;
 		return this;

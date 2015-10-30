@@ -292,7 +292,7 @@ class SoyComponent extends Component {
 		if (core.isDefAndNotNull(data.surfaceElementId)) {
 			surfaceElementId = data.surfaceElementId;
 		} else if (core.isDefAndNotNull(data.surfaceId)) {
-			surfaceElementId = this.getSurfaceElementId_(data.surfaceId.toString());
+			surfaceElementId = this.getSurfaceElementId(data.surfaceId.toString());
 		} else {
 			if (originalFn.private) {
 				return originalFn.call(null, data, opt_ignored, opt_ijData);

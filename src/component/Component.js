@@ -464,7 +464,7 @@ class Component extends Attribute {
 	createPlaceholderSurface_(parentSurfaceElementId, opt_surfaceElementId) {
 		var surfaceElementId = opt_surfaceElementId;
 		if (!core.isDefAndNotNull(surfaceElementId)) {
-			surfaceElementId = this.generateSurfaceElementId_(parentSurfaceElementId);
+			surfaceElementId = this.generateSurfaceElementId(parentSurfaceElementId);
 		}
 		var surface = this.getSurfaceFromElementId(surfaceElementId);
 		if (!surface) {
@@ -797,7 +797,7 @@ class Component extends Attribute {
 	 *   if there is none.
 	 * @return {string} The generated id.
 	 */
-	generateSurfaceElementId_(parentSurfaceElementId) {
+	generateSurfaceElementId(parentSurfaceElementId) {
 		this.generatedIdCount_[parentSurfaceElementId] = (this.generatedIdCount_[parentSurfaceElementId] || 0) + 1;
 		return parentSurfaceElementId + '-s' + this.generatedIdCount_[parentSurfaceElementId];
 	}

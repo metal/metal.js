@@ -188,14 +188,14 @@ class SoyComponent extends Component {
 	 * @return {string} The generated id.
 	 * @override
 	 */
-	generateSurfaceElementId_(parentSurfaceId, data) {
+	generateSurfaceElementId(parentSurfaceId, data) {
 		if (data.templateName &&
 			parentSurfaceId === this.id &&
 			!this.firstSurfaceFound_[data.templateName]) {
 			this.firstSurfaceFound_[data.templateName] = true;
 			return this.prefixSurfaceId_(data.templateName);
 		} else {
-			return super.generateSurfaceElementId_(parentSurfaceId);
+			return super.generateSurfaceElementId(parentSurfaceId);
 		}
 	}
 
@@ -243,7 +243,7 @@ class SoyComponent extends Component {
 		var surfaceData = {
 			componentName: componentName
 		};
-		var id = (data || {}).id || this.generateSurfaceElementId_(this.surfaceBeingRendered_, surfaceData);
+		var id = (data || {}).id || this.generateSurfaceElementId(this.surfaceBeingRendered_, surfaceData);
 		surfaceData.componentData = this.buildComponentConfigData_(id, data);
 		return this.buildPlaceholder(id, surfaceData);
 	}
@@ -297,7 +297,7 @@ class SoyComponent extends Component {
 			if (originalFn.private) {
 				return originalFn.call(null, data, opt_ignored, opt_ijData);
 			}
-			surfaceElementId = this.generateSurfaceElementId_(this.surfaceBeingRendered_, surfaceData);
+			surfaceElementId = this.generateSurfaceElementId(this.surfaceBeingRendered_, surfaceData);
 		}
 		return this.buildPlaceholder(surfaceElementId, surfaceData);
 	}

@@ -1228,18 +1228,12 @@ class Component extends Attribute {
 	renderContent_() {
 		var id = this.id;
 		if (this.decorating_) {
-			var surface = this.getSurfaceFromElementId(id);
-			var content = this.getElementContent_() || '';
-			var expandedContent = this.replaceSurfacePlaceholders_(content, id, surface);
-
+			var extendedContent = this.getElementExtendedContent();
+			var extendedCacheState = this.computeSurfaceCacheState_(extendedContent);
 			var htmlCacheState = this.computeSurfaceCacheState_(html.compress(this.element.outerHTML));
-			var newCacheState = this.computeSurfaceCacheState_(expandedContent);
-			if (!this.compareCacheStates_(htmlCacheState, newCacheState)) {
-				this.replaceElementContent_(expandedContent);
+			if (!this.compareCacheStates_(htmlCacheState, extendedCacheState)) {
+				this.replaceElementContent_(extendedContent);
 			}
-
-			this.eventsCollector_.attachListeners(content, id);
-			this.cacheSurfaceContent(id, content);
 		} else {
 			this.emitRenderSurfaceEvent_(id);
 		}

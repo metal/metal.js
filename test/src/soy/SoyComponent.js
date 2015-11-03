@@ -4,8 +4,8 @@ import dom from '../../../src/dom/dom';
 import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
+import SoyAop from '../../../src/soy/SoyAop';
 import SoyComponent from '../../../src/soy/SoyComponent';
-import SoyComponentAop from '../../../src/soy/SoyComponentAop';
 
 import './assets/ChildrenTestComponent.soy.js';
 import './assets/ContentSurfaceTestComponent.soy.js';
@@ -493,7 +493,7 @@ describe.skip('SoyComponent', function() {
 		});
 
 		it('should pass correct params to soy template', function() {
-			ComponentRegistry.Templates.CustomTestComponent.header = SoyComponentAop.getOriginalFn(
+			ComponentRegistry.Templates.CustomTestComponent.header = SoyAop.getOriginalFn(
 				ComponentRegistry.Templates.CustomTestComponent.header
 			);
 			sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');

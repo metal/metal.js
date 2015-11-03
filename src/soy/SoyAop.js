@@ -2,7 +2,7 @@
 
 import ComponentRegistry from '../component/ComponentRegistry';
 
-var SoyComponentAop = {
+var SoyAop = {
 	/**
 	 * The function that should be called instead of a template call. If null, the original function
 	 * will be called instead.
@@ -40,8 +40,8 @@ var SoyComponentAop = {
 	 * @return {*} The return value of the function that is called to handle this interception.
 	 */
 	handleTemplateCall_: function(compName, templateName, originalFn, opt_data, opt_ignored, opt_ijData) {
-		if (SoyComponentAop.interceptFn_) {
-			return SoyComponentAop.interceptFn_.call(null, compName, templateName, originalFn, opt_data, opt_ignored, opt_ijData);
+		if (SoyAop.interceptFn_) {
+			return SoyAop.interceptFn_.call(null, compName, templateName, originalFn, opt_data, opt_ignored, opt_ijData);
 		} else {
 			return originalFn.call(null, opt_data, opt_ignored, opt_ijData);
 		}
@@ -52,11 +52,11 @@ var SoyComponentAop = {
 	 * been registered before.
 	 */
 	registerAll: function() {
-		if (!SoyComponentAop.registeredTemplates_) {
+		if (!SoyAop.registeredTemplates_) {
 			Object.keys(ComponentRegistry.Templates).forEach(function(compName) {
-				SoyComponentAop.registerTemplates(compName);
+				SoyAop.registerTemplates(compName);
 			});
-			SoyComponentAop.registeredTemplates_ = true;
+			SoyAop.registeredTemplates_ = true;
 		}
 	},
 
@@ -69,7 +69,7 @@ var SoyComponentAop = {
 		Object.keys(compTemplates).forEach(function(templateName) {
 			var originalFn = compTemplates[templateName];
 			if (!originalFn.originalFn) {
-				compTemplates[templateName] = SoyComponentAop.handleTemplateCall_.bind(null, compName, templateName, originalFn);
+				compTemplates[templateName] = SoyAop.handleTemplateCall_.bind(null, compName, templateName, originalFn);
 				compTemplates[templateName].originalFn = originalFn;
 			}
 		});
@@ -82,15 +82,15 @@ var SoyComponentAop = {
 	 */
 	startInterception: function(fn) {
 		this.registerAll();
-		SoyComponentAop.interceptFn_ = fn;
+		SoyAop.interceptFn_ = fn;
 	},
 
 	/**
 	 * Stops intercepting template calls.
 	 */
 	stopInterception: function() {
-		SoyComponentAop.interceptFn_ = null;
+		SoyAop.interceptFn_ = null;
 	}
 };
 
-export default SoyComponentAop;
+export default SoyAop;

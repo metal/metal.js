@@ -5,7 +5,7 @@ import dom from '../dom/dom';
 import object from '../object/object';
 import Component from '../component/Component';
 import ComponentRegistry from '../component/ComponentRegistry';
-import SoyComponentAop from '../soy/SoyComponentAop';
+import SoyAop from '../soy/SoyAop';
 
 // The injected data that will be passed to soy templates.
 var ijData = {};
@@ -55,7 +55,7 @@ class SoyComponent extends Component {
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
-			var templateFn = SoyComponentAop.getOriginalFn(templates[templateName]);
+			var templateFn = SoyAop.getOriginalFn(templates[templateName]);
 			if (this.isSurfaceTemplate_(templateName, templateFn)) {
 				var surface = this.getSurface(templateName);
 				if (!surface) {
@@ -133,10 +133,10 @@ class SoyComponent extends Component {
 		ComponentRegistry.register(name, TemplateComponent);
 		ComponentRegistry.Templates[name] = {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
-				return SoyComponentAop.getOriginalFn(templateFn)(data, opt_ignored, opt_ijData);
+				return SoyAop.getOriginalFn(templateFn)(data, opt_ignored, opt_ijData);
 			}
 		};
-		SoyComponentAop.registerTemplates(name);
+		SoyAop.registerTemplates(name);
 		return new TemplateComponent(data);
 	}
 
@@ -269,7 +269,7 @@ class SoyComponent extends Component {
 		var templates = ComponentRegistry.Templates[this.getName()] || {};
 		if (templates.content) {
 			this.addSurface(this.id, {
-				renderAttrs: SoyComponentAop.getOriginalFn(templates.content).params
+				renderAttrs: SoyAop.getOriginalFn(templates.content).params
 			});
 		}
 	}
@@ -339,10 +339,10 @@ class SoyComponent extends Component {
 	 * @return {string} The template's result content.
 	 */
 	renderTemplate_(templateFn, opt_data) {
-		SoyComponentAop.startInterception(this.handleInterceptedCall_.bind(this));
-		templateFn = SoyComponentAop.getOriginalFn(templateFn);
+		SoyAop.startInterception(this.handleInterceptedCall_.bind(this));
+		templateFn = SoyAop.getOriginalFn(templateFn);
 		var content = templateFn(opt_data || this.buildTemplateData_(), null, ijData).content;
-		SoyComponentAop.stopInterception();
+		SoyAop.stopInterception();
 		return content;
 	}
 

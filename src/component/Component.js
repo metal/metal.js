@@ -618,11 +618,7 @@ class Component extends Attribute {
 		}
 
 		if (cacheHit) {
-			if (this.decorating_) {
-				this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
-			} else {
-				this.renderPlaceholderSurfaceContents_(cacheContent, surfaceElementId);
-			}
+			this.renderPlaceholderSurfaceContents_(cacheContent, surfaceElementId);
 		} else {
 			this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
 			this.replaceSurfaceContent_(surfaceElementId, surface, content);

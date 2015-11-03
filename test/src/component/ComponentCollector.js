@@ -6,11 +6,8 @@ import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import ComponentCollector from '../../../src/component/ComponentCollector';
 
 class TestComponent extends Component {
-	constructor(opt_config) {
-		super(opt_config);
-	}
 }
-ComponentRegistry.register('TestComponent', TestComponent);
+ComponentRegistry.register(TestComponent);
 TestComponent.ATTRS = {
 	bar: {}
 };

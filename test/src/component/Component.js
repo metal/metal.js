@@ -788,7 +788,7 @@ describe('Component Tests', function() {
 
 		it('should emit "renderSurface" event for the main component surface on render', function() {
 			var CustomComponent = createCustomComponentClass();
-			ComponentRegistry.register('CustomComponent', CustomComponent);
+			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent();
 
 			var listener = sinon.stub();
@@ -817,7 +817,7 @@ describe('Component Tests', function() {
 					renderAttrs: ['foo', 'bar']
 				}
 			};
-			ComponentRegistry.register('CustomComponent', CustomComponent);
+			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent().render();
 
 			var listener = sinon.stub();
@@ -848,7 +848,7 @@ describe('Component Tests', function() {
 					renderAttrs: ['foo']
 				}
 			};
-			ComponentRegistry.register('CustomComponent', CustomComponent);
+			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent().render();
 
 			custom.on('renderSurface', function(data, event) {
@@ -953,7 +953,7 @@ describe('Component Tests', function() {
 
 		it('should get element for component surface', function() {
 			var CustomComponent = createCustomComponentClass();
-			ComponentRegistry.register('CustomComponent', CustomComponent);
+			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent();
 			custom.addSurface('comp', {
 				componentName: 'CustomComponent'
@@ -963,7 +963,7 @@ describe('Component Tests', function() {
 
 		it('should not throw error when getting element of component surface for component that isn\'t registered', function() {
 			var CustomComponent = createCustomComponentClass();
-			ComponentRegistry.register('CustomComponent', CustomComponent);
+			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent();
 			custom.addSurface('comp', {
 				componentName: 'CustomComponent'
@@ -1750,7 +1750,7 @@ describe('Component Tests', function() {
 					renderAttrs: ['foo']
 				}
 			};
-			ComponentRegistry.register('ChildComponent', this.ChildComponent);
+			ComponentRegistry.register(this.ChildComponent, 'ChildComponent');
 		});
 
 		it('should instantiate sub component from placeholder', function() {
@@ -1983,7 +1983,7 @@ describe('Component Tests', function() {
 					return comp.count % 2 === 0 ? 'Even' : 'Odds';
 				}
 			});
-			ComponentRegistry.register('OddsOrEvenComponent', OddsOrEvenComponent);
+			ComponentRegistry.register(OddsOrEvenComponent, 'OddsOrEvenComponent');
 
 			var CustomComponent = createCustomComponentClass(function(surface, comp) {
 				if (surface.surfaceElementId === comp.id) {
@@ -2156,7 +2156,7 @@ describe('Component Tests', function() {
 					});
 				}
 			});
-			ComponentRegistry.register('AnotherComponent', AnotherComponent);
+			ComponentRegistry.register(AnotherComponent, 'AnotherComponent');
 
 			var CustomComponent = createCustomComponentClass(function(surface, comp) {
 				if (surface.surfaceElementId === comp.id) {
@@ -2232,7 +2232,7 @@ describe('Component Tests', function() {
 					return content;
 				}
 			});
-			ComponentRegistry.register('CustomComponent', CustomComponent);
+			ComponentRegistry.register(CustomComponent);
 
 			var NestedComponent = createCustomComponentClass(function(surface, comp) {
 				if (surface.surfaceElementId === comp.id) {
@@ -2335,7 +2335,7 @@ describe('Component Tests', function() {
 			EventsTestComponent.prototype.handleElementClicked = sinon.stub();
 			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
 			EventsTestComponent.prototype.handleSurfaceClicked = sinon.stub();
-			ComponentRegistry.register('EventsTestComponent', EventsTestComponent);
+			ComponentRegistry.register(EventsTestComponent, 'EventsTestComponent');
 			this.EventsTestComponent = EventsTestComponent;
 		});
 

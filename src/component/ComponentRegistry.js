@@ -1,5 +1,7 @@
 'use strict';
 
+import core from '../core';
+
 /**
  * The component registry is used to register components, so they can
  * be accessible by name.
@@ -26,14 +28,17 @@ class ComponentRegistry {
 	}
 
 	/**
-	 * Registers a component.
-	 * @param {string} name The component's name.
+	 * Registers a component, so it can be found by its name.
 	 * @param {string} constructorFn The component's constructor function.
+	 * @param {string=} opt_name Name of the registered component. If none is given
+	 *   the name defined by the NAME static variable will be used instead. If that
+	 *   isn't set as well, the name of the constructor function will be used.
 	 * @static
 	 */
-	static register(name, constructorFn) {
+	static register(constructorFn, opt_name) {
+		var name = opt_name || constructorFn.NAME || core.getFunctionName(constructorFn);
+		constructorFn.NAME = name;
 		ComponentRegistry.components_[name] = constructorFn;
-		constructorFn.TEMPLATES = ComponentRegistry.Templates[name];
 	}
 }
 

@@ -10,7 +10,7 @@ import ComponentCollector from '../../../src/component/ComponentCollector';
 import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import ComponentRenderer from '../../../src/component/ComponentRenderer';
 
-describe('Component Tests', function() {
+describe('Component', function() {
 	afterEach(function() {
 		document.body.innerHTML = '';
 		Component.surfacesCollector.removeAllSurfaces();
@@ -2501,7 +2501,6 @@ describe('Component Tests', function() {
 		sinon.spy(CustomComponent.prototype, 'attached');
 		sinon.spy(CustomComponent.prototype, 'detached');
 		sinon.spy(CustomComponent.RENDERER, 'getSurfaceContent');
-		sinon.spy(CustomComponent.RENDERER, 'init');
 
 		return CustomComponent;
 	}

@@ -815,15 +815,16 @@ class Component extends Attribute {
 
 	/**
 	 * Calls `getElementContent` and creating its surface if it hasn't been created yet.
+	 * @param {string=} opt_skipContents True if only the element's tag needs to be rendered.
 	 * @return {Object|string} The content to be rendered. If the content is a
 	 *   string, surfaces can be represented by placeholders in the format specified
 	 *   by Component.SURFACE_REGEX. Also, if the string content's main wrapper has
 	 *   the component's id, then it will be used to render the main element tag.
 	 * @protected
 	 */
-	getElementContent_() {
+	getElementContent_(opt_skipContents) {
 		this.addElementSurface_();
-		return this.getRenderer().getSurfaceContent(this.getSurface(this.id), this);
+		return this.getRenderer().getSurfaceContent(this.getSurface(this.id), this, opt_skipContents);
 	}
 
 	/**
@@ -954,7 +955,7 @@ class Component extends Attribute {
 		} else if (surface.componentName || this.hasComponentPrefix_(surfaceId)) {
 			return surfaceId;
 		} else {
-			return this.prefixSurfaceId_(surfaceId);
+			return this.prefixSurfaceId(surfaceId);
 		}
 	}
 
@@ -1089,9 +1090,8 @@ class Component extends Attribute {
 	 * Prefixes the given surface id with this component's id.
 	 * @param {string} surfaceId
 	 * @return {string}
-	 * @protected
 	 */
-	prefixSurfaceId_(surfaceId) {
+	prefixSurfaceId(surfaceId) {
 		return this.id + '-' + surfaceId;
 	}
 
@@ -1136,8 +1136,7 @@ class Component extends Attribute {
 	 *
 	 * Render Lifecycle:
 	 *   render - Decorate is manually called.
-	 *   render surfaces - All surfaces content are rendered, including the
-	 *     main content (`getElementContent`).
+	 *   render surfaces - All surfaces content are rendered.
 	 *   attribute synchronization - All synchronization methods are called.
 	 *   attach - Attach Lifecycle is called.
 	 *
@@ -1154,7 +1153,6 @@ class Component extends Attribute {
 			throw new Error(Component.Error.ALREADY_RENDERED);
 		}
 
-		this.getRenderer().init(this);
 		this.addElementSurface_();
 		this.renderContent_();
 		this.syncAttrs_();
@@ -1423,8 +1421,9 @@ class Component extends Attribute {
 			console.error(
 				'The component named "' + this.getName() + '" tried to change the component ' +
 				'element\'s tag name, which is not allowed. Make sure to always return the same tag ' +
-				'name for the component element on getElementContent. This may also have been caused by ' +
-				'passing an element to this component with a different tag name from the one it uses.'
+				'name for the component element on the renderer\'s getSurfaceContent. This may also ' +
+				'have been caused by passing an element to this component with a different tag name ' +
+				'from the one it uses.'
 			);
 		}
 	}
@@ -1520,7 +1519,7 @@ class Component extends Attribute {
 			// and the default value of "element" depends on "id".
 			this.id = this.makeId_();
 		}
-		var element = this.findElementInContent_(this.id, this.getElementContent_() || '');
+		var element = this.findElementInContent_(this.id, this.getElementContent_(true) || '');
 		if (!element) {
 			element = this.findElementInContent_(this.id, this.getComponentHtml(''));
 		}

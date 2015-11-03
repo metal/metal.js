@@ -5,13 +5,11 @@ import SoyAop from '../../../src/soy/SoyAop';
 
 describe('SoyAop', function() {
 	beforeEach(function() {
-		ComponentRegistry.Templates = {
-			TestComponent: {
-				test: sinon.stub()
-			},
-			TestComponent2: {
-				test2: sinon.stub()
-			}
+		ComponentRegistry.Templates.TestComponent = {
+			test: sinon.stub()
+		};
+		ComponentRegistry.Templates.TestComponent2 = {
+			test2: sinon.stub()
 		};
 		SoyAop.registeredTemplates_ = false;
 	});

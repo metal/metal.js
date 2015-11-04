@@ -12,13 +12,6 @@ var SoyAop = {
 	interceptFn_: null,
 
 	/**
-	 * Flag indicating if soy templates have already been registered for interception or not.
-	 * @type {boolean}
-	 * @protected
-	 */
-	registeredTemplates_: false,
-
-	/**
 	 * Gets the original function of the given template function. If no original exists,
 	 * returns the given function itself.
 	 * @param {!function()} fn
@@ -48,19 +41,6 @@ var SoyAop = {
 	},
 
 	/**
-	 * Registers all templates so they can be intercepted, unless they've already
-	 * been registered before.
-	 */
-	registerAll: function() {
-		if (!SoyAop.registeredTemplates_) {
-			Object.keys(SoyTemplates.get()).forEach(function(compName) {
-				SoyAop.registerTemplates(compName);
-			});
-			SoyAop.registeredTemplates_ = true;
-		}
-	},
-
-	/**
 	 * Registers the templates for the requested component so they can be intercepted.
 	 * @param {string} compName
 	 */
@@ -81,7 +61,6 @@ var SoyAop = {
 	 * @param {!function()} fn
 	 */
 	startInterception: function(fn) {
-		this.registerAll();
 		SoyAop.interceptFn_ = fn;
 	},
 

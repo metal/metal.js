@@ -4,6 +4,9 @@ import SoyAop from '../../../src/soy/SoyAop';
 import SoyTemplates from '../../../src/soy/SoyTemplates';
 
 describe('SoyAop', function() {
+	var originalFn1;
+	var originalFn2;
+
 	beforeEach(function() {
 		SoyTemplates.set('TestComponent', {
 			test: sinon.stub()
@@ -11,13 +14,14 @@ describe('SoyAop', function() {
 		SoyTemplates.set('TestComponent2', {
 			test2: sinon.stub()
 		});
-		SoyAop.registeredTemplates_ = false;
+		originalFn1 = SoyTemplates.get('TestComponent', 'test');
+		originalFn2 = SoyTemplates.get('TestComponent2', 'test2');
+		SoyAop.registerTemplates('TestComponent');
+		SoyAop.registerTemplates('TestComponent2');
 	});
 
 	it('should intercept calls to template functions', function() {
 		var interceptor = sinon.stub();
-		var originalFn1 = SoyTemplates.get('TestComponent', 'test');
-		var originalFn2 = SoyTemplates.get('TestComponent2', 'test2');
 		SoyAop.startInterception(interceptor);
 
 		SoyTemplates.get('TestComponent', 'test')({}, null, {});
@@ -50,8 +54,6 @@ describe('SoyAop', function() {
 
 	it('should stop intercepting calls to template functions', function() {
 		var interceptor = sinon.stub();
-		var originalFn1 = SoyTemplates.get('TestComponent', 'test');
-		var originalFn2 = SoyTemplates.get('TestComponent2', 'test2');
 		SoyAop.startInterception(interceptor);
 		SoyAop.stopInterception(interceptor);
 
@@ -66,8 +68,6 @@ describe('SoyAop', function() {
 
 	it('should restart intercepting calls to template functions', function() {
 		var interceptor = sinon.stub();
-		var originalFn1 = SoyTemplates.get('TestComponent', 'test');
-		var originalFn2 = SoyTemplates.get('TestComponent2', 'test2');
 		SoyAop.startInterception(interceptor);
 		SoyAop.stopInterception(interceptor);
 		SoyAop.startInterception(interceptor);
@@ -111,8 +111,6 @@ describe('SoyAop', function() {
 
 	it('should get original function', function() {
 		var interceptor = sinon.stub();
-		var originalFn1 = SoyTemplates.get('TestComponent', 'test');
-		var originalFn2 = SoyTemplates.get('TestComponent2', 'test2');
 		SoyAop.startInterception(interceptor);
 
 		var currentFn1 = SoyTemplates.get('TestComponent', 'test');

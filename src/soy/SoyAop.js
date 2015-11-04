@@ -1,6 +1,6 @@
 'use strict';
 
-import ComponentRegistry from '../component/ComponentRegistry';
+import SoyTemplates from '../soy/SoyTemplates';
 
 var SoyAop = {
 	/**
@@ -53,7 +53,7 @@ var SoyAop = {
 	 */
 	registerAll: function() {
 		if (!SoyAop.registeredTemplates_) {
-			Object.keys(ComponentRegistry.Templates).forEach(function(compName) {
+			Object.keys(SoyTemplates.get()).forEach(function(compName) {
 				SoyAop.registerTemplates(compName);
 			});
 			SoyAop.registeredTemplates_ = true;
@@ -65,7 +65,7 @@ var SoyAop = {
 	 * @param {string} compName
 	 */
 	registerTemplates: function(compName) {
-		var compTemplates = ComponentRegistry.Templates[compName];
+		var compTemplates = SoyTemplates.get(compName);
 		Object.keys(compTemplates).forEach(function(templateName) {
 			var originalFn = compTemplates[templateName];
 			if (!originalFn.originalFn) {

@@ -50,12 +50,4 @@ class ComponentRegistry {
  */
 ComponentRegistry.components_ = {};
 
-/**
- * Holds all registered component templates, indexed by component names.
- * Soy files automatically add their templates to this object when imported.
- * @type {!Object<string, !Object<string, !function()>>}
- * @static
- */
-ComponentRegistry.Templates = {};
-
 export default ComponentRegistry;

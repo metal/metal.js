@@ -6,7 +6,8 @@ import object from '../object/object';
 import Component from '../component/Component';
 import ComponentRegistry from '../component/ComponentRegistry';
 import ComponentRenderer from '../component/ComponentRenderer';
-import SoyAop from '../soy/SoyAop';
+import SoyAop from './SoyAop';
+import SoyTemplates from './SoyTemplates';
 
 // The injected data that will be passed to soy templates.
 var ijData = {};
@@ -26,7 +27,7 @@ class SoyRenderer extends ComponentRenderer {
 	 */
 	static addSurfacesFromTemplates_(component) {
 		var name = component.getName();
-		var templates = ComponentRegistry.Templates[name] || {};
+		var templates = SoyTemplates.get(name);
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
@@ -104,11 +105,11 @@ class SoyRenderer extends ComponentRenderer {
 		}
 		TemplateComponent.RENDERER = SoyRenderer;
 		ComponentRegistry.register(TemplateComponent, name);
-		ComponentRegistry.Templates[name] = {
+		SoyTemplates.set(name, {
 			content: function(opt_attrs, opt_ignored, opt_ijData) {
 				return SoyAop.getOriginalFn(templateFn)(data, opt_ignored, opt_ijData);
 			}
-		};
+		});
 		SoyAop.registerTemplates(name);
 		return new TemplateComponent(data);
 	}
@@ -309,12 +310,7 @@ class SoyRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	static renderTemplateByName_(component, templateComponentName, templateName, opt_data) {
-		var elementTemplate;
-		var componentTemplates = ComponentRegistry.Templates[templateComponentName];
-		if (componentTemplates) {
-			elementTemplate = componentTemplates[templateName];
-		}
-
+		var elementTemplate = SoyTemplates.get(templateComponentName, templateName);
 		if (core.isFunction(elementTemplate)) {
 			return SoyRenderer.renderTemplate_(component, elementTemplate, opt_data);
 		}

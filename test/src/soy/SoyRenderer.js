@@ -3,23 +3,24 @@
 import dom from '../../../src/dom/dom';
 import Component from '../../../src/component/Component';
 import ComponentCollector from '../../../src/component/ComponentCollector';
-import ComponentRegistry from '../../../src/component/ComponentRegistry';
 import SoyAop from '../../../src/soy/SoyAop';
 import SoyRenderer from '../../../src/soy/SoyRenderer';
+import SoyTemplates from '../../../src/soy/SoyTemplates';
 
-import './assets/ChildrenTestComponent.soy.js';
-import './assets/ContentSurfaceTestComponent.soy.js';
-import './assets/CustomTagTestComponent.soy.js';
-import './assets/CustomTestComponent.soy.js';
-import './assets/DeeplyNestedTestComponent.soy.js';
-import './assets/EventsTestComponent.soy.js';
-import './assets/ExternalTemplateTestComponent.soy.js';
-import './assets/ListTestComponent.soy.js';
-import './assets/NestedNoIdTestComponent.soy.js';
-import './assets/NestedPrivateTemplateTestComponent.soy.js';
-import './assets/NestedSurfacesTestComponent.soy.js';
-import './assets/NestedTestComponent.soy.js';
-import './assets/PrivateTemplateTestComponent.soy.js';
+import ChildrenTestComponent from './assets/ChildrenTestComponent.soy';
+import ContentSurfaceTestComponent from './assets/ContentSurfaceTestComponent.soy';
+import CustomTagTestComponent from './assets/CustomTagTestComponent.soy';
+import CustomTestComponent from './assets/CustomTestComponent.soy';
+import DeeplyNestedTestComponent from './assets/DeeplyNestedTestComponent.soy';
+import EventsTestComponent from './assets/EventsTestComponent.soy';
+import ExternalTemplateTestComponent from './assets/ExternalTemplateTestComponent.soy';
+import ListTestComponent from './assets/ListTestComponent.soy';
+import NestedNoIdTestComponent from './assets/NestedNoIdTestComponent.soy';
+import NestedPrivateTemplateTestComponent from './assets/NestedPrivateTemplateTestComponent.soy';
+import NestedSurfacesTestComponent from './assets/NestedSurfacesTestComponent.soy';
+import NestedTestComponent from './assets/NestedTestComponent.soy';
+import PrivateTemplateTestComponent from './assets/PrivateTemplateTestComponent.soy';
+import StaticTestComponent from './assets/StaticTestComponent.soy';
 
 describe('SoyRenderer', function() {
 	beforeEach(function() {
@@ -28,7 +29,6 @@ describe('SoyRenderer', function() {
 	});
 
 	it('should render element content with surfaces automatically from template', function() {
-		var CustomTestComponent = createCustomTestComponentClass();
 		var custom = new CustomTestComponent({
 			footerContent: 'My Footer',
 			headerContent: 'My Header'
@@ -44,8 +44,6 @@ describe('SoyRenderer', function() {
 	});
 
 	it('should render element tag according to its template when defined', function() {
-		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
-
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'
 		}).render();
@@ -55,8 +53,6 @@ describe('SoyRenderer', function() {
 	});
 
 	it('should render surface element tag according to its template when defined', function() {
-		var CustomTagTestComponent = createCustomTestComponentClass('CustomTagTestComponent');
-
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'
 		}).render();
@@ -67,7 +63,9 @@ describe('SoyRenderer', function() {
 	});
 
 	it('should not throw error if element template is not defined', function() {
-		var NoTemplateTestComponent = createCustomTestComponentClass('NoTemplateTestComponent');
+		class NoTemplateTestComponent extends Component {
+		}
+		NoTemplateTestComponent.RENDERER = SoyRenderer;
 		var custom = new NoTemplateTestComponent();
 
 		assert.doesNotThrow(function() {
@@ -76,14 +74,14 @@ describe('SoyRenderer', function() {
 	});
 
 	it('should not throw error if surface template is not defined', function() {
-		var CustomTestComponent = createCustomTestComponentClass();
-		CustomTestComponent.SURFACES = {
+		class MyCustomTestComponent extends CustomTestComponent {
+		}
+		MyCustomTestComponent.SURFACES = {
 			body: {
 				renderAttrs: ['body']
 			}
 		};
-
-		var custom = new CustomTestComponent();
+		var custom = new MyCustomTestComponent();
 
 		assert.doesNotThrow(function() {
 			custom.decorate();
@@ -91,7 +89,6 @@ describe('SoyRenderer', function() {
 	});
 
 	it('should not throw error if template depends on array attr that was not defined on component', function() {
-		var ListTestComponent = createCustomTestComponentClass('ListTestComponent');
 		var custom = new ListTestComponent({
 			items: [1, 2, 3]
 		});
@@ -112,9 +109,9 @@ describe('SoyRenderer', function() {
 		};
 		SoyRenderer.setInjectedData(ijData);
 
-		var CustomTestComponent = createCustomTestComponentClass();
-		sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
-		var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+		var templates = SoyTemplates.get('CustomTestComponent');
+		sinon.spy(templates, 'header');
+		var templateFn = templates.header;
 		new CustomTestComponent().render();
 		assert.strictEqual(ijData, templateFn.args[0][2]);
 
@@ -124,9 +121,9 @@ describe('SoyRenderer', function() {
 	it('should pass an empty object as injected data if it\'s set to falsey value', function() {
 		SoyRenderer.setInjectedData(null);
 
-		var CustomTestComponent = createCustomTestComponentClass();
-		sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
-		var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+		var templates = SoyTemplates.get('CustomTestComponent');
+		sinon.spy(templates, 'header');
+		var templateFn = templates.header;
 		new CustomTestComponent().render();
 		assert.deepEqual({}, templateFn.args[0][2]);
 
@@ -153,24 +150,18 @@ describe('SoyRenderer', function() {
 
 	describe('Surfaces', function() {
 		it('should automatically create surfaces for a component\'s non private templates', function() {
-			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
-
 			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
 			assert.deepEqual([custom.id, 'notPrivate'], Object.keys(surfaces));
 		});
 
 		it('should set surface renderAttrs to its template params', function() {
-			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
-
 			var custom = new PrivateTemplateTestComponent();
 			var surfaces = custom.getSurfaces();
 			assert.deepEqual(['text'], surfaces.notPrivate.renderAttrs);
 		});
 
 		it('should only create surfaces either from non private template calls or calls with surface id', function() {
-			var PrivateTemplateTestComponent = createCustomTestComponentClass('PrivateTemplateTestComponent');
-
 			var custom = new PrivateTemplateTestComponent({
 				id: 'custom'
 			}).render();
@@ -179,9 +170,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should only create surfaces on nested components either from non private template calls or calls with surface id', function() {
-			createCustomTestComponentClass('ChildrenTestComponent');
-			var NestedPrivateTemplateTestComponent = createCustomTestComponentClass('NestedPrivateTemplateTestComponent');
-
 			var custom = new NestedPrivateTemplateTestComponent({
 				id: 'nestedPrivate'
 			}).render();
@@ -198,16 +186,12 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should set renderAttrs for main surface from the template params of the "content" template', function() {
-			var ContentSurfaceTestComponent = createCustomTestComponentClass('ContentSurfaceTestComponent');
-
 			var custom = new ContentSurfaceTestComponent().render();
 			var surfaces = custom.getSurfaces();
 			assert.deepEqual(['foo'], surfaces[custom.id].renderAttrs);
 		});
 
 		it('should update element content if param from "content" changes', function(done) {
-			var ContentSurfaceTestComponent = createCustomTestComponentClass('ContentSurfaceTestComponent');
-
 			var custom = new ContentSurfaceTestComponent({
 				foo: 'foo',
 				id: 'custom'
@@ -222,7 +206,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should not repaint surface if it has @static doc tag, even when its contents would change', function(done) {
-			var StaticTestComponent = createCustomTestComponentClass('StaticTestComponent');
 			var comp = new StaticTestComponent({
 				text: 'foo'
 			}).render();
@@ -238,7 +221,6 @@ describe('SoyRenderer', function() {
 
 	describe('Nested Surfaces', function() {
 		it('should correctly render nested surfaces', function() {
-			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
 			var custom = new NestedSurfacesTestComponent({
 				id: 'custom',
 				items: ['Item1', 'Item2']
@@ -251,7 +233,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should correctly update nested surfaces', function(done) {
-			var NestedSurfacesTestComponent = createCustomTestComponentClass('NestedSurfacesTestComponent');
 			var custom = new NestedSurfacesTestComponent({
 				id: 'custom',
 				items: ['Item1', 'Item2']
@@ -274,14 +255,38 @@ describe('SoyRenderer', function() {
 
 	describe('Nested Components', function() {
 		var nestedComp;
+
+		before(function() {
+			NestedTestComponent.ATTRS = {
+				count: {
+					value: 1
+				},
+				foo: {
+					value: 'foo'
+				},
+				footerContent: {
+					value: 'footer'
+				}
+			};
+
+			DeeplyNestedTestComponent.prototype.handleClick = sinon.stub();
+			DeeplyNestedTestComponent.prototype.handleMouseDown = sinon.stub();
+			DeeplyNestedTestComponent.prototype.handleMouseOver = sinon.stub();
+			DeeplyNestedTestComponent.ATTRS = {
+				bar: {
+					value: 'bar'
+				},
+				footerButtons: {
+					value: [{
+						label: 'Ok'
+					}]
+				}
+			};
+		});
+
 		beforeEach(function() {
-			ComponentRegistry.components_ = {};
 			ComponentCollector.components = {};
 
-			var CustomTestComponent = createCustomTestComponentClass();
-			this.CustomTestComponent = CustomTestComponent;
-
-			var EventsTestComponent = createCustomTestComponentClass('EventsTestComponent');
 			EventsTestComponent.prototype.handleClick = sinon.stub();
 			EventsTestComponent.prototype.handleMouseDown = sinon.stub();
 			EventsTestComponent.prototype.handleMouseOver = sinon.stub();
@@ -294,33 +299,30 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should instantiate rendered child component', function() {
-			var NestedTestComponent = createNestedTestComponentClass();
 			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).render();
 
 			var child = nestedComp.components.nestedMyChild0;
 			assert.ok(child);
-			assert.strictEqual(this.CustomTestComponent, child.constructor);
+			assert.strictEqual(CustomTestComponent, child.constructor);
 			assert.strictEqual('foo', child.headerContent);
 			assert.strictEqual('footer', child.footerContent);
 		});
 
 		it('should instantiate rendered child component when decorating main component', function() {
-			var NestedTestComponent = createNestedTestComponentClass();
 			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).decorate();
 
 			var child = nestedComp.components.nestedMyChild0;
 			assert.ok(child);
-			assert.strictEqual(this.CustomTestComponent, child.constructor);
+			assert.strictEqual(CustomTestComponent, child.constructor);
 			assert.strictEqual('foo', child.headerContent);
 			assert.strictEqual('footer', child.footerContent);
 		});
 
 		it('should instantiate rendered child component without id', function() {
-			var NestedNoIdTestComponent = createCustomTestComponentClass('NestedNoIdTestComponent');
 			nestedComp = new NestedNoIdTestComponent({
 				id: 'nested'
 			}).render();
@@ -330,7 +332,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should render nested components inside parent', function() {
-			var NestedTestComponent = createNestedTestComponentClass();
 			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).render();
@@ -343,8 +344,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should update rendered child component', function(done) {
-			var test = this;
-			var NestedTestComponent = createNestedTestComponentClass();
 			nestedComp = new NestedTestComponent({
 				id: 'nested'
 			}).render();
@@ -353,7 +352,7 @@ describe('SoyRenderer', function() {
 			nestedComp.on('attrsChanged', function() {
 				var child = nestedComp.components.nestedMyChild0;
 				assert.ok(child);
-				assert.strictEqual(test.CustomTestComponent, child.constructor);
+				assert.strictEqual(CustomTestComponent, child.constructor);
 				assert.strictEqual('bar', child.headerContent);
 				assert.ok(nestedComp.element.querySelector('#' + child.id));
 
@@ -362,8 +361,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should not update parent if only child components change', function(done) {
-			// HERE
-			var NestedTestComponent = createNestedTestComponentClass();
 			nestedComp = new NestedTestComponent({
 				count: 2
 			}).render();
@@ -377,7 +374,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should pass non attribute params to sub component templates', function() {
-			var NestedTestComponent = createNestedTestComponentClass();
 			NestedTestComponent.ATTRS.extra = {};
 			nestedComp = new NestedTestComponent({
 				count: 2,
@@ -389,7 +385,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should pass children to nested components through surface attributes', function() {
-			var ChildrenTestComponent = createCustomTestComponentClass('ChildrenTestComponent');
 			ChildrenTestComponent.ATTRS = {
 				bar: 'bar',
 				children: {
@@ -397,7 +392,6 @@ describe('SoyRenderer', function() {
 				}
 			};
 
-			var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
 			nestedComp = new DeeplyNestedTestComponent({
 				id: 'nested'
 			}).render();
@@ -414,7 +408,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should attach listeners to parent component when its id is the listener name\'s prefix', function() {
-			var ChildrenTestComponent = createCustomTestComponentClass('ChildrenTestComponent');
 			ChildrenTestComponent.ATTRS = {
 				bar: 'bar',
 				children: {
@@ -422,7 +415,6 @@ describe('SoyRenderer', function() {
 				}
 			};
 
-			var DeeplyNestedTestComponent = createDeeplyNestedTestComponentClass();
 			nestedComp = new DeeplyNestedTestComponent({
 				id: 'nested'
 			}).render();
@@ -433,8 +425,6 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should render templates from other components', function() {
-			createNestedTestComponentClass();
-			var ExternalTemplateTestComponent = createCustomTestComponentClass('ExternalTemplateTestComponent');
 			ExternalTemplateTestComponent.ATTRS = {
 				count: {
 					value: 2
@@ -451,7 +441,7 @@ describe('SoyRenderer', function() {
 
 	describe('createComponentFromTemplate', function() {
 		it('should create and instantiate soy component using given template', function() {
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			var comp = SoyRenderer.createComponentFromTemplate(templateFn);
 			assert.ok(comp instanceof Component);
 
@@ -460,7 +450,7 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should render component contents inside given element', function() {
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			var element = document.createElement('div');
 			var comp = SoyRenderer.createComponentFromTemplate(templateFn, element);
 
@@ -470,7 +460,7 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should pass given data when rendering given template', function() {
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			var element = document.createElement('div');
 			var comp = SoyRenderer.createComponentFromTemplate(templateFn, element, {
 				headerContent: 'My Header'
@@ -481,11 +471,10 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should pass correct params to soy template', function() {
-			ComponentRegistry.Templates.CustomTestComponent.header = SoyAop.getOriginalFn(
-				ComponentRegistry.Templates.CustomTestComponent.header
-			);
-			sinon.spy(ComponentRegistry.Templates.CustomTestComponent, 'header');
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templates = SoyTemplates.get('CustomTestComponent');
+			templates.header = SoyAop.getOriginalFn(templates.header);
+			sinon.spy(templates, 'header');
+			var templateFn = templates.header;
 			var data = {
 				headerContent: 'My Header'
 			};
@@ -501,20 +490,19 @@ describe('SoyRenderer', function() {
 
 	describe('renderFromTemplate', function() {
 		afterEach(function() {
-			ComponentRegistry.components_ = {};
 			ComponentCollector.components = {};
 		});
 
 		it('should render the given template in the specified element', function() {
 			var element = document.createElement('div');
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			SoyRenderer.renderFromTemplate(templateFn, element);
 			assert.strictEqual('undefined', element.innerHTML);
 		});
 
 		it('should render the given template with the given data', function() {
 			var element = document.createElement('div');
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			var data = {
 				headerContent: 'My Header'
 			};
@@ -526,7 +514,7 @@ describe('SoyRenderer', function() {
 			var element = document.createElement('div');
 			element.id = 'comp';
 			dom.enterDocument(element);
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			var data = {
 				headerContent: 'My Header'
 			};
@@ -536,17 +524,16 @@ describe('SoyRenderer', function() {
 
 		it('should return a Component instance', function() {
 			var element = document.createElement('div');
-			var templateFn = ComponentRegistry.Templates.CustomTestComponent.header;
+			var templateFn = SoyTemplates.get('CustomTestComponent', 'header');
 			var comp = SoyRenderer.renderFromTemplate(templateFn, element);
 			assert.ok(comp instanceof Component);
 		});
 
 		it('should instantiate components inside rendered template', function() {
-			var CustomTestComponent = createCustomTestComponentClass();
 			sinon.spy(CustomTestComponent.prototype, 'renderAsSubComponent');
 
 			var element = document.createElement('div');
-			var templateFn = ComponentRegistry.Templates.NestedTestComponent.components;
+			var templateFn = SoyTemplates.get('NestedTestComponent', 'components');
 			var data = {
 				count: 2,
 				id: 'nested',
@@ -556,14 +543,14 @@ describe('SoyRenderer', function() {
 			assert.ok(comp.components.nestedMyChild0 instanceof CustomTestComponent);
 			assert.ok(comp.components.nestedMyChild1 instanceof CustomTestComponent);
 			assert.strictEqual(2, CustomTestComponent.prototype.renderAsSubComponent.callCount);
+			CustomTestComponent.prototype.renderAsSubComponent.restore();
 		});
 	});
 
 	describe('decorateFromTemplate', function() {
 		it('should decorate component with custom tag correctly', function() {
-			createCustomTestComponentClass('CustomTagTestComponent');
 			var element = document.createElement('custom');
-			var templateFn = ComponentRegistry.Templates.CustomTagTestComponent.content;
+			var templateFn = SoyTemplates.get('CustomTagTestComponent', 'content');
 			var data = {
 				count: 2,
 				id: 'custom',
@@ -576,10 +563,9 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should decorate component with custom tag correctly even without specifying id', function() {
-			createCustomTestComponentClass('CustomTagTestComponent');
 			var element = document.createElement('custom');
 			element.id = 'custom';
-			var templateFn = ComponentRegistry.Templates.CustomTagTestComponent.content;
+			var templateFn = SoyTemplates.get('CustomTagTestComponent', 'content');
 			var data = {
 				count: 2,
 				footerContent: 'foo'
@@ -591,11 +577,10 @@ describe('SoyRenderer', function() {
 		});
 
 		it('should call decorateAsSubComponent for components inside given template', function() {
-			var CustomTestComponent = createCustomTestComponentClass();
 			sinon.spy(CustomTestComponent.prototype, 'decorateAsSubComponent');
 
 			var element = document.createElement('div');
-			var templateFn = ComponentRegistry.Templates.NestedTestComponent.components;
+			var templateFn = SoyTemplates.get('NestedTestComponent', 'components');
 			var data = {
 				count: 2,
 				id: 'nested',
@@ -605,50 +590,7 @@ describe('SoyRenderer', function() {
 			assert.ok(comp.components.nestedMyChild0 instanceof CustomTestComponent);
 			assert.ok(comp.components.nestedMyChild1 instanceof CustomTestComponent);
 			assert.strictEqual(2, CustomTestComponent.prototype.decorateAsSubComponent.callCount);
+			CustomTestComponent.prototype.decorateAsSubComponent.restore();
 		});
 	});
-
-	function createCustomTestComponentClass(name) {
-		name = name || 'CustomTestComponent';
-		class CustomTestComponent extends Component {
-		}
-		CustomTestComponent.RENDERER = SoyRenderer;
-		ComponentRegistry.register(CustomTestComponent, name);
-		return CustomTestComponent;
-	}
-
-	function createNestedTestComponentClass() {
-		var NestedTestComponent = createCustomTestComponentClass('NestedTestComponent');
-		NestedTestComponent.ATTRS = {
-			count: {
-				value: 1
-			},
-			foo: {
-				value: 'foo'
-			},
-			footerContent: {
-				value: 'footer'
-			}
-		};
-		return NestedTestComponent;
-	}
-
-	function createDeeplyNestedTestComponentClass() {
-		createNestedTestComponentClass();
-		var DeeplyNestedTestComponent = createCustomTestComponentClass('DeeplyNestedTestComponent');
-		DeeplyNestedTestComponent.prototype.handleClick = sinon.stub();
-		DeeplyNestedTestComponent.prototype.handleMouseDown = sinon.stub();
-		DeeplyNestedTestComponent.prototype.handleMouseOver = sinon.stub();
-		DeeplyNestedTestComponent.ATTRS = {
-			bar: {
-				value: 'bar'
-			},
-			footerButtons: {
-				value: [{
-					label: 'Ok'
-				}]
-			}
-		};
-		return DeeplyNestedTestComponent;
-	}
 });

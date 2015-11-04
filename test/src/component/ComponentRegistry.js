@@ -32,8 +32,4 @@ describe('ComponentRegistry', function() {
 		assert.strictEqual(MyComponent1, ComponentRegistry.getConstructor('MyComponent1'));
 		assert.strictEqual(MyComponent2, ComponentRegistry.getConstructor('MyComponent2'));
 	});
-
-	it('should store templates', function() {
-		assert.strictEqual('object', typeof ComponentRegistry.Templates);
-	});
 });

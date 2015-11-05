@@ -28,14 +28,10 @@
  */
 {template .jsExample}
 	<textarea class="code" data-mode="javascript">{literal}
-import ComponentRegistry from 'bower:metal/src/component/ComponentRegistry';
-import SoyComponent from 'bower:metal/src/soy/SoyComponent';
-import './MyComponent.soy';
+import MyComponentBase './MyComponent.soy';
+import SoyRenderer 'bower:metal/src/soy/SoyRenderer';
 
-class MyComponent extends SoyComponent {
-  constructor(opt_config) {
-      super(opt_config);
-  }
+class MyComponent extends MyComponentBase {
 }
 
 MyComponent.ATTRS = {
@@ -43,15 +39,15 @@ MyComponent.ATTRS = {
       value: 'Initial body content.'
   },
   footerContent: {
-      value: SoyComponent.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
+      value: SoyRenderer.sanitizeHtml('&lt;footer&gt;Initial footer content.&lt;/footer&gt;')
   }
 };
 
-ComponentRegistry.register('MyComponent', MyComponent);{/literal}</textarea>
+MyComponentBase.setImpl(MyComponent);{/literal}</textarea>
 
-	<p>This file just defines a class named MyComponent, makes it extend from SoyComponent, imports the compiled soy templates and defines two <a href="/docs/attributes.html">attributes</a>. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
+	<p>This file defines a class named MyComponent that extends from the auto-generated component inside the compiled soy file. It also defines two <a href="/docs/attributes.html">attributes</a>. Note that html strings need to be properly sanitized, otherwise they will be escaped by default before rendering.</p>
 
-	<p>You may notice that the bower dependencies are not being imported as usual, through file paths. That's because Metal.js allows you to use aliases for bower dependencies. Check out the <a href="/docs/alias.html">Alias</a> guide for more details.</p>
+	<p>You may notice that the bower dependency is not being imported as usual, through a file path. That's because Metal.js allows you to use aliases for bower dependencies. Check out the <a href="/docs/alias.html">Alias</a> guide for more details.</p>
 {/template}
 
 /**

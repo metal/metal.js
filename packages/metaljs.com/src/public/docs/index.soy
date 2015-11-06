@@ -10,9 +10,9 @@
 	{param content kind="html"}
 		<h1>Creating your own component</h1>
 
-		<p>There are many different ways to create a new component using Metal.js. You can use <strong>SoyComponent</strong>, or extend directly from <strong>Component</strong>, or even build your own component abstraction on top of those and use it instead. You can build the ES6 code using babel, traceur or any other transpiler. You can test using karma, jasmine or any other test framework, and can use any directory structure for your project. To sum it up, you can customize everything to your own needs. The world is your oyster.</p>
+		<p>There are many different ways to create a new component using Metal.js. You can use the built-in integration with soy templates, or build your own template abstraction on top of Metal.js and use it instead. You can build the ES6 code using babel, traceur or any other transpiler. You can test using karma, jasmine or any other test framework, and can use any directory structure for your project. To sum it up, you can customize everything to your own needs. The world is your oyster.</p>
 
-		<p>This guide will focus on a quick and easy way to get started with Metal.js, using <strong>SoyComponent</strong> as the component base class and <strong>generator-metal</strong> for the project structure and workflow.</p>
+		<p>This guide will focus on a quick and easy way to get started with Metal.js, using soy templates and <strong>generator-metal</strong> for the project structure and workflow.</p>
 
 		<h2>Dependencies</h2>
 
@@ -61,26 +61,17 @@
 			<li><code>demos/index.js</code> - Demo</li>
 		</ul>
 
-		<h2>SoyComponent</h2>
-
-		<p>Now we can actually start to code our new component. We'll be using the <strong>SoyComponent</strong> class, which enables you to easily separate business logic from rendering logic, as it provides an integration with <a href="http://developers.google.com/closure/templates">soy templates</a>.</p>
-
-		<p>So, for example, let's say that <strong>MyComponent</strong> should have a body and a footer with content. The JavaScript file (<code>src/MyComponent.js</code>) would look like this:</p>
-
-		{call docsSoyComponents.jsExample /}
-
-		<h2>Attributes</h2>
-
-		<p>But what are attributes? They're basically a way to better define and control your component's state.</p>
-
-		{call docsAttributes.afterExample}
-			{param attrName: 'bodyContent' /}
-			{param className: 'MyComponent' /}
-		{/call}
-
 		<h2>Soy</h2>
 
+		<p>Now we can actually start to code our new component. We'll be taking advantage of the built-in <a href="http://developers.google.com/closure/templates">soy templates</a> integration, enabling you to easily separate business logic from rendering logic.</p>
+
+		<p>So, for example, let's say that <strong>MyComponent</strong> should have a body and a footer with content. The soy file (<code>src/MyComponent.soy</code>) would look like this:</p>
+
 		{call docsSoyComponents.soyExample /}
+
+		<h2>JS</h2>
+
+		{call docsSoyComponents.jsExample /}
 
 		<h2>Next steps</h2>
 

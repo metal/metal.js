@@ -236,4 +236,12 @@ describe('core', function() {
 			assert.strictEqual('myFunction', core.getFunctionName(myFunction));
 		});
 	});
+
+	describe('globalEval', function() {
+		it('should evaluate script in global scope', function() {
+			core.globalEval('var testScript = 2 + 2;');
+			assert.strictEqual(4, window.testScript);
+			window.testScript = null;
+		});
+	});
 });

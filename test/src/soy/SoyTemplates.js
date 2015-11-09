@@ -20,8 +20,7 @@ describe('SoyTemplates', function() {
 
 	it('should return specific component template', function() {
 		var myTemplates = {
-			test: function() {
-			}
+			test: function() {}
 		};
 		SoyTemplates.set('SoyTemplates1', myTemplates);
 		assert.strictEqual(myTemplates.test, SoyTemplates.get('SoyTemplates1', 'test'));

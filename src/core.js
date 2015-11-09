@@ -47,7 +47,7 @@ class core {
 	static getFunctionName(fn) {
 		if (!fn.name) {
 			var str = fn.toString();
-		  fn.name = str.substring(9, str.indexOf('('));
+			fn.name = str.substring(9, str.indexOf('('));
 		}
 		return fn.name;
 	}

@@ -2504,8 +2504,23 @@ describe('Component', function() {
 			var CustomComponent = createCustomComponentClass(function() {
 				return '<script src="test/fixtures/script.js"></script>';
 			});
-			window.testComponent = new CustomComponent().render();
-			window.testComponent.once('scriptLoaded', function() {
+			new CustomComponent().render();
+			var script = document.head.querySelector('script');
+			assert.ok(script);
+			dom.on(script, 'load', function() {
+				assert.ok(!document.head.querySelector('script'));
+				done();
+			});
+		});
+
+		it('should remove evaluated script tags with src on error', function(done) {
+			var CustomComponent = createCustomComponentClass(function() {
+				return '<script src="test/fixtures/unexistingScript.js"></script>';
+			});
+			new CustomComponent().render();
+			var script = document.head.querySelector('script');
+			assert.ok(script);
+			dom.on(script, 'error', function() {
 				done();
 			});
 		});

@@ -1,7 +1,6 @@
 'use strict';
 
 import array from '../array/array';
-import async from '../async/async';
 import core from '../core';
 import dom from '../dom/dom';
 import features from '../dom/features';
@@ -353,14 +352,12 @@ class Component extends Attribute {
 		var frag = dom.buildFragment(content);
 		if (content.indexOf('<script') !== -1) {
 			var scripts = frag.querySelectorAll('script');
-			var scriptsToRun = [];
 			for (var i = 0; i < scripts.length; i++) {
 				var script = scripts.item(i);
 				if (!script.type || script.type === 'text/javascript') {
-					scriptsToRun.push(script);
+					this.runScript_(script);
 				}
 			}
-			this.runScripts_(scriptsToRun);
 		}
 		return frag;
 	}
@@ -1387,23 +1384,26 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Runs the given javascript script tags, by moving them to the header.
-	 * @param {!Array<!Element>} scripts
+	 * Runs the given javascript script tag, by moving it to the header.
+	 * @param {!Element} script
 	 * @protected
 	 */
-	runScripts_(scripts) {
-		if (scripts.length > 0) {
-			scripts.forEach(script => script.parentNode.removeChild(script));
-			async.nextTick(() => {
-				scripts.forEach(script => {
-					var newScript = document.createElement('script');
-					newScript.text = script.text;
-					if (script.src) {
-						newScript.src = script.src;
-					}
-					document.head.appendChild(newScript).parentNode.removeChild(newScript);
-				});
+	runScript_(script) {
+		script.parentNode.removeChild(script);
+		var newScript = document.createElement('script');
+		newScript.text = script.text;
+		if (script.src) {
+			newScript.src = script.src;
+			dom.on(newScript, 'load', function() {
+				newScript.parentNode.removeChild(newScript);
 			});
+			dom.on(newScript, 'error', function() {
+				newScript.parentNode.removeChild(newScript);
+			});
+		}
+		document.head.appendChild(newScript);
+		if (!script.src) {
+			newScript.parentNode.removeChild(newScript);
 		}
 	}
 

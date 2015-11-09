@@ -1,6 +1,7 @@
 'use strict';
 
 import array from '../array/array';
+import async from '../async/async';
 import core from '../core';
 import dom from '../dom/dom';
 import features from '../dom/features';
@@ -340,6 +341,29 @@ class Component extends Attribute {
 	 * must be implemented on the detach phase.
 	 */
 	attached() {}
+
+	/**
+	 * Builds a fragment element with the given content, so it can be rendered.
+	 * Any script tags inside the content will be moved to the header, so they can
+	 * be reevaluated when this content is rendered.
+	 * @param {string} content
+	 * @return {!Element}
+	 */
+	buildFragment_(content) {
+		var frag = dom.buildFragment(content);
+		if (content.indexOf('<script') !== -1) {
+			var scripts = frag.querySelectorAll('script');
+			var scriptsToRun = [];
+			for (var i = 0; i < scripts.length; i++) {
+				var script = scripts.item(i);
+				if (!script.type || script.type === 'text/javascript') {
+					scriptsToRun.push(script);
+				}
+			}
+			this.runScripts_(scriptsToRun);
+		}
+		return frag;
+	}
 
 	/**
 	 * Builds a surface placeholder, attaching it to the given data.
@@ -747,12 +771,13 @@ class Component extends Attribute {
 	/**
 	 * Finds the element with the given id in the given content, if there is one.
 	 * @param {string} id
-	 * @param {string} content
+	 * @param {!Element|string} content
 	 * @return {Element}
 	 * @protected
 	 */
 	findElementInContent_(id, content) {
-		var firstChild = dom.buildFragment(content).childNodes[0];
+		content = core.isString(content) ? dom.buildFragment(content) : content;
+		var firstChild = content.childNodes[0];
 		if (firstChild && firstChild.id === id) {
 			return firstChild;
 		}
@@ -1287,13 +1312,14 @@ class Component extends Attribute {
 	 */
 	replaceElementContent_(content) {
 		var element = this.element;
-		var newElement = this.findElementInContent_(this.id, content);
+		var newContent = this.buildFragment_(content);
+		var newElement = this.findElementInContent_(this.id, newContent);
 		if (newElement) {
 			this.updateElementAttributes_(element, newElement);
-			content = newElement.childNodes;
+			newContent = newElement.childNodes;
 		}
 		dom.removeChildren(element);
-		dom.append(element, content);
+		dom.append(element, newContent);
 	}
 
 	/**
@@ -1311,12 +1337,14 @@ class Component extends Attribute {
 		}
 
 		var el = this.getSurfaceElement(surfaceElementId);
-		if (this.checkHasElementTag_(content, surfaceElementId)) {
-			surface.element = dom.buildFragment(content).childNodes[0];
+		var frag = this.buildFragment_(content);
+		var element = this.findElementInContent_(surfaceElementId, frag);
+		if (element) {
+			surface.element = element;
 			dom.replace(el, surface.element);
 		} else {
 			dom.removeChildren(el);
-			dom.append(el, content);
+			dom.append(el, frag);
 		}
 	}
 
@@ -1356,6 +1384,27 @@ class Component extends Attribute {
 
 			return expandedHtml;
 		});
+	}
+
+	/**
+	 * Runs the given javascript script tags, by moving them to the header.
+	 * @param {!Array<!Element>} scripts
+	 * @protected
+	 */
+	runScripts_(scripts) {
+		if (scripts.length > 0) {
+			scripts.forEach(script => script.parentNode.removeChild(script));
+			async.nextTick(() => {
+				scripts.forEach(script => {
+					var newScript = document.createElement('script');
+					newScript.text = script.text;
+					if (script.src) {
+						newScript.src = script.src;
+					}
+					document.head.appendChild(newScript).parentNode.removeChild(newScript);
+				});
+			});
+		}
 	}
 
 	/**

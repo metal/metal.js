@@ -2486,6 +2486,95 @@ describe('Component', function() {
 		});
 	});
 
+	describe('Script tags', function() {
+		it('should evaluate script tags without src rendered by components', function(done) {
+			var CustomComponent = createCustomComponentClass(function() {
+				return '<script>window.testScriptEvaluated = true</script>';
+			});
+			new CustomComponent().render();
+
+			async.nextTick(function() {
+				assert.ok(window.testScriptEvaluated);
+				window.testScriptEvaluated = null;
+				done();
+			});
+		});
+
+		it('should evaluate script tags with src', function(done) {
+			var CustomComponent = createCustomComponentClass(function() {
+				return '<script src="test/fixtures/script.js"></script>';
+			});
+			window.testComponent = new CustomComponent().render();
+			window.testComponent.once('scriptLoaded', function() {
+				done();
+			});
+		});
+
+		it('should evaluate script tags with the js type', function(done) {
+			var CustomComponent = createCustomComponentClass(function() {
+				return '<script type="text/javascript">window.testScriptEvaluated = true</script>';
+			});
+			new CustomComponent().render();
+
+			async.nextTick(function() {
+				assert.ok(window.testScriptEvaluated);
+				window.testScriptEvaluated = null;
+				done();
+			});
+		});
+
+		it('should not evaluate script tags with a non js type', function(done) {
+			var CustomComponent = createCustomComponentClass(function() {
+				return '<script type="text/html">My template</script>';
+			});
+			new CustomComponent().render();
+
+			async.nextTick(function() {
+				assert.ok(!window.testScriptEvaluated);
+				done();
+			});
+		});
+
+		it('should evaluate script tags on surfaces', function(done) {
+			var CustomComponent = createCustomComponentClass(function(surface, comp) {
+				if (surface.surfaceElementId === comp.id) {
+					return comp.buildPlaceholder(comp.id + '-foo');
+				} else {
+					return '<script>window.testScriptEvaluated = true</script>';
+				}
+			});
+			new CustomComponent().render();
+
+			async.nextTick(function() {
+				assert.ok(window.testScriptEvaluated);
+				window.testScriptEvaluated = null;
+				done();
+			});
+		});
+
+		it('should evaluate script tags on surfaces when they change', function(done) {
+			var CustomComponent = createCustomComponentClass(function(surface, comp) {
+				if (surface.surfaceElementId === comp.id) {
+					return comp.buildPlaceholder(comp.id + '-foo', {
+						renderAttrs: ['foo']
+					});
+				} else {
+					return '<script>window.testScriptEvaluated = \'' + comp.foo + '\'</script>';
+				}
+			});
+			var custom = new CustomComponent().render();
+
+			custom.foo = 'foo';
+			custom.once('attrsSynced', function() {
+				async.nextTick(function() {
+					assert.strictEqual('foo', window.testScriptEvaluated);
+					window.testScriptEvaluated = null;
+					done();
+				});
+			});
+		});
+	});
+
 	function createCustomComponentClass(opt_rendererContentOrFn) {
 		class CustomComponent extends Component {
 			constructor(opt_config) {

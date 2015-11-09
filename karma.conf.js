@@ -6,7 +6,8 @@ module.exports = function (config) {
 			'test/src/html/fixture/*.html',
 			'bower_components/soyutils/soyutils.js',
 			'src/**/*.js',
-			'test/src/**/*.js'
+			'test/src/**/*.js',
+			{pattern: 'test/fixtures/*.js', watched: false, included: false, served: true}
 		],
 
 		preprocessors: {
@@ -15,6 +16,10 @@ module.exports = function (config) {
 			// Fixture htmls should go through `html2js` so tests can access
 			// them through the `window.__html__` variable.
 			'test/src/html/fixture/*.html': ['html2js']
+		},
+
+		proxies: {
+		  '/test/fixtures/': '/base/test/fixtures/'
 		},
 
 		browsers: ['Chrome'],

@@ -9,7 +9,7 @@ module.exports = function (config) {
 			'bower_components/soyutils/soyutils.js',
 			'src/**/*.js',
 			'test/src/**/*.js',
-			{pattern: 'test/fixtures/*.js', watched: false, included: false, served: true}
+			{pattern: 'test/fixtures/*.js', watched: true, included: false, served: true}
 		],
 
 		preprocessors: {

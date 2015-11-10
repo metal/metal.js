@@ -70,16 +70,6 @@ class core {
 	}
 
 	/**
-	 * Evaluates the given string in the global scope.
-	 * @param {string} text
-	 */
-	static globalEval(text) {
-		var script = document.createElement('script');
-		script.text = text;
-		document.head.appendChild(script).parentNode.removeChild(script);
-	}
-
-	/**
 	 * The identity function. Returns its first argument.
 	 * @param {*=} opt_returnValue The single value that will be returned.
 	 * @return {?} The first argument.

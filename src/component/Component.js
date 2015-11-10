@@ -4,6 +4,7 @@ import array from '../array/array';
 import core from '../core';
 import dom from '../dom/dom';
 import features from '../dom/features';
+import globalEval from '../eval/globalEval';
 import html from '../html/html';
 import object from '../object/object';
 import string from '../string/string';
@@ -350,13 +351,14 @@ class Component extends Attribute {
 	 */
 	buildFragment_(content) {
 		var frag = dom.buildFragment(content);
-		if (content.indexOf('<script') !== -1) {
-			var scripts = frag.querySelectorAll('script');
-			for (var i = 0; i < scripts.length; i++) {
-				var script = scripts.item(i);
-				if (!script.type || script.type === 'text/javascript') {
-					this.runScript_(script);
-				}
+		if (content.indexOf('<script') === -1) {
+			return frag;
+		}
+		var scripts = frag.querySelectorAll('script');
+		for (var i = 0; i < scripts.length; i++) {
+			var script = scripts.item(i);
+			if (!script.type || script.type === 'text/javascript') {
+				globalEval.runScript(script);
 			}
 		}
 		return frag;
@@ -1381,30 +1383,6 @@ class Component extends Attribute {
 
 			return expandedHtml;
 		});
-	}
-
-	/**
-	 * Runs the given javascript script tag, by moving it to the header.
-	 * @param {!Element} script
-	 * @protected
-	 */
-	runScript_(script) {
-		script.parentNode.removeChild(script);
-		var newScript = document.createElement('script');
-		newScript.text = script.text;
-		if (script.src) {
-			newScript.src = script.src;
-			dom.on(newScript, 'load', function() {
-				newScript.parentNode.removeChild(newScript);
-			});
-			dom.on(newScript, 'error', function() {
-				newScript.parentNode.removeChild(newScript);
-			});
-		}
-		document.head.appendChild(newScript);
-		if (!script.src) {
-			newScript.parentNode.removeChild(newScript);
-		}
 	}
 
 	/**

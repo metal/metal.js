@@ -2513,18 +2513,6 @@ describe('Component', function() {
 			});
 		});
 
-		it('should remove evaluated script tags with src on error', function(done) {
-			var CustomComponent = createCustomComponentClass(function() {
-				return '<script src="test/fixtures/unexistingScript.js"></script>';
-			});
-			new CustomComponent().render();
-			var script = document.head.querySelector('script');
-			assert.ok(script);
-			dom.on(script, 'error', function() {
-				done();
-			});
-		});
-
 		it('should evaluate script tags with the js type', function(done) {
 			var CustomComponent = createCustomComponentClass(function() {
 				return '<script type="text/javascript">window.testScriptEvaluated = true</script>';

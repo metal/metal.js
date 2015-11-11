@@ -2130,6 +2130,33 @@ describe('Component', function() {
 			assert.strictEqual(custom.element.querySelector('#child'), child.element);
 		});
 
+		it('should get all sub components with ids matching a given prefix', function() {
+			var CustomComponent = createCustomComponentClass(function(surface, comp) {
+				var child1 = comp.buildPlaceholder('child-with-prefix1', {
+					componentName: 'ChildComponent'
+				});
+				var child2 = comp.buildPlaceholder('child-without-prefix1', {
+					componentName: 'ChildComponent'
+				});
+				var child3 = comp.buildPlaceholder('child-with-prefix2', {
+					componentName: 'ChildComponent'
+				});
+				var child4 = comp.buildPlaceholder('child-without-prefix2', {
+					componentName: 'ChildComponent'
+				});
+				return child1 + child2 + child3 + child4;
+			});
+
+			var custom = new CustomComponent({
+				id: 'custom'
+			}).render();
+
+			var childrenWithPrefix = custom.getComponentsWithPrefix('child-with-prefix');
+			assert.strictEqual(2, Object.keys(childrenWithPrefix).length);
+			assert.ok(childrenWithPrefix['child-with-prefix1']);
+			assert.ok(childrenWithPrefix['child-with-prefix2']);
+		});
+
 		it('should dispose sub components when parent component is disposed', function() {
 			var CustomComponent = createCustomComponentClass(function(surface, comp) {
 				if (surface.surfaceElementId === comp.id) {

@@ -824,6 +824,19 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Returns a map of all subcomponents with ids that have the specified prefix.
+	 * @param {string} prefix
+	 * @return {!Object<string, !Component>}
+	 */
+	getComponentsWithPrefix(prefix) {
+		var ids = Object.keys(this.components)
+			.filter(id => id.indexOf(prefix) === 0);
+		var map = {};
+		ids.forEach(id => map[id] = this.components[id]);
+		return map;
+	}
+
+	/**
 	 * Gets the name of this component. If the `NAME` static variable is set, this will
 	 * be the component's name. Otherwise, it will be formed from the constructor's
 	 * function name.

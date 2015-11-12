@@ -36,7 +36,10 @@ module.exports = function (config) {
 
 		reporters: ['coverage', 'progress'],
 
-		babelPreprocessor: {options: {sourceMap: 'both'}},
+		babelPreprocessor: {options: {
+			presets: ['es2015'],
+			sourceMap: 'both'
+		}},
 
 		coverageReporter: {
 			instrumenters: {isparta : isparta},

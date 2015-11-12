@@ -24,6 +24,9 @@ module.exports = function (config) {
 
 		browsers: ['Chrome'],
 
-		babelPreprocessor: {options: {sourceMap: 'both'}}
+		babelPreprocessor: {options: {
+			presets: ['es2015'],
+			sourceMap: 'both'
+		}}
 	});
 };

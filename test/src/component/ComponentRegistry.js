@@ -32,4 +32,41 @@ describe('ComponentRegistry', function() {
 		assert.strictEqual(MyComponent1, ComponentRegistry.getConstructor('MyComponent1'));
 		assert.strictEqual(MyComponent2, ComponentRegistry.getConstructor('MyComponent2'));
 	});
+
+	it('should set NAME static property of registered components', function() {
+		class MyComponent {
+		}
+		ComponentRegistry.register(MyComponent, 'MyName');
+		assert.strictEqual('MyName', MyComponent.NAME);
+	});
+
+	it('should use NAME static property if no name is passed to ComponentRegistry.register', function() {
+		class MyComponent {
+		}
+		MyComponent.NAME = 'StaticName';
+		ComponentRegistry.register(MyComponent);
+
+		assert.strictEqual(MyComponent, ComponentRegistry.getConstructor('StaticName'));
+	});
+
+	it('should use function name if no name is passed to ComponentRegistry.register', function() {
+		class MyComponent {
+		}
+		ComponentRegistry.register(MyComponent);
+
+		assert.strictEqual('MyComponent', MyComponent.NAME);
+		assert.strictEqual(MyComponent, ComponentRegistry.getConstructor('MyComponent'));
+	});
+
+	it('should use function name if NAME is only set on super class and no name is passed to ComponentRegistry.register', function() {
+		class SuperComponent {
+		}
+		SuperComponent.NAME = 'SuperComponent';
+		class MyComponent extends SuperComponent {
+		}
+		ComponentRegistry.register(MyComponent);
+
+		assert.strictEqual('MyComponent', MyComponent.NAME);
+		assert.strictEqual(MyComponent, ComponentRegistry.getConstructor('MyComponent'));
+	});
 });

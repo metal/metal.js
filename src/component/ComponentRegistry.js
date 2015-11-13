@@ -36,7 +36,14 @@ class ComponentRegistry {
 	 * @static
 	 */
 	static register(constructorFn, opt_name) {
-		var name = opt_name || constructorFn.NAME || core.getFunctionName(constructorFn);
+		var name = opt_name;
+		if (!name) {
+			if (constructorFn.hasOwnProperty('NAME')) {
+				name = constructorFn.NAME;
+			} else {
+				name = core.getFunctionName(constructorFn);
+			}
+		}
 		constructorFn.NAME = name;
 		ComponentRegistry.components_[name] = constructorFn;
 	}

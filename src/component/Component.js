@@ -10,6 +10,7 @@ import object from '../object/object';
 import string from '../string/string';
 import Attribute from '../attribute/Attribute';
 import ComponentCollector from '../component/ComponentCollector';
+import ComponentRegistry from '../component/ComponentRegistry';
 import ComponentRenderer from '../component/ComponentRenderer';
 import EventEmitterProxy from '../events/EventEmitterProxy';
 import EventHandler from '../events/EventHandler';
@@ -1126,6 +1127,15 @@ class Component extends Attribute {
 	 */
 	prefixSurfaceId(surfaceId) {
 		return this.id + '-' + surfaceId;
+	}
+
+	/**
+	 * Registers a Metal.js component. This is just a helper function to allow
+	 * subclasses to easily register themselves without having to import anything else.
+	 * @param {!Function} constructorFn The component's constructor function.
+	 */
+	registerMetalComponent(constructorFn) {
+		ComponentRegistry.register(constructorFn);
 	}
 
 	/**

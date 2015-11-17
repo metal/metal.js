@@ -2605,6 +2605,14 @@ describe('Component', function() {
 		});
 	});
 
+	it('should register components', function() {
+		class Foo extends Component {}
+		class TestComponentToRegister extends Component {}
+		var custom = new Foo();
+		custom.registerMetalComponent(TestComponentToRegister);
+		assert.ok(TestComponentToRegister, ComponentRegistry.getConstructor('TestComponentToRegister'));
+	});
+
 	function createCustomComponentClass(opt_rendererContentOrFn) {
 		class CustomComponent extends Component {
 			constructor(opt_config) {

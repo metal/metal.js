@@ -18,6 +18,7 @@ metal.registerTasks({
 	},
 	formatGlobs: codeFileGlobs,
 	lintGlobs: codeFileGlobs,
+	skipAutoComponentRegistration: true,
 	soyDest: function(file) {
 		if (file.base === path.resolve('temp')) {
 			return 'test';

@@ -788,7 +788,6 @@ describe('Component', function() {
 
 		it('should emit "renderSurface" event for the main component surface on render', function() {
 			var CustomComponent = createCustomComponentClass();
-			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent();
 
 			var listener = sinon.stub();
@@ -817,7 +816,6 @@ describe('Component', function() {
 					renderAttrs: ['foo', 'bar']
 				}
 			};
-			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent().render();
 
 			var listener = sinon.stub();
@@ -848,7 +846,6 @@ describe('Component', function() {
 					renderAttrs: ['foo']
 				}
 			};
-			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent().render();
 
 			custom.on('renderSurface', function(data, event) {
@@ -953,7 +950,6 @@ describe('Component', function() {
 
 		it('should get element for component surface', function() {
 			var CustomComponent = createCustomComponentClass();
-			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent();
 			custom.addSurface('comp', {
 				componentName: 'CustomComponent'
@@ -963,7 +959,6 @@ describe('Component', function() {
 
 		it('should not throw error when getting element of component surface for component that isn\'t registered', function() {
 			var CustomComponent = createCustomComponentClass();
-			ComponentRegistry.register(CustomComponent);
 			var custom = new CustomComponent();
 			custom.addSurface('comp', {
 				componentName: 'CustomComponent'
@@ -2245,22 +2240,6 @@ describe('Component', function() {
 		});
 
 		it('should automatically dispose unused sub components of sub components after repaint', function(done) {
-			var CustomComponent = createCustomComponentClass(function(surface, comp) {
-				if (surface.surfaceElementId === comp.id) {
-					comp.addSurface(comp.id, {
-						renderAttrs: ['count']
-					});
-					var content = '';
-					for (var i = 0; i < comp.count; i++) {
-						content += comp.buildPlaceholder(comp.id + '-comp' + i, {
-							componentName: 'ChildComponent'
-						});
-					}
-					return content;
-				}
-			});
-			ComponentRegistry.register(CustomComponent);
-
 			var NestedComponent = createCustomComponentClass(function(surface, comp) {
 				if (surface.surfaceElementId === comp.id) {
 					comp.addSurface(comp.id, {
@@ -2273,6 +2252,21 @@ describe('Component', function() {
 								count: comp.count
 							},
 							componentName: 'CustomComponent'
+						});
+					}
+					return content;
+				}
+			});
+
+			createCustomComponentClass(function(surface, comp) {
+				if (surface.surfaceElementId === comp.id) {
+					comp.addSurface(comp.id, {
+						renderAttrs: ['count']
+					});
+					var content = '';
+					for (var i = 0; i < comp.count; i++) {
+						content += comp.buildPlaceholder(comp.id + '-comp' + i, {
+							componentName: 'ChildComponent'
 						});
 					}
 					return content;
@@ -2606,8 +2600,10 @@ describe('Component', function() {
 	});
 
 	it('should register components', function() {
-		class Foo extends Component {}
-		class TestComponentToRegister extends Component {}
+		class Foo extends Component {
+		}
+		class TestComponentToRegister extends Component {
+		}
 		var custom = new Foo();
 		custom.registerMetalComponent(TestComponentToRegister);
 		assert.ok(TestComponentToRegister, ComponentRegistry.getConstructor('TestComponentToRegister'));

@@ -25,8 +25,7 @@ module.exports = function (config) {
 		browsers: ['Chrome'],
 
 		babelPreprocessor: {options: {
-			plugins: [['transform-es2015-classes', {loose: true}]],
-			presets: ['es2015'],
+			presets: ['metal'],
 			sourceMap: 'both'
 		}}
 	});

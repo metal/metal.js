@@ -1133,9 +1133,10 @@ class Component extends Attribute {
 	 * Registers a Metal.js component. This is just a helper function to allow
 	 * subclasses to easily register themselves without having to import anything else.
 	 * @param {!Function} constructorFn The component's constructor function.
+	 * @param {string=} opt_name The component's name.
 	 */
-	registerMetalComponent(constructorFn) {
-		ComponentRegistry.register(constructorFn);
+	registerMetalComponent(constructorFn, opt_name) {
+		ComponentRegistry.register(constructorFn, opt_name);
 	}
 
 	/**

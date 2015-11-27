@@ -75,7 +75,14 @@ class SoyRenderer extends ComponentRenderer {
 		});
 		var surface = component.getSurface(component.id);
 		var data = (surface && surface.componentData) ? surface.componentData : {};
-		return object.mixin(data, component.getAttrs(names));
+		var attrs = object.map(component.getAttrs(names), function(key, value) {
+			if (component.getAttrConfig(key).isHtml) {
+				return SoyRenderer.sanitizeHtml(value);
+			} else {
+				return value;
+			}
+		});
+		return object.mixin(data, attrs);
 	}
 
 	/**

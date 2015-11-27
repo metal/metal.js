@@ -43,6 +43,32 @@ describe('SoyRenderer', function() {
 		assert.strictEqual('My Footer', custom.element.childNodes[2].innerHTML);
 	});
 
+	it('should escape any html content rendered from a string attribute', function() {
+		var custom = new CustomTestComponent({
+			footerContent: '<div class="myFooter"></div>'
+		});
+		custom.render();
+
+		assert.ok(!custom.element.querySelector('.myFooter'));
+		assert.notStrictEqual(-1, custom.element.textContent.indexOf('<div class="myFooter"></div>'));
+	});
+
+	it('should not escape html content rendered from an html attribute', function() {
+		class HtmlTestComponent extends CustomTestComponent {
+		}
+		HtmlTestComponent.ATTRS = {
+			footerContent: {
+				isHtml: true
+			}
+		};
+		HtmlTestComponent.NAME = 'CustomTestComponent';
+
+		var custom = new HtmlTestComponent({
+			footerContent: '<div class="myFooter"></div>'
+		}).render();
+		assert.ok(custom.element.querySelector('.myFooter'));
+	});
+
 	it('should render element tag according to its template when defined', function() {
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'

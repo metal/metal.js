@@ -37,7 +37,7 @@ module.exports = function (config) {
 		reporters: ['coverage', 'progress'],
 
 		babelPreprocessor: {options: {
-			presets: ['es2015'],
+			presets: ['metal'],
 			sourceMap: 'both'
 		}},
 

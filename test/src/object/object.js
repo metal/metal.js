@@ -36,4 +36,17 @@ describe('object', function() {
 		assert.strictEqual(1, object.getObjectByName('Foo.Bar'));
 		assert.strictEqual(null, object.getObjectByName('Foo.Bar.None'));
 	});
+
+	it('should map an object\'s content to a new object', function() {
+		var obj = {
+			a: 1,
+			b: 2
+		};
+		var mappedObj = object.map(obj, (key, value) => key + ':' + value);
+		var expectedObj = {
+			a: 'a:1',
+			b: 'b:2'
+		};
+		assert.deepEqual(expectedObj, mappedObj);
+	});
 });

@@ -40,6 +40,22 @@ class object {
 		}
 		return cur;
 	}
+
+	/**
+	 * Returns a new object with the same keys as the given one, but with
+	 * their values set to the return values of the specified function.
+	 * @param {!Object} obj
+	 * @param {!function(string, *)} fn
+	 * @return {!Object}
+	 */
+	static map(obj, fn) {
+		var mappedObj = {};
+		var keys = Object.keys(obj);
+		for (var i = 0; i < keys.length; i++) {
+			mappedObj[keys[i]] = fn(keys[i], obj[keys[i]]);
+		}
+		return mappedObj;
+	}
 }
 
 export default object;

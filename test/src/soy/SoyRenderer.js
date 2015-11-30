@@ -69,6 +69,20 @@ describe('SoyRenderer', function() {
 		assert.ok(custom.element.querySelector('.myFooter'));
 	});
 
+	it('should render non string html attribute correctly', function() {
+		class HtmlTestComponent extends CustomTestComponent {
+		}
+		HtmlTestComponent.ATTRS = {
+			footerContent: {
+				isHtml: true
+			}
+		};
+		HtmlTestComponent.NAME = 'CustomTestComponent';
+
+		var custom = new HtmlTestComponent().render();
+		assert.strictEqual('undefined', custom.getSurfaceElement('footer').innerHTML);
+	});
+
 	it('should render element tag according to its template when defined', function() {
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'

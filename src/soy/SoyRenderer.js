@@ -76,7 +76,7 @@ class SoyRenderer extends ComponentRenderer {
 		var surface = component.getSurface(component.id);
 		var data = (surface && surface.componentData) ? surface.componentData : {};
 		var attrs = object.map(component.getAttrs(names), function(key, value) {
-			if (component.getAttrConfig(key).isHtml) {
+			if (component.getAttrConfig(key).isHtml && core.isString(value)) {
 				return SoyRenderer.sanitizeHtml(value);
 			} else {
 				return value;

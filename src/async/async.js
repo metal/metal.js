@@ -111,8 +111,8 @@ async.nextTick = function(callback, opt_context) {
 	}
 	cb = async.nextTick.wrapCallback_(cb);
 	// Introduced and currently only supported by IE10.
-	if (core.isFunction(window.setImmediate)) {
-		window.setImmediate(cb);
+	if (typeof setImmediate === 'function') {
+		setImmediate(cb);
 		return;
 	}
 	// Look for and cache the custom fallback version of setImmediate.
@@ -140,7 +140,12 @@ async.nextTick.setImmediate_ = null;
 async.nextTick.getSetImmediateEmulator_ = function() {
 	// Create a private message channel and use it to postMessage empty messages
 	// to ourselves.
-	var Channel = window.MessageChannel;
+	var Channel;
+
+	if (typeof MessageChannel === 'function') {
+		Channel = MessageChannel;
+	}
+
 	// If MessageChannel is not available and we are in a browser, implement
 	// an iframe based polyfill in browsers that have postMessage and
 	// document.addEventListener. The latter excludes IE8 because it has a

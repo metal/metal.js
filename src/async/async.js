@@ -111,6 +111,10 @@ async.nextTick = function(callback, opt_context) {
 	}
 	cb = async.nextTick.wrapCallback_(cb);
 	// Introduced and currently only supported by IE10.
+	// Verify if variable is defined on the current runtime (i.e., node, browser).
+	// Can't use typeof enclosed in a function (such as core.isFunction) or an
+	// exception will be thrown when the function is called on an environment
+	// where the variable is undefined.
 	if (typeof setImmediate === 'function') {
 		setImmediate(cb);
 		return;
@@ -142,6 +146,10 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	// to ourselves.
 	var Channel;
 
+	// Verify if variable is defined on the current runtime (i.e., node, browser).
+	// Can't use typeof enclosed in a function (such as core.isFunction) or an
+	// exception will be thrown when the function is called on an environment
+	// where the variable is undefined.
 	if (typeof MessageChannel === 'function') {
 		Channel = MessageChannel;
 	}

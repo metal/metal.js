@@ -5,8 +5,6 @@
 
 'use strict';
 
-import core from '../core';
-
 var async = {};
 
 

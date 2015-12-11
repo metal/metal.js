@@ -584,6 +584,20 @@ describe('dom', function() {
 		});
 	});
 
+	describe('next', function() {
+		it('should return the next sibling that matches the given selector', function() {
+			dom.enterDocument(
+				'<div class="rootElement"></div><div class="sibling1"></div><div class="sibling2"></div>'
+			);
+			var element = dom.toElement('.rootElement');
+			var sibling1 = dom.toElement('.sibling1');
+			var sibling2 = dom.toElement('.sibling2');
+			assert.strictEqual(sibling1, dom.next(element, '.sibling1'));
+			assert.strictEqual(sibling2, dom.next(element, '.sibling2'));
+			assert.strictEqual(null, dom.next(element, '.sibling3'));
+		});
+	});
+
 	describe('toElement', function() {
 		it('should return the element itself if one is given for conversion', function() {
 			var element = document.createElement('div');

@@ -273,6 +273,22 @@ class dom {
 	}
 
 	/**
+	 * Returns the next sibling of the given element that matches the specified
+	 * selector, or null if there is none.
+	 * @param {!Element} element
+	 * @param {?string} selector
+	 */
+	static next(element, selector) {
+		do {
+			element = element.nextSibling;
+			if (element && dom.match(element, selector)) {
+				return element;
+			}
+		} while(element);
+		return null;
+	}
+
+	/**
 	 * Normalizes the event payload for delegate listeners.
 	 * @param {!Event} event
 	 */

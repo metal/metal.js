@@ -284,7 +284,7 @@ class dom {
 			if (element && dom.match(element, selector)) {
 				return element;
 			}
-		} while(element);
+		} while (element);
 		return null;
 	}
 

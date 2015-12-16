@@ -82,4 +82,14 @@ describe('globalEval', function() {
 			done();
 		});
 	});
+
+	it('should run all script tags inside given element', function() {
+		var element = dom.buildFragment(
+			'<div><script>var testScript = 2 + 2;</script></div><script>var testScript2 = 2 + 3;</script>'
+		);
+		globalEval.runScriptsInElement(element);
+		assert.strictEqual(4, window.testScript);
+		assert.strictEqual(5, window.testScript2);
+		assert.ok(!document.head.querySelector('script'));
+	});
 });

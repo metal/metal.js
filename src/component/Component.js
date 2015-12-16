@@ -352,15 +352,8 @@ class Component extends Attribute {
 	 */
 	buildFragment_(content) {
 		var frag = dom.buildFragment(content);
-		if (content.indexOf('<script') === -1) {
-			return frag;
-		}
-		var scripts = frag.querySelectorAll('script');
-		for (var i = 0; i < scripts.length; i++) {
-			var script = scripts.item(i);
-			if (!script.type || script.type === 'text/javascript') {
-				globalEval.runScript(script);
-			}
+		if (content.indexOf('<script') !== -1) {
+			globalEval.runScriptsInElement(frag);
 		}
 		return frag;
 	}

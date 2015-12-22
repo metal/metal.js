@@ -65,7 +65,11 @@ class globalEval {
 	 */
 	static runScriptsInElement(element, opt_callback) {
 		var scripts = element.querySelectorAll('script');
-		globalEval.runScriptsInOrder(scripts, 0, opt_callback);
+		if (scripts.length) {
+			globalEval.runScriptsInOrder(scripts, 0, opt_callback);
+		} else if (opt_callback) {
+			opt_callback();
+		}
 	}
 
 	/**

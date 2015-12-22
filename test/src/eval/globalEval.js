@@ -136,4 +136,18 @@ describe('globalEval', function() {
 			done();
 		});
 	});
+
+	it('should not throw errors if trying to run scripts on element without any scripts', function() {
+		var element = dom.buildFragment('<div></div>');
+		assert.doesNotThrow(function() {
+			globalEval.runScriptsInElement(element);
+		});
+	});
+
+	it('should call given callback immediately if no script tags exist in received element', function() {
+		var element = dom.buildFragment('<div></div>');
+		var callback = sinon.stub();
+		globalEval.runScriptsInElement(element, callback);
+		assert.strictEqual(1, callback.callCount);
+	});
 });

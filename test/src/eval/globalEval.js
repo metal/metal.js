@@ -52,6 +52,14 @@ describe('globalEval', function() {
 		});
 	});
 
+	it('should call callback function after script file is run', function(done) {
+		globalEval.runFile('test/fixtures/script.js', function() {
+			assert.strictEqual(5, window.testScript);
+			assert.ok(!document.head.querySelector('script'));
+			done();
+		});
+	});
+
 	it('should run code inside script tag in global scope', function() {
 		var script = document.createElement('script');
 		script.text = 'var testScript = "script with code";';
@@ -70,6 +78,18 @@ describe('globalEval', function() {
 		assert.ok(!script.parentNode);
 	});
 
+	it('should call callback function after script tag with inline content is run', function(done) {
+		var script = document.createElement('script');
+		script.text = 'var testScript = "script with code";';
+		dom.enterDocument(script);
+
+		globalEval.runScript(script, function() {
+			assert.strictEqual('script with code', window.testScript);
+			assert.ok(!script.parentNode);
+			done();
+		});
+	});
+
 	it('should run file referenced by specified script element in global scope', function(done) {
 		var script = document.createElement('script');
 		script.src = 'test/fixtures/script.js';
@@ -83,6 +103,18 @@ describe('globalEval', function() {
 		});
 	});
 
+	it('should call callback function after script tag with file src is run', function(done) {
+		var script = document.createElement('script');
+		script.src = 'test/fixtures/script.js';
+		dom.enterDocument(script);
+
+		globalEval.runScript(script, function() {
+			assert.strictEqual(5, window.testScript);
+			assert.ok(!document.head.querySelector('script'));
+			done();
+		});
+	});
+
 	it('should run all script tags inside given element', function() {
 		var element = dom.buildFragment(
 			'<div><script>var testScript = 2 + 2;</script></div><script>var testScript2 = 2 + 3;</script>'
@@ -91,5 +123,17 @@ describe('globalEval', function() {
 		assert.strictEqual(4, window.testScript);
 		assert.strictEqual(5, window.testScript2);
 		assert.ok(!document.head.querySelector('script'));
+	});
+
+	it('should run script tags inside given element in order', function(done) {
+		var element = dom.buildFragment(
+			'<script src="test/fixtures/script.js"></script><div><script>var testScript = 2 + 2;</script></div>'
+		);
+
+		globalEval.runScriptsInElement(element, function() {
+			assert.strictEqual(4, window.testScript);
+			assert.ok(!document.head.querySelector('script'));
+			done();
+		});
 	});
 });

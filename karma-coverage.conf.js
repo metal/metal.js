@@ -1,3 +1,5 @@
+'use strict';
+
 var isparta = require('isparta');
 
 module.exports = function (config) {

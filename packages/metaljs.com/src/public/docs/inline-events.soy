@@ -36,7 +36,7 @@
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .footer&rbrace;
-    &lbrace;call Templates.Button.content&rbrace;
+    &lbrace;call Templates.Button.render&rbrace;
         &lbrace;param events: ['click': ['selector': 'button', 'fn': 'handleClick']] /&rbrace;
         &lbrace;param label: 'Ok' /&rbrace;
     &lbrace;/call&rbrace;
@@ -49,7 +49,7 @@
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .footer&rbrace;
-    &lbrace;call Templates.Button.content&rbrace;
+    &lbrace;call Templates.Button.render&rbrace;
         &lbrace;param events: ['click': ['selector': 'button', 'fn': $compId + 'handleClick']] /&rbrace;
         &lbrace;param label: 'Ok' /&rbrace;
     &lbrace;/call&rbrace;
@@ -61,7 +61,7 @@
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .footer&rbrace;
-    &lbrace;call Templates.Button.content&rbrace;
+    &lbrace;call Templates.Button.render&rbrace;
         &lbrace;param events: ['labelChanged': 'handleLabelChanged'] /&rbrace;
         &lbrace;param label: 'Ok' /&rbrace;
     &lbrace;/call&rbrace;

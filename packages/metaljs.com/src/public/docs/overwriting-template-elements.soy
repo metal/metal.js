@@ -10,7 +10,7 @@
 	{param content kind="html"}
 		<h1>Overwriting Template Elements</h1>
 
-		<p>Writing templates for your SoyComponent is easy. You just need to add the contents of your component to the <strong>.content</strong> template and, optionally, split it into more templates that will be updated automatically for you when the mapped params change. For example:</p>
+		<p>Writing templates for your SoyComponent is easy. You just need to add the contents of your component to the <strong>.render</strong> template and, optionally, split it into more templates that will be updated automatically for you when the mapped params change. For example:</p>
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;namespace Templates.MyComponent&rbrace;
@@ -18,7 +18,7 @@
 /**
  * This renders the component's whole content.
  */
-&lbrace;template .content&rbrace;
+&lbrace;template .render&rbrace;
   &lbrace;call .body data="all" /&rbrace;
   &lbrace;call .footer data="all" /&rbrace;
 &lbrace;/template&rbrace;
@@ -43,7 +43,7 @@
 
 		<p>In most cases this will be fine. Sometimes you may need more control over this wrapper element though, like customizing it to use a different tag or attributes, or making sure that your soy template can render the whole component correctly to help with progressive enhancement.</p>
 
-		<p>In those cases you can just overwrite the wrapper on your templates. Metal.js first looks for the wrapper inside the template's content, creating it only when it's not present. The only thing necessary for Metal.js to recognize the wrapper is having the appropriate id. For the <strong>.content</strong> template the id should be the component's id, and for the others it should be in the format: <code>&lt;componentId&gt;-&lt;templateName&gt;</code>. So for the template named <strong>.body</strong> the id should be <code>&lt;componentId&gt;-body</code>.</p>
+		<p>In those cases you can just overwrite the wrapper on your templates. Metal.js first looks for the wrapper inside the template's content, creating it only when it's not present. The only thing necessary for Metal.js to recognize the wrapper is having the appropriate id. For the <strong>.render</strong> template the id should be the component's id, and for the others it should be in the format: <code>&lt;componentId&gt;-&lt;templateName&gt;</code>. So for the template named <strong>.body</strong> the id should be <code>&lt;componentId&gt;-body</code>.</p>
 
 		<p>This is how the previous example would look like when overwriting wrappers:</p>
 
@@ -55,7 +55,7 @@
  * @param id
  * @param elementClasses
  */
-&lbrace;template .content&rbrace;
+&lbrace;template .render&rbrace;
   &lt;div id="{$id}" class="{$elementClasses}" data-foo="bar"&gt;
     &lbrace;call .body data="all" /&rbrace;
     &lbrace;call .footer data="all" /&rbrace;
@@ -93,7 +93,7 @@
  * @param id
  * @param elementClasses
  */
-&lbrace;template .content&rbrace;
+&lbrace;template .render&rbrace;
   &lt;ul id="{$id}" class="{$elementClasses}"&gt;
   	&lbrace;call .item data="all"&rbrace;
   		&lbrace;param surfaceId: 'item1' /&rbrace;

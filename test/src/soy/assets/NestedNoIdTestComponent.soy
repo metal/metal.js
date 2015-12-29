@@ -2,13 +2,13 @@
 
 /**
  */
-{template .content}
-	{call Templates.CustomTestComponent.content}{/call}
+{template .render}
+	{call Templates.CustomTestComponent.render}{/call}
 	{call Templates.NestedNoIdTestComponent.foo data="all" /}
 {/template}
 
 /**
  */
 {template .foo}
-	{call Templates.CustomTestComponent.content}{/call}
+	{call Templates.CustomTestComponent.render}{/call}
 {/template}

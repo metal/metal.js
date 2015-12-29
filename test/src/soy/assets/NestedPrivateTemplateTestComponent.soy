@@ -3,8 +3,8 @@
 /**
  * @param id
  */
-{template .content}
-	{call Templates.ChildrenTestComponent.content}
+{template .render}
+	{call Templates.ChildrenTestComponent.render}
 		{param bar: 'bar' /}
 		{param children kind="html"}
 			{call .private data="all"}

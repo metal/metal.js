@@ -225,13 +225,13 @@ describe('SoyRenderer', function() {
 			assert.strictEqual('Surface', custom.element.querySelector('#nestedPrivate-s1').textContent);
 		});
 
-		it('should set renderAttrs for main surface from the template params of the "content" template', function() {
+		it('should set renderAttrs for main surface from the template params of the "render" template', function() {
 			var custom = new ContentSurfaceTestComponent().render();
 			var surfaces = custom.getSurfaces();
 			assert.deepEqual(['foo'], surfaces[custom.id].renderAttrs);
 		});
 
-		it('should update element content if param from "content" changes', function(done) {
+		it('should update element content if a param from the "render" template changes', function(done) {
 			var custom = new ContentSurfaceTestComponent({
 				foo: 'foo',
 				id: 'custom'
@@ -590,7 +590,7 @@ describe('SoyRenderer', function() {
 	describe('decorateFromTemplate', function() {
 		it('should decorate component with custom tag correctly', function() {
 			var element = document.createElement('custom');
-			var templateFn = SoyTemplates.get('CustomTagTestComponent', 'content');
+			var templateFn = SoyTemplates.get('CustomTagTestComponent', 'render');
 			var data = {
 				count: 2,
 				id: 'custom',
@@ -605,7 +605,7 @@ describe('SoyRenderer', function() {
 		it('should decorate component with custom tag correctly even without specifying id', function() {
 			var element = document.createElement('custom');
 			element.id = 'custom';
-			var templateFn = SoyTemplates.get('CustomTagTestComponent', 'content');
+			var templateFn = SoyTemplates.get('CustomTagTestComponent', 'render');
 			var data = {
 				count: 2,
 				footerContent: 'foo'

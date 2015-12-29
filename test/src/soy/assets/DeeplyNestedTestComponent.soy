@@ -2,7 +2,7 @@
 
 /**
  */
-{template .content}
+{template .render}
 	{call .components data="all" /}
 {/template}
 
@@ -13,10 +13,10 @@
  */
 {template .components}
 	{let $child2 kind="html"}
-		{call Templates.ChildrenTestComponent.content}
+		{call Templates.ChildrenTestComponent.render}
 			{param bar: $bar /}
 			{param children kind="html"}
-				{call Templates.NestedTestComponent.content}
+				{call Templates.NestedTestComponent.render}
 					{param count: 1 /}
 					{param id: $id + '-child1' /}
 				{/call}
@@ -25,13 +25,13 @@
 		{/call}
 	{/let}
 	{let $child3 kind="html"}
-		{call Templates.EventsTestComponent.content}
+		{call Templates.EventsTestComponent.render}
 			{param footerButtons: $footerButtons /}
 			{param id: $id + '-child3' /}
 		{/call}
 	{/let}
 
-	{call Templates.ChildrenTestComponent.content}
+	{call Templates.ChildrenTestComponent.render}
 		{param bar: $bar /}
 		{param children kind="html"}
 			<button type="button" class="parentButton" data-onclick="{$id}:handleClick"></button>

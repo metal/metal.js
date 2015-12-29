@@ -33,7 +33,7 @@ class SoyRenderer extends ComponentRenderer {
 			var templateName = templateNames[i];
 			var templateFn = SoyAop.getOriginalFn(templates[templateName]);
 			if (SoyRenderer.isSurfaceTemplate_(templateName, templateFn)) {
-				var surfaceId = templateName === 'content' ? component.id : templateName;
+				var surfaceId = templateName === 'render' ? component.id : templateName;
 				component.addSurface(surfaceId, {
 					renderAttrs: templateFn.params,
 					templateComponentName: name,
@@ -87,7 +87,7 @@ class SoyRenderer extends ComponentRenderer {
 
 	/**
 	 * Creates and instantiates a component that has the given soy template function as its
-	 * main content template. All keys present in the config object, if one is given, will be
+	 * main render template. All keys present in the config object, if one is given, will be
 	 * attributes of this component, and the object itself will be passed to the constructor.
 	 * @param {!function()} templateFn
 	 * @param {(Element|string)=} opt_element The element that should be decorated. If none is given,
@@ -113,7 +113,7 @@ class SoyRenderer extends ComponentRenderer {
 		TemplateComponent.RENDERER = SoyRenderer;
 		ComponentRegistry.register(TemplateComponent, name);
 		SoyTemplates.set(name, {
-			content: function(opt_attrs, opt_ignored, opt_ijData) {
+			render: function(opt_attrs, opt_ignored, opt_ijData) {
 				return SoyAop.getOriginalFn(templateFn)(data, opt_ignored, opt_ijData);
 			}
 		});
@@ -225,7 +225,7 @@ class SoyRenderer extends ComponentRenderer {
 	static handleInterceptedCall_(component, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
 		if (SoyRenderer.skipInnerCalls_) {
 			return '';
-		} else if (templateName === 'content') {
+		} else if (templateName === 'render') {
 			return this.handleComponentCall_.call(this, component, templateComponentName, data);
 		} else {
 			return this.handleSurfaceCall_.call(this, component, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);

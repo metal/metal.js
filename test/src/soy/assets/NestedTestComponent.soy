@@ -2,7 +2,7 @@
 
 /**
  */
-{template .content}
+{template .render}
 	{call .components data="all" /}
 {/template}
 
@@ -15,7 +15,7 @@
 {template .components}
 	<div class="componentsWrapper">
 	{for $index in range($count)}
-		{call Templates.CustomTestComponent.content data="all"}
+		{call Templates.CustomTestComponent.render data="all"}
 			{param headerContent: $foo /}
 			{param id: $id + 'MyChild' + $index /}
 			{param extra: $extra /}

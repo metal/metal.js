@@ -1207,7 +1207,6 @@ class Component extends Attribute {
 	 *   component
 	 */
 	renderAsSubComponent(opt_content) {
-		this.addElementSurface_();
 		if (opt_content && dom.isEmpty(this.element)) {
 			// If we have the rendered content for this component, but it hasn't
 			// been rendered in its element yet, we render it manually here. That

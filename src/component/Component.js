@@ -1312,7 +1312,8 @@ class Component extends Attribute {
 		}
 
 		for (var i = 0; i < surfaceElementIds.length; i++) {
-			if (!this.getSurfaceFromElementId(surfaceElementIds[i]).handled) {
+			var surface = this.getSurfaceFromElementId(surfaceElementIds[i]);
+			if (!surface.handled && (surface.parent || surfaceElementIds[i] === this.id)) {
 				this.emitRenderSurfaceEvent_(surfaceElementIds[i], null, null, surfaces[surfaceElementIds[i]]);
 			}
 		}

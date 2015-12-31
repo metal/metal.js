@@ -1185,7 +1185,7 @@ describe('Component', function() {
 		it('should repaint surface when render attrs that were added later change', function(done) {
 			var CustomComponent = createCustomComponentClass(function(surface, comp) {
 				if (surface.surfaceElementId === comp.id) {
-					comp.buildPlaceholder(comp.id + '-foo');
+					return comp.buildPlaceholder(comp.id + '-foo');
 				} else {
 					return comp.foo;
 				}
@@ -1624,6 +1624,50 @@ describe('Component', function() {
 				assert.strictEqual(barInnerElement, custom.element.querySelector('.barInner'));
 				assert.notStrictEqual(fooInnerElement, custom.element.querySelector('.fooInner'));
 				assert.strictEqual('bar', custom.getSurfaceElement('foo').textContent);
+				done();
+			});
+		});
+
+		it('should not try to update nested surfaces that will not be rendered by parent', function(done) {
+			var content;
+			var CustomComponent = createCustomComponentClass(function(surface, comp) {
+				if (surface.surfaceElementId === comp.id) {
+					return comp.buildPlaceholder(comp.id + '-choice', {
+						renderAttrs: ['first']
+					});
+				} else {
+					switch (comp.getSurfaceId(surface)) {
+						case 'choice':
+							if (comp.first) {
+								return comp.buildPlaceholder(comp.id + '-first', {
+									renderAttrs: ['text']
+								});
+							} else {
+								return comp.buildPlaceholder(comp.id + '-second', {
+									renderAttrs: ['text']
+								});
+							}
+						case 'content':
+							return content;
+						default:
+							content = comp.text + ': ' + comp.getSurfaceId(surface);
+							return comp.buildPlaceholder(comp.id + '-content');
+					}
+				}
+			});
+			CustomComponent.ATTRS = {
+				first: {
+					value: false
+				}
+			};
+
+			var custom = new CustomComponent({
+				text: 'Initial'
+			}).render();
+			custom.first = true;
+			custom.text = 'New';
+			custom.once('attrsSynced', function() {
+				assert.strictEqual('New: first', custom.getSurfaceElement('content').textContent);
 				done();
 			});
 		});

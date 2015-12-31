@@ -1647,6 +1647,7 @@ describe('Component', function() {
 									renderAttrs: ['text']
 								});
 							}
+							break;
 						case 'content':
 							return content;
 						default:

@@ -616,8 +616,8 @@ describe('SoyRenderer', function() {
 			assert.strictEqual(element.childNodes[0], comp.getSurfaceElement('footer'));
 		});
 
-		it('should call decorateAsSubComponent for components inside given template', function() {
-			sinon.spy(CustomTestComponent.prototype, 'decorateAsSubComponent');
+		it('should call renderAsSubComponent for components inside given template', function() {
+			sinon.spy(CustomTestComponent.prototype, 'renderAsSubComponent');
 
 			var element = document.createElement('div');
 			var templateFn = SoyTemplates.get('NestedTestComponent', 'components');
@@ -629,8 +629,8 @@ describe('SoyRenderer', function() {
 			var comp = SoyRenderer.decorateFromTemplate(templateFn, element, data);
 			assert.ok(comp.components.nestedMyChild0 instanceof CustomTestComponent);
 			assert.ok(comp.components.nestedMyChild1 instanceof CustomTestComponent);
-			assert.strictEqual(2, CustomTestComponent.prototype.decorateAsSubComponent.callCount);
-			CustomTestComponent.prototype.decorateAsSubComponent.restore();
+			assert.strictEqual(2, CustomTestComponent.prototype.renderAsSubComponent.callCount);
+			CustomTestComponent.prototype.renderAsSubComponent.restore();
 		});
 	});
 });

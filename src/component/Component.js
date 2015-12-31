@@ -514,20 +514,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Decorates this component as a subcomponent, meaning that no rendering is
-	 * needed since it was already rendered by the parent component. Handles the
-	 * same logics that `renderAsSubComponent`, but also makes sure that the
-	 * surfaces content is updated if the html is incorrect for the given data.
-	 * @param {string=} opt_content The content that was already rendered for this
-	 *   component.
-	 */
-	decorateAsSubComponent(opt_content) {
-		this.decorating_ = true;
-		this.renderAsSubComponent(opt_content);
-		this.decorating_ = false;
-	}
-
-	/**
 	 * Listens to a delegate event on the component's element.
 	 * @param {string} eventName The name of the event to listen to.
 	 * @param {string} selector The selector that matches the child elements that
@@ -1231,8 +1217,6 @@ class Component extends Attribute {
 		if (component.wasRendered) {
 			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			Component.componentsCollector.updateComponent(surfaceElementId, surface.componentData);
-		} else if (this.decorating_) {
-			component.decorateAsSubComponent(opt_content);
 		} else {
 			component.renderAsSubComponent(opt_content);
 		}

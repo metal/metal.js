@@ -139,6 +139,19 @@ describe('core', function() {
 			assert.ok(core.isObject(function() {}));
 		});
 
+		it('should check if var is promise', function() {
+			assert.ok(!core.isPromise(1));
+			assert.ok(!core.isPromise({}));
+			assert.ok(!core.isPromise([]));
+			assert.ok(!core.isPromise(function() {}));
+			assert.ok(!core.isPromise(null));
+			assert.ok(!core.isPromise(undefined));
+
+			assert.ok(core.isPromise({
+				then: core.nullFunction
+			}));
+		});
+
 		it('should check if var is string', function() {
 			assert.ok(!core.isString(1));
 			assert.ok(!core.isString({}));

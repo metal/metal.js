@@ -19,6 +19,8 @@ Install via [Bower](http://bower.io/), [npm](https://www.npmjs.com/), or [downlo
 bower install metal
 ```
 
+or
+
 ```
 npm install metal
 ```
@@ -28,7 +30,7 @@ npm install metal
 With the code already available, you can use Metal.js by just importing the desired module on your js file and calling what you wish on it. For example:
 
 ```js
-import core from './bower_components/metal/src/core';
+import core from './node_modules/metal/src/core';
 
 // You can now call any function from Metal.js's core module.
 core.isString('Hello World');
@@ -41,7 +43,7 @@ Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.
 Metal.js comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To learn more about them and use them, take a look at [gulp-metal](https://github.com/metal/gulp-metal).
 
 ## Browser Support
- 		 
+
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/metal/metal.js)
 
 ## License

@@ -9,8 +9,5 @@
   "ignore": [
     "*",
     "!src/**/*"
-  ],
-  "dependencies": {
-    "soyutils": "2014.04.22"
-  }
+  ]
 }

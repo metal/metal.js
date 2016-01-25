@@ -8,7 +8,7 @@ module.exports = function (config) {
 
 		files: [
 			'test/src/html/fixture/*.html',
-			'bower_components/soyutils/soyutils.js',
+			'node_modules/closure-templates/soyutils.js',
 			'src/**/*.js',
 			'test/src/**/*.js',
 			{pattern: 'test/fixtures/*.js', watched: true, included: false, served: true}

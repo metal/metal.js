@@ -13,9 +13,14 @@
     "npm": ">=3.0.0"
   },
   "files": [
-    "src/**/*.js"
+    "lib",
+    "src"
   ],
+  "main": "lib/index.js",
+  "browser": "src/index.js",
   "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "install": "npm run compile",
     "test": "gulp test"
   },
   "keywords": [
@@ -26,6 +31,8 @@
     "closure-templates": "20140422.0.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
     "babel-preset-metal": "^2.0.0",
     "chai": "^3.0.0",
     "gulp": "^3.9.0",

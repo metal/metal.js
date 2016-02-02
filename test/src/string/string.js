@@ -11,6 +11,10 @@ describe('string', function() {
 		assert.strictEqual('foo bar', string.collapseBreakingSpaces('   foo   bar   '));
 	});
 
+	it('should generate random strings', function() {
+		assert.notStrictEqual(string.getRandomString(), string.getRandomString());
+	});
+
 	it('should replace interval', function() {
 		assert.strictEqual('ae', string.replaceInterval('abcde', 1, 4, ''));
 	});

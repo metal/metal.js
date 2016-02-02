@@ -13,6 +13,16 @@ class string {
 	}
 
 	/**
+	* Returns a string with at least 64-bits of randomness.
+	* @return {string} A random string, e.g. sn1s7vb4gcic.
+	*/
+	static getRandomString() {
+		var x = 2147483648;
+		return Math.floor(Math.random() * x).toString(36) +
+			Math.abs(Math.floor(Math.random() * x) ^ Date.now()).toString(36);
+	}
+
+	/**
 	 * Calculates the hashcode for a string. The hashcode value is computed by
 	 * the sum algorithm: s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]. A nice
 	 * property of using 31 prime is that the multiplication can be replaced by

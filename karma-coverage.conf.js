@@ -7,7 +7,6 @@ module.exports = function (config) {
 		frameworks: ['mocha', 'chai', 'sinon', 'source-map-support', 'commonjs'],
 
 		files: [
-			'test/src/html/fixture/*.html',
 			'node_modules/closure-templates/soyutils.js',
 			'src/**/*.js',
 			'test/src/**/*.js',
@@ -24,10 +23,7 @@ module.exports = function (config) {
 			// Since tests and async are not going through the `coverage`
 			// preprocessor we need to explicitly make them go through `babel`.
 			'src/async/async.js': ['babel', 'commonjs'],
-			'test/src/**/*.js': ['babel', 'commonjs'],
-			// Fixture htmls should go through `html2js` so tests can access
-			// them through the `window.__html__` variable.
-			'test/src/html/fixture/*.html': ['html2js']
+			'test/src/**/*.js': ['babel', 'commonjs']
 		},
 
 		proxies: {

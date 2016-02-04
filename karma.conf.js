@@ -5,7 +5,6 @@ module.exports = function (config) {
 		frameworks: ['mocha', 'chai', 'sinon', 'source-map-support', 'commonjs'],
 
 		files: [
-			'test/src/html/fixture/*.html',
 			'node_modules/closure-templates/soyutils.js',
 			'src/**/*.js',
 			'test/src/**/*.js',
@@ -14,10 +13,7 @@ module.exports = function (config) {
 
 		preprocessors: {
 			'src/**/*.js': ['babel', 'commonjs'],
-			'test/src/**/*.js': ['babel', 'commonjs'],
-			// Fixture htmls should go through `html2js` so tests can access
-			// them through the `window.__html__` variable.
-			'test/src/html/fixture/*.html': ['html2js']
+			'test/src/**/*.js': ['babel', 'commonjs']
 		},
 
 		proxies: {

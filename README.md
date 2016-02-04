@@ -13,13 +13,7 @@ Even though it's powerful, Metal.js is very small, being only around 9kb after c
 
 ## Install
 
-Install via [Bower](http://bower.io/), [npm](https://www.npmjs.com/), or [download as a zip](https://github.com/metal/metal.js/archive/master.zip):
-
-```
-bower install metal
-```
-
-or
+Install via [npm](https://www.npmjs.com/), or [download as a zip](https://github.com/metal/metal.js/archive/master.zip):
 
 ```
 npm install metal

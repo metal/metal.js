@@ -1,0 +1,15 @@
+{namespace Templates.ChildrenTestComponent}
+
+/**
+ */
+{template .render}
+	{call .children data="all" /}
+{/template}
+
+/**
+ * @param bar
+ * @param children
+ */
+{template .children}
+	{$bar}{$children}
+{/template}

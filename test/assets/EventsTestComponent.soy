@@ -1,0 +1,17 @@
+{namespace Templates.EventsTestComponent}
+
+/**
+ */
+{template .render}
+	<div class="content" data-onclick="handleClick" data-onmousedown="handleMouseDown"></div>
+	{call .footer data="all" /}
+{/template}
+
+/**
+ * @param footerButtons
+ */
+{template .footer}
+	{foreach $button in $footerButtons}
+		<button data-onclick="handleClick" data-onmouseover="handleMouseOver">$button.label</button>
+	{/foreach}
+{/template}

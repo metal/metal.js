@@ -1,0 +1,25 @@
+{namespace Templates.NestedTestComponent}
+
+/**
+ */
+{template .render}
+	{call .components data="all" /}
+{/template}
+
+/**
+ * @param count
+ * @param foo
+ * @param id
+ * @param? extra
+ */
+{template .components}
+	<div class="componentsWrapper">
+	{for $index in range($count)}
+		{call Templates.CustomTestComponent.render data="all"}
+			{param headerContent: $foo /}
+			{param id: $id + 'MyChild' + $index /}
+			{param extra: $extra /}
+		{/call}
+	{/for}
+	</div>
+{/template}

@@ -1,0 +1,21 @@
+{namespace Templates.CustomTagTestComponent}
+
+/**
+ * @param id
+ * @param elementClasses
+ */
+{template .render}
+	<custom id="{$id}" class="component {$elementClasses}" data-foo="foo">
+		{call .footer data="all" /}
+	</custom>
+{/template}
+
+/**
+ * @param id
+ * @param footerContent
+ */
+{template .footer}
+	<footer id="{$id}-footer" class="myFooter" data-bar="bar">
+		{$footerContent}
+	</footer>
+{/template}

@@ -1,0 +1,35 @@
+{
+  "name": "metal-soy",
+  "version": "0.0.0",
+  "description": "A soy templates renderer to be used with Metal.js's Component class",
+  "license": "BSD",
+  "repository": "metal/metal-soy",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "test"
+  ],
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "metal"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "closure-templates": "20140422.0.0",
+    "metal": "metal/metal.js#master",
+    "metal-component": "metal/metal-component#master",
+    "metal-dom": "metal/metal-dom#master"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-metal": "^0.9.0",
+    "gulp-replace": "^0.5.4",
+    "metal-tools-soy": "^0.1.1"
+  }
+}

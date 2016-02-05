@@ -1,0 +1,15 @@
+{namespace Templates.ContentSurfaceTestComponent}
+
+/**
+ * @param foo
+ */
+{template .render}
+	{$foo}
+	{call .body data="all" /}
+{/template}
+
+/**
+ */
+{template .body}
+	Body
+{/template}

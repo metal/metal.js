@@ -7,7 +7,6 @@ module.exports = function (config) {
 		frameworks: ['mocha', 'chai', 'sinon', 'source-map-support', 'commonjs'],
 
 		files: [
-			'node_modules/closure-templates/soyutils.js',
 			'src/**/*.js',
 			'test/src/**/*.js'
 		],

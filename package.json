@@ -1,0 +1,35 @@
+{
+	"name": "metal-component",
+	"version": "0.0.0",
+	"description": "A component class for Metal.js",
+	"license": "BSD",
+	"repository": "metal/metal-component",
+	"engines": {
+		"node": ">=0.12.0",
+		"npm": ">=3.0.0"
+	},
+	"browser": "src/Component.js",
+	"files": [
+		"src",
+		"test"
+	],
+	"scripts": {
+		"test": "gulp test"
+	},
+	"keywords": [
+		"metal"
+	],
+	"dependencies": {
+    "bootstrap": "^3.3.6",
+		"closure-templates": "20140422.0.0",
+		"metal": "metal/metal.js#master",
+		"metal-attribute": "metal/metal-attribute#master",
+		"metal-dom": "metal/metal-dom#master",
+		"metal-events": "metal/metal-events#master",
+		"metal-html": "metal/metal-html#master"
+	},
+	"devDependencies": {
+		"gulp": "^3.8.11",
+		"gulp-metal": "^0.9.0"
+	}
+}

@@ -6,6 +6,7 @@
   "eqeqeq": true,
   "esnext": true,
   "evil": false,
+  "expr": true,
   "forin": false,
   "globals": {
     "soy": true,

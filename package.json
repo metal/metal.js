@@ -30,6 +30,6 @@
     "gulp": "^3.8.11",
     "gulp-metal": "^0.9.0",
     "gulp-replace": "^0.5.4",
-    "metal-tools-soy": "^0.1.1"
+    "metal-tools-soy": "^1.0.0"
   }
 }

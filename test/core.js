@@ -200,6 +200,11 @@ describe('core', function() {
 		});
 
 		it('should check if var is window', function() {
+			if (typeof window === 'undefined') {
+				// Skip this test when on node environment.
+				return;
+			}
+
 			assert.ok(!core.isWindow({
 					nodeType: 9
 				}));

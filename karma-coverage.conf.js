@@ -9,8 +9,7 @@ module.exports = function (config) {
 		files: [
 			'node_modules/closure-templates/soyutils.js',
 			'src/**/*.js',
-			'test/src/**/*.js',
-			{pattern: 'test/fixtures/*.js', watched: true, included: false, served: true}
+			'test/src/**/*.js'
 		],
 
 		preprocessors: {
@@ -24,10 +23,6 @@ module.exports = function (config) {
 			// preprocessor we need to explicitly make them go through `babel`.
 			'src/async/async.js': ['babel', 'commonjs'],
 			'test/src/**/*.js': ['babel', 'commonjs']
-		},
-
-		proxies: {
-		  '/test/fixtures/': '/base/test/fixtures/'
 		},
 
 		browsers: ['Chrome'],

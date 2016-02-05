@@ -1,6 +1,6 @@
 'use strict';
 
-import array from '../../../src/array/array';
+import array from '../../src/array/array';
 
 describe('array', function() {
 	it('should remove an item from an array', function() {

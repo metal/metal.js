@@ -6,12 +6,12 @@ module.exports = function (config) {
 
 		files: [
 			'src/**/*.js',
-			'test/src/**/*.js'
+			'test/**/*.js'
 		],
 
 		preprocessors: {
 			'src/**/*.js': ['babel', 'commonjs'],
-			'test/src/**/*.js': ['babel', 'commonjs']
+			'test/**/*.js': ['babel', 'commonjs']
 		},
 
 		browsers: ['Chrome'],

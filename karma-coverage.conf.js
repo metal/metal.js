@@ -8,7 +8,7 @@ module.exports = function (config) {
 
 		files: [
 			'src/**/*.js',
-			'test/src/**/*.js'
+			'test/**/*.js'
 		],
 
 		preprocessors: {
@@ -21,7 +21,7 @@ module.exports = function (config) {
 			// Since tests and async are not going through the `coverage`
 			// preprocessor we need to explicitly make them go through `babel`.
 			'src/async/async.js': ['babel', 'commonjs'],
-			'test/src/**/*.js': ['babel', 'commonjs']
+			'test/**/*.js': ['babel', 'commonjs']
 		},
 
 		browsers: ['Chrome'],

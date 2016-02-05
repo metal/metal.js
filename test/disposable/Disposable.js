@@ -1,6 +1,6 @@
 'use strict';
 
-import Disposable from '../../../src/disposable/Disposable';
+import Disposable from '../../src/disposable/Disposable';
 
 describe('Disposable', function() {
 	it('should correctly inform if the instance has been disposed', function() {

@@ -1,6 +1,6 @@
 'use strict';
 
-import object from '../../../src/object/object';
+import object from '../../src/object/object';
 
 describe('object', function() {
 	it('should mixin object arguments', function() {

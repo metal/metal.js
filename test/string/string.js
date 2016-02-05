@@ -1,6 +1,6 @@
 'use strict';
 
-import string from '../../../src/string/string';
+import string from '../../src/string/string';
 
 describe('string', function() {
 	it('should compute string hashcode', function() {

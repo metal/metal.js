@@ -16,8 +16,8 @@
     "lib",
     "src"
   ],
-  "main": "lib/index.js",
-  "browser": "src/index.js",
+  "main": "lib/metal.js",
+  "browser": "src/metal.js",
   "scripts": {
     "compile": "babel --presets es2015 -d lib/ src/",
     "install": "npm run compile",

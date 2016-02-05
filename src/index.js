@@ -7,9 +7,5 @@ import Disposable from './disposable/Disposable';
 import object from './object/object';
 import string from './string/string';
 
-export { core };
-export { array };
-export { async };
-export { Disposable };
-export { object };
-export { string };
+export default core;
+export { core, array, async, Disposable, object, string };

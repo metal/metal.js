@@ -18,16 +18,15 @@ describe('globalEval', function() {
 	});
 
 	it('should not leave created script tag in document after code is evaluated', function() {
-		globalEval.run('var testScript = 2 + 2;');
-		assert.ok(!document.head.querySelector('script'));
+		var newScript = globalEval.run('var testScript = 2 + 2;');
+		assert.ok(!newScript.parentNode);
 	});
 
 	it('should evaluate script file in global scope', function(done) {
-		globalEval.runFile('base/fixtures/script.js');
+		var newScript = globalEval.runFile('base/fixtures/script.js');
 
-		var script = document.head.querySelector('script');
 		console.log('before load');
-		dom.on(script, 'load', function() {
+		dom.on(newScript, 'load', function() {
 			console.log('after load');
 			assert.strictEqual(5, window.testScript);
 			done();
@@ -35,29 +34,27 @@ describe('globalEval', function() {
 	});
 
 	it('should remove created script tag after evaluated script file is loaded', function(done) {
-		globalEval.runFile('base/fixtures/script.js');
+		var newScript = globalEval.runFile('base/fixtures/script.js');
 
-		var script = document.head.querySelector('script');
-		dom.on(script, 'load', function() {
-			assert.ok(!document.head.querySelector('script'));
+		dom.on(newScript, 'load', function() {
+			assert.ok(!newScript.parentNode);
 			done();
 		});
 	});
 
 	it('should remove created script tag after evaluated script file throws error', function(done) {
-		globalEval.runFile('base/fixtures/unexistingScript.js');
+		var newScript = globalEval.runFile('base/fixtures/unexistingScript.js');
 
-		var script = document.head.querySelector('script');
-		dom.on(script, 'error', function() {
-			assert.ok(!document.head.querySelector('script'));
+		dom.on(newScript, 'error', function() {
+			assert.ok(!newScript.parentNode);
 			done();
 		});
 	});
 
 	it('should call callback function after script file is run', function(done) {
-		globalEval.runFile('base/fixtures/script.js', function() {
+		var newScript = globalEval.runFile('base/fixtures/script.js', function() {
 			assert.strictEqual(5, window.testScript);
-			assert.ok(!document.head.querySelector('script'));
+			assert.ok(!newScript.parentNode);
 			done();
 		});
 	});
@@ -111,8 +108,7 @@ describe('globalEval', function() {
 		script.src = 'base/fixtures/script.js';
 		dom.enterDocument(script);
 
-		globalEval.runScript(script);
-		var newScript = document.head.querySelector('script');
+		var newScript = globalEval.runScript(script);
 		dom.on(newScript, 'load', function() {
 			assert.strictEqual(5, window.testScript);
 			done();
@@ -124,21 +120,23 @@ describe('globalEval', function() {
 		script.src = 'base/fixtures/script.js';
 		dom.enterDocument(script);
 
-		globalEval.runScript(script, function() {
+		var newScript = globalEval.runScript(script, function() {
 			assert.strictEqual(5, window.testScript);
-			assert.ok(!document.head.querySelector('script'));
+			assert.ok(!newScript.parentNode);
 			done();
 		});
 	});
 
-	it('should run all script tags inside given element', function() {
+	it('should run all script tags inside given element', function(done) {
 		var element = dom.buildFragment(
 			'<div><script>var testScript = 2 + 2;</script></div><script>var testScript2 = 2 + 3;</script>'
 		);
-		globalEval.runScriptsInElement(element);
-		assert.strictEqual(4, window.testScript);
-		assert.strictEqual(5, window.testScript2);
-		assert.ok(!document.head.querySelector('script'));
+		globalEval.runScriptsInElement(element, function() {
+			assert.strictEqual(4, window.testScript);
+			assert.strictEqual(5, window.testScript2);
+			assert.ok(!document.head.querySelector('script'));
+			done();
+		});
 	});
 
 	it('should run script tags inside given element in order', function(done) {

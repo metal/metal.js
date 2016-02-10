@@ -9,11 +9,13 @@ class globalEval {
 	/**
 	 * Evaluates the given string in the global scope.
 	 * @param {string} text
+	 * @return {Element} script
 	 */
 	static run(text) {
 		var script = document.createElement('script');
 		script.text = text;
 		document.head.appendChild(script).parentNode.removeChild(script);
+		return script;
 	}
 
 	/**
@@ -21,6 +23,7 @@ class globalEval {
 	 * @param {string} src The file's path.
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @return {Element} script
 	 */
 	static runFile(src, opt_callback) {
 		var script = document.createElement('script');
@@ -33,6 +36,8 @@ class globalEval {
 		dom.on(script, 'load', callback);
 		dom.on(script, 'error', callback);
 		document.head.appendChild(script);
+
+		return script;
 	}
 
 	/**
@@ -40,6 +45,7 @@ class globalEval {
 	 * @param {!Element} script
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @return {Element} script
 	 */
 	static runScript(script, opt_callback) {
 		if (script.type && script.type !== 'text/javascript') {
@@ -50,10 +56,11 @@ class globalEval {
 			script.parentNode.removeChild(script);
 		}
 		if (script.src) {
-			globalEval.runFile(script.src, opt_callback);
+			return globalEval.runFile(script.src, opt_callback);
 		} else {
 			globalEval.run(script.text);
 			opt_callback && opt_callback();
+			return globalEval.run(script.text);
 		}
 	}
 

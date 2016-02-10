@@ -30,19 +30,12 @@ class globalEvalStyles {
 		var link = document.createElement('link');
 		link.rel = 'stylesheet';
 		link.href = href;
-
-		var callback = function() {
-			opt_callback && opt_callback();
-		};
-		dom.on(link, 'load', callback);
-		dom.on(link, 'error', callback);
-		document.head.appendChild(link);
-
+		globalEvalStyles.runStyle(link, opt_callback);
 		return link;
 	}
 
 	/**
-	 * Evaluates the code referenced by the given style element.
+	 * Evaluates the code referenced by the given style/link element.
 	 * @param {!Element} style
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
@@ -56,12 +49,10 @@ class globalEvalStyles {
 			async.nextTick(callback);
 			return;
 		}
-		if (style.href) {
-			return globalEvalStyles.runFile(style.href, opt_callback);
-		} else {
-			async.nextTick(callback);
-			return globalEvalStyles.run(style.innerHTML);
-		}
+		dom.on(style, 'load', callback);
+		dom.on(style, 'error', callback);
+		document.head.appendChild(style);
+		return style;
 	}
 
 	/**

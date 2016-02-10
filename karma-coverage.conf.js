@@ -6,6 +6,6 @@ module.exports = function (config) {
 	metalKarmaConfig(config);
 
   config.files.push(
-		{pattern: 'fixtures/*.js', watched: true, included: false, served: true}
+		{pattern: 'fixtures/*', watched: true, included: false, served: true}
 	);
 };

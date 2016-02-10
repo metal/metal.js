@@ -26,9 +26,7 @@ describe('globalEval', function() {
 	it('should evaluate script file in global scope', function(done) {
 		var newScript = globalEval.runFile('base/fixtures/script.js');
 
-		console.log('before load');
 		dom.on(newScript, 'load', function() {
-			console.log('after load');
 			assert.strictEqual(5, window.testScript);
 			done();
 		});

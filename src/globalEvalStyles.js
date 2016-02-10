@@ -62,7 +62,6 @@ class globalEvalStyles {
 
 	/**
 	 * Evaluates any style present in the given element.
-	 * TODO: Evaluates running styles in parallel instead of in order.
 	 * @params {!Element} element
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the style has been run.

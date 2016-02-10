@@ -1,5 +1,6 @@
 'use strict';
 
+import { async } from 'metal';
 import dom from '../src/dom';
 import globalEval from '../src/globalEval';
 
@@ -158,10 +159,14 @@ describe('globalEval', function() {
 		});
 	});
 
-	it('should call given callback immediately if no script tags exist in received element', function() {
+	it('should call given callback on nextTick if no script tags exist in received element', function(done) {
 		var element = dom.buildFragment('<div></div>');
 		var callback = sinon.stub();
 		globalEval.runScriptsInElement(element, callback);
-		assert.strictEqual(1, callback.callCount);
+		assert.strictEqual(0, callback.callCount);
+		async.nextTick(function() {
+			assert.strictEqual(1, callback.callCount);
+			done();
+		});
 	});
 });

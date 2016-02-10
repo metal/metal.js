@@ -1,5 +1,6 @@
 'use strict';
 
+import { async } from 'metal';
 import dom from './dom';
 
 /**
@@ -48,8 +49,11 @@ class globalEval {
 	 * @return {Element} script
 	 */
 	static runScript(script, opt_callback) {
-		if (script.type && script.type !== 'text/javascript') {
+		var callback = function() {
 			opt_callback && opt_callback();
+		};
+		if (script.type && script.type !== 'text/javascript') {
+			async.nextTick(callback);
 			return;
 		}
 		if (script.parentNode) {
@@ -58,8 +62,7 @@ class globalEval {
 		if (script.src) {
 			return globalEval.runFile(script.src, opt_callback);
 		} else {
-			globalEval.run(script.text);
-			opt_callback && opt_callback();
+			async.nextTick(callback);
 			return globalEval.run(script.text);
 		}
 	}
@@ -75,7 +78,7 @@ class globalEval {
 		if (scripts.length) {
 			globalEval.runScriptsInOrder(scripts, 0, opt_callback);
 		} else if (opt_callback) {
-			opt_callback();
+			async.nextTick(opt_callback);
 		}
 	}
 
@@ -91,7 +94,7 @@ class globalEval {
 			if (index < scripts.length - 1) {
 				globalEval.runScriptsInOrder(scripts, index + 1, opt_callback);
 			} else if (opt_callback) {
-				opt_callback();
+				async.nextTick(opt_callback);
 			}
 		});
 	}

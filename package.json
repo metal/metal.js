@@ -8,7 +8,7 @@
 		"node": ">=0.12.0",
 		"npm": ">=3.0.0"
 	},
-	"browser": "src/index.js",
+	"browser": "src/all/component.js",
 	"files": [
 		"src",
 		"test"

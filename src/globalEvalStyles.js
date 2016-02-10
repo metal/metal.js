@@ -49,8 +49,13 @@ class globalEvalStyles {
 			async.nextTick(callback);
 			return;
 		}
-		dom.on(style, 'load', callback);
-		dom.on(style, 'error', callback);
+
+		if (style.tagName === 'STYLE') {
+			async.nextTick(callback);
+		} else {
+			dom.on(style, 'load', callback);
+			dom.on(style, 'error', callback);
+		}
 		document.head.appendChild(style);
 		return style;
 	}

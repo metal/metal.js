@@ -64,28 +64,20 @@ class globalEvalStyles {
 	 */
 	static runStylesInElement(element, opt_callback) {
 		var styles = element.querySelectorAll('style,link');
-		if (styles.length) {
-			globalEvalStyles.runStylesInOrder(styles, 0, opt_callback);
-		} else if (opt_callback) {
+		if (styles.length === 0 && opt_callback) {
 			async.nextTick(opt_callback);
+			return;
 		}
-	}
 
-	/**
-	 * Runs the given styles elements in the order that they appear.
-	 * @param {!NodeList} styles
-	 * @param {number} index
-	 * @param {function()=} opt_callback Optional function to be called
-	 *   when the script has been run.
-	 */
-	static runStylesInOrder(styles, index, opt_callback) {
-		globalEvalStyles.runStyle(styles.item(index), function() {
-			if (index < styles.length - 1) {
-				globalEvalStyles.runStylesInOrder(styles, index + 1, opt_callback);
-			} else if (opt_callback) {
+		var loadCount = 0;
+		var callback = function() {
+			if (opt_callback && ++loadCount === styles.length) {
 				async.nextTick(opt_callback);
 			}
-		});
+		};
+		for (var i = 0; i < styles.length; i++) {
+			globalEvalStyles.runStyle(styles[i], callback);
+		}
 	}
 }
 

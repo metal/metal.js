@@ -58,6 +58,16 @@ describe('globalEval', function() {
 		});
 	});
 
+	it('should be able to overwrite append function', function() {
+		var appendFn = sinon.stub();
+		var script = document.createElement('script');
+		globalEval.runScript(script, null, appendFn);
+		assert.strictEqual(1, appendFn.callCount);
+		script.src = 'base/fixtures/script.js';
+		globalEval.runScript(script, null, appendFn);
+		assert.strictEqual(2, appendFn.callCount);
+	});
+
 	it('should run code inside script tag in global scope', function() {
 		var script = document.createElement('script');
 		script.text = 'var testScript = "script with code";';

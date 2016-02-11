@@ -10,12 +10,19 @@ class globalEval {
 	/**
 	 * Evaluates the given string in the global scope.
 	 * @param {string} text
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 * @return {Element} script
 	 */
-	static run(text) {
+	static run(text, opt_appendFn) {
 		var script = document.createElement('script');
 		script.text = text;
-		document.head.appendChild(script).parentNode.removeChild(script);
+		if (opt_appendFn) {
+			opt_appendFn(script);
+		} else {
+			document.head.appendChild(script);
+		}
+		dom.exitDocument(script);
 		return script;
 	}
 
@@ -24,9 +31,11 @@ class globalEval {
 	 * @param {string} src The file's path.
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 * @return {Element} script
 	 */
-	static runFile(src, opt_callback) {
+	static runFile(src, opt_callback, opt_appendFn) {
 		var script = document.createElement('script');
 		script.src = src;
 
@@ -36,7 +45,12 @@ class globalEval {
 		};
 		dom.on(script, 'load', callback);
 		dom.on(script, 'error', callback);
-		document.head.appendChild(script);
+
+		if (opt_appendFn) {
+			opt_appendFn(script);
+		} else {
+			document.head.appendChild(script);
+		}
 
 		return script;
 	}
@@ -46,9 +60,11 @@ class globalEval {
 	 * @param {!Element} script
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 * @return {Element} script
 	 */
-	static runScript(script, opt_callback) {
+	static runScript(script, opt_callback, opt_appendFn) {
 		var callback = function() {
 			opt_callback && opt_callback();
 		};
@@ -60,10 +76,10 @@ class globalEval {
 			script.parentNode.removeChild(script);
 		}
 		if (script.src) {
-			return globalEval.runFile(script.src, opt_callback);
+			return globalEval.runFile(script.src, opt_callback, opt_appendFn);
 		} else {
 			async.nextTick(callback);
-			return globalEval.run(script.text);
+			return globalEval.run(script.text, opt_appendFn);
 		}
 	}
 
@@ -72,11 +88,13 @@ class globalEval {
 	 * @params {!Element} element
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 */
-	static runScriptsInElement(element, opt_callback) {
+	static runScriptsInElement(element, opt_callback, opt_appendFn) {
 		var scripts = element.querySelectorAll('script');
 		if (scripts.length) {
-			globalEval.runScriptsInOrder(scripts, 0, opt_callback);
+			globalEval.runScriptsInOrder(scripts, 0, opt_callback, opt_appendFn);
 		} else if (opt_callback) {
 			async.nextTick(opt_callback);
 		}
@@ -88,11 +106,13 @@ class globalEval {
 	 * @param {number} index
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 */
-	static runScriptsInOrder(scripts, index, opt_callback) {
+	static runScriptsInOrder(scripts, index, opt_callback, opt_appendFn) {
 		globalEval.runScript(scripts.item(index), function() {
 			if (index < scripts.length - 1) {
-				globalEval.runScriptsInOrder(scripts, index + 1, opt_callback);
+				globalEval.runScriptsInOrder(scripts, index + 1, opt_callback, opt_appendFn);
 			} else if (opt_callback) {
 				async.nextTick(opt_callback);
 			}

@@ -40,7 +40,7 @@ class globalEval {
 		script.src = src;
 
 		var callback = function() {
-			script.parentNode.removeChild(script);
+			dom.exitDocument(script);
 			opt_callback && opt_callback();
 		};
 		dom.on(script, 'load', callback);
@@ -72,9 +72,7 @@ class globalEval {
 			async.nextTick(callback);
 			return;
 		}
-		if (script.parentNode) {
-			script.parentNode.removeChild(script);
-		}
+		dom.exitDocument(script);
 		if (script.src) {
 			return globalEval.runFile(script.src, opt_callback, opt_appendFn);
 		} else {

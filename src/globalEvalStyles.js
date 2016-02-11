@@ -10,12 +10,18 @@ class globalEvalStyles {
 	/**
 	 * Evaluates the given style.
 	 * @param {string} text
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 * @return {Element} style
 	 */
-	static run(text) {
+	static run(text, opt_appendFn) {
 		var style = document.createElement('style');
 		style.innerHTML = text;
-		document.head.appendChild(style);
+		if (opt_appendFn) {
+			opt_appendFn(style);
+		} else {
+			document.head.appendChild(style);
+		}
 		return style;
 	}
 

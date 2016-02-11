@@ -89,6 +89,8 @@ describe('globalEvalStyles', function() {
 		var newStyle = globalEvalStyles.runStyle(style, null, appendFn);
 		assert.strictEqual(1, appendFn.callCount);
 		dom.exitDocument(newStyle);
+		globalEvalStyles.run('', appendFn);
+		assert.strictEqual(2, appendFn.callCount);
 	});
 
 	it('should run all styles tags inside given element', function(done) {

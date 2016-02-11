@@ -1,9 +1,9 @@
 'use strict';
 
 import dom from 'metal-dom';
-import Component from '../src/Component';
-import ComponentCollector from '../src/ComponentCollector';
-import EventsCollector from '../src/EventsCollector';
+import Component from '../../src/Component';
+import ComponentCollector from '../../src/ComponentCollector';
+import EventsCollector from '../../src/surfaces/EventsCollector';
 
 describe('EventsCollector', function() {
 	it('should fail when component instance is not passed', function() {

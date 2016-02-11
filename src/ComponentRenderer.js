@@ -1,22 +1,77 @@
 'use strict';
 
+import { EventEmitter, EventHandler } from 'metal-events';
+
 /**
  * Base class that component renderers should extend from. It defines the
  * required methods all renderers should have.
  */
-class ComponentRenderer {
+class ComponentRenderer extends EventEmitter {
 	/**
-	 * Returns the content, as a string, that should be rendered for
-	 * the given component's surface.
-	 * @param {!Object} surface The surface configuration.
-	 * @param {!Component} component The component instance.
-	 * @param {string=} opt_skipContents True if only the element's tag needs to be rendered.
-	 * @return {string} The content to be rendered, as a string. Nested surfaces can be
-	 *   represented by placeholders in the format specified by Component.SURFACE_REGEX.
-	 *   Also, if the string content's main wrapper has the surface's id, then it
-	 *   will be used to render the main surface tag.
+	 * Constructor function for `ComponentRenderer`.
+	 * @param {!Component} component The component that this renderer is
+	 *     responsible for.
 	 */
-	static getSurfaceContent() {}
+	constructor(component) {
+		super();
+		this.component_ = component;
+		this.componentRendererEvents_ = new EventHandler();
+		this.componentRendererEvents_.add(
+			this.component_.on('attrsChanged', this.handleComponentRendererAttrsChanged_.bind(this)),
+			this.component_.once('render', this.render.bind(this))
+		);
+	}
+
+	/**
+	 * Builds and returns the component's main element, without any content. This
+	 * is used by Component when building the element attribute from scratch,
+	 * which can happen before the first render, whenever the attribute is first
+	 * accessed.
+	 * Subclasses should override this to customize the creation of the default
+	 * component element.
+	 * @return {!Element}
+	 */
+	buildElement() {
+		return document.createElement('div');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	disposeInternal() {
+		this.componentRendererEvents_.removeAllListeners();
+		this.componentRendererEvents_ = null;
+	}
+
+	/**
+	 * Handles an `attrsChanged` event from this renderer's component. Calls the
+	 * `update` function if the component has already been rendered for the first
+	 * time.
+	 * @param {Object.<string, Object>} changes Object containing the names
+	 *     of all changed attributes as keys, each mapped to an object with its
+	 *     new (newVal) and previous (prevVal) values.
+	 */
+	handleComponentRendererAttrsChanged_(changes) {
+		if (this.component_.wasRendered) {
+			this.update(changes);
+		}
+	}
+
+	/**
+	 * Renders the component's whole content. When decorating this should avoid
+	 * replacing the existing content if it's already correct.
+	 * @param {decorating: boolean} data
+	 */
+	render() {}
+
+	/**
+	 * Updates the component's element html. This is automatically called by
+	 * the component when the value of at least one of its attributes has changed.
+	 * @param {Object.<string, Object>} changes Object containing the names
+	 *     of all changed attributes as keys, each mapped to an object with its
+	 *     new (newVal) and previous (prevVal) values.
+	 */
+	update() {}
 }
 
 export default ComponentRenderer;

@@ -1,6 +1,6 @@
 'use strict';
 
-import SurfaceCollector from '../src/SurfaceCollector';
+import SurfaceCollector from '../../src/surfaces/SurfaceCollector';
 
 describe('SurfaceCollector', function() {
 	it('should add and get surfaces', function() {
@@ -11,6 +11,15 @@ describe('SurfaceCollector', function() {
 		collector.addSurface('surface2', data2);
 		assert.strictEqual(data1, collector.getSurface('surface1'));
 		assert.strictEqual(data2, collector.getSurface('surface2'));
+	});
+
+	it('should create config object for surface added without one', function() {
+		var collector = new SurfaceCollector();
+		collector.addSurface('surface1');
+
+		var surface = collector.getSurface('surface1');
+		assert.ok(surface);
+		assert.strictEqual('surface1', surface.surfaceElementId);
 	});
 
 	it('should update existing surface', function() {

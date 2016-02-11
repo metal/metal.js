@@ -7,7 +7,6 @@ import ComponentCollector from '../src/ComponentCollector';
 
 class TestComponent extends Component {
 }
-ComponentRegistry.register(TestComponent);
 TestComponent.ATTRS = {
 	bar: {}
 };
@@ -17,6 +16,9 @@ describe('ComponentCollector', function() {
 		sinon.stub(console, 'warn');
 		document.body.innerHTML = '';
 		ComponentCollector.components = {};
+		ComponentRegistry.components_ = {};
+
+		ComponentRegistry.register(TestComponent);
 	});
 
 	afterEach(function() {

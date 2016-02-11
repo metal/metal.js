@@ -160,6 +160,19 @@ describe('globalEval', function() {
 		});
 	});
 
+	it('should be able to overwrite append function from element', function(done) {
+		var element = dom.buildFragment(
+			'<script src="base/fixtures/script.js"></script><div><script>var testScript = 2 + 1;</script>'
+		);
+		var appendFn = sinon.spy(function(script) {
+			document.head.appendChild(script);
+		});
+		globalEval.runScriptsInElement(element, function() {
+			assert.strictEqual(2, appendFn.callCount);
+			done();
+		}, appendFn);
+	});
+
 	it('should not throw errors if trying to run scripts on element without any scripts', function() {
 		var element = dom.buildFragment('<div></div>');
 		assert.doesNotThrow(function() {

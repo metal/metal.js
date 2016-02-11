@@ -116,7 +116,7 @@ class globalEval {
 			} else if (opt_callback) {
 				async.nextTick(opt_callback);
 			}
-		});
+		}, opt_appendFn);
 	}
 }
 

@@ -83,6 +83,14 @@ describe('globalEvalStyles', function() {
 		});
 	});
 
+	it('should be able to overwrite append function', function() {
+		var appendFn = sinon.stub();
+		var style = document.createElement('style');
+		var newStyle = globalEvalStyles.runStyle(style, null, appendFn);
+		assert.strictEqual(1, appendFn.callCount);
+		dom.exitDocument(newStyle);
+	});
+
 	it('should run all styles tags inside given element', function(done) {
 		var element = dom.buildFragment(
 			'<div><style>body{background-color:rgb(255, 0, 0);}</style></div><style>body{margin-top:10px;}</style>'

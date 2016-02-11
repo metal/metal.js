@@ -24,13 +24,15 @@ class globalEvalStyles {
 	 * @param {string} href The file's path.
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the styles has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 * @return {Element} style
 	 */
-	static runFile(href, opt_callback) {
+	static runFile(href, opt_callback, opt_appendFn) {
 		var link = document.createElement('link');
 		link.rel = 'stylesheet';
 		link.href = href;
-		globalEvalStyles.runStyle(link, opt_callback);
+		globalEvalStyles.runStyle(link, opt_callback, opt_appendFn);
 		return link;
 	}
 
@@ -39,9 +41,11 @@ class globalEvalStyles {
 	 * @param {!Element} style
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 *  @return {Element} style
 	 */
-	static runStyle(style, opt_callback) {
+	static runStyle(style, opt_callback, opt_appendFn) {
 		var callback = function() {
 			opt_callback && opt_callback();
 		};
@@ -56,17 +60,25 @@ class globalEvalStyles {
 			dom.on(style, 'load', callback);
 			dom.on(style, 'error', callback);
 		}
-		document.head.appendChild(style);
+
+		if (opt_appendFn) {
+			opt_appendFn(style);
+		} else {
+			document.head.appendChild(style);
+		}
+
 		return style;
 	}
 
 	/**
 	 * Evaluates any style present in the given element.
 	 * @params {!Element} element
-	 * @param {function()=} opt_callback Optional function to be called
-	 *   when the style has been run.
+	 * @param {function()=} opt_callback Optional function to be called when the
+	 *   style has been run.
+	 * @param {function()=} opt_appendFn Optional function to append the node
+	 *   into document.
 	 */
-	static runStylesInElement(element, opt_callback) {
+	static runStylesInElement(element, opt_callback, opt_appendFn) {
 		var styles = element.querySelectorAll('style,link');
 		if (styles.length === 0 && opt_callback) {
 			async.nextTick(opt_callback);
@@ -80,7 +92,7 @@ class globalEvalStyles {
 			}
 		};
 		for (var i = 0; i < styles.length; i++) {
-			globalEvalStyles.runStyle(styles[i], callback);
+			globalEvalStyles.runStyle(styles[i], callback, opt_appendFn);
 		}
 	}
 }

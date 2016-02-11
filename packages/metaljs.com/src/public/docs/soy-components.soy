@@ -36,11 +36,10 @@ import MyComponentBase './MyComponent.soy';
 
 class MyComponent extends MyComponentBase {
 }
-MyComponentBase.setImpl(MyComponent);
 
 export default MyComponent;{/literal}</textarea>
 
-	<p>It basically just defines a class named MyComponent that extends from the auto-generated component inside the compiled soy file and exports it. The <code>MyComponentBase.setImpl</code> call is only required if you want your component to be callable as a nested component. Check out <a href="/docs/nested-components.html">Nested Components</a> for more details.</p>
+	<p>It basically just defines a class named MyComponent that extends from the auto-generated component inside the compiled soy file and exports it.
 
 	<p>There are many ways to add behavior to your component. You can add handlers for <a href="/docs/inline-events.html">inline listeners</a>, add <a href="/docs/attributes.html">attributes</a> or simply override <a href="/docs/component-lifecycle.html">lifecycle functions</a> to add any other logic you need.</p>
 {/template}

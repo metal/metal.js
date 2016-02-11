@@ -10,18 +10,18 @@
 	{param content kind="html"}
 		<h1>Alias</h1>
 
-		<p>A straightforward way to import bower dependencies into your module is to use their relative paths, like we do for any other code. For example:</p>
+		<p>A straightforward way to import npm dependencies into your module is to use their relative paths, like we do for any other code. For example:</p>
 
 		<textarea class="code" data-mode="javascript">{literal}
-import core from '../bower_components/metal/src/core';{/literal}</textarea>
+import core from '../node_modules/metal/src/core';{/literal}</textarea>
 
-		<p>Having to supply the relative path to bower_components is not cool though and, besides that, it may cause problems when a module doing that is imported later as a bower dependency of another project, since the paths will change.</p>
+		<p>Having to supply the relative path to node_modules is not cool though and, besides that, it may cause problems when a module doing that is imported later as an npm dependency of another project, since the paths will change.</p>
 
-		<p>Knowing that, Metal.js allows the use of aliases to refer to bower dependencies. It basically allows importing dependencies by just using a prefix instead of the whole path to the bower folder location. Note that this will only work when using Metal.js's <a href="/docs/building.html">build tools</a> or adding a similar logic to your build process yourself (though we provide a <a href="https://github.com/metal/gulp-metal/blob/master/lib/renameAlias.js">helper function</a> on Metal.js's npm package).</p>
+		<p>Knowing that, Metal.js allows importing npm dependencies like you would from a regular node module, just by referencing their names. Note that this will only work when using Metal.js's <a href="/docs/building.html">build tools</a> or adding a similar logic to your build process yourself (though we provide a <a href="https://npmjs.com/package/babel-preset-metal">babel preset</a> with this logic that you can use separately too).</p>
 
 		<p>With aliases, the previous example can be rewritten like this:</p>
 
-		<textarea class="code" data-mode="javascript">import core from 'bower:metal/src/core';</textarea>
+		<textarea class="code" data-mode="javascript">import core from 'metal';</textarea>
 	{/param}
 {/call}
 {/template}

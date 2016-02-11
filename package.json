@@ -13,6 +13,7 @@
     "src",
     "test"
   ],
+  "format": "es6",
   "scripts": {
     "test": "gulp test"
   },

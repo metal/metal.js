@@ -18,6 +18,6 @@ metal.registerTasks(options);
 gulp.task('soy', function() {
 	return gulp.src('test/**/*.soy')
 		.pipe(compileSoy(options))
-		.pipe(replace('\'metal-soy\'', '\'../../src/index\''))
+		.pipe(replace('\'metal-soy\'', '\'../../src/soy\''))
 		.pipe(gulp.dest('test'));
 });

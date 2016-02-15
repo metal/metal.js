@@ -532,6 +532,18 @@ describe('Attribute', function() {
 		assert.strictEqual(20, attr.attr2);
 	});
 
+	it('should check if an attribute\'s value has already been set', function() {
+		var attr = new Attribute();
+		attr.addAttr('attr1', {}, 1);
+		attr.addAttr('attr2', {});
+
+		assert.ok(attr.hasBeenSet('attr1'));
+		assert.ok(!attr.hasBeenSet('attr2'));
+
+		attr.attr2 = 2;
+		assert.ok(attr.hasBeenSet('attr2'));
+	});
+
 	it('should not run setter, validator or events for removed attributes', function() {
 		var attr = new Attribute();
 		attr.addAttr('attr1', {

@@ -267,7 +267,7 @@ describe('SurfaceRenderer', function() {
 
 			var child = new ChildComponent();
 			var renderer = child.getRenderer();
-			assert.deepEqual(['bottom', 'content', 'header'], Object.keys(renderer.getSurfaces()).sort());
+			assert.deepEqual(['bottom', 'content', 'header', child.id], Object.keys(renderer.getSurfaces()).sort());
 		});
 
 		it('should dynamically add surfaces', function() {
@@ -279,7 +279,7 @@ describe('SurfaceRenderer', function() {
 			renderer.addSurface('header', headerSurfaceConfig);
 			renderer.addSurface('bottom');
 			assert.strictEqual(headerSurfaceConfig, renderer.getSurface('header'));
-			assert.deepEqual(['bottom', 'header'], Object.keys(renderer.getSurfaces()).sort());
+			assert.deepEqual(['bottom', 'header', custom.id], Object.keys(renderer.getSurfaces()).sort());
 			assert.strictEqual(null, renderer.getSurface('unknown'));
 		});
 

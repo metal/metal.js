@@ -89,22 +89,13 @@ class SurfaceRenderer extends ComponentRenderer {
 
 		this.setShouldUseFacade(true);
 		this.addSurfacesFromStaticHint_();
+		this.addSurface(this.component_.id, {
+			componentName: this.component_.getName()
+		});
 
 		this.component_.once('attached', this.handleComponentAttachedOnce_.bind(this));
 		this.component_.on('detached', this.handleComponentDetached_.bind(this));
 		this.on('renderSurface', this.defaultRenderSurfaceFn_, true);
-	}
-
-	/**
-	 * Adds the surface for this component's main element, if it doesn't exist yet.
-	 * @protected
-	 */
-	addElementSurface_() {
-		if (!this.surfaceIds_[this.component_.id]) {
-			this.addSurface(this.component_.id, {
-				componentName: this.component_.getName()
-			});
-		}
 	}
 
 	/**
@@ -491,7 +482,6 @@ class SurfaceRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	getElementContent_(opt_skipContents) {
-		this.addElementSurface_();
 		return this.getSurfaceContent(this.getSurface(this.component_.id), opt_skipContents);
 	}
 
@@ -776,7 +766,6 @@ class SurfaceRenderer extends ComponentRenderer {
 	 * @inheritDoc
 	 */
 	render(data) {
-		this.addElementSurface_();
 		var id = this.component_.id;
 		if (data.decorating) {
 			var extendedContent = this.getElementExtendedContent();

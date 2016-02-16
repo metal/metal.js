@@ -1,7 +1,7 @@
 'use strict';
 
 import dom from 'metal-dom';
-import { Component, ComponentCollector } from 'metal-component';
+import { Component, ComponentCollector, SurfaceRenderer } from 'metal-component';
 import SoyAop from '../src/SoyAop';
 import SoyRenderer from '../src/SoyRenderer';
 import SoyTemplates from '../src/SoyTemplates';
@@ -24,7 +24,7 @@ import StaticTestComponent from './assets/StaticTestComponent.soy';
 describe('SoyRenderer', function() {
 	beforeEach(function() {
 		document.body.innerHTML = '';
-		Component.surfacesCollector.removeAllSurfaces();
+		SurfaceRenderer.surfacesCollector.removeAllSurfaces();
 	});
 
 	it('should render element content with surfaces automatically from template', function() {
@@ -32,13 +32,14 @@ describe('SoyRenderer', function() {
 			footerContent: 'My Footer',
 			headerContent: 'My Header'
 		});
+		var renderer = custom.getRenderer();
 		custom.render();
 
 		assert.strictEqual(3, custom.element.childNodes.length);
 		assert.strictEqual('My Title', custom.element.childNodes[0].textContent);
-		assert.strictEqual(custom.getSurfaceElement('header'), custom.element.childNodes[1]);
+		assert.strictEqual(renderer.getSurfaceElement('header'), custom.element.childNodes[1]);
 		assert.strictEqual('My Header', custom.element.childNodes[1].innerHTML);
-		assert.strictEqual(custom.getSurfaceElement('footer'), custom.element.childNodes[2]);
+		assert.strictEqual(renderer.getSurfaceElement('footer'), custom.element.childNodes[2]);
 		assert.strictEqual('My Footer', custom.element.childNodes[2].innerHTML);
 	});
 
@@ -79,7 +80,8 @@ describe('SoyRenderer', function() {
 		HtmlTestComponent.NAME = 'CustomTestComponent';
 
 		var custom = new HtmlTestComponent().render();
-		assert.strictEqual('undefined', custom.getSurfaceElement('footer').innerHTML);
+		var renderer = custom.getRenderer();
+		assert.strictEqual('undefined', renderer.getSurfaceElement('footer').innerHTML);
 	});
 
 	it('should render element tag according to its template when defined', function() {
@@ -95,7 +97,7 @@ describe('SoyRenderer', function() {
 		var custom = new CustomTagTestComponent({
 			elementClasses: 'myClass'
 		}).render();
-		var surfaceElement = custom.getSurfaceElement('footer');
+		var surfaceElement = custom.getRenderer().getSurfaceElement('footer');
 		assert.strictEqual('FOOTER', surfaceElement.tagName);
 		assert.strictEqual('myFooter', surfaceElement.className);
 		assert.strictEqual('bar', surfaceElement.getAttribute('data-bar'));
@@ -188,32 +190,26 @@ describe('SoyRenderer', function() {
 	});
 
 	describe('Surfaces', function() {
-		it('should automatically create surfaces for a component\'s non private templates', function() {
-			var custom = new PrivateTemplateTestComponent();
-			var surfaces = custom.getSurfaces();
-			assert.deepEqual([custom.id, 'notPrivate'], Object.keys(surfaces));
-		});
-
-		it('should set surface renderAttrs to its template params', function() {
-			var custom = new PrivateTemplateTestComponent();
-			var surfaces = custom.getSurfaces();
-			assert.deepEqual(['text'], surfaces.notPrivate.renderAttrs);
-		});
-
 		it('should only create surfaces either from non private template calls or calls with surface id', function() {
 			var custom = new PrivateTemplateTestComponent({
 				id: 'custom'
 			}).render();
-			var surfaces = custom.getSurfaces();
+			var surfaces = custom.getRenderer().getSurfaces();
 			assert.deepEqual(['custom', 'notPrivate', 'privateTemplate', 's1'], Object.keys(surfaces).sort());
+		});
+
+		it('should set surface renderAttrs to its template params', function() {
+			var custom = new PrivateTemplateTestComponent().render();
+			var surfaces = custom.getRenderer().getSurfaces();
+			assert.deepEqual(['text'], surfaces.notPrivate.renderAttrs);
 		});
 
 		it('should only create surfaces on nested components either from non private template calls or calls with surface id', function() {
 			var custom = new NestedPrivateTemplateTestComponent({
 				id: 'nestedPrivate'
 			}).render();
-			var surfaces = custom.getSurfaces();
-			var nestedSurfaces = custom.components['nestedPrivate-child1'].getSurfaces();
+			var surfaces = custom.getRenderer().getSurfaces();
+			var nestedSurfaces = custom.components['nestedPrivate-child1'].getRenderer().getSurfaces();
 			assert.deepEqual(
 				['nestedPrivate', 'nestedPrivate-child1', 'notPrivate', 'privateTemplate', 's1'],
 				Object.keys(surfaces).sort()
@@ -226,7 +222,7 @@ describe('SoyRenderer', function() {
 
 		it('should set renderAttrs for main surface from the template params of the "render" template', function() {
 			var custom = new ContentSurfaceTestComponent().render();
-			var surfaces = custom.getSurfaces();
+			var surfaces = custom.getRenderer().getSurfaces();
 			assert.deepEqual(['foo'], surfaces[custom.id].renderAttrs);
 		});
 
@@ -248,11 +244,12 @@ describe('SoyRenderer', function() {
 			var comp = new StaticTestComponent({
 				text: 'foo'
 			}).render();
+			var renderer = comp.getRenderer();
 
-			var initialContent = comp.getSurfaceElement('inner').childNodes[0];
+			var initialContent = renderer.getSurfaceElement('inner').childNodes[0];
 			comp.text = 'bar';
 			comp.once('attrsChanged', function() {
-				assert.strictEqual(initialContent, comp.getSurfaceElement('inner').childNodes[0]);
+				assert.strictEqual(initialContent, renderer.getSurfaceElement('inner').childNodes[0]);
 				done();
 			});
 		});
@@ -264,11 +261,12 @@ describe('SoyRenderer', function() {
 				id: 'custom',
 				items: ['Item1', 'Item2']
 			}).render();
+			var renderer = custom.getRenderer();
 			var element = custom.element;
-			assert.strictEqual(custom.getSurfaceElement('title'), element.querySelector('#custom-title'));
-			assert.strictEqual(custom.getSurfaceElement('0'), element.querySelector('#custom-0'));
-			assert.strictEqual(custom.getSurfaceElement('list-s1'), element.querySelector('#custom-list-s1'));
-			assert.strictEqual(custom.getSurfaceElement('list-s2'), element.querySelector('#custom-list-s2'));
+			assert.strictEqual(renderer.getSurfaceElement('title'), element.querySelector('#custom-title'));
+			assert.strictEqual(renderer.getSurfaceElement('0'), element.querySelector('#custom-0'));
+			assert.strictEqual(renderer.getSurfaceElement('list-s1'), element.querySelector('#custom-list-s1'));
+			assert.strictEqual(renderer.getSurfaceElement('list-s2'), element.querySelector('#custom-list-s2'));
 		});
 
 		it('should correctly update nested surfaces', function(done) {
@@ -598,7 +596,7 @@ describe('SoyRenderer', function() {
 
 			var comp = SoyRenderer.decorateFromTemplate(templateFn, element, data);
 			assert.strictEqual(element, comp.element);
-			assert.strictEqual(element.childNodes[0], comp.getSurfaceElement('footer'));
+			assert.strictEqual(element.childNodes[0], comp.getRenderer().getSurfaceElement('footer'));
 		});
 
 		it('should decorate component with custom tag correctly even without specifying id', function() {
@@ -612,7 +610,7 @@ describe('SoyRenderer', function() {
 
 			var comp = SoyRenderer.decorateFromTemplate(templateFn, element, data);
 			assert.strictEqual(element, comp.element);
-			assert.strictEqual(element.childNodes[0], comp.getSurfaceElement('footer'));
+			assert.strictEqual(element.childNodes[0], comp.getRenderer().getSurfaceElement('footer'));
 		});
 
 		it('should call renderAsSubComponent for components inside given template', function() {

@@ -2,7 +2,7 @@
 
 import { core, object } from 'metal';
 import dom from 'metal-dom';
-import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
+import { Component, ComponentRegistry, SurfaceRenderer } from 'metal-component';
 import SoyAop from './SoyAop';
 import SoyTemplates from './SoyTemplates';
 
@@ -10,28 +10,27 @@ import SoyTemplates from './SoyTemplates';
 var ijData = {};
 
 /**
- * A `ComponentRenderer` that enables components to be rendered via soy templates. It
+ * A `SurfaceRenderer` that enables components to be rendered via soy templates. It
  * automatically creates surfaces named after each template and uses template params
  * as render attributes. That means that when an attribute value changes, the templates
  * that have a parameter with the same name will be automatically rendered again.
- * @extends {ComponentRenderer}
+ * @extends {SurfaceRenderer}
  */
-class SoyRenderer extends ComponentRenderer {
+class SoyRenderer extends SurfaceRenderer {
 	/**
 	 * Adds surfaces from the soy templates.
-	 * @param {!Component} component
 	 * @protected
 	 */
-	static addSurfacesFromTemplates_(component) {
-		var name = component.getName();
+	addSurfacesFromTemplates_() {
+		var name = this.component_.getName();
 		var templates = SoyTemplates.get(name);
 		var templateNames = Object.keys(templates);
 		for (var i = 0; i < templateNames.length; i++) {
 			var templateName = templateNames[i];
 			var templateFn = SoyAop.getOriginalFn(templates[templateName]);
 			if (SoyRenderer.isSurfaceTemplate_(templateName, templateFn)) {
-				var surfaceId = templateName === 'render' ? component.id : templateName;
-				component.addSurface(surfaceId, {
+				var surfaceId = templateName === 'render' ? this.component_.id : templateName;
+				this.addSurface(surfaceId, {
 					renderAttrs: templateFn.params,
 					templateComponentName: name,
 					templateName: templateName
@@ -60,17 +59,17 @@ class SoyRenderer extends ComponentRenderer {
 
 	/**
 	 * Builds the data object that should be passed to a template from the given component.
-	 * @param {!Component} component
 	 * @return {!Object}
 	 * @protected
 	 */
-	static buildTemplateData_(component) {
+	buildTemplateData_() {
+		var component = this.component_;
 		var names = component.getAttrNames().filter(function(name) {
 			// Get all attribute values except for "element", since it helps performance and this
 			// attribute shouldn't be referenced inside a soy template anyway.
 			return name !== 'element';
 		});
-		var surface = component.getSurface(component.id);
+		var surface = this.getSurface(component.id);
 		var data = (surface && surface.componentData) ? surface.componentData : {};
 		var attrs = object.map(component.getAttrs(names), function(key, value) {
 			if (component.getAttrConfig(key).isHtml && core.isString(value)) {
@@ -127,7 +126,6 @@ class SoyRenderer extends ComponentRenderer {
 	 * @param {Object=} opt_data Data to be passed to the soy template when it's called.
 	 * @return {!Component} The component that was created for this action. Contains
 	 *   references to components that were rendered by the given template function.
-	 * @static
 	 */
 	static decorateFromTemplate(templateFn, opt_element, opt_data) {
 		return SoyRenderer.createComponentFromTemplate(templateFn, opt_element, opt_data).decorate();
@@ -135,81 +133,76 @@ class SoyRenderer extends ComponentRenderer {
 
 	/**
 	 * Generates the id for a surface that was found by a soy template call.
-	 * @param {!Component} component
 	 * @param {string} parentSurfaceId The id of the parent surface, or undefined
 	 *   if there is none.
 	 * @param {!Object} data The placeholder data registered for this surface.
 	 * @return {string} The generated id.
 	 * @override
 	 */
-	static generateSurfaceElementId(component, parentSurfaceId, data) {
+	generateSurfaceElementId(parentSurfaceId, data) {
 		if (data.templateName &&
-			parentSurfaceId === component.id &&
-			!SoyRenderer.firstSurfaceFound_[data.templateName]) {
-			SoyRenderer.firstSurfaceFound_[data.templateName] = true;
-			return component.prefixSurfaceId(data.templateName);
+			parentSurfaceId === this.component_.id &&
+			!this.firstSurfaceFound_[data.templateName]) {
+			this.firstSurfaceFound_[data.templateName] = true;
+			return this.prefixSurfaceId(data.templateName);
 		} else {
-			return component.generateSurfaceElementId(parentSurfaceId);
+			return super.generateSurfaceElementId(parentSurfaceId);
 		}
 	}
 
 	/**
 	 * Renders the appropriate soy template for the specified surface.
 	 * @param {!Object} surface The surface configuration.
-	 * @param {!Component} component The component instance.
 	 * @param {string=} opt_skipContents True if only the element's tag needs to be rendered.
 	 * @return {string}
 	 * @override
 	 */
-	static getSurfaceContent(surface, component, opt_skipContents) {
-		if (surface.surfaceElementId === component.id) {
+	getSurfaceContent(surface, opt_skipContents) {
+		if (surface.surfaceElementId === this.component_.id) {
 			if (!surface.renderAttrs) {
-				this.addSurfacesFromTemplates_(component);
+				this.addSurfacesFromTemplates_();
 			}
-			SoyRenderer.firstSurfaceFound_ = {};
+			this.firstSurfaceFound_ = {};
 		}
 
-		SoyRenderer.surfaceBeingRendered_ = surface.surfaceElementId;
-		SoyRenderer.skipInnerCalls_ = SoyRenderer.skipInnerCalls_ || opt_skipContents;
+		this.surfaceBeingRendered_ = surface.surfaceElementId;
+		this.skipInnerCalls_ = this.skipInnerCalls_ || opt_skipContents;
 
 		var data = surface.templateData;
 		surface.templateData = null;
-		var content = SoyRenderer.renderTemplateByName_(
-			component,
+		var content = this.renderTemplateByName_(
 			surface.templateComponentName,
 			surface.templateName,
 			data
 		);
 
-		SoyRenderer.surfaceBeingRendered_ = null;
-		SoyRenderer.skipInnerCalls_ = false;
+		this.surfaceBeingRendered_ = null;
+		this.skipInnerCalls_ = false;
 		return content;
 	}
 
 	/**
 	 * Handles a call to the SoyRenderer component template.
-	 * @param {!Component} component The component that the call was made for.
 	 * @param {string} componentName The component's name.
 	 * @param {Object} data The data the template was called with.
 	 * @return {string} A placeholder to be rendered instead of the content the template
 	 *   function would have returned.
 	 * @protected
 	 */
-	static handleComponentCall_(component, componentName, data) {
+	handleComponentCall_(componentName, data) {
 		var surfaceData = {
 			componentName: componentName
 		};
 		var id = (data || {}).id;
 		if (!id) {
-			id = SoyRenderer.generateSurfaceElementId(component, SoyRenderer.surfaceBeingRendered_, surfaceData);
+			id = this.generateSurfaceElementId(this.surfaceBeingRendered_, surfaceData);
 		}
 		surfaceData.componentData = SoyRenderer.buildComponentConfigData_(id, data);
-		return component.buildPlaceholder(id, surfaceData);
+		return this.buildPlaceholder(id, surfaceData);
 	}
 
 	/**
 	 * Handles a call to a soy template.
-	 * @param {!Component} component The component that the call was made for.
 	 * @param {string} templateComponentName The name of the component that this template was belongs to.
 	 * @param {string} templateName The name of this template.
 	 * @param {!function()} originalFn The original template function that was intercepted.
@@ -219,19 +212,18 @@ class SoyRenderer extends ComponentRenderer {
 	 * @return {string}
 	 * @protected
 	 */
-	static handleInterceptedCall_(component, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
-		if (SoyRenderer.skipInnerCalls_) {
+	handleInterceptedCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
+		if (this.skipInnerCalls_) {
 			return '';
 		} else if (templateName === 'render') {
-			return this.handleComponentCall_.call(this, component, templateComponentName, data);
+			return this.handleComponentCall_.call(this, templateComponentName, data);
 		} else {
-			return this.handleSurfaceCall_.call(this, component, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);
+			return this.handleSurfaceCall_.call(this, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData);
 		}
 	}
 
 	/**
 	 * Handles a call to the SoyRenderer surface template.
-	 * @param {!Component} component
 	 * @param {string} templateComponentName The name of the component that this template was belongs to.
 	 * @param {string} templateName The name of this template.
 	 * @param {!function()} originalFn The original template function that was intercepted.
@@ -242,7 +234,7 @@ class SoyRenderer extends ComponentRenderer {
 	 *   function would have returned.
 	 * @protected
 	 */
-	static handleSurfaceCall_(component, templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
+	handleSurfaceCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
 		var surfaceData = {
 			static: originalFn.static,
 			templateComponentName: templateComponentName,
@@ -253,14 +245,14 @@ class SoyRenderer extends ComponentRenderer {
 		if (core.isDefAndNotNull(data.surfaceElementId)) {
 			surfaceElementId = data.surfaceElementId;
 		} else if (core.isDefAndNotNull(data.surfaceId)) {
-			surfaceElementId = component.getSurfaceElementId(data.surfaceId.toString());
+			surfaceElementId = this.getSurfaceElementId(data.surfaceId.toString());
 		} else {
 			if (originalFn.private) {
 				return originalFn.call(null, data, opt_ignored, opt_ijData);
 			}
-			surfaceElementId = SoyRenderer.generateSurfaceElementId(component, SoyRenderer.surfaceBeingRendered_, surfaceData);
+			surfaceElementId = this.generateSurfaceElementId(this.surfaceBeingRendered_, surfaceData);
 		}
-		return component.buildPlaceholder(surfaceElementId, surfaceData);
+		return this.buildPlaceholder(surfaceElementId, surfaceData);
 	}
 
 	/**
@@ -282,7 +274,6 @@ class SoyRenderer extends ComponentRenderer {
 	 * @param {Object=} opt_data Data to be passed to the soy template when it's called.
 	 * @return {!Component} The component that was created for this action. Contains
 	 *   references to components that were rendered by the given template function.
-	 * @static
 	 */
 	static renderFromTemplate(templateFn, opt_element, opt_data) {
 		return SoyRenderer.createComponentFromTemplate(templateFn, opt_element, opt_data).render();
@@ -290,33 +281,31 @@ class SoyRenderer extends ComponentRenderer {
 
 	/**
 	 * Renders the specified template.
-	 * @param {!Component} component
 	 * @param {!function()} templateFn
 	 * @param {Object=} opt_data
 	 * @return {string} The template's result content.
 	 * @protected
 	 */
-	static renderTemplate_(component, templateFn, opt_data) {
-		SoyAop.startInterception(SoyRenderer.handleInterceptedCall_.bind(SoyRenderer, component));
+	renderTemplate_(templateFn, opt_data) {
+		SoyAop.startInterception(this.handleInterceptedCall_.bind(this));
 		templateFn = SoyAop.getOriginalFn(templateFn);
-		var content = templateFn(opt_data || SoyRenderer.buildTemplateData_(component), null, ijData).content;
+		var content = templateFn(opt_data || this.buildTemplateData_(), null, ijData).content;
 		SoyAop.stopInterception();
 		return content;
 	}
 
 	/**
 	 * Renders the template with the specified name.
-	 * @param {!Component} component
 	 * @param {string} templateComponentName
 	 * @param {string} templateName
 	 * @param {Object=} opt_data
 	 * @return {string} The template's result content.
 	 * @protected
 	 */
-	static renderTemplateByName_(component, templateComponentName, templateName, opt_data) {
+	renderTemplateByName_(templateComponentName, templateName, opt_data) {
 		var elementTemplate = SoyTemplates.get(templateComponentName, templateName);
 		if (core.isFunction(elementTemplate)) {
-			return SoyRenderer.renderTemplate_(component, elementTemplate, opt_data);
+			return this.renderTemplate_(elementTemplate, opt_data);
 		}
 	}
 

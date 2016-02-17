@@ -570,7 +570,7 @@ class SurfaceRenderer extends ComponentRenderer {
 				return component.getRenderer().getElementExtendedContent();
 			}
 		} else {
-			return this.getSurfaceContent(surface, this) || '';
+			return this.getSurfaceContent(surface) || '';
 		}
 	}
 

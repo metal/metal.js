@@ -20,13 +20,47 @@ describe('SurfaceRenderer', function() {
 		document.body.innerHTML = '';
 	});
 
-	it('should throw error if getSurfaceContent is not implemented', function() {
-		class TestRenderer extends SurfaceRenderer {
-		}
-		class TestComponent extends Component {
-		}
-		TestComponent.RENDERER = TestRenderer;
-		assert.throws(() => new TestComponent().render());
+	describe('Function - getSurfaceContent', function() {
+		it('should throw error if getSurfaceContent is not implemented', function() {
+			class TestRenderer extends SurfaceRenderer {
+			}
+			class TestComponent extends Component {
+			}
+			TestComponent.RENDERER = TestRenderer;
+			assert.throws(() => new TestComponent().render());
+		});
+
+		it('should call getSurfaceContent with opt_skipContents set to true when building element', function() {
+			var TestComponent = createTestComponentClass();
+			component = new TestComponent();
+			var renderer = component.getRenderer();
+
+			sinon.spy(renderer, 'getSurfaceContent');
+			var element = component.element;
+			assert.ok(element);
+			assert.strictEqual(1, renderer.getSurfaceContent.callCount);
+
+			var args = renderer.getSurfaceContent.args[0];
+			assert.strictEqual(component.id, args[0].surfaceElementId);
+			assert.ok(args[1], 'Should pass the opt_skipContents param as true');
+		});
+
+		it('should call getSurfaceContent with opt_skipContents set to false when rendering', function() {
+			var TestComponent = createTestComponentClass();
+			component = new TestComponent();
+			var renderer = component.getRenderer();
+
+			var element = component.element;
+			assert.ok(element);
+
+			sinon.spy(renderer, 'getSurfaceContent');
+			component.render();
+			assert.strictEqual(1, renderer.getSurfaceContent.callCount);
+
+			var args = renderer.getSurfaceContent.args[0];
+			assert.strictEqual(component.id, args[0].surfaceElementId);
+			assert.ok(!args[1], 'Should not pass the opt_skipContents param as true');
+		});
 	});
 
 	describe('Main Element', function() {

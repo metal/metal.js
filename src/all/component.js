@@ -6,6 +6,15 @@ import ComponentRegistry from '../ComponentRegistry';
 import ComponentRenderer from '../ComponentRenderer';
 import EventsCollector from '../surfaces/EventsCollector';
 import SurfaceCollector from '../surfaces/SurfaceCollector';
+import SurfaceRenderer from '../surfaces/SurfaceRenderer';
 
 export default Component;
-export { Component, ComponentCollector, ComponentRegistry, ComponentRenderer, EventsCollector, SurfaceCollector };
+export {
+	Component,
+	ComponentCollector,
+	ComponentRegistry,
+	ComponentRenderer,
+	EventsCollector,
+	SurfaceCollector,
+	SurfaceRenderer
+};

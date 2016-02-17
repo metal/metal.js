@@ -407,7 +407,7 @@ class SurfaceRenderer extends ComponentRenderer {
 
 		this.surfacesRenderAttrs_ = null;
 
-		Object.keys(this.surfaceIds_).forEach(surfaceId => this.removeSurface(surfaceId));
+		Object.keys(this.surfaceIds_).forEach(surfaceId => this.removeSurface(surfaceId, true));
 		this.surfaceIds_ = null;
 	}
 
@@ -730,12 +730,17 @@ class SurfaceRenderer extends ComponentRenderer {
 	/**
 	 * Unregisters a surface and removes its element from the DOM.
 	 * @param {string} surfaceId The surface id.
+	 * @param {boolean=} opt_skipDomRemoval Flag indicating if the removal
+	 *     of the surface from the dom should be skipped. When true, only the
+	 *     surface data is going to be removed.
 	 * @chainable
 	 */
-	removeSurface(surfaceId) {
-		var el = this.getSurfaceElement(surfaceId);
-		if (el && el.parentNode) {
-			el.parentNode.removeChild(el);
+	removeSurface(surfaceId, opt_skipDomRemoval) {
+		if (!opt_skipDomRemoval) {
+			var el = this.getSurfaceElement(surfaceId);
+			if (el && el.parentNode) {
+				el.parentNode.removeChild(el);
+			}
 		}
 		var surfaceElementId = this.getSurfaceElementId(surfaceId, this.getSurface(surfaceId));
 		SurfaceRenderer.surfacesCollector.removeSurface(surfaceElementId);

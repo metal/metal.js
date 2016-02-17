@@ -286,6 +286,15 @@ describe('SurfaceRenderer', function() {
 	});
 
 	describe('Surfaces', function() {
+		it('should add a surface for the main element automatically', function() {
+			var TestComponent = createTestComponentClass();
+			component = new TestComponent();
+			var surfaces = component.getRenderer().getSurfaces();
+
+			assert.strictEqual(1, Object.keys(surfaces).length);
+			assert.ok(surfaces[component.id]);
+		});
+
 		it('should aggregate surfaces hierarchically from static hint', function() {
 			var ParentComponent = createTestComponentClass();
 			ParentComponent.SURFACES = {

@@ -1,0 +1,34 @@
+{
+  "name": "metal-incremental-dom",
+  "version": "0.0.0",
+  "description": "A Component renderer for templates compiled to incremental dom",
+  "license": "BSD",
+  "repository": "metal/metal-incremental-dom",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "main": "src/IncrementalDomRenderer.js",
+  "files": [
+    "src",
+    "test"
+  ],
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "metal"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "closure-templates": "20140422.0.0",
+    "incremental-dom": "^0.3.0",
+    "metal": "metal/metal.js#master",
+    "metal-attribute": "metal/metal-attribute#master",
+    "metal-component": "metal/metal-component#master"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-metal": "^0.14.0"
+  }
+}

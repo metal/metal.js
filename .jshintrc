@@ -8,8 +8,7 @@
   "evil": false,
   "forin": false,
   "globals": {
-    "soy": true,
-    "soydata": true
+    "IncrementalDOM": true
   },
   "immed": true,
   "indent": 2,

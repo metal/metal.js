@@ -1,6 +1,6 @@
-# metal-incrementalDom
+# metal-incremental-dom
 
-A Component renderer for templates compiled to incremental dom
+A Component renderer for templates compiled to incremental dom.
 
 ## Setup
 
@@ -23,5 +23,3 @@ A Component renderer for templates compiled to incremental dom
   ```
   gulp build
   ```
-
-

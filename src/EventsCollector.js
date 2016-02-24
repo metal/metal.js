@@ -157,6 +157,7 @@ class EventsCollector extends Disposable {
 	/**
 	 * Prepares the collector to start collecting listeners for the given group.
 	 * Should be called before all calls to `attachListener` for that group.
+	 * @param {string=} groupName
 	 */
 	startCollecting(groupName = 'element') {
 		this.groupHasListener_[groupName] = {};

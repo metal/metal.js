@@ -45,10 +45,9 @@ class EventsCollector extends Disposable {
 	 * been attached.
 	 * @param {string} eventType
 	 * @param {string} fnNamesString
-	 * @param {boolean} permanent
-	 * @protected
+	 * @param {string=} groupName
 	 */
-	attachListener_(eventType, fnNamesString, groupName) {
+	attachListener(eventType, fnNamesString, groupName = 'element') {
 		var selector = '[data-on' + eventType + '="' + fnNamesString + '"]';
 
 		this.groupHasListener_[groupName][selector] = true;
@@ -68,18 +67,17 @@ class EventsCollector extends Disposable {
 	/**
 	 * Attaches listeners found in the given html content.
 	 * @param {string} content
-	 * @param {boolean} groupName
-	 * @protected
+	 * @param {string=} groupName
 	 */
-	attachListenersFromHtml(content, groupName) {
-		this.groupHasListener_[groupName] = {};
+	attachListenersFromHtml(content, groupName = 'element') {
+		this.startCollecting(groupName);
 		if (content.indexOf('data-on') === -1) {
 			return;
 		}
 		var regex = /data-on([a-z]+)=['"]([^'"]+)['"]/g;
 		var match = regex.exec(content);
 		while (match) {
-			this.attachListener_(match[1], match[2], groupName);
+			this.attachListener(match[1], match[2], groupName);
 			match = regex.exec(content);
 		}
 	}
@@ -154,6 +152,14 @@ class EventsCollector extends Disposable {
 			event.handledByComponent = this.component_;
 			return fn(event);
 		}
+	}
+
+	/**
+	 * Prepares the collector to start collecting listeners for the given group.
+	 * Should be called before all calls to `attachListener` for that group.
+	 */
+	startCollecting(groupName = 'element') {
+		this.groupHasListener_[groupName] = {};
 	}
 }
 

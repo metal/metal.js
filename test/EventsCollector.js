@@ -306,6 +306,30 @@ describe('EventsCollector', function() {
 		assert.ok(collector.hasAttachedForGroup('group'));
 	});
 
+	it('should attach event listener by calling attachListener directly', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('keydown', 'handleKeyDown');
+
+		assert.strictEqual(0, custom.handleClick.callCount);
+		assert.strictEqual(0, custom.handleKeyDown.callCount);
+
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(0, custom.handleKeyDown.callCount);
+
+		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, custom.handleKeyDown.callCount);
+	});
+
 	function createCustomComponentInstance(content) {
 		class CustomComponent extends Component {
 			constructor(opt_config) {

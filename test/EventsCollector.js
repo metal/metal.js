@@ -1,9 +1,9 @@
 'use strict';
 
 import dom from 'metal-dom';
-import Component from '../../src/Component';
-import ComponentCollector from '../../src/ComponentCollector';
-import EventsCollector from '../../src/surfaces/EventsCollector';
+import Component from '../src/Component';
+import ComponentCollector from '../src/ComponentCollector';
+import EventsCollector from '../src/EventsCollector';
 
 describe('EventsCollector', function() {
 	it('should fail when component instance is not passed', function() {
@@ -17,7 +17,7 @@ describe('EventsCollector', function() {
 		var collector = new EventsCollector(custom);
 
 		assert.doesNotThrow(function() {
-			collector.attachListeners(custom.element.innerHTML, 'group');
+			collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		});
 	});
 
@@ -28,7 +28,7 @@ describe('EventsCollector', function() {
 		custom.handleClick = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		assert.strictEqual(0, custom.handleClick.callCount);
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -44,7 +44,7 @@ describe('EventsCollector', function() {
 		custom.handleClick = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		assert.strictEqual(0, custom.handleClick.callCount);
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -64,7 +64,7 @@ describe('EventsCollector', function() {
 		custom.handleClick = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		assert.strictEqual(0, custom.handleClick.callCount);
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -83,7 +83,7 @@ describe('EventsCollector', function() {
 		var collector = new EventsCollector(custom);
 
 		sinon.stub(console, 'error');
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		assert.strictEqual(1, console.error.callCount);
 
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -100,7 +100,7 @@ describe('EventsCollector', function() {
 		var collector = new EventsCollector(custom);
 
 		sinon.stub(console, 'error');
-		collector.attachListeners(custom.element.innerHTML);
+		collector.attachListenersFromHtml(custom.element.innerHTML);
 		assert.strictEqual(1, console.error.callCount);
 
 		console.error.restore();
@@ -114,7 +114,7 @@ describe('EventsCollector', function() {
 		custom.handleKeyDown = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
 		assert.strictEqual(1, custom.handleClick.callCount);
@@ -131,7 +131,7 @@ describe('EventsCollector', function() {
 		custom.handleAnotherClick = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		assert.strictEqual(0, custom.handleClick.callCount);
 		assert.strictEqual(0, custom.handleAnotherClick.callCount);
@@ -150,7 +150,7 @@ describe('EventsCollector', function() {
 		custom.handleClick = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
 		assert.strictEqual(1, custom.handleClick.callCount);
@@ -167,9 +167,9 @@ describe('EventsCollector', function() {
 		dom.append(custom.element, child.element);
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		var childCollector = new EventsCollector(child);
-		childCollector.attachListeners(child.element.innerHTML, 'group');
+		childCollector.attachListenersFromHtml(child.element.innerHTML, 'group');
 
 		dom.triggerEvent(child.element.childNodes[0], 'click');
 		assert.strictEqual(0, custom.handleClick.callCount);
@@ -189,9 +189,9 @@ describe('EventsCollector', function() {
 		dom.append(custom.element.childNodes[0], child.element);
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		var childCollector = new EventsCollector(child);
-		childCollector.attachListeners(child.element.innerHTML, 'group');
+		childCollector.attachListenersFromHtml(child.element.innerHTML, 'group');
 
 		dom.triggerEvent(child.element.childNodes[0], 'click');
 		assert.strictEqual(1, custom.handleClick.callCount);
@@ -206,13 +206,13 @@ describe('EventsCollector', function() {
 		custom.handleKeyDown = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		var trigger = custom.element.childNodes[0];
 		trigger.removeAttribute('data-onclick');
 		custom.element.removeEventListener = sinon.stub();
 
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		collector.detachUnusedListeners();
 
 		assert.strictEqual(1, custom.element.removeEventListener.callCount);
@@ -227,12 +227,12 @@ describe('EventsCollector', function() {
 		custom.handleKeyDown = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		var trigger = custom.element.childNodes[0];
 		trigger.removeAttribute('data-onclick');
 
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		collector.detachUnusedListeners();
 
 		assert.doesNotThrow(function() {
@@ -248,7 +248,7 @@ describe('EventsCollector', function() {
 		custom.handleKeyDown = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		collector.detachAllListeners();
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -265,12 +265,12 @@ describe('EventsCollector', function() {
 		custom.handleKeyDown = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		var trigger = custom.element.childNodes[0];
 		trigger.removeAttribute('data-onclick');
 
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		collector.detachUnusedListeners();
 
 		collector.detachAllListeners();
@@ -286,7 +286,7 @@ describe('EventsCollector', function() {
 		custom.handleKeyDown = sinon.stub();
 
 		var collector = new EventsCollector(custom);
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 
 		collector.dispose();
 		dom.triggerEvent(custom.element.childNodes[0], 'click');
@@ -302,7 +302,7 @@ describe('EventsCollector', function() {
 		var collector = new EventsCollector(custom);
 		assert.ok(!collector.hasAttachedForGroup('group'));
 
-		collector.attachListeners(custom.element.innerHTML, 'group');
+		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		assert.ok(collector.hasAttachedForGroup('group'));
 	});
 

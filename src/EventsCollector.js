@@ -66,23 +66,13 @@ class EventsCollector extends Disposable {
 	}
 
 	/**
-	 * Attaches all listeners declared as attributes on the given element and
-	 * its children.
-	 * @param {string} content
-	 * @param {boolean} groupName
-	 */
-	attachListeners(content, groupName) {
-		this.groupHasListener_[groupName] = {};
-		this.attachListenersFromHtml_(content, groupName);
-	}
-
-	/**
 	 * Attaches listeners found in the given html content.
 	 * @param {string} content
 	 * @param {boolean} groupName
 	 * @protected
 	 */
-	attachListenersFromHtml_(content, groupName) {
+	attachListenersFromHtml(content, groupName) {
+		this.groupHasListener_[groupName] = {};
 		if (content.indexOf('data-on') === -1) {
 			return;
 		}

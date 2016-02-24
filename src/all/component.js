@@ -4,7 +4,7 @@ import Component from '../Component';
 import ComponentCollector from '../ComponentCollector';
 import ComponentRegistry from '../ComponentRegistry';
 import ComponentRenderer from '../ComponentRenderer';
-import EventsCollector from '../surfaces/EventsCollector';
+import EventsCollector from '../EventsCollector';
 import SurfaceCollector from '../surfaces/SurfaceCollector';
 import SurfaceRenderer from '../surfaces/SurfaceRenderer';
 

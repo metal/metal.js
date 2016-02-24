@@ -6,7 +6,7 @@ import html from 'metal-html';
 import Component from '../Component';
 import ComponentCollector from '../ComponentCollector';
 import ComponentRenderer from '../ComponentRenderer';
-import EventsCollector from './EventsCollector';
+import EventsCollector from '../EventsCollector';
 import SurfaceCollector from './SurfaceCollector';
 
 /**
@@ -391,7 +391,7 @@ class SurfaceRenderer extends ComponentRenderer {
 		if (cacheHit) {
 			this.renderPlaceholderSurfaceContents_(cacheContent, surfaceElementId);
 		} else {
-			this.eventsCollector_.attachListeners(cacheContent, surfaceElementId);
+			this.eventsCollector_.attachListenersFromHtml(cacheContent, surfaceElementId);
 			this.replaceSurfaceContent_(surfaceElementId, surface, content);
 		}
 	}
@@ -493,7 +493,7 @@ class SurfaceRenderer extends ComponentRenderer {
 	 */
 	getElementExtendedContent() {
 		var content = this.getElementContent_() || '';
-		this.eventsCollector_.attachListeners(content, this.component_.id);
+		this.eventsCollector_.attachListenersFromHtml(content, this.component_.id);
 		this.cacheSurfaceContent(this.component_.id, content);
 		return this.replaceSurfacePlaceholders_(content, this.component_.id, this.getSurface(this.component_.id));
 	}
@@ -993,7 +993,7 @@ class SurfaceRenderer extends ComponentRenderer {
 			// listeners and cache its content manually.
 			surface.element = null;
 			this.cacheSurfaceContent(surfaceElementId, collectedData.cacheContent);
-			this.eventsCollector_.attachListeners(collectedData.cacheContent, surfaceElementId);
+			this.eventsCollector_.attachListenersFromHtml(collectedData.cacheContent, surfaceElementId);
 		}
 	}
 

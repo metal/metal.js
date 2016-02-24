@@ -5,6 +5,7 @@
   "curly": true,
   "eqeqeq": true,
   "esnext": true,
+  "expr": true,
   "evil": false,
   "forin": false,
   "globals": {

@@ -59,6 +59,23 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
+		it('should render content specified by the component\'s renderIncDom inside given element', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span', null, ['id', this.id], 'foo', 'foo');
+				IncDom.text('bar');
+				IncDom.elementClose('span');
+			};
+
+			var element = document.createElement('span');
+			component = new TestComponent({
+				element: element
+			}).render();
+			assert.strictEqual(element, component.element);
+			assert.strictEqual('foo', component.element.getAttribute('foo'));
+			assert.strictEqual('bar', component.element.textContent);
+		});
+
 		it('should update content when attribute values change', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {

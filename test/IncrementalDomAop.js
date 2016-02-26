@@ -80,4 +80,34 @@ describe('IncrementalDomAop', function() {
 		IncrementalDomAop.stopInterception();
 		assert.strictEqual(original, IncrementalDOM.elementOpenEnd);
 	});
+
+	it('should use last registered function for intercepting', function() {
+		var fn = sinon.stub();
+		IncrementalDomAop.startInterception(fn);
+		var fn2 = sinon.stub();
+		IncrementalDomAop.startInterception(fn2);
+
+		IncrementalDOM.elementVoid('div');
+		assert.strictEqual(0, fn.callCount);
+		assert.strictEqual(1, fn2.callCount);
+	});
+
+	it('should revert to previous registered function when stopping interception', function() {
+		var original = IncrementalDOM.elementVoid;
+
+		var fn = sinon.stub();
+		IncrementalDomAop.startInterception(fn);
+		var fn2 = sinon.stub();
+		IncrementalDomAop.startInterception(fn2);
+
+		IncrementalDomAop.stopInterception();
+		IncrementalDOM.elementVoid('div');
+		assert.strictEqual(1, fn.callCount);
+		assert.strictEqual(0, fn2.callCount);
+
+		IncrementalDomAop.stopInterception();
+		assert.strictEqual(1, fn.callCount);
+		assert.strictEqual(0, fn2.callCount);
+		assert.strictEqual(original, IncrementalDOM.elementVoid);
+	});
 });

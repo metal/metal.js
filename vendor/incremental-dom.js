@@ -515,6 +515,9 @@
   /** @type {?Document} */
   var doc = undefined;
 
+  /** @type {?function()} */
+  var findNode = undefined;
+
   /**
    * Sets up and restores a patch context, running the patch function with the
    * provided data.
@@ -637,6 +640,12 @@
       }
     }
 
+    // Check to see if the `findNode` function (registered through
+    // `registerFindNode`) returns a matching node.
+    if (!node && findNode) {
+      node = findNode.apply(null, arguments);
+    }
+
     // Create the node if it doesn't exist.
     if (!node) {
       if (nodeName === '#text') {
@@ -756,7 +765,7 @@
    */
   var coreElementOpen = function (tag, key, statics) {
     nextNode();
-    alignWithDOM(tag, key, statics);
+    alignWithDOM.apply(null, arguments);
     enterNode();
     return (/** @type {!Element} */currentParent
     );
@@ -797,6 +806,10 @@
     if ('production' !== 'production') {}
     return (/** @type {!Element} */currentParent
     );
+  };
+
+  var registerFindNode = function (findNodeFn) {
+    findNode = findNodeFn;
   };
 
   /**
@@ -1031,6 +1044,7 @@
   exports.patchInner = patchInner;
   exports.patchOuter = patchOuter;
   exports.currentElement = currentElement;
+  exports.registerFindNode = registerFindNode;
   exports.skip = skip;
   exports.elementVoid = elementVoid;
   exports.elementOpenStart = elementOpenStart;

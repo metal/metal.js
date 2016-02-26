@@ -58,4 +58,26 @@ describe('IncrementalDomAop', function() {
 		IncrementalDomAop.stopInterception();
 		assert.strictEqual(original, IncrementalDOM.elementVoid);
 	});
+
+	it('should intercept elementOpenEnd calls with specified function', function() {
+		var original = IncrementalDOM.elementOpenEnd;
+		var fn = sinon.stub();
+		IncrementalDomAop.startInterception(fn);
+		assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
+
+		IncrementalDOM.elementOpenEnd('div');
+		assert.strictEqual(1, fn.callCount);
+		assert.strictEqual(original, fn.args[0][0]);
+		assert.strictEqual('div', fn.args[0][1]);
+	});
+
+	it('should stop intercepting elementOpenEnd calls', function() {
+		var original = IncrementalDOM.elementOpenEnd;
+		var fn = sinon.stub();
+		IncrementalDomAop.startInterception(fn);
+		assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
+
+		IncrementalDomAop.stopInterception();
+		assert.strictEqual(original, IncrementalDOM.elementOpenEnd);
+	});
 });

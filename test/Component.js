@@ -521,6 +521,16 @@ describe('Component Tests', function() {
 			assert.strictEqual(sibling2, custom.element.nextSibling);
 		});
 
+		it('should render component without attaching it to a parent when specified', function() {
+			var CustomComponent = createCustomComponentClass();
+			var custom = new CustomComponent();
+			custom.render(false);
+			assert.ok(!custom.element.parentNode);
+
+			custom.attach();
+			assert.strictEqual(document.body, custom.element.parentNode);
+		});
+
 		it('should emit "render" event with the decorating key set to false when render is called', function() {
 			var custom = new Component();
 			var listenerFn = sinon.stub();

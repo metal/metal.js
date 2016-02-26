@@ -516,8 +516,10 @@ class Component extends Attribute {
 	 *   attribute synchronization - All synchronization methods are called.
 	 *   attach - Attach Lifecycle is called.
 	 *
-	 * @param {(string|Element)=} opt_parentElement Optional parent element
-	 *     to render the component.
+	 * @param {(string|Element|boolean)=} opt_parentElement Optional parent element
+	 *     to render the component. If set to `false`, the element won't be
+	 *     attached to any element after rendering. In this case, `attach` should
+	 *     be called manually later to actually attach it to the dom.
 	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
 	 *     to render the component before it. Relevant when the component needs
 	 *     to be rendered before an existing element in the DOM, e.g.
@@ -533,7 +535,9 @@ class Component extends Attribute {
 			decorating: this.decorating_
 		});
 		this.syncAttrs_();
-		this.attach(opt_parentElement, opt_siblingElement);
+		if (opt_parentElement !== false) {
+			this.attach(opt_parentElement, opt_siblingElement);
+		}
 		this.wasRendered = true;
 		return this;
 	}

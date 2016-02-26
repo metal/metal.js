@@ -16,18 +16,14 @@ class ComponentCollector extends Disposable {
 	 * Creates the appropriate component from the given config data if it doesn't
 	 * exist yet.
 	 * @param {string} componentName The name of the component to be created.
-	 * @param {string} id The id of the component to be created.
 	 * @param {Object=} opt_data
 	 * @return {!Component} The component instance.
 	 */
-	createComponent(componentName, id, opt_data) {
-		var component = ComponentCollector.components[id];
+	createComponent(componentName, opt_data) {
+		var component = ComponentCollector.components[(opt_data || {}).id];
 		if (!component) {
 			var ConstructorFn = ComponentRegistry.getConstructor(componentName);
-			var data = opt_data || {};
-			data.id = id;
-			data.element = '#' + id;
-			component = new ConstructorFn(data);
+			component = new ConstructorFn(opt_data);
 		}
 		return component;
 	}

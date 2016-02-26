@@ -216,17 +216,20 @@ class Component extends Attribute {
 	/**
 	 * Adds a sub component, creating it if it doesn't yet exist.
 	 * @param {string} componentName
-	 * @param {string} componentId
 	 * @param {Object=} opt_componentData
 	 * @return {!Component}
 	 */
-	addSubComponent(componentName, componentId, opt_componentData) {
-		this.components[componentId] = Component.componentsCollector.createComponent(
+	addSubComponent(componentName, opt_componentData) {
+		// Avoid accessing id from component if possible, since that may cause
+		// the lookup of the component's element in the dom unnecessarily, which is
+		// bad for performance.
+		var id = (opt_componentData || {}).id;
+		var component = Component.componentsCollector.createComponent(
 			componentName,
-			componentId,
 			opt_componentData
 		);
-		return this.components[componentId];
+		this.components[id || component.id] = component;
+		return component;
 	}
 
 	/**

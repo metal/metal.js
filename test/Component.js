@@ -604,7 +604,19 @@ describe('Component Tests', function() {
 
 		it('should add a new sub component', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', 'child', {
+			custom.addSubComponent('ChildComponent');
+			assert.strictEqual(1, Object.keys(custom.components).length);
+
+			var id = Object.keys(custom.components)[0];
+			var sub = custom.components[id];
+			assert.ok(sub instanceof ChildComponent);
+			assert.strictEqual(id, sub.id);
+		});
+
+		it('should add a new sub component with data', function() {
+			var custom = new Component();
+			custom.addSubComponent('ChildComponent', {
+				id: 'child',
 				foo: 'foo'
 			});
 			assert.strictEqual(1, Object.keys(custom.components).length);
@@ -619,17 +631,27 @@ describe('Component Tests', function() {
 				id: 'child'
 			});
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', 'child');
+			custom.addSubComponent('ChildComponent', {
+				id: 'child'
+			});
 
 			assert.strictEqual(child, custom.components.child);
 		});
 
 		it('should get all sub components with ids matching a given prefix', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', 'child-with-prefix1');
-			custom.addSubComponent('ChildComponent', 'child-without-prefix');
-			custom.addSubComponent('ChildComponent', 'child-with-prefix2');
-			custom.addSubComponent('ChildComponent', 'child-without-prefix2');
+			custom.addSubComponent('ChildComponent', {
+				id: 'child-with-prefix1'
+			});
+			custom.addSubComponent('ChildComponent', {
+				id: 'child-without-prefix'
+			});
+			custom.addSubComponent('ChildComponent', {
+				id: 'child-with-prefix2'
+			});
+			custom.addSubComponent('ChildComponent', {
+				id: 'child-without-prefix2'
+			});
 
 			var childrenWithPrefix = custom.getComponentsWithPrefix('child-with-prefix');
 			assert.strictEqual(2, Object.keys(childrenWithPrefix).length);
@@ -639,7 +661,9 @@ describe('Component Tests', function() {
 
 		it('should dispose sub components when parent component is disposed', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', 'child');
+			custom.addSubComponent('ChildComponent', {
+				id: 'child'
+			});
 
 			var child = custom.components.child;
 			assert.ok(!child.isDisposed());
@@ -652,14 +676,20 @@ describe('Component Tests', function() {
 			class AnotherComponent extends Component {
 				constructor(opt_config) {
 					super(opt_config);
-					this.addSubComponent('ChildComponent', 'child');
+					custom.addSubComponent('ChildComponent', {
+						id: 'child'
+					});
 				}
 			}
 			ComponentRegistry.register(AnotherComponent);
 
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', 'child');
-			custom.addSubComponent('AnotherComponent', 'another');
+			custom.addSubComponent('ChildComponent', {
+				id: 'child'
+			});
+			custom.addSubComponent('AnotherComponent', {
+				id: 'another'
+			});
 
 			var child = custom.components.child;
 			var another = custom.components.another;
@@ -673,7 +703,9 @@ describe('Component Tests', function() {
 
 		it('should not throw error when disposing after subcomponents have already been disposed', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', 'child');
+			custom.addSubComponent('ChildComponent', {
+				id: 'child'
+			});
 
 			custom.components.child.dispose();
 			assert.doesNotThrow(custom.dispose.bind(custom));

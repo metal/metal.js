@@ -342,10 +342,12 @@ class SurfaceRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	addSubComponent(componentName, componentId) {
+		var data = this.getSurfaceFromElementId(componentId).componentData || {};
+		data.id = componentId;
+		data.element = '#' + componentId;
 		return this.component_.addSubComponent(
 			componentName,
-			componentId,
-			this.getSurfaceFromElementId(componentId).componentData
+			data
 		);
 	}
 

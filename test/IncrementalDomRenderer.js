@@ -1,7 +1,7 @@
 'use strict';
 
 import dom from 'metal-dom';
-import Component from 'metal-component';
+import { Component, ComponentRegistry } from 'metal-component';
 import IncrementalDomRenderer from '../src/IncrementalDomRenderer';
 
 var IncDom = IncrementalDOM;
@@ -97,6 +97,22 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('bar', component.element.textContent);
 				done();
 			});
+		});
+
+		it('should reuse root element even if key is different', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', this.id, ['id', this.id]);
+				IncDom.text('bar');
+				IncDom.elementClose('div');
+			};
+
+			var element = document.createElement('div');
+			dom.enterDocument(element);
+			component = new TestComponent({
+				element: element
+			}).render();
+			assert.strictEqual(component.element, document.getElementById(component.id));
 		});
 	});
 
@@ -196,6 +212,115 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(1, component.element.removeEventListener.callCount);
 				done();
 			});
+		});
+	});
+
+	describe('Nested Components', function() {
+		var ChildComponent;
+
+		beforeEach(function() {
+			ChildComponent = createTestComponentClass();
+			ChildComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id], 'data-child', '1');
+				IncDom.elementVoid('button', null, null, 'data-onclick', 'handleClick');
+				IncDom.text(this.foo);
+				IncDom.elementClose('div');
+			};
+			ChildComponent.prototype.handleClick = sinon.stub();
+			ChildComponent.ATTRS = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			ComponentRegistry.register(ChildComponent, 'ChildComponent');
+		});
+
+		it('should create sub component instance', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child']);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.ok(child);
+			assert.ok(child instanceof ChildComponent);
+		});
+
+		it('should render sub component at specified place', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpen('ChildComponent', null, ['id', 'child']);
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual(child.element, component.element.querySelector('#child'));
+			assert.strictEqual('foo', child.element.textContent);
+			assert.ok(child.element.hasAttribute('data-child'));
+		});
+
+		it('should pass attributes to sub component', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpen('ChildComponent', null, ['id', 'child'], 'foo', 'bar');
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual('child', child.id);
+			assert.strictEqual('bar', child.foo);
+			assert.strictEqual('bar', child.element.textContent);
+		});
+
+		it('should update sub component attributes', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpen('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			TestComponent.ATTRS = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			component = new TestComponent().render();
+
+			component.foo = 'bar';
+			var child = component.components.child;
+			child.once('attrsSynced', function() {
+				assert.strictEqual('bar', child.foo);
+				assert.strictEqual('bar', child.element.textContent);
+				done();
+			});
+		});
+
+		it('should attach sub component inline listeners', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpen('ChildComponent', null, ['id', 'child']);
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual(0, child.handleClick.callCount);
+
+			var button = child.element.querySelector('button');
+			dom.triggerEvent(button, 'click');
+			assert.strictEqual(1, child.handleClick.callCount);
 		});
 	});
 

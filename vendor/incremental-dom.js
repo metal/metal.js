@@ -157,7 +157,6 @@
 
       data = initData(node, nodeName, key);
     }
-
     return data;
   };
 

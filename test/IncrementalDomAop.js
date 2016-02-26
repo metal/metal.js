@@ -2,7 +2,7 @@
 
 import IncrementalDomAop from '../src/IncrementalDomAop';
 
-describe.only('IncrementalDomAop', function() {
+describe('IncrementalDomAop', function() {
 	afterEach(function() {
 		IncrementalDomAop.stopInterception();
 	});

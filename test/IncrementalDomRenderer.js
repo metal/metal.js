@@ -272,8 +272,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementOpen('ChildComponent', null, ['id', 'child']);
-				IncDom.elementClose('ChildComponent');
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child']);
 				IncDom.elementClose('div');
 			};
 			component = new TestComponent().render();
@@ -288,8 +287,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementOpen('ChildComponent', null, ['id', 'child'], 'foo', 'bar');
-				IncDom.elementClose('ChildComponent');
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', 'bar');
 				IncDom.elementClose('div');
 			};
 			component = new TestComponent().render();
@@ -304,8 +302,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementOpen('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
-				IncDom.elementClose('ChildComponent');
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
 				IncDom.elementClose('div');
 			};
 			TestComponent.ATTRS = {
@@ -328,8 +325,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementOpen('ChildComponent', null, ['id', 'child']);
-				IncDom.elementClose('ChildComponent');
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child']);
 				IncDom.elementClose('div');
 			};
 			component = new TestComponent().render();
@@ -346,8 +342,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementOpen('ChildComponent');
-				IncDom.elementClose('ChildComponent');
+				IncDom.elementVoid('ChildComponent');
 				IncDom.elementClose('div');
 			};
 			component = new TestComponent().render();
@@ -375,6 +370,22 @@ describe('IncrementalDomRenderer', function() {
 			var child = component.components.child;
 			assert.ok(child instanceof PlainComponent);
 			assert.strictEqual(child.element, component.element.querySelector('#child'));
+		});
+
+		it('should render sub component via elementOpen/elementClose', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpen('ChildComponent', null, ['id', 'child']);
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual(child.element, component.element.querySelector('#child'));
+			assert.strictEqual('foo', child.element.textContent);
+			assert.ok(child.element.hasAttribute('data-child'));
 		});
 	});
 

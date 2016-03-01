@@ -101,10 +101,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles an intercepted call to the `elementOpen` or `elementVoid` functions
-	 * from incremental dom. Looks for attributes with the "data-on" prefix,
-	 * adding them to the list of inline listeners to be attached once patching is
-	 * done.
+	 * Handles an intercepted call to the `elementOpen` function from incremental
+	 * dom.
 	 * @param {!function()} originalFn The original function before interception.
 	 * @param {string} tag
 	 * @protected
@@ -121,9 +119,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles an intercepted call to the `elementOpen` or `elementVoid` functions
-	 * from incremental dom, done for a regular element. Adds any inline listeners
-	 * found and makes sure that component root elements are always reused.
+	 * Handles an intercepted call to the `elementOpen` function from incremental
+	 * dom, done for a regular element. Adds any inline listeners found and makes
+	 * sure that component root elements are always reused.
 	 * @param {!function()} originalFn The original function before interception.
 	 * @param {string} tag
 	 * @param {?string} key
@@ -143,10 +141,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles an intercepted call to the `elementOpen` or `elementVoid` functions
-	 * from incremental dom, done for a sub component element. Adds any inline
-	 * listeners found and makes sure that component root elements are always
-	 * reused.
+	 * Handles an intercepted call to the `elementOpen` function from incremental
+	 * dom, done for a sub component element. Creates and updates the appropriate
+	 * sub component.
 	 * @param {!function()} originalFn The original function before interception.
 	 * @param {string} tag
 	 * @param {?string} key
@@ -167,8 +164,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		// placeholder will be ignored.
 		var attrsArr = renderer.getAttributesArray && renderer.getAttributesArray();
 		var node = originalFn.apply(null, [tag, key, statics].concat(attrsArr));
-		comp.attach();
 		IncrementalDOM.skip();
+		comp.attach();
 		return node;
 	}
 

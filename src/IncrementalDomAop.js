@@ -7,12 +7,14 @@ class IncrementalDomAop {
 	 * @param {!function()} fn Function to be called instead of the original one.
 	 */
 	static startInterception(fn) {
-		var fnOpen = fn.bind(null, fnStack[0].elementOpen);
+		fn = fn.bind(null, fnStack[0].elementOpen);
 		fnStack.push({
-			elementOpen: fnOpen,
-			elementOpenEnd: fn.bind(null, fnStack[0].elementOpenEnd),
+			attr: fnAttr,
+			elementOpen: fn,
+			elementOpenEnd: () => fn.apply(null, collectedArgs),
+			elementOpenStart: fnOpenStart,
 			elementVoid: function(tag) {
-				var node = fnOpen.apply(null, arguments);
+				var node = fn.apply(null, arguments);
 				IncrementalDOM.elementClose(tag);
 				return node;
 			}
@@ -32,16 +34,29 @@ class IncrementalDomAop {
 	}
 }
 
+var collectedArgs = [];
+
+function fnAttr(name, value) {
+	collectedArgs.push(name, value);
+}
+
+function fnOpenStart(tag, key, statics) {
+	collectedArgs = [tag, key, statics];
+}
+
 var fnStack = [{
+	attr: IncrementalDOM.attr,
 	elementOpen: IncrementalDOM.elementOpen,
 	elementOpenEnd: IncrementalDOM.elementOpenEnd,
+	elementOpenStart: IncrementalDOM.elementOpenStart,
 	elementVoid: IncrementalDOM.elementVoid
 }];
 
 function replace(fns) {
-	IncrementalDOM.elementOpen = fns.elementOpen;
-	IncrementalDOM.elementOpenEnd = fns.elementOpenEnd;
-	IncrementalDOM.elementVoid = fns.elementVoid;
+	var names = Object.keys(fns);
+	for (var i = 0; i < names.length; i++) {
+		IncrementalDOM[names[i]] = fns[names[i]];
+	}
 }
 
 export default IncrementalDomAop;

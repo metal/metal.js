@@ -203,6 +203,43 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
+		it('should attach listeners from root element', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id], 'data-onclick', 'handleClick');
+				IncDom.elementVoid('div');
+				IncDom.elementClose('div');
+			};
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent().render();
+			assert.strictEqual(0, component.handleClick.callCount);
+
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
+		it('should attach listeners from elementOpenStart/elementOpenEnd calls', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpenStart('div');
+				IncDom.attr('data-onclick', 'handleClick');
+				IncDom.elementOpenEnd();
+				IncDom.elementClose('div');
+			};
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent().render();
+			assert.strictEqual(0, component.handleClick.callCount);
+
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(0, component.handleClick.callCount);
+
+			dom.triggerEvent(component.element.childNodes[0], 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
 		it('should remove unused inline listeners when dom is updated', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
@@ -385,6 +422,25 @@ describe('IncrementalDomRenderer', function() {
 			var child = component.components.child;
 			assert.strictEqual(child.element, component.element.querySelector('#child'));
 			assert.strictEqual('foo', child.element.textContent);
+			assert.ok(child.element.hasAttribute('data-child'));
+		});
+
+		it('should render sub component via elementOpenStart/elementOpenEnd', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpenStart('ChildComponent', null, ['id', 'child']);
+				IncDom.attr('foo', 'bar');
+				IncDom.elementOpenEnd();
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual('bar', child.foo);
+			assert.strictEqual(child.element, component.element.querySelector('#child'));
+			assert.strictEqual('bar', child.element.textContent);
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 	});

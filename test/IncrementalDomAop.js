@@ -7,30 +7,32 @@ describe('IncrementalDomAop', function() {
 		IncrementalDomAop.stopInterception();
 	});
 
-	it('should intercept elementOpen calls with specified function', function() {
-		var original = IncrementalDOM.elementOpen;
-		var fn = sinon.stub();
-		IncrementalDomAop.startInterception(fn);
-		assert.notStrictEqual(original, IncrementalDOM.elementOpen);
+	describe('elementOpen', function(){
+		it('should intercept elementOpen calls with specified function', function() {
+			var original = IncrementalDOM.elementOpen;
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception(fn);
+			assert.notStrictEqual(original, IncrementalDOM.elementOpen);
 
-		IncrementalDOM.elementOpen('div', 'key', 'statics', 'name', 'value');
-		assert.strictEqual(1, fn.callCount);
-		assert.strictEqual(original, fn.args[0][0]);
-		assert.strictEqual('div', fn.args[0][1]);
-		assert.strictEqual('key', fn.args[0][2]);
-		assert.strictEqual('statics', fn.args[0][3]);
-		assert.strictEqual('name', fn.args[0][4]);
-		assert.strictEqual('value', fn.args[0][5]);
-	});
+			IncrementalDOM.elementOpen('div', 'key', 'statics', 'name', 'value');
+			assert.strictEqual(1, fn.callCount);
+			assert.strictEqual(original, fn.args[0][0]);
+			assert.strictEqual('div', fn.args[0][1]);
+			assert.strictEqual('key', fn.args[0][2]);
+			assert.strictEqual('statics', fn.args[0][3]);
+			assert.strictEqual('name', fn.args[0][4]);
+			assert.strictEqual('value', fn.args[0][5]);
+		});
 
-	it('should stop intercepting elementOpen calls', function() {
-		var original = IncrementalDOM.elementOpen;
-		var fn = sinon.stub();
-		IncrementalDomAop.startInterception(fn);
-		assert.notStrictEqual(original, IncrementalDOM.elementOpen);
+		it('should stop intercepting elementOpen calls', function() {
+			var original = IncrementalDOM.elementOpen;
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception(fn);
+			assert.notStrictEqual(original, IncrementalDOM.elementOpen);
 
-		IncrementalDomAop.stopInterception();
-		assert.strictEqual(original, IncrementalDOM.elementOpen);
+			IncrementalDomAop.stopInterception();
+			assert.strictEqual(original, IncrementalDOM.elementOpen);
+		});
 	});
 
 	describe('elementVoid', function() {
@@ -42,7 +44,7 @@ describe('IncrementalDomAop', function() {
 			IncrementalDOM.elementClose.restore();
 		});
 
-		it('should intercept elementVoid calls with specified function', function() {
+		it('should intercept elementOpen from elementVoid calls with specified function', function() {
 			var originalVoid = IncrementalDOM.elementVoid;
 			var originalOpen = IncrementalDOM.elementOpen;
 			var fn = sinon.stub();
@@ -61,7 +63,7 @@ describe('IncrementalDomAop', function() {
 			assert.strictEqual(1, IncrementalDOM.elementClose.callCount);
 		});
 
-		it('should stop intercepting elementVoid calls', function() {
+		it('should stop intercepting elementOpen from elementVoid calls', function() {
 			var original = IncrementalDOM.elementVoid;
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn);
@@ -72,55 +74,69 @@ describe('IncrementalDomAop', function() {
 		});
 	});
 
-	it('should intercept elementOpenEnd calls with specified function', function() {
-		var original = IncrementalDOM.elementOpenEnd;
-		var fn = sinon.stub();
-		IncrementalDomAop.startInterception(fn);
-		assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
+	describe('elementOpenStart/elementOpenEnd', function() {
+		it('should intercept elementOpen from elementOpenEnd calls with specified function', function() {
+			var originalEnd = IncrementalDOM.elementOpenEnd;
+			var originalOpen = IncrementalDOM.elementOpen;
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception(fn);
+			assert.notStrictEqual(originalEnd, IncrementalDOM.elementOpenEnd);
 
-		IncrementalDOM.elementOpenEnd('div');
-		assert.strictEqual(1, fn.callCount);
-		assert.strictEqual(original, fn.args[0][0]);
-		assert.strictEqual('div', fn.args[0][1]);
+			IncrementalDOM.elementOpenStart('div', 'key', 'statics');
+			IncrementalDOM.attr('name', 'value');
+			IncrementalDOM.attr('name2', 'value2');
+			IncrementalDOM.elementOpenEnd('div');
+			assert.strictEqual(1, fn.callCount);
+			assert.strictEqual(originalOpen, fn.args[0][0]);
+			assert.strictEqual('div', fn.args[0][1]);
+			assert.strictEqual('key', fn.args[0][2]);
+			assert.strictEqual('statics', fn.args[0][3]);
+			assert.strictEqual('name', fn.args[0][4]);
+			assert.strictEqual('value', fn.args[0][5]);
+			assert.strictEqual('name2', fn.args[0][6]);
+			assert.strictEqual('value2', fn.args[0][7]);
+		});
+
+		it('should stop intercepting elementOpen from elementOpenEnd calls', function() {
+			var original = IncrementalDOM.elementOpenEnd;
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception(fn);
+			assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
+
+			IncrementalDomAop.stopInterception();
+			assert.strictEqual(original, IncrementalDOM.elementOpenEnd);
+		});
 	});
 
-	it('should stop intercepting elementOpenEnd calls', function() {
-		var original = IncrementalDOM.elementOpenEnd;
-		var fn = sinon.stub();
-		IncrementalDomAop.startInterception(fn);
-		assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
+	describe('Nested interceptions', function() {
+		it('should use last registered function for intercepting', function() {
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception(fn);
+			var fn2 = sinon.stub();
+			IncrementalDomAop.startInterception(fn2);
 
-		IncrementalDomAop.stopInterception();
-		assert.strictEqual(original, IncrementalDOM.elementOpenEnd);
-	});
+			IncrementalDOM.elementOpen('div');
+			assert.strictEqual(0, fn.callCount);
+			assert.strictEqual(1, fn2.callCount);
+		});
 
-	it('should use last registered function for intercepting', function() {
-		var fn = sinon.stub();
-		IncrementalDomAop.startInterception(fn);
-		var fn2 = sinon.stub();
-		IncrementalDomAop.startInterception(fn2);
+		it('should revert to previous registered function when stopping interception', function() {
+			var original = IncrementalDOM.elementOpen;
 
-		IncrementalDOM.elementOpen('div');
-		assert.strictEqual(0, fn.callCount);
-		assert.strictEqual(1, fn2.callCount);
-	});
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception(fn);
+			var fn2 = sinon.stub();
+			IncrementalDomAop.startInterception(fn2);
 
-	it('should revert to previous registered function when stopping interception', function() {
-		var original = IncrementalDOM.elementOpen;
+			IncrementalDomAop.stopInterception();
+			IncrementalDOM.elementOpen('div');
+			assert.strictEqual(1, fn.callCount);
+			assert.strictEqual(0, fn2.callCount);
 
-		var fn = sinon.stub();
-		IncrementalDomAop.startInterception(fn);
-		var fn2 = sinon.stub();
-		IncrementalDomAop.startInterception(fn2);
-
-		IncrementalDomAop.stopInterception();
-		IncrementalDOM.elementOpen('div');
-		assert.strictEqual(1, fn.callCount);
-		assert.strictEqual(0, fn2.callCount);
-
-		IncrementalDomAop.stopInterception();
-		assert.strictEqual(1, fn.callCount);
-		assert.strictEqual(0, fn2.callCount);
-		assert.strictEqual(original, IncrementalDOM.elementOpen);
+			IncrementalDomAop.stopInterception();
+			assert.strictEqual(1, fn.callCount);
+			assert.strictEqual(0, fn2.callCount);
+			assert.strictEqual(original, IncrementalDOM.elementOpen);
+		});
 	});
 });

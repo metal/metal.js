@@ -341,6 +341,41 @@ describe('IncrementalDomRenderer', function() {
 			dom.triggerEvent(button, 'click');
 			assert.strictEqual(1, child.handleClick.callCount);
 		});
+
+		it('should generate sub component id if none is given', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementOpen('ChildComponent');
+				IncDom.elementClose('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var componentNames = Object.keys(component.components);
+			assert.strictEqual(1, componentNames.length);
+
+			var child = component.components[componentNames[0]];
+			assert.ok(child instanceof ChildComponent);
+		});
+
+		it('should render sub component that doesn\'t use IncrementalDomRenderer', function() {
+			class PlainComponent extends Component {
+			}
+			ComponentRegistry.register(PlainComponent);
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementVoid('PlainComponent', null, ['id', 'child']);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.ok(child instanceof PlainComponent);
+			assert.strictEqual(child.element, component.element.querySelector('#child'));
+		});
 	});
 
 	function createTestComponentClass(opt_renderer) {

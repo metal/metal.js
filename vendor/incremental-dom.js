@@ -157,6 +157,7 @@
 
       data = initData(node, nodeName, key);
     }
+
     return data;
   };
 
@@ -643,6 +644,9 @@
     // `registerFindNode`) returns a matching node.
     if (!node && findNode) {
       node = findNode.apply(null, arguments);
+      if (node === currentNode) {
+        return;
+      }
     }
 
     // Create the node if it doesn't exist.

@@ -136,6 +136,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.rootElementReached_ = true;
 			IncrementalDomRenderer.currentComponent_ = this.component_;
 			this.attrsArr_ = attrsArr;
+			this.warnIfTagChanged_(tag);
 		}
 		this.addInlineListeners_((statics || []).concat(attrsArr));
 		return originalFn.apply(null, array.slice(arguments, 1));
@@ -243,6 +244,24 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			comp.render(false);
 		}
 		return comp;
+	}
+
+	/**
+	 * Warns if the chosen tag name for the component's root element has changed.
+	 * @param {string} newTag
+	 * @protected
+	 */
+	warnIfTagChanged_(newTag) {
+		var currentTag = newTag;
+		if (this.component_.hasBeenSet('element')) {
+			currentTag = this.component_.element.tagName.toLowerCase();
+		}
+		if (newTag !== currentTag) {
+			console.warn(
+				'Changing the component\'s root element\'s tag is not ' +
+				'allowed. The tag name will continue to be: "' + currentTag + '".'
+			);
+		}
 	}
 }
 

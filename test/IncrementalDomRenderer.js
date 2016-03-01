@@ -108,11 +108,30 @@ describe('IncrementalDomRenderer', function() {
 			};
 
 			var element = document.createElement('div');
+			// TODO: Remove dom.enterDocument call when incremental-dom's issue with
+			// calling patchOuter with key on parentless element is fixed.
 			dom.enterDocument(element);
 			component = new TestComponent({
 				element: element
 			}).render();
 			assert.strictEqual(component.element, document.getElementById(component.id));
+		});
+
+		it('should not allow and warn if trying to change tag name of root element', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span', null, ['id', this.id]);
+				IncDom.text('bar');
+				IncDom.elementClose('span');
+			};
+
+			sinon.stub(console, 'warn');
+			component = new TestComponent({
+				element: document.createElement('div')
+			}).render();
+
+			assert.strictEqual(1, console.warn.callCount);
+			console.warn.restore();
 		});
 	});
 

@@ -695,7 +695,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	valueIdFn_() {
-		return this.hasBeenSet('element') ? this.element.id : this.makeId_();
+		return this.hasBeenSet('element') && this.element.id ? this.element.id : this.makeId_();
 	}
 }
 

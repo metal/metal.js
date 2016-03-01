@@ -7,7 +7,7 @@ import ComponentCollector from '../src/ComponentCollector';
 import ComponentRegistry from '../src/ComponentRegistry';
 import ComponentRenderer from '../src/ComponentRenderer';
 
-describe('Component Tests', function() {
+describe('Component', function() {
 	afterEach(function() {
 		document.body.innerHTML = '';
 	});
@@ -128,6 +128,12 @@ describe('Component Tests', function() {
 			assert.strictEqual('customId', custom.id);
 		});
 
+		it('should generate id when none is given', function() {
+			var custom = new Component();
+			var custom2 = new Component();
+			assert.notStrictEqual(custom.id, custom2.id);
+		});
+
 		it('should not create default element value when default "id" is created', function() {
 			var custom = new Component();
 			assert.ok(custom.id);
@@ -179,6 +185,22 @@ describe('Component Tests', function() {
 			custom.render();
 			assert.strictEqual('customId', element.id);
 			assert.strictEqual(element, custom.element);
+		});
+
+		it('should set id from given element when is has one', function() {
+			var element = document.createElement('div');
+			element.id = 'elementId';
+			var custom = new Component({
+				element: element
+			});
+			assert.strictEqual('elementId', custom.id);
+		});
+
+		it('should generate id if given element has no id', function() {
+			var custom = new Component({
+				element: document.createElement('div')
+			});
+			assert.ok(custom.id);
 		});
 
 		it('should set component elementClasses attr', function(done) {

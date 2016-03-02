@@ -68,6 +68,11 @@ describe('Component', function() {
 			sinon.assert.callCount(Component.prototype.attached, 2);
 		});
 
+		it('should throw error if attach() is called before render()', function() {
+			var custom = new Component();
+			assert.throws(() => custom.attach());
+		});
+
 		it('should throw error when component renders and it was already rendered', function() {
 			var custom = new Component();
 			custom.render();
@@ -134,10 +139,11 @@ describe('Component', function() {
 			assert.notStrictEqual(custom.id, custom2.id);
 		});
 
-		it('should not create default element value when default "id" is created', function() {
+		it('should only create default value for component element after render', function() {
 			var custom = new Component();
-			assert.ok(custom.id);
-			assert.ok(!custom.hasBeenSet('element'));
+			assert.ok(!custom.element);
+			custom.render();
+			assert.ok(custom.element);
 		});
 
 		it('should set component element attr', function() {
@@ -165,12 +171,18 @@ describe('Component', function() {
 			assert.strictEqual(element, custom.element);
 		});
 
-		it('should set component element to default value if selector doesn\'t match any element', function() {
+		it('should keep previous element if selector doesn\'t match anything', function() {
 			var custom = new Component({
 				element: '.myClass'
 			});
-			custom.render();
-			assert.ok(custom.element);
+			assert.ok(!custom.element);
+
+			var element = document.createElement('div');
+			custom.element = element;
+			assert.strictEqual(element, custom.element);
+
+			custom.element = '.wrongSelector';
+			assert.strictEqual(element, custom.element);
 		});
 
 		it('should set component element id from id attr', function() {
@@ -187,7 +199,7 @@ describe('Component', function() {
 			assert.strictEqual(element, custom.element);
 		});
 
-		it('should set id from given element when is has one', function() {
+		it('should set id from given element when it has one', function() {
 			var element = document.createElement('div');
 			element.id = 'elementId';
 			var custom = new Component({
@@ -196,11 +208,19 @@ describe('Component', function() {
 			assert.strictEqual('elementId', custom.id);
 		});
 
-		it('should generate id if given element has no id', function() {
+		it('should generate id if given element has none', function() {
 			var custom = new Component({
 				element: document.createElement('div')
 			});
 			assert.ok(custom.id);
+		});
+
+		it('should set id on new element when changed', function() {
+			var custom = new Component({
+				id: 'custom'
+			}).render();
+			custom.element = document.createElement('div');
+			assert.strictEqual('custom', custom.id);
 		});
 
 		it('should set component elementClasses attr', function(done) {
@@ -235,6 +255,14 @@ describe('Component', function() {
 			assert.strictEqual('component', getClassNames(custom.element)[2]);
 		});
 
+		it('should set elementClasses on new element when changed', function() {
+			var custom = new Component({
+				elementClasses: 'testClass'
+			}).render();
+			custom.element = document.createElement('div');
+			assert.ok(dom.hasClass(custom.element, 'testClass'));
+		});
+
 		it('should update element display value according to visible attr', function(done) {
 			var custom = new Component().render();
 
@@ -249,6 +277,23 @@ describe('Component', function() {
 					assert.strictEqual('', custom.element.style.display);
 					done();
 				});
+			});
+		});
+
+		it('should set display value on new element when changed', function() {
+			var custom = new Component({
+				visible: false
+			}).render();
+			custom.element = document.createElement('div');
+			assert.strictEqual('none', custom.element.style.display);
+		});
+
+		it('should not throw error when trying to set display value before element is set', function(done) {
+			var custom = new Component();
+			custom.visible = false;
+			custom.once('attrsSynced', function() {
+				assert.ok(!custom.visible);
+				done();
 			});
 		});
 
@@ -578,8 +623,7 @@ describe('Component', function() {
 
 	describe('Events', function() {
 		it('should listen to events on the element through Component\'s "on" function', function() {
-			var custom = new Component();
-			custom.render();
+			var custom = new Component().render();
 
 			var element = custom.element;
 			element.onclick = null;
@@ -612,8 +656,7 @@ describe('Component', function() {
 
 		it('should listen to custom events on the element', function() {
 			var CustomComponent = createCustomComponentClass();
-			var custom = new CustomComponent();
-			custom.render();
+			var custom = new CustomComponent().render();
 
 			var listener = sinon.stub();
 			custom.on('transitionend', listener);
@@ -623,9 +666,7 @@ describe('Component', function() {
 		});
 
 		it('should transfer events listened through "on" function to new element', function() {
-			var custom = new Component();
-			custom.render();
-
+			var custom = new Component().render();
 			var element = custom.element;
 			var listener = sinon.stub();
 			custom.on('click', listener);
@@ -666,6 +707,88 @@ describe('Component', function() {
 			custom.dispose();
 			dom.triggerEvent(newFooElement, 'click');
 			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should listen to events on the element even before it\'s created', function() {
+			var custom = new Component();
+			var listener = sinon.stub();
+			custom.on('click', listener);
+
+			custom.render();
+			var element = custom.element;
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should listen to delegate events on the element even before it\'s created', function() {
+			var custom = new Component();
+			var listener = sinon.stub();
+			custom.delegate('click', '.foo', listener);
+
+			custom.render();
+			var element = custom.element;
+			dom.append(element, '<div class="foo"></div>');
+
+			dom.triggerEvent(element.querySelector('.foo'), 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should not reatach element listeners that were detached when element changes', function() {
+			var custom = new Component().render();
+			var listener = sinon.stub();
+			var handle = custom.on('click', listener);
+			handle.removeListener();
+
+			var newElement = document.createElement('div');
+			custom.element = newElement;
+
+			dom.triggerEvent(newElement, 'click');
+			assert.strictEqual(0, listener.callCount);
+		});
+
+		it('should not reatach delegate listeners that were detached when element changes', function() {
+			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			var custom = new CustomComponent().render();
+
+			var listener = sinon.stub();
+			var handle = custom.delegate('click', '.foo', listener);
+			handle.removeListener();
+
+			var newElement = document.createElement('div');
+			custom.element = newElement;
+			dom.append(newElement, '<div class="foo"></div>');
+
+			dom.triggerEvent(newElement.querySelector('.foo'), 'click');
+			assert.strictEqual(0, listener.callCount);
+		});
+
+		it('should be able to detach element listener that was attached before element changed', function() {
+			var custom = new Component().render();
+			var listener = sinon.stub();
+			var handle = custom.on('click', listener);
+
+			var newElement = document.createElement('div');
+			custom.element = newElement;
+
+			handle.removeListener();
+			dom.triggerEvent(newElement, 'click');
+			assert.strictEqual(0, listener.callCount);
+		});
+
+		it('should be able to detach delegate listener that was attached before element changed', function() {
+			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			var custom = new CustomComponent().render();
+
+			var listener = sinon.stub();
+			var handle = custom.delegate('click', '.foo', listener);
+
+			var newElement = document.createElement('div');
+			custom.element = newElement;
+			dom.append(newElement, '<div class="foo"></div>');
+
+			handle.removeListener();
+			dom.triggerEvent(newElement.querySelector('.foo'), 'click');
+			assert.strictEqual(0, listener.callCount);
 		});
 	});
 
@@ -819,6 +942,7 @@ describe('Component', function() {
 	function createCustomRenderer(opt_rendererContentOrFn) {
 		class CustomRenderer extends ComponentRenderer {
 			render() {
+				super.render();
 				if (core.isFunction(opt_rendererContentOrFn)) {
 					opt_rendererContentOrFn();
 				} else {

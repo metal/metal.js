@@ -30,63 +30,26 @@ describe('SurfaceRenderer', function() {
 			assert.throws(() => new TestComponent().render());
 		});
 
-		it('should call getSurfaceContent with opt_skipContents set to true when building element', function() {
+		it('should call getSurfaceContent when rendering', function() {
 			var TestComponent = createTestComponentClass();
 			component = new TestComponent();
 			var renderer = component.getRenderer();
-
-			sinon.spy(renderer, 'getSurfaceContent');
-			var element = component.element;
-			assert.ok(element);
-			assert.strictEqual(1, renderer.getSurfaceContent.callCount);
-
-			var args = renderer.getSurfaceContent.args[0];
-			assert.strictEqual(component.id, args[0].surfaceElementId);
-			assert.ok(args[1], 'Should pass the opt_skipContents param as true');
-		});
-
-		it('should call getSurfaceContent with opt_skipContents set to false when rendering', function() {
-			var TestComponent = createTestComponentClass();
-			component = new TestComponent();
-			var renderer = component.getRenderer();
-
-			var element = component.element;
-			assert.ok(element);
 
 			sinon.spy(renderer, 'getSurfaceContent');
 			component.render();
 			assert.strictEqual(1, renderer.getSurfaceContent.callCount);
+			assert.ok(component.element);
 
 			var args = renderer.getSurfaceContent.args[0];
 			assert.strictEqual(component.id, args[0].surfaceElementId);
-			assert.ok(!args[1], 'Should not pass the opt_skipContents param as true');
 		});
 	});
 
 	describe('Main Element', function() {
 		it('should build component element as a simple div by default', function() {
 			var TestComponent = createTestComponentClass();
-			component = new TestComponent();
+			component = new TestComponent().render();
 			assert.strictEqual('DIV', component.element.tagName);
-		});
-
-		it('should build element according to the value of the component\'s ELEMENT_TAG_NAME', function() {
-			var TestComponent = createTestComponentClass();
-			TestComponent.ELEMENT_TAG_NAME = 'span';
-
-			component = new TestComponent();
-			assert.strictEqual('SPAN', component.element.tagName);
-		});
-
-		it('should build element according to the component\'s inherited ELEMENT_TAG_NAME', function() {
-			var TestComponent = createTestComponentClass();
-			TestComponent.ELEMENT_TAG_NAME = 'span';
-
-			class TestComponent2 extends TestComponent {
-			}
-
-			component = new TestComponent2();
-			assert.strictEqual('SPAN', component.element.tagName);
 		});
 
 		it('should build element from the root surface content if id is included', function() {
@@ -94,9 +57,9 @@ describe('SurfaceRenderer', function() {
 				main: '<mycomp id="main" data-foo="foo"></mycomp>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				id: 'main'
-			});
+			}).render();
 
 			assert.strictEqual('MYCOMP', component.element.tagName);
 			assert.strictEqual('foo', component.element.getAttribute('data-foo'));
@@ -106,37 +69,12 @@ describe('SurfaceRenderer', function() {
 			var TestComponent = createTestComponentClass({
 				main: '<mycomp data-foo="foo"></mycomp>'
 			});
-			var component = new TestComponent({
+			component = new TestComponent({
 				id: 'main'
-			});
+			}).render();
 
 			assert.strictEqual('DIV', component.element.tagName);
 			assert.ok(!component.element.hasAttribute('data-foo'));
-		});
-
-		it('should build element from root surface\'s main element, without its children', function() {
-			var TestComponent = createTestComponentClass({
-				main: '<mycomp id="main">Content Here</mycomp>'
-			});
-			var component = new TestComponent({
-				id: 'main'
-			});
-
-			assert.strictEqual('MYCOMP', component.element.tagName);
-			assert.strictEqual(0, component.element.childNodes.length);
-		});
-
-		it('should ignore ELEMENT_TAG_NAME when root surface content can build element', function() {
-			var TestComponent = createTestComponentClass({
-				main: '<mycomp id="main" data-foo="foo"></mycomp>'
-			});
-			TestComponent.ELEMENT_TAG_NAME = 'span';
-
-			var component = new TestComponent({
-				id: 'main'
-			});
-
-			assert.strictEqual('MYCOMP', component.element.tagName);
 		});
 	});
 
@@ -146,7 +84,7 @@ describe('SurfaceRenderer', function() {
 				main: '<span id="main">My content</span>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				id: 'main'
 			}).render();
 
@@ -162,7 +100,7 @@ describe('SurfaceRenderer', function() {
 				'main-ss2': '<span id="main-ss2">Sub Surface 2</span>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				id: 'main'
 			}).render();
 
@@ -180,7 +118,7 @@ describe('SurfaceRenderer', function() {
 				main: '<span id="main"></span>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				id: 'main',
 				element: document.createElement('div')
 			}).render();
@@ -198,7 +136,7 @@ describe('SurfaceRenderer', function() {
 				main: '<div id="main"><div>Inner Content</div></div>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				element: element
 			}).render();
 			assert.notStrictEqual(originalContent, component.element.childNodes[0]);
@@ -215,7 +153,7 @@ describe('SurfaceRenderer', function() {
 				main: '<div id="main"><div>Inner Content</div></div>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				element: element
 			}).decorate();
 			assert.strictEqual(originalContent, component.element.childNodes[0]);
@@ -230,7 +168,7 @@ describe('SurfaceRenderer', function() {
 				main: '<div id="main"><span>New Content</span></div>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				element: element
 			}).decorate();
 			assert.notStrictEqual(originalContent, component.element.childNodes[0]);
@@ -246,7 +184,7 @@ describe('SurfaceRenderer', function() {
 				'main-s1': '<div id="main-s1">Surface Content</div>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				element: element
 			}).decorate();
 			assert.strictEqual(surfaceElement, component.getRenderer().getSurfaceElement('main-s1'));
@@ -262,7 +200,7 @@ describe('SurfaceRenderer', function() {
 				'main-s1': '<div id="main-s1">Surface Content</div>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				element: element
 			}).decorate();
 			assert.notStrictEqual(surfaceElement, component.getRenderer().getSurfaceElement('main-s1'));
@@ -278,7 +216,7 @@ describe('SurfaceRenderer', function() {
 				'main-s1': '<div id="main-s1">Surface Content</div>'
 			});
 
-			var component = new TestComponent({
+			component = new TestComponent({
 				element: element
 			}).decorate();
 			assert.notStrictEqual(surfaceElement, component.getRenderer().getSurfaceElement('main-s1'));
@@ -308,21 +246,24 @@ describe('SurfaceRenderer', function() {
 				content: {}
 			};
 
-			var child = new ChildComponent();
-			var renderer = child.getRenderer();
-			assert.deepEqual(['bottom', 'content', 'header', child.id], Object.keys(renderer.getSurfaces()).sort());
+			component = new ChildComponent();
+			var renderer = component.getRenderer();
+			assert.deepEqual(
+				['bottom', 'content', 'header', component.id],
+				Object.keys(renderer.getSurfaces()).sort()
+			);
 		});
 
 		it('should dynamically add surfaces', function() {
 			var CustomComponent = createTestComponentClass();
-			var custom = new CustomComponent();
-			var renderer = custom.getRenderer();
+			component = new CustomComponent();
+			var renderer = component.getRenderer();
 
 			var headerSurfaceConfig = {};
 			renderer.addSurface('header', headerSurfaceConfig);
 			renderer.addSurface('bottom');
 			assert.strictEqual(headerSurfaceConfig, renderer.getSurface('header'));
-			assert.deepEqual(['bottom', 'header', custom.id], Object.keys(renderer.getSurfaces()).sort());
+			assert.deepEqual(['bottom', 'header', component.id], Object.keys(renderer.getSurfaces()).sort());
 			assert.strictEqual(null, renderer.getSurface('unknown'));
 		});
 
@@ -345,10 +286,10 @@ describe('SurfaceRenderer', function() {
 				'main-nestedFoo': 'Nested'
 			});
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			var renderer = custom.getRenderer();
+			var renderer = component.getRenderer();
 
 			assert.deepEqual(['main-nestedFoo'], renderer.getSurface('foo').children);
 			assert.strictEqual('main', renderer.getSurface('foo').parent);
@@ -367,10 +308,10 @@ describe('SurfaceRenderer', function() {
 				}
 			});
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'custom'
 			}).render();
-			var renderer = custom.getRenderer();
+			var renderer = component.getRenderer();
 
 			assert.deepEqual(['foo', 'bar'], renderer.getSurface('foo').renderAttrs);
 			assert.ok(renderer.getSurface('s1'));
@@ -381,10 +322,10 @@ describe('SurfaceRenderer', function() {
 				custom: '%%%%~s-custom-header~%%%%',
 			});
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'custom'
 			}).render();
-			var renderer = custom.getRenderer();
+			var renderer = component.getRenderer();
 
 			renderer.removeSurface('header');
 			assert.strictEqual(null, renderer.getSurface('header'));
@@ -397,21 +338,21 @@ describe('SurfaceRenderer', function() {
 
 		it('should remove surfaces from collector when component is disposed', function() {
 			var CustomComponent = createTestComponentClass();
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'custom'
 			});
-			var renderer = custom.getRenderer();
+			var renderer = component.getRenderer();
 			renderer.addSurface('header');
 
 			assert.ok(SurfaceRenderer.surfacesCollector.getSurface('custom-header'));
-			custom.dispose();
+			component.dispose();
 			assert.ok(!SurfaceRenderer.surfacesCollector.getSurface('custom-header'));
 		});
 
 		it('should return renderer instance from surface methods', function() {
 			var CustomComponent = createTestComponentClass();
-			var custom = new CustomComponent();
-			var renderer = custom.getRenderer();
+			component = new CustomComponent();
+			var renderer = component.getRenderer();
 
 			assert.strictEqual(renderer, renderer.addSurface('header'));
 			assert.strictEqual(renderer, renderer.addSurfaces({}));
@@ -421,14 +362,14 @@ describe('SurfaceRenderer', function() {
 		describe('Render Attributes', function() {
 			it('should automatically create attrs from render attrs of added surfaces', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent();
-				custom.getRenderer().addSurfaces({
+				component = new CustomComponent();
+				component.getRenderer().addSurfaces({
 					header: {
 						renderAttrs: ['headerContent', 'fontSize']
 					}
 				});
-				assert.deepEqual({}, custom.getAttrConfig('headerContent'));
-				assert.deepEqual({}, custom.getAttrConfig('fontSize'));
+				assert.deepEqual({}, component.getAttrConfig('headerContent'));
+				assert.deepEqual({}, component.getAttrConfig('fontSize'));
 			});
 
 			it('should automatically create attrs from render attrs from SURFACES static variable', function() {
@@ -438,29 +379,29 @@ describe('SurfaceRenderer', function() {
 						renderAttrs: ['headerContent', 'fontSize']
 					}
 				};
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					headerContent: 'My Header'
 				});
-				assert.deepEqual({}, custom.getAttrConfig('headerContent'));
-				assert.strictEqual('My Header', custom.headerContent);
-				assert.deepEqual({}, custom.getAttrConfig('fontSize'));
-				assert.strictEqual(undefined, custom.fontSize);
+				assert.deepEqual({}, component.getAttrConfig('headerContent'));
+				assert.strictEqual('My Header', component.headerContent);
+				assert.deepEqual({}, component.getAttrConfig('fontSize'));
+				assert.strictEqual(undefined, component.fontSize);
 			});
 
 			it('should not override attr config when it already exists', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent();
+				component = new CustomComponent();
 				var headerContentConfig = {
 					value: 'My Header Content'
 				};
-				custom.addAttr('headerContent', headerContentConfig);
-				custom.getRenderer().addSurfaces({
+				component.addAttr('headerContent', headerContentConfig);
+				component.getRenderer().addSurfaces({
 					header: {
 						renderAttrs: ['headerContent', 'fontSize']
 					}
 				});
-				assert.strictEqual(headerContentConfig, custom.getAttrConfig('headerContent'));
-				assert.deepEqual({}, custom.getAttrConfig('fontSize'));
+				assert.strictEqual(headerContentConfig, component.getAttrConfig('headerContent'));
+				assert.deepEqual({}, component.getAttrConfig('fontSize'));
 			});
 
 			it('should rerender surfaces when the values of their render attributes change', function(done) {
@@ -474,7 +415,7 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var component = new TestComponent({
+				component = new TestComponent({
 					id: 'main',
 					foo: 'foo',
 					bar: 'bar'
@@ -496,18 +437,18 @@ describe('SurfaceRenderer', function() {
 					'main-foo': comp => comp.foo
 				});
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main'
 				});
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 				renderer.addSurface('foo');
-				custom.render();
+				component.render();
 
 				renderer.addSurface('foo', {
 					renderAttrs: ['foo']
 				});
-				custom.foo = 'foo';
-				custom.once('attrsChanged', function() {
+				component.foo = 'foo';
+				component.once('attrsChanged', function() {
 					assert.strictEqual('foo', renderer.getSurfaceElement('foo').textContent);
 					done();
 				});
@@ -523,15 +464,15 @@ describe('SurfaceRenderer', function() {
 					}
 				});
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main',
 					foo: 'foo'
 				}).render();
 
-				assert.strictEqual('foo', custom.element.textContent);
-				custom.foo = 'bar';
-				custom.once('attrsSynced', function() {
-					assert.strictEqual('bar', custom.element.textContent);
+				assert.strictEqual('foo', component.element.textContent);
+				component.foo = 'bar';
+				component.once('attrsSynced', function() {
+					assert.strictEqual('bar', component.element.textContent);
 					done();
 				});
 			});
@@ -551,14 +492,14 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main'
 				}).render();
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 				sinon.spy(renderer, 'getSurfaceContent');
 
-				custom.foo = 'bar';
-				custom.once('attrsSynced', function() {
+				component.foo = 'bar';
+				component.once('attrsSynced', function() {
 					assert.strictEqual(2, renderer.getSurfaceContent.callCount);
 					assert.strictEqual('main-foo', renderer.getSurfaceContent.args[0][0].surfaceElementId);
 					assert.strictEqual('main-nestedFoo', renderer.getSurfaceContent.args[1][0].surfaceElementId);
@@ -575,7 +516,7 @@ describe('SurfaceRenderer', function() {
 					foo: {}
 				};
 
-				var component = new TestComponent({
+				component = new TestComponent({
 					id: 'main',
 					foo: 'foo'
 				}).render();
@@ -596,19 +537,19 @@ describe('SurfaceRenderer', function() {
 						return comp.number % 2 === 0 ? 'Even' : 'Odds';
 					}
 				});
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main',
 					number: 2
 				});
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 				renderer.addSurface('oddsOrEven', {
 					renderAttrs: ['number']
 				});
-				custom.render();
+				component.render();
 
 				var initialContent = renderer.getSurfaceElement('oddsOrEven').childNodes[0];
-				custom.number = 4;
-				custom.once('attrsChanged', function() {
+				component.number = 4;
+				component.once('attrsChanged', function() {
 					assert.strictEqual(initialContent, renderer.getSurfaceElement('oddsOrEven').childNodes[0]);
 					done();
 				});
@@ -625,15 +566,15 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main'
 				}).render();
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 
 				renderer.clearSurfaceCache('foo');
 				var surfaceContent = renderer.getSurfaceElement('foo').childNodes[0];
-				custom.foo = 1;
-				custom.once('attrsChanged', function() {
+				component.foo = 1;
+				component.once('attrsChanged', function() {
 					assert.notStrictEqual(surfaceContent, renderer.getSurfaceElement('foo').childNodes[0]);
 					done();
 				});
@@ -650,17 +591,17 @@ describe('SurfaceRenderer', function() {
 						static: true
 					}
 				};
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main',
 					foo: 'foo'
 				}).render();
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 
 				var surfaceContent = renderer.getSurfaceElement('foo').childNodes[0];
 				assert.strictEqual('foo', surfaceContent.textContent);
 
-				custom.foo = 'bar';
-				custom.once('attrsChanged', function() {
+				component.foo = 'bar';
+				component.once('attrsChanged', function() {
 					assert.strictEqual(surfaceContent, renderer.getSurfaceElement('foo').childNodes[0]);
 					done();
 				});
@@ -683,17 +624,17 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main',
 					count: 3
 				}).render();
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 				assert.ok(renderer.getSurface('s0'));
 				assert.ok(renderer.getSurface('s1'));
 				assert.ok(renderer.getSurface('s2'));
 
-				custom.count = 1;
-				custom.once('attrsChanged', function() {
+				component.count = 1;
+				component.once('attrsChanged', function() {
 					assert.ok(renderer.getSurface('s0'));
 					assert.ok(!renderer.getSurface('s1'));
 					assert.ok(!renderer.getSurface('s2'));
@@ -705,11 +646,11 @@ describe('SurfaceRenderer', function() {
 		describe('Surface Element', function() {
 			it('should use div as the default tagName for surface elements', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent();
-				var renderer = custom.getRenderer();
+				component = new CustomComponent();
+				var renderer = component.getRenderer();
 
 				renderer.addSurface('header');
-				custom.render();
+				component.render();
 				assert.strictEqual('div', renderer.getSurfaceElement('header').tagName.toLowerCase());
 			});
 
@@ -717,11 +658,11 @@ describe('SurfaceRenderer', function() {
 				var CustomComponent = createTestComponentClass();
 				CustomComponent.SURFACE_TAG_NAME = 'span';
 
-				var custom = new CustomComponent();
-				var renderer = custom.getRenderer();
+				component = new CustomComponent();
+				var renderer = component.getRenderer();
 
 				renderer.addSurface('header');
-				custom.render();
+				component.render();
 				assert.strictEqual('span', renderer.getSurfaceElement('header').tagName.toLowerCase());
 			});
 
@@ -731,11 +672,11 @@ describe('SurfaceRenderer', function() {
 
 				class ChildComponent extends CustomComponent {
 				}
-				var custom = new ChildComponent();
-				var renderer = custom.getRenderer();
+				component = new ChildComponent();
+				var renderer = component.getRenderer();
 
 				renderer.addSurface('header');
-				custom.render();
+				component.render();
 				assert.strictEqual('span', renderer.getSurfaceElement('header').tagName.toLowerCase());
 			});
 
@@ -746,13 +687,13 @@ describe('SurfaceRenderer', function() {
 					'main-bottom': '<bottom id="main-bottom" class="testBottom" data-bar="bar"></bottom>'
 				});
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main'
 				});
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 				renderer.addSurface('header');
 				renderer.addSurface('bottom');
-				custom.render();
+				component.render();
 
 				var headerElement = renderer.getSurfaceElement('header');
 				var bottomElement = renderer.getSurfaceElement('bottom');
@@ -777,17 +718,17 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main',
 					tag: 'div'
 				}).render();
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 
 				var surfaceElement = renderer.getSurfaceElement('dynamic');
 				assert.strictEqual('DIV', surfaceElement.tagName);
 
-				custom.tag = 'span';
-				custom.once('attrsChanged', function() {
+				component.tag = 'span';
+				component.once('attrsChanged', function() {
 					var newSurfaceElement = renderer.getSurfaceElement('dynamic');
 					assert.notStrictEqual(surfaceElement, newSurfaceElement);
 					assert.strictEqual('SPAN', newSurfaceElement.tagName);
@@ -801,8 +742,8 @@ describe('SurfaceRenderer', function() {
 					header: {}
 				};
 
-				var custom = new CustomComponent();
-				var renderer = custom.getRenderer();
+				component = new CustomComponent();
+				var renderer = component.getRenderer();
 				var surface = renderer.getSurfaceElement('header');
 
 				assert.ok(surface);
@@ -819,31 +760,31 @@ describe('SurfaceRenderer', function() {
 				CustomComponent.SURFACES = {
 					header: {}
 				};
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					element: '#custom'
 				});
 
-				assert.strictEqual(surface, custom.getRenderer().getSurfaceElement('header'));
+				assert.strictEqual(surface, component.getRenderer().getSurfaceElement('header'));
 			});
 
 			it('should return null when element is requested for unknown surface', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent().render();
-				assert.strictEqual(null, custom.getRenderer().getSurfaceElement('unknown'));
+				component = new CustomComponent().render();
+				assert.strictEqual(null, component.getRenderer().getSurfaceElement('unknown'));
 			});
 		});
 
 		describe('Event - renderSurface', function() {
 			it('should emit "renderSurface" event for the main component surface on render', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent();
+				component = new CustomComponent();
 
 				var listener = sinon.stub();
-				custom.getRenderer().on('renderSurface', listener);
-				custom.render();
+				component.getRenderer().on('renderSurface', listener);
+				component.render();
 
 				assert.strictEqual(1, listener.callCount);
-				assert.deepEqual(custom.id, listener.args[0][0].surfaceId);
+				assert.deepEqual(component.id, listener.args[0][0].surfaceId);
 			});
 
 			it('should emit "renderSurface" event for each surface that will be rendered on attr change', function(done) {
@@ -861,15 +802,15 @@ describe('SurfaceRenderer', function() {
 						renderAttrs: ['foo', 'bar']
 					}
 				};
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main'
 				}).render();
 
 				var listener = sinon.stub();
-				custom.getRenderer().on('renderSurface', listener);
+				component.getRenderer().on('renderSurface', listener);
 
-				custom.foo = 2;
-				custom.once('attrsChanged', function() {
+				component.foo = 2;
+				component.once('attrsChanged', function() {
 					assert.strictEqual(2, listener.callCount);
 					var surfaceIds = [listener.args[0][0].surfaceId, listener.args[1][0].surfaceId];
 					assert.deepEqual(['bottom', 'header'], surfaceIds.sort());
@@ -891,10 +832,10 @@ describe('SurfaceRenderer', function() {
 						renderAttrs: ['foo']
 					}
 				};
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'main'
 				}).render();
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 
 				renderer.on('renderSurface', function(data, event) {
 					if (data.surfaceId === 'header') {
@@ -902,8 +843,8 @@ describe('SurfaceRenderer', function() {
 					}
 				});
 
-				custom.foo = 'foo';
-				custom.once('attrsChanged', function() {
+				component.foo = 'foo';
+				component.once('attrsChanged', function() {
 					assert.strictEqual('foo', renderer.getSurfaceElement('bottom').textContent);
 					assert.strictEqual('', renderer.getSurfaceElement('header').textContent);
 					done();
@@ -932,39 +873,39 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
-				assert.ok(custom.components.child);
+				assert.ok(component.components.child);
 
-				var child = custom.components.child;
-				assert.strictEqual(child.element, custom.element.querySelector('#child'));
-				assert.strictEqual(child.element, custom.getRenderer().getSurfaceElement('child'));
+				var child = component.components.child;
+				assert.strictEqual(child.element, component.element.querySelector('#child'));
+				assert.strictEqual(child.element, component.getRenderer().getSurfaceElement('child'));
 			});
 
 			it('should get element for component surface', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent();
-				var renderer = custom.getRenderer();
+				component = new CustomComponent();
+				var renderer = component.getRenderer();
 
 				renderer.addSurface('comp', {
 					componentName: 'ChildComponent'
 				});
 				assert.strictEqual(
-					custom.components.comp.element,
+					component.components.comp.element,
 					renderer.getSurfaceElement('comp')
 				);
 			});
 
 			it('should return null when getting element of component surface for component that isn\'t registered', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent();
-				var renderer = custom.getRenderer();
+				component = new CustomComponent();
+				var renderer = component.getRenderer();
 
 				renderer.addSurface('comp', {
 					componentName: 'ChildComponent'
 				});
-				Component.componentsCollector.removeComponent(custom.components.comp);
+				Component.componentsCollector.removeComponent(component.components.comp);
 				assert.ok(!renderer.getSurfaceElement('comp'));
 			});
 
@@ -982,11 +923,11 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
 
-				var child = custom.components.child;
+				var child = component.components.child;
 				assert.strictEqual('CHILD', child.element.tagName);
 				assert.strictEqual('foo', child.element.getAttribute('data-foo'));
 				assert.strictEqual('Child Content', child.element.textContent);
@@ -1002,13 +943,13 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
 
-				var child = custom.components['my-child'];
+				var child = component.components['my-child'];
 				assert.ok(child);
-				assert.strictEqual(child.element, custom.element.querySelector('#my-child'));
+				assert.strictEqual(child.element, component.element.querySelector('#my-child'));
 			});
 
 			it('should create sub component from placeholder passing defined config data', function() {
@@ -1026,14 +967,14 @@ describe('SurfaceRenderer', function() {
 					foo: {}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					foo: 'foo',
 					id: 'custom'
 				}).render();
 
-				var child = custom.components.child;
+				var child = component.components.child;
 				assert.ok(child);
-				assert.strictEqual(child.element, custom.element.querySelector('#child'));
+				assert.strictEqual(child.element, component.element.querySelector('#child'));
 				assert.strictEqual('foo', child.foo);
 			});
 
@@ -1055,14 +996,14 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					foo: 'foo',
 					id: 'custom'
 				}).render();
-				var child = custom.components.child;
+				var child = component.components.child;
 				assert.strictEqual('foo', child.foo);
 
-				custom.foo = 'bar';
+				component.foo = 'bar';
 				child.once('attrsChanged', function() {
 					assert.strictEqual('bar', child.foo);
 					done();
@@ -1092,18 +1033,18 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
-				var child1 = custom.components.child1;
-				var child2 = custom.components.child2;
-				var childElements = custom.element.querySelectorAll('.component');
+				var child1 = component.components.child1;
+				var child2 = component.components.child2;
+				var childElements = component.element.querySelectorAll('.component');
 				assert.strictEqual(childElements[0], child1.element);
 				assert.strictEqual(childElements[1], child2.element);
 
-				custom.invert = true;
-				custom.once('attrsSynced', function() {
-					childElements = custom.element.querySelectorAll('.component');
+				component.invert = true;
+				component.once('attrsSynced', function() {
+					childElements = component.element.querySelectorAll('.component');
 					assert.strictEqual(childElements[0], child2.element);
 					assert.strictEqual(childElements[1], child1.element);
 					done();
@@ -1126,14 +1067,14 @@ describe('SurfaceRenderer', function() {
 					this.element = childElement;
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
 
-				var child = custom.components.child;
+				var child = component.components.child;
 				assert.ok(child);
 				assert.strictEqual(child.element, childElement);
-				assert.strictEqual(child.element, custom.element.querySelector('#child'));
+				assert.strictEqual(child.element, component.element.querySelector('#child'));
 				assert.ok(!child.element.querySelector('#child'));
 			});
 
@@ -1148,14 +1089,14 @@ describe('SurfaceRenderer', function() {
 				};
 
 				var element = document.createElement('div');
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render(element);
 
-				var child = custom.components.child;
+				var child = component.components.child;
 				assert.ok(child);
 				assert.strictEqual(ChildComponent, child.constructor);
-				assert.strictEqual(custom.element.querySelector('#child'), child.element);
+				assert.strictEqual(component.element.querySelector('#child'), child.element);
 			});
 
 			it('should create sub components when parent is decorated', function() {
@@ -1172,13 +1113,13 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					element: '#custom'
 				}).decorate();
 
-				var child = custom.components.child;
+				var child = component.components.child;
 				assert.ok(child);
-				assert.strictEqual(child.element, custom.element.querySelector('#child'));
+				assert.strictEqual(child.element, component.element.querySelector('#child'));
 				assert.strictEqual(childElement, child.element);
 			});
 
@@ -1196,10 +1137,10 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					element: '#custom'
 				}).decorate();
-				assert.notStrictEqual(childElement, custom.components.child.element);
+				assert.notStrictEqual(childElement, component.components.child.element);
 			});
 
 			it('should automatically dispose unused sub components after repaint', function(done) {
@@ -1221,18 +1162,18 @@ describe('SurfaceRenderer', function() {
 					}
 				};
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					count: 3,
 					id: 'custom'
 				}).render();
-				var comps = object.mixin({}, custom.components);
+				var comps = object.mixin({}, component.components);
 				assert.strictEqual(3, Object.keys(comps).length);
 
-				custom.count = 1;
-				custom.once('attrsChanged', function() {
-					assert.ok(custom.components.comp0);
-					assert.ok(!custom.components.comp1);
-					assert.ok(!custom.components.comp2);
+				component.count = 1;
+				component.once('attrsChanged', function() {
+					assert.ok(component.components.comp0);
+					assert.ok(!component.components.comp1);
+					assert.ok(!component.components.comp2);
 					assert.ok(!comps.comp0.isDisposed());
 					assert.ok(comps.comp1.isDisposed());
 					assert.ok(comps.comp2.isDisposed());
@@ -1247,20 +1188,20 @@ describe('SurfaceRenderer', function() {
 					custom: '%%%%~s-custom-header~%%%%',
 					'custom-header': 'Header'
 				});
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
 
 				assert.strictEqual(
 					'<div id="custom-header">Header</div>',
-					custom.getRenderer().getElementExtendedContent()
+					component.getRenderer().getElementExtendedContent()
 				);
 			});
 
 			it('should return empty string if "getElementExtendedContent" is called but content wasn\'t defined', function() {
 				var CustomComponent = createTestComponentClass();
-				var custom = new CustomComponent().render();
-				assert.strictEqual('', custom.getRenderer().getElementExtendedContent());
+				component = new CustomComponent().render();
+				assert.strictEqual('', component.getRenderer().getElementExtendedContent());
 			});
 		});
 
@@ -1271,14 +1212,14 @@ describe('SurfaceRenderer', function() {
 					'custom-s1': '%%%%~s~%%%%%%%%~s~%%%%'
 				});
 
-				var custom = new CustomComponent({
+				component = new CustomComponent({
 					id: 'custom'
 				}).render();
-				assert.strictEqual(1, custom.element.childNodes.length);
+				assert.strictEqual(1, component.element.childNodes.length);
 
-				var renderer = custom.getRenderer();
+				var renderer = component.getRenderer();
 				var s1 = renderer.getSurfaceElement('s1');
-				assert.strictEqual(custom.element.childNodes[0], s1);
+				assert.strictEqual(component.element.childNodes[0], s1);
 				assert.strictEqual(2, s1.childNodes.length);
 				assert.strictEqual(s1.childNodes[0], renderer.getSurfaceElement('s1-s1'));
 				assert.strictEqual(s1.childNodes[1], renderer.getSurfaceElement('s1-s2'));
@@ -1298,20 +1239,20 @@ describe('SurfaceRenderer', function() {
 				}
 			};
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				foo: 'foo',
 				id: 'custom'
 			}).render();
-			var s1 = custom.element.querySelector('.s1');
-			var s1S1 = custom.element.querySelector('.s1S1');
-			var s1S2 = custom.element.querySelector('.s1S2');
+			var s1 = component.element.querySelector('.s1');
+			var s1S1 = component.element.querySelector('.s1S1');
+			var s1S2 = component.element.querySelector('.s1S2');
 
-			custom.foo = 'bar';
-			custom.on('attrsChanged', function() {
-				assert.strictEqual(s1, custom.element.querySelector('.s1'));
-				assert.strictEqual(s1S2, custom.element.querySelector('.s1S2'));
-				assert.notStrictEqual(s1S1, custom.element.querySelector('.s1S1'));
-				assert.strictEqual('bar', custom.element.querySelector('.s1S1').textContent);
+			component.foo = 'bar';
+			component.on('attrsChanged', function() {
+				assert.strictEqual(s1, component.element.querySelector('.s1'));
+				assert.strictEqual(s1S2, component.element.querySelector('.s1S2'));
+				assert.notStrictEqual(s1S1, component.element.querySelector('.s1S1'));
+				assert.strictEqual('bar', component.element.querySelector('.s1S1').textContent);
 				done();
 			});
 		});
@@ -1324,12 +1265,12 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.prototype.handleClick = sinon.stub();
 
-			var comp = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			var button = comp.element.querySelector('.elementButton');
+			var button = component.element.querySelector('.elementButton');
 			dom.triggerEvent(button, 'click');
-			assert.strictEqual(1, comp.handleClick.callCount);
+			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should attach listeners from element tag', function() {
@@ -1338,11 +1279,11 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.prototype.handleClick = sinon.stub();
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			dom.triggerEvent(custom.element, 'click');
-			assert.strictEqual(1, custom.handleClick.callCount);
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should attach listeners from surface content', function() {
@@ -1352,12 +1293,12 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.prototype.handleClick = sinon.stub();
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			var button = custom.element.querySelector('.fooButton');
+			var button = component.element.querySelector('.fooButton');
 			dom.triggerEvent(button, 'click');
-			assert.strictEqual(1, custom.handleClick.callCount);
+			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should attach listeners from surface element tag', function() {
@@ -1367,12 +1308,12 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.prototype.handleClick = sinon.stub();
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			var element = custom.element.querySelector('#main-foo');
+			var element = component.element.querySelector('#main-foo');
 			dom.triggerEvent(element, 'click');
-			assert.strictEqual(1, custom.handleClick.callCount);
+			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should attach listeners from element content after decorating', function() {
@@ -1382,11 +1323,11 @@ describe('SurfaceRenderer', function() {
 			CustomComponent.prototype.handleClick = sinon.stub();
 			dom.enterDocument(dom.buildFragment('<div id="main" data-onclick="handleClick"></div>'));
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				element: '#main'
 			}).decorate();
-			dom.triggerEvent(custom.element, 'click');
-			assert.strictEqual(1, custom.handleClick.callCount);
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should attach listeners when component is rendered as sub component', function() {
@@ -1405,12 +1346,12 @@ describe('SurfaceRenderer', function() {
 				}
 			};
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			var button = custom.element.querySelector('button');
+			var button = component.element.querySelector('button');
 			dom.triggerEvent(button, 'click');
-			assert.strictEqual(1, custom.components.events.handleClick.callCount);
+			assert.strictEqual(1, component.components.events.handleClick.callCount);
 		});
 
 		it('should attach listeners when component is decorated as sub component', function() {
@@ -1432,12 +1373,12 @@ describe('SurfaceRenderer', function() {
 			var content = '<div id="main"><button id="events" data-onclick="handleClick"></button></div>';
 			dom.enterDocument(dom.buildFragment(content));
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				element: '#main'
 			}).decorate();
-			var button = custom.element.querySelector('button');
+			var button = component.element.querySelector('button');
 			dom.triggerEvent(button, 'click');
-			assert.strictEqual(1, custom.components.events.handleClick.callCount);
+			assert.strictEqual(1, component.components.events.handleClick.callCount);
 		});
 
 		it('should detach unused listeners after surface update', function(done) {
@@ -1455,15 +1396,15 @@ describe('SurfaceRenderer', function() {
 			CustomComponent.prototype.handleClick = sinon.stub();
 			CustomComponent.prototype.handleMouseOver = sinon.stub();
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main',
 				mouseover: true
 			}).render();
-			sinon.spy(custom.element, 'removeEventListener');
-			custom.mouseover = false;
-			custom.once('attrsSynced', function() {
-				assert.strictEqual(1, custom.element.removeEventListener.callCount);
-				assert.strictEqual('mouseover', custom.element.removeEventListener.args[0][0]);
+			sinon.spy(component, 'removeListener');
+			component.mouseover = false;
+			component.on('attrsSynced', function() {
+				assert.strictEqual(1, component.removeListener.callCount);
+				assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('mouseover'));
 				done();
 			});
 		});
@@ -1475,15 +1416,15 @@ describe('SurfaceRenderer', function() {
 			CustomComponent.prototype.handleClick = sinon.stub();
 			CustomComponent.prototype.handleMouseOver = sinon.stub();
 
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
-			sinon.spy(custom.element, 'removeEventListener');
-			custom.detach();
+			sinon.spy(component, 'removeListener');
+			component.detach();
 
-			assert.strictEqual(2, custom.element.removeEventListener.callCount);
-			assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
-			assert.strictEqual('mouseover', custom.element.removeEventListener.args[1][0]);
+			assert.strictEqual(2, component.removeListener.callCount);
+			assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('click'));
+			assert.notStrictEqual(-1, component.removeListener.args[1][0][0].indexOf('mouseover'));
 		});
 	});
 
@@ -1496,7 +1437,7 @@ describe('SurfaceRenderer', function() {
 			var CustomComponent = createTestComponentClass({
 				main: '<script>window.testScriptEvaluated = true</script>'
 			});
-			new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
 
@@ -1511,7 +1452,7 @@ describe('SurfaceRenderer', function() {
 			var CustomComponent = createTestComponentClass({
 				main: '<script src="test/fixtures/script.js"></script>'
 			});
-			new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
 			assert.strictEqual(1, globalEval.runScriptsInElement.callCount);
@@ -1521,7 +1462,7 @@ describe('SurfaceRenderer', function() {
 			var CustomComponent = createTestComponentClass({
 				main: '<script type="text/javascript">window.testScriptEvaluated = true</script>'
 			});
-			new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
 
@@ -1535,7 +1476,7 @@ describe('SurfaceRenderer', function() {
 			var CustomComponent = createTestComponentClass({
 				main: '<script type="text/html">My template</script>'
 			});
-			new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
 
@@ -1550,7 +1491,7 @@ describe('SurfaceRenderer', function() {
 				main: '%%%%~s-main-foo~%%%%',
 				'main-foo': '<script>window.testScriptEvaluated = true</script>'
 			});
-			new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
 
@@ -1570,12 +1511,12 @@ describe('SurfaceRenderer', function() {
 					renderAttrs: ['foo']
 				}
 			};
-			var custom = new CustomComponent({
+			component = new CustomComponent({
 				id: 'main'
 			}).render();
 
-			custom.foo = 'foo';
-			custom.once('attrsSynced', function() {
+			component.foo = 'foo';
+			component.once('attrsSynced', function() {
 				async.nextTick(function() {
 					assert.strictEqual('foo', window.testScriptEvaluated);
 					done();

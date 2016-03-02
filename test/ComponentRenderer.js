@@ -11,13 +11,6 @@ describe('ComponentRenderer', function() {
 		renderer.dispose();
 	});
 
-	it('should return a simple div element from buildElement', function() {
-		renderer = new ComponentRenderer(new Component());
-		var element = renderer.buildElement();
-		assert.ok(core.isElement(element));
-		assert.strictEqual('DIV', element.tagName);
-	});
-
 	it('should call the render method when the component is rendered', function() {
 		var component = new Component();
 
@@ -27,6 +20,15 @@ describe('ComponentRenderer', function() {
 		component.render();
 		assert.strictEqual(1, renderer.render.callCount);
 		ComponentRenderer.prototype.render.restore();
+	});
+
+	it('should set element to simple empty div as the default render implementation', function() {
+		var component = new Component();
+		renderer = new ComponentRenderer(component);
+		component.render();
+
+		assert.ok(core.isElement(component.element));
+		assert.strictEqual('DIV', component.element.tagName);
 	});
 
 	it('should not call the render method after disposed', function() {

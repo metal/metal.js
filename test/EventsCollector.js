@@ -210,13 +210,13 @@ describe('EventsCollector', function() {
 
 		var trigger = custom.element.childNodes[0];
 		trigger.removeAttribute('data-onclick');
-		custom.element.removeEventListener = sinon.stub();
+		sinon.spy(custom, 'removeListener');
 
 		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
 		collector.detachUnusedListeners();
 
-		assert.strictEqual(1, custom.element.removeEventListener.callCount);
-		assert.strictEqual('click', custom.element.removeEventListener.args[0][0]);
+		assert.strictEqual(1, custom.removeListener.callCount);
+		assert.notStrictEqual(-1, custom.removeListener.args[0][0][0].indexOf('click'));
 	});
 
 	it('should not throw error when detaching unused listeners twice', function() {

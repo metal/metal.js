@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, core } from 'metal';
+import { array, core, object } from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
 import Attribute from 'metal-attribute';
 import ComponentCollector from './ComponentCollector';
@@ -54,6 +54,14 @@ class Component extends Attribute {
 		super(opt_config);
 
 		/**
+		 * All listeners that were attached until the `DomEventEmitterProxy` instance
+		 * was created.
+		 * @type {!Object<string, bool>}
+		 * @protected
+		 */
+		this.attachedListeners_ = {};
+
+		/**
 		 * Gets all nested components.
 		 * @type {!Array<!Component>}
 		 */
@@ -65,22 +73,6 @@ class Component extends Attribute {
 		 * @protected
 		 */
 		this.decorating_ = false;
-
-		/**
-		 * Holds events that were listened through the `delegate` Component function.
-		 * @type {EventHandler}
-		 * @protected
-		 */
-		this.delegateEventHandler_ = null;
-
-		/**
-		 * A list of calls made to this component's `delegate` function. Used when
-		 * the component's element changes, so these calls may be attached to the
-		 * new element.
-		 * @type {!Array<{eventName: string, selector: string, callback: !function()}>}
-		 * @protected
-		 */
-		this.delegateListenerCalls_ = [];
 
 		/**
 		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
@@ -125,13 +117,23 @@ class Component extends Attribute {
 		this.DEFAULT_ELEMENT_PARENT = document.body;
 
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
-		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_TAG_NAME', array.firstDefinedValue);
 		core.mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
 
 		this.renderer_ = new this.constructor.RENDERER_MERGED(this);
-		this.delegateEventHandler_ = new EventHandler();
 
 		this.created_();
+	}
+
+	/**
+	 * Adds the necessary classes to the component's element.
+	 * @protected
+	 */
+	addElementClasses_() {
+		var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
+		if (this.elementClasses) {
+			classesToAdd = classesToAdd + ' ' + this.elementClasses;
+		}
+		dom.addClasses(this.element, classesToAdd);
 	}
 
 	/**
@@ -156,28 +158,6 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Overrides `addSingleListener_` from `EventEmitter`, so we can create
-	 * the `DomEventEmitterProxy` instance only when it's needed for the first
-	 * time.
-	 * @param {string} event
-	 * @param {!Function} listener
-	 * @param {boolean} opt_default Flag indicating if this listener is a default
-	 *   action for this event. Default actions are run last, and only if no previous
-	 *   listener call `preventDefault()` on the received event facade.
-	 * @param {Function=} opt_origin The original function that was added as a
-	 *   listener, if there is any.
-	 * @protected
-	 * @override
-	 */
-	addSingleListener_(event, listener, opt_default, opt_origin) {
-		if (!this.elementEventProxy_ &&
-			dom.supportsEvent(this.constructor.ELEMENT_TAG_NAME_MERGED, event)) {
-			this.elementEventProxy_ = new DomEventEmitterProxy(this.element, this);
-		}
-		super.addSingleListener_(event, listener, opt_default, opt_origin);
-	}
-
-	/**
 	 * Invokes the attached Lifecycle. When attached, the component element is
 	 * appended to the DOM and any other action to be performed must be
 	 * implemented in this method, such as, binding DOM events. A component can
@@ -192,6 +172,9 @@ class Component extends Attribute {
 	 * @chainable
 	 */
 	attach(opt_parentElement, opt_siblingElement) {
+		if (!this.element) {
+			throw new Error(Component.Error.ELEMENT_NOT_CREATED);
+		}
 		if (!this.inDocument) {
 			this.renderElement_(opt_parentElement, opt_siblingElement);
 			this.inDocument = true;
@@ -215,13 +198,14 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	created_() {
-		this.on('eventsChanged', this.onEventsChanged_);
-		this.addListenersFromObj_(this.events);
-
 		this.on('elementChanged', this.onElementChanged_);
-
 		this.on('attrsChanged', this.handleAttributesChanges_);
 		Component.componentsCollector.addComponent(this);
+
+		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
+
+		this.on('eventsChanged', this.onEventsChanged_);
+		this.addListenersFromObj_(this.events);
 	}
 
 	/**
@@ -265,17 +249,10 @@ class Component extends Attribute {
 	 *   the event should be triggered for.
 	 * @param {!function(!Object)} callback Function to be called when the event is
 	 *   triggered. It will receive the normalized event object.
-	 * @return {!DomEventHandle} Can be used to remove the listener.
+	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
 	delegate(eventName, selector, callback) {
-		var handle = dom.delegate(this.element, eventName, selector, callback);
-		this.delegateEventHandler_.add(handle);
-		this.delegateListenerCalls_.push({
-			eventName: eventName,
-			selector: selector,
-			callback: callback
-		});
-		return handle;
+		return this.on('delegate:' + eventName + ':' + selector, callback);
 	}
 
 	/**
@@ -316,9 +293,6 @@ class Component extends Attribute {
 			this.elementEventProxy_.dispose();
 			this.elementEventProxy_ = null;
 		}
-
-		this.delegateEventHandler_.removeAllListeners();
-		this.delegateEventHandler_ = null;
 
 		this.disposeSubComponents(Object.keys(this.components));
 		this.components = null;
@@ -476,6 +450,16 @@ class Component extends Attribute {
 	}
 
 	/**
+	 * Handles the `newListener` event. Just flags that this event type has been
+	 * attached, so we can start proxying it when `DomEventEmitterProxy` is created.
+	 * @param {string} event
+	 * @protected
+	 */
+	handleNewListener_(event) {
+		this.attachedListeners_[event] = true;
+	}
+
+	/**
 	 * Makes an unique id for the component.
 	 * @return {string} Unique id.
 	 * @protected
@@ -512,13 +496,9 @@ class Component extends Attribute {
 			this.elementEventProxy_.setOriginEmitter(event.newVal);
 		}
 
-		this.delegateEventHandler_.removeAllListeners();
-
-		var calls = this.delegateListenerCalls_;
-		this.delegateListenerCalls_ = [];
-		for (var i = 0; i < calls.length; i++) {
-			this.delegate(calls[i].eventName, calls[i].selector, calls[i].callback);
-		}
+		event.newVal.id = this.id;
+		this.addElementClasses_();
+		this.syncVisible(this.visible);
 	}
 
 	/**
@@ -559,16 +539,23 @@ class Component extends Attribute {
 	 *     to render the component before it. Relevant when the component needs
 	 *     to be rendered before an existing element in the DOM, e.g.
 	 *     `component.render(null, existingElement)`.
+	 * @param {boolean=} opt_skipRender Optional flag indicating that the actual
+	 *     rendering should be skipped. Only the other render lifecycle logic will
+	 *     be run, like syncing attributes and attaching the element. Should only
+	 *     be set if the component has already been rendered, like sub components.
 	 * @chainable
 	 */
-	render(opt_parentElement, opt_siblingElement) {
+	render(opt_parentElement, opt_siblingElement, opt_skipRender) {
 		if (this.wasRendered) {
 			throw new Error(Component.Error.ALREADY_RENDERED);
 		}
 
-		this.emit('render', {
-			decorating: this.decorating_
-		});
+		if (!opt_skipRender) {
+			this.emit('render', {
+				decorating: this.decorating_
+			});
+		}
+		this.setUpProxy_();
 		this.syncAttrs_();
 		if (opt_parentElement !== false) {
 			this.attach(opt_parentElement, opt_siblingElement);
@@ -584,9 +571,7 @@ class Component extends Attribute {
 	 * attributes.
 	 */
 	renderAsSubComponent() {
-		this.syncAttrs_();
-		this.attach();
-		this.wasRendered = true;
+		this.render(null, null, true);
 	}
 
 	/**
@@ -610,16 +595,29 @@ class Component extends Attribute {
 
 	/**
 	 * Setter logic for element attribute.
-	 * @param {string|Element} val
+	 * @param {string|Element} newVal
+	 * @param {Element} currentVal
 	 * @return {Element}
 	 * @protected
 	 */
-	setterElementFn_(val) {
-		var element = dom.toElement(val);
-		if (!element) {
-			element = this.valueElementFn_();
-		}
-		return element;
+	setterElementFn_(newVal, currentVal) {
+		return dom.toElement(newVal) || currentVal;
+	}
+
+	/**
+	 * Creates the `DomEventEmitterProxy` instance and has it start proxying any
+	 * listeners that have already been listened to.
+	 * @protected
+	 */
+	setUpProxy_() {
+		var proxy = new DomEventEmitterProxy(this.element, this);
+		this.elementEventProxy_ = proxy;
+
+		object.map(this.attachedListeners_, proxy.proxyEvent.bind(proxy));
+		this.attachedListeners_ = null;
+
+		this.newListenerHandle_.removeListener();
+		this.newListenerHandle_ = null;
 	}
 
 	/**
@@ -651,14 +649,10 @@ class Component extends Attribute {
 	 * @param {string} prevVal
 	 */
 	syncElementClasses(newVal, prevVal) {
-		var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
-		if (newVal) {
-			classesToAdd = classesToAdd + ' ' + newVal;
-		}
-		if (prevVal) {
+		if (this.element && prevVal) {
 			dom.removeClasses(this.element, prevVal);
 		}
-		dom.addClasses(this.element, classesToAdd);
+		this.addElementClasses_();
 	}
 
 	/**
@@ -667,7 +661,9 @@ class Component extends Attribute {
 	 * @param {boolean} newVal
 	 */
 	syncVisible(newVal) {
-		this.element.style.display = newVal ? '' : 'none';
+		if (this.element) {
+			this.element.style.display = newVal ? '' : 'none';
+		}
 	}
 
 	/**
@@ -711,26 +707,13 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Provides the default value for element attribute.
-	 * @return {!Element} The element.
-	 * @protected
-	 */
-	valueElementFn_() {
-		if (!this.id) {
-			// This may happen because the default value of "id" depends on "element",
-			// and the default value of "element" depends on "id".
-			this.id = this.makeId_();
-		}
-		return this.renderer_.buildElement();
-	}
-
-	/**
 	 * Provides the default value for id attribute.
 	 * @return {string} The id.
 	 * @protected
 	 */
 	valueIdFn_() {
-		return this.hasBeenSet('element') && this.element.id ? this.element.id : this.makeId_();
+		var hasElement = this.hasBeenSet('element') && this.element;
+		return hasElement && this.element.id ? this.element.id : this.makeId_();
 	}
 }
 
@@ -755,8 +738,7 @@ Component.ATTRS = {
 	 */
 	element: {
 		setter: 'setterElementFn_',
-		validator: 'validatorElementFn_',
-		valueFn: 'valueElementFn_'
+		validator: 'validatorElementFn_'
 	},
 
 	/**
@@ -808,17 +790,6 @@ Component.ATTRS = {
 Component.ELEMENT_CLASSES = 'component';
 
 /**
- * Element tag name is a string that specifies the type of element to be
- * created. The nodeName of the created element is initialized with the
- * value of tag name.
- * @type {string}
- * @default div
- * @protected
- * @static
- */
-Component.ELEMENT_TAG_NAME = 'div';
-
-/**
  * The `ComponentRenderer` that should be used. Components need to set this
  * to a subclass of `ComponentRenderer` that has the rendering logic, like
  * `SoyRenderer`.
@@ -836,7 +807,12 @@ Component.Error = {
 	 * Error when the component is already rendered and another render attempt
 	 * is made.
 	 */
-	ALREADY_RENDERED: 'Component already rendered'
+	ALREADY_RENDERED: 'Component already rendered.',
+
+	/**
+	 * Error when the component is attached but its element hasn't been created yet.
+	 */
+	ELEMENT_NOT_CREATED: 'Can\'t attach component element. It hasn\'t been created yet.'
 };
 
 /**

@@ -23,19 +23,6 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
-	 * Builds and returns the component's main element, without any content. This
-	 * is used by Component when building the element attribute from scratch,
-	 * which can happen before the first render, whenever the attribute is first
-	 * accessed.
-	 * Subclasses should override this to customize the creation of the default
-	 * component element.
-	 * @return {!Element}
-	 */
-	buildElement() {
-		return document.createElement('div');
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	disposeInternal() {
@@ -58,11 +45,16 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
-	 * Renders the component's whole content. When decorating this should avoid
-	 * replacing the existing content if it's already correct.
+	 * Renders the component's whole content (including its main element). When
+	 * decorating this should avoid replacing the existing content if it's already
+	 * correct.
 	 * @param {decorating: boolean} data
 	 */
-	render() {}
+	render() {
+		if (!this.component_.element) {
+			this.component_.element = document.createElement('div');
+		}
+	}
 
 	/**
 	 * Updates the component's element html. This is automatically called by

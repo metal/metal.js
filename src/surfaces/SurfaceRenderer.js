@@ -179,20 +179,6 @@ class SurfaceRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	buildElement() {
-		var compId = this.component_.id;
-		var element = this.findElementInContent_(compId, this.getElementContent_(true) || '');
-		if (!element) {
-			element = this.findElementInContent_(compId, this.getComponentHtml(''));
-		}
-		dom.removeChildren(element);
-		dom.exitDocument(element);
-		return element;
-	}
-
-	/**
 	 * Builds a fragment element with the given content, so it can be rendered.
 	 * Any script tags inside the content will be moved to the header, so they can
 	 * be reevaluated when this content is rendered.
@@ -467,24 +453,19 @@ class SurfaceRenderer extends ComponentRenderer {
 	 * @return {string}
 	 */
 	getComponentHtml(content) {
-		return this.wrapContentIfNecessary(
-			content,
-			this.component_.id,
-			this.component_.constructor.ELEMENT_TAG_NAME_MERGED
-		);
+		return this.wrapContentIfNecessary(content, this.component_.id, 'div');
 	}
 
 	/**
 	 * Calls `getElementContent` and creating its surface if it hasn't been created yet.
-	 * @param {string=} opt_skipContents True if only the element's tag needs to be rendered.
 	 * @return {Object|string} The content to be rendered. If the content is a
 	 *   string, surfaces can be represented by placeholders in the format specified
 	 *   by SurfaceRenderer.SURFACE_REGEX. Also, if the string content's main wrapper has
 	 *   the component's id, then it will be used to render the main element tag.
 	 * @protected
 	 */
-	getElementContent_(opt_skipContents) {
-		return this.getSurfaceContent(this.getSurface(this.component_.id), opt_skipContents);
+	getElementContent_() {
+		return this.getSurfaceContent(this.getSurface(this.component_.id));
 	}
 
 	/**
@@ -547,7 +528,6 @@ class SurfaceRenderer extends ComponentRenderer {
 	 * Returns the appropriate string content for the specified surface. Subclasses
 	 * should implement this method.
 	 * @param {!Object} surface The surface configuration.
-	 * @param {string=} opt_skipContents True if only the element's tag needs to be rendered.
 	 * @return {string}
 	 * @override
 	 */
@@ -774,7 +754,7 @@ class SurfaceRenderer extends ComponentRenderer {
 	 */
 	render(data) {
 		var id = this.component_.id;
-		if (data.decorating) {
+		if (data.decorating && this.component_.element) {
 			var extendedContent = this.getElementExtendedContent();
 			var extendedCacheState = this.computeSurfaceCacheState_(extendedContent);
 			var originalContent = html.compress(this.component_.element.outerHTML);
@@ -799,7 +779,9 @@ class SurfaceRenderer extends ComponentRenderer {
 			var surface = this.getSurfaceFromElementId(surfaceElementId);
 			Component.componentsCollector.updateComponent(surfaceElementId, surface.componentData);
 		} else {
-			if (opt_content && dom.isEmpty(component.element)) {
+			if (!component.element) {
+				component.element = this.component_.findElementById(surfaceElementId);
+			} else if (opt_content && dom.isEmpty(component.element)) {
 				// If we have the rendered content for this component, but it hasn't
 				// been rendered in its element yet, we render it manually here. That
 				// can happen if the subcomponent's element is set before the parent
@@ -865,10 +847,22 @@ class SurfaceRenderer extends ComponentRenderer {
 		var element = this.component_.element;
 		var newContent = this.buildFragment_(content);
 		var newElement = this.findElementInContent_(this.component_.id, newContent);
+
+		if (!element) {
+			if (newElement) {
+				this.component_.element = newElement;
+				return;
+			} else {
+				this.component_.element = document.createElement('div');
+				element = this.component_.element;
+			}
+		}
+
 		if (newElement) {
 			this.updateElementAttributes_(element, newElement);
 			newContent = newElement.childNodes;
 		}
+
 		dom.removeChildren(element);
 		dom.append(element, newContent);
 	}

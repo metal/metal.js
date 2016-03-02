@@ -74,6 +74,15 @@ class Component extends Attribute {
 		this.delegateEventHandler_ = null;
 
 		/**
+		 * A list of calls made to this component's `delegate` function. Used when
+		 * the component's element changes, so these calls may be attached to the
+		 * new element.
+		 * @type {!Array<{eventName: string, selector: string, callback: !function()}>}
+		 * @protected
+		 */
+		this.delegateListenerCalls_ = [];
+
+		/**
 		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
 		 * element to the component itself.
 		 * @type {DomEventEmitterProxy}
@@ -209,6 +218,8 @@ class Component extends Attribute {
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.events);
 
+		this.on('elementChanged', this.onElementChanged_);
+
 		this.on('attrsChanged', this.handleAttributesChanges_);
 		Component.componentsCollector.addComponent(this);
 	}
@@ -259,6 +270,11 @@ class Component extends Attribute {
 	delegate(eventName, selector, callback) {
 		var handle = dom.delegate(this.element, eventName, selector, callback);
 		this.delegateEventHandler_.add(handle);
+		this.delegateListenerCalls_.push({
+			eventName: eventName,
+			selector: selector,
+			callback: callback
+		});
 		return handle;
 	}
 
@@ -484,6 +500,25 @@ class Component extends Attribute {
 				return true;
 			}
 		}).join(' ');
+	}
+
+	/**
+	 * Fired when the `element` attribute value is changed.
+	 * @param {!Object} event
+	 * @protected
+	 */
+	onElementChanged_(event) {
+		if (this.elementEventProxy_) {
+			this.elementEventProxy_.setOriginEmitter(event.newVal);
+		}
+
+		this.delegateEventHandler_.removeAllListeners();
+
+		var calls = this.delegateListenerCalls_;
+		this.delegateListenerCalls_ = [];
+		for (var i = 0; i < calls.length; i++) {
+			this.delegate(calls[i].eventName, calls[i].selector, calls[i].callback);
+		}
 	}
 
 	/**
@@ -721,8 +756,7 @@ Component.ATTRS = {
 	element: {
 		setter: 'setterElementFn_',
 		validator: 'validatorElementFn_',
-		valueFn: 'valueElementFn_',
-		writeOnce: true
+		valueFn: 'valueElementFn_'
 	},
 
 	/**

@@ -621,6 +621,52 @@ describe('Component', function() {
 			dom.triggerEvent(custom.element, features.checkAnimationEventName().transition);
 			assert.strictEqual(1, listener.callCount);
 		});
+
+		it('should transfer events listened through "on" function to new element', function() {
+			var custom = new Component();
+			custom.render();
+
+			var element = custom.element;
+			var listener = sinon.stub();
+			custom.on('click', listener);
+
+			var newElement = document.createElement('div');
+			custom.element = newElement;
+
+			dom.triggerEvent(element, 'click');
+			assert.strictEqual(0, listener.callCount);
+
+			dom.triggerEvent(newElement, 'click');
+			assert.strictEqual(1, listener.callCount);
+
+			custom.dispose();
+			dom.triggerEvent(newElement, 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should transfer delegate events listened on the compoennt to the new element', function() {
+			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			var custom = new CustomComponent().render();
+
+			var fooElement = custom.element.querySelector('.foo');
+			var listener = sinon.stub();
+			custom.delegate('click', '.foo', listener);
+
+			var newElement = document.createElement('div');
+			custom.element = newElement;
+			dom.append(newElement, '<div class="foo"></div>');
+
+			dom.triggerEvent(fooElement, 'click');
+			assert.strictEqual(0, listener.callCount);
+
+			var newFooElement = newElement.querySelector('.foo');
+			dom.triggerEvent(newFooElement, 'click');
+			assert.strictEqual(1, listener.callCount);
+
+			custom.dispose();
+			dom.triggerEvent(newFooElement, 'click');
+			assert.strictEqual(1, listener.callCount);
+		});
 	});
 
 	describe('Sub Components', function() {

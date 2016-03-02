@@ -107,6 +107,17 @@ class EventEmitterProxy extends Disposable {
 	}
 
 	/**
+	 * Changes the origin emitter. This automatically detaches any events that
+	 * were already being proxied from the previous emitter, and starts proxying
+	 * them on the new emitter instead.
+	 */
+	setOriginEmitter(originEmitter) {
+		object.map(this.proxiedEvents_, this.removeListener_.bind(this));
+		this.originEmitter_ = originEmitter;
+		object.map(this.proxiedEvents_, this.addListener_.bind(this));
+	}
+
+	/**
 	 * Checks if the given event should be proxied.
 	 * @param {string} event
 	 * @return {boolean}

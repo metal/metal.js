@@ -81,6 +81,26 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(1, listener2.callCount);
 	});
 
+	it('should change the emitter that events are proxied from', function() {
+		var origin = new EventEmitter();
+		var target = new EventEmitter();
+		var proxy = new EventEmitterProxy(origin, target);
+
+		var listener = sinon.stub();
+		target.on('event1', listener);
+
+		var origin2 = new EventEmitter();
+		proxy.setOriginEmitter(origin2);
+
+		origin.emit('event1', 1, 2);
+		assert.strictEqual(0, listener.callCount);
+
+		origin2.emit('event1', 1, 2);
+		assert.strictEqual(1, listener.callCount);
+		assert.strictEqual(1, listener.args[0][0]);
+		assert.strictEqual(2, listener.args[0][1]);
+	});
+
 	it('should not proxy events after disposed', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

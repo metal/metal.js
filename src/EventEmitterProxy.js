@@ -83,7 +83,7 @@ class EventEmitterProxy extends Disposable {
 	 * Proxies the given event from the origin to the target emitter.
 	 * @param {string} event
 	 */
-	proxyEvent_(event) {
+	proxyEvent(event) {
 		if (!this.shouldProxyEvent_(event)) {
 			return;
 		}
@@ -138,7 +138,7 @@ class EventEmitterProxy extends Disposable {
 	 * @protected
 	 */
 	startProxy_() {
-		this.targetEmitter_.on('newListener', this.proxyEvent_.bind(this));
+		this.targetEmitter_.on('newListener', this.proxyEvent.bind(this));
 	}
 }
 

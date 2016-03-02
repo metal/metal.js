@@ -101,6 +101,22 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(2, listener.args[0][1]);
 	});
 
+	it('should allow manually choosing events to be proxied', function() {
+		var origin = new EventEmitter();
+		var target = new EventEmitter();
+
+		var listener = sinon.stub();
+		target.on('event1', listener);
+
+		var proxy = new EventEmitterProxy(origin, target);
+		proxy.proxyEvent('event1');
+		origin.emit('event1', 1, 2);
+
+		assert.strictEqual(1, listener.callCount);
+		assert.strictEqual(1, listener.args[0][0]);
+		assert.strictEqual(2, listener.args[0][1]);
+	});
+
 	it('should not proxy events after disposed', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

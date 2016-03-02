@@ -359,6 +359,26 @@ describe('Attribute', function() {
 		assert.strictEqual(3, attr.attr1);
 	});
 
+	it('should pass attribute\'s current value to setter', function() {
+		var attr = new Attribute();
+		attr.addAttrs({
+			attr1: {
+				setter: (newValue, currentValue) => {
+					return currentValue ? currentValue + ':' + newValue : newValue;
+				},
+				value: 'first'
+			}
+		});
+
+		assert.strictEqual('first', attr.attr1);
+
+		attr.attr1 = 'second';
+		assert.strictEqual('first:second', attr.attr1);
+
+		attr.attr1 = 'third';
+		assert.strictEqual('first:second:third', attr.attr1);
+	});
+
 	it('should allow setting a writeOnce with initial value', function() {
 		var attr = new Attribute();
 		attr.addAttrs(

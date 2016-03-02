@@ -171,13 +171,14 @@ class Attribute extends EventEmitter {
 	 * Calls the attribute's setter, if there is one.
 	 * @param {string} name The name of the attribute.
 	 * @param {*} value The value to be set.
+	 * @param {*} currentValue The current value.
 	 * @return {*} The final value to be set.
 	 */
-	callSetter_(name, value) {
+	callSetter_(name, value, currentValue) {
 		var info = this.attrsInfo_[name];
 		var config = info.config;
 		if (config.setter) {
-			value = this.callFunction_(config.setter, [value]);
+			value = this.callFunction_(config.setter, [value, currentValue]);
 		}
 		return value;
 	}
@@ -448,7 +449,7 @@ class Attribute extends EventEmitter {
 		}
 
 		var prevVal = this[name];
-		info.value = this.callSetter_(name, value);
+		info.value = this.callSetter_(name, value, prevVal);
 		info.written = true;
 		this.informChange_(name, prevVal);
 	}

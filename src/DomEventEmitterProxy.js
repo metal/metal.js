@@ -10,31 +10,34 @@ import { EventEmitterProxy } from 'metal-events';
  */
 class DomEventEmitterProxy extends EventEmitterProxy {
 	/**
-	 * Adds the proxy listener for the given event.
+	 * Adds the given listener for the given event.
 	 * @param {string} event.
+	 * @param {!function()} listener
+	 * @return {!EventHandle} The listened event's handle.
 	 * @protected
 	 * @override
 	 */
-	addListener_(event) {
+	addListener_(event, listener) {
 		if (this.originEmitter_.addEventListener) {
-			dom.on(this.originEmitter_, event, this.proxiedEvents_[event]);
+			if (event.startsWith('delegate:')) {
+				var parts = event.split(':');
+				return dom.delegate(this.originEmitter_, parts[1], parts[2], listener);
+			} else {
+				return dom.on(this.originEmitter_, event, listener);
+			}
 		} else {
-			super.addListener_(event);
+			return super.addListener_(event, listener);
 		}
 	}
 
 	/**
-	 * Removes the proxy listener for the given event.
+	 * Checks if the given event is supported by the origin element.
 	 * @param {string} event
 	 * @protected
-	 * @override
 	 */
-	removeListener_(event) {
-		if (this.originEmitter_.removeEventListener) {
-			this.originEmitter_.removeEventListener(event, this.proxiedEvents_[event]);
-		} else {
-			super.removeListener_(event);
-		}
+	isSupportedDomEvent_(event) {
+		return event.startsWith('delegate:') ||
+			dom.supportsEvent(this.originEmitter_, event);
 	}
 
 	/**
@@ -46,7 +49,7 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 */
 	shouldProxyEvent_(event) {
 		return super.shouldProxyEvent_(event) &&
-			(!this.originEmitter_.addEventListener || dom.supportsEvent(this.originEmitter_, event));
+			(!this.originEmitter_.addEventListener || this.isSupportedDomEvent_(event));
 	}
 }
 

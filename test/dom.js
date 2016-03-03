@@ -584,17 +584,33 @@ describe('dom', function() {
 		});
 	});
 
-	describe('ancestor', function() {
-		it('should return the first ancestor that matches the given selector', function() {
+	describe('parent', function() {
+		it('should return the first parent that matches the given selector', function() {
 			dom.enterDocument(
-				'<div class="ancestor2"><div class="ancestor1"><div class="element"></div></div></div>'
+				'<div class="parent2"><div class="parent1"><div class="element"></div></div></div>'
 			);
 			var element = dom.toElement('.element');
-			var ancestor2 = dom.toElement('.ancestor1');
-			var ancestor3 = dom.toElement('.ancestor2');
-			assert.strictEqual(ancestor2, dom.ancestor(element, '.ancestor1'));
-			assert.strictEqual(ancestor3, dom.ancestor(element, '.ancestor2'));
-			assert.strictEqual(null, dom.ancestor(element, '.ancestor3'));
+			var parent2 = dom.toElement('.parent1');
+			var parent3 = dom.toElement('.parent2');
+			assert.strictEqual(null, dom.parent(element, '.element'));
+			assert.strictEqual(parent2, dom.parent(element, '.parent1'));
+			assert.strictEqual(parent3, dom.parent(element, '.parent2'));
+			assert.strictEqual(null, dom.parent(element, '.parent3'));
+		});
+	});
+
+	describe('closest', function() {
+		it('should return the closest element up the tree that matches the given selector', function() {
+			dom.enterDocument(
+				'<div class="parent2"><div class="parent1"><div class="element"></div></div></div>'
+			);
+			var element = dom.toElement('.element');
+			var parent2 = dom.toElement('.parent1');
+			var parent3 = dom.toElement('.parent2');
+			assert.strictEqual(element, dom.closest(element, '.element'));
+			assert.strictEqual(parent2, dom.closest(element, '.parent1'));
+			assert.strictEqual(parent3, dom.closest(element, '.parent2'));
+			assert.strictEqual(null, dom.closest(element, '.parent3'));
 		});
 	});
 

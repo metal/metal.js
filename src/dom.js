@@ -59,14 +59,13 @@ class dom {
 	}
 
 	/**
-	 * Gets the first ancestor from the given element that matches the specified
-	 * selector, or null if none match.
-	 * @param {!Element} element
+	 * Gets the closest element up the tree from the given element (including
+	 * itself) that matches the specified selector, or null if none match.
+	 * @param {Element} element
 	 * @param {string} selector
 	 * @return {Element}
 	 */
-	static ancestor(element, selector) {
-		element = element.parentNode;
+	static closest(element, selector) {
 		while (element && !dom.match(element, selector)) {
 			element = element.parentNode;
 		}
@@ -353,6 +352,17 @@ class dom {
 			return callback.apply(this, arguments);
 		});
 		return domEventHandle;
+	}
+
+	/**
+	 * Gets the first parent from the given element that matches the specified
+	 * selector, or null if none match.
+	 * @param {!Element} element
+	 * @param {string} selector
+	 * @return {Element}
+	 */
+	static parent(element, selector) {
+		return dom.closest(element.parentNode, selector);
 	}
 
 	/**

@@ -2,20 +2,25 @@
 
 class IncrementalDomAop {
 	/**
-	 * Starts intercepting calls to the `elementOpen` function from incremental
-	 * dom with the given function.
-	 * @param {!function()} fn Function to be called instead of the original one.
+	 * Starts intercepting calls to the `elementOpen` and `elementClose` functions
+	 * from incremental dom with the given functions.
+	 * @param {!function()} openFn Function to be called instead of the original
+	 *     `elementOpen` one.
+	 * @param {!function()} closeFn Function to be called instead of the original
+	 *     `elementClose` one.
 	 */
-	static startInterception(fn) {
-		fn = fn.bind(null, fnStack[0].elementOpen);
+	static startInterception(openFn, closeFn) {
+		openFn = openFn.bind(null, fnStack[0].elementOpen);
+		closeFn = closeFn.bind(null, fnStack[0].elementClose);
 		fnStack.push({
 			attr: fnAttr,
-			elementOpen: fn,
-			elementOpenEnd: () => fn.apply(null, collectedArgs),
+			elementClose: closeFn,
+			elementOpen: openFn,
+			elementOpenEnd: () => openFn.apply(null, collectedArgs),
 			elementOpenStart: fnOpenStart,
 			elementVoid: function(tag) {
-				var node = fn.apply(null, arguments);
-				IncrementalDOM.elementClose(tag);
+				var node = openFn.apply(null, arguments);
+				closeFn(tag);
 				return node;
 			}
 		});
@@ -46,6 +51,7 @@ function fnOpenStart(tag, key, statics) {
 
 var fnStack = [{
 	attr: IncrementalDOM.attr,
+	elementClose: IncrementalDOM.elementClose,
 	elementOpen: IncrementalDOM.elementOpen,
 	elementOpenEnd: IncrementalDOM.elementOpenEnd,
 	elementOpenStart: IncrementalDOM.elementOpenStart,

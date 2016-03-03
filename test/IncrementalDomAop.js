@@ -11,7 +11,7 @@ describe('IncrementalDomAop', function() {
 		it('should intercept elementOpen calls with specified function', function() {
 			var original = IncrementalDOM.elementOpen;
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			assert.notStrictEqual(original, IncrementalDOM.elementOpen);
 
 			IncrementalDOM.elementOpen('div', 'key', 'statics', 'name', 'value');
@@ -27,7 +27,7 @@ describe('IncrementalDomAop', function() {
 		it('should stop intercepting elementOpen calls', function() {
 			var original = IncrementalDOM.elementOpen;
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			assert.notStrictEqual(original, IncrementalDOM.elementOpen);
 
 			IncrementalDomAop.stopInterception();
@@ -36,21 +36,13 @@ describe('IncrementalDomAop', function() {
 	});
 
 	describe('elementVoid', function() {
-		beforeEach(function() {
-			sinon.stub(IncrementalDOM, 'elementClose');
-		});
-
-		afterEach(function() {
-			IncrementalDOM.elementClose.restore();
-		});
-
-		it('should intercept elementOpen from elementVoid calls with specified function', function() {
+		it('should intercept elementOpen and elementClose from elementVoid calls with specified function', function() {
 			var originalVoid = IncrementalDOM.elementVoid;
 			var originalOpen = IncrementalDOM.elementOpen;
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			var closeFn = sinon.stub();
+			IncrementalDomAop.startInterception(fn, closeFn);
 			assert.notStrictEqual(originalVoid, IncrementalDOM.elementVoid);
-			assert.strictEqual(0, IncrementalDOM.elementClose.callCount);
 
 			IncrementalDOM.elementVoid('div', 'key', 'statics', 'name', 'value');
 			assert.strictEqual(1, fn.callCount);
@@ -60,13 +52,13 @@ describe('IncrementalDomAop', function() {
 			assert.strictEqual('statics', fn.args[0][3]);
 			assert.strictEqual('name', fn.args[0][4]);
 			assert.strictEqual('value', fn.args[0][5]);
-			assert.strictEqual(1, IncrementalDOM.elementClose.callCount);
+			assert.strictEqual(1, closeFn.callCount);
 		});
 
 		it('should stop intercepting elementOpen from elementVoid calls', function() {
 			var original = IncrementalDOM.elementVoid;
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			assert.notStrictEqual(original, IncrementalDOM.elementVoid);
 
 			IncrementalDomAop.stopInterception();
@@ -79,7 +71,7 @@ describe('IncrementalDomAop', function() {
 			var originalEnd = IncrementalDOM.elementOpenEnd;
 			var originalOpen = IncrementalDOM.elementOpen;
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			assert.notStrictEqual(originalEnd, IncrementalDOM.elementOpenEnd);
 
 			IncrementalDOM.elementOpenStart('div', 'key', 'statics');
@@ -100,7 +92,7 @@ describe('IncrementalDomAop', function() {
 		it('should stop intercepting elementOpen from elementOpenEnd calls', function() {
 			var original = IncrementalDOM.elementOpenEnd;
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
 
 			IncrementalDomAop.stopInterception();
@@ -111,9 +103,9 @@ describe('IncrementalDomAop', function() {
 	describe('Nested interceptions', function() {
 		it('should use last registered function for intercepting', function() {
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			var fn2 = sinon.stub();
-			IncrementalDomAop.startInterception(fn2);
+			IncrementalDomAop.startInterception(fn2, sinon.stub());
 
 			IncrementalDOM.elementOpen('div');
 			assert.strictEqual(0, fn.callCount);
@@ -124,9 +116,9 @@ describe('IncrementalDomAop', function() {
 			var original = IncrementalDOM.elementOpen;
 
 			var fn = sinon.stub();
-			IncrementalDomAop.startInterception(fn);
+			IncrementalDomAop.startInterception(fn, sinon.stub());
 			var fn2 = sinon.stub();
-			IncrementalDomAop.startInterception(fn2);
+			IncrementalDomAop.startInterception(fn2, sinon.stub());
 
 			IncrementalDomAop.stopInterception();
 			IncrementalDOM.elementOpen('div');

@@ -1,6 +1,7 @@
 'use strict';
 
 import { array, core } from 'metal';
+import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 
@@ -18,6 +19,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		this.listenersToAttach_ = [];
 		this.eventsCollector_ = new EventsCollector(comp);
+
+		comp.on('attrChanged', this.handleAttrChanged_.bind(this));
 	}
 
 	/**
@@ -51,53 +54,43 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Builds a map of attribute name to attribute value, from an array that
-	 * contains all this info sequentially.
-	 * @param {!Array} arr
-	 * @return {!Object}
+	 * Guarantees that the component's element has a parent. That's necessary
+	 * when calling incremental dom's `patchOuter` for now, as otherwise it will
+	 * throw an error if the element needs to be replaced.
+	 * @return {Element} The parent, in case it was added.
 	 * @protected
 	 */
-	static buildAttrsObject_(arr) {
-		var config = {};
-		for (var i = 0; i < arr.length; i += 2) {
-			config[arr[i]] = arr[i + 1];
-		}
-		return config;
-	}
-
-	/**
-	 * Builds the component's main element, returning it without any content.
-	 * TODO: Need to guarantee that the element won't have children before
-	 * returning. Preferrably, we should not even allow creating the children in
-	 * the first place.
-	 * @return {!Element}
-	 */
-	buildElement() {
-		this.builtElement_ = true;
-		var tempParent = document.createElement('div');
-		IncrementalDOM.patch(tempParent, this.renderWithoutPatch_.bind(this, true));
-		return tempParent.childNodes[0];
-	}
-
-	/**
-	 * Returns the element of the component that has just been created, to
-	 * guarantee that component elements will always be reused. This is called by
-	 * incremental dom.
-	 * @return {Element}
-	 * @protected
-	 */
-	static findNode_() {
-		if (IncrementalDomRenderer.currentComponent_) {
-			return IncrementalDomRenderer.currentComponent_.element;
+	guaranteeParent_() {
+		var element = this.component_.element;
+		if (!element || !element.parentNode) {
+			var parent = document.createElement('div');
+			if (element) {
+				dom.append(parent, element);
+			}
+			return parent;
 		}
 	}
 
 	/**
-	 * Gets the attributes array used when rendering this component's element.
-	 * @return {Array}
+	 * Handles the `attrChanged` event.
+	 * @param {!Object} data
+	 * @protected
 	 */
-	getAttributesArray() {
-		return this.attrsArr_;
+	handleAttrChanged_(data) {
+		this.shouldUpdate_ = data.attrName !== 'element';
+	}
+
+	/**
+	 * Handles an intercepted call to the `elementClose` function from incremental
+	 * dom.
+	 * @param {!function()} originalFn The original function before interception.
+	 * @param {string} tag
+	 * @protected
+	 */
+	handleInterceptedCloseCall_(originalFn, tag) {
+		if (!this.isComponentTag_(tag)) {
+			originalFn(tag);
+		}
 	}
 
 	/**
@@ -107,14 +100,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @param {string} tag
 	 * @protected
 	 */
-	handleInterceptedCall_(originalFn, tag) {
+	handleInterceptedOpenCall_(originalFn, tag) {
 		var node;
-		if (tag[0] === tag[0].toUpperCase()) {
+		if (this.isComponentTag_(tag)) {
 			node = this.handleSubComponentCall_.apply(this, arguments);
 		} else {
 			node = this.handleRegularCall_.apply(this, arguments);
 		}
-		IncrementalDomRenderer.currentComponent_ = null;
 		return node;
 	}
 
@@ -130,14 +122,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleRegularCall_(originalFn, tag, key, statics) {
 		var attrsArr = array.slice(arguments, 4);
+		this.addInlineListeners_((statics || []).concat(attrsArr));
+		var node = originalFn.apply(null, array.slice(arguments, 1));
 		if (!this.rootElementReached_) {
 			this.rootElementReached_ = true;
-			IncrementalDomRenderer.currentComponent_ = this.component_;
-			this.attrsArr_ = attrsArr;
-			this.warnIfTagChanged_(tag);
+			if (this.component_.element !== node) {
+				this.component_.element = node;
+			}
 		}
-		this.addInlineListeners_((statics || []).concat(attrsArr));
-		return originalFn.apply(null, array.slice(arguments, 1));
+		return node;
 	}
 
 	/**
@@ -151,22 +144,22 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleSubComponentCall_(originalFn, tag, key, statics) {
-		var config = IncrementalDomRenderer.buildAttrsObject_(
-			(statics || []).concat(array.slice(arguments, 4))
-		);
+		var config = {};
+		var attrsArr = (statics || []).concat(array.slice(arguments, 4));
+		for (var i = 0; i < attrsArr.length; i += 2) {
+			config[attrsArr[i]] = attrsArr[i + 1];
+		}
 		var comp = this.updateSubComponent_(tag, config);
-		var renderer = comp.getRenderer();
-		IncrementalDomRenderer.currentComponent_ = comp;
+		return comp.element;
+	}
 
-		// This guarantees that the following incremental dom call won't miss any
-		// of the component element's attributes, which were just rendered above.
-		// Also guarantees that the component data passed as attributes to this
-		// placeholder will be ignored.
-		var attrsArr = renderer.getAttributesArray && renderer.getAttributesArray();
-		var node = originalFn.apply(null, [tag, key, statics].concat(attrsArr));
-		IncrementalDOM.skip();
-		comp.attach();
-		return node;
+	/**
+	 * Checks if the given tag represents a metal component.
+	 * @param {string} tag
+	 * @protected
+	 */
+	isComponentTag_(tag) {
+		return tag[0] === tag[0].toUpperCase();
 	}
 
 	/**
@@ -174,13 +167,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * through the incremental dom function calls done by `renderIncDom`.
 	 */
 	render() {
-		// Access the `element` attribute first to check if it will be built via
-		// `buildElement` now. If so, there's no need to patch it again, just to
-		// attach the collected listeners.
-		if (!this.builtElement_ && this.component_.element && this.builtElement_) {
-			this.attachInlineListeners_();
-			return;
-		}
 		this.patch();
 	}
 
@@ -198,11 +184,20 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * doesn't call `patch` yet. Rather, this will be the function that should be
 	 * called by `patch`.
 	 */
-	renderWithoutPatch_() {
+	renderWithoutPatch() {
+		// Mark that there shouldn't be an update for attrs changed so far, since
+		// render has already been called.
+		this.shouldUpdate_ = false;
+
+		this.rootElementReached_ = false;
 		this.listenersToAttach_ = [];
-		IncrementalDomAop.startInterception(this.handleInterceptedCall_.bind(this));
+		IncrementalDomAop.startInterception(
+			this.handleInterceptedOpenCall_.bind(this),
+			this.handleInterceptedCloseCall_.bind(this)
+		);
 		this.fn_();
 		IncrementalDomAop.stopInterception();
+		this.attachInlineListeners_();
 	}
 
 	/**
@@ -210,8 +205,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * done by `renderIncDom`.
 	 */
 	patch() {
-		IncrementalDOM.patchOuter(this.component_.element, this.renderWithoutPatch_.bind(this));
-		this.attachInlineListeners_();
+		var tempParent = this.guaranteeParent_();
+		if (tempParent) {
+			IncrementalDOM.patch(tempParent, this.renderWithoutPatch.bind(this));
+			dom.exitDocument(this.component_.element);
+		} else {
+			IncrementalDOM.patchOuter(this.component_.element, this.renderWithoutPatch.bind(this));
+		}
 	}
 
 	/**
@@ -219,8 +219,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * element through the incremental dom function calls done by `renderIncDom`.
 	 */
 	update() {
-		this.patch();
-		this.eventsCollector_.detachUnusedListeners();
+		if (this.shouldUpdate_) {
+			this.patch();
+			this.eventsCollector_.detachUnusedListeners();
+		}
 	}
 
 	/**
@@ -237,33 +239,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var comp = this.component_.addSubComponent(tag, config);
 		if (comp.wasRendered) {
 			comp.setAttrs(config);
-		} else {
-			comp.render(false);
+		}
+		comp.getRenderer().renderWithoutPatch();
+		if (!comp.wasRendered) {
+			comp.renderAsSubComponent();
 		}
 		return comp;
-	}
-
-	/**
-	 * Warns if the chosen tag name for the component's root element has changed.
-	 * @param {string} newTag
-	 * @protected
-	 */
-	warnIfTagChanged_(newTag) {
-		var currentTag = newTag;
-		if (this.component_.hasBeenSet('element')) {
-			currentTag = this.component_.element.tagName.toLowerCase();
-		}
-		if (newTag !== currentTag) {
-			console.warn(
-				'Changing the component\'s root element\'s tag is not ' +
-				'allowed. The tag name will continue to be: "' + currentTag + '".'
-			);
-		}
 	}
 }
 
 IncrementalDomRenderer.FN_NAME = 'renderIncDom';
-
-IncrementalDOM.registerFindNode(IncrementalDomRenderer.findNode_);
 
 export default IncrementalDomRenderer;

@@ -15,24 +15,10 @@ describe('IncrementalDomRenderer', function() {
 		}
 	});
 
-	it('should call patch only once on the component element when rendering', function() {
-		var Component = createTestComponentClass();
-		component = new Component();
-
-		sinon.spy(IncDom, 'patch');
-		sinon.spy(IncDom, 'patchOuter');
-		component.render();
-		assert.strictEqual(1, IncDom.patch.callCount);
-		assert.strictEqual(0, IncDom.patchOuter.callCount);
-
-		IncDom.patch.restore();
-		IncDom.patchOuter.restore();
-	});
-
 	describe('Default renderIncDom', function() {
 		it('should build div element by default', function() {
 			var TestComponent = createTestComponentClass();
-			component = new TestComponent();
+			component = new TestComponent().render();
 			assert.strictEqual('DIV', component.element.tagName);
 		});
 
@@ -99,25 +85,7 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should reuse root element even if key is different', function() {
-			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', this.id, ['id', this.id]);
-				IncDom.text('bar');
-				IncDom.elementClose('div');
-			};
-
-			var element = document.createElement('div');
-			// TODO: Remove dom.enterDocument call when incremental-dom's issue with
-			// calling patchOuter with key on parentless element is fixed.
-			dom.enterDocument(element);
-			component = new TestComponent({
-				element: element
-			}).render();
-			assert.strictEqual(component.element, document.getElementById(component.id));
-		});
-
-		it('should not allow and warn if trying to change tag name of root element', function() {
+		it('should allow changing tag name of root element', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('span', null, ['id', this.id]);
@@ -125,13 +93,39 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementClose('span');
 			};
 
-			sinon.stub(console, 'warn');
+			var element = document.createElement('div');
 			component = new TestComponent({
-				element: document.createElement('div')
+				element: element
 			}).render();
+			assert.notStrictEqual(element, component.element);
+			assert.strictEqual('SPAN', component.element.tagName);
+		});
 
-			assert.strictEqual(1, console.warn.callCount);
-			console.warn.restore();
+		it('should attach given element on specified parent', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementVoid('div', null, ['id', this.id]);
+			};
+
+			var element = document.createElement('div');
+			var parent = document.createElement('div');
+			component = new TestComponent({
+				element: element
+			}).render(parent);
+			assert.strictEqual(element, component.element);
+			assert.strictEqual(parent, component.element.parentNode);
+		});
+
+		it('should guarantee that component element always has id set', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.text(this.foo);
+				IncDom.elementClose('div');
+			};
+
+			component = new TestComponent().render();
+			assert.strictEqual(component.id, component.element.id);
 		});
 	});
 
@@ -262,10 +256,12 @@ describe('IncrementalDomRenderer', function() {
 			dom.triggerEvent(component.element.childNodes[1], 'keydown');
 			assert.strictEqual(1, component.handleKeydown.callCount);
 
-			sinon.spy(component.element, 'removeEventListener');
+			sinon.spy(component, 'removeListener');
 			component.keydown = false;
 			component.once('attrsSynced', function() {
-				assert.strictEqual(1, component.element.removeEventListener.callCount);
+				assert.strictEqual(2, component.removeListener.callCount);
+				assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('keydown'));
+				assert.strictEqual('attrsSynced', component.removeListener.args[1][0]);
 				done();
 			});
 		});
@@ -335,7 +331,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', child.element.textContent);
 		});
 
-		it('should update sub component attributes', function(done) {
+		it('should update sub component attributes and content', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.id]);
@@ -350,11 +346,63 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent().render();
 
 			component.foo = 'bar';
-			var child = component.components.child;
-			child.once('attrsSynced', function() {
+			component.once('attrsSynced', function() {
+				var child = component.components.child;
 				assert.strictEqual('bar', child.foo);
 				assert.strictEqual('bar', child.element.textContent);
 				done();
+			});
+		});
+
+		it('should not try to rerender sub component later when attrs change during parent rendering', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
+				IncDom.elementClose('div');
+			};
+			TestComponent.ATTRS = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			component = new TestComponent().render();
+
+			component.foo = 'bar';
+			component.once('attrsSynced', function() {
+				var child = component.components.child;
+				sinon.spy(child.getRenderer(), 'patch');
+				child.once('attrsSynced', function() {
+					assert.strictEqual(0, child.getRenderer().patch.callCount);
+					done();
+				});
+			});
+		});
+
+		it('should rerender sub component when attrs change after parent rendering', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.id]);
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
+				IncDom.elementClose('div');
+			};
+			TestComponent.ATTRS = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			component = new TestComponent().render();
+
+			component.foo = 'bar';
+			component.once('attrsSynced', function() {
+				var child = component.components.child;
+				child.foo = 'bar2';
+				sinon.spy(child.getRenderer(), 'patch');
+				child.once('attrsSynced', function() {
+					assert.strictEqual(1, child.getRenderer().patch.callCount);
+					assert.strictEqual('bar2', child.element.textContent);
+					done();
+				});
 			});
 		});
 
@@ -389,24 +437,6 @@ describe('IncrementalDomRenderer', function() {
 
 			var child = component.components[componentNames[0]];
 			assert.ok(child instanceof ChildComponent);
-		});
-
-		it('should render sub component that doesn\'t use IncrementalDomRenderer', function() {
-			class PlainComponent extends Component {
-			}
-			ComponentRegistry.register(PlainComponent);
-
-			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementVoid('PlainComponent', null, ['id', 'child']);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent().render();
-
-			var child = component.components.child;
-			assert.ok(child instanceof PlainComponent);
-			assert.strictEqual(child.element, component.element.querySelector('#child'));
 		});
 
 		it('should render sub component via elementOpen/elementClose', function() {

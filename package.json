@@ -25,7 +25,7 @@
     "incremental-dom": "^0.3.0",
     "metal": "metal/metal.js#master",
     "metal-attribute": "metal/metal-attribute#master",
-    "metal-component": "metal/metal-component#master"
+    "metal-component": "metal/metal-component#id"
   },
   "devDependencies": {
     "gulp": "^3.8.11",

@@ -101,6 +101,21 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(2, listener.args[0][1]);
 	});
 
+	it('should remove listeners after changing the emitter that events were proxied from', function() {
+		var target = new EventEmitter();
+		var proxy = new EventEmitterProxy(new EventEmitter(), target);
+
+		var listener = sinon.stub();
+		target.on('event1', listener);
+
+		var origin2 = new EventEmitter();
+		proxy.setOriginEmitter(origin2);
+		proxy.dispose();
+
+		origin2.emit('event1', 1, 2);
+		assert.strictEqual(0, listener.callCount);
+	});
+
 	it('should allow manually choosing events to be proxied', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

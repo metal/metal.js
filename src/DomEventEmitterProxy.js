@@ -20,8 +20,10 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	addListener_(event, listener) {
 		if (this.originEmitter_.addEventListener) {
 			if (event.startsWith('delegate:')) {
-				var parts = event.split(':');
-				return dom.delegate(this.originEmitter_, parts[1], parts[2], listener);
+				var index = event.indexOf(':', 9);
+				var eventName = event.substring(9, index);
+				var selector = event.substring(index + 1);
+				return dom.delegate(this.originEmitter_, eventName, selector, listener);
 			} else {
 				return dom.on(this.originEmitter_, event, listener);
 			}
@@ -36,7 +38,7 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 * @protected
 	 */
 	isSupportedDomEvent_(event) {
-		return event.startsWith('delegate:') ||
+		return (event.startsWith('delegate:') && event.indexOf(':', 9) !== -1) ||
 			dom.supportsEvent(this.originEmitter_, event);
 	}
 

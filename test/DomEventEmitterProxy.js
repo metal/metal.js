@@ -94,6 +94,38 @@ describe('DomEventEmitterProxy', function() {
 		document.body.removeChild(origin);
 	});
 
+	it('should proxy delegate event that contains ":" in selector', function() {
+		var origin = document.createElement('div');
+		dom.append(origin, '<button data-onclick="test:handleClick"></button>');
+		document.body.appendChild(origin);
+
+		var target = new EventEmitter();
+		new DomEventEmitterProxy(origin, target);
+
+		var listener = sinon.stub();
+		target.on('delegate:click:[data-onclick="test:handleClick"]', listener);
+		var button = origin.querySelector('[data-onclick="test:handleClick"]');
+		dom.triggerEvent(button, 'click');
+
+		assert.strictEqual(1, listener.callCount);
+		document.body.removeChild(origin);
+	});
+
+	it('should try to proxy event with "delegate:" prefix but no selector', function() {
+		var origin = document.createElement('div');
+		document.body.appendChild(origin);
+
+		var target = new EventEmitter();
+		new DomEventEmitterProxy(origin, target);
+
+		sinon.spy(dom, 'delegate');
+		target.on('delegate:click', sinon.stub());
+		assert.strictEqual(0, dom.delegate.callCount);
+
+		dom.delegate.restore();
+		document.body.removeChild(origin);
+	});
+
 	it('should change the element that events are proxied from', function() {
 		var origin = document.createElement('div');
 		document.body.appendChild(origin);

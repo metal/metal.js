@@ -112,6 +112,23 @@ class SurfaceRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Adds a sub component to this renderer's component.
+	 * @param {string} componentName
+	 * @param {string} componentId
+	 * @return {!Component}
+	 * @protected
+	 */
+	addSubComponent(componentName, componentId) {
+		var data = this.getSurfaceFromElementId(componentId).componentData || {};
+		data.id = componentId;
+		data.element = '#' + componentId;
+		return this.component_.addSubComponent(
+			componentName,
+			data
+		);
+	}
+
+	/**
 	 * Registers a surface to the component. Surface elements are not
 	 * automatically appended to the component element.
 	 * @param {string} surfaceId The surface id to be registered.
@@ -318,23 +335,6 @@ class SurfaceRenderer extends ComponentRenderer {
 			this.addSurface(surfaceElementId, surface);
 		}
 		return surface;
-	}
-
-	/**
-	 * Adds a sub component to this renderer's component.
-	 * @param {string} componentName
-	 * @param {string} componentId
-	 * @return {!Component}
-	 * @protected
-	 */
-	addSubComponent(componentName, componentId) {
-		var data = this.getSurfaceFromElementId(componentId).componentData || {};
-		data.id = componentId;
-		data.element = '#' + componentId;
-		return this.component_.addSubComponent(
-			componentName,
-			data
-		);
 	}
 
 	/**

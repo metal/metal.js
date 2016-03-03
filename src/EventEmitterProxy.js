@@ -1,6 +1,6 @@
 'use strict';
 
-import { Disposable, object } from 'metal';
+import { array, Disposable, object } from 'metal';
 
 /**
  * EventEmitterProxy utility. It's responsible for linking two EventEmitter
@@ -37,7 +37,7 @@ class EventEmitterProxy extends Disposable {
 
 		/**
 		 * Holds a map of events from the origin emitter that are already being proxied.
-		 * @type {Object}
+		 * @type {Object<string, !EventHandle>}
 		 * @protected
 		 */
 		this.proxiedEvents_ = {};
@@ -61,22 +61,44 @@ class EventEmitterProxy extends Disposable {
 	}
 
 	/**
-	 * Adds the proxy listener for the given event.
-	 * @param {string} event.
+	 * Adds the given listener for the given event.
+	 * @param {string} event
+	 * @param {!function()} listener
+	 * @return {!EventHandle} The listened event's handle.
 	 * @protected
 	 */
-	addListener_(event) {
-		this.originEmitter_.on(event, this.proxiedEvents_[event]);
+	addListener_(event, listener) {
+		return this.originEmitter_.on(event, listener);
+	}
+
+	/**
+	 * Adds the proxy listener for the given event.
+	 * @param {string} event
+	 * @return {!EventHandle} The listened event's handle.
+	 * @protected
+	 */
+	addListenerForEvent_(event) {
+		return this.addListener_(event, this.emitOnTarget_.bind(this, event));
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	disposeInternal() {
-		object.map(this.proxiedEvents_, this.removeListener_.bind(this));
+		this.removeListeners_();
 		this.proxiedEvents_ = null;
 		this.originEmitter_ = null;
 		this.targetEmitter_ = null;
+	}
+
+	/**
+	 * Emits the specified event type on the target emitter.
+	 * @param {string} eventType
+	 * @protected
+	 */
+	emitOnTarget_(eventType) {
+		var args = [eventType].concat(array.slice(arguments, 1));
+		this.targetEmitter_.emit.apply(this.targetEmitter_, args);
 	}
 
 	/**
@@ -84,26 +106,21 @@ class EventEmitterProxy extends Disposable {
 	 * @param {string} event
 	 */
 	proxyEvent(event) {
-		if (!this.shouldProxyEvent_(event)) {
-			return;
+		if (this.shouldProxyEvent_(event)) {
+			this.proxiedEvents_[event] = this.addListenerForEvent_(event);
 		}
-
-		var self = this;
-		this.proxiedEvents_[event] = function() {
-			var args = [event].concat(Array.prototype.slice.call(arguments, 0));
-			self.targetEmitter_.emit.apply(self.targetEmitter_, args);
-		};
-
-		this.addListener_(event);
 	}
 
 	/**
-	 * Removes the proxy listener for the given event.
-	 * @param {string} event
+	 * Removes the proxy listener for all events.
 	 * @protected
 	 */
-	removeListener_(event) {
-		this.originEmitter_.removeListener(event, this.proxiedEvents_[event]);
+	removeListeners_() {
+		var events = Object.keys(this.proxiedEvents_);
+		for (var i = 0; i < events.length; i++) {
+			this.proxiedEvents_[events[i]].removeListener();
+		}
+		this.proxiedEvents_ = {};
 	}
 
 	/**
@@ -112,9 +129,14 @@ class EventEmitterProxy extends Disposable {
 	 * them on the new emitter instead.
 	 */
 	setOriginEmitter(originEmitter) {
-		object.map(this.proxiedEvents_, this.removeListener_.bind(this));
+		var handles = this.proxiedEvents_;
+		this.removeListeners_();
 		this.originEmitter_ = originEmitter;
-		object.map(this.proxiedEvents_, this.addListener_.bind(this));
+
+		var events = Object.keys(handles);
+		for (var i = 0; i < events.length; i++) {
+			this.proxiedEvents_[events[i]] = this.addListenerForEvent_(events[i]);
+		}
 	}
 
 	/**

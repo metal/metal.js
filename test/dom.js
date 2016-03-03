@@ -584,6 +584,20 @@ describe('dom', function() {
 		});
 	});
 
+	describe('ancestor', function() {
+		it('should return the first ancestor that matches the given selector', function() {
+			dom.enterDocument(
+				'<div class="ancestor2"><div class="ancestor1"><div class="element"></div></div></div>'
+			);
+			var element = dom.toElement('.element');
+			var ancestor2 = dom.toElement('.ancestor1');
+			var ancestor3 = dom.toElement('.ancestor2');
+			assert.strictEqual(ancestor2, dom.ancestor(element, '.ancestor1'));
+			assert.strictEqual(ancestor3, dom.ancestor(element, '.ancestor2'));
+			assert.strictEqual(null, dom.ancestor(element, '.ancestor3'));
+		});
+	});
+
 	describe('next', function() {
 		it('should return the next sibling that matches the given selector', function() {
 			dom.enterDocument(

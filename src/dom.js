@@ -59,6 +59,21 @@ class dom {
 	}
 
 	/**
+	 * Gets the first ancestor from the given element that matches the specified
+	 * selector, or null if none match.
+	 * @param {!Element} element
+	 * @param {string} selector
+	 * @return {Element}
+	 */
+	static ancestor(element, selector) {
+		element = element.parentNode;
+		while (element && !dom.match(element, selector)) {
+			element = element.parentNode;
+		}
+		return element;
+	}
+
+	/**
 	 * Appends a child node with text or other nodes to a parent node. If
 	 * child is a HTML string it will be automatically converted to a document
 	 * fragment before appending it to the parent.

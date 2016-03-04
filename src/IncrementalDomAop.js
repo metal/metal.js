@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * Class responsible for intercepting incremental dom functions through AOP.
+ */
 class IncrementalDomAop {
 	/**
 	 * Starts intercepting calls to the `elementOpen` and `elementClose` functions

@@ -5,6 +5,9 @@ import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 
+/**
+ * Class responsible for rendering components via incremental dom.
+ */
 class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * @inheritDoc

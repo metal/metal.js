@@ -38,6 +38,16 @@ describe('Attribute', function() {
 		assert.notStrictEqual(-1, keys.indexOf('attr2'));
 	});
 
+	it('should not allow adding attribute named "attr"', function() {
+		var attr = new Attribute();
+
+		assert.throws(function() {
+			attr.addAttrs({
+				attr: {}
+			});
+		});
+	});
+
 	it('should not allow adding attribute named "attrs"', function() {
 		var attr = new Attribute();
 
@@ -445,6 +455,29 @@ describe('Attribute', function() {
 		assert.strictEqual(2, listener.args[0][0].newVal);
 		assert.strictEqual(attr, listener.args[0][1].target);
 		assert.strictEqual('attr1Changed', listener.args[0][1].type);
+	});
+
+	it('should emit attrChanged event when attribute changes', function() {
+		var attr = new Attribute();
+		attr.addAttrs({
+			attr1: {
+				value: 1,
+				writeOnce: true
+			}
+		}, {
+			attr1: 10
+		});
+
+		var listener = sinon.stub();
+		attr.on('attrChanged', listener);
+
+		attr.attr1 = 2;
+		assert.strictEqual(1, listener.callCount);
+		assert.strictEqual('attr1', listener.args[0][0].attrName);
+		assert.strictEqual(10, listener.args[0][0].prevVal);
+		assert.strictEqual(2, listener.args[0][0].newVal);
+		assert.strictEqual(attr, listener.args[0][1].target);
+		assert.strictEqual('attrChanged', listener.args[0][1].type);
 	});
 
 	it('should not emit events when attribute doesn\'t change', function() {

@@ -314,6 +314,7 @@ class Attribute extends EventEmitter {
 				prevVal: prevVal
 			};
 			this.emit(name + 'Changed', data);
+			this.emit('attrChanged', data);
 			this.scheduleBatchEvent_(data);
 		}
 	}
@@ -520,7 +521,7 @@ class Attribute extends EventEmitter {
  * on their constructors, which will be merged together and handled automatically.
  * @type {!Array<string>}
  */
-Attribute.INVALID_ATTRS = ['attrs'];
+Attribute.INVALID_ATTRS = ['attr', 'attrs'];
 
 /**
  * Constants that represent the states that an attribute can be in.

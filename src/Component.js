@@ -198,7 +198,6 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	created_() {
-		this.on('elementChanged', this.onElementChanged_);
 		this.on('attrsChanged', this.handleAttributesChanges_);
 		Component.componentsCollector.addComponent(this);
 
@@ -492,10 +491,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	onElementChanged_(event) {
-		if (this.elementEventProxy_) {
-			this.elementEventProxy_.setOriginEmitter(event.newVal);
-		}
-
+		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		event.newVal.id = this.id;
 		this.addElementClasses_();
 		this.syncVisible(this.visible);
@@ -618,6 +614,8 @@ class Component extends Attribute {
 
 		this.newListenerHandle_.removeListener();
 		this.newListenerHandle_ = null;
+
+		this.on('elementChanged', this.onElementChanged_);
 	}
 
 	/**

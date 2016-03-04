@@ -33,8 +33,8 @@ describe('IncrementalDomRenderer', function() {
 	describe('Component renderIncDom', function() {
 		it('should render content specified by the component\'s renderIncDom', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('span', null, ['id', this.id], 'foo', 'foo');
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span', null, ['id', this.component_.id], 'foo', 'foo');
 				IncDom.text('bar');
 				IncDom.elementClose('span');
 			};
@@ -47,8 +47,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should render content specified by the component\'s renderIncDom inside given element', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('span', null, ['id', this.id], 'foo', 'foo');
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span', null, ['id', this.component_.id], 'foo', 'foo');
 				IncDom.text('bar');
 				IncDom.elementClose('span');
 			};
@@ -64,9 +64,9 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should update content when attribute values change', function(done) {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.text(this.foo);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.text(this.component_.foo);
 				IncDom.elementClose('div');
 			};
 			TestComponent.ATTRS = {
@@ -87,8 +87,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should allow changing tag name of root element', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('span', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span', null, ['id', this.component_.id]);
 				IncDom.text('bar');
 				IncDom.elementClose('span');
 			};
@@ -103,8 +103,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should attach given element on specified parent', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementVoid('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementVoid('div', null, ['id', this.component_.id]);
 			};
 
 			var element = document.createElement('div');
@@ -118,9 +118,9 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should guarantee that component element always has id set', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
-				IncDom.text(this.foo);
+				IncDom.text(this.component_.foo);
 				IncDom.elementClose('div');
 			};
 
@@ -129,59 +129,11 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
-	describe('Subclass renderer renderIncDom', function() {
-		var CustomRenderer;
-
-		beforeEach(function() {
-			class TestRenderer extends IncrementalDomRenderer {
-			}
-			CustomRenderer = TestRenderer;
-		});
-
-		it('should render and update content specified by the renderer\'s renderIncDom', function(done) {
-			var TestComponent = createTestComponentClass(CustomRenderer);
-			CustomRenderer.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.text(this.component_.foo);
-				IncDom.elementClose('div');
-			};
-			TestComponent.ATTRS = {
-				foo: {
-					value: 'foo'
-				}
-			};
-
-			component = new TestComponent().render();
-			assert.strictEqual('foo', component.element.textContent);
-
-			component.foo = 'bar';
-			component.once('attrsSynced', function() {
-				assert.strictEqual('bar', component.element.textContent);
-				done();
-			});
-		});
-
-		it('should render content specified by the renderer function defined by FN_NAME', function() {
-			var TestComponent = createTestComponentClass(CustomRenderer);
-			CustomRenderer.prototype.renderFn = function() {
-				IncDom.elementOpen('span', null, ['id', this.id], 'foo', 'foo');
-				IncDom.text('bar');
-				IncDom.elementClose('span');
-			};
-			CustomRenderer.FN_NAME = 'renderFn';
-
-			component = new TestComponent().render();
-			assert.strictEqual('SPAN', component.element.tagName);
-			assert.strictEqual('foo', component.element.getAttribute('foo'));
-			assert.strictEqual('bar', component.element.textContent);
-		});
-	});
-
 	describe('Inline Listeners', function() {
 		it('should attach listeners from "data-on<event>" attributes', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
 				IncDom.elementClose('div');
 			};
@@ -199,8 +151,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should attach listeners from root element', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id], 'data-onclick', 'handleClick');
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id], 'data-onclick', 'handleClick');
 				IncDom.elementVoid('div');
 				IncDom.elementClose('div');
 			};
@@ -215,8 +167,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should attach listeners from elementOpenStart/elementOpenEnd calls', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementOpenStart('div');
 				IncDom.attr('data-onclick', 'handleClick');
 				IncDom.elementOpenEnd();
@@ -236,10 +188,10 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should remove unused inline listeners when dom is updated', function(done) {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
-				if (this.keydown) {
+				if (this.component_.keydown) {
 					IncDom.elementVoid('div', null, null, 'data-onkeydown', 'handleKeydown');
 				}
 				IncDom.elementClose('div');
@@ -272,10 +224,10 @@ describe('IncrementalDomRenderer', function() {
 
 		beforeEach(function() {
 			ChildComponent = createTestComponentClass();
-			ChildComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id], 'data-child', '1');
+			ChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id], 'data-child', '1');
 				IncDom.elementVoid('button', null, null, 'data-onclick', 'handleClick');
-				IncDom.text(this.foo);
+				IncDom.text(this.component_.foo);
 				IncDom.elementClose('div');
 			};
 			ChildComponent.prototype.handleClick = sinon.stub();
@@ -289,8 +241,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should create sub component instance', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child']);
 				IncDom.elementClose('div');
 			};
@@ -303,8 +255,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should render sub component at specified place', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child']);
 				IncDom.elementClose('div');
 			};
@@ -318,8 +270,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should pass attributes to sub component', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', 'bar');
 				IncDom.elementClose('div');
 			};
@@ -333,9 +285,9 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should update sub component attributes and content', function(done) {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
 			TestComponent.ATTRS = {
@@ -356,9 +308,9 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should not try to rerender sub component later when attrs change during parent rendering', function(done) {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
 			TestComponent.ATTRS = {
@@ -381,9 +333,9 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should rerender sub component when attrs change after parent rendering', function(done) {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
-				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.foo);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
 			TestComponent.ATTRS = {
@@ -408,8 +360,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should attach sub component inline listeners', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child']);
 				IncDom.elementClose('div');
 			};
@@ -425,8 +377,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should generate sub component id if none is given', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent');
 				IncDom.elementClose('div');
 			};
@@ -441,8 +393,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should render sub component via elementOpen/elementClose', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementOpen('ChildComponent', null, ['id', 'child']);
 				IncDom.elementClose('ChildComponent');
 				IncDom.elementClose('div');
@@ -457,8 +409,8 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should render sub component via elementOpenStart/elementOpenEnd', function() {
 			var TestComponent = createTestComponentClass();
-			TestComponent.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div', null, ['id', this.id]);
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementOpenStart('ChildComponent', null, ['id', 'child']);
 				IncDom.attr('foo', 'bar');
 				IncDom.elementOpenEnd();
@@ -478,7 +430,13 @@ describe('IncrementalDomRenderer', function() {
 	function createTestComponentClass(opt_renderer) {
 		class TestComponent extends Component {
 		}
-		TestComponent.RENDERER = opt_renderer || IncrementalDomRenderer;
+		TestComponent.RENDERER = opt_renderer || createIncrementalDomRenderer();
 		return TestComponent;
+	}
+
+	function createIncrementalDomRenderer() {
+		class TestRenderer extends IncrementalDomRenderer {
+		}
+		return TestRenderer;
 	}
 });

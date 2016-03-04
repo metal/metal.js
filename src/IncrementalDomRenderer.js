@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, core } from 'metal';
+import { array } from 'metal';
 import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
@@ -12,14 +12,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	constructor(comp) {
 		super(comp);
 
-		var mergeFn = array.firstDefinedValue;
-		core.mergeSuperClassesProperty(this.constructor, 'FN_NAME', mergeFn);
-		var name = this.constructor.FN_NAME_MERGED;
-		this.fn_ = comp[name] ? comp[name].bind(comp) : this[name].bind(this);
-
 		this.listenersToAttach_ = [];
 		this.eventsCollector_ = new EventsCollector(comp);
-
 		comp.on('attrChanged', this.handleAttrChanged_.bind(this));
 	}
 
@@ -195,7 +189,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedOpenCall_.bind(this),
 			this.handleInterceptedCloseCall_.bind(this)
 		);
-		this.fn_();
+		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
 	}
@@ -247,7 +241,5 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		return comp;
 	}
 }
-
-IncrementalDomRenderer.FN_NAME = 'renderIncDom';
 
 export default IncrementalDomRenderer;

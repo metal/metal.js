@@ -288,6 +288,17 @@ describe('Component', function() {
 			assert.strictEqual('none', custom.element.style.display);
 		});
 
+		it('should only set display value on new element after render', function() {
+			var custom = new Component({
+				visible: false
+			});
+			custom.element = document.createElement('div');
+			assert.notStrictEqual('none', custom.element.style.display);
+
+			custom.render();
+			assert.strictEqual('none', custom.element.style.display);
+		});
+
 		it('should not throw error when trying to set display value before element is set', function(done) {
 			var custom = new Component();
 			custom.visible = false;
@@ -685,7 +696,7 @@ describe('Component', function() {
 			assert.strictEqual(1, listener.callCount);
 		});
 
-		it('should transfer delegate events listened on the compoennt to the new element', function() {
+		it('should transfer delegate events listened on the component to the new element', function() {
 			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
 			var custom = new CustomComponent().render();
 
@@ -707,6 +718,17 @@ describe('Component', function() {
 			custom.dispose();
 			dom.triggerEvent(newFooElement, 'click');
 			assert.strictEqual(1, listener.callCount);
+		});
+
+		it('should not reattach element listeners if its set to itself again', function() {
+			var custom = new Component().render();
+			var listener = sinon.stub();
+			custom.on('click', listener);
+
+			custom.element.removeEventListener = sinon.stub();
+			custom.element = custom.element;
+
+			assert.strictEqual(0, custom.element.removeEventListener.callCount);
 		});
 
 		it('should listen to events on the element even before it\'s created', function() {

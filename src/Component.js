@@ -491,6 +491,13 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	onElementChanged_(event) {
+		if (event.prevVal === event.newVal) {
+			// The `elementChanged` event will be fired whenever the element is set,
+			// even if its value hasn't actually changed, since that's how Attribute
+			// handles objects. We need to check manually here.
+			return;
+		}
+
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		event.newVal.id = this.id;
 		this.addElementClasses_();

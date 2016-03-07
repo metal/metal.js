@@ -15,7 +15,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	constructor(comp) {
 		super(comp);
 
-		this.listenersToAttach_ = [];
 		this.eventsCollector_ = new EventsCollector(comp);
 		comp.on('attrChanged', this.handleAttrChanged_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
@@ -49,6 +48,21 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			var listener = this.listenersToAttach_[i];
 			this.eventsCollector_.attachListener(listener.eventName, listener.fn);
 		}
+	}
+
+	/**
+	 * Disposes all sub components that were not found after an update anymore.
+	 * @protected
+	 */
+	disposeUnusedSubComponents_() {
+		var ids = Object.keys(this.component_.components);
+		var unused = [];
+		for (var i = 0; i < ids.length; i++) {
+			if (!this.subComponentsFound_[ids[i]]) {
+				unused.push(ids[i]);
+			}
+		}
+		this.component_.disposeSubComponents(unused);
 	}
 
 	/**
@@ -198,6 +212,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.shouldUpdate_ = false;
 
 		this.rootElementReached_ = false;
+		this.subComponentsFound_ = {};
 		this.listenersToAttach_ = [];
 		IncrementalDomAop.startInterception(
 			this.handleInterceptedOpenCall_.bind(this),
@@ -230,6 +245,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (this.shouldUpdate_) {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
+			this.disposeUnusedSubComponents_();
 		}
 	}
 
@@ -252,6 +268,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}
+		this.subComponentsFound_[comp.id] = true;
 		return comp;
 	}
 }

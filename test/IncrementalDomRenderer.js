@@ -1,5 +1,6 @@
 'use strict';
 
+import { object } from 'metal';
 import dom from 'metal-dom';
 import { Component, ComponentRegistry } from 'metal-component';
 import IncrementalDomRenderer from '../src/IncrementalDomRenderer';
@@ -534,6 +535,41 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(child.element, component.element.querySelector('#child'));
 			assert.strictEqual('bar', child.element.textContent);
 			assert.ok(child.element.hasAttribute('data-child'));
+		});
+
+		it('should dispose sub components that are unused after an update', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				for (var i = 1; i <= this.component_.count; i++) {
+						IncDom.elementVoid('ChildComponent', null, ['id', 'child' + i]);
+				}
+				IncDom.elementClose('div');
+			};
+			TestComponent.ATTRS = {
+				count: {
+					value: 3
+				}
+			};
+			component = new TestComponent().render();
+			var subComps = object.mixin({}, component.components);
+			assert.strictEqual(3, Object.keys(subComps).length);
+			assert.ok(subComps.child1);
+			assert.ok(subComps.child2);
+			assert.ok(subComps.child3);
+
+			component.count = 2;
+			component.once('attrsSynced', function() {
+				assert.strictEqual(2, Object.keys(component.components).length);
+				assert.ok(component.components.child1);
+				assert.ok(component.components.child2);
+				assert.ok(!component.components.child3);
+
+				assert.ok(!subComps.child1.isDisposed());
+				assert.ok(!subComps.child2.isDisposed());
+				assert.ok(subComps.child3.isDisposed());
+				done();
+			});
 		});
 	});
 

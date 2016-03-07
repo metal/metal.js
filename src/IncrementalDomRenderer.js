@@ -18,6 +18,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.listenersToAttach_ = [];
 		this.eventsCollector_ = new EventsCollector(comp);
 		comp.on('attrChanged', this.handleAttrChanged_.bind(this));
+		comp.on('detached', this.handleDetached_.bind(this));
 	}
 
 	/**
@@ -69,12 +70,22 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles the `attrChanged` event.
+	 * Handles the `attrChanged` event. Makes sure that, when `attrsChanged` is
+	 * fired, the component's contents will only be updated if the changed attr
+	 * wasn't `element`, since that wouldn't cause a rerender.
 	 * @param {!Object} data
 	 * @protected
 	 */
 	handleAttrChanged_(data) {
-		this.shouldUpdate_ = data.attrName !== 'element';
+		this.shouldUpdate_ = this.shouldUpdate_ || (data.attrName !== 'element');
+	}
+
+	/**
+	 * Handles the `detached` listener. Removes all inline listeners.
+	 * @protected
+	 */
+	handleDetached_() {
+		this.eventsCollector_.detachAllListeners();
 	}
 
 	/**

@@ -30,7 +30,7 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
-	describe('Component renderIncDom', function() {
+	describe('Custom renderIncDom', function() {
 		it('should render content specified by the component\'s renderIncDom', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -116,7 +116,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(parent, component.element.parentNode);
 		});
 
-		it('should guarantee that component element always has id set', function() {
+		it('should guarantee that rendered component element always has id set', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
@@ -126,6 +126,76 @@ describe('IncrementalDomRenderer', function() {
 
 			component = new TestComponent().render();
 			assert.strictEqual(component.id, component.element.id);
+		});
+	});
+
+	describe('Existing Content', function() {
+		it('should not change existing content if the same that would be rendered', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen('div', null, 'class', 'inner');
+				IncDom.text('foo');
+				IncDom.elementClose('div');
+				IncDom.elementClose('div');
+			};
+
+			var element = document.createElement('div');
+			dom.append(element, '<div class="inner">foo</div>');
+			var innerElement = element.querySelector('.inner');
+			component = new TestComponent({
+				element: element
+			}).render();
+
+			assert.strictEqual(element, component.element);
+			assert.strictEqual(innerElement, component.element.querySelector('.inner'));
+			assert.strictEqual('foo', component.element.textContent);
+		});
+
+		it('should override existing content if element tag is different from what would be rendered', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen('div', null, 'class', 'inner');
+				IncDom.text('foo');
+				IncDom.elementClose('div');
+				IncDom.elementClose('div');
+			};
+
+			var element = document.createElement('div');
+			dom.append(element, '<span class="inner">foo</span>');
+			var innerElement = element.querySelector('.inner');
+			component = new TestComponent({
+				element: element
+			}).render();
+
+			assert.strictEqual(element, component.element);
+			assert.notStrictEqual(innerElement, component.element.querySelector('.inner'));
+			assert.strictEqual('foo', component.element.textContent);
+		});
+
+		it('should not override existing content if only attributes are different', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen('div', null, [], 'class', 'inner');
+				IncDom.text('foo');
+				IncDom.elementClose('div');
+				IncDom.elementClose('div');
+			};
+
+			var element = document.createElement('div');
+			dom.append(element, '<div class="inner2">foo</div>');
+			var innerElement = element.querySelector('.inner2');
+			component = new TestComponent({
+				element: element
+			}).render();
+
+			assert.strictEqual(element, component.element);
+			assert.strictEqual(innerElement, component.element.querySelector('.inner'));
+			assert.strictEqual('foo', component.element.textContent);
+			assert.ok(dom.hasClass(innerElement, 'inner'));
+			assert.ok(!dom.hasClass(innerElement, 'inner2'));
 		});
 	});
 
@@ -186,6 +256,27 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
+		it('should attach listeners on existing children from the given element', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+				IncDom.elementClose('div');
+			};
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			var element = document.createElement('div');
+			dom.append(element, '<div></div>');
+			var innerElement = element.childNodes[0];
+			component = new TestComponent({
+				element: element
+			}).render();
+			assert.strictEqual(innerElement, component.element.childNodes[0]);
+
+			dom.triggerEvent(innerElement, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
 		it('should remove unused inline listeners when dom is updated', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -216,6 +307,25 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('attrsSynced', component.removeListener.args[1][0]);
 				done();
 			});
+		});
+
+		it('should remove all inline listeners when element is detached', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id], 'data-onkeydown', 'handleKeydown');
+				IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+				IncDom.elementClose('div');
+			};
+			TestComponent.prototype.handleClick = sinon.stub();
+			TestComponent.prototype.handleKeydown = sinon.stub();
+
+			component = new TestComponent().render();
+			sinon.spy(component, 'removeListener');
+			component.detach();
+
+			assert.strictEqual(2, component.removeListener.callCount);
+			assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('keydown'));
+			assert.notStrictEqual(-1, component.removeListener.args[1][0][0].indexOf('click'));
 		});
 	});
 

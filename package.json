@@ -1,6 +1,6 @@
 {
   "name": "metal-attribute",
-  "version": "0.0.0",
+  "version": "1.0.0-rc",
   "description": "A class that adds support for watchable, configurable object properties",
   "license": "BSD",
   "repository": "metal/metal-attribute",

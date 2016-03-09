@@ -1,6 +1,6 @@
 {
 	"name": "metal-events",
-	"version": "0.0.0",
+	"version": "1.0.0-rc",
 	"description": "Classes responsible for emitting and listening to events",
 	"license": "BSD",
 	"repository": "metal/metal-events",

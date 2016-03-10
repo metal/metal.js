@@ -18,6 +18,7 @@ import NestedNoIdTestComponent from './assets/NestedNoIdTestComponent.soy';
 import NestedPrivateTemplateTestComponent from './assets/NestedPrivateTemplateTestComponent.soy';
 import NestedSurfacesTestComponent from './assets/NestedSurfacesTestComponent.soy';
 import NestedTestComponent from './assets/NestedTestComponent.soy';
+import NoParamsTemplateComponent from './assets/NoParamsTemplateComponent.soy';
 import PrivateTemplateTestComponent from './assets/PrivateTemplateTestComponent.soy';
 import StaticTestComponent from './assets/StaticTestComponent.soy';
 
@@ -126,6 +127,13 @@ describe('SoyRenderer', function() {
 
 		assert.doesNotThrow(function() {
 			custom.decorate();
+		});
+	});
+
+	it('should not throw error if template is called without data', function() {
+		var custom = new NoParamsTemplateComponent();
+		assert.doesNotThrow(function() {
+			custom.render();
 		});
 	});
 

@@ -235,6 +235,7 @@ class SoyRenderer extends SurfaceRenderer {
 	 * @protected
 	 */
 	handleSurfaceCall_(templateComponentName, templateName, originalFn, data, opt_ignored, opt_ijData) {
+		data = data || {};
 		var surfaceData = {
 			static: originalFn.static,
 			templateComponentName: templateComponentName,

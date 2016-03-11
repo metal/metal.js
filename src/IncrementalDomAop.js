@@ -1,9 +1,19 @@
 'use strict';
 
+import { array } from 'metal';
+
 /**
  * Class responsible for intercepting incremental dom functions through AOP.
  */
 class IncrementalDomAop {
+	/**
+	 * Gets the original functions that are intercepted by `IncrementalDomAop`.
+	 * @return {!Object}
+	 */
+	static getOriginalFns() {
+		return fnStack[0];
+	}
+
 	/**
 	 * Starts intercepting calls to the `elementOpen` and `elementClose` functions
 	 * from incremental dom with the given functions.
@@ -27,7 +37,6 @@ class IncrementalDomAop {
 				return node;
 			}
 		});
-		replace(fnStack[fnStack.length - 1]);
 	}
 
 	/**
@@ -38,18 +47,7 @@ class IncrementalDomAop {
 		if (fnStack.length > 1) {
 			fnStack.pop();
 		}
-		replace(fnStack[fnStack.length - 1]);
 	}
-}
-
-var collectedArgs = [];
-
-function fnAttr(name, value) {
-	collectedArgs.push(name, value);
-}
-
-function fnOpenStart(tag, key, statics) {
-	collectedArgs = [tag, key, statics];
 }
 
 var fnStack = [{
@@ -61,11 +59,26 @@ var fnStack = [{
 	elementVoid: IncrementalDOM.elementVoid
 }];
 
-function replace(fns) {
-	var names = Object.keys(fns);
-	for (var i = 0; i < names.length; i++) {
-		IncrementalDOM[names[i]] = fns[names[i]];
-	}
+var collectedArgs = [];
+
+function fnAttr(name, value) {
+	collectedArgs.push(name, value);
 }
+
+function fnOpenStart(tag, key, statics) {
+	collectedArgs = [tag, key, statics];
+}
+
+function handleCall(name) {
+	var fn = fnStack[fnStack.length - 1][name];
+	fn.apply(null, array.slice(arguments, 1));
+}
+
+IncrementalDOM.attr = handleCall.bind(null, 'attr');
+IncrementalDOM.elementClose = handleCall.bind(null, 'elementClose');
+IncrementalDOM.elementOpen = handleCall.bind(null, 'elementOpen');
+IncrementalDOM.elementOpenEnd = handleCall.bind(null, 'elementOpenEnd');
+IncrementalDOM.elementOpenStart = handleCall.bind(null, 'elementOpenStart');
+IncrementalDOM.elementVoid = handleCall.bind(null, 'elementVoid');
 
 export default IncrementalDomAop;

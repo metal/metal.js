@@ -1,20 +1,41 @@
 'use strict';
 
+import dom from 'metal-dom';
 import IncrementalDomAop from '../src/IncrementalDomAop';
 
 describe('IncrementalDomAop', function() {
+	var element;
+
+	beforeEach(function() {
+		element = document.createElement('div');
+		dom.enterDocument(element);
+	});
+
 	afterEach(function() {
 		IncrementalDomAop.stopInterception();
+		dom.exitDocument(element);
+	});
+
+	describe('Original Functions', function() {
+		it('should return the original functions', function() {
+			var originalFns = IncrementalDomAop.getOriginalFns();
+			assert.ok(originalFns);
+			assert.ok(originalFns.attr);
+			assert.ok(originalFns.elementClose);
+			assert.ok(originalFns.elementOpen);
+			assert.ok(originalFns.elementOpenEnd);
+			assert.ok(originalFns.elementOpenStart);
+			assert.ok(originalFns.elementVoid);
+		});
 	});
 
 	describe('elementOpen', function(){
 		it('should intercept elementOpen calls with specified function', function() {
-			var original = IncrementalDOM.elementOpen;
+			var original = IncrementalDomAop.getOriginalFns().elementOpen;
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
-			assert.notStrictEqual(original, IncrementalDOM.elementOpen);
-
 			IncrementalDOM.elementOpen('div', 'key', 'statics', 'name', 'value');
+
 			assert.strictEqual(1, fn.callCount);
 			assert.strictEqual(original, fn.args[0][0]);
 			assert.strictEqual('div', fn.args[0][1]);
@@ -25,28 +46,25 @@ describe('IncrementalDomAop', function() {
 		});
 
 		it('should stop intercepting elementOpen calls', function() {
-			var original = IncrementalDOM.elementOpen;
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
-			assert.notStrictEqual(original, IncrementalDOM.elementOpen);
-
 			IncrementalDomAop.stopInterception();
-			assert.strictEqual(original, IncrementalDOM.elementOpen);
+
+			IncrementalDOM.patch(element, () => IncrementalDOM.elementOpen('div'));
+			assert.strictEqual(0, fn.callCount);
 		});
 	});
 
 	describe('elementVoid', function() {
 		it('should intercept elementOpen and elementClose from elementVoid calls with specified function', function() {
-			var originalVoid = IncrementalDOM.elementVoid;
-			var originalOpen = IncrementalDOM.elementOpen;
+			var original = IncrementalDomAop.getOriginalFns().elementOpen;
 			var fn = sinon.stub();
 			var closeFn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, closeFn);
-			assert.notStrictEqual(originalVoid, IncrementalDOM.elementVoid);
 
 			IncrementalDOM.elementVoid('div', 'key', 'statics', 'name', 'value');
 			assert.strictEqual(1, fn.callCount);
-			assert.strictEqual(originalOpen, fn.args[0][0]);
+			assert.strictEqual(original, fn.args[0][0]);
 			assert.strictEqual('div', fn.args[0][1]);
 			assert.strictEqual('key', fn.args[0][2]);
 			assert.strictEqual('statics', fn.args[0][3]);
@@ -56,30 +74,27 @@ describe('IncrementalDomAop', function() {
 		});
 
 		it('should stop intercepting elementOpen from elementVoid calls', function() {
-			var original = IncrementalDOM.elementVoid;
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
-			assert.notStrictEqual(original, IncrementalDOM.elementVoid);
-
 			IncrementalDomAop.stopInterception();
-			assert.strictEqual(original, IncrementalDOM.elementVoid);
+
+			IncrementalDOM.patch(element, () => IncrementalDOM.elementVoid('div'));
+			assert.strictEqual(0, fn.callCount);
 		});
 	});
 
 	describe('elementOpenStart/elementOpenEnd', function() {
 		it('should intercept elementOpen from elementOpenEnd calls with specified function', function() {
-			var originalEnd = IncrementalDOM.elementOpenEnd;
-			var originalOpen = IncrementalDOM.elementOpen;
+			var original = IncrementalDomAop.getOriginalFns().elementOpen;
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
-			assert.notStrictEqual(originalEnd, IncrementalDOM.elementOpenEnd);
 
 			IncrementalDOM.elementOpenStart('div', 'key', 'statics');
 			IncrementalDOM.attr('name', 'value');
 			IncrementalDOM.attr('name2', 'value2');
 			IncrementalDOM.elementOpenEnd('div');
 			assert.strictEqual(1, fn.callCount);
-			assert.strictEqual(originalOpen, fn.args[0][0]);
+			assert.strictEqual(original, fn.args[0][0]);
 			assert.strictEqual('div', fn.args[0][1]);
 			assert.strictEqual('key', fn.args[0][2]);
 			assert.strictEqual('statics', fn.args[0][3]);
@@ -90,17 +105,23 @@ describe('IncrementalDomAop', function() {
 		});
 
 		it('should stop intercepting elementOpen from elementOpenEnd calls', function() {
-			var original = IncrementalDOM.elementOpenEnd;
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
-			assert.notStrictEqual(original, IncrementalDOM.elementOpenEnd);
-
 			IncrementalDomAop.stopInterception();
-			assert.strictEqual(original, IncrementalDOM.elementOpenEnd);
+
+			IncrementalDOM.patch(element, () => {
+				IncrementalDOM.elementOpenStart('div');
+				IncrementalDOM.elementOpenEnd('div');
+			});
+			assert.strictEqual(0, fn.callCount);
 		});
 	});
 
 	describe('Nested interceptions', function() {
+		afterEach(function() {
+			IncrementalDomAop.stopInterception();
+		});
+
 		it('should use last registered function for intercepting', function() {
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
@@ -113,8 +134,6 @@ describe('IncrementalDomAop', function() {
 		});
 
 		it('should revert to previous registered function when stopping interception', function() {
-			var original = IncrementalDOM.elementOpen;
-
 			var fn = sinon.stub();
 			IncrementalDomAop.startInterception(fn, sinon.stub());
 			var fn2 = sinon.stub();
@@ -126,9 +145,12 @@ describe('IncrementalDomAop', function() {
 			assert.strictEqual(0, fn2.callCount);
 
 			IncrementalDomAop.stopInterception();
+			IncrementalDOM.patch(element, () => {
+				IncrementalDOM.elementOpen('div');
+				IncrementalDOM.elementClose('div');
+			});
 			assert.strictEqual(1, fn.callCount);
 			assert.strictEqual(0, fn2.callCount);
-			assert.strictEqual(original, IncrementalDOM.elementOpen);
 		});
 	});
 });

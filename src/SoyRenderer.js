@@ -257,6 +257,16 @@ class SoyRenderer extends SurfaceRenderer {
 	}
 
 	/**
+	 * Sanitizes the given html string, so it can skip escaping when passed to a
+	 * soy template.
+	 * @param {*} content
+	 * @return {boolean}
+	 */
+	static isSanitizedHtml(content) {
+		return content instanceof goog.soy.data.SanitizedContent;
+	}
+
+	/**
 	 * Checks if a template is a surface template.
 	 * @param {string} templateName
 	 * @param {!function()} templateFn

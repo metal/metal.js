@@ -195,6 +195,11 @@ describe('SoyRenderer', function() {
 			assert.ok(sanitized instanceof soydata.SanitizedHtml);
 			assert.strictEqual('<div>Content</div>', sanitized.content);
 		});
+
+		it('should check if given content is a sanitized html', function() {
+			assert.ok(!SoyRenderer.isSanitizedHtml('<div>Content</div>'));
+			assert.ok(SoyRenderer.isSanitizedHtml(SoyRenderer.sanitizeHtml('<div>Content</div>')));
+		});
 	});
 
 	describe('Surfaces', function() {

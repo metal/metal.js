@@ -8,6 +8,7 @@
   "evil": false,
   "forin": false,
   "globals": {
+    "goog": true,
     "soy": true,
     "soydata": true
   },

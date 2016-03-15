@@ -2,7 +2,7 @@
 
 import { array } from 'metal';
 import dom from 'metal-dom';
-import { Component, ComponentCollector, ComponentRenderer, EventsCollector } from 'metal-component';
+import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 
 /**
@@ -15,6 +15,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	constructor(comp) {
 		super(comp);
 
+		this.changes_ = {};
 		this.eventsCollector_ = new EventsCollector(comp);
 		comp.on('attrChanged', this.handleAttrChanged_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
@@ -113,7 +114,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleAttrChanged_(data) {
-		this.shouldUpdate_ = this.shouldUpdate_ || (data.attrName !== 'element');
+		if (data.attrName !== 'element') {
+			this.shouldUpdate_ = true;
+			this.changes_[data.attrName] = data;
+		}
 	}
 
 	/**
@@ -232,6 +236,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		// Mark that there shouldn't be an update for attrs changed so far, since
 		// render has already been called.
 		this.shouldUpdate_ = false;
+		this.changes_ = {};
 
 		this.rootElementReached_ = false;
 		this.subComponentsFound_ = {};
@@ -243,6 +248,17 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
+	}
+
+	/**
+	 * Checks if the component should be updated with the current attr changes.
+	 * Can be overridden by subclasses to provide customized behavior (only
+	 * updating when a template attribute is changed for example).
+	 * @param {!Object} changes
+	 * @return {boolean}
+	 */
+	shouldUpdate() {
+		return this.shouldUpdate_;
 	}
 
 	/**
@@ -264,7 +280,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * element through the incremental dom function calls done by `renderIncDom`.
 	 */
 	update() {
-		if (this.shouldUpdate_) {
+		if (this.shouldUpdate(this.changes_)) {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
 			this.disposeUnusedSubComponents_();

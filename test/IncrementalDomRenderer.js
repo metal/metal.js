@@ -537,6 +537,56 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
+		it('should create and render sub component instance from Component tag', function() {
+			var TestChildComponent = createTestComponentClass();
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
+					id: 'child'
+				});
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.ok(child);
+			assert.ok(child instanceof TestChildComponent);
+			assert.strictEqual(child.element, component.element.querySelector('#child'));
+		});
+
+		it('should update sub component data from Component tag', function(done) {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.ATTRS = {
+				foo: {}
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
+					foo: this.component_.foo,
+					id: 'child'
+				});
+				IncDom.elementClose('div');
+			};
+			TestComponent.ATTRS = {
+				foo: {}
+			};
+			component = new TestComponent({
+				foo: 'foo'
+			}).render();
+
+			var child = component.components.child;
+			assert.strictEqual('foo', child.foo);
+
+			component.foo = 'bar';
+			component.once('attrsSynced', function() {
+				assert.strictEqual('bar', child.foo);
+				done();
+			});
+		});
+
 		it('should dispose sub components that are unused after an update', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {

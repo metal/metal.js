@@ -30,6 +30,7 @@
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-metal": "^0.14.0",
+    "metal-dom": "metal/metal-dom#master",
     "metal-karma-config": "^1.0.0"
   }
 }

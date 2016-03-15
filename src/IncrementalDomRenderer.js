@@ -2,7 +2,7 @@
 
 import { array } from 'metal';
 import dom from 'metal-dom';
-import { ComponentRenderer, EventsCollector } from 'metal-component';
+import { Component, ComponentCollector, ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 
 /**
@@ -63,6 +63,28 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			}
 		}
 		this.component_.disposeSubComponents(unused);
+	}
+
+	/**
+	 * Gets the sub component referenced by the given tag and config data,
+	 * creating it if it doesn't yet exist.
+	 * @param {string} tag The tag name.
+	 * @param {!Object} config The config object for the sub component.
+	 * @return {!Component} The sub component.
+	 * @protected
+	 */
+	getSubComponent_(tag, config) {
+		var tagOrCtor = tag;
+		if (tag === 'Component' && config.ctor) {
+			tagOrCtor = config.ctor;
+			config = config.data;
+		}
+		var comp = this.component_.addSubComponent(tagOrCtor, config);
+
+		if (comp.wasRendered) {
+			comp.setAttrs(config);
+		}
+		return comp;
 	}
 
 	/**
@@ -171,7 +193,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		for (var i = 0; i < attrsArr.length; i += 2) {
 			config[attrsArr[i]] = attrsArr[i + 1];
 		}
-		var comp = this.updateSubComponent_(tag, config);
+		var comp = this.renderSubComponent_(tag, config);
 		return comp.element;
 	}
 
@@ -259,11 +281,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @return {!Component} The updated sub component.
 	 * @protected
 	 */
-	updateSubComponent_(tag, config) {
-		var comp = this.component_.addSubComponent(tag, config);
-		if (comp.wasRendered) {
-			comp.setAttrs(config);
-		}
+	renderSubComponent_(tag, config) {
+		var comp = this.getSubComponent_(tag, config);
 		comp.getRenderer().renderWithoutPatch();
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();

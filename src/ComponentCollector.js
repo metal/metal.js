@@ -15,7 +15,8 @@ class ComponentCollector extends Disposable {
 	/**
 	 * Creates the appropriate component from the given config data if it doesn't
 	 * exist yet.
-	 * @param {string} componentNameOrCtor The name of the component to be created.
+	 * @param {string|!Function} componentNameOrCtor The name or constructor for
+	 *     the component to be created.
 	 * @param {Object=} opt_data
 	 * @return {!Component} The component instance.
 	 */

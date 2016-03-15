@@ -592,7 +592,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				for (var i = 1; i <= this.component_.count; i++) {
-						IncDom.elementVoid('ChildComponent', null, ['id', 'child' + i]);
+					IncDom.elementVoid('ChildComponent', null, ['id', 'child' + i]);
 				}
 				IncDom.elementClose('div');
 			};

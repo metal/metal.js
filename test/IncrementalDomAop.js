@@ -29,7 +29,7 @@ describe('IncrementalDomAop', function() {
 		});
 	});
 
-	describe('elementOpen', function(){
+	describe('elementOpen', function() {
 		it('should intercept elementOpen calls with specified function', function() {
 			var original = IncrementalDomAop.getOriginalFns().elementOpen;
 			var fn = sinon.stub();

@@ -1,7 +1,7 @@
 'use strict';
 
 import ComponentRegistry from './ComponentRegistry';
-import { Disposable } from 'metal';
+import { core, Disposable } from 'metal';
 
 class ComponentCollector extends Disposable {
 	/**
@@ -15,14 +15,17 @@ class ComponentCollector extends Disposable {
 	/**
 	 * Creates the appropriate component from the given config data if it doesn't
 	 * exist yet.
-	 * @param {string} componentName The name of the component to be created.
+	 * @param {string} componentNameOrCtor The name of the component to be created.
 	 * @param {Object=} opt_data
 	 * @return {!Component} The component instance.
 	 */
-	createComponent(componentName, opt_data) {
+	createComponent(componentNameOrCtor, opt_data) {
 		var component = ComponentCollector.components[(opt_data || {}).id];
 		if (!component) {
-			var ConstructorFn = ComponentRegistry.getConstructor(componentName);
+			var ConstructorFn = componentNameOrCtor;
+			if (core.isString(ConstructorFn)) {
+				ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
+			}
 			component = new ConstructorFn(opt_data);
 		}
 		return component;

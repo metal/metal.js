@@ -43,7 +43,14 @@ describe('ComponentCollector', function() {
 		assert.ok(!ComponentCollector.components.test);
 	});
 
-	it('should instantiate a new component', function() {
+	it('should instantiate a new component from constructor function', function() {
+		var collector = new ComponentCollector();
+		var component = collector.createComponent(TestComponent);
+
+		assert.ok(component instanceof TestComponent);
+	});
+
+	it('should instantiate a new component from name', function() {
 		var collector = new ComponentCollector();
 		var component = collector.createComponent('TestComponent');
 

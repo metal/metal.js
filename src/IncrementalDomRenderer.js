@@ -115,7 +115,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleAttrChanged_(data) {
 		if (data.attrName !== 'element') {
-			this.shouldUpdate_ = true;
 			this.changes_[data.attrName] = data;
 		}
 	}
@@ -235,7 +234,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	renderWithoutPatch() {
 		// Mark that there shouldn't be an update for attrs changed so far, since
 		// render has already been called.
-		this.shouldUpdate_ = false;
 		this.changes_ = {};
 
 		this.rootElementReached_ = false;
@@ -258,7 +256,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @return {boolean}
 	 */
 	shouldUpdate() {
-		return this.shouldUpdate_;
+		return true;
 	}
 
 	/**
@@ -280,7 +278,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * element through the incremental dom function calls done by `renderIncDom`.
 	 */
 	update() {
-		if (this.shouldUpdate(this.changes_)) {
+		var changedAttrs = Object.keys(this.changes_);
+		if (changedAttrs.length > 0 && this.shouldUpdate(this.changes_)) {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
 			this.disposeUnusedSubComponents_();

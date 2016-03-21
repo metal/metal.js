@@ -792,7 +792,7 @@ Component.ATTRS = {
  * @protected
  * @static
  */
-Component.ELEMENT_CLASSES = 'component';
+Component.ELEMENT_CLASSES = '';
 
 /**
  * The `ComponentRenderer` that should be used. Components need to set this

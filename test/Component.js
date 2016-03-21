@@ -229,16 +229,14 @@ describe('Component', function() {
 			});
 			custom.render();
 
-			assert.strictEqual(3, getClassNames(custom.element).length);
-			assert.strictEqual('component', getClassNames(custom.element)[0]);
-			assert.strictEqual('foo', getClassNames(custom.element)[1]);
-			assert.strictEqual('bar', getClassNames(custom.element)[2]);
+			assert.strictEqual(2, getClassNames(custom.element).length);
+			assert.strictEqual('foo', getClassNames(custom.element)[0]);
+			assert.strictEqual('bar', getClassNames(custom.element)[1]);
 
 			custom.elementClasses = 'other';
 			async.nextTick(function() {
-				assert.strictEqual(2, getClassNames(custom.element).length);
-				assert.strictEqual('component', getClassNames(custom.element)[0]);
-				assert.strictEqual('other', getClassNames(custom.element)[1]);
+				assert.strictEqual(1, getClassNames(custom.element).length);
+				assert.strictEqual('other', getClassNames(custom.element)[0]);
 				done();
 			});
 		});
@@ -249,10 +247,9 @@ describe('Component', function() {
 
 			var custom = new CustomComponent();
 			custom.render();
-			assert.strictEqual(3, getClassNames(custom.element).length);
+			assert.strictEqual(2, getClassNames(custom.element).length);
 			assert.strictEqual('overwritten1', getClassNames(custom.element)[0]);
 			assert.strictEqual('overwritten2', getClassNames(custom.element)[1]);
-			assert.strictEqual('component', getClassNames(custom.element)[2]);
 		});
 
 		it('should set elementClasses on new element when changed', function() {

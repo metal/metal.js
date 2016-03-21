@@ -1038,13 +1038,13 @@ describe('SurfaceRenderer', function() {
 				}).render();
 				var child1 = component.components.child1;
 				var child2 = component.components.child2;
-				var childElements = component.element.querySelectorAll('.component');
+				var childElements = component.element.childNodes[0].childNodes;
 				assert.strictEqual(childElements[0], child1.element);
 				assert.strictEqual(childElements[1], child2.element);
 
 				component.invert = true;
 				component.once('attrsSynced', function() {
-					childElements = component.element.querySelectorAll('.component');
+					childElements = component.element.childNodes[0].childNodes;
 					assert.strictEqual(childElements[0], child2.element);
 					assert.strictEqual(childElements[1], child1.element);
 					done();

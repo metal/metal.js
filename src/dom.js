@@ -29,7 +29,9 @@ class dom {
 	 */
 	static addClassesWithNative_(element, classes) {
 		classes.split(' ').forEach(function(className) {
-			element.classList.add(className);
+			if (className) {
+				element.classList.add(className);
+			}
 		});
 	}
 
@@ -411,7 +413,9 @@ class dom {
 	 */
 	static removeClassesWithNative_(element, classes) {
 		classes.split(' ').forEach(function(className) {
-			element.classList.remove(className);
+			if (className) {
+				element.classList.remove(className);
+			}
 		});
 	}
 

@@ -22,6 +22,11 @@ describe('dom', function() {
 			assertClassesAdded();
 		});
 
+		it('should not throw error if addClasses is called with empty string', function() {
+			var element = document.createElement('div');
+			assert.doesNotThrow(() => dom.addClasses(element, ''));
+		});
+
 		it('should not add css classes twice to the same element', function() {
 			var element = document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
@@ -47,6 +52,11 @@ describe('dom', function() {
 			dom.removeClasses(element, 'class1');
 			assert.ok(!dom.hasClass(element, 'class1'));
 			assert.ok(dom.hasClass(element, 'class2'));
+		});
+
+		it('should not throw error if removeClasses is called with empty string', function() {
+			var element = document.createElement('div');
+			assert.doesNotThrow(() => dom.removeClasses(element, ''));
 		});
 
 		it('should do nothing if element or classes are not object and string in add/remove classes', function() {

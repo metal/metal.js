@@ -3,10 +3,9 @@
 var metal = require('gulp-metal');
 
 metal.registerTasks({
-	bundleCssFileName: 'attribute.css',
-	bundleFileName: 'attribute.js',
+	bundleFileName: 'state.js',
 	mainBuildJsTasks: ['build:globals'],
-	moduleName: 'metal-attribute',
+	moduleName: 'metal-state',
 	testNodeSrc: [
 		'env/test/node.js',
 		'test/**/*.js'

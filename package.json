@@ -1,15 +1,15 @@
 {
-  "name": "metal-attribute",
+  "name": "metal-state",
   "version": "1.0.0-rc",
-  "description": "A class that adds support for watchable, configurable object properties",
+  "description": "A class that adds support for watchable, configurable state",
   "license": "BSD",
-  "repository": "metal/metal-attribute",
+  "repository": "metal/metal-state",
   "engines": {
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "main": "lib/Attribute.js",
-  "browser": "src/Attribute.js",
+  "main": "lib/State.js",
+  "browser": "src/State.js",
   "files": [
     "lib",
     "src",

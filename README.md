@@ -1,6 +1,6 @@
-# metal-attribute
+# metal-state
 
-A class that adds support for watchable, configurable object properties.
+A class that adds support for watchable, configurable state.
 
 ## Setup
 

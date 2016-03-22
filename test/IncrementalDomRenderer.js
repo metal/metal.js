@@ -63,14 +63,14 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
-		it('should update content when attribute values change', function(done) {
+		it('should update content when state values change', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.text(this.component_.foo);
 				IncDom.elementClose('div');
 			};
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				foo: {
 					value: 'foo'
 				}
@@ -80,7 +80,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', component.element.textContent);
 
 			component.foo = 'bar';
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				assert.strictEqual('bar', component.element.textContent);
 				done();
 			});
@@ -290,7 +290,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 			TestComponent.prototype.handleKeydown = sinon.stub();
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				keydown: {
 					value: true
 				}
@@ -302,10 +302,10 @@ describe('IncrementalDomRenderer', function() {
 
 			sinon.spy(component, 'removeListener');
 			component.keydown = false;
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				assert.strictEqual(2, component.removeListener.callCount);
 				assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('keydown'));
-				assert.strictEqual('attrsSynced', component.removeListener.args[1][0]);
+				assert.strictEqual('stateSynced', component.removeListener.args[1][0]);
 				done();
 			});
 		});
@@ -342,7 +342,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementClose('div');
 			};
 			ChildComponent.prototype.handleClick = sinon.stub();
-			ChildComponent.ATTRS = {
+			ChildComponent.STATE = {
 				foo: {
 					value: 'foo'
 				}
@@ -379,7 +379,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
-		it('should pass attributes to sub component', function() {
+		it('should pass state to sub component', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.component_.id]);
@@ -394,14 +394,14 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', child.element.textContent);
 		});
 
-		it('should update sub component attributes and content', function(done) {
+		it('should update sub component state and content', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				foo: {
 					value: 'foo'
 				}
@@ -409,7 +409,7 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent().render();
 
 			component.foo = 'bar';
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				var child = component.components.child;
 				assert.strictEqual('bar', child.foo);
 				assert.strictEqual('bar', child.element.textContent);
@@ -417,14 +417,14 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not try to rerender sub component later when attrs change during parent rendering', function(done) {
+		it('should not try to rerender sub component later when state changes during parent rendering', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				foo: {
 					value: 'foo'
 				}
@@ -432,24 +432,24 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent().render();
 
 			component.foo = 'bar';
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				var child = component.components.child;
 				sinon.spy(child.getRenderer(), 'patch');
-				child.once('attrsSynced', function() {
+				child.once('stateSynced', function() {
 					assert.strictEqual(0, child.getRenderer().patch.callCount);
 					done();
 				});
 			});
 		});
 
-		it('should rerender sub component when attrs change after parent rendering', function(done) {
+		it('should rerender sub component when state changes after parent rendering', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div', null, ['id', this.component_.id]);
 				IncDom.elementVoid('ChildComponent', null, ['id', 'child'], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				foo: {
 					value: 'foo'
 				}
@@ -457,11 +457,11 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent().render();
 
 			component.foo = 'bar';
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				var child = component.components.child;
 				child.foo = 'bar2';
 				sinon.spy(child.getRenderer(), 'patch');
-				child.once('attrsSynced', function() {
+				child.once('stateSynced', function() {
 					assert.strictEqual(1, child.getRenderer().patch.callCount);
 					assert.strictEqual('bar2', child.element.textContent);
 					done();
@@ -557,7 +557,7 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should update sub component data from Component tag', function(done) {
 			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.ATTRS = {
+			TestChildComponent.STATE = {
 				foo: {}
 			};
 
@@ -570,7 +570,7 @@ describe('IncrementalDomRenderer', function() {
 				});
 				IncDom.elementClose('div');
 			};
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				foo: {}
 			};
 			component = new TestComponent({
@@ -581,7 +581,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', child.foo);
 
 			component.foo = 'bar';
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				assert.strictEqual('bar', child.foo);
 				done();
 			});
@@ -596,7 +596,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 				IncDom.elementClose('div');
 			};
-			TestComponent.ATTRS = {
+			TestComponent.STATE = {
 				count: {
 					value: 3
 				}
@@ -609,7 +609,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(subComps.child3);
 
 			component.count = 2;
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				assert.strictEqual(2, Object.keys(component.components).length);
 				assert.ok(component.components.child1);
 				assert.ok(component.components.child2);

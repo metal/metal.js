@@ -17,7 +17,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		this.changes_ = {};
 		this.eventsCollector_ = new EventsCollector(comp);
-		comp.on('attrChanged', this.handleAttrChanged_.bind(this));
+		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
 	}
 
@@ -83,7 +83,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var comp = this.component_.addSubComponent(tagOrCtor, config);
 
 		if (comp.wasRendered) {
-			comp.setAttrs(config);
+			comp.setState(config);
 		}
 		return comp;
 	}
@@ -103,19 +103,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				dom.append(parent, element);
 			}
 			return parent;
-		}
-	}
-
-	/**
-	 * Handles the `attrChanged` event. Makes sure that, when `attrsChanged` is
-	 * fired, the component's contents will only be updated if the changed attr
-	 * wasn't `element`, since that wouldn't cause a rerender.
-	 * @param {!Object} data
-	 * @protected
-	 */
-	handleAttrChanged_(data) {
-		if (data.attrName !== 'element') {
-			this.changes_[data.attrName] = data;
 		}
 	}
 
@@ -181,6 +168,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Handles the `stateKeyChanged` event. Makes sure that, when `stateChanged`
+	 * is fired, the component's contents will only be updated if the changed
+	 * state key wasn't `element`, since that wouldn't cause a rerender.
+	 * @param {!Object} data
+	 * @protected
+	 */
+	handleStateKeyChanged_(data) {
+		if (data.key !== 'element') {
+			this.changes_[data.key] = data;
+		}
+	}
+
+	/**
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom, done for a sub component element. Creates and updates the appropriate
 	 * sub component.
@@ -232,7 +232,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * called by `patch`.
 	 */
 	renderWithoutPatch() {
-		// Mark that there shouldn't be an update for attrs changed so far, since
+		// Mark that there shouldn't be an update for state changes so far, since
 		// render has already been called.
 		this.changes_ = {};
 
@@ -249,9 +249,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Checks if the component should be updated with the current attr changes.
+	 * Checks if the component should be updated with the current state changes.
 	 * Can be overridden by subclasses to provide customized behavior (only
-	 * updating when a template attribute is changed for example).
+	 * updating when a state key used by the template is changed for example).
 	 * @param {!Object} changes
 	 * @return {boolean}
 	 */
@@ -274,12 +274,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Updates the renderer's component when attributes change, patching its
-	 * element through the incremental dom function calls done by `renderIncDom`.
+	 * Updates the renderer's component when state changes, patching its element
+	 * through the incremental dom function calls done by `renderIncDom`.
 	 */
 	update() {
-		var changedAttrs = Object.keys(this.changes_);
-		if (changedAttrs.length > 0 && this.shouldUpdate(this.changes_)) {
+		var changedKeys = Object.keys(this.changes_);
+		if (changedKeys.length > 0 && this.shouldUpdate(this.changes_)) {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
 			this.disposeUnusedSubComponents_();
@@ -289,8 +289,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * This updates the sub component that is represented by the given data.
 	 * The sub component is created, added to its parent and rendered. If it
-	 * had already been rendered before though, it will only have its attributes
-	 * updates instead.
+	 * had already been rendered before though, it will only have its state
+	 * updated instead.
 	 * @param {string} tag The tag name.
 	 * @param {!Object} config The config object for the sub component.
 	 * @return {!Component} The updated sub component.

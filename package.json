@@ -23,8 +23,6 @@
     "bootstrap": "^3.3.6",
     "closure-templates": "20140422.0.0",
     "incremental-dom": "^0.3.0",
-    "metal": "metal/metal.js#master",
-    "metal-attribute": "metal/metal-attribute#master",
     "metal-component": "metal/metal-component#id"
   },
   "devDependencies": {

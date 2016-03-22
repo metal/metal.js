@@ -8,7 +8,7 @@
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "main": "src/soy.js",
+  "main": "src/Soy.js",
   "files": [
     "src",
     "test"
@@ -21,14 +21,14 @@
   ],
   "dependencies": {
     "closure-templates": "20140422.0.0",
+    "html2incdom": "^0.1.1",
     "metal": "^1.0.0-rc",
-    "metal-component": "^1.0.0-rc",
-    "metal-dom": "^1.0.0-rc"
+    "metal-incremental-dom": "metal/metal-incremental-dom#master",
+    "metal-soy-bundle": "^0.2.0"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
-    "gulp-metal": "^0.14.0",
-    "gulp-replace": "^0.5.4",
-    "metal-tools-soy": "^1.0.0"
+    "gulp-metal": "^1.0.0",
+    "gulp-replace": "^0.5.4"
   }
 }

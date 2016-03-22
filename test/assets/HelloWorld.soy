@@ -1,0 +1,20 @@
+{namespace HelloWorld}
+
+
+/**
+ * @param? name
+ */
+{template .render}
+  <span class="render">
+    {call .content}
+      {param name: $name /}
+    {/call}
+  </span>
+{/template}
+
+/**
+ * @param? name
+ */
+{template .content}
+  <span class="content">Hello {$name ? $name : 'World'}!</span>
+{/template}

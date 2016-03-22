@@ -154,6 +154,19 @@ describe('Soy', function() {
 			assert.ok(dom.hasClass(comp.element, 'content'));
 			assert.strictEqual('Hello World!', comp.element.textContent);
 		});
+
+		it('should use last component registration for the same template', function() {
+			class TestComponent extends Component {
+			}
+			Soy.register(TestComponent, helloWorldTemplates, 'content');
+
+			class TestComponent2 extends Component {
+			}
+			Soy.register(TestComponent2, helloWorldTemplates, 'content');
+
+			assert.strictEqual(TestComponent.TEMPLATE, TestComponent2.TEMPLATE);
+			assert.strictEqual(TestComponent2, TestComponent2.TEMPLATE.componentCtor);
+		});
 	});
 
 	describe('HTML attributes', function() {

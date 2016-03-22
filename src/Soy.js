@@ -110,8 +110,8 @@ class Soy extends IncrementalDomRenderer {
 	 */
 	static register(componentCtor, templates, mainTemplate = 'render') {
 		componentCtor.RENDERER = Soy;
-		componentCtor.TEMPLATE = templates[mainTemplate];
-		templates[mainTemplate].componentCtor = componentCtor;
+		componentCtor.TEMPLATE = SoyAop.getOriginalFn(templates[mainTemplate]);
+		componentCtor.TEMPLATE.componentCtor = componentCtor;
 		SoyAop.registerForInterception(templates, mainTemplate);
 	}
 

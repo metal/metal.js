@@ -20,15 +20,12 @@
     "metal"
   ],
   "dependencies": {
-    "bootstrap": "^3.3.6",
-    "closure-templates": "20140422.0.0",
     "incremental-dom": "^0.3.0",
-    "metal-component": "metal/metal-component#id"
+    "metal-component": "metal/metal-component#master"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-metal": "^0.14.0",
-    "metal-dom": "metal/metal-dom#master",
     "metal-karma-config": "^1.0.0"
   }
 }

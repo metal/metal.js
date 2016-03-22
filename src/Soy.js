@@ -51,7 +51,7 @@ class Soy extends IncrementalDomRenderer {
 
 			var value = component[key];
 			if (component.getStateKeyConfig(key).isHtml && core.isString(value)) {
-				value = HTML2IncDom.buildFn(value);
+				value = Soy.toIncDom(value);
 			}
 			data[key] = value;
 		});
@@ -71,6 +71,15 @@ class Soy extends IncrementalDomRenderer {
 		var ctor = originalFn.componentCtor;
 		var data = opt_data;
 		IncrementalDOM.elementVoid('Component', null, [], 'ctor', ctor, 'data', data);
+	}
+
+	/**
+	 * Converts the given html string into an incremental dom function.
+	 * @param {string} value
+	 * @return {!function()}
+	 */
+	static toIncDom(value) {
+		return HTML2IncDom.buildFn(value);
 	}
 
 	/**

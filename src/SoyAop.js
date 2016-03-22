@@ -2,12 +2,13 @@
 
 var SoyAop = {
 	/**
-	 * The function that should be called instead of a template call. If null, the original function
-	 * will be called instead.
-	 * @type {function()}
+	 * The functions that should be called instead of a template call. The last
+	 * function in the array is the one that is intercepting at the moment. If the
+	 * array is empty, the original function will be called instead.
+	 * @type {!Array<function()>}
 	 * @protected
 	 */
-	interceptFn_: null,
+	interceptFns_: [],
 
 	/**
 	 * Gets the original function of the given template function. If no original exists,
@@ -31,8 +32,9 @@ var SoyAop = {
 	 *     interception.
 	 */
 	handleTemplateCall_: function(originalFn, opt_data, opt_ignored, opt_ijData) {
-		if (SoyAop.interceptFn_) {
-			return SoyAop.interceptFn_.call(null, originalFn, opt_data, opt_ignored, opt_ijData);
+		var interceptFn = SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1];
+		if (interceptFn) {
+			return interceptFn.call(null, originalFn, opt_data, opt_ignored, opt_ijData);
 		} else {
 			return originalFn.call(null, opt_data, opt_ignored, opt_ijData);
 		}
@@ -58,14 +60,21 @@ var SoyAop = {
 	 * @param {!function()} fn
 	 */
 	startInterception: function(fn) {
-		SoyAop.interceptFn_ = fn;
+		SoyAop.interceptFns_.push(fn);
 	},
 
 	/**
 	 * Stops intercepting template calls.
 	 */
+	stopAllInterceptions: function() {
+		SoyAop.interceptFns_ = [];
+	},
+
+	/**
+	 * Stops intercepting template calls with the last registered function.
+	 */
 	stopInterception: function() {
-		SoyAop.interceptFn_ = null;
+		SoyAop.interceptFns_.pop();
 	}
 };
 

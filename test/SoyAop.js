@@ -4,6 +4,10 @@ import { object } from 'metal';
 import SoyAop from '../src/SoyAop';
 
 describe('SoyAop', function() {
+	afterEach(function() {
+		SoyAop.stopAllInterceptions();
+	});
+
 	it('should intercept calls to template functions that were registered', function() {
 		var templates = {
 			fn1: sinon.stub(),
@@ -104,6 +108,36 @@ describe('SoyAop', function() {
 		templates.fn({}, null, {});
 		assert.strictEqual(0, SoyAop.getOriginalFn(templates.fn).callCount);
 		assert.strictEqual(1, interceptor.callCount);
+	});
+
+	it('should go back to previous intercepting function when interception is stopped', function() {
+		var templates = {
+			fn: sinon.stub()
+		};
+		SoyAop.registerForInterception(templates, 'fn');
+
+		var interceptor1 = sinon.stub();
+		var interceptor2 = sinon.stub();
+
+		SoyAop.startInterception(interceptor1);
+		SoyAop.startInterception(interceptor2);
+
+		templates.fn({}, null, {});
+		assert.strictEqual(0, SoyAop.getOriginalFn(templates.fn).callCount);
+		assert.strictEqual(0, interceptor1.callCount);
+		assert.strictEqual(1, interceptor2.callCount);
+
+		SoyAop.stopInterception();
+		templates.fn({}, null, {});
+		assert.strictEqual(0, SoyAop.getOriginalFn(templates.fn).callCount);
+		assert.strictEqual(1, interceptor1.callCount);
+		assert.strictEqual(1, interceptor2.callCount);
+
+		SoyAop.stopInterception();
+		templates.fn({}, null, {});
+		assert.strictEqual(1, SoyAop.getOriginalFn(templates.fn).callCount);
+		assert.strictEqual(1, interceptor1.callCount);
+		assert.strictEqual(1, interceptor2.callCount);
 	});
 
 	it('should register templates after interception has already started', function() {

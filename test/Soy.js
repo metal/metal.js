@@ -15,6 +15,7 @@ import { ExternalTemplate as ExternalTemplateComponent } from './assets/External
 import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy';
 import { Nested as NestedComponent } from './assets/Nested.soy';
 import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy';
+import { NestedMultiple as NestedMultipleComponent } from './assets/NestedMultiple.soy';
 import { NestedNoData as NestedNoDataComponent } from './assets/NestedNoData.soy';
 import Soy from '../src/Soy';
 
@@ -251,6 +252,22 @@ describe('Soy', function() {
 			assert.ok(nested2 instanceof HelloWorldComponent);
 			assert.strictEqual(nested2.element, nested.element.childNodes[0]);
 			assert.strictEqual('Hello Foo!', nested2.element.textContent);
+		});
+
+		it('should render and instantiate multiple nested components', function() {
+			comp = new NestedMultipleComponent({
+				count: 2
+			}).render();
+
+			var nested1 = comp.components.hello1;
+			assert.ok(nested1 instanceof HelloWorldComponent);
+			assert.strictEqual(nested1.element, comp.element.childNodes[0]);
+			assert.strictEqual('Hello World!', nested1.element.textContent);
+
+			var nested2 = comp.components.hello2;
+			assert.ok(nested2 instanceof HelloWorldComponent);
+			assert.strictEqual(nested2.element, comp.element.childNodes[1]);
+			assert.strictEqual('Hello World!', nested2.element.textContent);
 		});
 	});
 });

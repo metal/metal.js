@@ -6,7 +6,7 @@ import ComponentCollector from '../src/ComponentCollector';
 
 class TestComponent extends Component {
 }
-TestComponent.ATTRS = {
+TestComponent.STATE = {
 	bar: {}
 };
 

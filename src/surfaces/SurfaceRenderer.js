@@ -13,7 +13,7 @@ import SurfaceCollector from './SurfaceCollector';
  * Renders components based on surfaces. Surfaces are an area of the component
  * that can have information rendered into it. This renderer can manage multiple
  * surfaces. Surfaces are only rendered when their contents are modified,
- * representing render performance gains. For each surface, render attributes
+ * representing render performance gains. For each surface, render state keys
  * could be associated. When the render context of a surface gets modified, the
  * renderer's lifecycle will repaint the modified surface automatically.
  *
@@ -99,15 +99,14 @@ class SurfaceRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Adds a simple attribute with the given name to the component, if it doesn't
-	 * exist yet.
-	 * @param {string} attrName
-	 * @param {Object=} opt_initialValue Optional initial value for the new attr.
+	 * Adds a simple state key to the component, if it doesn't exist yet.
+	 * @param {string} key
+	 * @param {Object=} opt_initialValue Optional initial value for the new key.
 	 * @protected
 	 */
-	addMissingAttr_(attrName, opt_initialValue) {
-		if (!this.component_.getAttrConfig(attrName)) {
-			this.component_.addAttr(attrName, {}, opt_initialValue);
+	addMissingStateKey_(key, opt_initialValue) {
+		if (!this.component_.getStateKeyConfig(key)) {
+			this.component_.addToState(key, {}, opt_initialValue);
 		}
 	}
 
@@ -148,7 +147,7 @@ class SurfaceRenderer extends ComponentRenderer {
 				this.addSubComponent(config.componentName, surfaceElementId);
 			}
 		}
-		this.cacheSurfaceRenderAttrs_(surfaceElementId, config.renderAttrs);
+		this.cacheSurfaceRenderKeys_(surfaceElementId, config.renderKeys);
 
 		return this;
 	}
@@ -173,7 +172,7 @@ class SurfaceRenderer extends ComponentRenderer {
 	 */
 	addSurfacesFromStaticHint_() {
 		core.mergeSuperClassesProperty(this.component_.constructor, 'SURFACES', this.mergeObjects_);
-		this.surfacesRenderAttrs_ = {};
+		this.surfacesRenderKeys_ = {};
 
 		var configs = this.component_.constructor.SURFACES_MERGED;
 		for (var surfaceId in configs) {
@@ -237,21 +236,21 @@ class SurfaceRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Caches surface render attributes into a O(k) flat map representation.
+	 * Caches surface render state keys into a O(k) flat map representation.
 	 * Relevant for performance to calculate the surfaces group that were
-	 * modified by attributes mutation.
+	 * modified by state mutation.
 	 * @param {string} surfaceElementId The surface id to be cached into the flat map.
-	 * @param {Array} renderAttrs The surface's render attrs.
+	 * @param {Array} renderKeys The surface's render keys.
 	 * @protected
 	 */
-	cacheSurfaceRenderAttrs_(surfaceElementId, renderAttrs) {
-		var attrs = renderAttrs || [];
-		for (var i = 0; i < attrs.length; i++) {
-			if (!this.surfacesRenderAttrs_[attrs[i]]) {
-				this.surfacesRenderAttrs_[attrs[i]] = {};
-				this.addMissingAttr_(attrs[i], this.component_.getInitialConfig()[attrs[i]]);
+	cacheSurfaceRenderKeys_(surfaceElementId, renderKeys) {
+		var keys = renderKeys || [];
+		for (var i = 0; i < keys.length; i++) {
+			if (!this.surfacesRenderKeys_[keys[i]]) {
+				this.surfacesRenderKeys_[keys[i]] = {};
+				this.addMissingStateKey_(keys[i], this.component_.getInitialConfig()[keys[i]]);
 			}
-			this.surfacesRenderAttrs_[attrs[i]][surfaceElementId] = true;
+			this.surfacesRenderKeys_[keys[i]][surfaceElementId] = true;
 		}
 	}
 
@@ -393,7 +392,7 @@ class SurfaceRenderer extends ComponentRenderer {
 		this.eventsCollector_.dispose();
 		this.eventsCollector_ = null;
 
-		this.surfacesRenderAttrs_ = null;
+		this.surfacesRenderKeys_ = null;
 
 		Object.keys(this.surfaceIds_).forEach(surfaceId => this.removeSurface(surfaceId, true));
 		this.surfaceIds_ = null;
@@ -405,15 +404,15 @@ class SurfaceRenderer extends ComponentRenderer {
 	 * @param {string} surfaceElementId
 	 * @param {string=} opt_content
 	 * @param {string=} opt_cacheContent
-	 * @param {Array<string>=} opt_renderAttrs The render attributes that caused the
+	 * @param {Array<string>=} opt_renderKeys The state keys that caused the
 	 *   surface to be rerendered, or nothing if that wasn't the cause of the update.
 	 * @protected
 	 */
-	emitRenderSurfaceEvent_(surfaceElementId, opt_content, opt_cacheContent, opt_renderAttrs) {
+	emitRenderSurfaceEvent_(surfaceElementId, opt_content, opt_cacheContent, opt_renderKeys) {
 		this.emit('renderSurface', {
 			cacheContent: opt_cacheContent,
 			content: opt_content,
-			renderAttrs: opt_renderAttrs || [],
+			renderKeys: opt_renderKeys || [],
 			surfaceElementId: surfaceElementId,
 			surfaceId: this.getSurfaceId(this.getSurfaceFromElementId(surfaceElementId))
 		});
@@ -482,22 +481,22 @@ class SurfaceRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Gets surfaces that got modified by the specified attributes changes.
-	 * @param {Object.<string, Object>} changes Object containing the attribute
-	 *     name as key and an object with newVal and prevVal as value.
+	 * Gets surfaces that got modified by the specified state changes.
+	 * @param {Object.<string, Object>} changes Object containing the state keys,
+	 *     each mapped to an object with newVal and prevVal.
 	 * @return {Object.<string, boolean>} Object containing modified surface ids
 	 *     as key and true as value.
 	 * @protected
 	 */
 	getModifiedSurfacesFromChanges_(changes) {
 		var surfaces = {};
-		for (var attr in changes) {
-			var surfaceNames = Object.keys(this.surfacesRenderAttrs_[attr] || {});
+		for (var key in changes) {
+			var surfaceNames = Object.keys(this.surfacesRenderKeys_[key] || {});
 			for (var i = 0; i < surfaceNames.length; i++) {
 				if (!surfaces[surfaceNames[i]]) {
 					surfaces[surfaceNames[i]] = [];
 				}
-				surfaces[surfaceNames[i]].push(attr);
+				surfaces[surfaceNames[i]].push(key);
 			}
 		}
 		return surfaces;
@@ -811,7 +810,7 @@ class SurfaceRenderer extends ComponentRenderer {
 	/**
 	 * Renders all surfaces contents ignoring the cache.
 	 * @param {Object.<string, Array=>} surfaces Object map where the key is
-	 *     the surface id and value the optional attributes list that caused
+	 *     the surface id and value the optional state keys list that caused
 	 *     the rerender.
 	 * @protected
 	 */

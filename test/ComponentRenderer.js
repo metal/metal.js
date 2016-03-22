@@ -43,33 +43,33 @@ describe('ComponentRenderer', function() {
 		ComponentRenderer.prototype.render.restore();
 	});
 
-	it('should not call the update method if attributes change before render', function(done) {
+	it('should not call the update method if state changes before render', function(done) {
 		var component = new Component();
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
-		component.addAttr('foo');
+		component.addToState('foo');
 		component.foo = 'foo';
-		component.once('attrsChanged', function() {
+		component.once('stateChanged', function() {
 			assert.strictEqual(0, renderer.update.callCount);
 			done();
 		});
 	});
 
-	it('should call the update method if attributes change after render', function(done) {
+	it('should call the update method if state changes after render', function(done) {
 		var component = new Component();
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
-		component.addAttr('foo');
+		component.addToState('foo');
 		component.render();
 
 		component.foo = 'foo';
-		component.once('attrsChanged', function() {
+		component.once('stateChanged', function() {
 			assert.strictEqual(1, renderer.update.callCount);
 
 			component.foo = 'bar';
-			component.once('attrsChanged', function() {
+			component.once('stateChanged', function() {
 				assert.strictEqual(2, renderer.update.callCount);
 				done();
 			});
@@ -81,12 +81,12 @@ describe('ComponentRenderer', function() {
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
-		component.addAttr('foo');
+		component.addToState('foo');
 		component.render();
 		renderer.dispose();
 
 		component.foo = 'foo';
-		component.once('attrsChanged', function() {
+		component.once('stateChanged', function() {
 			assert.strictEqual(0, renderer.update.callCount);
 			done();
 		});

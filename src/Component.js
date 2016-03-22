@@ -2,11 +2,11 @@
 
 import { array, core, object } from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
-import Attribute from 'metal-attribute';
 import ComponentCollector from './ComponentCollector';
 import ComponentRegistry from './ComponentRegistry';
 import ComponentRenderer from './ComponentRenderer';
 import { EventHandler } from 'metal-events';
+import State from 'metal-state';
 
 /**
  * Component collects common behaviors to be followed by UI components, such
@@ -38,18 +38,21 @@ import { EventHandler } from 'metal-events';
  *
  * CustomComponent.RENDERER = MyRenderer;
  *
- * CustomComponent.ATTRS = {
+ * CustomComponent.STATE = {
  *   title: { value: 'Title' },
  *   fontSize: { value: '10px' }
  * };
  * </code>
  *
- * @param {!Object} opt_config An object with the initial values for this component's
- *   attributes.
- * @constructor
- * @extends {Attribute}
+ * @extends {State}
  */
-class Component extends Attribute {
+class Component extends State {
+	/**
+	 * Constructor function for `Component`.
+	 * @param {Object=} opt_config An object with the initial values for this
+	 *     component's state.
+	 * @constructor
+	 */
 	constructor(opt_config) {
 		super(opt_config);
 
@@ -83,11 +86,11 @@ class Component extends Attribute {
 		this.elementEventProxy_ = null;
 
 		/**
-		 * The `EventHandler` instance for events attached from the `events` attribute.
+		 * The `EventHandler` instance for events attached from the `events` state key.
 		 * @type {!EventHandler}
 		 * @protected
 		 */
-		this.eventsAttrHandler_ = new EventHandler();
+		this.eventsStateKeyHandler_ = new EventHandler();
 
 		/**
 		 * Whether the element is in document.
@@ -152,7 +155,7 @@ class Component extends Attribute {
 				} else {
 					handler = this.on(eventNames[i], info.fn);
 				}
-				this.eventsAttrHandler_.add(handler);
+				this.eventsStateKeyHandler_.add(handler);
 			}
 		}
 	}
@@ -198,7 +201,7 @@ class Component extends Attribute {
 	 * @protected
 	 */
 	created_() {
-		this.on('attrsChanged', this.handleAttributesChanges_);
+		this.on('stateChanged', this.handleStateChanged_);
 		Component.componentsCollector.addComponent(this);
 
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
@@ -388,17 +391,18 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Fires attribute synchronization change for the attribute.
-	 * @param {Object.<string, Object>} change Object containing newVal and
+	 * Calls the synchronization function for the state key.
+	 * @param {string} key
+	 * @param {Object.<string, Object>=} opt_change Object containing newVal and
 	 *     prevVal keys.
 	 * @protected
 	 */
-	fireAttrChange_(attr, opt_change) {
-		var fn = this['sync' + attr.charAt(0).toUpperCase() + attr.slice(1)];
+	fireStateKeyChange_(key, opt_change) {
+		var fn = this['sync' + key.charAt(0).toUpperCase() + key.slice(1)];
 		if (core.isFunction(fn)) {
 			if (!opt_change) {
 				opt_change = {
-					newVal: this[attr],
+					newVal: this[key],
 					prevVal: undefined
 				};
 			}
@@ -438,14 +442,14 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Handles attributes batch changes. Calls any existing `sync` functions that
-	 * match the changed attributes.
+	 * Handles state batch changes. Calls any existing `sync` functions that
+	 * match the changed state keys.
 	 * @param {Event} event
 	 * @protected
 	 */
-	handleAttributesChanges_(event) {
-		this.syncAttrsFromChanges_(event.changes);
-		this.emit('attrsSynced', event);
+	handleStateChanged_(event) {
+		this.syncStateFromChanges_(event.changes);
+		this.emit('stateSynced', event);
 	}
 
 	/**
@@ -486,14 +490,14 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Fired when the `element` attribute value is changed.
+	 * Fired when the `element` state value is changed.
 	 * @param {!Object} event
 	 * @protected
 	 */
 	onElementChanged_(event) {
 		if (event.prevVal === event.newVal) {
 			// The `elementChanged` event will be fired whenever the element is set,
-			// even if its value hasn't actually changed, since that's how Attribute
+			// even if its value hasn't actually changed, since that's how State
 			// handles objects. We need to check manually here.
 			return;
 		}
@@ -505,12 +509,12 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Fired when the `events` attribute value is changed.
+	 * Fired when the `events` state value is changed.
 	 * @param {!Object} event
 	 * @protected
 	 */
 	onEventsChanged_(event) {
-		this.eventsAttrHandler_.removeAllListeners();
+		this.eventsStateKeyHandler_.removeAllListeners();
 		this.addListenersFromObj_(event.newVal);
 	}
 
@@ -531,7 +535,7 @@ class Component extends Attribute {
 	 * Render Lifecycle:
 	 *   render - Decorate is manually called.
 	 *   render event - The "render" event is emitted. Renderers act on this step.
-	 *   attribute synchronization - All synchronization methods are called.
+	 *   state synchronization - All synchronization methods are called.
 	 *   attach - Attach Lifecycle is called.
 	 *
 	 * @param {(string|Element|boolean)=} opt_parentElement Optional parent element
@@ -544,7 +548,7 @@ class Component extends Attribute {
 	 *     `component.render(null, existingElement)`.
 	 * @param {boolean=} opt_skipRender Optional flag indicating that the actual
 	 *     rendering should be skipped. Only the other render lifecycle logic will
-	 *     be run, like syncing attributes and attaching the element. Should only
+	 *     be run, like syncing state and attaching the element. Should only
 	 *     be set if the component has already been rendered, like sub components.
 	 * @chainable
 	 */
@@ -559,7 +563,7 @@ class Component extends Attribute {
 			});
 		}
 		this.setUpProxy_();
-		this.syncAttrs_();
+		this.syncState_();
 		if (opt_parentElement !== false) {
 			this.attach(opt_parentElement, opt_siblingElement);
 		}
@@ -571,7 +575,7 @@ class Component extends Attribute {
 	 * Renders this component as a subcomponent, meaning that no actual rendering is
 	 * needed since it was already rendered by the parent component. This just handles
 	 * other logics from the rendering lifecycle, like calling sync methods for the
-	 * attributes.
+	 * state.
 	 */
 	renderAsSubComponent() {
 		this.render(null, null, true);
@@ -597,7 +601,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Setter logic for element attribute.
+	 * Setter logic for element state key.
 	 * @param {string|Element} newVal
 	 * @param {Element} currentVal
 	 * @return {Element}
@@ -626,30 +630,30 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Fires attributes synchronization changes for attributes.
+	 * Fires state synchronization functions.
 	 * @protected
 	 */
-	syncAttrs_() {
-		var attrNames = this.getAttrNames();
-		for (var i = 0; i < attrNames.length; i++) {
-			this.fireAttrChange_(attrNames[i]);
+	syncState_() {
+		var keys = this.getStateKeys();
+		for (var i = 0; i < keys.length; i++) {
+			this.fireStateKeyChange_(keys[i]);
 		}
 	}
 
 	/**
-	 * Fires attributes synchronization changes for attributes.
-	 * @param {Object.<string, Object>} changes Object containing the attribute
+	 * Fires synchronization changes for state keys.
+	 * @param {Object.<string, Object>} changes Object containing the state key
 	 *     name as key and an object with newVal and prevVal as value.
 	 * @protected
 	 */
-	syncAttrsFromChanges_(changes) {
-		for (var attr in changes) {
-			this.fireAttrChange_(attr, changes[attr]);
+	syncStateFromChanges_(changes) {
+		for (var key in changes) {
+			this.fireStateKeyChange_(key, changes[key]);
 		}
 	}
 
 	/**
-	 * Attribute synchronization logic for the `elementClasses` attribute.
+	 * State synchronization logic for the `elementClasses` state key.
 	 * @param {string} newVal
 	 * @param {string} prevVal
 	 */
@@ -661,7 +665,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Attribute synchronization logic for `visible` attribute.
+	 * State synchronization logic for `visible` state key.
 	 * Updates the element's display value according to its visibility.
 	 * @param {boolean} newVal
 	 */
@@ -672,7 +676,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Validator logic for elementClasses attribute.
+	 * Validator logic for elementClasses state key.
 	 * @param {string} val
 	 * @return {boolean} True if val is a valid element classes.
 	 * @protected
@@ -682,7 +686,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Validator logic for element attribute.
+	 * Validator logic for element state key.
 	 * @param {string|Element} val
 	 * @return {boolean} True if val is a valid element.
 	 * @protected
@@ -692,7 +696,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Validator logic for the `events` attribute.
+	 * Validator logic for the `events` state key.
 	 * @param {Object} val
 	 * @return {boolean}
 	 * @protected
@@ -702,7 +706,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Validator logic for the `id` attribute.
+	 * Validator logic for the `id` state key.
 	 * @param {string} val
 	 * @return {boolean} True if val is a valid id.
 	 * @protected
@@ -712,7 +716,7 @@ class Component extends Attribute {
 	}
 
 	/**
-	 * Provides the default value for id attribute.
+	 * Provides the default value for id state key.
 	 * @return {string} The id.
 	 * @protected
 	 */
@@ -731,11 +735,11 @@ class Component extends Attribute {
 Component.componentsCollector = new ComponentCollector();
 
 /**
- * Component attributes definition.
+ * Component state definition.
  * @type {Object}
  * @static
  */
-Component.ATTRS = {
+Component.STATE = {
 	/**
 	 * Component element bounding box.
 	 * @type {Element}
@@ -821,9 +825,9 @@ Component.Error = {
 };
 
 /**
- * A list with attribute names that will automatically be rejected as invalid.
+ * A list with state key names that will automatically be rejected as invalid.
  * @type {!Array<string>}
  */
-Component.INVALID_ATTRS = ['components'];
+Component.INVALID_KEYS = ['components'];
 
 export default Component;

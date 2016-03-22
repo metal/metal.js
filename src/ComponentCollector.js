@@ -41,7 +41,7 @@ class ComponentCollector extends Disposable {
 	}
 
 	/**
-	 * Updates an existing component instance with new attributes.
+	 * Updates an existing component instance with new state values.
 	 * @param {string} id The id of the component to be created or updated.
 	 * @param {Object=} opt_data
 	 * @return {Component} The extracted component instance.
@@ -49,7 +49,7 @@ class ComponentCollector extends Disposable {
 	updateComponent(id, opt_data) {
 		var component = ComponentCollector.components[id];
 		if (component && opt_data) {
-			component.setAttrs(opt_data);
+			component.setState(opt_data);
 		}
 		return component;
 	}

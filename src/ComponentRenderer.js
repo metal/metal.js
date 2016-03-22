@@ -17,7 +17,7 @@ class ComponentRenderer extends EventEmitter {
 		this.component_ = component;
 		this.componentRendererEvents_ = new EventHandler();
 		this.componentRendererEvents_.add(
-			this.component_.on('attrsChanged', this.handleComponentRendererAttrsChanged_.bind(this)),
+			this.component_.on('stateChanged', this.handleComponentRendererStateChanged_.bind(this)),
 			this.component_.once('render', this.render.bind(this))
 		);
 	}
@@ -31,14 +31,14 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
-	 * Handles an `attrsChanged` event from this renderer's component. Calls the
+	 * Handles an `stateChanged` event from this renderer's component. Calls the
 	 * `update` function if the component has already been rendered for the first
 	 * time.
 	 * @param {Object.<string, Object>} changes Object containing the names
-	 *     of all changed attributes as keys, each mapped to an object with its
-	 *     new (newVal) and previous (prevVal) values.
+	 *     of all changed state keys, each mapped to an object with its new
+	 *     (newVal) and previous (prevVal) values.
 	 */
-	handleComponentRendererAttrsChanged_(changes) {
+	handleComponentRendererStateChanged_(changes) {
 		if (this.component_.wasRendered) {
 			this.update(changes);
 		}
@@ -58,10 +58,10 @@ class ComponentRenderer extends EventEmitter {
 
 	/**
 	 * Updates the component's element html. This is automatically called by
-	 * the component when the value of at least one of its attributes has changed.
+	 * the component when the value of at least one of its state keys has changed.
 	 * @param {Object.<string, Object>} changes Object containing the names
-	 *     of all changed attributes as keys, each mapped to an object with its
-	 *     new (newVal) and previous (prevVal) values.
+	 *     of all changed state keys, each mapped to an object with its new
+	 *     (newVal) and previous (prevVal) values.
 	 */
 	update() {}
 }

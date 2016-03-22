@@ -301,7 +301,7 @@ describe('SurfaceRenderer', function() {
 			var CustomComponent = createTestComponentClass({
 				custom: comp => {
 					var placeholer1 = comp.getRenderer().buildPlaceholder('custom-foo', {
-						renderAttrs: ['foo', 'bar']
+						renderKeys: ['foo', 'bar']
 					});
 					var placeholer2 = comp.getRenderer().buildPlaceholder();
 					return placeholer1 + placeholer2;
@@ -313,7 +313,7 @@ describe('SurfaceRenderer', function() {
 			}).render();
 			var renderer = component.getRenderer();
 
-			assert.deepEqual(['foo', 'bar'], renderer.getSurface('foo').renderAttrs);
+			assert.deepEqual(['foo', 'bar'], renderer.getSurface('foo').renderKeys);
 			assert.ok(renderer.getSurface('s1'));
 		});
 
@@ -359,59 +359,59 @@ describe('SurfaceRenderer', function() {
 			assert.strictEqual(renderer, renderer.removeSurface('header'));
 		});
 
-		describe('Render Attributes', function() {
-			it('should automatically create attrs from render attrs of added surfaces', function() {
+		describe('Render Keys', function() {
+			it('should automatically create state keys from render keys of added surfaces', function() {
 				var CustomComponent = createTestComponentClass();
 				component = new CustomComponent();
 				component.getRenderer().addSurfaces({
 					header: {
-						renderAttrs: ['headerContent', 'fontSize']
+						renderKeys: ['headerContent', 'fontSize']
 					}
 				});
-				assert.deepEqual({}, component.getAttrConfig('headerContent'));
-				assert.deepEqual({}, component.getAttrConfig('fontSize'));
+				assert.deepEqual({}, component.getStateKeyConfig('headerContent'));
+				assert.deepEqual({}, component.getStateKeyConfig('fontSize'));
 			});
 
-			it('should automatically create attrs from render attrs from SURFACES static variable', function() {
+			it('should automatically create state keys from render keys from SURFACES static variable', function() {
 				var CustomComponent = createTestComponentClass();
 				CustomComponent.SURFACES = {
 					header: {
-						renderAttrs: ['headerContent', 'fontSize']
+						renderKeys: ['headerContent', 'fontSize']
 					}
 				};
 				component = new CustomComponent({
 					headerContent: 'My Header'
 				});
-				assert.deepEqual({}, component.getAttrConfig('headerContent'));
+				assert.deepEqual({}, component.getStateKeyConfig('headerContent'));
 				assert.strictEqual('My Header', component.headerContent);
-				assert.deepEqual({}, component.getAttrConfig('fontSize'));
+				assert.deepEqual({}, component.getStateKeyConfig('fontSize'));
 				assert.strictEqual(undefined, component.fontSize);
 			});
 
-			it('should not override attr config when it already exists', function() {
+			it('should not override state key config when it already exists', function() {
 				var CustomComponent = createTestComponentClass();
 				component = new CustomComponent();
 				var headerContentConfig = {
 					value: 'My Header Content'
 				};
-				component.addAttr('headerContent', headerContentConfig);
+				component.addToState('headerContent', headerContentConfig);
 				component.getRenderer().addSurfaces({
 					header: {
-						renderAttrs: ['headerContent', 'fontSize']
+						renderKeys: ['headerContent', 'fontSize']
 					}
 				});
-				assert.strictEqual(headerContentConfig, component.getAttrConfig('headerContent'));
-				assert.deepEqual({}, component.getAttrConfig('fontSize'));
+				assert.strictEqual(headerContentConfig, component.getStateKeyConfig('headerContent'));
+				assert.deepEqual({}, component.getStateKeyConfig('fontSize'));
 			});
 
-			it('should rerender surfaces when the values of their render attributes change', function(done) {
+			it('should rerender surfaces when the values of their render state keys change', function(done) {
 				var TestComponent = createTestComponentClass({
 					main: '<span id="main">%%%%~s-main-foo~%%%%</span>',
 					'main-foo': comp => comp.foo + comp.bar
 				});
 				TestComponent.SURFACES = {
 					foo: {
-						renderAttrs: ['foo', 'bar']
+						renderKeys: ['foo', 'bar']
 					}
 				};
 
@@ -425,13 +425,13 @@ describe('SurfaceRenderer', function() {
 
 				component.foo = 'bar';
 				component.bar = 'foo';
-				component.once('attrsSynced', function() {
+				component.once('stateSynced', function() {
 					assert.strictEqual('barfoo', fooSurface.textContent);
 					done();
 				});
 			});
 
-			it('should rerender surface when render attrs that were added later change', function(done) {
+			it('should rerender surface when render state keys that were added later change', function(done) {
 				var CustomComponent = createTestComponentClass({
 					main: '%%%%~s-main-foo~%%%%',
 					'main-foo': comp => comp.foo
@@ -445,20 +445,20 @@ describe('SurfaceRenderer', function() {
 				component.render();
 
 				renderer.addSurface('foo', {
-					renderAttrs: ['foo']
+					renderKeys: ['foo']
 				});
 				component.foo = 'foo';
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.strictEqual('foo', renderer.getSurfaceElement('foo').textContent);
 					done();
 				});
 			});
 
-			it('should rerender element content when its render attrs change', function(done) {
+			it('should rerender element content when the values of its render state keys change', function(done) {
 				var CustomComponent = createTestComponentClass({
 					main: comp => {
 						comp.getRenderer().addSurface(comp.id, {
-							renderAttrs: ['foo']
+							renderKeys: ['foo']
 						});
 						return '<div>' + comp.foo + '</div>';
 					}
@@ -471,13 +471,13 @@ describe('SurfaceRenderer', function() {
 
 				assert.strictEqual('foo', component.element.textContent);
 				component.foo = 'bar';
-				component.once('attrsSynced', function() {
+				component.once('stateSynced', function() {
 					assert.strictEqual('bar', component.element.textContent);
 					done();
 				});
 			});
 
-			it('should not rerender surface twice if both it and its parent change with render attrs', function(done) {
+			it('should not rerender surface twice if both it and its parent change with render keys', function(done) {
 				var CustomComponent = createTestComponentClass({
 					main: '%%%%~s-main-foo~%%%%',
 					'main-foo': comp => comp.foo + '%%%%~s-main-nestedFoo~%%%%',
@@ -485,10 +485,10 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					foo: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					},
 					nestedFoo: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					}
 				};
 
@@ -499,7 +499,7 @@ describe('SurfaceRenderer', function() {
 				sinon.spy(renderer, 'getSurfaceContent');
 
 				component.foo = 'bar';
-				component.once('attrsSynced', function() {
+				component.once('stateSynced', function() {
 					assert.strictEqual(2, renderer.getSurfaceContent.callCount);
 					assert.strictEqual('main-foo', renderer.getSurfaceContent.args[0][0].surfaceElementId);
 					assert.strictEqual('main-nestedFoo', renderer.getSurfaceContent.args[1][0].surfaceElementId);
@@ -507,12 +507,12 @@ describe('SurfaceRenderer', function() {
 				});
 			});
 
-			it('should not rerender surfaces the value of non-render attributes change', function(done) {
+			it('should not rerender surfaces the value of non-render state keys change', function(done) {
 				var TestComponent = createTestComponentClass({
 					main: '<span id="main">%%%%~s-main-foo~%%%%</span>',
 					'main-foo': '<div>foo</div>'
 				});
-				TestComponent.ATTRS = {
+				TestComponent.STATE = {
 					foo: {}
 				};
 
@@ -524,13 +524,13 @@ describe('SurfaceRenderer', function() {
 				var child = renderer.getSurfaceElement('main-foo').childNodes[0];
 
 				component.foo = 'bar';
-				component.once('attrsSynced', function() {
+				component.once('stateSynced', function() {
 					assert.strictEqual(child, renderer.getSurfaceElement('main-foo').childNodes[0]);
 					done();
 				});
 			});
 
-			it('should not rerender surface when its render attrs change but content stays the same', function(done) {
+			it('should not rerender surface when its render keys change but content stays the same', function(done) {
 				var CustomComponent = createTestComponentClass({
 					main: '%%%%~s-main-oddsOrEven~%%%%',
 					'main-oddsOrEven': comp => {
@@ -543,13 +543,13 @@ describe('SurfaceRenderer', function() {
 				});
 				var renderer = component.getRenderer();
 				renderer.addSurface('oddsOrEven', {
-					renderAttrs: ['number']
+					renderKeys: ['number']
 				});
 				component.render();
 
 				var initialContent = renderer.getSurfaceElement('oddsOrEven').childNodes[0];
 				component.number = 4;
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.strictEqual(initialContent, renderer.getSurfaceElement('oddsOrEven').childNodes[0]);
 					done();
 				});
@@ -562,7 +562,7 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					foo: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					}
 				};
 
@@ -574,7 +574,7 @@ describe('SurfaceRenderer', function() {
 				renderer.clearSurfaceCache('foo');
 				var surfaceContent = renderer.getSurfaceElement('foo').childNodes[0];
 				component.foo = 1;
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.notStrictEqual(surfaceContent, renderer.getSurfaceElement('foo').childNodes[0]);
 					done();
 				});
@@ -587,7 +587,7 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					foo: {
-						renderAttrs: ['foo'],
+						renderKeys: ['foo'],
 						static: true
 					}
 				};
@@ -601,7 +601,7 @@ describe('SurfaceRenderer', function() {
 				assert.strictEqual('foo', surfaceContent.textContent);
 
 				component.foo = 'bar';
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.strictEqual(surfaceContent, renderer.getSurfaceElement('foo').childNodes[0]);
 					done();
 				});
@@ -620,7 +620,7 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					foo: {
-						renderAttrs: ['count']
+						renderKeys: ['count']
 					}
 				};
 
@@ -634,7 +634,7 @@ describe('SurfaceRenderer', function() {
 				assert.ok(renderer.getSurface('s2'));
 
 				component.count = 1;
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.ok(renderer.getSurface('s0'));
 					assert.ok(!renderer.getSurface('s1'));
 					assert.ok(!renderer.getSurface('s2'));
@@ -714,7 +714,7 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					dynamic: {
-						renderAttrs: ['tag']
+						renderKeys: ['tag']
 					}
 				};
 
@@ -728,7 +728,7 @@ describe('SurfaceRenderer', function() {
 				assert.strictEqual('DIV', surfaceElement.tagName);
 
 				component.tag = 'span';
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					var newSurfaceElement = renderer.getSurfaceElement('dynamic');
 					assert.notStrictEqual(surfaceElement, newSurfaceElement);
 					assert.strictEqual('SPAN', newSurfaceElement.tagName);
@@ -787,19 +787,19 @@ describe('SurfaceRenderer', function() {
 				assert.deepEqual(component.id, listener.args[0][0].surfaceId);
 			});
 
-			it('should emit "renderSurface" event for each surface that will be rendered on attr change', function(done) {
+			it('should emit "renderSurface" event for each surface that will be rendered on state key change', function(done) {
 				var CustomComponent = createTestComponentClass({
 					main: '%%%%~s-main-header~%%%%%%%%~s-main-body~%%%%%%%%~s-main-bottom~%%%%'
 				});
 				CustomComponent.SURFACES = {
 					header: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					},
 					body: {
-						renderAttrs: ['bar']
+						renderKeys: ['bar']
 					},
 					bottom: {
-						renderAttrs: ['foo', 'bar']
+						renderKeys: ['foo', 'bar']
 					}
 				};
 				component = new CustomComponent({
@@ -810,7 +810,7 @@ describe('SurfaceRenderer', function() {
 				component.getRenderer().on('renderSurface', listener);
 
 				component.foo = 2;
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.strictEqual(2, listener.callCount);
 					var surfaceIds = [listener.args[0][0].surfaceId, listener.args[1][0].surfaceId];
 					assert.deepEqual(['bottom', 'header'], surfaceIds.sort());
@@ -826,10 +826,10 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					header: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					},
 					bottom: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					}
 				};
 				component = new CustomComponent({
@@ -844,7 +844,7 @@ describe('SurfaceRenderer', function() {
 				});
 
 				component.foo = 'foo';
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.strictEqual('foo', renderer.getSurfaceElement('bottom').textContent);
 					assert.strictEqual('', renderer.getSurfaceElement('header').textContent);
 					done();
@@ -857,7 +857,7 @@ describe('SurfaceRenderer', function() {
 
 			beforeEach(function() {
 				ChildComponent = createTestComponentClass();
-				ChildComponent.ATTRS = {
+				ChildComponent.STATE = {
 					foo: {}
 				};
 				ComponentRegistry.register(ChildComponent, 'ChildComponent');
@@ -963,7 +963,7 @@ describe('SurfaceRenderer', function() {
 						});
 					}
 				});
-				CustomComponent.ATTRS = {
+				CustomComponent.STATE = {
 					foo: {}
 				};
 
@@ -992,7 +992,7 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					foo: {
-						renderAttrs: ['foo']
+						renderKeys: ['foo']
 					}
 				};
 
@@ -1004,7 +1004,7 @@ describe('SurfaceRenderer', function() {
 				assert.strictEqual('foo', child.foo);
 
 				component.foo = 'bar';
-				child.once('attrsChanged', function() {
+				child.once('stateChanged', function() {
 					assert.strictEqual('bar', child.foo);
 					done();
 				});
@@ -1029,7 +1029,7 @@ describe('SurfaceRenderer', function() {
 						componentName: 'ChildComponent'
 					},
 					invert: {
-						renderAttrs: ['invert']
+						renderKeys: ['invert']
 					}
 				};
 
@@ -1043,7 +1043,7 @@ describe('SurfaceRenderer', function() {
 				assert.strictEqual(childElements[1], child2.element);
 
 				component.invert = true;
-				component.once('attrsSynced', function() {
+				component.once('stateSynced', function() {
 					childElements = component.element.childNodes[0].childNodes;
 					assert.strictEqual(childElements[0], child2.element);
 					assert.strictEqual(childElements[1], child1.element);
@@ -1158,7 +1158,7 @@ describe('SurfaceRenderer', function() {
 				});
 				CustomComponent.SURFACES = {
 					count: {
-						renderAttrs: ['count']
+						renderKeys: ['count']
 					}
 				};
 
@@ -1170,7 +1170,7 @@ describe('SurfaceRenderer', function() {
 				assert.strictEqual(3, Object.keys(comps).length);
 
 				component.count = 1;
-				component.once('attrsChanged', function() {
+				component.once('stateChanged', function() {
 					assert.ok(component.components.comp0);
 					assert.ok(!component.components.comp1);
 					assert.ok(!component.components.comp2);
@@ -1235,7 +1235,7 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.SURFACES = {
 				's1-s1': {
-					renderAttrs: ['foo']
+					renderKeys: ['foo']
 				}
 			};
 
@@ -1248,7 +1248,7 @@ describe('SurfaceRenderer', function() {
 			var s1S2 = component.element.querySelector('.s1S2');
 
 			component.foo = 'bar';
-			component.on('attrsChanged', function() {
+			component.on('stateChanged', function() {
 				assert.strictEqual(s1, component.element.querySelector('.s1'));
 				assert.strictEqual(s1S2, component.element.querySelector('.s1S2'));
 				assert.notStrictEqual(s1S1, component.element.querySelector('.s1S1'));
@@ -1390,7 +1390,7 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.SURFACES = {
 				mouseover: {
-					renderAttrs: ['mouseover']
+					renderKeys: ['mouseover']
 				}
 			};
 			CustomComponent.prototype.handleClick = sinon.stub();
@@ -1402,7 +1402,7 @@ describe('SurfaceRenderer', function() {
 			}).render();
 			sinon.spy(component, 'removeListener');
 			component.mouseover = false;
-			component.on('attrsSynced', function() {
+			component.on('stateSynced', function() {
 				assert.strictEqual(1, component.removeListener.callCount);
 				assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('mouseover'));
 				done();
@@ -1508,7 +1508,7 @@ describe('SurfaceRenderer', function() {
 			});
 			CustomComponent.SURFACES = {
 				foo: {
-					renderAttrs: ['foo']
+					renderKeys: ['foo']
 				}
 			};
 			component = new CustomComponent({
@@ -1516,7 +1516,7 @@ describe('SurfaceRenderer', function() {
 			}).render();
 
 			component.foo = 'foo';
-			component.once('attrsSynced', function() {
+			component.once('stateSynced', function() {
 				async.nextTick(function() {
 					assert.strictEqual('foo', window.testScriptEvaluated);
 					done();

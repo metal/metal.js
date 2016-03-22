@@ -124,8 +124,8 @@ describe('Component', function() {
 		});
 	});
 
-	describe('Attributes', function() {
-		it('should set component id attr', function() {
+	describe('State', function() {
+		it('should set component id', function() {
 			var custom = new Component({
 				id: 'customId'
 			});
@@ -146,7 +146,7 @@ describe('Component', function() {
 			assert.ok(custom.element);
 		});
 
-		it('should set component element attr', function() {
+		it('should set component element', function() {
 			var element = document.createElement('div');
 			element.id = 'elementId';
 			document.body.appendChild(element);
@@ -159,7 +159,7 @@ describe('Component', function() {
 			assert.strictEqual(element, custom.element);
 		});
 
-		it('should set component element attr from selector', function() {
+		it('should set component element from selector', function() {
 			var element = document.createElement('div');
 			element.className = 'myClass';
 			document.body.appendChild(element);
@@ -185,7 +185,7 @@ describe('Component', function() {
 			assert.strictEqual(element, custom.element);
 		});
 
-		it('should set component element id from id attr', function() {
+		it('should set component element id from id', function() {
 			var element = document.createElement('div');
 			element.id = 'elementId';
 			document.body.appendChild(element);
@@ -223,7 +223,7 @@ describe('Component', function() {
 			assert.strictEqual('custom', custom.id);
 		});
 
-		it('should set component elementClasses attr', function(done) {
+		it('should set component elementClasses', function(done) {
 			var custom = new Component({
 				elementClasses: 'foo bar'
 			});
@@ -260,17 +260,17 @@ describe('Component', function() {
 			assert.ok(dom.hasClass(custom.element, 'testClass'));
 		});
 
-		it('should update element display value according to visible attr', function(done) {
+		it('should update element display value according to visible state', function(done) {
 			var custom = new Component().render();
 
 			assert.ok(custom.visible);
 			assert.strictEqual('', custom.element.style.display);
 
 			custom.visible = false;
-			custom.once('attrsChanged', function() {
+			custom.once('stateChanged', function() {
 				assert.strictEqual('none', custom.element.style.display);
 				custom.visible = true;
-				custom.once('attrsChanged', function() {
+				custom.once('stateChanged', function() {
 					assert.strictEqual('', custom.element.style.display);
 					done();
 				});
@@ -299,13 +299,13 @@ describe('Component', function() {
 		it('should not throw error when trying to set display value before element is set', function(done) {
 			var custom = new Component();
 			custom.visible = false;
-			custom.once('attrsSynced', function() {
+			custom.once('stateSynced', function() {
 				assert.ok(!custom.visible);
 				done();
 			});
 		});
 
-		describe('events attr', function() {
+		describe('events state key', function() {
 			it('should attach events to specified functions', function() {
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
@@ -403,7 +403,7 @@ describe('Component', function() {
 				assert.strictEqual(1, custom.listener1.callCount);
 			});
 
-			it('should detach unused events when value of the "events" attribute is changed', function() {
+			it('should detach unused events when value of the "events" state key is changed', function() {
 				var CustomComponent = createCustomComponentClass();
 				CustomComponent.prototype.listener1 = sinon.stub();
 				CustomComponent.prototype.listener2 = sinon.stub();
@@ -425,9 +425,9 @@ describe('Component', function() {
 			});
 		});
 
-		it('should fire synchronize attr synchronously on render and asynchronously when attr value change', function() {
+		it('should synchronize state synchronously on render and asynchronously when state value changes', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {
+			CustomComponent.STATE = {
 				foo: {
 					value: 0
 				}
@@ -459,9 +459,9 @@ describe('Component', function() {
 			});
 		});
 
-		it('should fire sync methods for attrs defined by super classes as well', function() {
+		it('should fire sync methods for state keys defined by super classes as well', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {
+			CustomComponent.STATE = {
 				foo: {
 					value: 0
 				}
@@ -469,7 +469,7 @@ describe('Component', function() {
 
 			class ChildComponent extends CustomComponent {
 			}
-			ChildComponent.ATTRS = {
+			ChildComponent.STATE = {
 				bar: {
 					value: 1
 				}
@@ -483,9 +483,9 @@ describe('Component', function() {
 			sinon.assert.callCount(custom.syncBar, 1);
 		});
 
-		it('should emit "attrsSynced" event after attr changes update the component', function(done) {
+		it('should emit "stateSynced" event after state changes update the component', function(done) {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {
+			CustomComponent.STATE = {
 				foo: {
 					value: 0
 				}
@@ -493,18 +493,18 @@ describe('Component', function() {
 
 			var custom = new CustomComponent().render();
 			var listener = sinon.stub();
-			custom.on('attrsSynced', listener);
+			custom.on('stateSynced', listener);
 			custom.foo = 1;
-			custom.once('attrsChanged', function(data) {
+			custom.once('stateChanged', function(data) {
 				assert.strictEqual(1, listener.callCount);
 				assert.strictEqual(data, listener.args[0][0]);
 				done();
 			});
 		});
 
-		it('should not allow defining attribute named components', function() {
+		it('should not allow defining state key named components', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ATTRS = {
+			CustomComponent.STATE = {
 				components: {}
 			};
 
@@ -816,7 +816,7 @@ describe('Component', function() {
 
 		before(function() {
 			ChildComponent = createCustomComponentClass();
-			ChildComponent.ATTRS = {
+			ChildComponent.STATE = {
 				foo: {}
 			};
 			ComponentRegistry.register(ChildComponent, 'ChildComponent');

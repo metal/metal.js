@@ -20,7 +20,6 @@
     "metal"
   ],
   "dependencies": {
-    "closure-templates": "20140422.0.0",
     "html2incdom": "^0.1.1",
     "metal": "^1.0.0-rc",
     "metal-incremental-dom": "metal/metal-incremental-dom#master",

@@ -59,6 +59,25 @@ class Soy extends IncrementalDomRenderer {
 	}
 
 	/**
+	 * Returns the requested template function. This function will be wrapped in
+	 * another though, just to defer the requirement of the template's module
+	 * being ready until the function is actually called.
+	 * @param {string} namespace The soy template's namespace.
+	 * @param {string} templateName The name of the template function.
+	 * @return {!function()}
+	 */
+	static getTemplate(namespace, templateName) {
+		return function(opt_data, opt_ignored, opt_ijData) {
+			if (!goog.loadedModules_[namespace]) {
+				throw new Error(
+					'No template with namespace "' + namespace + '" has been loaded yet.'
+				);
+			}
+			return goog.loadedModules_[namespace][templateName](opt_data, opt_ignored, opt_ijData);
+		};
+	}
+
+	/**
 	 * Handles an intercepted soy template call. If the call is for a component's
 	 * main template, then it will be replaced with a call that incremental dom
 	 * can use for both handling an instance of that component and rendering it.

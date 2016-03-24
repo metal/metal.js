@@ -270,4 +270,28 @@ describe('Soy', function() {
 			assert.strictEqual('Hello World!', nested2.element.textContent);
 		});
 	});
+
+	describe('Soy.getTemplate', function() {
+		it('should not throw error if called for undeclared namespace', function() {
+			assert.doesNotThrow(() => Soy.getTemplate('Undeclared.incrementaldom', 'render'));
+		});
+
+		it('should throw error if returned function is called for undeclared namespace', function() {
+			var template = Soy.getTemplate('Undeclared.incrementaldom', 'render');
+			assert.throws(template);
+		});
+
+		it('should not throw error if namespace is declared before returned function is called', function() {
+			var template = Soy.getTemplate('DeclaredLater.incrementaldom', 'render');
+			var module = {
+				render: sinon.stub()
+			};
+			goog.loadModule(function() {
+				goog.module('DeclaredLater.incrementaldom');
+				return module;
+			});
+			template();
+			assert.strictEqual(1, module.render.callCount);
+		});
+	});
 });

@@ -22,6 +22,7 @@
   "dependencies": {
     "html2incdom": "^0.1.1",
     "metal": "^1.0.0-rc",
+    "metal-component": "metal/metal-component#master",
     "metal-incremental-dom": "metal/metal-incremental-dom#master",
     "metal-soy-bundle": "^0.2.0"
   },

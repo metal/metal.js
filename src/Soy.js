@@ -4,6 +4,7 @@ import 'metal-soy-bundle';
 import './requireWarning';
 
 import core from 'metal';
+import { ComponentRegistry } from 'metal-component';
 import HTML2IncDom from 'html2incdom';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import SoyAop from './SoyAop';
@@ -106,6 +107,7 @@ class Soy extends IncrementalDomRenderer {
 		componentCtor.TEMPLATE = SoyAop.getOriginalFn(templates[mainTemplate]);
 		componentCtor.TEMPLATE.componentCtor = componentCtor;
 		SoyAop.registerForInterception(templates, mainTemplate);
+		ComponentRegistry.register(componentCtor);
 	}
 
 	/**

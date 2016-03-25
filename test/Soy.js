@@ -189,6 +189,20 @@ describe('Soy', function() {
 			assert.ok(dom.hasClass(comp.element.childNodes[0], 'custom'));
 			assert.strictEqual('HTML Content', comp.element.childNodes[0].textContent);
 		});
+
+		it('should render html sanitized object attributes correctly if isHtml is true', function() {
+			comp = new HtmlContentComponent({
+				content: {
+					content: '<span class="custom">HTML Content</span>',
+					contentKind: 'HTML'
+				}
+			}).render();
+
+			assert.strictEqual(1, comp.element.childNodes.length);
+			assert.strictEqual('SPAN', comp.element.childNodes[0].tagName);
+			assert.ok(dom.hasClass(comp.element.childNodes[0], 'custom'));
+			assert.strictEqual('HTML Content', comp.element.childNodes[0].textContent);
+		});
 	});
 
 	describe('Inline Events', function() {

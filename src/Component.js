@@ -387,17 +387,6 @@ class Component extends State {
 	}
 
 	/**
-	 * Finds the element that matches the given id on this component. This searches
-	 * on the document first, for performance. If the element is not found, it's
-	 * searched in the component's element directly.
-	 * @param {string} id
-	 * @return {Element}
-	 */
-	findElementById(id) {
-		return document.getElementById(id) || (this.element && this.element.querySelector('#' + id));
-	}
-
-	/**
 	 * Calls the synchronization function for the state key.
 	 * @param {string} key
 	 * @param {Object.<string, Object>=} opt_change Object containing newVal and
@@ -428,16 +417,6 @@ class Component extends State {
 		var map = {};
 		ids.forEach(id => map[id] = this.components[id]);
 		return map;
-	}
-
-	/**
-	 * Gets the name of this component. If the `NAME` static variable is set, this will
-	 * be the component's name. Otherwise, it will be formed from the constructor's
-	 * function name.
-	 * @return {string}
-	 */
-	getName() {
-		return this.constructor.NAME || core.getFunctionName(this.constructor);
 	}
 
 	/**

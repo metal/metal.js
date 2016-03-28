@@ -305,6 +305,12 @@ describe('Component', function() {
 			});
 		});
 
+		it('should return initial config object received by the constructor', function() {
+			var config = {};
+			var custom = new Component(config);
+			assert.strictEqual(config, custom.getInitialConfig());
+		});
+
 		describe('events state key', function() {
 			it('should attach events to specified functions', function() {
 				var listener1 = sinon.stub();
@@ -626,6 +632,17 @@ describe('Component', function() {
 
 			assert.strictEqual(1, listenerFn.callCount);
 			assert.ok(listenerFn.args[0][0].decorating);
+		});
+
+		it('should not emit "render" event when renderAsSubComponent is called', function() {
+			var custom = new Component({
+				element: document.createElement('div')
+			});
+			var listenerFn = sinon.stub();
+			custom.once('render', listenerFn);
+
+			custom.renderAsSubComponent();
+			assert.strictEqual(0, listenerFn.callCount);
 		});
 	});
 

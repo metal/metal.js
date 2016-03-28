@@ -1,5 +1,7 @@
 'use strict';
 
+import 'metal-soy-bundle';
+
 var original = goog.require;
 goog.require = function(name) {
 	try {

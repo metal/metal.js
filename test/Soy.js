@@ -308,4 +308,16 @@ describe('Soy', function() {
 			assert.strictEqual(1, module.render.callCount);
 		});
 	});
+
+	describe('Soy.toHtmlString', function() {
+		it('should convert given incremental dom function into an html string', function() {
+			var fn = function() {
+				IncrementalDOM.elementOpen('div', null, [], 'class', 'toHtmlString');
+				IncrementalDOM.text('To Convert');
+				IncrementalDOM.elementClose('div');
+			};
+			var str = Soy.toHtmlString(fn);
+			assert.strictEqual('<div class="toHtmlString">To Convert</div>', str);
+		});
+	});
 });

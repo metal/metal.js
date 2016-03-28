@@ -160,6 +160,17 @@ class Soy extends IncrementalDomRenderer {
 	}
 
 	/**
+	 * Converts the given incremental dom function into an html string.
+	 * @param {!function()} incDomFn
+	 * @return {string}
+	 */
+	static toHtmlString(incDomFn) {
+		var element = document.createElement('div');
+		IncrementalDOM.patch(element, incDomFn);
+		return element.innerHTML;
+	}
+
+	/**
 	 * Converts the given html string into an incremental dom function.
 	 * @param {string} value
 	 * @return {!function()}

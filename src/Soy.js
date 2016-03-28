@@ -52,12 +52,7 @@ class Soy extends IncrementalDomRenderer {
 
 			var value = component[key];
 			if (component.getStateKeyConfig(key).isHtml) {
-				if (core.isObject(value) && core.isString(value.content) && (value.contentKind === 'HTML')) {
-					value = value.content;
-				}
-				if (core.isString(value)) {
-					value = Soy.toIncDom(value);
-				}
+				value = Soy.toIncDom(value);
 			}
 			data[key] = value;
 		});
@@ -172,11 +167,17 @@ class Soy extends IncrementalDomRenderer {
 
 	/**
 	 * Converts the given html string into an incremental dom function.
-	 * @param {string} value
+	 * @param {string|{contentKind: string, content: string}} value
 	 * @return {!function()}
 	 */
 	static toIncDom(value) {
-		return HTML2IncDom.buildFn(value);
+		if (core.isObject(value) && core.isString(value.content) && (value.contentKind === 'HTML')) {
+			value = value.content;
+		}
+		if (core.isString(value)) {
+			value = HTML2IncDom.buildFn(value);
+		}
+		return value;
 	}
 }
 

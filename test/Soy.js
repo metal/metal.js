@@ -320,4 +320,32 @@ describe('Soy', function() {
 			assert.strictEqual('<div class="toHtmlString">To Convert</div>', str);
 		});
 	});
+
+	describe('Soy.toIncDom', function() {
+		it('should convert given html string into an incremental dom function', function() {
+			var str = '<div class="toHtmlString">To Convert</div>';
+			var fn = Soy.toIncDom(str);
+
+			var element = document.createElement('div');
+			IncrementalDOM.patch(element, fn);
+			assert.strictEqual(str, element.innerHTML);
+		});
+
+		it('should convert given sanitized html object into an incremental dom function', function() {
+			var str = '<div class="toHtmlString">To Convert</div>';
+			var fn = Soy.toIncDom({
+				content: str,
+				contentKind: 'HTML'
+			});
+
+			var element = document.createElement('div');
+			IncrementalDOM.patch(element, fn);
+			assert.strictEqual(str, element.innerHTML);
+		});
+
+		it('should not try to convert param that is not a string or a sanitized html object', function() {
+			var fn = sinon.stub();
+			assert.strictEqual(fn, Soy.toIncDom(fn));
+		});
+	});
 });

@@ -221,6 +221,13 @@ class Component extends State {
 		// the lookup of the component's element in the dom unnecessarily, which is
 		// bad for performance.
 		var id = (opt_componentData || {}).id;
+		if (id === this.id) {
+			throw new Error(
+				'A component can\'t be its own sub component. Tried adding sub ' +
+				'component with the same id as the parent component. Make sure that ' +
+				'you\'re not passing the parent\'s id to the child by mistake.'
+			);
+		}
 		var component = Component.componentsCollector.createComponent(
 			componentNameOrCtor,
 			opt_componentData

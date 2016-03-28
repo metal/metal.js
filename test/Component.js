@@ -858,6 +858,15 @@ describe('Component', function() {
 			assert.strictEqual(child, custom.components.child);
 		});
 
+		it('should throw error if adding component as its own sub component', function() {
+			var custom = new Component();
+			assert.throws(function() {
+				custom.addSubComponent('ChildComponent', {
+					id: custom.id
+				});
+			});
+		});
+
 		it('should get all sub components with ids matching a given prefix', function() {
 			var custom = new Component();
 			custom.addSubComponent('ChildComponent', {

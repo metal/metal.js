@@ -242,6 +242,11 @@ describe('Soy', function() {
 			dom.triggerEvent(comp.element.querySelector('button'), 'click');
 			assert.strictEqual(comp, context);
 		});
+
+		it('should not add prototype functions to the state', function() {
+			comp = new FunctionsComponent().render();
+			assert.ok(!comp.getStateKeys.handleClick);
+		});
 	});
 
 	describe('Nested Components', function() {

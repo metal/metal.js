@@ -1,7 +1,7 @@
 'use strict';
 
 import dom from 'metal-dom';
-import { Component, ComponentCollector } from 'metal-component';
+import Component from 'metal-component';
 import { HelloWorld as HelloWorldComponent, templates as helloWorldTemplates } from './assets/HelloWorld.soy';
 import { IJData as IJDataComponent } from './assets/IJData.soy';
 import { Events as EventsComponent } from './assets/Events.soy';
@@ -27,7 +27,6 @@ describe('Soy', function() {
 		if (comp) {
 			comp.dispose();
 		}
-		ComponentCollector.components = {};
 	});
 
 	describe('Rendering', function() {
@@ -270,12 +269,12 @@ describe('Soy', function() {
 			assert.strictEqual('Hello Foo!', nested.element.textContent);
 		});
 
-		it('should render and instantiate nested components even without id', function() {
+		it('should render and instantiate nested components even without key', function() {
 			comp = new NestedNoDataComponent().render();
-			var subComponentIds = Object.keys(comp.components);
-			assert.strictEqual(1, subComponentIds.length);
+			var keys = Object.keys(comp.components);
+			assert.strictEqual(1, keys.length);
 
-			var nested = comp.components[subComponentIds[0]];
+			var nested = comp.components[keys[0]];
 			assert.ok(nested instanceof HelloWorldComponent);
 			assert.strictEqual(nested.element, comp.element.childNodes[0]);
 			assert.strictEqual('Hello World!', nested.element.textContent);

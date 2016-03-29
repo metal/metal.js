@@ -7,7 +7,7 @@
 	<div>
 		{for $i in range($count)}
 			{call HelloWorld.render}
-				{param id: 'hello' + ($i + 1) /}
+				{param key: 'hello' + ($i + 1) /}
 			{/call}
 		{/for}
 	</div>

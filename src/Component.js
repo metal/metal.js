@@ -410,15 +410,6 @@ class Component extends State {
 	}
 
 	/**
-	 * Makes an unique id for the component.
-	 * @return {string} Unique id.
-	 * @protected
-	 */
-	makeId_() {
-		return 'metal_c_' + core.getUid(this);
-	}
-
-	/**
 	 * Merges an array of values for the ELEMENT_CLASSES property into a single object.
 	 * @param {!Array.<string>} values The values to be merged.
 	 * @return {!string} The merged value.
@@ -450,7 +441,6 @@ class Component extends State {
 		}
 
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
-		event.newVal.id = this.id;
 		this.addElementClasses_();
 		this.syncVisible(this.visible);
 	}
@@ -530,7 +520,6 @@ class Component extends State {
 	 */
 	renderElement_(opt_parentElement, opt_siblingElement) {
 		var element = this.element;
-		element.id = this.id;
 		if (opt_siblingElement || !element.parentNode) {
 			var parent = dom.toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 			parent.insertBefore(element, dom.toElement(opt_siblingElement));
@@ -641,26 +630,6 @@ class Component extends State {
 	validatorEventsFn_(val) {
 		return !core.isDefAndNotNull(val) || core.isObject(val);
 	}
-
-	/**
-	 * Validator logic for the `id` state key.
-	 * @param {string} val
-	 * @return {boolean} True if val is a valid id.
-	 * @protected
-	 */
-	validatorIdFn_(val) {
-		return core.isString(val);
-	}
-
-	/**
-	 * Provides the default value for id state key.
-	 * @return {string} The id.
-	 * @protected
-	 */
-	valueIdFn_() {
-		var hasElement = this.hasBeenSet('element') && this.element;
-		return hasElement && this.element.id ? this.element.id : this.makeId_();
-	}
 }
 
 /**
@@ -696,17 +665,6 @@ Component.STATE = {
 	events: {
 		validator: 'validatorEventsFn_',
 		value: null
-	},
-
-	/**
-	 * Component element id. If not specified will be generated.
-	 * @type {string}
-	 * @writeOnce
-	 */
-	id: {
-		validator: 'validatorIdFn_',
-		valueFn: 'valueIdFn_',
-		writeOnce: true
 	},
 
 	/**

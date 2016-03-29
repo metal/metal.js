@@ -56,13 +56,13 @@ describe('Component', function() {
 
 			custom.detach();
 			custom.detach(); // Allow multiple
-			assert.strictEqual(null, document.getElementById(custom.id));
+			assert.ok(!custom.element.parentNode);
 			assert.strictEqual(false, custom.inDocument);
 			sinon.assert.callCount(Component.prototype.detached, 1);
 
 			custom.attach();
 			custom.attach(); // Allow multiple
-			assert.notStrictEqual(null, document.getElementById(custom.id));
+			assert.ok(custom.element.parentNode);
 			assert.strictEqual(true, custom.inDocument);
 			sinon.assert.callCount(Component.prototype.attached, 2);
 		});
@@ -107,30 +107,17 @@ describe('Component', function() {
 			var custom = new Component();
 			custom.render();
 
-			var customId = custom.id;
-			assert.notStrictEqual(null, document.getElementById(customId));
+			assert.ok(custom.element.parentNode);
+			var element = custom.element;
+
 			custom.dispose();
-			assert.strictEqual(null, document.getElementById(customId));
+			assert.ok(!element.parentNode);
 
 			sinon.assert.callCount(Component.prototype.detached, 1);
 		});
 	});
 
 	describe('State', function() {
-		it('should set component id', function() {
-			var custom = new Component({
-				id: 'customId'
-			});
-			custom.render();
-			assert.strictEqual('customId', custom.id);
-		});
-
-		it('should generate id when none is given', function() {
-			var custom = new Component();
-			var custom2 = new Component();
-			assert.notStrictEqual(custom.id, custom2.id);
-		});
-
 		it('should only create default value for component element after render', function() {
 			var custom = new Component();
 			assert.ok(!custom.element);
@@ -140,14 +127,12 @@ describe('Component', function() {
 
 		it('should set component element', function() {
 			var element = document.createElement('div');
-			element.id = 'elementId';
 			document.body.appendChild(element);
 
 			var custom = new Component({
 				element: element
 			});
 			custom.render();
-			assert.strictEqual('elementId', custom.id);
 			assert.strictEqual(element, custom.element);
 		});
 
@@ -175,44 +160,6 @@ describe('Component', function() {
 
 			custom.element = '.wrongSelector';
 			assert.strictEqual(element, custom.element);
-		});
-
-		it('should set component element id from id', function() {
-			var element = document.createElement('div');
-			element.id = 'elementId';
-			document.body.appendChild(element);
-
-			var custom = new Component({
-				element: element,
-				id: 'customId'
-			});
-			custom.render();
-			assert.strictEqual('customId', element.id);
-			assert.strictEqual(element, custom.element);
-		});
-
-		it('should set id from given element when it has one', function() {
-			var element = document.createElement('div');
-			element.id = 'elementId';
-			var custom = new Component({
-				element: element
-			});
-			assert.strictEqual('elementId', custom.id);
-		});
-
-		it('should generate id if given element has none', function() {
-			var custom = new Component({
-				element: document.createElement('div')
-			});
-			assert.ok(custom.id);
-		});
-
-		it('should set id on new element when changed', function() {
-			var custom = new Component({
-				id: 'custom'
-			}).render();
-			custom.element = document.createElement('div');
-			assert.strictEqual('custom', custom.id);
 		});
 
 		it('should set component elementClasses', function(done) {

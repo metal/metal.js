@@ -3,7 +3,6 @@
 import { array, core, object } from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
 import ComponentCollector from './ComponentCollector';
-import ComponentRegistry from './ComponentRegistry';
 import ComponentRenderer from './ComponentRenderer';
 import { EventHandler } from 'metal-events';
 import State from 'metal-state';
@@ -363,25 +362,12 @@ class Component extends State {
 	 * @return {function()}
 	 */
 	getListenerFn(fnName) {
-		var fnComponent;
-		var split = fnName.split(':');
-		if (split.length === 2) {
-			fnName = split[1];
-			fnComponent = ComponentCollector.components[split[0]];
-			if (!fnComponent) {
-				console.error('No component with the id "' + split[0] + '" has been collected' +
-					'yet. Make sure that you specify an id for an existing component when ' +
-					'adding inline listeners.'
-				);
-			}
-		}
-		fnComponent = fnComponent || this;
-		if (core.isFunction(fnComponent[fnName])) {
-			return fnComponent[fnName].bind(fnComponent);
+		if (core.isFunction(this[fnName])) {
+			return this[fnName].bind(this);
 		} else {
-			console.error('No function named "' + fnName + '" was found in the component with id "' +
-				fnComponent.id + '". Make sure that you specify valid function names when adding ' +
-				'inline listeners.'
+			console.error('No function named "' + fnName + '" was found in the ' +
+			  'component "' + core.getFunctionName(this.constructor) + '". Make ' +
+				'sure that you specify valid function names when adding inline listeners.'
 			);
 		}
 	}

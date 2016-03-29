@@ -53,46 +53,6 @@ describe('EventsCollector', function() {
 		assert.strictEqual(1, custom.handleClick.callCount);
 	});
 
-	it('should attach event listener with a function from another component', function() {
-		var another = createCustomComponentInstance('');
-		another.handleClick = sinon.stub();
-		ComponentCollector.components['another-comp'] = another;
-
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="another-comp:handleClick"></div><div></div>'
-		);
-		custom.handleClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		assert.strictEqual(0, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(0, custom.handleClick.callCount);
-		assert.strictEqual(1, another.handleClick.callCount);
-	});
-
-	it('should print error if trying to attach function from non existing component', function() {
-		var nonExisting = createCustomComponentInstance('');
-		nonExisting.handleClick = sinon.stub();
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="non-existing:handleClick"></div><div></div>'
-		);
-		custom.handleClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-
-		sinon.stub(console, 'error');
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		assert.strictEqual(1, console.error.callCount);
-
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		assert.strictEqual(0, nonExisting.handleClick.callCount);
-
-		console.error.restore();
-	});
-
 	it('should print error if trying to attach unexisting function', function() {
 		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick"></div><div></div>'

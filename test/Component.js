@@ -358,38 +358,6 @@ describe('Component', function() {
 				console.error.restore();
 			});
 
-			it('should attach events to specified function name on another component', function() {
-				var AnotherComponent = createCustomComponentClass();
-				AnotherComponent.prototype.listener1 = sinon.stub();
-
-				var another = new AnotherComponent({
-					id: 'another'
-				});
-				var custom = new Component({
-					events: {
-						event1: 'another:listener1'
-					}
-				});
-
-				custom.emit('event1');
-				assert.strictEqual(1, another.listener1.callCount);
-			});
-
-			it('should warn if trying to attach event to unexisting other component', function() {
-				var CustomComponent = createCustomComponentClass();
-				CustomComponent.prototype.listener1 = sinon.stub();
-
-				sinon.stub(console, 'error');
-				new CustomComponent({
-					events: {
-						event1: 'unexisting:listener1'
-					}
-				});
-
-				assert.strictEqual(1, console.error.callCount);
-				console.error.restore();
-			});
-
 			it('should attach delegate events with specified selector', function() {
 				var CustomComponent = createCustomComponentClass('<button class="testButton"></button>');
 				CustomComponent.prototype.listener1 = sinon.stub();

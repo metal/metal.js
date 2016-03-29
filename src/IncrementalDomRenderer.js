@@ -57,11 +57,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	disposeUnusedSubComponents_() {
-		var ids = Object.keys(this.component_.components);
+		var keys = Object.keys(this.component_.components);
 		var unused = [];
-		for (var i = 0; i < ids.length; i++) {
-			if (!this.subComponentsFound_[ids[i]]) {
-				unused.push(ids[i]);
+		for (var i = 0; i < keys.length; i++) {
+			if (!this.subComponentsFound_[keys[i]]) {
+				unused.push(keys[i]);
 			}
 		}
 		this.component_.disposeSubComponents(unused);
@@ -70,18 +70,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Gets the sub component referenced by the given tag and config data,
 	 * creating it if it doesn't yet exist.
-	 * @param {string} tag The tag name.
+	 * @param {string} key The sub component's key.
+	 * @param {string|!Function} tagOrCtor The tag name.
 	 * @param {!Object} config The config object for the sub component.
 	 * @return {!Component} The sub component.
 	 * @protected
 	 */
-	getSubComponent_(tag, config) {
-		var tagOrCtor = tag;
-		if (tag === 'Component' && config.ctor) {
-			tagOrCtor = config.ctor;
-			config = config.data;
-		}
-		var comp = this.component_.addSubComponent(tagOrCtor, config);
+	getSubComponent_(key, tagOrCtor, config) {
+		var comp = this.component_.addSubComponent(key, tagOrCtor, config);
 
 		if (comp.wasRendered) {
 			comp.setState(config);
@@ -180,7 +176,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	handleRegularCall_(originalFn, tag, key, statics) {
 		var attrsArr = array.slice(arguments, 4);
 		this.addInlineListeners_((statics || []).concat(attrsArr));
-		var node = originalFn.apply(null, array.slice(arguments, 1));
+		var args = array.slice(arguments, 1);
+		if (!this.rootElementReached_) {
+			args[1] = IncrementalDomRenderer.componentKey;
+		}
+		var node = originalFn.apply(null, args);
 		if (!this.rootElementReached_) {
 			this.rootElementReached_ = true;
 			if (this.component_.element !== node) {
@@ -246,7 +246,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * engines for example).
 	 */
 	renderIncDom() {
-		IncrementalDOM.elementVoid('div', null, ['id', this.component_.id]);
+		IncrementalDOM.elementVoid('div');
 	}
 
 	/**
@@ -261,6 +261,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		this.rootElementReached_ = false;
 		this.subComponentsFound_ = {};
+		this.generatedKeyCount_ = 0;
 		this.listenersToAttach_ = [];
 		IncrementalDomAop.startInterception(
 			this.handleInterceptedOpenCall_.bind(this),
@@ -321,12 +322,21 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	renderSubComponent_(tag, config) {
-		var comp = this.getSubComponent_(tag, config);
+		var tagOrCtor = tag;
+		if (tag === 'Component' && config.ctor) {
+			tagOrCtor = config.ctor;
+			config = config.data || {};
+		}
+
+		var key = config.key || ('sub' + this.generatedKeyCount_++);
+		var comp = this.getSubComponent_(key, tagOrCtor, config);
+		IncrementalDomRenderer.componentKey = key;
 		comp.getRenderer().renderWithoutPatch();
+		IncrementalDomRenderer.componentKey = null;
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}
-		this.subComponentsFound_[comp.id] = true;
+		this.subComponentsFound_[key] = true;
 		return comp;
 	}
 }

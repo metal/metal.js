@@ -3,7 +3,6 @@
 import { async, core } from 'metal';
 import { dom, features } from 'metal-dom';
 import Component from '../src/Component';
-import ComponentCollector from '../src/ComponentCollector';
 import ComponentRegistry from '../src/ComponentRegistry';
 import ComponentRenderer from '../src/ComponentRenderer';
 
@@ -102,13 +101,6 @@ describe('Component', function() {
 
 			custom.detach();
 			assert.strictEqual(custom, custom.attach());
-		});
-
-		it('should add component to ComponentCollector after it\'s created', function() {
-			var custom = new Component({
-				id: 'custom'
-			});
-			assert.strictEqual(custom, ComponentCollector.components.custom);
 		});
 
 		it('should dispose component', function() {
@@ -807,119 +799,58 @@ describe('Component', function() {
 			ComponentRegistry.register(ChildComponent, 'ChildComponent');
 		});
 
-		it('should add a new sub component', function() {
+		it('should add a new sub component from constructor name', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent');
+			custom.addSubComponent('child', 'ChildComponent');
 			assert.strictEqual(1, Object.keys(custom.components).length);
 
-			var id = Object.keys(custom.components)[0];
-			var sub = custom.components[id];
+			var sub = custom.components.child;
 			assert.ok(sub instanceof ChildComponent);
-			assert.strictEqual(id, sub.id);
+		});
+
+		it('should add a new sub component from constructor', function() {
+			var custom = new Component();
+			custom.addSubComponent('child', ChildComponent);
+			assert.strictEqual(1, Object.keys(custom.components).length);
+
+			var sub = custom.components.child;
+			assert.ok(sub instanceof ChildComponent);
 		});
 
 		it('should add a new sub component with data', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', {
-				id: 'child',
+			custom.addSubComponent('child', ChildComponent, {
 				foo: 'foo'
 			});
-			assert.strictEqual(1, Object.keys(custom.components).length);
 
 			var sub = custom.components.child;
 			assert.ok(sub instanceof ChildComponent);
 			assert.strictEqual('foo', sub.foo);
 		});
 
-		it('should not create a new component when one with the given id already exists', function() {
-			var child = new ChildComponent({
-				id: 'child'
-			});
+		it('should not create a new component when one with the given key already exists', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', {
-				id: 'child'
-			});
+			custom.addSubComponent('child', ChildComponent);
+			var child = custom.components.child;
 
+			custom.addSubComponent('child', ChildComponent);
 			assert.strictEqual(child, custom.components.child);
-		});
-
-		it('should throw error if adding component as its own sub component', function() {
-			var custom = new Component();
-			assert.throws(function() {
-				custom.addSubComponent('ChildComponent', {
-					id: custom.id
-				});
-			});
-		});
-
-		it('should get all sub components with ids matching a given prefix', function() {
-			var custom = new Component();
-			custom.addSubComponent('ChildComponent', {
-				id: 'child-with-prefix1'
-			});
-			custom.addSubComponent('ChildComponent', {
-				id: 'child-without-prefix'
-			});
-			custom.addSubComponent('ChildComponent', {
-				id: 'child-with-prefix2'
-			});
-			custom.addSubComponent('ChildComponent', {
-				id: 'child-without-prefix2'
-			});
-
-			var childrenWithPrefix = custom.getComponentsWithPrefix('child-with-prefix');
-			assert.strictEqual(2, Object.keys(childrenWithPrefix).length);
-			assert.ok(childrenWithPrefix['child-with-prefix1']);
-			assert.ok(childrenWithPrefix['child-with-prefix2']);
 		});
 
 		it('should dispose sub components when parent component is disposed', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', {
-				id: 'child'
-			});
+			custom.addSubComponent('child', ChildComponent);
 
 			var child = custom.components.child;
 			assert.ok(!child.isDisposed());
 
 			custom.dispose();
 			assert.ok(child.isDisposed());
-		});
-
-		it('should not throw error when disposing a component with shared sub components', function() {
-			class AnotherComponent extends Component {
-				constructor(opt_config) {
-					super(opt_config);
-					custom.addSubComponent('ChildComponent', {
-						id: 'child'
-					});
-				}
-			}
-			ComponentRegistry.register(AnotherComponent);
-
-			var custom = new Component();
-			custom.addSubComponent('ChildComponent', {
-				id: 'child'
-			});
-			custom.addSubComponent('AnotherComponent', {
-				id: 'another'
-			});
-
-			var child = custom.components.child;
-			var another = custom.components.another;
-			assert.ok(!child.isDisposed());
-			assert.ok(!another.isDisposed());
-
-			custom.dispose();
-			assert.ok(child.isDisposed());
-			assert.ok(another.isDisposed());
 		});
 
 		it('should not throw error when disposing after subcomponents have already been disposed', function() {
 			var custom = new Component();
-			custom.addSubComponent('ChildComponent', {
-				id: 'child'
-			});
+			custom.addSubComponent('child', ChildComponent);
 
 			custom.components.child.dispose();
 			assert.doesNotThrow(custom.dispose.bind(custom));

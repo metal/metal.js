@@ -2,7 +2,7 @@
 
 import { array, core, object } from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
-import ComponentCollector from './ComponentCollector';
+import ComponentRegistry from './ComponentRegistry';
 import ComponentRenderer from './ComponentRenderer';
 import { EventHandler } from 'metal-events';
 import State from 'metal-state';
@@ -201,38 +201,27 @@ class Component extends State {
 	 */
 	created_() {
 		this.on('stateChanged', this.handleStateChanged_);
-		Component.componentsCollector.addComponent(this);
-
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
-
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.events);
 	}
 
 	/**
 	 * Adds a sub component, creating it if it doesn't yet exist.
+	 * @param {string} key
 	 * @param {string|!Function} componentNameOrCtor
-	 * @param {Object=} opt_componentData
+	 * @param {Object=} opt_data
 	 * @return {!Component}
 	 */
-	addSubComponent(componentNameOrCtor, opt_componentData) {
-		// Avoid accessing id from component if possible, since that may cause
-		// the lookup of the component's element in the dom unnecessarily, which is
-		// bad for performance.
-		var id = (opt_componentData || {}).id;
-		if (id === this.id) {
-			throw new Error(
-				'A component can\'t be its own sub component. Tried adding sub ' +
-				'component with the same id as the parent component. Make sure that ' +
-				'you\'re not passing the parent\'s id to the child by mistake.'
-			);
+	addSubComponent(key, componentNameOrCtor, opt_data) {
+		if (!this.components[key]) {
+			var ConstructorFn = componentNameOrCtor;
+			if (core.isString(ConstructorFn)) {
+				ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
+			}
+			this.components[key] = new ConstructorFn(opt_data);
 		}
-		var component = Component.componentsCollector.createComponent(
-			componentNameOrCtor,
-			opt_componentData
-		);
-		this.components[id || component.id] = component;
-		return component;
+		return this.components[key];
 	}
 
 	/**
@@ -313,15 +302,14 @@ class Component extends State {
 
 	/**
 	 * Calls `dispose` on all subcomponents.
-	 * @param {!Array<string>} ids
+	 * @param {!Array<string>} keys
 	 */
-	disposeSubComponents(ids) {
-		for (var i = 0; i < ids.length; i++) {
-			var component = this.components[ids[i]];
+	disposeSubComponents(keys) {
+		for (var i = 0; i < keys.length; i++) {
+			var component = this.components[keys[i]];
 			if (!component.isDisposed()) {
-				Component.componentsCollector.removeComponent(component);
 				component.dispose();
-				delete this.components[ids[i]];
+				delete this.components[keys[i]];
 			}
 		}
 	}
@@ -390,19 +378,6 @@ class Component extends State {
 			}
 			fn.call(this, opt_change.newVal, opt_change.prevVal);
 		}
-	}
-
-	/**
-	 * Returns a map of all subcomponents with ids that have the specified prefix.
-	 * @param {string} prefix
-	 * @return {!Object<string, !Component>}
-	 */
-	getComponentsWithPrefix(prefix) {
-		var ids = Object.keys(this.components)
-			.filter(id => id.indexOf(prefix) === 0);
-		var map = {};
-		ids.forEach(id => map[id] = this.components[id]);
-		return map;
 	}
 
 	/**
@@ -687,14 +662,6 @@ class Component extends State {
 		return hasElement && this.element.id ? this.element.id : this.makeId_();
 	}
 }
-
-/**
- * Helper responsible for extracting components from strings and config data.
- * @type {!ComponentCollector}
- * @protected
- * @static
- */
-Component.componentsCollector = new ComponentCollector();
 
 /**
  * Component state definition.

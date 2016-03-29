@@ -2,7 +2,6 @@
 
 import dom from 'metal-dom';
 import Component from '../src/Component';
-import ComponentCollector from '../src/ComponentCollector';
 import EventsCollector from '../src/EventsCollector';
 
 describe('EventsCollector', function() {
@@ -12,261 +11,7 @@ describe('EventsCollector', function() {
 		});
 	});
 
-	it('should not throw error if no listeners are found', function() {
-		var custom = createCustomComponentInstance('<div></div><div></div>');
-		var collector = new EventsCollector(custom);
-
-		assert.doesNotThrow(function() {
-			collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		});
-	});
-
-	it('should attach event listener', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick"></div><div></div>'
-		);
-		custom.handleClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		assert.strictEqual(0, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[1], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-	});
-
-	it('should attach event listener with single quotes', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick=\'handleClick\'></div><div></div>'
-		);
-		custom.handleClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		assert.strictEqual(0, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[1], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-	});
-
-	it('should print error if trying to attach unexisting function', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick"></div><div></div>'
-		);
-		var collector = new EventsCollector(custom);
-
-		sinon.stub(console, 'error');
-		collector.attachListenersFromHtml(custom.element.innerHTML);
-		assert.strictEqual(1, console.error.callCount);
-
-		console.error.restore();
-	});
-
-	it('should attach multiple event listeners', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleKeyDown = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-
-		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
-		assert.strictEqual(1, custom.handleKeyDown.callCount);
-	});
-
-	it('should attach multiple listeners for the same element and event type', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick,handleAnotherClick"></div><div></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleAnotherClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		assert.strictEqual(0, custom.handleClick.callCount);
-		assert.strictEqual(0, custom.handleAnotherClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		assert.strictEqual(1, custom.handleAnotherClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[1], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		assert.strictEqual(1, custom.handleAnotherClick.callCount);
-	});
-
-	it('should trigger attached listener registered by multiple elements only once', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick"></div><div data-onclick="handleClick"></div>'
-		);
-		custom.handleClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[1], 'click');
-		assert.strictEqual(2, custom.handleClick.callCount);
-	});
-
-	it('should not trigger sub component listeners on unrelated parent elements', function() {
-		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
-		custom.handleClick = sinon.stub();
-
-		var child = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
-		child.handleClick = sinon.stub();
-		dom.append(custom.element, child.element);
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		var childCollector = new EventsCollector(child);
-		childCollector.attachListenersFromHtml(child.element.innerHTML, 'group');
-
-		dom.triggerEvent(child.element.childNodes[0], 'click');
-		assert.strictEqual(0, custom.handleClick.callCount);
-		assert.strictEqual(1, child.handleClick.callCount);
-
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		assert.strictEqual(1, child.handleClick.callCount);
-	});
-
-	it('should trigger listeners that bubbled from sub components to correct element', function() {
-		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
-		custom.handleClick = sinon.stub();
-
-		var child = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
-		child.handleClick = sinon.stub();
-		dom.append(custom.element.childNodes[0], child.element);
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		var childCollector = new EventsCollector(child);
-		childCollector.attachListenersFromHtml(child.element.innerHTML, 'group');
-
-		dom.triggerEvent(child.element.childNodes[0], 'click');
-		assert.strictEqual(1, custom.handleClick.callCount);
-		assert.strictEqual(1, child.handleClick.callCount);
-	});
-
-	it('should detach listeners that are unused', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleKeyDown = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		var trigger = custom.element.childNodes[0];
-		trigger.removeAttribute('data-onclick');
-		sinon.spy(custom, 'removeListener');
-
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		collector.detachUnusedListeners();
-
-		assert.strictEqual(1, custom.removeListener.callCount);
-		assert.notStrictEqual(-1, custom.removeListener.args[0][0][0].indexOf('click'));
-	});
-
-	it('should not throw error when detaching unused listeners twice', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleKeyDown = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		var trigger = custom.element.childNodes[0];
-		trigger.removeAttribute('data-onclick');
-
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		collector.detachUnusedListeners();
-
-		assert.doesNotThrow(function() {
-			collector.detachUnusedListeners();
-		});
-	});
-
-	it('should detach all listeners when detachAllListeners is called', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleKeyDown = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		collector.detachAllListeners();
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(0, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
-		assert.strictEqual(0, custom.handleKeyDown.callCount);
-	});
-
-	it('should detach remaining listeners when detachAllListeners is called', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleKeyDown = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		var trigger = custom.element.childNodes[0];
-		trigger.removeAttribute('data-onclick');
-
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		collector.detachUnusedListeners();
-
-		collector.detachAllListeners();
-		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
-		assert.strictEqual(0, custom.handleKeyDown.callCount);
-	});
-
-	it('should detach all listeners when collector is disposed', function() {
-		var custom = createCustomComponentInstance(
-			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
-		);
-		custom.handleClick = sinon.stub();
-		custom.handleKeyDown = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-
-		collector.dispose();
-		dom.triggerEvent(custom.element.childNodes[0], 'click');
-		assert.strictEqual(0, custom.handleClick.callCount);
-		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
-		assert.strictEqual(0, custom.handleKeyDown.callCount);
-	});
-
-	it('should check if listeners have been attached for the given group before', function() {
-		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
-		custom.handleClick = sinon.stub();
-
-		var collector = new EventsCollector(custom);
-		assert.ok(!collector.hasAttachedForGroup('group'));
-
-		collector.attachListenersFromHtml(custom.element.innerHTML, 'group');
-		assert.ok(collector.hasAttachedForGroup('group'));
-	});
-
-	it('should attach event listener by calling attachListener directly', function() {
+	it('should attach event listeners', function() {
 		var custom = createCustomComponentInstance(
 			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
 		);
@@ -290,11 +35,207 @@ describe('EventsCollector', function() {
 		assert.strictEqual(1, custom.handleKeyDown.callCount);
 	});
 
+	it('should print error if trying to attach unexisting function', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick"></div><div></div>'
+		);
+		var collector = new EventsCollector(custom);
+
+		sinon.stub(console, 'error');
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		assert.strictEqual(1, console.error.callCount);
+
+		console.error.restore();
+	});
+
+	it('should attach multiple listeners for the same element and event type', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick,handleAnotherClick"></div><div></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleAnotherClick = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick,handleAnotherClick');
+
+		assert.strictEqual(0, custom.handleClick.callCount);
+		assert.strictEqual(0, custom.handleAnotherClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, custom.handleAnotherClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[1], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, custom.handleAnotherClick.callCount);
+	});
+
+	it('should trigger attached listener registered multiple times only once', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick"></div><div data-onclick="handleClick"></div>'
+		);
+		custom.handleClick = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('click', 'handleClick');
+
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[1], 'click');
+		assert.strictEqual(2, custom.handleClick.callCount);
+	});
+
+	it('should not trigger sub component listeners on unrelated parent elements', function() {
+		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		custom.handleClick = sinon.stub();
+
+		var child = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		child.handleClick = sinon.stub();
+		dom.append(custom.element, child.element);
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		var childCollector = new EventsCollector(child);
+		childCollector.startCollecting();
+		childCollector.attachListener('click', 'handleClick');
+
+		dom.triggerEvent(child.element.childNodes[0], 'click');
+		assert.strictEqual(0, custom.handleClick.callCount);
+		assert.strictEqual(1, child.handleClick.callCount);
+
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, child.handleClick.callCount);
+	});
+
+	it('should trigger listeners that bubbled from sub components to correct element', function() {
+		var custom = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		custom.handleClick = sinon.stub();
+
+		var child = createCustomComponentInstance('<div data-onclick="handleClick"></div>');
+		child.handleClick = sinon.stub();
+		dom.append(custom.element.childNodes[0], child.element);
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		var childCollector = new EventsCollector(child);
+		childCollector.startCollecting();
+		childCollector.attachListener('click', 'handleClick');
+
+		dom.triggerEvent(child.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+		assert.strictEqual(1, child.handleClick.callCount);
+	});
+
+	it('should detach listeners that are unused', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('keydown', 'handleKeyDown');
+
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.detachUnusedListeners();
+
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(1, custom.handleClick.callCount);
+
+		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+		assert.strictEqual(0, custom.handleKeyDown.callCount);
+	});
+
+	it('should not throw error when detaching unused listeners twice', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('keydown', 'handleKeyDown');
+
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.detachUnusedListeners();
+
+		assert.doesNotThrow(function() {
+			collector.detachUnusedListeners();
+		});
+	});
+
+	it('should detach all listeners when detachAllListeners is called', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('keydown', 'handleKeyDown');
+
+		collector.detachAllListeners();
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(0, custom.handleClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+		assert.strictEqual(0, custom.handleKeyDown.callCount);
+	});
+
+	it('should detach remaining listeners when detachAllListeners is called', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('keydown', 'handleKeyDown');
+
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.detachUnusedListeners();
+
+		collector.detachAllListeners();
+		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+		assert.strictEqual(0, custom.handleKeyDown.callCount);
+	});
+
+	it('should detach all listeners when collector is disposed', function() {
+		var custom = createCustomComponentInstance(
+			'<div data-onclick="handleClick" data-onkeydown="handleKeyDown"></div>'
+		);
+		custom.handleClick = sinon.stub();
+		custom.handleKeyDown = sinon.stub();
+
+		var collector = new EventsCollector(custom);
+		collector.startCollecting();
+		collector.attachListener('click', 'handleClick');
+		collector.attachListener('keydown', 'handleKeyDown');
+
+		collector.dispose();
+		dom.triggerEvent(custom.element.childNodes[0], 'click');
+		assert.strictEqual(0, custom.handleClick.callCount);
+		dom.triggerEvent(custom.element.childNodes[0], 'keydown');
+		assert.strictEqual(0, custom.handleKeyDown.callCount);
+	});
+
 	function createCustomComponentInstance(content) {
 		class CustomComponent extends Component {
-			constructor(opt_config) {
-				super(opt_config);
-			}
 		}
 		var comp = new CustomComponent().render();
 		dom.append(comp.element, content);

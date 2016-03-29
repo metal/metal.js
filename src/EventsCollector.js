@@ -33,11 +33,11 @@ class EventsCollector extends Disposable {
 		this.eventHandles_ = {};
 
 		/**
-		 * Holds flags indicating which selectors a group has listeners for.
-		 * @type {!Object<string, !Object<string, boolean>>}
+		 * Holds flags indicating which selectors have listeners.
+		 * @type {!Object<string, boolean>}
 		 * @protected
 		 */
-		this.groupHasListener_ = {};
+		this.hasListener_ = {};
 	}
 
 	/**
@@ -45,12 +45,11 @@ class EventsCollector extends Disposable {
 	 * been attached.
 	 * @param {string} eventType
 	 * @param {string} fnNamesString
-	 * @param {string=} groupName
 	 */
-	attachListener(eventType, fnNamesString, groupName = 'element') {
+	attachListener(eventType, fnNamesString) {
 		var selector = '[data-on' + eventType + '="' + fnNamesString + '"]';
 
-		this.groupHasListener_[groupName][selector] = true;
+		this.hasListener_[selector] = true;
 
 		if (!this.eventHandles_[selector]) {
 			this.eventHandles_[selector] = new EventHandler();
@@ -61,24 +60,6 @@ class EventsCollector extends Disposable {
 					this.eventHandles_[selector].add(this.component_.delegate(eventType, selector, this.onEvent_.bind(this, fn)));
 				}
 			}
-		}
-	}
-
-	/**
-	 * Attaches listeners found in the given html content.
-	 * @param {string} content
-	 * @param {string=} groupName
-	 */
-	attachListenersFromHtml(content, groupName = 'element') {
-		this.startCollecting(groupName);
-		if (content.indexOf('data-on') === -1) {
-			return;
-		}
-		var regex = /data-on([a-z]+)=['"]([^'"]+)['"]/g;
-		var match = regex.exec(content);
-		while (match) {
-			this.attachListener(match[1], match[2], groupName);
-			match = regex.exec(content);
 		}
 	}
 
@@ -101,18 +82,9 @@ class EventsCollector extends Disposable {
 	 */
 	detachUnusedListeners() {
 		for (var selector in this.eventHandles_) {
-			if (this.eventHandles_[selector]) {
-				var unused = true;
-				for (var groupName in this.groupHasListener_) {
-					if (this.groupHasListener_[groupName][selector]) {
-						unused = false;
-						break;
-					}
-				}
-				if (unused) {
-					this.eventHandles_[selector].removeAllListeners();
-					this.eventHandles_[selector] = null;
-				}
+			if (this.eventHandles_[selector] && !this.hasListener_[selector]) {
+				this.eventHandles_[selector].removeAllListeners();
+				this.eventHandles_[selector] = null;
 			}
 		}
 	}
@@ -123,16 +95,6 @@ class EventsCollector extends Disposable {
 	disposeInternal() {
 		this.detachAllListeners();
 		this.component_ = null;
-	}
-
-	/**
-	 * Checks if this EventsCollector instance has already attached listeners for the given
-	 * group before.
-	 * @param  {string} group
-	 * @return {boolean}
-	 */
-	hasAttachedForGroup(group) {
-		return !!this.groupHasListener_.hasOwnProperty(group);
 	}
 
 	/**
@@ -155,12 +117,11 @@ class EventsCollector extends Disposable {
 	}
 
 	/**
-	 * Prepares the collector to start collecting listeners for the given group.
-	 * Should be called before all calls to `attachListener` for that group.
-	 * @param {string=} groupName
+	 * Prepares the collector to start collecting listeners. Should be called
+	 * before all calls to `attachListener`.
 	 */
-	startCollecting(groupName = 'element') {
-		this.groupHasListener_[groupName] = {};
+	startCollecting() {
+		this.hasListener_ = {};
 	}
 }
 

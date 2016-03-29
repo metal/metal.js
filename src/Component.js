@@ -505,16 +505,6 @@ class Component extends State {
 	}
 
 	/**
-	 * Registers a Metal.js component. This is just a helper function to allow
-	 * subclasses to easily register themselves without having to import anything else.
-	 * @param {!Function} constructorFn The component's constructor function.
-	 * @param {string=} opt_name The component's name.
-	 */
-	registerMetalComponent(constructorFn, opt_name) {
-		ComponentRegistry.register(constructorFn, opt_name);
-	}
-
-	/**
 	 * Lifecycle. Renders the component into the DOM. Render phase replaces
 	 * decorate phase, without progressive enhancement support.
 	 *

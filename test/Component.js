@@ -958,16 +958,6 @@ describe('Component', function() {
 		});
 	});
 
-	it('should register components', function() {
-		class Foo extends Component {
-		}
-		class TestComponentToRegister extends Component {
-		}
-		var custom = new Foo();
-		custom.registerMetalComponent(TestComponentToRegister);
-		assert.ok(TestComponentToRegister, ComponentRegistry.getConstructor('TestComponentToRegister'));
-	});
-
 	it('should get the renderer instance', function() {
 		class TestComponent extends Component {
 		}

@@ -1,6 +1,6 @@
 'use strict';
 
-import { array } from 'metal';
+import { array, core } from 'metal';
 import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
@@ -29,10 +29,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	addInlineListeners_(listeners) {
 		for (var i = 0; i < listeners.length; i += 2) {
 			var name = listeners[i];
-			if (name.startsWith('data-on')) {
+			var fn = listeners[i + 1];
+			if (name.startsWith('data-on') && core.isString(fn)) {
 				this.listenersToAttach_.push({
 					eventName: name.substr(7),
-					fn: listeners[i + 1]
+					fn
 				});
 			}
 		}
@@ -112,6 +113,28 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleDetached_() {
 		this.eventsCollector_.detachAllListeners();
+	}
+
+	/**
+	 * Handles an intercepted call to the attributes default handler from
+	 * incremental dom.
+	 * @param {!function()} originalFn The original function before interception.
+	 * @param {!Element} element
+	 * @param {string} name
+	 * @param {*} value
+	 * @protected
+	 */
+	handleInterceptedAttributesCall_(originalFn, element, name, value) {
+		if (name.startsWith('data-on')) {
+			var eventName = name.substr(7);
+			if (core.isFunction(element[name])) {
+				element.removeEventListener(eventName, element[name]);
+			}
+			if (core.isFunction(value)) {
+				dom.on(element, eventName, value);
+			}
+		}
+		originalFn(element, name, value);
 	}
 
 	/**
@@ -241,7 +264,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.listenersToAttach_ = [];
 		IncrementalDomAop.startInterception(
 			this.handleInterceptedOpenCall_.bind(this),
-			this.handleInterceptedCloseCall_.bind(this)
+			this.handleInterceptedCloseCall_.bind(this),
+			this.handleInterceptedAttributesCall_.bind(this)
 		);
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();

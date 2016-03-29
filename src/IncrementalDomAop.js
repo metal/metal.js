@@ -21,12 +21,15 @@ class IncrementalDomAop {
 	 *     `elementOpen` one.
 	 * @param {!function()} closeFn Function to be called instead of the original
 	 *     `elementClose` one.
+	 * @param {!function()} attributesFn Function to be called instead of the
+	 *     original `attributes` default handler.
 	 */
-	static startInterception(openFn, closeFn) {
+	static startInterception(openFn, closeFn, attributesFn) {
 		openFn = openFn.bind(null, fnStack[0].elementOpen);
 		closeFn = closeFn.bind(null, fnStack[0].elementClose);
 		fnStack.push({
 			attr: fnAttr,
+			attributes: attributesFn.bind(null, fnStack[0].attributes),
 			elementClose: closeFn,
 			elementOpen: openFn,
 			elementOpenEnd: () => openFn.apply(null, collectedArgs),
@@ -52,6 +55,7 @@ class IncrementalDomAop {
 
 var fnStack = [{
 	attr: IncrementalDOM.attr,
+	attributes: IncrementalDOM.attributes[IncrementalDOM.symbols.default],
 	elementClose: IncrementalDOM.elementClose,
 	elementOpen: IncrementalDOM.elementOpen,
 	elementOpenEnd: IncrementalDOM.elementOpenEnd,
@@ -80,5 +84,10 @@ IncrementalDOM.elementOpen = handleCall.bind(null, 'elementOpen');
 IncrementalDOM.elementOpenEnd = handleCall.bind(null, 'elementOpenEnd');
 IncrementalDOM.elementOpenStart = handleCall.bind(null, 'elementOpenStart');
 IncrementalDOM.elementVoid = handleCall.bind(null, 'elementVoid');
+
+IncrementalDOM.attributes[IncrementalDOM.symbols.default] = handleCall.bind(
+	null,
+	'attributes'
+);
 
 export default IncrementalDomAop;

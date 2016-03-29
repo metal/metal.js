@@ -328,6 +328,53 @@ describe('IncrementalDomRenderer', function() {
 			assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('keydown'));
 			assert.notStrictEqual(-1, component.removeListener.args[1][0][0].indexOf('click'));
 		});
+
+		it('should attach listeners functions passed to "data-on<event>" attributes', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				IncDom.elementVoid('div', null, null, 'data-onclick', this.component_.handleClick);
+				IncDom.elementClose('div');
+			};
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent().render();
+			assert.strictEqual(0, component.handleClick.callCount);
+
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(0, component.handleClick.callCount);
+
+			dom.triggerEvent(component.element.childNodes[0], 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
+		it('should update inline listeners when dom is updated', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div', null, ['id', this.component_.id]);
+				var fn = this.component_.switch ? this.component_.handleClick2 : this.component_.handleClick;
+				IncDom.elementVoid('div', null, null, 'data-onclick', fn);
+				IncDom.elementClose('div');
+			};
+			TestComponent.prototype.handleClick = sinon.stub();
+			TestComponent.prototype.handleClick2 = sinon.stub();
+			TestComponent.STATE = {
+				switch: {}
+			};
+
+			component = new TestComponent().render();
+			dom.triggerEvent(component.element.childNodes[0], 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+			assert.strictEqual(0, component.handleClick2.callCount);
+
+			component.switch = true;
+			component.once('stateSynced', function() {
+				dom.triggerEvent(component.element.childNodes[0], 'click');
+				assert.strictEqual(1, component.handleClick.callCount);
+				assert.strictEqual(1, component.handleClick2.callCount);
+				done();
+			});
+		});
 	});
 
 	describe('Nested Components', function() {

@@ -26,7 +26,7 @@ class Soy extends IncrementalDomRenderer {
 		this.addedMissingStateKeys_ = true;
 		var component = this.component_;
 		for (var i = 0; i < keys.length; i++) {
-			if (!component.getStateKeyConfig(keys[i])) {
+			if (!component.getStateKeyConfig(keys[i]) && !component[keys[i]]) {
 				component.addToState(keys[i], {}, component.getInitialConfig()[keys[i]]);
 			}
 		}
@@ -37,10 +37,11 @@ class Soy extends IncrementalDomRenderer {
 	 * template call's data. The copying needs to be done because, if the component
 	 * itself is passed directly, some problems occur when soy tries to merge it
 	 * with other data, due to property getters and setters. This is safer.
+	 * @param {!Array<string>} params The params used by this template.
 	 * @return {!Object}
 	 * @protected
 	 */
-	buildTemplateData_() {
+	buildTemplateData_(params) {
 		var component = this.component_;
 		var data = {};
 		component.getStateKeys().forEach(key => {
@@ -56,6 +57,11 @@ class Soy extends IncrementalDomRenderer {
 			}
 			data[key] = value;
 		});
+		for (var i = 0; i < params.length; i++) {
+			if (!data[params[i]] && core.isFunction(component[params[i]])) {
+				data[params[i]] = component[params[i]].bind(component);
+			}
+		}
 		return data;
 	}
 
@@ -122,7 +128,7 @@ class Soy extends IncrementalDomRenderer {
 			this.addMissingStateKeys_(elementTemplate.params);
 
 			SoyAop.startInterception(Soy.handleInterceptedCall_);
-			elementTemplate(this.buildTemplateData_(), null, ijData);
+			elementTemplate(this.buildTemplateData_(elementTemplate.params), null, ijData);
 			SoyAop.stopInterception();
 		} else {
 			super.renderIncDom();

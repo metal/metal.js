@@ -12,6 +12,7 @@ import { Events as EventsComponent } from './assets/Events.soy';
 // TODO: We should have a better dependency management for soy files so that
 // the order in which they're required doesn't matter.
 import { ExternalTemplate as ExternalTemplateComponent } from './assets/ExternalTemplate.soy';
+import { Functions as FunctionsComponent } from './assets/Functions.soy';
 import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy';
 import { Nested as NestedComponent } from './assets/Nested.soy';
 import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy';
@@ -208,6 +209,7 @@ describe('Soy', function() {
 	describe('Inline Events', function() {
 		beforeEach(function() {
 			EventsComponent.prototype.handleClick = sinon.stub();
+			FunctionsComponent.prototype.handleClick = sinon.stub();
 		});
 
 		it('should attach inline events found in component\'s soy template', function() {
@@ -218,6 +220,27 @@ describe('Soy', function() {
 
 			dom.triggerEvent(comp.element.querySelector('button'), 'click');
 			assert.strictEqual(1, comp.handleClick.callCount);
+		});
+
+		it('should attach function listeners found in component\'s soy template', function() {
+			comp = new FunctionsComponent().render();
+
+			dom.triggerEvent(comp.element, 'click');
+			assert.strictEqual(0, comp.handleClick.callCount);
+
+			dom.triggerEvent(comp.element.querySelector('button'), 'click');
+			assert.strictEqual(1, comp.handleClick.callCount);
+		});
+
+		it('should bind function listeners to component', function() {
+			var context;
+			FunctionsComponent.prototype.handleClick = function() {
+				context = this;
+			};
+			comp = new FunctionsComponent().render();
+
+			dom.triggerEvent(comp.element.querySelector('button'), 'click');
+			assert.strictEqual(comp, context);
 		});
 	});
 

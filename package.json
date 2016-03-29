@@ -23,7 +23,6 @@
 		"metal": "^1.0.0-rc",
 		"metal-dom": "^1.0.0-rc.1",
 		"metal-events": "^1.0.0-rc",
-		"metal-html": "^1.0.0-rc",
 		"metal-state": "metal/metal-state#master"
 	},
 	"devDependencies": {

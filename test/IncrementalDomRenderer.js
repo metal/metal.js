@@ -40,6 +40,23 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
+		it('should pass initial config object to renderIncDom', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function(data) {
+				IncDom.elementOpen('span', null, null, 'foo', data.foo);
+				IncDom.text('bar');
+				IncDom.elementClose('span');
+			};
+
+			var config = {
+				foo: 'foo'
+			};
+			component = new TestComponent(config).render();
+			assert.strictEqual('SPAN', component.element.tagName);
+			assert.strictEqual('foo', component.element.getAttribute('foo'));
+			assert.strictEqual('bar', component.element.textContent);
+		});
+
 		it('should render content specified by the component\'s renderIncDom inside given element', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {

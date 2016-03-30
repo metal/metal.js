@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, core } from 'metal';
+import { array, core, object } from 'metal';
 import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
@@ -65,6 +65,18 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			}
 		}
 		this.component_.disposeSubComponents(unused);
+	}
+
+	/**
+	 * Gets the current rendering data for this component.
+	 * @return {!Object}
+	 * @protected
+	 */
+	getRenderingData() {
+		if (!this.renderingData_) {
+			this.renderingData_ = object.mixin({}, this.component_.getInitialConfig());
+		}
+		return this.renderingData_;
 	}
 
 	/**
@@ -250,7 +262,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Calls functions from `IncrementalDOM` to build the component element's
 	 * content. Can be overriden by subclasses (for integration with template
 	 * engines for example).
-	 * @param {Object=} opt_config Data passed to the component when rendering it.
+	 * @param {!Object} data Data passed to the component when rendering it.
 	 */
 	renderIncDom() {
 		IncrementalDOM.elementVoid('div');
@@ -260,9 +272,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Runs the incremental dom functions for rendering this component, but
 	 * doesn't call `patch` yet. Rather, this will be the function that should be
 	 * called by `patch`.
-	 * @param {Object=} opt_config Data passed to the component when rendering it.
 	 */
-	renderWithoutPatch(opt_config) {
+	renderWithoutPatch() {
 		// Mark that there shouldn't be an update for state changes so far, since
 		// render has already been called.
 		this.changes_ = {};
@@ -276,7 +287,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedCloseCall_.bind(this),
 			this.handleInterceptedAttributesCall_.bind(this)
 		);
-		this.renderIncDom(opt_config);
+		this.renderIncDom(this.getRenderingData());
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
 	}
@@ -332,7 +343,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	renderSubComponent_(tagOrCtor, config) {
 		var key = config.key || ('sub' + this.generatedKeyCount_++);
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
-		comp.getRenderer().renderWithoutPatch(config);
+		object.mixin(this.getRenderingData(), config);
+		comp.getRenderer().renderWithoutPatch();
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}

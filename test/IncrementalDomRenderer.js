@@ -714,6 +714,21 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
 		});
 
+		it('should not keep sub component rendering data on parent component', function() {
+			var TestChildComponent = createTestComponentClass();
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
+					foo: 'foo'
+				});
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			assert.ok(!component.getRenderer().getRenderingData().foo);
+		});
+
 		it('should dispose sub components that are unused after an update', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {

@@ -272,8 +272,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Runs the incremental dom functions for rendering this component, but
 	 * doesn't call `patch` yet. Rather, this will be the function that should be
 	 * called by `patch`.
+	 * @param {Object=} opt_data Data passed to the component when rendering it.
 	 */
-	renderWithoutPatch() {
+	renderWithoutPatch(opt_data) {
 		// Mark that there shouldn't be an update for state changes so far, since
 		// render has already been called.
 		this.changes_ = {};
@@ -287,6 +288,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedCloseCall_.bind(this),
 			this.handleInterceptedAttributesCall_.bind(this)
 		);
+		object.mixin(this.getRenderingData(), opt_data);
 		this.renderIncDom(this.getRenderingData());
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
@@ -343,8 +345,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	renderSubComponent_(tagOrCtor, config) {
 		var key = config.key || ('sub' + this.generatedKeyCount_++);
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
-		object.mixin(this.getRenderingData(), config);
-		comp.getRenderer().renderWithoutPatch();
+		comp.getRenderer().renderWithoutPatch(config);
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}

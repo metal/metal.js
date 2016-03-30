@@ -3,7 +3,7 @@
 import 'metal-soy-bundle';
 import './requireWarning';
 
-import core from 'metal';
+import { core, object } from 'metal';
 import { ComponentRegistry } from 'metal-component';
 import HTML2IncDom from 'html2incdom';
 import IncrementalDomRenderer from 'metal-incremental-dom';
@@ -44,6 +44,7 @@ class Soy extends IncrementalDomRenderer {
 	 */
 	buildTemplateData_(data, params) {
 		var component = this.component_;
+		data = object.mixin({}, data);
 		component.getStateKeys().forEach(key => {
 			// Get all state values except "element", since it helps performance
 			// and the element shouldn't be referenced inside a soy template anyway.

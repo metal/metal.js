@@ -544,11 +544,27 @@ describe('IncrementalDomRenderer', function() {
 			};
 			component = new TestComponent().render();
 
-			var componentNames = Object.keys(component.components);
-			assert.strictEqual(1, componentNames.length);
-
-			var child = component.components[componentNames[0]];
+			var child = component.components.sub0;
 			assert.ok(child instanceof ChildComponent);
+		});
+
+		it('should update sub component with generated key', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('ChildComponent');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.sub0;
+			child.foo = 'bar';
+			child.once('stateSynced', function() {
+				assert.strictEqual(child, component.components.sub0);
+				assert.strictEqual(child.element, component.element.querySelector('child'));
+				assert.strictEqual('bar', child.element.textContent);
+				done();
+			});
 		});
 
 		it('should render sub component via elementOpen/elementClose', function() {
@@ -602,6 +618,25 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent().render();
 
 			var child = component.components.child;
+			assert.ok(child);
+			assert.ok(child instanceof TestChildComponent);
+			assert.strictEqual(child.element, component.element.querySelector('child'));
+		});
+
+		it('should create and render sub component instance with no data from Component tag', function() {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementVoid('child');
+			};
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.sub0;
 			assert.ok(child);
 			assert.ok(child instanceof TestChildComponent);
 			assert.strictEqual(child.element, component.element.querySelector('child'));

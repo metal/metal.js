@@ -219,7 +219,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		for (var i = 0; i < attrsArr.length; i += 2) {
 			config[attrsArr[i]] = attrsArr[i + 1];
 		}
-		var comp = this.renderSubComponent_(tag, config);
+
+		var tagOrCtor = tag;
+		if (tag === 'Component' && config.ctor) {
+			tagOrCtor = config.ctor;
+			config = config.data || {};
+		}
+		var comp = this.renderSubComponent_(tagOrCtor, config);
 		return comp.element;
 	}
 
@@ -244,6 +250,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Calls functions from `IncrementalDOM` to build the component element's
 	 * content. Can be overriden by subclasses (for integration with template
 	 * engines for example).
+	 * @param {Object=} opt_config Data passed to the component when rendering it.
 	 */
 	renderIncDom() {
 		IncrementalDOM.elementVoid('div');
@@ -253,8 +260,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Runs the incremental dom functions for rendering this component, but
 	 * doesn't call `patch` yet. Rather, this will be the function that should be
 	 * called by `patch`.
+	 * @param {Object=} opt_config Data passed to the component when rendering it.
 	 */
-	renderWithoutPatch() {
+	renderWithoutPatch(opt_config) {
 		// Mark that there shouldn't be an update for state changes so far, since
 		// render has already been called.
 		this.changes_ = {};
@@ -268,7 +276,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedCloseCall_.bind(this),
 			this.handleInterceptedAttributesCall_.bind(this)
 		);
-		this.renderIncDom();
+		this.renderIncDom(opt_config);
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
 	}
@@ -316,21 +324,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * The sub component is created, added to its parent and rendered. If it
 	 * had already been rendered before though, it will only have its state
 	 * updated instead.
-	 * @param {string} tag The tag name.
+	 * @param {string|!function()} tagOrCtor The tag name or constructor function.
 	 * @param {!Object} config The config object for the sub component.
 	 * @return {!Component} The updated sub component.
 	 * @protected
 	 */
-	renderSubComponent_(tag, config) {
-		var tagOrCtor = tag;
-		if (tag === 'Component' && config.ctor) {
-			tagOrCtor = config.ctor;
-			config = config.data || {};
-		}
-
+	renderSubComponent_(tagOrCtor, config) {
 		var key = config.key || ('sub' + this.generatedKeyCount_++);
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
-		comp.getRenderer().renderWithoutPatch();
+		comp.getRenderer().renderWithoutPatch(config);
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}

@@ -677,6 +677,26 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should pass rendering data to sub component\'s "renderIncDom"', function() {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function(config = {}) {
+				IncDom.elementVoid('child', null, null, 'data-foo', config.foo);
+			};
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
+					key: 'child',
+					foo: 'foo'
+				});
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
+		});
+
 		it('should dispose sub components that are unused after an update', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {

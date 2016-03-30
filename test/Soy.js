@@ -18,6 +18,7 @@ import { Nested as NestedComponent } from './assets/Nested.soy';
 import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy';
 import { NestedMultiple as NestedMultipleComponent } from './assets/NestedMultiple.soy';
 import { NestedNoData as NestedNoDataComponent } from './assets/NestedNoData.soy';
+import { TemplateData as TemplateDataComponent } from './assets/TemplateData.soy';
 import Soy from '../src/Soy';
 
 describe('Soy', function() {
@@ -91,6 +92,20 @@ describe('Soy', function() {
 				IncrementalDOM.patchOuter.restore();
 				done();
 			});
+		});
+
+		it('should not add sub template soy params as state keys', function() {
+			comp = new TemplateDataComponent({
+				foo: 'foo'
+			}).render();
+			assert.ok(!comp.foo);
+		});
+
+		it('should pass non state config data to sub templates', function() {
+			comp = new TemplateDataComponent({
+				foo: 'foo'
+			}).render();
+			assert.strictEqual('foo', comp.element.textContent);
 		});
 
 		it('should not throw error if rendering component with no templates', function() {

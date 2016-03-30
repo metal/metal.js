@@ -1,0 +1,15 @@
+{namespace TemplateData}
+
+
+/**
+ */
+{template .render}
+  <span>{call .subTemplate data="all" /}</span>
+{/template}
+
+/**
+ * @param? foo
+ */
+{template .subTemplate}
+  <span class="subTemplate">{$foo}</span>
+{/template}

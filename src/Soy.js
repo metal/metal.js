@@ -37,13 +37,13 @@ class Soy extends IncrementalDomRenderer {
 	 * template call's data. The copying needs to be done because, if the component
 	 * itself is passed directly, some problems occur when soy tries to merge it
 	 * with other data, due to property getters and setters. This is safer.
+	 * @param {!Object} data Data passed to the component when rendering it.
 	 * @param {!Array<string>} params The params used by this template.
 	 * @return {!Object}
 	 * @protected
 	 */
-	buildTemplateData_(params) {
+	buildTemplateData_(data, params) {
 		var component = this.component_;
-		var data = {};
 		component.getStateKeys().forEach(key => {
 			// Get all state values except "element", since it helps performance
 			// and the element shouldn't be referenced inside a soy template anyway.
@@ -119,16 +119,17 @@ class Soy extends IncrementalDomRenderer {
 	/**
 	 * Overrides the default method from `IncrementalDomRenderer` so the component's
 	 * soy template can be used for rendering.
+	 * @param {!Object} data Data passed to the component when rendering it.
 	 * @override
 	 */
-	renderIncDom() {
+	renderIncDom(data) {
 		var elementTemplate = this.component_.constructor.TEMPLATE;
 		if (core.isFunction(elementTemplate)) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
 			this.addMissingStateKeys_(elementTemplate.params);
 
 			SoyAop.startInterception(Soy.handleInterceptedCall_);
-			elementTemplate(this.buildTemplateData_(elementTemplate.params), null, ijData);
+			elementTemplate(this.buildTemplateData_(data, elementTemplate.params), null, ijData);
 			SoyAop.stopInterception();
 		} else {
 			super.renderIncDom();

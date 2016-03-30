@@ -78,10 +78,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	getSubComponent_(key, tagOrCtor, config) {
 		var comp = this.component_.addSubComponent(key, tagOrCtor, config);
-
 		if (comp.wasRendered) {
 			comp.setState(config);
 		}
+		comp.componentIncrementalDomKey_ = key;
 		return comp;
 	}
 
@@ -177,8 +177,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var attrsArr = array.slice(arguments, 4);
 		this.addInlineListeners_((statics || []).concat(attrsArr));
 		var args = array.slice(arguments, 1);
-		if (!this.rootElementReached_) {
-			args[1] = IncrementalDomRenderer.componentKey;
+		if (!this.rootElementReached_ && this.component_.componentIncrementalDomKey_) {
+			args[1] = this.component_.componentIncrementalDomKey_;
 		}
 		var node = originalFn.apply(null, args);
 		if (!this.rootElementReached_) {
@@ -330,9 +330,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		var key = config.key || ('sub' + this.generatedKeyCount_++);
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
-		IncrementalDomRenderer.componentKey = key;
 		comp.getRenderer().renderWithoutPatch();
-		IncrementalDomRenderer.componentKey = null;
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}

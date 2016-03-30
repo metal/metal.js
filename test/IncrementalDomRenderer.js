@@ -497,6 +497,27 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should not remove sub component key when it updates itself', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('ChildComponent', null, ['key', 'child']);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent().render();
+
+			var child = component.components.child;
+			assert.strictEqual('child', child.element.__incrementalDOMData.key);
+
+			child.foo = 'bar';
+			child.once('stateSynced', function() {
+				assert.strictEqual('child', child.element.__incrementalDOMData.key);
+				assert.strictEqual(child.element, component.element.querySelector('child'));
+				assert.strictEqual('bar', child.element.textContent);
+				done();
+			});
+		});
+
 		it('should attach sub component inline listeners', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -514,7 +535,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, child.handleClick.callCount);
 		});
 
-		it('should generate sub component id if none is given', function() {
+		it('should generate sub component key if none is given', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
@@ -569,7 +590,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementVoid('child');
-			}
+			};
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
@@ -590,7 +611,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementVoid('child');
-			}
+			};
 			TestChildComponent.STATE = {
 				foo: {}
 			};

@@ -38,7 +38,7 @@ describe('object', function() {
 			Bar: 1
 		};
 		assert.strictEqual(1, object.getObjectByName('Foo.Bar'));
-		assert.strictEqual(null, object.getObjectByName('Foo.Bar.None'));
+		assert.strictEqual(undefined, object.getObjectByName('Foo.Bar.None'));
 	});
 
 	it('should get object by name from object', function() {
@@ -48,7 +48,7 @@ describe('object', function() {
 			}
 		};
 		assert.strictEqual(1, object.getObjectByName('Foo.Bar', obj));
-		assert.strictEqual(null, object.getObjectByName('Foo.Bar.None', obj));
+		assert.strictEqual(undefined, object.getObjectByName('Foo.Bar.None', obj));
 	});
 
 	it('should map an object\'s content to a new object', function() {

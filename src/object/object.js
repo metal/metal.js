@@ -1,7 +1,5 @@
 'use strict';
 
-import core from '../core';
-
 class object {
 	/**
 	 * Copies all the members of a source object to a target object.
@@ -25,20 +23,12 @@ class object {
 	 * @param {string} name The fully qualified name.
 	 * @param {object=} opt_obj The object within which to look; default is
 	 *     <code>window</code>.
-	 * @return {?} The value (object or primitive) or, if not found, null.
+	 * @return {?} The value (object or primitive) or, if not found, undefined.
 	 */
 	static getObjectByName(name, opt_obj) {
+		var scope = opt_obj || window;
 		var parts = name.split('.');
-		var cur = opt_obj || window;
-		var part;
-		while ((part = parts.shift())) {
-			if (core.isDefAndNotNull(cur[part])) {
-				cur = cur[part];
-			} else {
-				return null;
-			}
-		}
-		return cur;
+		return parts.reduce((part, key) => part[key], scope);
 	}
 
 	/**

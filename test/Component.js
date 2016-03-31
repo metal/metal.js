@@ -81,25 +81,10 @@ describe('Component', function() {
 			sinon.assert.callCount(Component.prototype.attached, 1);
 		});
 
-		it('should throw error when component decorates and it was already decorated', function() {
-			var custom = new Component();
-			custom.decorate();
-			assert.throws(function() {
-				custom.decorate();
-			}, Error);
-			sinon.assert.callCount(Component.prototype.attached, 1);
-		});
-
 		it('should return component instance from lifecycle methods', function() {
 			var custom = new Component();
-
 			assert.strictEqual(custom, custom.render());
 			assert.strictEqual(custom, custom.detach());
-
-			custom = new Component();
-			assert.strictEqual(custom, custom.decorate());
-
-			custom.detach();
 			assert.strictEqual(custom, custom.attach());
 		});
 
@@ -517,28 +502,6 @@ describe('Component', function() {
 
 			custom.attach();
 			assert.strictEqual(document.body, custom.element.parentNode);
-		});
-
-		it('should emit "render" event with the decorating key set to false when render is called', function() {
-			var custom = new Component();
-			var listenerFn = sinon.stub();
-			custom.once('render', listenerFn);
-
-			custom.render();
-
-			assert.strictEqual(1, listenerFn.callCount);
-			assert.ok(!listenerFn.args[0][0].decorating);
-		});
-
-		it('should emit "render" event with the decorating key set to true when decorate is called', function() {
-			var custom = new Component();
-			var listenerFn = sinon.stub();
-			custom.once('render', listenerFn);
-
-			custom.decorate();
-
-			assert.strictEqual(1, listenerFn.callCount);
-			assert.ok(listenerFn.args[0][0].decorating);
 		});
 
 		it('should not emit "render" event when renderAsSubComponent is called', function() {

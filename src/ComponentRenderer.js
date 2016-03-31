@@ -45,10 +45,7 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
-	 * Renders the component's whole content (including its main element). When
-	 * decorating this should avoid replacing the existing content if it's already
-	 * correct.
-	 * @param {decorating: boolean} data
+	 * Renders the component's whole content (including its main element).
 	 */
 	render() {
 		if (!this.component_.element) {

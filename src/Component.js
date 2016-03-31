@@ -70,13 +70,6 @@ class Component extends State {
 		this.components = {};
 
 		/**
-		 * Whether the element is being decorated.
-		 * @type {boolean}
-		 * @protected
-		 */
-		this.decorating_ = false;
-
-		/**
 		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
 		 * element to the component itself.
 		 * @type {DomEventEmitterProxy}
@@ -222,21 +215,6 @@ class Component extends State {
 			this.components[key] = new ConstructorFn(opt_data);
 		}
 		return this.components[key];
-	}
-
-	/**
-	 * Lifecycle. Creates the component using existing DOM elements. Often the
-	 * component can be created using existing elements in the DOM to leverage
-	 * progressive enhancement. Any extra operation necessary to prepare the
-	 * component DOM must be implemented in this phase. Decorate phase replaces
-	 * render phase.
-	 * @chainable
-	 */
-	decorate() {
-		this.decorating_ = true;
-		this.render();
-		this.decorating_ = false;
-		return this;
 	}
 
 	/**
@@ -456,11 +434,9 @@ class Component extends State {
 	}
 
 	/**
-	 * Lifecycle. Renders the component into the DOM. Render phase replaces
-	 * decorate phase, without progressive enhancement support.
+	 * Lifecycle. Renders the component into the DOM.
 	 *
 	 * Render Lifecycle:
-	 *   render - Decorate is manually called.
 	 *   render event - The "render" event is emitted. Renderers act on this step.
 	 *   state synchronization - All synchronization methods are called.
 	 *   attach - Attach Lifecycle is called.
@@ -485,9 +461,7 @@ class Component extends State {
 		}
 
 		if (!opt_skipRender) {
-			this.emit('render', {
-				decorating: this.decorating_
-			});
+			this.emit('render');
 		}
 		this.setUpProxy_();
 		this.syncState_();

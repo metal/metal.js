@@ -14,16 +14,22 @@ var ijData = {};
 
 class Soy extends IncrementalDomRenderer {
 	/**
-	 * Adds the specified state keys to the component, if they don't exist yet.
-	 * @param {Array<string>} keys
+	 * @inheritDoc
+	 */
+	constructor(comp) {
+		super(comp);
+		this.addMissingStateKeys_();
+	}
+	/**
+	 * Adds the template params to the component's state, if they don't exist yet.
 	 * @protected
 	 */
-	addMissingStateKeys_(keys) {
-		if (this.addedMissingStateKeys_) {
+	addMissingStateKeys_() {
+		var elementTemplate = this.component_.constructor.TEMPLATE;
+		if (!core.isFunction(elementTemplate)) {
 			return;
 		}
-
-		this.addedMissingStateKeys_ = true;
+		var keys = SoyAop.getOriginalFn(elementTemplate).params;
 		var component = this.component_;
 		for (var i = 0; i < keys.length; i++) {
 			if (!component.getStateKeyConfig(keys[i]) && !component[keys[i]]) {
@@ -127,8 +133,6 @@ class Soy extends IncrementalDomRenderer {
 		var elementTemplate = this.component_.constructor.TEMPLATE;
 		if (core.isFunction(elementTemplate)) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
-			this.addMissingStateKeys_(elementTemplate.params);
-
 			SoyAop.startInterception(Soy.handleInterceptedCall_);
 			elementTemplate(this.buildTemplateData_(data, elementTemplate.params), null, ijData);
 			SoyAop.stopInterception();

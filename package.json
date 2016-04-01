@@ -22,12 +22,12 @@
   ],
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "metal": "^1.0.0-rc",
-    "metal-events": "^1.0.0-rc"
+    "metal": "^1.0.0-rc.1",
+    "metal-events": "^1.0.0-rc.1"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
-    "gulp-metal": "^0.14.0",
-    "metal-karma-config": "^1.0.0"
+    "gulp-metal": "^1.0.0",
+    "metal-karma-config": "^2.0.0"
   }
 }

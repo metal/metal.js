@@ -9,7 +9,7 @@
 		"npm": ">=3.0.0"
 	},
 	"main": "lib/events.js",
-	"browser": "src/events.js",
+	"jsnext:main": "src/events.js",
 	"files": [
 		"lib",
 		"src",

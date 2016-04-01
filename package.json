@@ -9,7 +9,7 @@
     "npm": ">=3.0.0"
   },
   "main": "lib/State.js",
-  "browser": "src/State.js",
+  "jsnext:main": "src/State.js",
   "files": [
     "lib",
     "src",

@@ -1,6 +1,6 @@
 {
   "name": "metal-incremental-dom",
-  "version": "0.0.0",
+  "version": "1.0.0-rc",
   "description": "A Component renderer for templates compiled to incremental dom",
   "license": "BSD",
   "repository": "metal/metal-incremental-dom",
@@ -26,6 +26,6 @@
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
-    "metal-karma-config": "^1.0.0"
+    "metal-karma-config": "^2.0.0"
   }
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, Disposable, object } from 'metal';
+import { array, Disposable } from 'metal';
 
 /**
  * EventEmitterProxy utility. It's responsible for linking two EventEmitter

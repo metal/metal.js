@@ -42,7 +42,6 @@ describe('Soy', function() {
 			comp = new HelloWorldComponent({
 				name: 'Foo'
 			});
-			assert.ok(!comp.name);
 
 			comp.render();
 			assert.strictEqual('Foo', comp.name);
@@ -52,7 +51,6 @@ describe('Soy', function() {
 			comp = new HelloWorldComponent({
 				name: 'Foo'
 			});
-			assert.ok(!comp.name);
 
 			comp.addToState('name', {
 				value: 'Bar'

@@ -21,14 +21,15 @@
   ],
   "dependencies": {
     "html2incdom": "^0.1.1",
-    "metal": "^1.0.0-rc",
-    "metal-component": "metal/metal-component#master",
-    "metal-incremental-dom": "metal/metal-incremental-dom#master",
+    "metal": "^1.0.0-rc.1",
+    "metal-component": "^1.0.0-rc.2",
+    "metal-incremental-dom": "^1.0.0-rc",
     "metal-soy-bundle": "^0.2.0"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
-    "gulp-replace": "^0.5.4"
+    "gulp-replace": "^0.5.4",
+    "metal-tools-soy": "^2.1.2"
   }
 }

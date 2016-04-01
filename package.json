@@ -21,11 +21,11 @@
   ],
   "dependencies": {
     "incremental-dom": "^0.3.0",
-    "metal-component": "metal/metal-component#master"
+    "metal-component": "^1.0.0-rc.2"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
-    "gulp-metal": "^0.14.0",
+    "gulp-metal": "^1.0.0",
     "metal-karma-config": "^1.0.0"
   }
 }

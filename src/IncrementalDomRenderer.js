@@ -345,7 +345,16 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	renderSubComponent_(tagOrCtor, config) {
 		var key = config.key || ('sub' + this.generatedKeyCount_++);
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
-		comp.getRenderer().renderWithoutPatch(config);
+		var renderer = comp.getRenderer();
+		if (renderer instanceof IncrementalDomRenderer) {
+			renderer.renderWithoutPatch(config);
+		} else {
+			console.warn(
+				'IncrementalDomRenderer doesn\'t support rendering sub components ' +
+				'that don\'t use IncrementalDomRenderer as well, like:',
+				comp
+			);
+		}
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}

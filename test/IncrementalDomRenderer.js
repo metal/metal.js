@@ -729,6 +729,26 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(!component.getRenderer().getRenderingData().foo);
 		});
 
+		it('should warn if rendering sub component that doesn\'t use incremental dom', function() {
+			class TestChildComponent extends Component {
+				constructor() {
+					super();
+					this.element = document.createElement('div');
+				}
+			}
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent);
+				IncDom.elementClose('div');
+			};
+
+			sinon.stub(console, 'warn');
+			component = new TestComponent().render();
+			assert.strictEqual(1, console.warn.callCount);
+			console.warn.restore();
+		});
+
 		it('should dispose sub components that are unused after an update', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {

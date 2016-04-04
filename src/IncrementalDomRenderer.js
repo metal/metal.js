@@ -141,6 +141,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			if (core.isFunction(value)) {
 				dom.on(element, eventName, value);
 			}
+		} else if (name === 'checked') {
+			// This is a temporary fix to account for incremental dom setting
+			// "checked" as an attribute only, which can cause bugs since that won't
+			// necessarily check/uncheck the element it's set on. See
+			// https://github.com/google/incremental-dom/issues/198 for more details.
+			element.checked = core.isDefAndNotNull(value) && value !== false;
 		}
 		originalFn(element, name, value);
 	}

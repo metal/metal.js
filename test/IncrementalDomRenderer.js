@@ -127,6 +127,38 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(element, component.element);
 			assert.strictEqual(parent, component.element.parentNode);
 		});
+
+		it('should uncheck input element when "checked" attribute is removed', function(done) {
+			var input = document.createElement('input');
+			input.type = 'checkbox';
+			input.checked = true;
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpenStart('input');
+				IncDom.attr('type', 'checkbox');
+				if (this.component_.checked) {
+					IncDom.attr('checked', '');
+				}
+				IncDom.elementOpenEnd('input');
+			};
+			TestComponent.STATE = {
+				checked: {
+				}
+			};
+
+			component = new TestComponent({
+				checked: true,
+				element: input
+			}).render();
+			assert.ok(input.checked);
+
+			component.checked = false;
+			component.once('stateSynced', function() {
+				assert.ok(!input.checked);
+				done();
+			});
+		});
 	});
 
 	describe('Existing Content', function() {

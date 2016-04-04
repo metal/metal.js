@@ -23,7 +23,7 @@
     "html2incdom": "^0.1.1",
     "metal": "^1.0.0-rc.1",
     "metal-component": "^1.0.0-rc.2",
-    "metal-incremental-dom": "^1.0.0-rc",
+    "metal-incremental-dom": "^1.0.0-rc.1",
     "metal-soy-bundle": "^0.2.0"
   },
   "devDependencies": {

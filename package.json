@@ -1,0 +1,30 @@
+{
+  "name": "metal-jsx",
+  "version": "0.0.0",
+  "description": "A JSX templates renderer to be used with Metal.js's Component class",
+  "license": "BSD",
+  "repository": "metal/metal-jsx",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "main": "src/JSX.js",
+  "files": [
+    "src",
+    "test"
+  ],
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "metal"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "metal-incremental-dom": "^1.0.0-rc.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-metal": "^1.0.0"
+  }
+}

@@ -1,8 +1,6 @@
 'use strict';
 
 import 'metal-soy-bundle';
-import './requireWarning';
-
 import { core, object } from 'metal';
 import { ComponentRegistry } from 'metal-component';
 import HTML2IncDom from 'html2incdom';

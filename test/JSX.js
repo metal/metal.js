@@ -26,4 +26,14 @@ describe('JSX', function() {
 		assert.ok(dom.hasClass(component.element, 'test'));
 		assert.strictEqual('Hello World', component.element.textContent);
 	});
+
+	it('should not throw error if no jsx function is implemented', function() {
+		class TestComponent extends Component {
+		}
+		JSX.register(TestComponent);
+
+		component = new TestComponent().render();
+		assert.strictEqual('DIV', component.element.tagName);
+		assert.strictEqual('', component.element.textContent);
+	});
 });

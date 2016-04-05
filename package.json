@@ -37,6 +37,6 @@
     "babel-plugin-incremental-dom": "^3.0.3",
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
-    "metal-karma-config": "^2.0.0"
+    "metal-karma-config": "^2.0.2"
   }
 }

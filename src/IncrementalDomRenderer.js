@@ -1,5 +1,6 @@
 'use strict';
 
+import './incremental-dom';
 import { array, core, object } from 'metal';
 import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';

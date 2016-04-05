@@ -1,5 +1,6 @@
 'use strict';
 
+import './incremental-dom';
 import { array } from 'metal';
 
 /**

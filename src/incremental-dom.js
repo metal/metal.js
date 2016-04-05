@@ -1,3 +1,4 @@
+/* jshint ignore:start */
 
 /**
  * @license
@@ -17,10 +18,8 @@
  */
 
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (factory((global.IncrementalDOM = global.IncrementalDOM || {})));
-}(this, function (exports) { 'use strict';
+}(window, function (exports) { 'use strict';
 
   /**
    * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
@@ -1064,3 +1063,4 @@
   exports.notifications = notifications;
 
 }));
+/* jshint ignore:end */

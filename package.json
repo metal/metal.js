@@ -10,8 +10,7 @@
   },
   "main": "src/JSX.js",
   "files": [
-    "src",
-    "test"
+    "src"
   ],
   "scripts": {
     "test": "gulp test"
@@ -19,12 +18,25 @@
   "keywords": [
     "metal"
   ],
+  "babel": {
+    "plugins": [
+      [
+        "incremental-dom",
+        {
+          "prefix": "IncrementalDOM"
+        }
+      ]
+    ]
+  },
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "metal-incremental-dom": "^1.0.0-rc.1"
+    "metal-incremental-dom": "^1.0.0-rc.1",
+    "metal-karma-config": "^2.0.1"
   },
   "devDependencies": {
+    "babel-plugin-incremental-dom": "^3.0.3",
     "gulp": "^3.8.11",
-    "gulp-metal": "^1.0.0"
+    "gulp-metal": "^1.0.0",
+    "metal-karma-config": "^2.0.0"
   }
 }

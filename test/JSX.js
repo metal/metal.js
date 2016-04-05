@@ -37,6 +37,22 @@ describe('JSX', function() {
 		assert.strictEqual('', component.element.textContent);
 	});
 
+	it('should attach inline listeners', function() {
+		class TestComponent extends Component {
+			jsx() {
+				return <div>
+					<button data-onclick={this.handleClick.bind(this)}></button>
+				</div>;
+			}
+		}
+		TestComponent.prototype.handleClick = sinon.stub();
+		JSX.register(TestComponent);
+
+		component = new TestComponent().render();
+		dom.triggerEvent(component.element.childNodes[0], 'click');
+		assert.strictEqual(1, component.handleClick.callCount);
+	});
+
 	it('should create and render sub components', function() {
 		class ChildComponent extends Component {
 			jsx() {

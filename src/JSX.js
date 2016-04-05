@@ -1,5 +1,6 @@
 'use strict';
 
+import { ComponentRegistry } from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
 /**
@@ -41,6 +42,7 @@ class JSX extends IncrementalDomRenderer {
 	 */
 	static register(componentCtor) {
 		componentCtor.RENDERER = JSX;
+		ComponentRegistry.register(componentCtor);
 	}
 }
 

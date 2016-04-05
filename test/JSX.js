@@ -36,4 +36,30 @@ describe('JSX', function() {
 		assert.strictEqual('DIV', component.element.tagName);
 		assert.strictEqual('', component.element.textContent);
 	});
+
+	it('should create and render sub components', function() {
+		class ChildComponent extends Component {
+			jsx() {
+				return <div class="child">Child</div>;
+			}
+		}
+		JSX.register(ChildComponent);
+
+		class TestComponent extends Component {
+			jsx() {
+				return <div class="test">
+					<ChildComponent key="child"></ChildComponent>
+				</div>;
+			}
+		}
+		JSX.register(TestComponent);
+
+		component = new TestComponent().render();
+		var child = component.components.child;
+		assert.ok(child);
+		assert.strictEqual('DIV', child.element.tagName);
+		assert.ok(dom.hasClass(child.element, 'child'));
+		assert.strictEqual('Child', child.element.textContent);
+		assert.strictEqual(child.element, component.element.childNodes[0]);
+	});
 });

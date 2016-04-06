@@ -237,7 +237,7 @@ describe('EventsCollector', function() {
 	function createCustomComponentInstance(content) {
 		class CustomComponent extends Component {
 		}
-		var comp = new CustomComponent().render();
+		var comp = new CustomComponent();
 		dom.append(comp.element, content);
 		return comp;
 	}

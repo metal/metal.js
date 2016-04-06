@@ -17,7 +17,7 @@ describe('ComponentRenderer', function() {
 		sinon.spy(ComponentRenderer.prototype, 'render');
 		renderer = new ComponentRenderer(component);
 
-		component.render();
+		component.emit('render');
 		assert.strictEqual(1, renderer.render.callCount);
 		ComponentRenderer.prototype.render.restore();
 	});
@@ -25,7 +25,7 @@ describe('ComponentRenderer', function() {
 	it('should set element to simple empty div as the default render implementation', function() {
 		var component = new Component();
 		renderer = new ComponentRenderer(component);
-		component.render();
+		component.emit('render');
 
 		assert.ok(core.isElement(component.element));
 		assert.strictEqual('DIV', component.element.tagName);
@@ -38,13 +38,13 @@ describe('ComponentRenderer', function() {
 		renderer = new ComponentRenderer(component);
 
 		renderer.dispose();
-		component.render();
+		component.emit('render');
 		assert.strictEqual(0, renderer.render.callCount);
 		ComponentRenderer.prototype.render.restore();
 	});
 
 	it('should not call the update method if state changes before render', function(done) {
-		var component = new Component();
+		var component = new Component({}, false);
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
@@ -62,7 +62,7 @@ describe('ComponentRenderer', function() {
 		sinon.spy(renderer, 'update');
 
 		component.addToState('foo');
-		component.render();
+		component.emit('render');
 
 		component.foo = 'foo';
 		component.once('stateChanged', function() {
@@ -82,7 +82,7 @@ describe('ComponentRenderer', function() {
 		sinon.spy(renderer, 'update');
 
 		component.addToState('foo');
-		component.render();
+		component.emit('render');
 		renderer.dispose();
 
 		component.foo = 'foo';

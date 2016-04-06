@@ -50,9 +50,13 @@ class Component extends State {
 	 * Constructor function for `Component`.
 	 * @param {Object=} opt_config An object with the initial values for this
 	 *     component's state.
+	 * @param {boolean|string|Element=} opt_parentElement The element where the
+	 *     component should be rendered. Can be given as a selector or an element.
+	 *     If `false` is passed, the component won't be rendered automatically
+	 *     after created.
 	 * @constructor
 	 */
-	constructor(opt_config) {
+	constructor(opt_config, opt_parentElement) {
 		super(opt_config);
 
 		/**
@@ -117,6 +121,9 @@ class Component extends State {
 		this.renderer_ = new this.constructor.RENDERER_MERGED(this);
 
 		this.created_();
+		if (opt_parentElement !== false) {
+			this.render_(opt_parentElement);
+		}
 	}
 
 	/**
@@ -161,8 +168,7 @@ class Component extends State {
 	 *     to render the component.
 	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
 	 *     to render the component before it. Relevant when the component needs
-	 *     to be rendered before an existing element in the DOM, e.g.
-	 *     `component.render(null, existingElement)`.
+	 *     to be rendered before an existing element in the DOM.
 	 * @protected
 	 * @chainable
 	 */
@@ -197,6 +203,7 @@ class Component extends State {
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.events);
+		this.on('elementChanged', this.onElementChanged_);
 	}
 
 	/**
@@ -212,7 +219,7 @@ class Component extends State {
 			if (core.isString(ConstructorFn)) {
 				ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
 			}
-			this.components[key] = new ConstructorFn(opt_data);
+			this.components[key] = new ConstructorFn(opt_data, false);
 		}
 		return this.components[key];
 	}
@@ -418,6 +425,7 @@ class Component extends State {
 			return;
 		}
 
+		this.setUpProxy_();
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		this.addElementClasses_();
 		this.syncVisible(this.visible);
@@ -445,31 +453,20 @@ class Component extends State {
 	 *     to render the component. If set to `false`, the element won't be
 	 *     attached to any element after rendering. In this case, `attach` should
 	 *     be called manually later to actually attach it to the dom.
-	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
-	 *     to render the component before it. Relevant when the component needs
-	 *     to be rendered before an existing element in the DOM, e.g.
-	 *     `component.render(null, existingElement)`.
 	 * @param {boolean=} opt_skipRender Optional flag indicating that the actual
 	 *     rendering should be skipped. Only the other render lifecycle logic will
 	 *     be run, like syncing state and attaching the element. Should only
 	 *     be set if the component has already been rendered, like sub components.
-	 * @chainable
+	 * @protected
 	 */
-	render(opt_parentElement, opt_siblingElement, opt_skipRender) {
-		if (this.wasRendered) {
-			throw new Error(Component.Error.ALREADY_RENDERED);
-		}
-
+	render_(opt_parentElement, opt_skipRender) {
 		if (!opt_skipRender) {
 			this.emit('render');
 		}
 		this.setUpProxy_();
 		this.syncState_();
-		if (opt_parentElement !== false) {
-			this.attach(opt_parentElement, opt_siblingElement);
-		}
+		this.attach(opt_parentElement);
 		this.wasRendered = true;
-		return this;
 	}
 
 	/**
@@ -479,7 +476,7 @@ class Component extends State {
 	 * state.
 	 */
 	renderAsSubComponent() {
-		this.render(null, null, true);
+		this.render_(null, true);
 	}
 
 	/**
@@ -489,7 +486,7 @@ class Component extends State {
 	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
 	 *     to render the component before it. Relevant when the component needs
 	 *     to be rendered before an existing element in the DOM, e.g.
-	 *     `component.render(null, existingElement)`.
+	 *     `component.attach(null, existingElement)`.
 	 * @protected
 	 */
 	renderElement_(opt_parentElement, opt_siblingElement) {
@@ -517,6 +514,10 @@ class Component extends State {
 	 * @protected
 	 */
 	setUpProxy_() {
+		if (this.elementEventProxy_) {
+			return;
+		}
+
 		var proxy = new DomEventEmitterProxy(this.element, this);
 		this.elementEventProxy_ = proxy;
 
@@ -525,8 +526,6 @@ class Component extends State {
 
 		this.newListenerHandle_.removeListener();
 		this.newListenerHandle_ = null;
-
-		this.on('elementChanged', this.onElementChanged_);
 	}
 
 	/**
@@ -673,12 +672,6 @@ Component.RENDERER = ComponentRenderer;
  * @enum {string}
  */
 Component.Error = {
-	/**
-	 * Error when the component is already rendered and another render attempt
-	 * is made.
-	 */
-	ALREADY_RENDERED: 'Component already rendered.',
-
 	/**
 	 * Error when the component is attached but its element hasn't been created yet.
 	 */

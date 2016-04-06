@@ -12,10 +12,10 @@
 
 		<p>Another feature Metal.js has that can be very useful is the ability to declare events inside templates, directly on the desired element. Besides being simple and intuitive, this feature allows Metal.js to handle attaching events itself, and so this can be done in the best way possible, with <a href="https://learn.jquery.com/events/event-delegation/">delegates</a> for example, without the user having worry about that at all.</p>
 
-		<p>By using SoyComponent, for example, you can add inline listeners like this:</p>
+		<p>By using <a href="/docs/soy-components.html">soy components</a>, for example, you can add inline listeners like this:</p>
 
 		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .button&rbrace;
+&lbrace;template .render&rbrace;
     &lt;button data-onclick="handleClick"&gt;&lt;/button&gt;
 &lbrace;/template&rbrace;{/literal}</textarea>
 
@@ -24,11 +24,23 @@
 		<p>It's also possible to add multiple functions to listen to the same event on the same element, by just separating them by commas. For example:</p>
 
 		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .button&rbrace;
+&lbrace;template .render&rbrace;
 	&lt;button data-onclick="handleClick,anotherHandleClick"&gt;&lt;/button&gt;
 &lbrace;/template&rbrace;{/literal}</textarea>
 
 		<p>Now both the <code>handleClick</code> and the <code>anotherHandleClick</code> methods will be called on your component for each click on that button.</p>
+
+		<p>Finally, you can pass function references directly as well, instead of strings. Params declared on `render` templates that match function names on the component will be the function references themselves. For example:</p>
+
+		<textarea class="code" data-mode="x-soy">{literal}
+/**
+ * @param handleClick
+ */
+&lbrace;template .render&rbrace;
+	&lt;button data-onclick="{$handleClick}"&gt;&lt;/button&gt;
+&lbrace;/template&rbrace;{/literal}</textarea>
+
+		<p>This last example will have the same effect as the first one above.</p>
 
 		<h2>Inline events for nested components</h2>
 
@@ -36,7 +48,7 @@
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .footer&rbrace;
-    &lbrace;call Templates.Button.render&rbrace;
+    &lbrace;call Button.render&rbrace;
         &lbrace;param events: ['click': ['selector': 'button', 'fn': 'handleClick']] /&rbrace;
         &lbrace;param label: 'Ok' /&rbrace;
     &lbrace;/call&rbrace;
@@ -45,23 +57,25 @@
 
 		<p>This will cause the <code>handleClick</code> function from the sub component to be called whenever a click event triggers for the elements that match the given selector.</p>
 
-		<p>In case you want to listen to the event with a function from another component, like the parent, instead of from the sub component itself, you can just prefix the function name with the desired component's id. Note that this can also be done when using the <code>data-on&lt;event&gt;</code> format.</p>
+		<p>In case you want to listen to the event with a function from the parent component, just pass the function reference instead of a string, like this:</p>
 
 		<textarea class="code" data-mode="x-soy">{literal}
+/**
+ * @param handleClick
+ */
 &lbrace;template .footer&rbrace;
-    &lbrace;call Templates.Button.render&rbrace;
-        &lbrace;param events: ['click': ['selector': 'button', 'fn': $compId + 'handleClick']] /&rbrace;
+    &lbrace;call Button.render&rbrace;
+        &lbrace;param events: ['click': ['selector': 'button', 'fn': $handleClick]] /&rbrace;
         &lbrace;param label: 'Ok' /&rbrace;
     &lbrace;/call&rbrace;
-   &lt;button data-onclick="&lbrace;$compId&rbrace;:handleClick"&gt;&lt;/button&gt;
 &lbrace;/template&rbrace;
 {/literal}</textarea>
 
-		<p>You can also listen to custom events from the sub component like this:</p>
+		<p>Besides dom events, you can also listen to custom events from the sub component like this:</p>
 
 		<textarea class="code" data-mode="x-soy">{literal}
 &lbrace;template .footer&rbrace;
-    &lbrace;call Templates.Button.render&rbrace;
+    &lbrace;call Button.render&rbrace;
         &lbrace;param events: ['labelChanged': 'handleLabelChanged'] /&rbrace;
         &lbrace;param label: 'Ok' /&rbrace;
     &lbrace;/call&rbrace;

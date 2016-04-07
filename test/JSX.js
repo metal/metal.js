@@ -21,7 +21,7 @@ describe('JSX', function() {
 		}
 		JSX.register(TestComponent);
 
-		component = new TestComponent().render();
+		component = new TestComponent();
 		assert.strictEqual('DIV', component.element.tagName);
 		assert.ok(dom.hasClass(component.element, 'test'));
 		assert.strictEqual('Hello World', component.element.textContent);
@@ -32,7 +32,7 @@ describe('JSX', function() {
 		}
 		JSX.register(TestComponent);
 
-		component = new TestComponent().render();
+		component = new TestComponent();
 		assert.strictEqual('DIV', component.element.tagName);
 		assert.strictEqual('', component.element.textContent);
 	});
@@ -48,7 +48,7 @@ describe('JSX', function() {
 		TestComponent.prototype.handleClick = sinon.stub();
 		JSX.register(TestComponent);
 
-		component = new TestComponent().render();
+		component = new TestComponent();
 		dom.triggerEvent(component.element.childNodes[0], 'click');
 		assert.strictEqual(1, component.handleClick.callCount);
 	});
@@ -70,7 +70,7 @@ describe('JSX', function() {
 		}
 		JSX.register(TestComponent);
 
-		component = new TestComponent().render();
+		component = new TestComponent();
 		var child = component.components.child;
 		assert.ok(child);
 		assert.strictEqual('DIV', child.element.tagName);

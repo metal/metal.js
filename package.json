@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "metal-incremental-dom": "^1.0.0-rc.1",
+    "metal-incremental-dom": "^1.0.0-rc.3",
     "metal-karma-config": "^2.0.1"
   },
   "devDependencies": {

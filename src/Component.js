@@ -12,10 +12,10 @@ import State from 'metal-state';
  * as Lifecycle, CSS classes management, events encapsulation and support for
  * different types of rendering.
  * Rendering logic can be done by either:
- *     - Listening to the `render` event and adding the rendering logic to the
- *       listener.
- *     - Using an existing implementation of `ComponentRenderer` like
- *       `SurfaceRenderer` or `SoyRenderer`, and following its patterns.
+ *     - Listening to the `render` event inside the `created` lifecycle function
+ *       and adding the rendering logic to the listener.
+ *     - Using an existing implementation of `ComponentRenderer` like `Soy`,
+ *       and following its patterns.
  *     - Building your own implementation of a `ComponentRenderer`.
  * Specifying the renderer that will be used can be done by setting the RENDERER
  * static variable to the renderer's constructor function.
@@ -26,6 +26,9 @@ import State from 'metal-state';
  * class CustomComponent extends Component {
  *   constructor(config) {
  *     super(config);
+ *   }
+ *
+ *   created() {
  *   }
  *
  *   attached() {
@@ -120,7 +123,13 @@ class Component extends State {
 
 		this.renderer_ = new this.constructor.RENDERER_MERGED(this);
 
-		this.created_();
+		this.on('stateChanged', this.handleStateChanged_);
+		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
+		this.on('eventsChanged', this.onEventsChanged_);
+		this.addListenersFromObj_(this.events);
+		this.on('elementChanged', this.onElementChanged_);
+
+		this.created();
 		if (opt_parentElement !== false) {
 			this.render_(opt_parentElement);
 		}
@@ -195,18 +204,6 @@ class Component extends State {
 	attached() {}
 
 	/**
-	 * Internal implementation for the creation phase of the component.
-	 * @protected
-	 */
-	created_() {
-		this.on('stateChanged', this.handleStateChanged_);
-		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
-		this.on('eventsChanged', this.onEventsChanged_);
-		this.addListenersFromObj_(this.events);
-		this.on('elementChanged', this.onElementChanged_);
-	}
-
-	/**
 	 * Adds a sub component, creating it if it doesn't yet exist.
 	 * @param {string} key
 	 * @param {string|!Function} componentNameOrCtor
@@ -222,6 +219,13 @@ class Component extends State {
 			this.components[key] = new ConstructorFn(opt_data, false);
 		}
 		return this.components[key];
+	}
+
+	/**
+	 * Lifecycle. This is called when the component has just been created, before
+	 * it's rendered.
+	 */
+	created() {
 	}
 
 	/**

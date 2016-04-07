@@ -36,8 +36,7 @@ describe('Component', function() {
 		it('should run component render lifecycle', function() {
 			var renderListener = sinon.stub();
 			class TestComponent extends Component {
-				created_() {
-					super.created_();
+				created() {
 					this.on('render', renderListener);
 				}
 			}
@@ -57,8 +56,7 @@ describe('Component', function() {
 		it('should not run component render lifecycle if "false" is passed as second param', function() {
 			var renderListener = sinon.stub();
 			class TestComponent extends Component {
-				created_() {
-					super.created_();
+				created() {
 					this.on('render', renderListener);
 				}
 			}
@@ -417,8 +415,7 @@ describe('Component', function() {
 			var defaultParent = document.createElement('div');
 
 			class CustomComponent extends Component {
-				created_() {
-					super.created_();
+				created() {
 					this.DEFAULT_ELEMENT_PARENT = defaultParent;
 				}
 			}

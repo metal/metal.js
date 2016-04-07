@@ -127,12 +127,12 @@ class Component extends State {
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.events);
-		this.on('elementChanged', this.onElementChanged_);
 
 		this.created();
 		if (opt_parentElement !== false) {
 			this.render_(opt_parentElement);
 		}
+		this.on('elementChanged', this.onElementChanged_);
 	}
 
 	/**

@@ -77,11 +77,11 @@ export default MyComponent;{/literal}</textarea>
  * Example for running a soy component.
  */
 {template .runExample}
-	<p>Finally, to render an instance of MyComponent, just call <code>render</code>, passing any attribute values that you want to initialize:</p>
+	<p>Finally, to use your new component, just call instantiate it, passing any attribute values that you want to initialize it with, as well as an optional parent element:</p>
 
 	<textarea class="code" data-mode="javascript">{literal}
 new MyComponent({
 	bodyContent: 'My Body',
 	footerContent: '&lt;footer&gt;My Footer.&lt;/footer&gt;'
-}).render(parentElement);{/literal}</textarea>
+}, parentElement);{/literal}</textarea>
 {/template}

@@ -32,7 +32,7 @@ describe('Soy', function() {
 
 	describe('Rendering', function() {
 		it('should render component\'s "render" template', function() {
-			comp = new HelloWorldComponent().render();
+			comp = new HelloWorldComponent();
 			assert.strictEqual('SPAN', comp.element.tagName);
 			assert.ok(dom.hasClass(comp.element, 'render'));
 			assert.strictEqual('Hello World!', comp.element.textContent);
@@ -42,27 +42,13 @@ describe('Soy', function() {
 			comp = new HelloWorldComponent({
 				name: 'Foo'
 			});
-
-			comp.render();
 			assert.strictEqual('Foo', comp.name);
-		});
-
-		it('should not add soy param as state key if it already exists', function() {
-			comp = new HelloWorldComponent({
-				name: 'Foo'
-			});
-
-			comp.addToState('name', {
-				value: 'Bar'
-			});
-			comp.render();
-			assert.strictEqual('Bar', comp.name);
 		});
 
 		it('should pass state values to "render template"', function() {
 			comp = new HelloWorldComponent({
 				name: 'Foo'
-			}).render();
+			});
 			assert.strictEqual('SPAN', comp.element.tagName);
 			assert.strictEqual('Hello Foo!', comp.element.textContent);
 		});
@@ -70,7 +56,7 @@ describe('Soy', function() {
 		it('should update content when state values change', function(done) {
 			comp = new HelloWorldComponent({
 				name: 'Foo'
-			}).render();
+			});
 
 			comp.name = 'Bar';
 			comp.once('stateSynced', function() {
@@ -80,7 +66,7 @@ describe('Soy', function() {
 		});
 
 		it('should not trigger update when changed state key is not used by template', function(done) {
-			comp = new HelloWorldComponent().render();
+			comp = new HelloWorldComponent();
 			comp.addToState('foo');
 			sinon.spy(IncrementalDOM, 'patchOuter');
 
@@ -95,14 +81,14 @@ describe('Soy', function() {
 		it('should not add sub template soy params as state keys', function() {
 			comp = new TemplateDataComponent({
 				foo: 'foo'
-			}).render();
+			});
 			assert.ok(!comp.foo);
 		});
 
 		it('should pass non state config data to sub templates', function() {
 			comp = new TemplateDataComponent({
 				foo: 'foo'
-			}).render();
+			});
 			assert.strictEqual('foo', comp.element.textContent);
 		});
 
@@ -112,7 +98,7 @@ describe('Soy', function() {
 			NoTemplateComponent.RENDERER = Soy;
 
 			assert.doesNotThrow(function() {
-				comp = new NoTemplateComponent().render();
+				comp = new NoTemplateComponent();
 			});
 		});
 
@@ -125,7 +111,7 @@ describe('Soy', function() {
 			};
 			NoTemplateComponent.RENDERER = Soy;
 
-			comp = new NoTemplateComponent().render();
+			comp = new NoTemplateComponent();
 			sinon.spy(IncrementalDOM, 'patchOuter');
 
 			comp.foo = 'Bar';
@@ -137,7 +123,7 @@ describe('Soy', function() {
 		});
 
 		it('should render contents from external templates', function() {
-			comp = new ExternalTemplateComponent().render();
+			comp = new ExternalTemplateComponent();
 			assert.strictEqual('DIV', comp.element.tagName);
 			assert.strictEqual('Hello External!', comp.element.textContent);
 		});
@@ -146,14 +132,14 @@ describe('Soy', function() {
 			Soy.setInjectedData({
 				content: 'Foo'
 			});
-			comp = new IJDataComponent().render();
+			comp = new IJDataComponent();
 			assert.strictEqual('DIV', comp.element.tagName);
 			assert.strictEqual('Foo', comp.element.textContent);
 		});
 
 		it('should not throw error if setting injected data to null', function() {
 			Soy.setInjectedData(null);
-			comp = new IJDataComponent().render();
+			comp = new IJDataComponent();
 			assert.strictEqual('DIV', comp.element.tagName);
 			assert.strictEqual('', comp.element.textContent);
 		});
@@ -163,7 +149,7 @@ describe('Soy', function() {
 			}
 			Soy.register(TestComponent, helloWorldTemplates, 'content');
 
-			comp = new TestComponent().render();
+			comp = new TestComponent();
 			assert.strictEqual('SPAN', comp.element.tagName);
 			assert.ok(dom.hasClass(comp.element, 'content'));
 			assert.strictEqual('Hello World!', comp.element.textContent);
@@ -195,7 +181,7 @@ describe('Soy', function() {
 		it('should render html string attributes correctly if isHtml is true', function() {
 			comp = new HtmlContentComponent({
 				content: '<span class="custom">HTML Content</span>'
-			}).render();
+			});
 
 			assert.strictEqual(1, comp.element.childNodes.length);
 			assert.strictEqual('SPAN', comp.element.childNodes[0].tagName);
@@ -209,7 +195,7 @@ describe('Soy', function() {
 					content: '<span class="custom">HTML Content</span>',
 					contentKind: 'HTML'
 				}
-			}).render();
+			});
 
 			assert.strictEqual(1, comp.element.childNodes.length);
 			assert.strictEqual('SPAN', comp.element.childNodes[0].tagName);
@@ -225,7 +211,7 @@ describe('Soy', function() {
 		});
 
 		it('should attach inline events found in component\'s soy template', function() {
-			comp = new EventsComponent().render();
+			comp = new EventsComponent();
 
 			dom.triggerEvent(comp.element, 'click');
 			assert.strictEqual(0, comp.handleClick.callCount);
@@ -235,7 +221,7 @@ describe('Soy', function() {
 		});
 
 		it('should attach function listeners found in component\'s soy template', function() {
-			comp = new FunctionsComponent().render();
+			comp = new FunctionsComponent();
 
 			dom.triggerEvent(comp.element, 'click');
 			assert.strictEqual(0, comp.handleClick.callCount);
@@ -249,21 +235,21 @@ describe('Soy', function() {
 			FunctionsComponent.prototype.handleClick = function() {
 				context = this;
 			};
-			comp = new FunctionsComponent().render();
+			comp = new FunctionsComponent();
 
 			dom.triggerEvent(comp.element.querySelector('button'), 'click');
 			assert.strictEqual(comp, context);
 		});
 
 		it('should not add prototype functions to the state', function() {
-			comp = new FunctionsComponent().render();
+			comp = new FunctionsComponent();
 			assert.ok(!comp.getStateKeys.handleClick);
 		});
 	});
 
 	describe('Nested Components', function() {
 		it('should render and instantiate nested components', function() {
-			comp = new NestedComponent().render();
+			comp = new NestedComponent();
 
 			var nested = comp.components.hello;
 			assert.ok(nested instanceof HelloWorldComponent);
@@ -274,7 +260,7 @@ describe('Soy', function() {
 		it('should pass data to nested components', function() {
 			comp = new NestedComponent({
 				name: 'Foo'
-			}).render();
+			});
 
 			var nested = comp.components.hello;
 			assert.ok(nested instanceof HelloWorldComponent);
@@ -283,7 +269,7 @@ describe('Soy', function() {
 		});
 
 		it('should render and instantiate nested components even without key', function() {
-			comp = new NestedNoDataComponent().render();
+			comp = new NestedNoDataComponent();
 			var keys = Object.keys(comp.components);
 			assert.strictEqual(1, keys.length);
 
@@ -296,7 +282,7 @@ describe('Soy', function() {
 		it('should render and instantiate nested components inside nested components', function() {
 			comp = new NestedLevelsComponent({
 				name: 'Foo'
-			}).render();
+			});
 
 			var nested = comp.components.nested;
 			assert.ok(nested instanceof NestedComponent);
@@ -311,7 +297,7 @@ describe('Soy', function() {
 		it('should render and instantiate multiple nested components', function() {
 			comp = new NestedMultipleComponent({
 				count: 2
-			}).render();
+			});
 
 			var nested1 = comp.components.hello1;
 			assert.ok(nested1 instanceof HelloWorldComponent);

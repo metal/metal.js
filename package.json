@@ -22,8 +22,8 @@
   "dependencies": {
     "html2incdom": "^0.1.1",
     "metal": "^1.0.0-rc.1",
-    "metal-component": "^1.0.0-rc.2",
-    "metal-incremental-dom": "^1.0.0-rc.2",
+    "metal-component": "^1.0.0-rc.3",
+    "metal-incremental-dom": "^1.0.0-rc.3",
     "metal-soy-bundle": "^1.1.0"
   },
   "devDependencies": {

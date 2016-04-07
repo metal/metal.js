@@ -19,7 +19,7 @@ describe('IncrementalDomRenderer', function() {
 	describe('Default renderIncDom', function() {
 		it('should render empty div element by default', function() {
 			var TestComponent = createTestComponentClass();
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual('DIV', component.element.tagName);
 			assert.strictEqual(0, component.element.childNodes.length);
 		});
@@ -34,7 +34,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementClose('span');
 			};
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual('SPAN', component.element.tagName);
 			assert.strictEqual('foo', component.element.getAttribute('foo'));
 			assert.strictEqual('bar', component.element.textContent);
@@ -51,7 +51,7 @@ describe('IncrementalDomRenderer', function() {
 			var config = {
 				foo: 'foo'
 			};
-			component = new TestComponent(config).render();
+			component = new TestComponent(config);
 			assert.strictEqual('SPAN', component.element.tagName);
 			assert.strictEqual('foo', component.element.getAttribute('foo'));
 			assert.strictEqual('bar', component.element.textContent);
@@ -68,7 +68,7 @@ describe('IncrementalDomRenderer', function() {
 			var element = document.createElement('span');
 			component = new TestComponent({
 				element: element
-			}).render();
+			});
 			assert.strictEqual(element, component.element);
 			assert.strictEqual('foo', component.element.getAttribute('foo'));
 			assert.strictEqual('bar', component.element.textContent);
@@ -87,7 +87,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 			};
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual('foo', component.element.textContent);
 
 			component.foo = 'bar';
@@ -108,7 +108,7 @@ describe('IncrementalDomRenderer', function() {
 			var element = document.createElement('div');
 			component = new TestComponent({
 				element: element
-			}).render();
+			});
 			assert.notStrictEqual(element, component.element);
 			assert.strictEqual('SPAN', component.element.tagName);
 		});
@@ -121,9 +121,12 @@ describe('IncrementalDomRenderer', function() {
 
 			var element = document.createElement('div');
 			var parent = document.createElement('div');
-			component = new TestComponent({
-				element: element
-			}).render(parent);
+			component = new TestComponent(
+				{
+					element: element
+				},
+				parent
+			);
 			assert.strictEqual(element, component.element);
 			assert.strictEqual(parent, component.element.parentNode);
 		});
@@ -150,7 +153,7 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent({
 				checked: true,
 				element: input
-			}).render();
+			});
 			assert.ok(input.checked);
 
 			component.checked = false;
@@ -177,7 +180,7 @@ describe('IncrementalDomRenderer', function() {
 			var innerElement = element.querySelector('.inner');
 			component = new TestComponent({
 				element: element
-			}).render();
+			});
 
 			assert.strictEqual(element, component.element);
 			assert.strictEqual(innerElement, component.element.querySelector('.inner'));
@@ -199,7 +202,7 @@ describe('IncrementalDomRenderer', function() {
 			var innerElement = element.querySelector('.inner');
 			component = new TestComponent({
 				element: element
-			}).render();
+			});
 
 			assert.strictEqual(element, component.element);
 			assert.notStrictEqual(innerElement, component.element.querySelector('.inner'));
@@ -221,7 +224,7 @@ describe('IncrementalDomRenderer', function() {
 			var innerElement = element.querySelector('.inner2');
 			component = new TestComponent({
 				element: element
-			}).render();
+			});
 
 			assert.strictEqual(element, component.element);
 			assert.strictEqual(innerElement, component.element.querySelector('.inner'));
@@ -241,7 +244,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual(0, component.handleClick.callCount);
 
 			dom.triggerEvent(component.element, 'click');
@@ -260,7 +263,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual(0, component.handleClick.callCount);
 
 			dom.triggerEvent(component.element, 'click');
@@ -278,7 +281,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual(0, component.handleClick.callCount);
 
 			dom.triggerEvent(component.element, 'click');
@@ -302,7 +305,7 @@ describe('IncrementalDomRenderer', function() {
 			var innerElement = element.childNodes[0];
 			component = new TestComponent({
 				element: element
-			}).render();
+			});
 			assert.strictEqual(innerElement, component.element.childNodes[0]);
 
 			dom.triggerEvent(innerElement, 'click');
@@ -327,7 +330,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 			};
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			dom.triggerEvent(component.element.childNodes[1], 'keydown');
 			assert.strictEqual(1, component.handleKeydown.callCount);
 
@@ -351,7 +354,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.prototype.handleClick = sinon.stub();
 			TestComponent.prototype.handleKeydown = sinon.stub();
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			sinon.spy(component, 'removeListener');
 			component.detach();
 
@@ -369,7 +372,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual(0, component.handleClick.callCount);
 
 			dom.triggerEvent(component.element, 'click');
@@ -393,7 +396,7 @@ describe('IncrementalDomRenderer', function() {
 				switch: {}
 			};
 
-			component = new TestComponent().render();
+			component = new TestComponent();
 			dom.triggerEvent(component.element.childNodes[0], 'click');
 			assert.strictEqual(1, component.handleClick.callCount);
 			assert.strictEqual(0, component.handleClick2.callCount);
@@ -435,7 +438,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent', null, ['key', 'child']);
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.ok(child);
@@ -449,7 +452,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent', null, ['key', 'child']);
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual(child.element, component.element.querySelector('child'));
@@ -464,7 +467,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent', null, ['key', 'child'], 'foo', 'bar');
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual('bar', child.foo);
@@ -483,7 +486,7 @@ describe('IncrementalDomRenderer', function() {
 					value: 'foo'
 				}
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
@@ -506,7 +509,7 @@ describe('IncrementalDomRenderer', function() {
 					value: 'foo'
 				}
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
@@ -531,7 +534,7 @@ describe('IncrementalDomRenderer', function() {
 					value: 'foo'
 				}
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
@@ -553,7 +556,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent', null, ['key', 'child']);
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual('child', child.element.__incrementalDOMData.key);
@@ -574,7 +577,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent', null, ['key', 'child']);
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual(0, child.handleClick.callCount);
@@ -591,7 +594,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent');
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.sub0;
 			assert.ok(child instanceof ChildComponent);
@@ -604,7 +607,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('ChildComponent');
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.sub0;
 			child.foo = 'bar';
@@ -624,7 +627,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementClose('ChildComponent');
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual(child.element, component.element.querySelector('child'));
@@ -642,7 +645,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementClose('ChildComponent');
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual('bar', child.foo);
@@ -664,7 +667,7 @@ describe('IncrementalDomRenderer', function() {
 				});
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.ok(child);
@@ -683,7 +686,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent);
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.sub0;
 			assert.ok(child);
@@ -714,7 +717,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 			component = new TestComponent({
 				foo: 'foo'
-			}).render();
+			});
 
 			var child = component.components.child;
 			assert.strictEqual('foo', child.foo);
@@ -740,7 +743,7 @@ describe('IncrementalDomRenderer', function() {
 				});
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
@@ -756,7 +759,7 @@ describe('IncrementalDomRenderer', function() {
 				});
 				IncDom.elementClose('div');
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 
 			assert.ok(!component.getRenderer().getRenderingData().foo);
 		});
@@ -776,7 +779,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 
 			sinon.stub(console, 'warn');
-			component = new TestComponent().render();
+			component = new TestComponent();
 			assert.strictEqual(1, console.warn.callCount);
 			console.warn.restore();
 		});
@@ -795,7 +798,7 @@ describe('IncrementalDomRenderer', function() {
 					value: 3
 				}
 			};
-			component = new TestComponent().render();
+			component = new TestComponent();
 			var subComps = object.mixin({}, component.components);
 			assert.strictEqual(3, Object.keys(subComps).length);
 			assert.ok(subComps.child1);

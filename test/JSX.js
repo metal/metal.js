@@ -15,7 +15,7 @@ describe('JSX', function() {
 
 	it('should render contents from component\'s jsx function', function() {
 		class TestComponent extends Component {
-			jsx() {
+			render() {
 				return <div class="test">Hello World</div>;
 			}
 		}
@@ -39,7 +39,7 @@ describe('JSX', function() {
 
 	it('should attach inline listeners', function() {
 		class TestComponent extends Component {
-			jsx() {
+			render() {
 				return <div>
 					<button data-onclick={this.handleClick.bind(this)}></button>
 				</div>;
@@ -55,14 +55,14 @@ describe('JSX', function() {
 
 	it('should create and render sub components', function() {
 		class ChildComponent extends Component {
-			jsx() {
+			render() {
 				return <div class="child">Child</div>;
 			}
 		}
 		JSX.register(ChildComponent);
 
 		class TestComponent extends Component {
-			jsx() {
+			render() {
 				return <div class="test">
 					<ChildComponent key="child"></ChildComponent>
 				</div>;

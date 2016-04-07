@@ -20,7 +20,7 @@ class JSX extends IncrementalDomRenderer {
 	 */
 	constructor(comp) {
 		super(comp);
-		this.fn_ = comp.jsx && comp.jsx.bind(comp);
+		this.fn_ = comp.render && comp.render.bind(comp);
 	}
 
 	/**

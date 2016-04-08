@@ -167,18 +167,22 @@ describe('Soy', function() {
 			assert.strictEqual(TestComponent.TEMPLATE, TestComponent2.TEMPLATE);
 			assert.strictEqual(TestComponent2, TestComponent2.TEMPLATE.componentCtor);
 		});
+
+		it('should not throw error if soy template doesn\'t have params/types info', function() {
+			class TestComponent extends Component {
+			}
+			Soy.register(
+				TestComponent,
+				{
+					render: () => IncrementalDOM.elementVoid('div')
+				}
+			);
+			assert.doesNotThrow(() => comp = new TestComponent());
+		});
 	});
 
 	describe('HTML attributes', function() {
-		before(function() {
-			HtmlContentComponent.STATE = {
-				content: {
-					isHtml: true
-				}
-			};
-		});
-
-		it('should render html string attributes correctly if isHtml is true', function() {
+		it('should render html string attributes correctly', function() {
 			comp = new HtmlContentComponent({
 				content: '<span class="custom">HTML Content</span>'
 			});
@@ -189,7 +193,7 @@ describe('Soy', function() {
 			assert.strictEqual('HTML Content', comp.element.childNodes[0].textContent);
 		});
 
-		it('should render html sanitized object attributes correctly if isHtml is true', function() {
+		it('should render html sanitized object attributes correctly', function() {
 			comp = new HtmlContentComponent({
 				content: {
 					content: '<span class="custom">HTML Content</span>',

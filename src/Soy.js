@@ -27,7 +27,11 @@ class Soy extends IncrementalDomRenderer {
 		if (!core.isFunction(elementTemplate)) {
 			return;
 		}
-		var keys = SoyAop.getOriginalFn(elementTemplate).params;
+
+		elementTemplate = SoyAop.getOriginalFn(elementTemplate);
+		this.soyParamTypes_ = elementTemplate.types || {};
+
+		var keys = elementTemplate.params || [];
 		var component = this.component_;
 		for (var i = 0; i < keys.length; i++) {
 			if (!component.getStateKeyConfig(keys[i]) && !component[keys[i]]) {
@@ -57,7 +61,8 @@ class Soy extends IncrementalDomRenderer {
 			}
 
 			var value = component[key];
-			if (component.getStateKeyConfig(key).isHtml) {
+			if (component.getStateKeyConfig(key).isHtml ||
+			   this.soyParamTypes_[key] === 'html') {
 				value = Soy.toIncDom(value);
 			}
 			data[key] = value;
@@ -132,7 +137,7 @@ class Soy extends IncrementalDomRenderer {
 		if (core.isFunction(elementTemplate)) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
 			SoyAop.startInterception(Soy.handleInterceptedCall_);
-			elementTemplate(this.buildTemplateData_(data, elementTemplate.params), null, ijData);
+			elementTemplate(this.buildTemplateData_(data, elementTemplate.params || []), null, ijData);
 			SoyAop.stopInterception();
 		} else {
 			super.renderIncDom();

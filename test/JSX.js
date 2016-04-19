@@ -78,4 +78,26 @@ describe('JSX', function() {
 		assert.strictEqual('Child', child.element.textContent);
 		assert.strictEqual(child.element, component.element.childNodes[0]);
 	});
+
+	it('should receive data from parent components as props', function() {
+		class ChildComponent extends Component {
+			render() {
+				return <div class="child">{this.props.foo}</div>;
+			}
+		}
+		JSX.register(ChildComponent);
+
+		class TestComponent extends Component {
+			render() {
+				return <div class="test">
+					<ChildComponent key="child" foo="Foo"></ChildComponent>
+				</div>;
+			}
+		}
+		JSX.register(TestComponent);
+
+		component = new TestComponent();
+		var child = component.components.child;
+		assert.strictEqual('Foo', child.element.textContent);
+	});
 });

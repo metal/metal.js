@@ -26,9 +26,11 @@ class JSX extends IncrementalDomRenderer {
 	/**
 	 * Overrides the default method from `IncrementalDomRenderer` so the
 	 * component's JSX template can be used for rendering.
+	 * @param {!Object} data Data passed to the component when rendering it.
 	 * @override
 	 */
-	renderIncDom() {
+	renderIncDom(data) {
+		this.component_.props = data;
 		if (this.fn_) {
 			this.fn_();
 		} else {

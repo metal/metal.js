@@ -61,8 +61,7 @@ class Soy extends IncrementalDomRenderer {
 			}
 
 			var value = component[key];
-			if (component.getStateKeyConfig(key).isHtml ||
-			   this.soyParamTypes_[key] === 'html') {
+			if (this.isHtmlParam_(key)) {
 				value = Soy.toIncDom(value);
 			}
 			data[key] = value;
@@ -107,6 +106,19 @@ class Soy extends IncrementalDomRenderer {
 		var ctor = originalFn.componentCtor;
 		var data = opt_data;
 		IncrementalDOM.elementVoid('Component', null, [], 'ctor', ctor, 'data', data);
+	}
+
+	/**
+	 * Checks if the given param type is html.
+	 * @param {string} name
+	 * @protected
+	 */
+	isHtmlParam_(name) {
+		if (this.component_.getStateKeyConfig(name).isHtml) {
+			return true;
+		}
+		var type = this.soyParamTypes_[name] || '';
+		return type.split('|').indexOf('html') !== -1;
 	}
 
 	/**

@@ -18,4 +18,10 @@ describe('string', function() {
 	it('should replace interval', function() {
 		assert.strictEqual('ae', string.replaceInterval('abcde', 1, 4, ''));
 	});
+
+	it('should escape regex', function() {
+		var spec = '()[]{}+-?*.$^|,:#<!\\';
+		var escapedSpec = '\\' + spec.split('').join('\\');
+		assert.strictEqual(escapedSpec, string.escapeRegex(spec));
+	});
 });

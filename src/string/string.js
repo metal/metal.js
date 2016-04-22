@@ -13,6 +13,18 @@ class string {
 	}
 
 	/**
+	* Escapes characters in the string that are not safe to use in a RegExp.
+	* @param {*} str The string to escape. If not a string, it will be casted
+	*     to one.
+	* @return {string} A RegExp safe, escaped copy of {@code s}.
+	*/
+	static escapeRegex(str) {
+		return String(str)
+			.replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1')
+			.replace(/\x08/g, '\\x08');
+	}
+
+	/**
 	* Returns a string with at least 64-bits of randomness.
 	* @return {string} A random string, e.g. sn1s7vb4gcic.
 	*/

@@ -18,7 +18,7 @@
  */
 
 (function (global, factory) {
-  (factory((global.IncrementalDOM = global.IncrementalDOM || {})));
+  (factory((global.IncrementalDOM = global.IncrementalDOM || {})))
 }(window, function (exports) { 'use strict';
 
   /**
@@ -184,6 +184,20 @@
   };
 
   /**
+   * @param {string} name
+   * @return {string|undefined} The namespace to use for the attribute.
+   */
+  var getNamespace = function (name) {
+    if (name.lastIndexOf('xml:', 0) === 0) {
+      return 'http://www.w3.org/XML/1998/namespace';
+    }
+
+    if (name.lastIndexOf('xlink:', 0) === 0) {
+      return 'http://www.w3.org/1999/xlink';
+    }
+  };
+
+  /**
    * Applies an attribute or property to a given Element. If the value is null
    * or undefined, it is removed from the Element. Otherwise, the value is set
    * as an attribute.
@@ -195,7 +209,12 @@
     if (value == null) {
       el.removeAttribute(name);
     } else {
-      el.setAttribute(name, value);
+      var attrNS = getNamespace(name);
+      if (attrNS) {
+        el.setAttributeNS(attrNS, name, value);
+      } else {
+        el.setAttribute(name, value);
+      }
     }
   };
 
@@ -353,16 +372,16 @@
    */
   var createKeyMap = function (el) {
     var map = createMap();
-    var children = el.children;
-    var count = children.length;
+    var child = el.firstElementChild;
 
-    for (var i = 0; i < count; i += 1) {
-      var child = children[i];
+    while (child) {
       var key = getData(child).key;
 
       if (key) {
         map[key] = child;
       }
+
+      child = child.nextElementSibling;
     }
 
     return map;
@@ -503,55 +522,63 @@
   var context = null;
 
   /** @type {?Node} */
-  var currentNode = undefined;
+  var currentNode = null;
 
   /** @type {?Node} */
-  var currentParent = undefined;
+  var currentParent = null;
 
   /** @type {?Element|?DocumentFragment} */
-  var root = undefined;
+  var root = null;
 
   /** @type {?Document} */
-  var doc = undefined;
-
-  /** @type {?function()} */
-  var findNode = undefined;
+  var doc = null;
 
   /**
-   * Sets up and restores a patch context, running the patch function with the
-   * provided data.
-   * @param {!Element|!DocumentFragment} node The Element or Document
-   *     where the patch should start.
-   * @param {!function(T)} fn The patching function.
-   * @param {T=} data An argument passed to fn.
+   * Returns a patcher function that sets up and restores a patch context,
+   * running the run function with the provided data.
+   * @param {function((!Element|!DocumentFragment),!function(T),T=)} run
+   * @return {function((!Element|!DocumentFragment),!function(T),T=)}
    * @template T
    */
-  var runPatch = function (node, fn, data) {
-    var prevContext = context;
-    var prevRoot = root;
-    var prevDoc = doc;
-    var prevCurrentNode = currentNode;
-    var prevCurrentParent = currentParent;
-    var previousInAttributes = false;
-    var previousInSkip = false;
+  var patchFactory = function (run) {
+    /**
+     * TODO(moz): These annotations won't be necessary once we switch to Closure
+     * Compiler's new type inference. Remove these once the switch is done.
+     *
+     * @param {(!Element|!DocumentFragment)} node
+     * @param {!function(T)} fn
+     * @param {T=} data
+     * @template T
+     */
+    var f = function (node, fn, data) {
+      var prevContext = context;
+      var prevRoot = root;
+      var prevDoc = doc;
+      var prevCurrentNode = currentNode;
+      var prevCurrentParent = currentParent;
+      var previousInAttributes = false;
+      var previousInSkip = false;
 
-    context = new Context();
-    root = node;
-    doc = node.ownerDocument;
+      context = new Context();
+      root = node;
+      doc = node.ownerDocument;
+      currentParent = node.parentNode;
 
-    if ('production' !== 'production') {}
+      if ('production' !== 'production') {}
 
-    fn(data);
+      run(node, fn, data);
 
-    if ('production' !== 'production') {}
+      if ('production' !== 'production') {}
 
-    context.notifyChanges();
+      context.notifyChanges();
 
-    context = prevContext;
-    root = prevRoot;
-    doc = prevDoc;
-    currentNode = prevCurrentNode;
-    currentParent = prevCurrentParent;
+      context = prevContext;
+      root = prevRoot;
+      doc = prevDoc;
+      currentNode = prevCurrentNode;
+      currentParent = prevCurrentParent;
+    };
+    return f;
   };
 
   /**
@@ -564,18 +591,15 @@
    * @param {T=} data An argument passed to fn to represent DOM state.
    * @template T
    */
-  var patchInner = function (node, fn, data) {
-    runPatch(node, function (data) {
-      currentNode = node;
-      currentParent = node.parentNode;
+  var patchInner = patchFactory(function (node, fn, data) {
+    currentNode = node;
 
-      enterNode();
-      fn(data);
-      exitNode();
+    enterNode();
+    fn(data);
+    exitNode();
 
-      if ('production' !== 'production') {}
-    }, data);
-  };
+    if ('production' !== 'production') {}
+  });
 
   /**
    * Patches an Element with the the provided function. Exactly one top level
@@ -587,16 +611,13 @@
    * @param {T=} data An argument passed to fn to represent DOM state.
    * @template T
    */
-  var patchOuter = function (node, fn, data) {
-    runPatch(node, function (data) {
-      currentNode = /** @type {!Element} */{ nextSibling: node };
-      currentParent = node.parentNode;
+  var patchOuter = patchFactory(function (node, fn, data) {
+    currentNode = /** @type {!Element} */{ nextSibling: node };
 
-      fn(data);
+    fn(data);
 
-      if ('production' !== 'production') {}
-    }, data);
-  };
+    if ('production' !== 'production') {}
+  });
 
   /**
    * Checks whether or not the current node matches the specified nodeName and
@@ -636,15 +657,6 @@
       node = getChild(currentParent, key);
       if (node && 'production' !== 'production') {
         assertKeyedTagMatches(getData(node).nodeName, nodeName, key);
-      }
-    }
-
-    // Check to see if the `findNode` function (registered through
-    // `registerFindNode`) returns a matching node.
-    if (!node && findNode) {
-      node = findNode.apply(null, arguments);
-      if (node === currentNode) {
-        return;
       }
     }
 
@@ -767,7 +779,7 @@
    */
   var coreElementOpen = function (tag, key, statics) {
     nextNode();
-    alignWithDOM.apply(null, arguments);
+    alignWithDOM(tag, key, statics);
     enterNode();
     return (/** @type {!Element} */currentParent
     );
@@ -808,10 +820,6 @@
     if ('production' !== 'production') {}
     return (/** @type {!Element} */currentParent
     );
-  };
-
-  var registerFindNode = function (findNodeFn) {
-    findNode = findNodeFn;
   };
 
   /**
@@ -978,9 +986,8 @@
    * @return {!Element} The corresponding Element.
    */
   var elementVoid = function (tag, key, statics, const_args) {
-    var node = elementOpen.apply(null, arguments);
-    elementClose.apply(null, arguments);
-    return node;
+    elementOpen.apply(null, arguments);
+    return elementClose(tag);
   };
 
   /**
@@ -1005,7 +1012,7 @@
 
     elementOpen.apply(null, arguments);
     skip();
-    return elementClose.apply(null, arguments);
+    return elementClose(tag);
   };
 
   /**
@@ -1046,7 +1053,6 @@
   exports.patchInner = patchInner;
   exports.patchOuter = patchOuter;
   exports.currentElement = currentElement;
-  exports.registerFindNode = registerFindNode;
   exports.skip = skip;
   exports.elementVoid = elementVoid;
   exports.elementOpenStart = elementOpenStart;
@@ -1063,4 +1069,5 @@
   exports.notifications = notifications;
 
 }));
-/* jshint ignore:end */
+
+//# sourceMappingURL=incremental-dom.js.map

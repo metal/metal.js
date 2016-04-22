@@ -20,12 +20,12 @@
     "metal"
   ],
   "dependencies": {
-    "incremental-dom": "^0.3.0",
     "metal-component": "^1.0.0-rc.3"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
+    "incremental-dom": "^0.4.1",
     "metal-karma-config": "^2.0.0"
   }
 }

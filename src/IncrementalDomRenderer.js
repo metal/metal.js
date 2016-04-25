@@ -254,7 +254,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	isComponentTag_(tag) {
-		return tag[0] === tag[0].toUpperCase();
+		return !core.isString(tag) || tag[0] === tag[0].toUpperCase();
 	}
 
 	/**

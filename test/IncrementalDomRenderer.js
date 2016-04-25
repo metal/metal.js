@@ -654,6 +654,22 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
+		it('should create and render sub component instance from function tag', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid(ChildComponent, null, ['key', 'child']);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			assert.ok(child instanceof ChildComponent);
+			assert.strictEqual(child.element, component.element.querySelector('child'));
+			assert.strictEqual('foo', child.element.textContent);
+			assert.ok(child.element.hasAttribute('data-child'));
+		});
+
 		it('should create and render sub component instance from Component tag', function() {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.RENDERER.prototype.renderIncDom = function() {

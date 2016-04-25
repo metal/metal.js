@@ -14,3 +14,4 @@ class JSXComponent extends Component {
 }
 
 export default JSXComponent;
+export { JSX };

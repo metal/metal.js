@@ -69,18 +69,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Gets the current rendering data for this component.
-	 * @return {!Object}
-	 * @protected
-	 */
-	getRenderingData() {
-		if (!this.renderingData_) {
-			this.renderingData_ = object.mixin({}, this.component_.getInitialConfig());
-		}
-		return this.renderingData_;
-	}
-
-	/**
 	 * Gets the sub component referenced by the given tag and config data,
 	 * creating it if it doesn't yet exist.
 	 * @param {string} key The sub component's key.
@@ -269,7 +257,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Calls functions from `IncrementalDOM` to build the component element's
 	 * content. Can be overriden by subclasses (for integration with template
 	 * engines for example).
-	 * @param {!Object} data Data passed to the component when rendering it.
 	 */
 	renderIncDom() {
 		IncrementalDOM.elementVoid('div');
@@ -279,9 +266,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Runs the incremental dom functions for rendering this component, but
 	 * doesn't call `patch` yet. Rather, this will be the function that should be
 	 * called by `patch`.
-	 * @param {Object=} opt_data Data passed to the component when rendering it.
 	 */
-	renderWithoutPatch(opt_data) {
+	renderWithoutPatch() {
 		// Mark that there shouldn't be an update for state changes so far, since
 		// render has already been called.
 		this.changes_ = {};
@@ -295,8 +281,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedCloseCall_.bind(this),
 			this.handleInterceptedAttributesCall_.bind(this)
 		);
-		object.mixin(this.getRenderingData(), opt_data);
-		this.renderIncDom(this.getRenderingData());
+		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
 	}
@@ -354,7 +339,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
-			renderer.renderWithoutPatch(config);
+			renderer.renderWithoutPatch();
 		} else {
 			console.warn(
 				'IncrementalDomRenderer doesn\'t support rendering sub components ' +

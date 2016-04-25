@@ -40,23 +40,6 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
-		it('should pass initial config object to renderIncDom', function() {
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function(data) {
-				IncDom.elementOpen('span', null, null, 'foo', data.foo);
-				IncDom.text('bar');
-				IncDom.elementClose('span');
-			};
-
-			var config = {
-				foo: 'foo'
-			};
-			component = new TestComponent(config);
-			assert.strictEqual('SPAN', component.element.tagName);
-			assert.strictEqual('foo', component.element.getAttribute('foo'));
-			assert.strictEqual('bar', component.element.textContent);
-		});
-
 		it('should render content specified by the component\'s renderIncDom inside given element', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -745,10 +728,10 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should pass rendering data to sub component\'s "renderIncDom"', function() {
+		it('should pass rendering data to component\'s config property"', function() {
 			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function(config = {}) {
-				IncDom.elementVoid('child', null, null, 'data-foo', config.foo);
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementVoid('child', null, null, 'data-foo', this.component_.config.foo);
 			};
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -763,21 +746,6 @@ describe('IncrementalDomRenderer', function() {
 
 			var child = component.components.child;
 			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
-		});
-
-		it('should not keep sub component rendering data on parent component', function() {
-			var TestChildComponent = createTestComponentClass();
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
-					foo: 'foo'
-				});
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			assert.ok(!component.getRenderer().getRenderingData().foo);
 		});
 
 		it('should warn if rendering sub component that doesn\'t use incremental dom', function() {

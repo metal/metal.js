@@ -30,6 +30,13 @@ class State extends EventEmitter {
 		 */
 		this.stateInfo_ = {};
 
+		/**
+		 * Object with the most recent values that state properties were set to
+		 * through either the constructor or setState calls.
+		 * @type {!Object<string, *>}
+		 */
+		this.config = object.mixin({}, opt_config || {});
+
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
 		this.addToStateFromStaticHint_(opt_config);
@@ -476,8 +483,9 @@ class State extends EventEmitter {
 	 *   should be set to.
 	 */
 	setState(values) {
-		var names = Object.keys(values);
+		object.mixin(this.config, values);
 
+		var names = Object.keys(values);
 		for (var i = 0; i < names.length; i++) {
 			this[names[i]] = values[names[i]];
 		}
@@ -547,7 +555,7 @@ class State extends EventEmitter {
  * constructors, which will be merged together and handled automatically.
  * @type {!Array<string>}
  */
-State.INVALID_KEYS = ['state', 'stateKey'];
+State.INVALID_KEYS = ['config', 'state', 'stateKey'];
 
 /**
  * Constants that represent the states that an a state key can be in.

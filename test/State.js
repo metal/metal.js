@@ -38,6 +38,16 @@ describe('State', function() {
 		assert.notStrictEqual(-1, keys.indexOf('key2'));
 	});
 
+	it('should not allow adding key named "config"', function() {
+		var state = new State();
+
+		assert.throws(function() {
+			state.addToState({
+				config: {}
+			});
+		});
+	});
+
 	it('should not allow adding key named "state"', function() {
 		var state = new State();
 
@@ -651,6 +661,30 @@ describe('State', function() {
 				key1: 2
 			});
 			assert.strictEqual(2, test.key1);
+		});
+
+		it('should store copy of config object from constructor', function() {
+			var Test = createTestClass();
+			var config = {
+				key1: 1
+			};
+			var test = new Test(config);
+			assert.notStrictEqual(config, test.config);
+			assert.strictEqual(1, test.config.key1);
+		});
+
+		it('should update config object from setState calls', function() {
+			var Test = createTestClass();
+			var test = new Test({
+				key1: 1,
+				key2: 2
+			});
+
+			test.setState({
+				key1: 10
+			});
+			assert.strictEqual(10, test.config.key1);
+			assert.strictEqual(2, test.config.key2);
 		});
 
 		it('should merge STATE from super class', function() {

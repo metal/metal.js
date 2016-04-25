@@ -1,6 +1,5 @@
 'use strict';
 
-import { ComponentRegistry } from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
 /**

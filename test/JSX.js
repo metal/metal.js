@@ -79,10 +79,10 @@ describe('JSX', function() {
 		assert.strictEqual(child.element, component.element.childNodes[0]);
 	});
 
-	it('should receive data from parent components as props', function() {
+	it('should receive data from parent components through "config" property', function() {
 		class ChildComponent extends Component {
 			render() {
-				return <div class="child">{this.props.foo}</div>;
+				return <div class="child">{this.config.foo}</div>;
 			}
 		}
 		ChildComponent.RENDERER = JSX;

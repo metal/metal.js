@@ -120,7 +120,7 @@ class Component extends State {
 
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
 
-		this.createRenderer_();
+		this.renderer_ = this.createRenderer();
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
@@ -229,12 +229,12 @@ class Component extends State {
 
 	/**
 	 * Creates the renderer for this component. Sub classes can override this to
-	 * create the renderer as needed.
-	 * @protected
+	 * return a custom renderer as needed.
+	 * @return {!ComponentRenderer}
 	 */
-	createRenderer_() {
+	createRenderer() {
 		core.mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
-		this.renderer_ = new this.constructor.RENDERER_MERGED(this);
+		return new this.constructor.RENDERER_MERGED(this);
 	}
 
 	/**

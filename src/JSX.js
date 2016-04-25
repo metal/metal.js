@@ -37,15 +37,6 @@ class JSX extends IncrementalDomRenderer {
 			super.renderIncDom();
 		}
 	}
-
-	/**
-	 * Registers the given component constructor to use JSX templates.
-	 * @param {!Function} componentCtor
-	 */
-	static register(componentCtor) {
-		componentCtor.RENDERER = JSX;
-		ComponentRegistry.register(componentCtor);
-	}
 }
 
 export default JSX;

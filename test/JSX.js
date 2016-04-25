@@ -19,7 +19,7 @@ describe('JSX', function() {
 				return <div class="test">Hello World</div>;
 			}
 		}
-		JSX.register(TestComponent);
+		TestComponent.RENDERER = JSX;
 
 		component = new TestComponent();
 		assert.strictEqual('DIV', component.element.tagName);
@@ -30,7 +30,7 @@ describe('JSX', function() {
 	it('should not throw error if no jsx function is implemented', function() {
 		class TestComponent extends Component {
 		}
-		JSX.register(TestComponent);
+		TestComponent.RENDERER = JSX;
 
 		component = new TestComponent();
 		assert.strictEqual('DIV', component.element.tagName);
@@ -46,7 +46,7 @@ describe('JSX', function() {
 			}
 		}
 		TestComponent.prototype.handleClick = sinon.stub();
-		JSX.register(TestComponent);
+		TestComponent.RENDERER = JSX;
 
 		component = new TestComponent();
 		dom.triggerEvent(component.element.childNodes[0], 'click');
@@ -59,7 +59,7 @@ describe('JSX', function() {
 				return <div class="child">Child</div>;
 			}
 		}
-		JSX.register(ChildComponent);
+		ChildComponent.RENDERER = JSX;
 
 		class TestComponent extends Component {
 			render() {
@@ -68,7 +68,7 @@ describe('JSX', function() {
 				</div>;
 			}
 		}
-		JSX.register(TestComponent);
+		TestComponent.RENDERER = JSX;
 
 		component = new TestComponent();
 		var child = component.components.child;
@@ -85,7 +85,7 @@ describe('JSX', function() {
 				return <div class="child">{this.props.foo}</div>;
 			}
 		}
-		JSX.register(ChildComponent);
+		ChildComponent.RENDERER = JSX;
 
 		class TestComponent extends Component {
 			render() {
@@ -94,7 +94,7 @@ describe('JSX', function() {
 				</div>;
 			}
 		}
-		JSX.register(TestComponent);
+		TestComponent.RENDERER = JSX;
 
 		component = new TestComponent();
 		var child = component.components.child;

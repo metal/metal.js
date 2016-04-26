@@ -40,6 +40,6 @@
     "babel-plugin-incremental-dom": "mairatma/babel-plugin-incremental-dom#componentAsReferenceBuild",
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
-    "metal-karma-config": "^2.0.2"
+    "metal-karma-config": "^2.1.0"
   }
 }

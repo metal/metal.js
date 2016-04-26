@@ -99,7 +99,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (comp.wasRendered) {
 			comp.setState(config);
 		}
-		comp.componentIncrementalDomKey_ = key;
 		return comp;
 	}
 
@@ -242,8 +241,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var attrsArr = array.slice(arguments, 4);
 		this.addInlineListeners_((statics || []).concat(attrsArr));
 		var args = array.slice(arguments, 1);
-		if (!this.rootElementReached_ && this.component_.componentIncrementalDomKey_) {
-			args[1] = this.component_.componentIncrementalDomKey_;
+		if (!this.rootElementReached_ && this.component_.config.key) {
+			args[1] = this.component_.config.key;
 		}
 		var node = originalFn.apply(null, args);
 		if (!this.rootElementReached_) {

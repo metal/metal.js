@@ -102,9 +102,12 @@ class Soy extends IncrementalDomRenderer {
 	 * @protected
 	 */
 	static handleInterceptedCall_(originalFn, opt_data) {
-		var ctor = originalFn.componentCtor;
-		var data = opt_data;
-		IncrementalDOM.elementVoid('Component', null, [], 'ctor', ctor, 'data', data);
+		var args = [originalFn.componentCtor, null, []];
+		var names = Object.keys(opt_data || {});
+		for (var i = 0; i < names.length; i++) {
+			args.push(names[i], opt_data[names[i]]);
+		}
+		IncrementalDOM.elementVoid.apply(null, args);
 	}
 
 	/**

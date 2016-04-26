@@ -26,6 +26,6 @@
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
     "incremental-dom": "^0.4.1",
-    "metal-karma-config": "^2.0.0"
+    "metal-karma-config": "^2.1.0"
   }
 }

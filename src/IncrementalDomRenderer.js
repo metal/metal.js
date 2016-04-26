@@ -1,7 +1,7 @@
 'use strict';
 
 import './incremental-dom';
-import { array, core, object } from 'metal';
+import { array, core } from 'metal';
 import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
@@ -276,11 +276,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.subComponentsFound_ = {};
 		this.generatedKeyCount_ = 0;
 		this.listenersToAttach_ = [];
-		IncrementalDomAop.startInterception(
-			this.handleInterceptedOpenCall_.bind(this),
-			this.handleInterceptedCloseCall_.bind(this),
-			this.handleInterceptedAttributesCall_.bind(this)
-		);
+		IncrementalDomAop.startInterception({
+			attributes: this.handleInterceptedAttributesCall_.bind(this),
+			elementClose: this.handleInterceptedCloseCall_.bind(this),
+			elementOpen: this.handleInterceptedOpenCall_.bind(this)
+		});
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();

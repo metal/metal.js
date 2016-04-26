@@ -1,7 +1,7 @@
 'use strict';
 
 import './incremental-dom';
-import { array } from 'metal';
+import { array, object } from 'metal';
 
 /**
  * Class responsible for intercepting incremental dom functions through AOP.
@@ -16,31 +16,31 @@ class IncrementalDomAop {
 	}
 
 	/**
-	 * Starts intercepting calls to the `elementOpen` and `elementClose` functions
-	 * from incremental dom with the given functions.
-	 * @param {!function()} openFn Function to be called instead of the original
-	 *     `elementOpen` one.
-	 * @param {!function()} closeFn Function to be called instead of the original
-	 *     `elementClose` one.
-	 * @param {!function()} attributesFn Function to be called instead of the
-	 *     original `attributes` default handler.
+	 * Starts intercepting calls to incremental dom, replacing them with the given
+	 * functions. Note that `elementVoid`, `elementOpenStart`, `elementOpenEnd`
+	 * and `attr` are the only ones that can't be intercepted, since they'll
+	 * automatically be converted into equivalent calls to `elementOpen` and
+	 * `elementClose`.
+	 * @param {!Object} fns Functions to be called instead of the original ones
+	 *     from incremental DOM. Should be given as a map from the function name
+	 *     to the function that should intercept it. All interceptors will receive
+	 *     the original function as the first argument, the actual arguments from
+	 *     from the original call following it.
 	 */
-	static startInterception(openFn, closeFn, attributesFn) {
-		openFn = openFn.bind(null, fnStack[0].elementOpen);
-		closeFn = closeFn.bind(null, fnStack[0].elementClose);
-		fnStack.push({
+	static startInterception(fns) {
+		var originals = IncrementalDomAop.getOriginalFns();
+		fns = object.map(fns, (name, value) => value.bind(null, originals[name]));
+		fns = object.mixin({}, originals, fns);
+		fnStack.push(object.mixin(fns, {
 			attr: fnAttr,
-			attributes: attributesFn.bind(null, fnStack[0].attributes),
-			elementClose: closeFn,
-			elementOpen: openFn,
-			elementOpenEnd: () => openFn.apply(null, collectedArgs),
+			elementOpenEnd: () => fns.elementOpen.apply(null, collectedArgs),
 			elementOpenStart: fnOpenStart,
 			elementVoid: function(tag) {
-				var node = openFn.apply(null, arguments);
-				closeFn(tag);
+				var node = fns.elementOpen.apply(null, arguments);
+				fns.elementClose(tag);
 				return node;
 			}
-		});
+		}));
 	}
 
 	/**
@@ -61,7 +61,8 @@ var fnStack = [{
 	elementOpen: IncrementalDOM.elementOpen,
 	elementOpenEnd: IncrementalDOM.elementOpenEnd,
 	elementOpenStart: IncrementalDOM.elementOpenStart,
-	elementVoid: IncrementalDOM.elementVoid
+	elementVoid: IncrementalDOM.elementVoid,
+	text: IncrementalDOM.text
 }];
 
 var collectedArgs = [];

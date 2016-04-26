@@ -5,5 +5,6 @@ var metal = require('gulp-metal');
 metal.registerTasks({
 	bundleCssFileName: 'incrementalDom.css',
 	bundleFileName: 'incrementalDom.js',
-	moduleName: 'metal-incrementalDom'
+	moduleName: 'metal-incrementalDom',
+	noSoy: true
 });

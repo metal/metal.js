@@ -653,62 +653,11 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
-		it('should create and render sub component instance from Component tag', function() {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementVoid('child');
-			};
+		it('should update sub component data from constructor tag', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
-				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
-					key: 'child'
-				});
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			assert.ok(child);
-			assert.ok(child instanceof TestChildComponent);
-			assert.strictEqual(child.element, component.element.querySelector('child'));
-		});
-
-		it('should create and render sub component instance with no data from Component tag', function() {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementVoid('child');
-			};
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.sub0;
-			assert.ok(child);
-			assert.ok(child instanceof TestChildComponent);
-			assert.strictEqual(child.element, component.element.querySelector('child'));
-		});
-
-		it('should update sub component data from Component tag', function(done) {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementVoid('child');
-			};
-			TestChildComponent.STATE = {
-				foo: {}
-			};
-
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
-					foo: this.component_.foo,
-					key: 'child'
-				});
+				IncDom.elementVoid(ChildComponent, 'child', [], 'foo', this.component_.foo);
 				IncDom.elementClose('div');
 			};
 			TestComponent.STATE = {
@@ -736,10 +685,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
-				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent, 'data', {
-					key: 'child',
-					foo: 'foo'
-				});
+				IncDom.elementVoid(TestChildComponent, 'child', [], 'foo', 'foo');
 				IncDom.elementClose('div');
 			};
 			component = new TestComponent();
@@ -825,7 +771,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
-				IncDom.elementVoid('Component', null, [], 'ctor', TestChildComponent);
+				IncDom.elementVoid(TestChildComponent);
 				IncDom.elementClose('div');
 			};
 

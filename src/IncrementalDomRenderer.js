@@ -168,10 +168,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				--this.componentToRender_.tagsCount === 0) {
 
 			var {calls, config, tag} = this.componentToRender_;
-			if (tag === 'Component' && config.ctor) {
-				tag = config.ctor;
-				config = config.data || {};
-			}
 			config.children = this.buildChildrenFn_(calls);
 			this.componentToRender_ = null;
 			IncrementalDomAop.stopInterception();

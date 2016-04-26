@@ -1,5 +1,6 @@
 'use strict';
 
+import './iDOMHelpers';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
 /**

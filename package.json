@@ -24,7 +24,8 @@
         "incremental-dom",
         {
           "componentAsReference": true,
-          "prefix": "IncrementalDOM"
+          "prefix": "IncrementalDOM",
+          "runtime": "iDOMHelpers"
         }
       ]
     ]

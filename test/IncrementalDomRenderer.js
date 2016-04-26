@@ -532,7 +532,7 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not remove sub component key when it updates itself', function(done) {
+		it('should not remove sub component key when this sub component updates itself', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
@@ -637,7 +637,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
-		it('should create and render sub component instance from function tag', function() {
+		it('should create and render sub component instance from constructor tag', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
@@ -746,6 +746,73 @@ describe('IncrementalDomRenderer', function() {
 
 			var child = component.components.child;
 			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
+		});
+
+		it('should pass children function to component\'s config property"', function() {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('child');
+				this.component_.config.children();
+				IncDom.elementClose('child');
+			};
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen(TestChildComponent, 'child');
+				IncDom.elementOpen('span');
+				IncDom.text('Hello World');
+				IncDom.elementClose('span');
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			assert.ok(child instanceof TestChildComponent);
+			assert.strictEqual(1, child.element.childNodes.length);
+			assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
+			assert.strictEqual('Hello World', child.element.childNodes[0].textContent);
+		});
+
+		it('should render correctly when recursive children are used', function() {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('child');
+				this.component_.config.children();
+				IncDom.elementClose('child');
+			};
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen(TestChildComponent, 'child');
+				IncDom.elementOpen(TestChildComponent, 'child2');
+				IncDom.elementOpen(TestChildComponent, 'child3');
+				IncDom.elementOpen('span');
+				IncDom.text('Hello World');
+				IncDom.elementClose('span');
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			var child2 = component.components.child2;
+			var child3 = component.components.child3;
+			assert.ok(child instanceof TestChildComponent);
+			assert.ok(child2 instanceof TestChildComponent);
+			assert.ok(child3 instanceof TestChildComponent);
+			assert.ok(!child.components.child2);
+			assert.strictEqual(child.element, component.element.childNodes[0]);
+			assert.strictEqual(1, child.element.childNodes.length);
+			assert.strictEqual('CHILD', child.element.childNodes[0].tagName);
+			assert.strictEqual(child2.element, child.element.childNodes[0]);
+			assert.strictEqual(1, child2.element.childNodes.length);
+			assert.strictEqual('CHILD', child2.element.childNodes[0].tagName);
+			assert.strictEqual(child3.element, child2.element.childNodes[0]);
+			assert.strictEqual(1, child3.element.childNodes.length);
+			assert.strictEqual('Hello World', child2.element.childNodes[0].textContent);
 		});
 
 		it('should warn if rendering sub component that doesn\'t use incremental dom', function() {

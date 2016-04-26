@@ -30,16 +30,11 @@ class IncrementalDomAop {
 	static startInterception(fns) {
 		var originals = IncrementalDomAop.getOriginalFns();
 		fns = object.map(fns, (name, value) => value.bind(null, originals[name]));
-		fns = object.mixin({}, originals, fns);
-		fnStack.push(object.mixin(fns, {
+		fnStack.push(object.mixin({}, originals, fns, {
 			attr: fnAttr,
-			elementOpenEnd: () => fns.elementOpen.apply(null, collectedArgs),
+			elementOpenEnd: fnOpenEnd,
 			elementOpenStart: fnOpenStart,
-			elementVoid: function(tag) {
-				var node = fns.elementOpen.apply(null, arguments);
-				fns.elementClose(tag);
-				return node;
-			}
+			elementVoid: fnVoid
 		}));
 	}
 
@@ -75,9 +70,21 @@ function fnOpenStart(tag, key, statics) {
 	collectedArgs = [tag, key, statics];
 }
 
+function fnOpenEnd() {
+	return getFn('elementOpen').apply(null, collectedArgs);
+}
+
+function fnVoid(tag) {
+	getFn('elementOpen').apply(null, arguments);
+	return getFn('elementClose')(tag);
+}
+
+function getFn(name) {
+	return fnStack[fnStack.length - 1][name];
+}
+
 function handleCall(name) {
-	var fn = fnStack[fnStack.length - 1][name];
-	fn.apply(null, array.slice(arguments, 1));
+	return getFn(name).apply(null, array.slice(arguments, 1));
 }
 
 IncrementalDOM.attr = handleCall.bind(null, 'attr');
@@ -86,6 +93,7 @@ IncrementalDOM.elementOpen = handleCall.bind(null, 'elementOpen');
 IncrementalDOM.elementOpenEnd = handleCall.bind(null, 'elementOpenEnd');
 IncrementalDOM.elementOpenStart = handleCall.bind(null, 'elementOpenStart');
 IncrementalDOM.elementVoid = handleCall.bind(null, 'elementVoid');
+IncrementalDOM.text = handleCall.bind(null, 'text');
 
 IncrementalDOM.attributes[IncrementalDOM.symbols.default] = handleCall.bind(
 	null,

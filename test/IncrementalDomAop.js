@@ -133,6 +133,32 @@ describe('IncrementalDomAop', function() {
 		});
 	});
 
+	describe('text', function() {
+		it('should intercept "text" calls with specified function', function() {
+			var original = IncrementalDomAop.getOriginalFns().text;
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception({
+				text: fn
+			});
+
+			IncrementalDOM.text('foo');
+			assert.strictEqual(1, fn.callCount);
+			assert.strictEqual(original, fn.args[0][0]);
+			assert.strictEqual('foo', fn.args[0][1]);
+		});
+
+		it('should stop intercepting "text" calls', function() {
+			var fn = sinon.stub();
+			IncrementalDomAop.startInterception({
+				text: fn
+			});
+			IncrementalDomAop.stopInterception();
+
+			IncrementalDOM.patch(element, () => IncrementalDOM.text('foo'));
+			assert.strictEqual(0, fn.callCount);
+		});
+	});
+
 	describe('attributes', function() {
 		it('should intercept attribute calls with specified function', function() {
 			var original = IncrementalDomAop.getOriginalFns().attributes;

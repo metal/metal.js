@@ -54,6 +54,23 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Builds the "children" config property to be passed to the current
+	 * component.
+	 * @param {!Array<!{name: string, args: !Array}>} calls
+	 * @return {!function()}
+	 * @protected
+	 */
+	buildChildrenFn_(calls) {
+		return () => {
+			this.intercept_();
+			for (var i = 0; i < calls.length; i++) {
+				IncrementalDOM[calls[i].name].apply(null, array.slice(calls[i].args, 1));
+			}
+			IncrementalDomAop.stopInterception();
+		};
+	}
+
+	/**
 	 * Disposes all sub components that were not found after an update anymore.
 	 * @protected
 	 */
@@ -142,15 +159,58 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 	/**
 	 * Handles an intercepted call to the `elementClose` function from incremental
-	 * dom.
+	 * dom, while collecting a component's children.
+	 * @param {!function()} originalFn The original function before interception.
+	 * @param {string} callTag
+	 * @protected
+	 */
+	handleInterceptedChildrenCloseCall_(originalFn, callTag) {
+		if (this.isCurrentComponentTag_(callTag) &&
+				--this.componentToRender_.tagsCount === 0) {
+
+			var {calls, config, tag} = this.componentToRender_;
+			if (tag === 'Component' && config.ctor) {
+				tag = config.ctor;
+				config = config.data || {};
+			}
+			config.children = this.buildChildrenFn_(calls);
+			this.componentToRender_ = null;
+			IncrementalDomAop.stopInterception();
+			return this.renderSubComponent_(tag, config).element;
+		}
+		this.componentToRender_.calls.push({
+			name: 'elementClose',
+			args: arguments
+		});
+	}
+
+	/**
+	 * Handles an intercepted call to the `elementOpen` function from incremental
+	 * dom, while collecting a component's children.
 	 * @param {!function()} originalFn The original function before interception.
 	 * @param {string} tag
 	 * @protected
 	 */
-	handleInterceptedCloseCall_(originalFn, tag) {
-		if (!this.isComponentTag_(tag)) {
-			originalFn(tag);
+	handleInterceptedChildrenOpenCall_(originalFn, tag) {
+		if (this.isCurrentComponentTag_(tag)) {
+			this.componentToRender_.tagsCount++;
 		}
+		this.componentToRender_.calls.push({
+			name: 'elementOpen',
+			args: arguments
+		});
+	}
+
+	/**
+	 * Handles an intercepted call to the `text` function from incremental dom,
+	 * while collecting a component's children.
+	 * @protected
+	 */
+	handleInterceptedChildrenTextCall_() {
+		this.componentToRender_.calls.push({
+			name: 'text',
+			args: arguments
+		});
 	}
 
 	/**
@@ -161,13 +221,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleInterceptedOpenCall_(originalFn, tag) {
-		var node;
 		if (this.isComponentTag_(tag)) {
-			node = this.handleSubComponentCall_.apply(this, arguments);
+			return this.handleSubComponentCall_.apply(this, arguments);
 		} else {
-			node = this.handleRegularCall_.apply(this, arguments);
+			return this.handleRegularCall_.apply(this, arguments);
 		}
-		return node;
 	}
 
 	/**
@@ -221,19 +279,34 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleSubComponentCall_(originalFn, tag, key, statics) {
-		var config = {};
+		var config = {key};
 		var attrsArr = (statics || []).concat(array.slice(arguments, 4));
 		for (var i = 0; i < attrsArr.length; i += 2) {
 			config[attrsArr[i]] = attrsArr[i + 1];
 		}
 
-		var tagOrCtor = tag;
-		if (tag === 'Component' && config.ctor) {
-			tagOrCtor = config.ctor;
-			config = config.data || {};
-		}
-		var comp = this.renderSubComponent_(tagOrCtor, config);
-		return comp.element;
+		this.componentToRender_ = {
+			calls: [],
+			config,
+			tag,
+			tagsCount: 1
+		};
+		IncrementalDomAop.startInterception({
+			elementClose: this.handleInterceptedChildrenCloseCall_.bind(this),
+			elementOpen: this.handleInterceptedChildrenOpenCall_.bind(this),
+			text: this.handleInterceptedChildrenTextCall_.bind(this)
+		});
+	}
+
+	/**
+	 * Intercepts incremental dom calls from this component.
+	 * @protected
+	 */
+	intercept_() {
+		IncrementalDomAop.startInterception({
+			attributes: this.handleInterceptedAttributesCall_.bind(this),
+			elementOpen: this.handleInterceptedOpenCall_.bind(this)
+		});
 	}
 
 	/**
@@ -243,6 +316,16 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	isComponentTag_(tag) {
 		return !core.isString(tag) || tag[0] === tag[0].toUpperCase();
+	}
+
+	/**
+	 * Checks if the given tag represents the metal component currently being
+	 * rendered.
+	 * @param {string} tag
+	 * @protected
+	 */
+	isCurrentComponentTag_(tag) {
+		return this.isComponentTag_(tag) && this.componentToRender_.tag === tag;
 	}
 
 	/**
@@ -276,11 +359,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.subComponentsFound_ = {};
 		this.generatedKeyCount_ = 0;
 		this.listenersToAttach_ = [];
-		IncrementalDomAop.startInterception({
-			attributes: this.handleInterceptedAttributesCall_.bind(this),
-			elementClose: this.handleInterceptedCloseCall_.bind(this),
-			elementOpen: this.handleInterceptedOpenCall_.bind(this)
-		});
+		this.intercept_();
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();

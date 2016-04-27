@@ -100,4 +100,32 @@ describe('JSX', function() {
 		var child = component.components.child;
 		assert.strictEqual('Foo', child.element.textContent);
 	});
+
+	it('should receive and render children from parent components', function() {
+		class ChildComponent extends Component {
+			render() {
+				return <div class="child">{this.config.children}</div>;
+			}
+		}
+		ChildComponent.RENDERER = JSX;
+
+		class TestComponent extends Component {
+			render() {
+				return (
+					<div class="test">
+						<ChildComponent key="child">
+							<span>Children Test</span>
+						</ChildComponent>
+					</div>
+				);
+			}
+		}
+		TestComponent.RENDERER = JSX;
+
+		component = new TestComponent();
+		var child = component.components.child;
+		assert.strictEqual(1, child.element.childNodes.length);
+		assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
+		assert.strictEqual('Children Test', child.element.textContent);
+	});
 });

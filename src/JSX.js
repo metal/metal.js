@@ -24,6 +24,19 @@ class JSX extends IncrementalDomRenderer {
 	}
 
 	/**
+	 * Overrides the original method so the "children" function can be
+	 * automatically rendered through jsx.
+	 * @param {!Array<!{name: string, args: !Array}>} calls
+	 * @return {!function()}
+	 * @protected
+	 * @override
+	 */
+	buildChildrenFn_(calls) {
+		var fn = super.buildChildrenFn_(calls);
+		return iDOMHelpers.jsxWrapper(fn);
+	}
+
+	/**
 	 * Overrides the default method from `IncrementalDomRenderer` so the
 	 * component's JSX template can be used for rendering.
 	 * @override

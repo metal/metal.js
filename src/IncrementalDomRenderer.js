@@ -20,6 +20,20 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.eventsCollector_ = new EventsCollector(comp);
 		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
+
+		// Binds functions that will be used many times, to avoid creating new
+		// functions each time.
+		this.handleInterceptedAttributesCall_ =
+			this.handleInterceptedAttributesCall_.bind(this);
+		this.handleInterceptedOpenCall_ =
+			this.handleInterceptedOpenCall_.bind(this);
+		this.handleInterceptedChildrenCloseCall_ =
+			this.handleInterceptedChildrenCloseCall_.bind(this);
+		this.handleInterceptedChildrenOpenCall_ =
+			this.handleInterceptedChildrenOpenCall_.bind(this);
+		this.handleInterceptedChildrenTextCall_ =
+			this.handleInterceptedChildrenTextCall_.bind(this);
+		this.renderWithoutPatch = this.renderWithoutPatch.bind(this);
 	}
 
 	/**
@@ -287,9 +301,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			tagsCount: 1
 		};
 		IncrementalDomAop.startInterception({
-			elementClose: this.handleInterceptedChildrenCloseCall_.bind(this),
-			elementOpen: this.handleInterceptedChildrenOpenCall_.bind(this),
-			text: this.handleInterceptedChildrenTextCall_.bind(this)
+			elementClose: this.handleInterceptedChildrenCloseCall_,
+			elementOpen: this.handleInterceptedChildrenOpenCall_,
+			text: this.handleInterceptedChildrenTextCall_
 		});
 	}
 
@@ -299,8 +313,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	intercept_() {
 		IncrementalDomAop.startInterception({
-			attributes: this.handleInterceptedAttributesCall_.bind(this),
-			elementOpen: this.handleInterceptedOpenCall_.bind(this)
+			attributes: this.handleInterceptedAttributesCall_,
+			elementOpen: this.handleInterceptedOpenCall_
 		});
 	}
 
@@ -378,10 +392,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	patch() {
 		var tempParent = this.guaranteeParent_();
 		if (tempParent) {
-			IncrementalDOM.patch(tempParent, this.renderWithoutPatch.bind(this));
+			IncrementalDOM.patch(tempParent, this.renderWithoutPatch);
 			dom.exitDocument(this.component_.element);
 		} else {
-			IncrementalDOM.patchOuter(this.component_.element, this.renderWithoutPatch.bind(this));
+			IncrementalDOM.patchOuter(this.component_.element, this.renderWithoutPatch);
 		}
 	}
 

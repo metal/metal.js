@@ -6,5 +6,6 @@ metal.registerTasks({
 	bundleCssFileName: 'component.css',
 	bundleFileName: 'component.js',
 	mainBuildJsTasks: ['build:globals'],
-	moduleName: 'metal-component'
+	moduleName: 'metal-component',
+	noSoy: true
 });

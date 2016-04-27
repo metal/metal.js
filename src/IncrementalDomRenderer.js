@@ -396,6 +396,36 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * This updates the sub component that is represented by the given data.
+	 * The sub component is created, added to its parent and rendered. If it
+	 * had already been rendered before though, it will only have its state
+	 * updated instead.
+	 * @param {string|!function()} tagOrCtor The tag name or constructor function.
+	 * @param {!Object} config The config object for the sub component.
+	 * @return {!Component} The updated sub component.
+	 * @protected
+	 */
+	renderSubComponent_(tagOrCtor, config) {
+		var key = config.key || ('sub' + this.generatedKeyCount_++);
+		var comp = this.getSubComponent_(key, tagOrCtor, config);
+		var renderer = comp.getRenderer();
+		if (renderer instanceof IncrementalDomRenderer) {
+			renderer.renderInsidePatch();
+		} else {
+			console.warn(
+				'IncrementalDomRenderer doesn\'t support rendering sub components ' +
+				'that don\'t use IncrementalDomRenderer as well, like:',
+				comp
+			);
+		}
+		if (!comp.wasRendered) {
+			comp.renderAsSubComponent();
+		}
+		this.subComponentsFound_[key] = true;
+		return comp;
+	}
+
+	/**
 	 * Checks if the component should be updated with the current state changes.
 	 * Can be overridden by subclasses or implemented by components to provide
 	 * customized behavior (only updating when a state property used by the
@@ -447,36 +477,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.eventsCollector_.detachUnusedListeners();
 			this.disposeUnusedSubComponents_();
 		}
-	}
-
-	/**
-	 * This updates the sub component that is represented by the given data.
-	 * The sub component is created, added to its parent and rendered. If it
-	 * had already been rendered before though, it will only have its state
-	 * updated instead.
-	 * @param {string|!function()} tagOrCtor The tag name or constructor function.
-	 * @param {!Object} config The config object for the sub component.
-	 * @return {!Component} The updated sub component.
-	 * @protected
-	 */
-	renderSubComponent_(tagOrCtor, config) {
-		var key = config.key || ('sub' + this.generatedKeyCount_++);
-		var comp = this.getSubComponent_(key, tagOrCtor, config);
-		var renderer = comp.getRenderer();
-		if (renderer instanceof IncrementalDomRenderer) {
-			renderer.renderInsidePatch();
-		} else {
-			console.warn(
-				'IncrementalDomRenderer doesn\'t support rendering sub components ' +
-				'that don\'t use IncrementalDomRenderer as well, like:',
-				comp
-			);
-		}
-		if (!comp.wasRendered) {
-			comp.renderAsSubComponent();
-		}
-		this.subComponentsFound_[key] = true;
-		return comp;
 	}
 }
 

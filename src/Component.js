@@ -111,6 +111,13 @@ class Component extends State {
 		this.wasRendered = false;
 
 		/**
+		 * This holds information passed down from ancestors through
+		 * `getChildContext`.
+		 * @type {!Object}
+		 */
+		this.context = {};
+
+		/**
 		 * The component's element will be appended to the element this variable is
 		 * set to, unless the user specifies another parent when calling `render` or
 		 * `attach`.
@@ -217,7 +224,9 @@ class Component extends State {
 			}
 			this.components[key] = new ConstructorFn(opt_data, false);
 		}
-		return this.components[key];
+		var comp = this.components[key];
+		comp.context = object.mixin({}, this.context, this.getChildContext());
+		return comp;
 	}
 
 	/**
@@ -376,6 +385,15 @@ class Component extends State {
 			}
 			fn.call(this, opt_change.newVal, opt_change.prevVal);
 		}
+	}
+
+	/**
+	 * Returns an object with context data to be added to all descendant
+	 * components. Subclasses can override this to have any data they wish.
+	 * @return {!Object}
+	 */
+	getChildContext() {
+		return {};
 	}
 
 	/**
@@ -695,6 +713,6 @@ Component.Error = {
  * A list with state key names that will automatically be rejected as invalid.
  * @type {!Array<string>}
  */
-Component.INVALID_KEYS = ['components'];
+Component.INVALID_KEYS = ['components', 'context', 'wasRendered'];
 
 export default Component;

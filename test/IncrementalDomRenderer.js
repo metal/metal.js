@@ -817,6 +817,85 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
+	describe('Function - shouldUpdate', function() {
+		it('should only rerender after state change if "shouldUpdate" returns true', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.shouldUpdate = function(changes) {
+				return changes.foo && (changes.foo.prevVal !== changes.foo.newVal);
+			};
+			TestComponent.STATE = {
+				bar: {
+					value: 'bar'
+				},
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+			var renderer = component.getRenderer();
+			sinon.spy(renderer, 'patch');
+
+			component.bar = 'bar2';
+			component.once('stateSynced', function() {
+				assert.strictEqual(0, renderer.patch.callCount);
+				component.foo = 'foo2';
+				component.once('stateSynced', function() {
+					assert.strictEqual(1, renderer.patch.callCount);
+					done();
+				});
+			});
+		});
+
+		describe('Nested Components', function() {
+			beforeEach(function() {
+				sinon.spy(IncrementalDOM, 'skip');
+			});
+
+			afterEach(function() {
+				IncrementalDOM.skip.restore();
+			});
+
+			it('should not rerender child component if its "shouldUpdate" returns false', function(done) {
+				var TestChildComponent = createTestComponentClass();
+				TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('span');
+					IncDom.text('Child');
+					IncDom.elementClose('span');
+				};
+				TestChildComponent.prototype.shouldUpdate = function() {
+					return false;
+				};
+
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.text(this.component_.foo);
+					IncDom.elementVoid(TestChildComponent, 'child');
+					IncDom.elementClose('div');
+				};
+				TestComponent.STATE = {
+					foo: {
+						value: 'foo'
+					}
+				};
+
+				component = new TestComponent();
+				var child = component.components.child;
+
+				component.foo = 'foo2';
+				component.once('stateSynced', function() {
+					assert.strictEqual(1, IncrementalDOM.skip.callCount);
+					assert.strictEqual('foo2', component.element.childNodes[0].textContent);
+					assert.strictEqual(child.element, component.element.childNodes[1]);
+					assert.strictEqual('SPAN', child.element.tagName);
+					assert.strictEqual('Child', child.element.textContent);
+					done();
+				});
+			});
+		});
+	});
+
 	function createTestComponentClass(opt_renderer) {
 		class TestComponent extends Component {
 		}

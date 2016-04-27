@@ -33,7 +33,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedChildrenOpenCall_.bind(this);
 		this.handleInterceptedChildrenTextCall_ =
 			this.handleInterceptedChildrenTextCall_.bind(this);
-		this.renderWithoutPatch = this.renderWithoutPatch.bind(this);
+		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
 	}
 
 	/**
@@ -260,21 +260,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			if (this.component_.element !== node) {
 				this.component_.element = node;
 			}
+			this.lastElementCreationCall_ = args;
 		}
 		return node;
 	}
 
 	/**
-	 * Handles the `stateKeyChanged` event. Makes sure that, when `stateChanged`
-	 * is fired, the component's contents will only be updated if the changed
-	 * state key wasn't `element`, since that wouldn't cause a rerender.
+	 * Handles the `stateKeyChanged` event. Stores state properties that have
+	 * changed since the last render.
 	 * @param {!Object} data
 	 * @protected
 	 */
 	handleStateKeyChanged_(data) {
-		if (data.key !== 'element') {
-			this.changes_[data.key] = data;
-		}
+		this.changes_[data.key] = data;
 	}
 
 	/**
@@ -305,6 +303,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			elementOpen: this.handleInterceptedChildrenOpenCall_,
 			text: this.handleInterceptedChildrenTextCall_
 		});
+	}
+
+	/**
+	 * Checks if any other state property besides "element" has changed since the
+	 * last render.
+	 * @protected
+	 */
+	hasChangedBesidesElement_() {
+		var count = Object.keys(this.changes_).length;
+		if (this.changes_.hasOwnProperty('element')) {
+			count--;
+		}
+		return count > 0;
 	}
 
 	/**
@@ -359,11 +370,21 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * doesn't call `patch` yet. Rather, this will be the function that should be
 	 * called by `patch`.
 	 */
-	renderWithoutPatch() {
-		// Mark that there shouldn't be an update for state changes so far, since
-		// render has already been called.
-		this.changes_ = {};
+	renderInsidePatch() {
+		if (this.component_.wasRendered && !this.shouldUpdate(this.changes_)) {
+			this.skipRerender_();
+			return;
+		}
+		this.renderInsidePatchDontSkip_();
+	}
 
+	/**
+	 * The same as `renderInsidePatch`, but without the check that may skip the
+	 * render action.
+	 * @protected
+	 */
+	renderInsidePatchDontSkip_() {
+		this.changes_ = {};
 		this.rootElementReached_ = false;
 		this.subComponentsFound_ = {};
 		this.generatedKeyCount_ = 0;
@@ -376,13 +397,28 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 	/**
 	 * Checks if the component should be updated with the current state changes.
-	 * Can be overridden by subclasses to provide customized behavior (only
-	 * updating when a state key used by the template is changed for example).
+	 * Can be overridden by subclasses or implemented by components to provide
+	 * customized behavior (only updating when a state property used by the
+	 * template changes, for example).
 	 * @param {!Object} changes
 	 * @return {boolean}
 	 */
-	shouldUpdate() {
+	shouldUpdate(changes) {
+		if (this.component_.shouldUpdate) {
+			return this.component_.shouldUpdate(changes);
+		}
 		return true;
+	}
+
+	/**
+	 * Skips rerendering the component by repeating the last incremental dom call
+	 * for creating its main element and then calling `IncrementalDOM.skip`.
+	 * @protected
+	 */
+	skipRerender_() {
+		IncrementalDOM.elementOpen.apply(null, this.lastElementCreationCall_);
+		IncrementalDOM.skip();
+		IncrementalDOM.elementClose(this.lastElementCreationCall_[0]);
 	}
 
 	/**
@@ -392,20 +428,21 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	patch() {
 		var tempParent = this.guaranteeParent_();
 		if (tempParent) {
-			IncrementalDOM.patch(tempParent, this.renderWithoutPatch);
+			IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
 			dom.exitDocument(this.component_.element);
 		} else {
-			IncrementalDOM.patchOuter(this.component_.element, this.renderWithoutPatch);
+			IncrementalDOM.patchOuter(this.component_.element, this.renderInsidePatchDontSkip_);
 		}
 	}
 
 	/**
 	 * Updates the renderer's component when state changes, patching its element
-	 * through the incremental dom function calls done by `renderIncDom`.
+	 * through the incremental dom function calls done by `renderIncDom`. Makes
+	 * sure that it won't cause a rerender if the only change was for the
+	 * "element" property.
 	 */
 	update() {
-		var changedKeys = Object.keys(this.changes_);
-		if (changedKeys.length > 0 && this.shouldUpdate(this.changes_)) {
+		if (this.hasChangedBesidesElement_() && this.shouldUpdate(this.changes_)) {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
 			this.disposeUnusedSubComponents_();
@@ -427,7 +464,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
-			renderer.renderWithoutPatch();
+			renderer.renderInsidePatch();
 		} else {
 			console.warn(
 				'IncrementalDomRenderer doesn\'t support rendering sub components ' +

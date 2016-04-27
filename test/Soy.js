@@ -65,16 +65,38 @@ describe('Soy', function() {
 			});
 		});
 
-		it('should not trigger update when changed state key is not used by template', function(done) {
-			comp = new HelloWorldComponent();
-			comp.addToState('foo');
-			sinon.spy(IncrementalDOM, 'patchOuter');
+		describe('Should Update', function() {
+			beforeEach(function() {
+				sinon.spy(IncrementalDOM, 'patchOuter');
+			});
 
-			comp.foo = 'Bar';
-			comp.once('stateSynced', function() {
-				assert.strictEqual(0, IncrementalDOM.patchOuter.callCount);
+			afterEach(function() {
 				IncrementalDOM.patchOuter.restore();
-				done();
+				delete HelloWorldComponent.prototype.shouldUpdate;
+			});
+
+			it('should not trigger update when changed state key is not used by template', function(done) {
+				comp = new HelloWorldComponent();
+				comp.addToState('foo');
+
+				comp.foo = 'Bar';
+				comp.once('stateSynced', function() {
+					assert.strictEqual(0, IncrementalDOM.patchOuter.callCount);
+					done();
+				});
+			});
+
+			it('should not trigger update when shouldUpdate returns false', function(done) {
+				HelloWorldComponent.prototype.shouldUpdate = function() {
+					return false;
+				};
+				comp = new HelloWorldComponent();
+
+				comp.name = 'Bar';
+				comp.once('stateSynced', function() {
+					assert.strictEqual(0, IncrementalDOM.patchOuter.callCount);
+					done();
+				});
 			});
 		});
 

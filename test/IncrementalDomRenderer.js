@@ -57,6 +57,20 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
+		it('should run component\'s "rendered" lifecycle method on first render', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span', null, null, 'foo', 'foo');
+				IncDom.text('bar');
+				IncDom.elementClose('span');
+			};
+			sinon.spy(TestComponent.prototype, 'rendered');
+
+			component = new TestComponent();
+			assert.strictEqual(1, component.rendered.callCount);
+			assert.ok(component.rendered.args[0][0]);
+		});
+
 		it('should update content when state values change', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -76,6 +90,29 @@ describe('IncrementalDomRenderer', function() {
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
 				assert.strictEqual('bar', component.element.textContent);
+				done();
+			});
+		});
+
+		it('should run component\'s "rendered" lifecycle method on updates', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.text(this.component_.foo);
+				IncDom.elementClose('div');
+			};
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			sinon.spy(TestComponent.prototype, 'rendered');
+
+			component = new TestComponent();
+			component.foo = 'bar';
+			component.once('stateSynced', function() {
+				assert.strictEqual(2, component.rendered.callCount);
+				assert.ok(!component.rendered.args[1][0]);
 				done();
 			});
 		});
@@ -443,6 +480,22 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
+		it('should run component\'s "rendered" lifecycle method when rendered as sub component', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('ChildComponent', null, ['key', 'child']);
+				IncDom.elementClose('div');
+			};
+
+			sinon.spy(ChildComponent.prototype, 'rendered');
+			component = new TestComponent();
+
+			var child = component.components.child;
+			assert.strictEqual(1, child.rendered.callCount);
+			assert.ok(child.rendered.args[0][0]);
+		});
+
 		it('should pass state to sub component', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
@@ -476,6 +529,31 @@ describe('IncrementalDomRenderer', function() {
 				var child = component.components.child;
 				assert.strictEqual('bar', child.foo);
 				assert.strictEqual('bar', child.element.textContent);
+				done();
+			});
+		});
+
+		it('should run component\'s "rendered" lifecycle method when updated as sub component', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid('ChildComponent', null, ['key', 'child'], 'foo', this.component_.foo);
+				IncDom.elementClose('div');
+			};
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			sinon.spy(ChildComponent.prototype, 'rendered');
+			component = new TestComponent();
+
+			component.foo = 'bar';
+			component.once('stateSynced', function() {
+				var child = component.components.child;
+				assert.strictEqual(2, child.rendered.callCount);
+				assert.ok(!child.rendered.args[1][0]);
 				done();
 			});
 		});

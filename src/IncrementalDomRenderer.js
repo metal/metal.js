@@ -393,6 +393,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
+		this.emit('rendered', !this.component_.wasRendered);
 	}
 
 	/**

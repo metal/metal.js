@@ -3,7 +3,7 @@
 import './incremental-dom';
 import { array, core, object } from 'metal';
 import dom from 'metal-dom';
-import { ComponentRenderer, EventsCollector } from 'metal-component';
+import { Component, ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 
 /**
@@ -203,7 +203,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			config.children = this.buildChildrenFn_(calls);
 			this.componentToRender_ = null;
 			IncrementalDomAop.stopInterception();
-			return this.renderSubComponent_(tag, config).element;
+			var comp = this.renderSubComponent_(tag, config);
+			this.updateElementIfNotReached_(comp);
+			return comp.element;
 		}
 		this.componentToRender_.calls.push({
 			name: 'elementClose',
@@ -273,13 +275,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			args[1] = this.component_.config.key;
 		}
 		var node = originalFn.apply(null, args);
-		if (!this.rootElementReached_) {
-			this.rootElementReached_ = true;
-			if (this.component_.element !== node) {
-				this.component_.element = node;
-			}
-			this.lastElementCreationCall_ = args;
-		}
+		this.updateElementIfNotReached_(node, args);
 		return node;
 	}
 
@@ -506,6 +502,36 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
 			this.disposeUnusedSubComponents_();
+		}
+	}
+
+	/**
+	 * Updates this renderer's component's element with the given values, unless
+	 * it has already been reached by an earlier call.
+	 * @param {!Element|Component} nodeOrComponent
+	 * @param {Array=} opt_args The arguments that were used to create this
+	 *     element via incremental dom.
+	 * @protected
+	 */
+	updateElementIfNotReached_(nodeOrComponent, opt_args) {
+		if (!this.rootElementReached_) {
+			this.rootElementReached_ = true;
+
+			var node = nodeOrComponent;
+			var args = opt_args;
+
+			if (nodeOrComponent instanceof Component) {
+				var renderer = nodeOrComponent.getRenderer();
+				args = renderer instanceof IncrementalDomRenderer ?
+					renderer.lastElementCreationCall_ :
+					['div'];
+				node = nodeOrComponent.element;
+			}
+
+			if (this.component_.element !== node) {
+				this.component_.element = node;
+			}
+			this.lastElementCreationCall_ = args;
 		}
 	}
 

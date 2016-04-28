@@ -912,24 +912,61 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('elementClose', child.children.iDomCalls[2].name);
 		});
 
-		it('should warn if rendering sub component that doesn\'t use incremental dom', function() {
-			class TestChildComponent extends Component {
-				constructor() {
-					super();
-					this.element = document.createElement('div');
-				}
-			}
+		it('should use the same element from sub component if no wrapper is given', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementVoid(TestChildComponent);
-				IncDom.elementClose('div');
+				IncDom.elementVoid(ChildComponent, 'child');
 			};
-
-			sinon.stub(console, 'warn');
 			component = new TestComponent();
-			assert.strictEqual(1, console.warn.callCount);
-			console.warn.restore();
+
+			var child = component.components.child;
+			assert.strictEqual(child.element, component.element);
+		});
+
+		describe('Non Incremental DOM sub component', function() {
+			beforeEach(function() {
+				sinon.stub(console, 'warn');
+			});
+
+			afterEach(function() {
+				console.warn.restore();
+			});
+
+			it('should warn if rendering sub component that doesn\'t use incremental dom', function() {
+				class TestChildComponent extends Component {
+					constructor() {
+						super();
+						this.element = document.createElement('div');
+					}
+				}
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+
+				component = new TestComponent();
+				assert.strictEqual(1, console.warn.callCount);
+			});
+
+			it('should use the same element from sub component even if it doesn\'t use incremental dom', function() {
+				class TestChildComponent extends Component {
+					constructor() {
+						super();
+						this.element = document.createElement('div');
+					}
+				}
+
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementVoid(TestChildComponent, 'child');
+				};
+				component = new TestComponent();
+
+				var child = component.components.child;
+				assert.strictEqual(child.element, component.element);
+			});
 		});
 
 		it('should dispose sub components that are unused after an update', function(done) {

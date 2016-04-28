@@ -1,7 +1,7 @@
 'use strict';
 
 import './incremental-dom';
-import { array, core } from 'metal';
+import { array, core, object } from 'metal';
 import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
@@ -16,6 +16,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	constructor(comp) {
 		super(comp);
 
+		comp.context = {};
 		this.changes_ = {};
 		this.eventsCollector_ = new EventsCollector(comp);
 		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
@@ -100,6 +101,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Gets the component being currently rendered via `IncrementalDomRenderer`.
+	 * @return {Component}
+	 */
+	static getComponentBeingRendered() {
+		return renderingComponents_[renderingComponents_.length - 1];
+	}
+
+	/**
 	 * Gets the sub component referenced by the given tag and config data,
 	 * creating it if it doesn't yet exist.
 	 * @param {string} key The sub component's key.
@@ -132,6 +141,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			}
 			return parent;
 		}
+	}
+
+	/**
+	 * Removes the most recent component from the queue of rendering components.
+	 */
+	static finishedRenderingComponent() {
+		renderingComponents_.pop();
 	}
 
 	/**
@@ -384,6 +400,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	renderInsidePatchDontSkip_() {
+		IncrementalDomRenderer.startedRenderingComponent(this.component_);
 		this.changes_ = {};
 		this.rootElementReached_ = false;
 		this.subComponentsFound_ = {};
@@ -393,6 +410,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
+		IncrementalDomRenderer.finishedRenderingComponent();
 		this.emit('rendered', !this.component_.wasRendered);
 	}
 
@@ -409,6 +427,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	renderSubComponent_(tagOrCtor, config) {
 		var key = config.key || ('sub' + this.generatedKeyCount_++);
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
+		this.updateContext_(comp);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
 			renderer.renderInsidePatch();
@@ -453,6 +472,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Stores the component that has just started being rendered.
+	 * @param {!Component} comp
+	 */
+	static startedRenderingComponent(comp) {
+		renderingComponents_.push(comp);
+	}
+
+	/**
 	 * Patches the component's element with the incremental dom function calls
 	 * done by `renderIncDom`.
 	 */
@@ -479,6 +506,22 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.disposeUnusedSubComponents_();
 		}
 	}
+
+	/**
+	 * Updates the given component's context according to the data from the
+	 * component that is currently being rendered.
+	 * @param {!Component} comp
+	 * @protected
+	 */
+	updateContext_(comp) {
+		var context = comp.context;
+		var parent = IncrementalDomRenderer.getComponentBeingRendered();
+		var childContext = parent.getChildContext ? parent.getChildContext() : {};
+		object.mixin(context, parent.context, childContext);
+		comp.context = context;
+	}
 }
+
+var renderingComponents_ = [];
 
 export default IncrementalDomRenderer;

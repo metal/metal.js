@@ -839,6 +839,51 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('Hello World', child2.element.childNodes[0].textContent);
 		});
 
+		it('should pass context data to all descendants', function() {
+			var TestGrandChildComponent = createTestComponentClass();
+			TestGrandChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementVoid('grandchild');
+			};
+
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.prototype.getChildContext = function() {
+				return {
+					bar: 'bar'
+				};
+			};
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('child');
+				this.component_.config.children();
+				IncDom.elementClose('child');
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.getChildContext = function() {
+				return {
+					foo: 'foo'
+				};
+			};
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen(TestChildComponent, 'child');
+				IncDom.elementVoid(TestGrandChildComponent, 'grandChild');
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			var grandChild = component.components.grandChild;
+			assert.ok(child instanceof TestChildComponent);
+			assert.ok(grandChild instanceof TestGrandChildComponent);
+			assert.ok(!component.context.foo);
+			assert.ok(!component.context.bar);
+			assert.strictEqual('foo', child.context.foo);
+			assert.ok(!child.context.bar);
+			assert.strictEqual('foo', grandChild.context.foo);
+			assert.strictEqual('bar', grandChild.context.bar);
+		});
+
 		it('should warn if rendering sub component that doesn\'t use incremental dom', function() {
 			class TestChildComponent extends Component {
 				constructor() {

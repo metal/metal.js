@@ -20,7 +20,7 @@
     "metal"
   ],
   "dependencies": {
-    "metal-component": "^1.0.0-rc.7"
+    "metal-component": "^1.0.0-rc.8"
   },
   "devDependencies": {
     "gulp": "^3.8.11",

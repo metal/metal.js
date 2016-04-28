@@ -514,8 +514,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	updateElementIfNotReached_(nodeOrComponent, opt_args) {
-		if (!this.rootElementReached_) {
-			this.rootElementReached_ = true;
+		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
+		var currRenderer = currComp.getRenderer();
+		if (!currRenderer.rootElementReached_) {
+			currRenderer.rootElementReached_ = true;
 
 			var node = nodeOrComponent;
 			var args = opt_args;
@@ -528,10 +530,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				node = nodeOrComponent.element;
 			}
 
-			if (this.component_.element !== node) {
-				this.component_.element = node;
+			if (currComp.element !== node) {
+				currComp.element = node;
 			}
-			this.lastElementCreationCall_ = args;
+			currRenderer.lastElementCreationCall_ = args;
 		}
 	}
 

@@ -923,6 +923,28 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(child.element, component.element);
 		});
 
+		it('should use the same element from children sub component if no wrapper is given', function() {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				this.component_.config.children();
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen(TestChildComponent, 'child');
+				IncDom.elementVoid(ChildComponent, 'child2');
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			var child2 = component.components.child2;
+			assert.strictEqual(child.element, child2.element);
+			assert.notStrictEqual(component.element, child.element);
+		});
+
 		describe('Non Incremental DOM sub component', function() {
 			beforeEach(function() {
 				sinon.stub(console, 'warn');

@@ -90,7 +90,23 @@ describe('Component', function() {
 			assert.throws(() => comp.attach());
 		});
 
-		it('should return component instance from lifecycle methods', function() {
+		it('should run "rendered" lifecycle method when rendered indicates that component was rerendered', function() {
+			class TestComponent extends Component {
+			}
+			sinon.spy(TestComponent.prototype, 'rendered');
+			comp = new TestComponent();
+
+			var renderer = comp.getRenderer();
+			renderer.emit('rendered', true);
+			assert.strictEqual(1, comp.rendered.callCount);
+			assert.ok(comp.rendered.args[0][0]);
+
+			renderer.emit('rendered', false);
+			assert.strictEqual(2, comp.rendered.callCount);
+			assert.ok(!comp.rendered.args[1][0]);
+		});
+
+		it('should return component instance from lifecycle triggering methods', function() {
 			comp = new Component();
 			assert.strictEqual(comp, comp.detach());
 			assert.strictEqual(comp, comp.attach());

@@ -31,6 +31,9 @@ import State from 'metal-state';
  *   created() {
  *   }
  *
+ *   rendered() {
+ *   }
+ *
  *   attached() {
  *   }
  *
@@ -128,6 +131,7 @@ class Component extends State {
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
 
 		this.renderer_ = this.createRenderer();
+		this.renderer_.on('rendered', this.rendered.bind(this));
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
@@ -603,6 +607,14 @@ class Component extends State {
 		if (this.element) {
 			this.element.style.display = newVal ? '' : 'none';
 		}
+	}
+
+	/**
+	 * Lifecycle. Called whenever the component has just been rendered.
+	 * @param {boolean} firstRender Flag indicating if this was the component's
+	 *     first render.
+	 */
+	rendered() {
 	}
 
 	/**

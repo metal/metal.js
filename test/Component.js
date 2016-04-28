@@ -741,28 +741,6 @@ describe('Component', function() {
 			assert.strictEqual(child, comp.components.child);
 		});
 
-		it('should pass child context to all descendant components', function() {
-			class TestComponent extends Component {
-				getChildContext() {
-					return {
-						foo: 'foo'
-					};
-				}
-			}
-			comp = new TestComponent();
-			assert.ok(!comp.context.foo);
-
-			comp.addSubComponent('child', ChildComponent);
-			var child = comp.components.child;
-			assert.ok(!comp.context.foo);
-			assert.strictEqual('foo', child.context.foo);
-
-			child.addSubComponent('child2', ChildComponent);
-			assert.ok(!comp.context.foo);
-			assert.strictEqual('foo', child.context.foo);
-			assert.strictEqual('foo', child.components.child2.context.foo);
-		});
-
 		it('should dispose sub components when parent component is disposed', function() {
 			comp = new Component();
 			comp.addSubComponent('child', ChildComponent);

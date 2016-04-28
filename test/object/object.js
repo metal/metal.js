@@ -63,4 +63,27 @@ describe('object', function() {
 		};
 		assert.deepEqual(expectedObj, mappedObj);
 	});
+
+	it('should check if two objects are shallowly equal', function(){
+		var obj1 = {};
+		assert.ok(object.shallowEqual(obj1, obj1));
+
+		var obj2 = {
+			a: 1
+		};
+		assert.ok(!object.shallowEqual(obj1, obj2));
+
+		var obj3 = {
+			a: 1
+		};
+		assert.ok(!object.shallowEqual(obj1, obj3));
+		assert.ok(object.shallowEqual(obj2, obj3));
+
+		var obj4 = {
+			a: 2
+		};
+		assert.ok(!object.shallowEqual(obj1, obj4));
+		assert.ok(!object.shallowEqual(obj2, obj4));
+		assert.ok(!object.shallowEqual(obj3, obj4));
+	});
 });

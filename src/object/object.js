@@ -46,6 +46,30 @@ class object {
 		}
 		return mappedObj;
 	}
+
+	/**
+	 * Checks if the two given objects are equal. This is done via a shallow
+	 * check, including only the keys directly contained by the 2 objects.
+	 * @return {boolean}
+	 */
+	static shallowEqual(obj1, obj2) {
+		if (obj1 === obj2) {
+			return true;
+		}
+
+		var keys1 = Object.keys(obj1);
+		var keys2 = Object.keys(obj2);
+		if (keys1.length !== keys2.length) {
+			return false;
+		}
+
+		for (var i = 0; i < keys1.length; i++) {
+			if (obj1[keys1[i]] !== obj2[keys1[i]]) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
 export default object;

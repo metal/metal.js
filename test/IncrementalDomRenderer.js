@@ -884,6 +884,34 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', grandChild.context.bar);
 		});
 
+		it('should pass array of incremental dom calls with the "children" function', function() {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.STATE = {
+				children: {
+				}
+			};
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen(TestChildComponent, 'child');
+				IncDom.elementOpen('span');
+				IncDom.text('Hello World');
+				IncDom.elementClose('span');
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			assert.ok(child instanceof TestChildComponent);
+			assert.ok(child.children);
+			assert.ok(child.children.iDomCalls);
+			assert.strictEqual(3, child.children.iDomCalls.length);
+			assert.strictEqual('elementOpen', child.children.iDomCalls[0].name);
+			assert.strictEqual('text', child.children.iDomCalls[1].name);
+			assert.strictEqual('elementClose', child.children.iDomCalls[2].name);
+		});
+
 		it('should warn if rendering sub component that doesn\'t use incremental dom', function() {
 			class TestChildComponent extends Component {
 				constructor() {

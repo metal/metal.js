@@ -76,13 +76,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	buildChildrenFn_(calls) {
-		return () => {
+		var fn = () => {
 			this.intercept_();
 			for (var i = 0; i < calls.length; i++) {
 				IncrementalDOM[calls[i].name].apply(null, array.slice(calls[i].args, 1));
 			}
 			IncrementalDomAop.stopInterception();
 		};
+		fn.iDomCalls = calls;
+		return fn;
 	}
 
 	/**

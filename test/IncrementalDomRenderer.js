@@ -839,6 +839,31 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('Hello World', child2.element.childNodes[0].textContent);
 		});
 
+		it('should pass same children function when there are no children', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid(ChildComponent, 'child', [], 'foo', this.component_.foo);
+				IncDom.elementClose('div');
+			};
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+			var fn = child.config.children;
+			assert.ok(fn);
+
+			component.foo = 'foo2';
+			component.once('stateSynced', function() {
+				assert.strictEqual(fn, child.config.children);
+				done();
+			});
+		});
+
 		it('should pass context data to all descendants', function() {
 			var TestGrandChildComponent = createTestComponentClass();
 			TestGrandChildComponent.RENDERER.prototype.renderIncDom = function() {

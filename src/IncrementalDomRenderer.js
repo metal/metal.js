@@ -76,6 +76,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	buildChildrenFn_(calls) {
+		if (calls.length === 0) {
+			return emptyChildrenFn_;
+		}
 		var fn = () => {
 			this.intercept_();
 			for (var i = 0; i < calls.length; i++) {
@@ -553,5 +556,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 }
 
 var renderingComponents_ = [];
+function emptyChildrenFn_() {
+}
+emptyChildrenFn_.calls = [];
 
 export default IncrementalDomRenderer;

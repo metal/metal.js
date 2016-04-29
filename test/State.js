@@ -687,6 +687,25 @@ describe('State', function() {
 			assert.strictEqual(2, test.config.key2);
 		});
 
+		it('should emit event when config data changes', function() {
+			var Test = createTestClass();
+			var test = new Test({
+				key1: 1,
+				key2: 2
+			});
+
+			var listener = sinon.stub();
+			test.on('configChanged', listener);
+
+			var prevConfig = test.config;
+			test.setState({
+				key1: 10
+			});
+			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual(prevConfig, listener.args[0][0].prevVal);
+			assert.strictEqual(test.config, listener.args[0][0].newVal);
+		});
+
 		it('should merge STATE from super class', function() {
 			var Test = createTestClass();
 			Test.STATE = {

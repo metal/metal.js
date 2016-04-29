@@ -35,8 +35,9 @@ class State extends EventEmitter {
 		 * through either the constructor or setState calls.
 		 * @type {!Object<string, *>}
 		 */
-		this.config = object.mixin({}, opt_config || {});
+		this.config = {};
 
+		this.updateConfig_(opt_config || {});
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
 		this.addToStateFromStaticHint_(opt_config);
@@ -483,8 +484,7 @@ class State extends EventEmitter {
 	 *   should be set to.
 	 */
 	setState(values) {
-		object.mixin(this.config, values);
-
+		this.updateConfig_(values);
 		var names = Object.keys(values);
 		for (var i = 0; i < names.length; i++) {
 			this[names[i]] = values[names[i]];
@@ -531,6 +531,20 @@ class State extends EventEmitter {
 		var info = this.stateInfo_[name];
 		return (info.state === State.KeyStates.INITIALIZED) &&
 			(core.isObject(prevVal) || prevVal !== this[name]);
+	}
+
+	/**
+	 * Updates the config data object with the given values.
+	 * @param {!Object} values
+	 * @protected
+	 */
+	updateConfig_(values) {
+		var prevConfig = this.config;
+		this.config = object.mixin({}, this.config, values);
+		this.emit('configChanged', {
+			newVal: this.config,
+			prevVal: prevConfig
+		});
 	}
 
 	/**

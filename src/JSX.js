@@ -9,10 +9,15 @@ import IncrementalDomRenderer from 'metal-incremental-dom';
  *
  * class MyComp extends Component {
  *   jsx() {
- *     <div class="my-comp">Hello World</div>;
+ *     return <div class="my-comp">Hello World</div>;
  *   }
  * }
  * JSX.register(MyComp);
+ *
+ * Note that this renderer is assuming that `babel-plugin-incremental-dom` is
+ * being used, so it integrates well with it. If that's not the case, it's
+ * possible to use just `IncrementalDomRenderer` directly with other build
+ * tools, or create another renderer that integrates better with them.
  */
 class JSX extends IncrementalDomRenderer {
 	/**

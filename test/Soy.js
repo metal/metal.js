@@ -190,6 +190,18 @@ describe('Soy', function() {
 			assert.strictEqual(TestComponent2, TestComponent2.TEMPLATE.componentCtor);
 		});
 
+		it('should give precendence to the component\'s own "render" function over template', function() {
+			class TestComponent extends Component {
+				render() {
+					IncrementalDOM.elementVoid('render');
+				}
+			}
+			Soy.register(TestComponent, helloWorldTemplates, 'content');
+
+			comp = new TestComponent();
+			assert.strictEqual('RENDER', comp.element.tagName);
+		});
+
 		it('should not throw error if soy template doesn\'t have params/types info', function() {
 			class TestComponent extends Component {
 			}

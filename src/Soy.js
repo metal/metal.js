@@ -148,7 +148,7 @@ class Soy extends IncrementalDomRenderer {
 	 */
 	renderIncDom() {
 		var elementTemplate = this.component_.constructor.TEMPLATE;
-		if (core.isFunction(elementTemplate)) {
+		if (core.isFunction(elementTemplate) && !this.component_.render) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
 			SoyAop.startInterception(Soy.handleInterceptedCall_);
 			elementTemplate(this.buildTemplateData_(elementTemplate.params || []), null, ijData);

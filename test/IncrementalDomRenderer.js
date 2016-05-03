@@ -25,8 +25,24 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
-	describe('Custom renderIncDom', function() {
-		it('should render content specified by the component\'s renderIncDom', function() {
+	describe('Custom component renderIncDom', function() {
+		it('should render content specified by the component\'s render function', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.prototype.render = function() {
+				IncDom.elementOpen('span', null, null, 'foo', 'foo');
+				IncDom.text('bar');
+				IncDom.elementClose('span');
+			};
+
+			component = new TestComponent();
+			assert.strictEqual('SPAN', component.element.tagName);
+			assert.strictEqual('foo', component.element.getAttribute('foo'));
+			assert.strictEqual('bar', component.element.textContent);
+		});
+	});
+
+	describe('Custom renderer renderIncDom', function() {
+		it('should render content specified by the renderer\'s renderIncDom', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('span', null, null, 'foo', 'foo');
@@ -40,7 +56,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
-		it('should render content specified by the component\'s renderIncDom inside given element', function() {
+		it('should render content specified by the renderer\'s renderIncDom inside given element', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('span', null, null, 'foo', 'foo');

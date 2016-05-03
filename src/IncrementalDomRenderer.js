@@ -379,7 +379,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * engines for example).
 	 */
 	renderIncDom() {
-		IncrementalDOM.elementVoid('div');
+		if (this.component_.render) {
+			this.component_.render();
+		} else {
+			IncrementalDOM.elementVoid('div');
+		}
 	}
 
 	/**

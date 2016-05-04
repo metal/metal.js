@@ -525,7 +525,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				);
 			}
 		} else {
-			IncrementalDOM.patchOuter(this.component_.element, this.renderInsidePatchDontSkip_);
+			var element = this.component_.element;
+			IncrementalDOM.patchOuter(element, this.renderInsidePatchDontSkip_);
+			if (!this.component_.element) {
+				dom.exitDocument(element);
+			}
 		}
 	}
 

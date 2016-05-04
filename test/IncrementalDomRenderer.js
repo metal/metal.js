@@ -193,9 +193,11 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(component.element);
 			assert.strictEqual(parent, component.element.parentNode);
 
+			var prevElement = component.element;
 			component.noElement = true;
 			component.once('stateSynced', function() {
 				assert.ok(!component.element);
+				assert.ok(!prevElement.parentNode);
 
 				component.noElement = false;
 				component.once('stateSynced', function() {

@@ -185,10 +185,7 @@ class Component extends State {
 	 * @chainable
 	 */
 	attach(opt_parentElement, opt_siblingElement) {
-		if (!this.element) {
-			throw new Error(Component.Error.ELEMENT_NOT_CREATED);
-		}
-		if (!this.inDocument) {
+		if (!this.inDocument && this.element) {
 			this.renderElement_(opt_parentElement, opt_siblingElement);
 			this.inDocument = true;
 			this.emit('attached');
@@ -263,7 +260,7 @@ class Component extends State {
 	 */
 	detach() {
 		if (this.inDocument) {
-			if (this.element.parentNode) {
+			if (this.element && this.element.parentNode) {
 				this.element.parentNode.removeChild(this.element);
 			}
 			this.inDocument = false;
@@ -522,7 +519,11 @@ class Component extends State {
 	 * @protected
 	 */
 	setterElementFn_(newVal, currentVal) {
-		return dom.toElement(newVal) || currentVal;
+		var element = newVal;
+		if (element) {
+			element = dom.toElement(newVal) || currentVal;
+		}
+		return element;
 	}
 
 	/**
@@ -611,12 +612,12 @@ class Component extends State {
 
 	/**
 	 * Validator logic for element state key.
-	 * @param {string|Element} val
+	 * @param {?string|Element} val
 	 * @return {boolean} True if val is a valid element.
 	 * @protected
 	 */
 	validatorElementFn_(val) {
-		return core.isElement(val) || core.isString(val);
+		return core.isElement(val) || core.isString(val) || !core.isDefAndNotNull(val);
 	}
 
 	/**
@@ -691,17 +692,6 @@ Component.ELEMENT_CLASSES = '';
  * @static
  */
 Component.RENDERER = ComponentRenderer;
-
-/**
- * Errors thrown by the component.
- * @enum {string}
- */
-Component.Error = {
-	/**
-	 * Error when the component is attached but its element hasn't been created yet.
-	 */
-	ELEMENT_NOT_CREATED: 'Can\'t attach component element. It hasn\'t been created yet.'
-};
 
 /**
  * A list with state key names that will automatically be rejected as invalid.

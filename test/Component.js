@@ -85,9 +85,9 @@ describe('Component', function() {
 			sinon.assert.callCount(Component.prototype.attached, 2);
 		});
 
-		it('should throw error if attach() is called before component is rendered', function() {
+		it('should not throw error if attach() is called before component is rendered', function() {
 			comp = new Component({}, false);
-			assert.throws(() => comp.attach());
+			assert.doesNotThrow(() => comp.attach());
 		});
 
 		it('should run "rendered" lifecycle method when rendered indicates that component was rerendered', function() {
@@ -198,10 +198,32 @@ describe('Component', function() {
 			assert.strictEqual('overwritten2', getClassNames(comp.element)[1]);
 		});
 
+		it('should allow setting element to null', function() {
+			comp = new Component();
+			assert.doesNotThrow(() => comp.element = null);
+			assert.strictEqual(null, comp.element);
+		});
+
+		it('should not throw error if detached after element is set to null', function() {
+			comp = new Component();
+			comp.element = null;
+			assert.doesNotThrow(() => comp.detach());
+			assert.ok(!comp.inDocument);
+		});
+
 		it('should set elementClasses on new element when changed', function() {
 			comp = new Component({
 				elementClasses: 'testClass'
 			});
+			comp.element = document.createElement('div');
+			assert.ok(dom.hasClass(comp.element, 'testClass'));
+		});
+
+		it('should set elementClasses on new element when changed after being set to null', function() {
+			comp = new Component({
+				elementClasses: 'testClass'
+			});
+			comp.element = null;
 			comp.element = document.createElement('div');
 			assert.ok(dom.hasClass(comp.element, 'testClass'));
 		});

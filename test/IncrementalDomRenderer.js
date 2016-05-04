@@ -176,7 +176,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(!component.element);
 		});
 
-		it('should allow component to only have element some of the time', function(done) {
+		it('should reposition component on requested parent when its content is back after an update', function(done) {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				if (!this.component_.noElement) {
@@ -188,8 +188,10 @@ describe('IncrementalDomRenderer', function() {
 				}
 			};
 
-			component = new TestComponent();
+			var parent = document.createElement('div');
+			component = new TestComponent({}, parent);
 			assert.ok(component.element);
+			assert.strictEqual(parent, component.element.parentNode);
 
 			component.noElement = true;
 			component.once('stateSynced', function() {
@@ -198,6 +200,7 @@ describe('IncrementalDomRenderer', function() {
 				component.noElement = false;
 				component.once('stateSynced', function() {
 					assert.ok(component.element);
+					assert.strictEqual(parent, component.element.parentNode);
 					done();
 				});
 			});
@@ -1020,6 +1023,40 @@ describe('IncrementalDomRenderer', function() {
 			var child2 = component.components.child2;
 			assert.strictEqual(child.element, child2.element);
 			assert.notStrictEqual(component.element, child.element);
+		});
+
+		it('should position previously empty child component correctly inside parent', function(done) {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				if (!this.component_.empty) {
+					IncrementalDOM.elementVoid('div');
+				}
+			};
+			TestChildComponent.STATE = {
+				empty: {
+					value: true
+				}
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid(TestChildComponent, 'child');
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			assert.ok(!child.element);
+			assert.strictEqual(0, component.element.childNodes.length);
+
+			child.empty = false;
+			child.once('stateSynced', function() {
+				assert.ok(child.element);
+				assert.strictEqual(1, component.element.childNodes.length);
+				assert.strictEqual(child.element, component.element.childNodes[0]);
+				done();
+			});
 		});
 
 		describe('Non Incremental DOM sub component', function() {

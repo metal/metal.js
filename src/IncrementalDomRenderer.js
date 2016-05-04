@@ -21,6 +21,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.eventsCollector_ = new EventsCollector(comp);
 		this.lastElementCreationCall_ = [];
 		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
+		comp.on('attached', this.handleAttached_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
 
 		// Binds functions that will be used many times, to avoid creating new
@@ -154,6 +155,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	static finishedRenderingComponent() {
 		renderingComponents_.pop();
+	}
+
+	/**
+	 * Handles the `attached` listener. Stores attach data.
+	 * @param {!Object} data
+	 * @protected
+	 */
+	handleAttached_(data) {
+		this.attachData_ = data;
 	}
 
 	/**
@@ -439,6 +449,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.updateContext_(comp);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
+			renderer.lastParentComponent_ = IncrementalDomRenderer.getComponentBeingRendered();
 			renderer.renderInsidePatch();
 		} else {
 			console.warn(
@@ -495,10 +506,24 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * done by `renderIncDom`.
 	 */
 	patch() {
+		if (!this.component_.element && this.lastParentComponent_) {
+			// If the component has no content but was rendered from another component,
+			// we'll need to patch this parent to make sure that any new content will
+			// be added in the right place.
+			this.lastParentComponent_.getRenderer().patch();
+			return;
+		}
+
 		var tempParent = this.guaranteeParent_();
 		if (tempParent) {
 			IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
 			dom.exitDocument(this.component_.element);
+			if (this.component_.element && this.component_.inDocument) {
+				this.component_.renderElement_(
+					this.attachData_.parent,
+					this.attachData_.sibling
+				);
+			}
 		} else {
 			IncrementalDOM.patchOuter(this.component_.element, this.renderInsidePatchDontSkip_);
 		}

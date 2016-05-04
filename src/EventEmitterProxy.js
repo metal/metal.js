@@ -36,6 +36,15 @@ class EventEmitterProxy extends Disposable {
 		this.originEmitter_ = originEmitter;
 
 		/**
+		 * A list of events that are pending to be listened by an actual origin
+		 * emitter. Events are stored here when the origin doesn't exist, so they
+		 * can be set on a new origin when one is set.
+		 * @type {!Array}
+		 * @protected
+		 */
+		this.pendingEvents_ = [];
+
+		/**
 		 * Holds a map of events from the origin emitter that are already being proxied.
 		 * @type {Object<string, !EventHandle>}
 		 * @protected
@@ -107,7 +116,7 @@ class EventEmitterProxy extends Disposable {
 	 */
 	proxyEvent(event) {
 		if (this.shouldProxyEvent_(event)) {
-			this.proxiedEvents_[event] = this.addListenerForEvent_(event);
+			this.tryToAddListener_(event);
 		}
 	}
 
@@ -121,22 +130,22 @@ class EventEmitterProxy extends Disposable {
 			this.proxiedEvents_[events[i]].removeListener();
 		}
 		this.proxiedEvents_ = {};
+		this.pendingEvents_ = [];
 	}
 
 	/**
 	 * Changes the origin emitter. This automatically detaches any events that
 	 * were already being proxied from the previous emitter, and starts proxying
 	 * them on the new emitter instead.
+	 * @param {!EventEmitter} originEmitter
 	 */
 	setOriginEmitter(originEmitter) {
-		var handles = this.proxiedEvents_;
+		var events = this.originEmitter_?
+			Object.keys(this.proxiedEvents_) :
+			this.pendingEvents_;
 		this.removeListeners_();
 		this.originEmitter_ = originEmitter;
-
-		var events = Object.keys(handles);
-		for (var i = 0; i < events.length; i++) {
-			this.proxiedEvents_[events[i]] = this.addListenerForEvent_(events[i]);
-		}
+		events.forEach(event => this.tryToAddListener_(event));
 	}
 
 	/**
@@ -161,6 +170,20 @@ class EventEmitterProxy extends Disposable {
 	 */
 	startProxy_() {
 		this.targetEmitter_.on('newListener', this.proxyEvent.bind(this));
+	}
+
+	/**
+	 * Adds a listener to the origin emitter, if it exists. Otherwise, stores
+	 * the pending listener so it can be used on a future origin emitter.
+	 * @param {string} event
+	 * @protected
+	 */
+	tryToAddListener_(event) {
+		if (this.originEmitter_) {
+			this.proxiedEvents_[event] = this.addListenerForEvent_(event);
+		} else {
+			this.pendingEvents_.push(event);
+		}
 	}
 }
 

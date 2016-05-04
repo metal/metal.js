@@ -116,6 +116,39 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(0, listener.callCount);
 	});
 
+	it('should not throw error if origin emitter is set to null', function() {
+		var origin = new EventEmitter();
+		var target = new EventEmitter();
+		var proxy = new EventEmitterProxy(origin, target);
+
+		var listener = sinon.stub();
+		target.on('event1', listener);
+
+		assert.doesNotThrow(() => proxy.setOriginEmitter(null));
+	});
+
+	it('should pass proxied events to new origin emitters, even when no emitter exists for a while', function() {
+		var origin = new EventEmitter();
+		var target = new EventEmitter();
+		var proxy = new EventEmitterProxy(origin, target);
+
+		var listener = sinon.stub();
+		target.on('event1', listener);
+
+		proxy.setOriginEmitter(null);
+
+		var origin2 = new EventEmitter();
+		proxy.setOriginEmitter(origin2);
+
+		origin.emit('event1', 1, 2);
+		assert.strictEqual(0, listener.callCount);
+
+		origin2.emit('event1', 1, 2);
+		assert.strictEqual(1, listener.callCount);
+		assert.strictEqual(1, listener.args[0][0]);
+		assert.strictEqual(2, listener.args[0][1]);
+	});
+
 	it('should allow manually choosing events to be proxied', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

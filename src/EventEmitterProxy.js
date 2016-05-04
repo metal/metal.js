@@ -145,7 +145,7 @@ class EventEmitterProxy extends Disposable {
 			this.pendingEvents_;
 		this.removeListeners_();
 		this.originEmitter_ = originEmitter;
-		events.forEach(event => this.tryToAddListener_(event));
+		events.forEach(event => this.proxyEvent(event));
 	}
 
 	/**

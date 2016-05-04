@@ -185,10 +185,13 @@ class Component extends State {
 	 * @chainable
 	 */
 	attach(opt_parentElement, opt_siblingElement) {
-		if (!this.inDocument && this.element) {
+		if (!this.inDocument) {
 			this.renderElement_(opt_parentElement, opt_siblingElement);
 			this.inDocument = true;
-			this.emit('attached');
+			this.emit('attached', {
+				parent: opt_parentElement,
+				sibling: opt_siblingElement
+			});
 			this.attached();
 		}
 		return this;
@@ -505,7 +508,7 @@ class Component extends State {
 	 */
 	renderElement_(opt_parentElement, opt_siblingElement) {
 		var element = this.element;
-		if (opt_siblingElement || !element.parentNode) {
+		if (element && (opt_siblingElement || !element.parentNode)) {
 			var parent = dom.toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 			parent.insertBefore(element, dom.toElement(opt_siblingElement));
 		}

@@ -88,6 +88,17 @@ describe('Component', function() {
 		it('should not throw error if attach() is called before component is rendered', function() {
 			comp = new Component({}, false);
 			assert.doesNotThrow(() => comp.attach());
+			assert.ok(comp.inDocument);
+		});
+
+		it('should emit "attached" event when component is attached', function() {
+			comp = new Component({}, false);
+			var listener = sinon.stub();
+			comp.on('attached', listener);
+			comp.attach('.parent', '.sibling');
+			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual('.parent', listener.args[0][0].parent);
+			assert.strictEqual('.sibling', listener.args[0][0].sibling);
 		});
 
 		it('should run "rendered" lifecycle method when rendered indicates that component was rerendered', function() {

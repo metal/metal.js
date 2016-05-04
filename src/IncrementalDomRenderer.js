@@ -19,6 +19,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		comp.context = {};
 		this.changes_ = {};
 		this.eventsCollector_ = new EventsCollector(comp);
+		this.lastElementCreationCall_ = [];
 		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
 
@@ -416,6 +417,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
 		IncrementalDomRenderer.finishedRenderingComponent();
+		if (!this.rootElementReached_) {
+			this.component_.element = null;
+		}
 		this.emit('rendered', !this.component_.wasRendered);
 	}
 
@@ -471,9 +475,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	skipRerender_() {
-		IncrementalDOM.elementOpen.apply(null, this.lastElementCreationCall_);
-		IncrementalDOM.skip();
-		IncrementalDOM.elementClose(this.lastElementCreationCall_[0]);
+		if (this.lastElementCreationCall_.length > 0) {
+			IncrementalDOM.elementOpen.apply(null, this.lastElementCreationCall_);
+			IncrementalDOM.skip();
+			IncrementalDOM.elementClose(this.lastElementCreationCall_[0]);
+		}
 	}
 
 	/**
@@ -533,7 +539,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				var renderer = nodeOrComponent.getRenderer();
 				args = renderer instanceof IncrementalDomRenderer ?
 					renderer.lastElementCreationCall_ :
-					['div'];
+					[];
 				node = nodeOrComponent.element;
 			}
 

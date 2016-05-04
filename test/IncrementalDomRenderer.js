@@ -167,6 +167,42 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(parent, component.element.parentNode);
 		});
 
+		it('should not throw error if no content is rendered for component', function() {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+			};
+
+			component = new TestComponent();
+			assert.ok(!component.element);
+		});
+
+		it('should allow component to only have element some of the time', function(done) {
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				if (!this.component_.noElement) {
+					IncrementalDOM.elementVoid('div');
+				}
+			};
+			TestComponent.STATE = {
+				noElement: {
+				}
+			};
+
+			component = new TestComponent();
+			assert.ok(component.element);
+
+			component.noElement = true;
+			component.once('stateSynced', function() {
+				assert.ok(!component.element);
+
+				component.noElement = false;
+				component.once('stateSynced', function() {
+					assert.ok(component.element);
+					done();
+				});
+			});
+		});
+
 		it('should uncheck input element when "checked" attribute is removed', function(done) {
 			var input = document.createElement('input');
 			input.type = 'checkbox';
@@ -1143,6 +1179,41 @@ describe('IncrementalDomRenderer', function() {
 					assert.strictEqual('Child', child.element.textContent);
 					done();
 				});
+			});
+		});
+
+		it('should skip child update without error if it had no element before', function(done) {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.prototype.render = function() {
+			};
+			TestChildComponent.prototype.shouldUpdate = function() {
+				return false;
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.text(this.component_.foo);
+				IncDom.elementVoid(TestChildComponent, 'child');
+				IncDom.elementClose('div');
+			};
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+			sinon.spy(child, 'render');
+
+			component.foo = 'foo2';
+			component.once('stateSynced', function() {
+				assert.strictEqual(0, child.render.callCount);
+				assert.strictEqual(1, component.element.childNodes.length);
+				assert.strictEqual('foo2', component.element.childNodes[0].textContent);
+				assert.ok(!child.element);
+				done();
 			});
 		});
 	});

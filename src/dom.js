@@ -159,7 +159,7 @@ class dom {
 	 * @param {Element} node Element to remove children from.
 	 */
 	static enterDocument(node) {
-		dom.append(document.body, node);
+		node && dom.append(document.body, node);
 	}
 
 	/**
@@ -167,7 +167,7 @@ class dom {
 	 * @param {Element} node Element to remove children from.
 	 */
 	static exitDocument(node) {
-		if (node.parentNode) {
+		if (node && node.parentNode) {
 			node.parentNode.removeChild(node);
 		}
 	}

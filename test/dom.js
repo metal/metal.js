@@ -201,6 +201,12 @@ describe('dom', function() {
 			assert.strictEqual(document.body, element.parentNode);
 		});
 
+		it('should not throw error if "enterDocument" is called without element', function() {
+			assert.doesNotThrow(function() {
+				dom.enterDocument();
+			});
+		});
+
 		it('should node exit document', function() {
 			var element = document.createElement('div');
 			dom.enterDocument(element);
@@ -212,6 +218,12 @@ describe('dom', function() {
 			var element = document.createElement('div');
 			assert.doesNotThrow(function() {
 				dom.exitDocument(element);
+			});
+		});
+
+		it('should not throw error if "exitDocument" is called without element', function() {
+			assert.doesNotThrow(function() {
+				dom.exitDocument();
 			});
 		});
 

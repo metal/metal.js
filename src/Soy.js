@@ -173,8 +173,9 @@ class Soy extends IncrementalDomRenderer {
 	 * @return {boolean}
 	 */
 	shouldUpdate(changes) {
-		if (!super.shouldUpdate(changes)) {
-			return false;
+		var should = super.shouldUpdate(changes);
+		if (!should || this.component_.shouldUpdate) {
+			return should;
 		}
 
 		var fn = this.component_.constructor.TEMPLATE;

@@ -98,6 +98,20 @@ describe('Soy', function() {
 					done();
 				});
 			});
+
+			it('should trigger update when state key is not used by template if component shouldUpdate returns true', function(done) {
+				HelloWorldComponent.prototype.shouldUpdate = function() {
+					return true;
+				};
+				comp = new HelloWorldComponent();
+				comp.addToState('foo');
+
+				comp.foo = 'Bar';
+				comp.once('stateSynced', function() {
+					assert.strictEqual(1, IncrementalDOM.patchOuter.callCount);
+					done();
+				});
+			});
 		});
 
 		it('should not add sub template soy params as state keys', function() {

@@ -38,6 +38,9 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 * @protected
 	 */
 	isSupportedDomEvent_(event) {
+		if (!this.originEmitter_ || !this.originEmitter_.addEventListener) {
+			return true;
+		}
 		return (event.startsWith('delegate:') && event.indexOf(':', 9) !== -1) ||
 			dom.supportsEvent(this.originEmitter_, event);
 	}
@@ -50,8 +53,7 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 * @override
 	 */
 	shouldProxyEvent_(event) {
-		return super.shouldProxyEvent_(event) &&
-			(!this.originEmitter_.addEventListener || this.isSupportedDomEvent_(event));
+		return super.shouldProxyEvent_(event) && this.isSupportedDomEvent_(event);
 	}
 }
 

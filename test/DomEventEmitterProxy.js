@@ -176,4 +176,12 @@ describe('DomEventEmitterProxy', function() {
 		dom.triggerEvent(origin, 'click');
 		assert.strictEqual(0, listener.callCount);
 	});
+
+	it('should not throw error if origin emitter is null', function() {
+		var target = new EventEmitter();
+		new DomEventEmitterProxy(null, target);
+
+		var listener = sinon.stub();
+		assert.doesNotThrow(() => target.on('click', listener));
+	});
 });

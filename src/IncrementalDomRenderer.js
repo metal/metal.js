@@ -301,9 +301,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var attrsArr = array.slice(arguments, 4);
 		this.addInlineListeners_((statics || []).concat(attrsArr));
 		var args = array.slice(arguments, 1);
-		if (!this.rootElementReached_ && this.component_.config.key) {
-			args[1] = this.component_.config.key;
+
+		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
+		var currRenderer = currComp.getRenderer();
+		if (!currRenderer.rootElementReached_ && currComp.config.key) {
+			args[1] = currComp.config.key;
 		}
+
 		var node = originalFn.apply(null, args);
 		this.updateElementIfNotReached_(node, args);
 		return node;

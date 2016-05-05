@@ -1027,6 +1027,46 @@ describe('IncrementalDomRenderer', function() {
 			assert.notStrictEqual(component.element, child.element);
 		});
 
+		it('should use same keys for children components when rerendered after update', function(done) {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncrementalDOM.elementOpen('div');
+				IncrementalDOM.text(this.foo);
+				this.component_.config.children();
+				IncrementalDOM.elementClose('div');
+			};
+			TestChildComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementOpen(TestChildComponent, 'child');
+				IncDom.elementVoid(ChildComponent);
+				IncDom.elementClose(TestChildComponent);
+				IncDom.elementClose('div');
+			};
+			component = new TestComponent();
+			assert.strictEqual(2, Object.keys(component.components).length);
+
+			var child = component.components.child;
+			var child2 = component.components.sub0sub0;
+			assert.ok(component.components.child);
+			assert.ok(component.components.sub0sub0);
+
+			child.foo = 'foo2';
+			child.once('stateSynced', function() {
+				assert.strictEqual(2, Object.keys(component.components).length);
+				assert.strictEqual(child, component.components.child);
+				assert.strictEqual(child2, component.components.sub0sub0);
+				assert.ok(!component.components.sub1);
+				done();
+			});
+		});
+
 		it('should position previously empty child component correctly inside parent', function(done) {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.RENDERER.prototype.renderIncDom = function() {

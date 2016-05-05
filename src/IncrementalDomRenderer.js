@@ -81,15 +81,31 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (calls.length === 0) {
 			return emptyChildrenFn_;
 		}
+		var prefix = this.buildKey_();
 		var fn = () => {
+			var prevPrefix = this.currentPrefix_;
+			this.generatedKeyCount_[prefix] = 0;
+			this.currentPrefix_ = prefix;
 			this.intercept_();
 			for (var i = 0; i < calls.length; i++) {
 				IncrementalDOM[calls[i].name].apply(null, array.slice(calls[i].args, 1));
 			}
 			IncrementalDomAop.stopInterception();
+			this.currentPrefix_ = prevPrefix;
 		};
 		fn.iDomCalls = calls;
 		return fn;
+	}
+
+	/**
+	 * Builds the key for the next component that is found.
+	 * @return {string}
+	 * @protected
+	 */
+	buildKey_() {
+		var count = this.generatedKeyCount_[this.currentPrefix_] || 0;
+		this.generatedKeyCount_[this.currentPrefix_] = count + 1;
+		return this.currentPrefix_ + 'sub' + count;
 	}
 
 	/**
@@ -420,8 +436,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.changes_ = {};
 		this.rootElementReached_ = false;
 		this.subComponentsFound_ = {};
-		this.generatedKeyCount_ = 0;
+		this.generatedKeyCount_ = {};
 		this.listenersToAttach_ = [];
+		this.currentPrefix_ = '';
 		this.intercept_();
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
@@ -444,7 +461,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	renderSubComponent_(tagOrCtor, config) {
-		var key = config.key || ('sub' + this.generatedKeyCount_++);
+		var key = config.key || this.buildKey_();
 		var comp = this.getSubComponent_(key, tagOrCtor, config);
 		this.updateContext_(comp);
 		var renderer = comp.getRenderer();

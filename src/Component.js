@@ -214,11 +214,18 @@ class Component extends State {
 	 * @return {!Component}
 	 */
 	addSubComponent(key, componentNameOrCtor, opt_data) {
-		if (!this.components[key]) {
-			var ConstructorFn = componentNameOrCtor;
-			if (core.isString(ConstructorFn)) {
-				ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
-			}
+		var ConstructorFn = componentNameOrCtor;
+		if (core.isString(ConstructorFn)) {
+			ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
+		}
+
+		var component = this.components[key];
+		if (component && component.constructor !== ConstructorFn) {
+			component.dispose();
+			component = null;
+		}
+
+		if (!component) {
 			this.components[key] = new ConstructorFn(opt_data, false);
 		}
 		return this.components[key];

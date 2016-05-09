@@ -765,13 +765,30 @@ describe('Component', function() {
 			assert.strictEqual('foo', sub.foo);
 		});
 
-		it('should not create a new component when one with the given key already exists', function() {
+		it('should not create a new component when one with the given key and constructor already exists', function() {
 			comp = new Component();
 			comp.addSubComponent('child', ChildComponent);
 			var child = comp.components.child;
 
 			comp.addSubComponent('child', ChildComponent);
 			assert.strictEqual(child, comp.components.child);
+		});
+
+		it('should create a new component when one with the given key but different constructor already', function() {
+			var ChildComponent2 = createCustomComponentClass();
+
+			comp = new Component();
+			comp.addSubComponent('child', ChildComponent);
+			var child = comp.components.child;
+			assert.ok(child instanceof ChildComponent);
+			assert.ok(!child.isDisposed());
+
+			comp.addSubComponent('child', ChildComponent2);
+			var newChild = comp.components.child;
+			assert.notStrictEqual(child, newChild);
+			assert.ok(child.isDisposed());
+			assert.ok(!newChild.isDisposed());
+			assert.ok(newChild instanceof ChildComponent2);
 		});
 
 		it('should dispose sub components when parent component is disposed', function() {

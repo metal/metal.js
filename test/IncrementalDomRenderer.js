@@ -917,6 +917,7 @@ describe('IncrementalDomRenderer', function() {
 			component.foo = 'foo2';
 			component.once('stateSynced', function() {
 				assert.strictEqual(fn, child.config.children);
+				assert.doesNotThrow(fn);
 				done();
 			});
 		});

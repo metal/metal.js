@@ -832,7 +832,44 @@ describe('IncrementalDomRenderer', function() {
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
+				var newChild = component.components.child;
+				assert.strictEqual(child, newChild);
 				assert.strictEqual('bar', child.foo);
+				done();
+			});
+		});
+
+		it('should not reuse component with same key if constructor is different"', function(done) {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementVoid('div');
+			};
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				if (this.component_.switch) {
+					IncDom.elementVoid(TestChildComponent, 'child');
+				} else {
+					IncDom.elementVoid(ChildComponent, 'child');
+				}
+				IncDom.elementClose('div');
+			};
+			TestComponent.STATE = {
+				switch: {
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+			assert.ok(child instanceof ChildComponent);
+			assert.strictEqual(child.element, component.element.childNodes[0]);
+
+			component.switch = true;
+			component.once('stateSynced', function() {
+				var newChild = component.components.child;
+				assert.notStrictEqual(child, newChild);
+				assert.ok(newChild instanceof TestChildComponent);
+				assert.strictEqual(newChild.element, component.element.childNodes[0]);
 				done();
 			});
 		});

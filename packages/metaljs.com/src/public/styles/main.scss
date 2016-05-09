@@ -33,6 +33,10 @@ html, body {
 	overflow-x: hidden;
 }
 
+.hidden {
+	display: none;
+}
+
 @mixin anim($property) {
 	transition: $property .3s ease-in-out;
 }
@@ -56,3 +60,4 @@ html, body {
 @import "home";
 @import "buttons";
 @import "docs";
+@import "tabs";

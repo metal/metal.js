@@ -1,0 +1,19 @@
+{namespace codeTabs}
+
+/**
+ * @param content
+ * @param tabs
+ */
+{template .main}
+	<div class="code-tabs">
+		<div class="code-tabs-header">
+			{foreach $tab in $tabs}
+				{let $selected: index($tab) == 0 /}
+				<button class="code-tab{$selected ? ' selected' : ''}" data-index="{index($tab)}" type="button">
+					{$tab}
+				</button>
+			{/foreach}
+		</div>
+		<div class="content">{$content}</div>
+	</div>
+{/template}

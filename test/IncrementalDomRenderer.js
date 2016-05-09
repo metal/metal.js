@@ -1297,6 +1297,31 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
+	describe('Non component function tags', function() {
+		it('should render no component function passed as incremental dom tag', function() {
+			var TestFunction = ({foo}) => {
+				IncDom.elementOpen('span');
+				IncDom.text(foo);
+				return IncDom.elementClose('span');
+			};
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(TestFunction, null, [], 'foo', 'foo');
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			assert.strictEqual(0, Object.keys(component.components).length);
+			assert.strictEqual(1, component.element.childNodes.length);
+			assert.strictEqual('SPAN', component.element.childNodes[0].tagName);
+			assert.strictEqual('foo', component.element.childNodes[0].textContent);
+		});
+	});
+
 	function createTestComponentClass(opt_renderer) {
 		class TestComponent extends Component {
 		}

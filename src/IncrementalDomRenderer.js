@@ -233,9 +233,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			config.children = this.buildChildrenFn_(calls);
 			this.componentToRender_ = null;
 			IncrementalDomAop.stopInterception();
-			var comp = this.renderSubComponent_(tag, config);
-			this.updateElementIfNotReached_(comp);
-			return comp.element;
+			return this.renderFromTag_(tag, config);
 		}
 		this.componentToRender_.calls.push({
 			name: 'elementClose',
@@ -402,6 +400,22 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	render() {
 		this.patch();
+	}
+
+	/**
+	 * Renders the contents for the given tag.
+	 * @param {!function()|string} tag
+	 * @param {!Object} config
+	 * @protected
+	 */
+	renderFromTag_(tag, config) {
+		if (core.isString(tag) || tag.prototype.getRenderer) {
+			var comp = this.renderSubComponent_(tag, config);
+			this.updateElementIfNotReached_(comp);
+			return comp.element;
+		} else {
+			return tag(config);
+		}
 	}
 
 	/**

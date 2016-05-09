@@ -239,6 +239,31 @@ describe('IncrementalDomRenderer', function() {
 				done();
 			});
 		});
+
+		it('should add/remove html attributes by using boolean values', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('button', null, [], 'disabled', this.disabled);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				disabled: {
+					value: true
+				}
+			};
+
+			component = new TestComponent();
+			assert.ok(component.element.disabled);
+			assert.strictEqual('', component.element.getAttribute('disabled'));
+
+			component.disabled = false;
+			component.once('stateSynced', function() {
+				assert.ok(!component.element.disabled);
+				assert.ok(!component.element.getAttribute('disabled'));
+				done();
+			});
+		});
 	});
 
 	describe('Existing Content', function() {

@@ -85,8 +85,8 @@
 		</p>
 		<p>
 			<strong>generator-metal</strong> already prepares some useful scripts that
-			you can use, including a build script. So, to build you project, simply
-			type: <code>npm run build</code>
+			you can use, including a build script. By default, this script will build
+			everything into global variables. To use it, simply type: <code>npm run build</code>
 		</p>
 
 		<h2>Demo Page</h2>
@@ -97,6 +97,12 @@
 			a nice <strong>Hello World</strong> message, like this:
 			<br><br>
 			<img src="../images/docs/hello_world.png" width="100">
+		</p>
+
+		<p>
+			If you look at <strong>demos/index.html</strong>'s contents you'll see
+			how the component is being rendered. In this example, it's simply being
+			instantiated directly by calling <code>new metal.Modal();</code>.
 		</p>
 
 		<h2>Hello World</h2>

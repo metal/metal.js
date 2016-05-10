@@ -1,0 +1,144 @@
+{namespace docsModal}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Tutorial: Modal</h1>
+
+		<p>
+			In the <a href="/docs/">previous section</a> you learned how to build a
+			simple project using Metal.js that just renders
+			<strong> Hello World</strong> on the screen. Let's enhance what we already
+			have to render a modal dialog instead.
+		</p>
+
+		<h2>Rendering</h2>
+
+		<p>
+			Our generated project already includes <a href="http://getbootstrap.com/">bootstrap css</a>,
+			so let's use its markup for our modal. Let's update the component's
+			template to do that then:
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">{literal}&lbrace;namespace Modal&rbrace;
+
+/**
+ * This renders the component's whole content.
+ * @param body
+ * @param header
+ */
+&lbrace;template .render&rbrace;
+	&lt;div class="modal"&gt;
+		&lt;div class="modal-dialog"&gt;
+			&lt;div class="modal-content"&gt;
+				&lt;header class="modal-header"&gt;
+					&lt;button type="button" class="close"&gt;
+						&lt;span&gt;×&lt;/span&gt;
+					&lt;/button&gt;
+					&lt;h4&gt;{$header}&lt;/h4&gt;
+				&lt;/header&gt;
+				&lt;section class="modal-body"&gt;
+					{$body}
+				&lt;/section&gt;
+				&lt;footer class="modal-footer"&gt;
+					&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
+				&lt;/footer&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lbrace;/template&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">{literal}import JSXComponent from 'metal-jsx';
+
+class Modal extends JSXComponent {
+	/**
+	 * Renders the component's content. Note that data can be accessed via the
+	 * `config` property.
+	 */
+	render() &lbrace;
+		return &lt;div class="modal"&gt;
+			&lt;div class="modal-dialog"&gt;
+				&lt;div class="modal-content"&gt;
+					&lt;header class="modal-header"&gt;
+						&lt;button type="button" class="close"&gt;
+							&lt;span&gt;×&lt;/span&gt;
+						&lt;/button&gt;
+						&lt;h4&gt;{this.config.header}&lt;/h4&gt;
+					&lt;/header&gt;
+					&lt;section class="modal-body"&gt;
+						{this.config.body}
+					&lt;/section&gt;
+					&lt;footer class="modal-footer"&gt;
+						&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
+					&lt;/footer&gt;
+				&lt;/div&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;;
+	}
+}
+
+export default Modal;{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<h2>Passing data</h2>
+
+		<p>
+			Note that the template is accessing data to determine the content of the
+			modal's <strong>header</strong> and <strong>body</strong>. How can the
+			component receive this data though?
+		</p>
+
+		<p>
+			One way is through the component's constructor. When creating component
+			instances directly, you can pass them a data object as its first param.
+			So let's update our demo to pass it some data:
+		</p>
+
+		<textarea class="code" data-mode="javascript">{literal}new metal.Modal({
+	header: 'My Modal',
+	body: 'Built using Metal.js'
+});{/literal}
+		</textarea>
+
+		<h2>Run the demo</h2>
+
+		<p>
+			If you compile and open the demo page now you'll be surprised to see a
+			blank page. That's because bootstrap's css makes modals invisible by
+			default. To fix this, just add css to the demo page, like this:
+		</p>
+		<textarea class="code" data-mode="css">{literal}&lt;style&gt;
+  .modal {
+  	display: block;
+  }
+&lt;/style&gt;{/literal}
+		</textarea>
+
+		<p>
+			Now compile your code with <code>npm run build</code> and open the demo
+			on a browser, and you should be seeing this:
+		</p>
+		<img src="../images/docs/modal.png" width="100%">
+
+		<h2>Next steps</h2>
+
+		<p>
+			We've taken care of the rendering, but you'll notice that clicking the
+			<strong> x</strong> button doesn't do anything yet though. Let's make that
+			work.
+		</p>
+
+		<p><strong><a href="/docs/modal_events.html">↪ Tutorial: Modal - Events</a></strong></p>
+	{/param}
+{/call}
+{/template}

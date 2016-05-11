@@ -1,0 +1,182 @@
+{namespace docsModalNested}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Tutorial: Modal - Nested Components</h1>
+
+		<p>
+			In the <a href="/docs/modal_updates.html">previous section</a> we finished
+			working on our component's behavior.
+		</p>
+
+		<p>
+			But what if our <strong>Modal</strong> header's markup was very similar to
+			one that is used in other places though? Ideally we'd move it into a
+			separate component that can be reused. That's what we'll be doing in this
+			section.
+		</p>
+
+		<h2>Creating <strong>CloseHeader</strong></h2>
+
+		<p>
+			First let's create the new component. Add
+			a <strong>src/CloseHeader.js</strong> file to your project:
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/CloseHeader.js', 'JSX: src/CloseHeader.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="javascript">{literal}import templates from './CloseHeader.soy';
+import Component from 'metal-component';
+import Soy from 'metal-soy';
+
+class CloseHeader extends Component {
+}
+Soy.register(CloseHeader, templates);
+
+export default CloseHeader;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">{literal}import JSXComponent from 'metal-jsx';
+
+class CloseHeader extends JSXComponent {
+	render() &lbrace;
+	}
+}
+
+export default CloseHeader;{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<p>
+			Now let's prepare the template to be similar to the one used
+			by <strong>Modal</strong>:
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/CloseHeader.soy', 'JSX: src/CloseHeader.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}&lbrace;namespace CloseHeader&rbrace;
+
+/**
+ * @param cssClass
+ * @param onClick
+ * @param title
+ */
+&lbrace;template .render&rbrace;
+	&lt;header class="{$cssClass}"&gt;
+		&lt;button data-onclick="{$onClick}" type="button" class="close"&gt;
+			&lt;span&gt;×&lt;/span&gt;
+		&lt;/button&gt;
+		&lt;h4&gt;{$title}&lt;/h4&gt;
+	&lt;/header&gt;
+&lbrace;/template&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}render() {
+	return &lt;header class={this.config.cssClass}&gt;
+		&lt;button data-onclick={this.config.onClick} type="button" class="close"&gt;
+			&lt;span&gt;×&lt;/span&gt;
+		&lt;/button&gt;
+		&lt;h4&gt;{this.config.title}&lt;/h4&gt;
+	&lt;/header&gt;;
+}{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<p>Done! Our new component is ready to be used by <strong>Modal</strong>.</p>
+
+		<h2>Using <strong>CloseHeader</strong></h2>
+
+		<p>
+			All we have to do is to replace the header markup
+			from <strong>Modal</strong>'s template with a call
+			to <strong>CloseHeader</strong>:
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}/**
+ * @param body
+ * @param close
+ * @param header
+ * @param shown
+ */
+&lbrace;template .render&rbrace;
+	&lt;div class="modal {$shown ? 'show': ''}"&gt;
+		&lt;div class="modal-dialog"&gt;
+			&lt;div class="modal-content"&gt;
+				&lbrace;call CloseHeader.render&rbrace;
+					&lbrace;param cssClass: 'modal-header' /&rbrace;
+					&lbrace;param onClick: $close /&rbrace;
+					&lbrace;param title: $header /&rbrace;
+				&lbrace;/call&rbrace;
+				&lt;section class="modal-body"&gt;
+					{$body}
+				&lt;/section&gt;
+				&lt;footer class="modal-footer"&gt;
+					&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
+				&lt;/footer&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lbrace;/template&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}import CloseHeader from './CloseHeader';
+class Modal extends JSXComponent {
+	render() {
+		var cssClass = 'modal';
+		if (this.shown) {
+			cssClass += 'show';
+		}
+		return &lt;div class={cssClass}&gt;
+			&lt;div class="modal-dialog"&gt;
+				&lt;div class="modal-content"&gt;
+					&lt;CloseHeader
+						cssClass="modal-header"
+						onClick={this.close.bind(this)}
+						title={this.config.header}
+					/&gt;
+					&lt;section class="modal-body"&gt;
+						{this.config.body}
+					&lt;/section&gt;
+					&lt;footer class="modal-footer"&gt;
+						&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
+					&lt;/footer&gt;
+				&lt;/div&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;;
+	}
+}{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<p>
+			This will not only render <strong>CloseHeader</strong> at the right
+			position, but also instantiate it for you. For more details on nested
+			components, check out
+			the <a href="/docs/nested-components">guide about it</a>.
+		</p>
+
+		<h2>Next steps</h2>
+
+		<p>
+			You should now have a good knowledge of <strong>Metal.js</strong> basics.
+			If you want to dive into more details and advanced topics, go ahead and
+			check some of our guides.
+		</p>
+	{/param}
+{/call}
+{/template}

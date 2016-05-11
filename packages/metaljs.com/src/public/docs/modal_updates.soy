@@ -1,0 +1,176 @@
+{namespace docsModalUpdates}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Tutorial: Modal - Updates</h1>
+
+		<p>
+			In the <a href="/docs/modal_events.html">previous section</a> we learned how to
+			add inline listeners, by making the <strong>Modal</strong>'s close button
+			work.
+		</p>
+
+		<p>
+			We first implemented this feature by disposing of the
+			entire <strong>Modal</strong> instance when it was closed. It'd be best
+			to have the modal just hide itself so it could be shown again afterwards
+			though.
+		</p>
+
+		<h2>State</h2>
+
+		<p>
+			We've seen that it's possible to pass data to components via the
+			constructor. By default this kind of data is read-only for the component
+			though, that is, it can be received from the outside but not changed from
+			the inside.
+		</p>
+
+		<p>
+			When you need to be able to change a component's data, as well as have
+			that change cause its html contents to update, you should indicate that
+			it'll be part of the component's state.
+		</p>
+
+		<p>
+			This can be done by using your component's <code>STATE</code> static
+			variable, where you can also configure state properties, specifying
+			initial values and validators for example.
+		</p>
+
+		<p>
+			So let's add a <code>shown</code> property to
+			our <strong>Modal</strong> state, in <strong>src/Modal.js</strong>:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}Modal.STATE = {
+	shown: {
+		// The default value will be: `true`.
+		value: true
+	}
+};{/literal}
+		</textarea>
+
+		<h2>Updating the template</h2>
+
+		<p>
+			Now we need to update our template to only show the modal
+			when <code>shown</code> is true.
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}/**
+ * State properties are passed to the "render" template in the same way as
+ * config properties.
+ * @param shown
+ */
+&lbrace;template .render&rbrace;
+	&lt;div class="modal {$shown ? 'show': ''}"&gt;
+		...
+	&lt;/div&gt;
+&lbrace;/template&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}/**
+ * State properties are accessed directly from `this`.
+ */
+render() &lbrace;
+	var cssClass = 'modal';
+	if (this.shown) {
+		cssClass += 'show';
+	}
+	return &lt;div class={cssClass}&gt;
+		...
+	&lt;/div&gt;;
+}{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<h2>Updating the <code>close</code> function</h2>
+
+		<p>
+			Now we can change our <code>close</code> function to just update the
+			state property.
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+			{literal}close() {
+  this.shown = false;
+}{/literal}
+		</textarea>
+
+		<p>
+			State changes are automatically detected by <code>Metal.js</code>, causing
+			the component to be rerendered. Since <code>Metal.js</code>
+			uses <a href="http://google.github.io/incremental-dom/">incremental dom</a>,
+			rerendering will cause minimal dom updates. In this case,
+			the <code>shown</code> css class will be removed from the modal element.
+		</p>
+
+		<h2>Run the demo</h2>
+
+		<p>
+			Now compile your code with <code>npm run build</code> and open the demo
+			on a browser. Clicking the <strong>x</strong> button will close the modal
+			as before, but inspecting the dom you'll notice that it's just hidden,
+			not removed from the dom.
+		</p>
+
+		<h2>Playing with state data</h2>
+
+		<p>
+			State data makes it very easy to update a component's contents. If you
+			want to quickly see it working you can make some experiments on your
+			browser's javascript console for example.
+		</p>
+
+		<p>
+			First let's hold the <code>Modal</code> instance somewhere so we can
+			access it:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}window.modal = new metal.Modal({
+	header: 'My Modal',
+	body: 'Built using Metal.js'
+});{/literal}
+		</textarea>
+
+		<p>
+			Now run the demo again, go to the browser's console and type:
+			<code>modal.shown = false</code>. You'll notice that the modal will be
+			hidden as expected. If you now type <code>modal.shown = true</code>, it
+			will show up again.
+		</p>
+
+		<p>
+			If you want you can also turn <code>header</code> and <code>body</code>
+			into state properties. That way when you type something
+			like <code>modal.header = 'New Header'</code>, the contents will also be
+			updated automatically.
+		</p>
+
+		<h2>Next steps</h2>
+
+		<p>
+			Our modal is working as expected now. But what if you want to split it
+			into multiple components? How would we use them together? Check it out in
+			the next section.
+		</p>
+
+		<p><strong><a href="/docs/modal_nested.html">↪ Tutorial: Modal - Nested Components</a></strong></p>
+
+	{/param}
+{/call}
+{/template}

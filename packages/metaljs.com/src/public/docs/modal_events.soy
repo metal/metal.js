@@ -1,0 +1,109 @@
+{namespace docsModalEvents}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Tutorial: Modal - Events</h1>
+
+		<p>
+			In the <a href="/docs/modal.html">previous section</a> we've created a
+			component that renders a <strong>Modal</strong>. Its close button doesn't
+			do anything yet though. This section will teach you how to handle dom
+			events on your components.
+		</p>
+
+		<h2>Inline listeners - via function name</h2>
+
+		<p>You can add DOM event listeners easily through your templates, like this:</p>
+
+		<textarea class="code" data-mode="javascript">
+			{literal}&lt;button data-onclick="close" type="button" class="close"&gt;{/literal}
+		</textarea>
+
+		<p>
+			The above code declares that whenever the Modal's <strong>x</strong> button
+			is clicked, the <code>close</code> function from the component should be
+			called.
+		</p>
+
+		<h2>Inline listeners - via function reference</h2>
+
+		<p>
+			If you prefer though, you can also pass the actual function reference
+			(instead of just its name) as an inline listener.
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}// Soy params that match a component function name will be that
+// function (automatically bound to the component instance).
+&lt;button data-onclick="{$close}" type="button" class="close"&gt;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}
+&lt;button data-onclick={this.close.bind(this)} type="button" class="close"&gt;{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<p>
+			That will work exactly the same way as the previous example.
+		</p>
+
+		<h2>Listener implementation</h2>
+
+		<p>
+			All you need to do now is to implement the <code>close</code> function in
+			your <strong>src/Modal.js</strong> file:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+			{literal}close() {
+  this.dispose();
+}{/literal}
+		</textarea>
+
+		<p>
+			All components have this <code>dispose</code> function, which basically
+			destroys it and removes its content from the dom. Check the guide
+			about <a href="/docs/component-lifecycle.html">lifecycle functions</a> for
+			more details.
+		</p>
+
+		<h2>Run the demo</h2>
+
+		<p>
+			Now compile your code with <code>npm run build</code> and open the demo
+			on a browser. Clicking the <strong>x</strong> button will close the modal
+			as expected.
+		</p>
+
+		<p>
+			For more details on inline listeners check <a href="/docs/inline-events.html">this guide</a>.
+		</p>
+
+		<h2>Next steps</h2>
+
+		<p>
+			Our modal now properly closes itself when the <strong>x</strong> button is
+			clicked. To do this we're disposing of it completely though, so we'll need
+			to create a new Modal instance whenever we need to show it again.
+		</p>
+
+		<p>
+			Ideally, instead of disposing it, we should just hide it instead, while
+			also having a way to show it back. The next section will explain how to do
+			this by having data changes update the modal accordingly.
+		</p>
+
+		<p><strong><a href="/docs/modal_updates.html">↪ Tutorial: Modal - Updates</a></strong></p>
+	{/param}
+{/call}
+{/template}

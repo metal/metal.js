@@ -36,7 +36,7 @@
  * @param header
  */
 &lbrace;template .render&rbrace;
-	&lt;div class="modal"&gt;
+	&lt;div class="modal show"&gt;
 		&lt;div class="modal-dialog"&gt;
 			&lt;div class="modal-content"&gt;
 				&lt;header class="modal-header"&gt;
@@ -64,7 +64,7 @@ class Modal extends JSXComponent {
 	 * `config` property.
 	 */
 	render() &lbrace;
-		return &lt;div class="modal"&gt;
+		return &lt;div class="modal show"&gt;
 			&lt;div class="modal-dialog"&gt;
 				&lt;div class="modal-content"&gt;
 					&lt;header class="modal-header"&gt;
@@ -111,18 +111,6 @@ export default Modal;{/literal}
 		</textarea>
 
 		<h2>Run the demo</h2>
-
-		<p>
-			If you compile and open the demo page now you'll be surprised to see a
-			blank page. That's because bootstrap's css makes modals invisible by
-			default. To fix this, just add css to the demo page, like this:
-		</p>
-		<textarea class="code" data-mode="css">{literal}&lt;style&gt;
-  .modal {
-  	display: block;
-  }
-&lt;/style&gt;{/literal}
-		</textarea>
 
 		<p>
 			Now compile your code with <code>npm run build</code> and open the demo

@@ -290,9 +290,17 @@ class Component extends State {
 	detached() {}
 
 	/**
+	 * Lifecycle. Called when the component is disposed. Should be overridden by
+	 * sub classes to dispose of any internal data or events.
+	 */
+	disposed() {}
+
+	/**
 	 * @inheritDoc
 	 */
 	disposeInternal() {
+		this.disposed();
+
 		this.detach();
 
 		if (this.elementEventProxy_) {

@@ -20,6 +20,7 @@ describe('Component', function() {
 		beforeEach(function() {
 			sinon.spy(Component.prototype, 'attached');
 			sinon.spy(Component.prototype, 'detached');
+			sinon.spy(Component.prototype, 'disposed');
 
 			sinon.spy(Component.RENDERER.prototype, 'render');
 			sinon.spy(Component.RENDERER.prototype, 'update');
@@ -28,6 +29,7 @@ describe('Component', function() {
 		afterEach(function() {
 			Component.prototype.attached.restore();
 			Component.prototype.detached.restore();
+			Component.prototype.disposed.restore();
 
 			Component.RENDERER.prototype.render.restore();
 			Component.RENDERER.prototype.update.restore();
@@ -133,6 +135,14 @@ describe('Component', function() {
 			assert.ok(!element.parentNode);
 
 			sinon.assert.callCount(Component.prototype.detached, 1);
+		});
+
+		it('should call "disposed" lifecycle function when component is disposed', function() {
+			comp = new Component();
+			assert.strictEqual(0, comp.disposed.callCount);
+
+			comp.dispose();
+			assert.strictEqual(1, comp.disposed.callCount);
 		});
 	});
 

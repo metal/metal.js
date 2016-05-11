@@ -10,29 +10,35 @@
 	{param content kind="html"}
 		<h1>Soy Components</h1>
 
-		<p>This section will explain how to build rich widgets on Metal.js, by taking advantage of the built-in <a href="http://developers.google.com/closure/templates">soy templates</a> integration, enabling you to easily separate business logic from rendering logic.</p>
+		<p>
+			For a full tutorial on how to build components using soy templates, make
+			sure to follow the <a href="/docs/modal.html">Modal tutorial</a> section.
+		</p>
 
-		<p>So, for example, let's say we want to create a component called <strong>MyComponent</strong>, that has a body and a footer with content. The soy file would look like this:</p>
+		<p>
+			This guide will explain some details about the integration
+			between <strong>Metal.js</strong> components
+			and <a href="http://developers.google.com/closure/templates/">soy templates</a>.
+		</p>
 
-		{call .soyExample /}
+		<p>
+			Note that <strong>Metal.js</strong> is template agnostic, so it's not
+			necessary to use soy at all. That said, we already provide a very good
+			integration between metal components and soy, so if you like this
+			template language you should give it a try.
+		</p>
 
-		{call .jsExample /}
+		<h2>Soy.register</h2>
 
-		{call .runExample /}
-	{/param}
-{/call}
-{/template}
+		<p>
+			The only thing you need to do to use soy templates in
+			your <strong>Metal.js</strong> component is to
+			call <code>Soy.register</code>, passing it your component class and the
+			soy templates you're going to use, like this:
+		</p>
 
-/**
- * Example for the JS part of a soy component.
- */
-{template .jsExample}
-	<p>Since all that rendering logic is done automatically for you just from creating a soy file, you don't actually need a JS file at all if that's all the component needs to do. When compiled, the soy file will already generate the appropriate component class for you.</p>
-
-	<p>Many components do need more behavior though, so to add more JS to a soy component you should have a JS file like this:</p>
-
-	<textarea class="code" data-mode="javascript">{literal}
-import templates from './MyComponent.soy';
+		<textarea class="code" data-mode="javascript">
+{literal}import templates from './MyComponent.soy';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 
@@ -40,48 +46,57 @@ class MyComponent extends Component {
 }
 Soy.register(MyComponent, templates);
 
-export default MyComponent;{/literal}</textarea>
+export default MyComponent;{/literal}
+		</textarea>
 
-	<p>It basically just defines a class named <b>MyComponent</b> that extends Metal.js's <b>Component</b> class, and registers its soy templates (which are automatically exported from the soy file).</p>
+		<p>
+			By default, <strong>Metal.js</strong> will use the soy template called
+			<strong>render</strong> as the entry point for rendering. But you can
+			tell us to use a different one if you prefer by passing the name as
+			the last param to the <code>Soy.register</code> call, like this:
+		</p>
 
-	<p>There are many ways to add behavior to your component. You can add handlers for <a href="/docs/inline-events.html">inline listeners</a>, add <a href="/docs/state.html">state configuration</a> or simply override <a href="/docs/component-lifecycle.html">lifecycle functions</a> to add any other logic you need.</p>
-{/template}
+		<textarea class="code" data-mode="javascript">
+{literal}Soy.register(MyComponent, templates, 'templateName');{/literal}
+		</textarea>
 
-/**
- * Example for the template part of a soy component.
- */
-{template .soyExample}
-	<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;namespace MyComponent&rbrace;
+		<h2>Template file</h2>
 
-/**
-* This renders the component's whole content.
-*/
-&lbrace;template .render&rbrace;
-  &lbrace;@param bodyContent: html&rbrace;
-  &lbrace;@param footerContent: html&rbrace;
-  &lt;p&gt;&lbrace;$bodyContent&rbrace;&lt;/p&gt;
-  &lt;footer&gt;&lbrace;$footerContent&rbrace;&lt;/footer&gt;
-&lbrace;/template&rbrace;{/literal}</textarea>
+		<p>
+			Make sure that your soy file has the entry point template
+			(<strong>render</strong> by default), otherwise nothing will be rendered.
+		</p>
 
-	<p>Looking at that you can see that it's just a basic soy file. Now let's understand how this integration with the template works.</p>
+		<p>
+			This main template will receive as data a combination of:
+			<ul>
+				<li><a href="/docs/modal_updates.html#state">State data</a></li>
+				<li><a href="/docs/modal.html#data">Configuration data</a></li>
+				<li><a href="/docs/modal_events.html#function">Component functions</a></li>
+			</ul>
+		</p>
 
-	<p>Firstly, Metal.js will by default use the template named `render` as the component's content. You can have other templates in youy soy file, but the `render` template should be the main one.</p>
+		<p>
+			Note that by default all params declared on the component's main soy
+			template are automatically configured as state properties as well, but
+			without any special configurations (like initial value or validators).
+			If they're <a href="/docs/state.html">manually defined</a> through
+			the <code>STATE</code> property they will retain the setup specified there
+			though.
+		</p>
 
-	<p>Secondly, each param used on this main template will be automatically added to the component's <a href="/docs/state.html">state</a>. This basically means that Metal.js will set these params as properties of the component, as well as track any changes to them, automatically rerendering the component when necessary. In <b>MyComponent</b>'s case this means that whenever the value of the <code>bodyContent</code> param is changed, that part of the component that uses it will be updated, even though there is no JavaScript code on MyComponent to handle this logic. The same goes for the <code>footerContent</code> param.</p>
+		<p>
+			Any params passed to the component but not directly declared on its main
+			soy template will be treated as basic configuration data, meaning that
+			changes to them will not automatically rerender the component. They can
+			still be passed down to other templates using <code>data="all"</code>, as
+			well be accessed via the <code>config</code> property on the js file.
+		</p>
 
-	<p>Metal.js's logic for updating the component's contents automatically is very smart, it uses <a href="http://google.github.io/incremental-dom">incremental-dom</a>, so it will only rerender the parts of the component that actually changed.</p>
-{/template}
-
-/**
- * Example for running a soy component.
- */
-{template .runExample}
-	<p>Finally, to use your new component, just call instantiate it, passing any attribute values that you want to initialize it with, as well as an optional parent element:</p>
-
-	<textarea class="code" data-mode="javascript">{literal}
-new MyComponent({
-	bodyContent: 'My Body',
-	footerContent: '&lt;footer&gt;My Footer.&lt;/footer&gt;'
-}, parentElement);{/literal}</textarea>
+		<textarea class="code" data-mode="javascript">
+{literal}// Contains all the data received by the component.
+this.config{/literal}
+		</textarea>
+	{/param}
+{/call}
 {/template}

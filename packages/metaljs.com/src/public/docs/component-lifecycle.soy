@@ -15,17 +15,23 @@
 		<textarea class="code" data-mode="javascript">{literal}
 class MyComponent extends Component {
 	/**
-	 * Called when the component is initialized.
+	 * Called when the component is first created,
+	 * but before it's first rendered.
 	 */
-	constructor(opt_config) {
-		super(opt_config);
+	created() {
+	}
+
+	/**
+	 * Called whenever the component is rendered.
+	 */
+	rendered() {
 	}
 
 	/**
 	 * Called when the component is attached to the
 	 * DOM. The component will automatically be
-	 * attached when `render` is called, but can
-	 * also be attached (without rendering the
+	 * attached when first rendered, but can also
+	 * be attached (without rerendering the
 	 * component) by calling the `attach` method
 	 * directly. This is a good place to attach event
 	 * listeners, since the component is available
@@ -37,8 +43,8 @@ class MyComponent extends Component {
 	/**
 	 * Called when the component is detached from the
 	 * DOM. The component will automatically be
-	 * detached when `dispose` is called, but can also
-	 * be detached (without disposing the component)
+	 * detached when disposed, but can also be
+	 * detached (without disposing the component)
 	 * by calling the `detach` method directly. This
 	 * is a good place to detach event listeners,
 	 * since the component is not available in the
@@ -53,8 +59,7 @@ class MyComponent extends Component {
 	 * detaching any remaining events and disposing
 	 * of sub components and local variables.
 	 */
-	disposeInternal() {
-		super.disposeInternal();
+	disposed() {
 	}
 }
 {/literal}</textarea>

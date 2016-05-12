@@ -69,6 +69,26 @@ Calculator.STATE = {
 			{param className: 'Calculator' /}
 			{param stateKey: 'number' /}
 		{/call}
+
+		<h2>Configuration data</h2>
+
+		<p>
+			Any data passed to the constructor that has not been configured as a
+			state property can still be accessed via <code>config</code>. Changes
+			to these properties won't be tracked, so it's usually intended for your
+			component's options, which are only set from the outside.
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}var obj = new Calculator({
+  number: 10,
+  foo: 'foo'
+});
+console.log(obj.number); // Prints 2
+console.log(obj.foo); // Prints undefined
+console.log(obj.config.foo); // Prints 'foo'{/literal}
+		</textarea>
+
 	{/param}
 {/call}
 {/template}

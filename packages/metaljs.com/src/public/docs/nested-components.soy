@@ -10,28 +10,94 @@
 	{param content kind="html"}
 		<h1>Nested Components</h1>
 
-		<p>Since we want to be able to separate business logic from rendering, it'd be really useful to be able to reference components on the template files. That would make it easier to correctly place the child component at the right position inside the parent, and would make the template more complete so it would be able to render the whole component by itself (see <a href="/docs/progressive-enhancement.html">Progressive Enhancement</a>).</p>
+		<p>
+			The ability to reference components inside templates can be very useful.
+			It enables the developer to correctly place the child component at the
+			right position inside the parent in an intuitive way.
+		</p>
 
-		<p>This can already be done with Metal.js's <a href="/docs/soy-components.html">soy components</a>. For example, let's say we have the Modal and Button components, and the modal wants to render buttons on its footer. Inside <strong>Modal.soy</strong> we'd see the following:</p>
+		<p>
+			This can certainly be done <strong>with Metal.js</strong> components. For
+			example, let's say we have the Modal and Button components, and the modal
+			wants to render buttons inside its footer.
+			Inside <strong>Modal's</strong> template file we could do the following:
+		</p>
 
-		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .footer&rbrace;
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}&lt;div class="footer"&gt;
+  &lbrace;foreach $button as $buttons&rbrace;
     &lbrace;call Button.render&rbrace;
-        &lbrace;param key: 'ok' /&rbrace;
-        &lbrace;param label: 'Ok' /&rbrace;
+      &lbrace;param label: $button /&rbrace;
     &lbrace;/call&rbrace;
-    &lbrace;call Button.render&rbrace;
-        &lbrace;param key: 'cancel' /&rbrace;
-        &lbrace;param label: 'Cancel' /&rbrace;
-    &lbrace;/call&rbrace;
-&lbrace;/template&rbrace;
-{/literal}</textarea>
+  &lbrace;/foreach&rbrace;
+&lt;/div&gt;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}var buttons = this.config.buttons.map(button => {
+  return &lt;Button label={button} /&gt;;
+});
+return &lt;div class="footer"&gt;{buttons}&lt;/div&gt;;{/literal}
+				</textarea>
+			{/param}
+		{/call}
 
-		<p>When Modal is rendered, the two specified buttons will be rendered as well. Also, the button instances can be accessed from the <code>components</code> property inside the modal instance, indexed by their keys (which are optional, by the way):</p>
+		<p>
+			When Modal is rendered, the buttons also will be, at the specified
+			position. Besides this, <strong>Button</strong> components will be
+			automatically instantiated for these elements.
+		</p>
+
+		<h2>Accessing sub component instances</h2>
+
+		<p>
+			But what if we need to access the created instances? That's possible by
+			using keys.
+		</p>
+
+		<p>
+			Since both <strong>soy</strong> and <strong>JSX</strong> components are
+			compiled
+			to <a href="http://google.github.io/incremental-dom">incremental DOM</a>,
+			one of the reasons for using keys is
+			to <a href="http://google.github.io/incremental-dom/#conditional-rendering/array-of-items">optimize rendering</a>.
+		</p>
+
+		<p>
+			<strong>Metal.js</strong> components also use keys to reference sub
+			components in the js code though. Let's add some keys to the previous
+			example and see what happens:
+		</p>
+
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}&lbrace;foreach $button as $buttons&rbrace;
+  &lbrace;call Button.render&rbrace;
+    &lbrace;param key: 'button' + index($button) /&rbrace;
+    &lbrace;param label: $button /&rbrace;
+  &lbrace;/call&rbrace;
+&lbrace;/foreach&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}var buttons = this.config.buttons.map((button, index) => {
+  return &lt;Button label={button} key={'button' + index} /&gt;;
+});{/literal}
+				</textarea>
+			{/param}
+		{/call}
+
+		<p>
+			Now you'll be able to access your sub components through
+			your instance's <code>components</code> property, like this:
+		</p>
 
 		<textarea class="code" data-mode="javascript">{literal}
-modal.components.ok // The instance for the 'Ok' button
-modal.components.cancel // The instance for the 'Cancel' button{/literal}</textarea>
+modal.components.button0 // The instance for first button
+modal.components.button1 // The instance for second button{/literal}</textarea>
 	{/param}
 {/call}
 {/template}

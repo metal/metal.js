@@ -70,8 +70,8 @@ export default MyComponent;{/literal}
 		<p>
 			This main template will receive as data a combination of:
 			<ul>
-				<li><a href="/docs/modal_updates.html#state">State data</a></li>
-				<li><a href="/docs/modal.html#data">Configuration data</a> (accessed through <code>this.config</code>)</li>
+				<li><a href="/docs/state.html">State data</a></li>
+				<li><a href="/docs/state.html#config">Configuration data</a> (accessed through <code>this.config</code>)</li>
 				<li><a href="/docs/modal_events.html#function">Component functions</a></li>
 			</ul>
 		</p>
@@ -97,6 +97,41 @@ export default MyComponent;{/literal}
 {literal}// Contains all the data received by the component.
 this.config{/literal}
 		</textarea>
+
+		<h2>Soy compilation</h2>
+
+		<p>
+			For the integration between <strong>Metal.js</strong>
+			and <strong>soy</strong> to work, the soy files need to be compiled via
+			one of our available build tools. That's because they don't just compile
+			the code, but also add some information that help with the integration
+			(like export declarations).
+		</p>
+
+		<p>
+			The available build tools that correctly compile soy
+			for <strong>Metal.js</strong> are:
+		</p>
+
+		<ul>
+			<li>
+				<p>
+					<a href="http://npmjs.com/package/gulp-metal">gulp-metal</a> (already
+					included when creating project
+					via <a href="/docs/#generator">generator-metal</a>).
+				</p>
+			</li>
+			<li>
+				<p>
+					<a href="http://npmjs.com/package/metal-cli">metal-cli</a>
+				</p>
+			</li>
+			<li>
+				<p>
+					<a href="http://npmjs.com/package/metal-tools-soy">metal-tools-soy</a>
+				</p>
+			</li>
+		</ul>
 	{/param}
 {/call}
 {/template}

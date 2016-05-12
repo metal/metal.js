@@ -10,77 +10,141 @@
 	{param content kind="html"}
 		<h1>Inline Events</h1>
 
-		<p>Another feature Metal.js has that can be very useful is the ability to declare events inside templates, directly on the desired element. Besides being simple and intuitive, this feature allows Metal.js to handle attaching events itself, and so this can be done in the best way possible, with <a href="https://learn.jquery.com/events/event-delegation/">delegates</a> for example, without the user having worry about that at all.</p>
+		<p>
+			Another feature Metal.js has that can be very useful is the ability to
+			declare events inside templates, directly on the desired element. Besides
+			being simple and intuitive, this feature allows Metal.js to handle
+			attaching events itself, and so this can be done in the best way possible,
+			with <a href="https://learn.jquery.com/events/event-delegation/">delegates</a> for
+			example, without the user having worry about that at all. These events are
+			also automatically detached when the component is disposed.
+		</p>
 
-		<p>By using <a href="/docs/soy-components.html">soy components</a>, for example, you can add inline listeners like this:</p>
+		{call .functionName /}
 
-		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .render&rbrace;
-    &lt;button data-onclick="handleClick"&gt;&lt;/button&gt;
-&lbrace;/template&rbrace;{/literal}</textarea>
+		{call .functionReference /}
 
-		<p>Then, you just need to define a <code>handleClick</code> method on your component, and it will be called whenever the event is triggered.</p>
+		<h2>Inline listeners - nested components</h2>
 
-		<p>It's also possible to add multiple functions to listen to the same event on the same element, by just separating them by commas. For example:</p>
+		<p>
+			When using <a href="/docs/nested-components.html">nested components</a> it's
+			also possible to inline events by using the <strong>events</strong> property:
+		</p>
 
-		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .render&rbrace;
-	&lt;button data-onclick="handleClick,anotherHandleClick"&gt;&lt;/button&gt;
-&lbrace;/template&rbrace;{/literal}</textarea>
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}&lbrace;call Button.render&rbrace;
+  &lbrace;param events: ['click': ['selector': 'button', 'fn': 'close']] /&rbrace;
+  &lbrace;param label: 'Ok' /&rbrace;
+&lbrace;/call&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}var events = {click: {
+  selector: 'button',
+  fn: 'close'
+}};
+&lt;Button events={events} label="Ok" /&gt;{/literal}
+				</textarea>
+			{/param}
+		{/call}
 
-		<p>Now both the <code>handleClick</code> and the <code>anotherHandleClick</code> methods will be called on your component for each click on that button.</p>
-
-		<p>Finally, you can pass function references directly as well, instead of strings. Params declared on `render` templates that match function names on the component will be the function references themselves. For example:</p>
-
-		<textarea class="code" data-mode="x-soy">{literal}
-/**
- * @param handleClick
- */
-&lbrace;template .render&rbrace;
-	&lt;button data-onclick="{$handleClick}"&gt;&lt;/button&gt;
-&lbrace;/template&rbrace;{/literal}</textarea>
-
-		<p>This last example will have the same effect as the first one above.</p>
-
-		<h2>Inline events for nested components</h2>
-
-		<p>When using <a href="/docs/nested-components.html">nested components</a> it's also possible to inline events by using the <strong>events</strong> attribute:</p>
-
-		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .footer&rbrace;
-    &lbrace;call Button.render&rbrace;
-        &lbrace;param events: ['click': ['selector': 'button', 'fn': 'handleClick']] /&rbrace;
-        &lbrace;param label: 'Ok' /&rbrace;
-    &lbrace;/call&rbrace;
-&lbrace;/template&rbrace;
-{/literal}</textarea>
-
-		<p>This will cause the <code>handleClick</code> function from the sub component to be called whenever a click event triggers for the elements that match the given selector.</p>
+		<p>
+			This will cause the <code>close</code> function from the sub component to
+			be called whenever a click event triggers for the elements that match the
+			given selector.
+		</p>
 
 		<p>In case you want to listen to the event with a function from the parent component, just pass the function reference instead of a string, like this:</p>
 
-		<textarea class="code" data-mode="x-soy">{literal}
-/**
- * @param handleClick
- */
-&lbrace;template .footer&rbrace;
-    &lbrace;call Button.render&rbrace;
-        &lbrace;param events: ['click': ['selector': 'button', 'fn': $handleClick]] /&rbrace;
-        &lbrace;param label: 'Ok' /&rbrace;
-    &lbrace;/call&rbrace;
-&lbrace;/template&rbrace;
-{/literal}</textarea>
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}&lbrace;call Button.render&rbrace;
+  &lbrace;param events: ['click': ['selector': 'button', 'fn': $close]] /&rbrace;
+  &lbrace;param label: 'Ok' /&rbrace;
+&lbrace;/call&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}var events = {click: {
+  selector: 'button',
+  fn: this.close.bind(this)
+}};
+&lt;Button events={events} label="Ok" /&gt;{/literal}
+				</textarea>
+			{/param}
+		{/call}
 
-		<p>Besides dom events, you can also listen to custom events from the sub component like this:</p>
+		<p>
+			Besides dom events, you can also listen to custom events from the sub
+			component in this same way:
+		</p>
 
-		<textarea class="code" data-mode="x-soy">{literal}
-&lbrace;template .footer&rbrace;
-    &lbrace;call Button.render&rbrace;
-        &lbrace;param events: ['labelChanged': 'handleLabelChanged'] /&rbrace;
-        &lbrace;param label: 'Ok' /&rbrace;
-    &lbrace;/call&rbrace;
-&lbrace;/template&rbrace;
-{/literal}</textarea>
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="x-soy">
+{literal}&lbrace;call Button.render&rbrace;
+  &lbrace;param events: ['labelChanged': $handleLabelChanged] /&rbrace;
+  &lbrace;param label: 'Ok' /&rbrace;
+&lbrace;/call&rbrace;{/literal}
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}var events = {labelChanged: this.handleLabelChanged.bind(this)};
+&lt;Button events={events} label="Ok" /&gt;{/literal}
+				</textarea>
+			{/param}
+		{/call}
 	{/param}
 {/call}
+{/template}
+
+/**
+ */
+{template .functionName}
+	<h2>Inline listeners - via function name</h2>
+
+	<p>You can add DOM event listeners easily through your templates, like this:</p>
+
+	<textarea class="code" data-mode="javascript">
+		{literal}&lt;button data-onclick="close" type="button" class="close"&gt;{/literal}
+	</textarea>
+
+	<p>
+		The above code declares that whenever the <strong>x</strong> button is
+		clicked, the <code>close</code> function from the component should be
+		called.
+	</p>
+{/template}
+
+/**
+ */
+{template .functionReference}
+	<h2 id="function">Inline listeners - via function reference</h2>
+
+	<p>
+		If you prefer though, you can also pass the actual function reference
+		(instead of just its name) as an inline listener.
+	</p>
+
+	{call codeTabs.main}
+		{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+		{param content kind="html"}
+			<textarea class="code" data-mode="x-soy">
+{literal}// Soy params that match a component function name will be that
+// function (automatically bound to the component instance).
+&lt;button data-onclick="{$close}" type="button" class="close"&gt;{/literal}
+			</textarea>
+			<textarea class="code hidden" data-mode="javascript">
+	{literal}
+&lt;button data-onclick={this.close.bind(this)} type="button" class="close"&gt;{/literal}
+			</textarea>
+		{/param}
+	{/call}
+
+	<p>
+		That will work exactly the same way as the previous example.
+	</p>
 {/template}

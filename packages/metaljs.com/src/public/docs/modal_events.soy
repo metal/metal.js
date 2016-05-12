@@ -17,45 +17,9 @@
 			events on your components.
 		</p>
 
-		<h2>Inline listeners - via function name</h2>
+		{call docsInlineEvents.functionName /}
 
-		<p>You can add DOM event listeners easily through your templates, like this:</p>
-
-		<textarea class="code" data-mode="javascript">
-			{literal}&lt;button data-onclick="close" type="button" class="close"&gt;{/literal}
-		</textarea>
-
-		<p>
-			The above code declares that whenever the Modal's <strong>x</strong> button
-			is clicked, the <code>close</code> function from the component should be
-			called.
-		</p>
-
-		<h2 id="function">Inline listeners - via function reference</h2>
-
-		<p>
-			If you prefer though, you can also pass the actual function reference
-			(instead of just its name) as an inline listener.
-		</p>
-
-		{call codeTabs.main}
-			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
-			{param content kind="html"}
-				<textarea class="code" data-mode="x-soy">
-{literal}// Soy params that match a component function name will be that
-// function (automatically bound to the component instance).
-&lt;button data-onclick="{$close}" type="button" class="close"&gt;{/literal}
-				</textarea>
-				<textarea class="code hidden" data-mode="javascript">
-{literal}
-&lt;button data-onclick={this.close.bind(this)} type="button" class="close"&gt;{/literal}
-				</textarea>
-			{/param}
-		{/call}
-
-		<p>
-			That will work exactly the same way as the previous example.
-		</p>
+		{call docsInlineEvents.functionReference /}
 
 		<h2>Listener implementation</h2>
 

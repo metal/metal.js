@@ -133,9 +133,17 @@
 		{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
 		{param content kind="html"}
 			<textarea class="code" data-mode="x-soy">
-{literal}// Soy params that match a component function name will be that
-// function (automatically bound to the component instance).
-&lt;button data-onclick="{$close}" type="button" class="close"&gt;{/literal}
+{literal}/**
+ * In the "render" template, soy params that match a
+ * component's function name will be that function
+ * (automatically bound to the component instance).
+ * @param close
+ */
+&lbrace;template .render&rbrace;
+  // ...
+  &lt;button data-onclick="{$close}" type="button" class="close"&gt;
+  // ...
+&lbrace;/template&rbrace;{/literal}
 			</textarea>
 			<textarea class="code hidden" data-mode="javascript">
 	{literal}

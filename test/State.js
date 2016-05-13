@@ -557,6 +557,22 @@ describe('State', function() {
 		});
 	});
 
+	it('should call callback function from setState asynchronously after the batch event is triggered', function(done) {
+		var state = createStateInstance();
+
+		var listener = sinon.stub();
+		state.on('stateChanged', listener);
+
+		var newState = {
+			key1: 12,
+			key2: 21
+		};
+		state.setState(newState, function() {
+			assert.strictEqual(1, listener.callCount);
+			done();
+		});
+	});
+
 	it('should get all state values', function() {
 		var state = createStateInstance();
 

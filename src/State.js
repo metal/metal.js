@@ -482,12 +482,17 @@ class State extends EventEmitter {
 	 * Sets the value of all the specified state keys.
 	 * @param {!Object.<string,*>} values A map of state keys to the values they
 	 *   should be set to.
+	 * @param {function()=} opt_callback An optional function that will be run
+	 *   after the next batched update is triggered.
 	 */
-	setState(values) {
+	setState(values, opt_callback) {
 		this.updateConfig_(values);
 		var names = Object.keys(values);
 		for (var i = 0; i < names.length; i++) {
 			this[names[i]] = values[names[i]];
+		}
+		if (opt_callback && this.scheduledBatchData_) {
+			this.once('stateChanged', opt_callback);
 		}
 	}
 

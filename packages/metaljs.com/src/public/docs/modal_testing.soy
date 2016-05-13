@@ -1,0 +1,107 @@
+{namespace docsModalTesting}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Tutorial: Modal - Testing</h1>
+
+		<p>
+			In the <a href="/docs/modal_nested.html">previous section</a> we've
+			completed our <strong>Modal</strong> component. The last thing we'd like
+			to show is how to use the tools that <strong>Metal.js</strong> offers to
+			help you test your code.
+		</p>
+
+		<h2>Test script</h2>
+
+		<p>
+			If you look at your <strong>package.json</strong> file you'll notice that
+			it already contains a test script that you can use. That's because we're
+			using <a href="/docs/#generator">generator-metal</a>, which automatically
+			prepares this script for you.
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}{
+	"scripts": {
+		"test": "gulp test"
+	}
+}{/literal}
+		</textarea>
+
+		<p>
+			If you're building a project without the generator, you can still
+			get <strong>Metal.js</strong>'s test tools by
+			using <a href="/docs/gulp_metal.html">gulp-metal</a>.
+		</p>
+
+		<h2>Adding a test</h2>
+
+		<p>
+			Also note that your generated project directory also has a file
+			called <strong>test/Modal.js</strong>, with a failing assertion. As you
+			can imagine, all you need to do is add your tests to this file.
+		</p>
+
+		<p>
+			To illustrate this let's start by replacing the existing test with one
+			that checks that the given <code>body</code> data is being rendered
+			correctly:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}import Modal from '../src/Modal';
+
+describe('Modal', function() {
+	it('should render the body', function() {
+		var component = new Modal({
+			body: 'Test Body'
+		});
+		var bodyElement = component.element.querySelector('.modal-body');
+		assert.ok(bodyElement);
+		assert.strictEqual('Test Body', bodyElement.textContent);
+	});
+});
+{/literal}
+		</textarea>
+
+		<h2>Running the tests</h2>
+
+		<p>
+			To run our tests all you need to do is type <code>npm test</code> on
+			your terminal. You'll see something like this:
+		</p>
+
+		<img src="../images/docs/test.png" width="100%">
+
+		<h2>Test environment</h2>
+
+		<p>
+			This test file we wrote
+			uses <a href="http://mochajs.org">Mocha</a> and <a href="http://chaijs.com/">Chai</a> for
+			describing tests, and <a href="http://karma-runner.github.io/0.12/index.html">Karma</a> as
+			the test runner. That's the default setup used by <strong>gulp-metal</strong>.
+		</p>
+
+		<p>
+			It's important to note that you don't have to
+			use <strong>gulp-metal</strong> for you tests though. It's just an easy
+			way that's already provided for you, but you can certainly setup your
+			own environment if you wish.
+		</p>
+
+		<h2>Next steps</h2>
+
+		<p>
+			You should now have a good knowledge of <strong>Metal.js</strong> basics.
+			If you want to dive into more details and advanced topics, go ahead and
+			check some of our guides.
+		</p>
+	{/param}
+{/call}
+{/template}

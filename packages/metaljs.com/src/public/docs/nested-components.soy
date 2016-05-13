@@ -28,7 +28,7 @@
 			{param content kind="html"}
 				<textarea class="code" data-mode="x-soy">
 {literal}&lt;div class="footer"&gt;
-  &lbrace;foreach $button as $buttons&rbrace;
+  &lbrace;foreach $button in $buttons&rbrace;
     &lbrace;call Button.render&rbrace;
       &lbrace;param label: $button /&rbrace;
     &lbrace;/call&rbrace;

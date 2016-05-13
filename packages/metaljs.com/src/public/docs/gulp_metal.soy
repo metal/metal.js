@@ -1,0 +1,96 @@
+{namespace docsGulpMetal}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Using gulp-metal</h1>
+
+		<p>
+			As we mentioned before, <strong>Metal.js</strong> components are written
+			in ES6, which means that we need a transpiling process before using it on
+			a website.
+		<p>
+
+		<p>
+			This can be done via any tools that you prefer,
+			like <a href="http://webpack.github.io/">webpack</a> or <a href="http://browserify.org/">browserify</a>,
+			but we've also published our own tool, which focuses
+			on <strong>Metal.js</strong> projects,
+			called <a href="http://npmjs.com/package/gulp-metal">gulp-metal</a>.
+		</p>
+
+		<p>
+			What this package offers is a a bunch
+			of <a href="http://gulpjs.com/">gulp</a> tasks. There are tasks that can
+			handle not only building javascript, as well as soy compilation,
+			testing, linting and many other things.
+		</p>
+
+		<p>
+			The <a href="/docs/">tutorials</a> we've provided are all using it,
+			though indirectly, through some npm scripts. In this guide we'll show you
+			how you can set it up on your own.
+		</p>
+
+		<h2>Setup</h2>
+
+		<p>
+			To run <strong>gulp-metal</strong> tasks you'll need to have
+			<strong>gulp</strong> installed first. If you don't have it yet, just run:
+		</p>
+
+		<pre><code>
+		[sudo] npm i -g gulp
+		</code></pre>
+
+		<p>Then install <strong>gulp-metal</strong> itself on your project:</p>
+
+		<pre><code>
+		[sudo] npm i gulp-metal --save-dev
+		</code></pre>
+
+		<h2>Usage</h2>
+
+		<p>
+			Now that we have it installed, we should register the tasks provided
+			by <strong>gulp-metal</strong> in our project's <strong>gulpfile.js</strong>,
+			like this:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}var metal = require('gulp-metal');
+
+metal.registerTasks({
+	bundleCssFileName: 'modal.css',
+	bundleFileName: 'modal.js',
+	moduleName: 'metal-modal'
+});{/literal}
+		</textarea>
+
+		<p>
+			Eveything's ready now! To run a task, just call gulp with the task name.
+			To run a task named <strong>foo</strong> for example, you'd just need to do:
+		</p>
+
+		<pre><code>
+		gulp foo
+		</code></pre>
+
+		<p>
+			All tasks can be configured by going by setting some more options on
+			your <strong>gulpfile.js</strong>'s call
+			to <code>metal.registerTasks</code> function.
+		</p>
+
+		<p>A list of all the available tasks, as well as their options can be
+			accessed at <a href="http://www.npmjs.com/package/gulp-metal">gulp-metal's
+			page</a>.
+		</p>
+	{/param}
+{/call}
+{/template}

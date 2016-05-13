@@ -133,31 +133,28 @@ export default CloseHeader;{/literal}
 &lbrace;/template&rbrace;{/literal}
 				</textarea>
 				<textarea class="code hidden" data-mode="javascript">
-{literal}import CloseHeader from './CloseHeader';
-class Modal extends JSXComponent {
-	render() {
-		var cssClass = 'modal';
-		if (this.shown) {
-			cssClass += 'show';
-		}
-		return &lt;div class={cssClass}&gt;
-			&lt;div class="modal-dialog"&gt;
-				&lt;div class="modal-content"&gt;
-					&lt;CloseHeader
-						cssClass="modal-header"
-						onClick={this.close.bind(this)}
-						title={this.config.header}
-					/&gt;
-					&lt;section class="modal-body"&gt;
-						{this.config.body}
-					&lt;/section&gt;
-					&lt;footer class="modal-footer"&gt;
-						&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
-					&lt;/footer&gt;
-				&lt;/div&gt;
-			&lt;/div&gt;
-		&lt;/div&gt;;
+{literal}render() {
+	var cssClass = 'modal';
+	if (this.shown) {
+		cssClass += 'show';
 	}
+	return &lt;div class={cssClass}&gt;
+		&lt;div class="modal-dialog"&gt;
+			&lt;div class="modal-content"&gt;
+				&lt;CloseHeader
+					cssClass="modal-header"
+					onClick={this.close.bind(this)}
+					title={this.config.header}
+				/&gt;
+				&lt;section class="modal-body"&gt;
+					{this.config.body}
+				&lt;/section&gt;
+				&lt;footer class="modal-footer"&gt;
+					&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
+				&lt;/footer&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;;
 }{/literal}
 				</textarea>
 			{/param}

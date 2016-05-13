@@ -101,11 +101,10 @@ class Soy extends IncrementalDomRenderer {
 	 * @param {Object} data The data the template was called with.
 	 * @protected
 	 */
-	static handleInterceptedCall_(originalFn, opt_data) {
+	static handleInterceptedCall_(originalFn, opt_data = {}) {
 		var args = [originalFn.componentCtor, null, []];
-		var names = Object.keys(opt_data || {});
-		for (var i = 0; i < names.length; i++) {
-			args.push(names[i], opt_data[names[i]]);
+		for (var key in opt_data) {
+			args.push(key, opt_data[key]);
 		}
 		IncrementalDOM.elementVoid.apply(null, args);
 	}

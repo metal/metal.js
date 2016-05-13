@@ -15,6 +15,7 @@ import { ExternalTemplate as ExternalTemplateComponent } from './assets/External
 import { Functions as FunctionsComponent } from './assets/Functions.soy';
 import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy';
 import { Nested as NestedComponent } from './assets/Nested.soy';
+import { NestedDataAll as NestedDataAllComponent } from './assets/NestedDataAll.soy';
 import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy';
 import { NestedMultiple as NestedMultipleComponent } from './assets/NestedMultiple.soy';
 import { NestedNoData as NestedNoDataComponent } from './assets/NestedNoData.soy';
@@ -311,6 +312,17 @@ describe('Soy', function() {
 
 		it('should pass data to nested components', function() {
 			comp = new NestedComponent({
+				name: 'Foo'
+			});
+
+			var nested = comp.components.hello;
+			assert.ok(nested instanceof HelloWorldComponent);
+			assert.strictEqual(nested.element, comp.element.childNodes[0]);
+			assert.strictEqual('Hello Foo!', nested.element.textContent);
+		});
+
+		it('should pass data via `data="all"` to nested components', function() {
+			comp = new NestedDataAllComponent({
 				name: 'Foo'
 			});
 

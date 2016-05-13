@@ -1,0 +1,12 @@
+{namespace NestedDataAll}
+
+/**
+ * @param name
+ */
+{template .render}
+	<div>
+		{call HelloWorld.render data="all"}
+			{param key: 'hello' /}
+		{/call}
+	</div>
+{/template}

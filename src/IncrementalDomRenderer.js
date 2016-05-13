@@ -321,6 +321,17 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			args[1] = currComp.config.key;
 		}
 
+		// Don't allow using both key and statics at the same time. This is because
+		// incremental dom won't update the element with new statics when the key is
+		// the same, and that can happen in our case due to the same key being
+		// passed to different components with different contents, for example.
+		if (args[1] && statics) {
+			args[2] = null;
+			for (var i = 0; i < statics.length; i++) {
+				args.push(statics[i]);
+			}
+		}
+
 		var node = originalFn.apply(null, args);
 		this.updateElementIfNotReached_(node, args);
 		return node;

@@ -123,6 +123,10 @@
 	width: auto;
 }
 
+.architecture-description:last-child {
+	margin-bottom: 64px;
+}
+
 @media (min-width: $screen-lg-min) {
 	.architecture-description {
 		width: 386px;
@@ -143,7 +147,7 @@
 }
 
 .architecture-image-primary {
-	margin-top: -31px;
+	margin-top: 60px;
 	transform: translate(0px, 0px);
 }
 

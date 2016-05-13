@@ -853,9 +853,9 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
 				if (this.component_.switch) {
-					IncDom.elementVoid(TestChild2Component, 'child');
+					IncDom.elementVoid(TestChild2Component);
 				} else {
-					IncDom.elementVoid(TestChild1Component, 'child');
+					IncDom.elementVoid(TestChild1Component);
 				}
 				IncDom.elementClose('div');
 			};
@@ -865,13 +865,13 @@ describe('IncrementalDomRenderer', function() {
 			};
 
 			component = new TestComponent();
-			var child = component.components.child;
+			var child = component.components.sub0;
 			assert.ok(child instanceof TestChild1Component);
 			assert.ok(dom.hasClass(child.element, 'test1'));
 
 			component.switch = true;
 			component.once('stateSynced', function() {
-				var newChild = component.components.child;
+				var newChild = component.components.sub0;
 				assert.ok(newChild instanceof TestChild2Component);
 				assert.ok(dom.hasClass(newChild.element, 'test2'));
 				done();

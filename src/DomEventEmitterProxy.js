@@ -19,7 +19,7 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 */
 	addListener_(event, listener) {
 		if (this.originEmitter_.addEventListener) {
-			if (event.startsWith('delegate:')) {
+			if (this.isDelegateEvent_(event)) {
 				var index = event.indexOf(':', 9);
 				var eventName = event.substring(9, index);
 				var selector = event.substring(index + 1);
@@ -33,6 +33,16 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	}
 
 	/**
+	 * Checks if the given event is of the delegate type.
+	 * @param {string} event
+	 * @return {boolean}
+	 * @protected
+	 */
+	isDelegateEvent_(event) {
+		return event.substr(0, 9) === 'delegate:';
+	}
+
+	/**
 	 * Checks if the given event is supported by the origin element.
 	 * @param {string} event
 	 * @protected
@@ -41,7 +51,7 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 		if (!this.originEmitter_ || !this.originEmitter_.addEventListener) {
 			return true;
 		}
-		return (event.startsWith('delegate:') && event.indexOf(':', 9) !== -1) ||
+		return (this.isDelegateEvent_(event) && event.indexOf(':', 9) !== -1) ||
 			dom.supportsEvent(this.originEmitter_, event);
 	}
 

@@ -221,7 +221,7 @@ class State extends EventEmitter {
 		var info = this.stateInfo_[name];
 		var config = info.config;
 		if (config.validator) {
-			return this.callFunction_(config.validator, [value]);
+			return this.callFunction_(config.validator, [value, name]);
 		}
 		return true;
 	}

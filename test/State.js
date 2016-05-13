@@ -266,6 +266,24 @@ describe('State', function() {
 		assert.strictEqual(1, valueFn.callCount);
 	});
 
+	it('should pass value and key args to validator function', function(done) {
+		var state = new State();
+		var keyName = 'key1';
+		var value = 2;
+		state.addToState({
+			[keyName]: {
+				validator: function(val, name) {
+					assert.strictEqual(val, value);
+					assert.strictEqual(name, keyName);
+
+					done();
+				}
+			}
+		});
+
+		state[keyName] = value;
+	});
+
 	it('should validate new state values', function() {
 		var state = new State();
 		state.addToState({

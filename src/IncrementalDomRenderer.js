@@ -429,7 +429,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	isListenerAttr_(attr) {
-		return attr.startsWith('data-on');
+		return attr.substr(0, 7) === 'data-on';
 	}
 
 	/**

@@ -22,40 +22,66 @@
 		</p>
 		<p>
 			This guide will focus on a quick and easy way to get started with
-			Metal.js, using a Yeoman generator that will prepare the project structure
-			and workflow for you.
+			Metal.js.
 		</p>
 
-		<h2 id="generator">Using generator-metal</h2>
+		<h2 id="boilerplate">Boilerplate</h2>
 
-		<p>We've built a <a href="https://www.npmjs.com/package/generator-metal">Yeoman generator</a> for creating the initial project structure together with some useful dependencies. To use it:</p>
+		<p>
+			You can organize your <strong>Metal.js</strong> project in any way you
+			want, but to start out we recommend using
+			the <a href="/docs/yeoman-generator.html">Yeoman generator</a> we've
+			created, which prepares both the project structure as well as a basic
+			development workflow for you.
+		</p>
+
+		<p>
+			You can use it if you wish, but to makes things even simpler we're
+			providing a zip with the boilerplate that the generator would create for
+			this tutorial, so you can just download it here:
+		</p>
+
+		<a
+			href="/downloads/boilerplate.zip"
+			class="btn btn-size-medium btn-effect-primary">
+			Boilerplate with Soy
+		</a>
+		<a
+			href="/downloads/boilerplate-jsx.zip"
+			class="btn btn-size-medium btn-effect-primary">
+			Boilerplate with JSX
+		</a>
+
+		<p>
+			Note that this zip you've downloaded contains not only the starting
+			boilerplate, but also a folder for each step of this tutorial guide, so
+			that you can either code along with us or just check out the final code
+			for each step.
+		</p>
+
+		<p>
+			Now that you have the boilerplate, you just need to:
+		</p>
 
 		<ol>
-			<li><p>Install <a href="https://nodejs.org">NPM</a> v3.0.0 or newer</p></li>
-			<li>
-				<p>Install <strong>Yeoman</strong> and <strong>generator-metal</strong>:</p>
-				<p><code>[sudo] npm i -g yo generator-metal</code></p>
-			</li>
 			<li>
 				<p>
-					Open the folder that you want to use on your terminal and type: <code>yo metal</code>
+					Install <a href="https://nodejs.org">NPM</a> v3.0.0 or newer (if you
+					don't have it yet)
 				</p>
 			</li>
 			<li>
-				<p>Answer the generator prompts:</p>
-				<img src="../images/docs/prompts.png" width="500"><br>
 				<p>
-					Make sure to type <strong>Modal </strong>
-					as the component's name and choose either <strong>Soy</strong> or
-					<strong> JSX</strong> as the template language (don't worry, we'll always
-					provide examples for both templates during this guide). Use the default
-					for all other questions.
+					Enter the <strong>1. Hello World</strong> folder in your terminal and
+					install its npm dependencies, by typing: <code>[sudo] npm i</code>
 				</p>
 			</li>
-			<li><p>Wait for the generator to finish fetching dependencies</p></li>
 		</ol>
 
-		<p>After those steps you'll get a directory tree similar to this:</p>
+		<p>
+			Once the dependency installation ends, you'll get a directory tree similar
+			to this:
+		</p>
 
 		<textarea class="code" data-mode="javascript">{literal}├── demos
 │   └── index.html

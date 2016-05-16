@@ -20,6 +20,11 @@ gulp.task('deploy', ['cname', 'build'], function() {
 		.pipe(ghpages());
 });
 
+gulp.task('downloads', function() {
+	return gulp.src('src/public/downloads/**')
+		.pipe(gulp.dest('dist/public/downloads'));
+});
+
 gulp.task('images', function() {
 	return gulp.src('src/public/images/**')
 		.pipe(gulp.dest('dist/public/images'));
@@ -54,6 +59,7 @@ gulp.task('vendor', function() {
 });
 
 gulp.task('watch', function () {
+	gulp.watch('src/public/downloads/**', ['downloads']);
 	gulp.watch('src/public/images/**', ['images']);
 	gulp.watch('src/public/scripts/**', ['scripts']);
 	gulp.watch('src/public/vendor/**', ['vendor']);
@@ -61,5 +67,5 @@ gulp.task('watch', function () {
 	gulp.watch('src/**/*.soy', ['soy']);
 });
 
-gulp.task('build', ['images', 'scripts', 'vendor', 'soy', 'styles']);
+gulp.task('build', ['images', 'downloads', 'scripts', 'vendor', 'soy', 'styles']);
 gulp.task('default', ['build', 'connect', 'watch']);

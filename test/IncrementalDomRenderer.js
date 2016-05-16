@@ -839,45 +839,6 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should update static attributes when reusing element for different components through key', function(done) {
-			var TestChild1Component = createTestComponentClass();
-			TestChild1Component.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementVoid('div', null, ['class', 'test1']);
-			};
-			var TestChild2Component = createTestComponentClass();
-			TestChild2Component.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementVoid('div', null, ['class', 'test2']);
-			};
-
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				if (this.component_.switch) {
-					IncDom.elementVoid(TestChild2Component);
-				} else {
-					IncDom.elementVoid(TestChild1Component);
-				}
-				IncDom.elementClose('div');
-			};
-			TestComponent.STATE = {
-				switch: {
-				}
-			};
-
-			component = new TestComponent();
-			var child = component.components.sub0;
-			assert.ok(child instanceof TestChild1Component);
-			assert.ok(dom.hasClass(child.element, 'test1'));
-
-			component.switch = true;
-			component.once('stateSynced', function() {
-				var newChild = component.components.sub0;
-				assert.ok(newChild instanceof TestChild2Component);
-				assert.ok(dom.hasClass(newChild.element, 'test2'));
-				done();
-			});
-		});
-
 		it('should not reuse component with same key if constructor is different"', function(done) {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.RENDERER.prototype.renderIncDom = function() {

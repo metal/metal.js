@@ -1,0 +1,51 @@
+{namespace docsGulpMetal}
+
+/**
+ * This template will be rendered by SoyWeb when the user loads static.soy.
+ * It deliberately includes dummy data so the designer can get a feel for how
+ * the task list will appear with real data rather with minimal copy and paste.
+ */
+{template .soyweb}
+{call docs.layout}
+	{param content kind="html"}
+		<h1>Building</h1>
+
+		<p>
+			As we mentioned before, <strong>Metal.js</strong> components are written
+			in ES6, which means that we need a transpiling process before using it on
+			a website.
+		<p>
+
+		<p>
+			This can be done via any tools that you prefer,
+			like <a href="http://webpack.github.io/">webpack</a> or <a href="http://browserify.org/">browserify</a>,
+			but we've also published a few tools of our own, which focuses
+			on <strong>Metal.js</strong> projects, which we'll talk about here.
+		</p>
+
+		<h2>gulp-metal</h2>
+
+		<p>
+			What this package offers is a a bunch
+			of <a href="http://gulpjs.com/">gulp</a> tasks. There are tasks that can
+			handle not only building javascript, as well as soy compilation,
+			testing, linting and many other things.
+		</p>
+
+		<p>
+			The <a href="/docs/">tutorials</a> we've provided are all using it,
+			though indirectly, through some npm scripts. To learn how to
+			use <strong>gulp-metal</strong> directly take a look at
+			its <a href="http://www.npmjs.com/package/gulp-metal">npm page</a>.
+		</p>
+
+		<h2>metal-cli</h2>
+
+		<p>
+			If you're not a fan of <strong>gulp</strong> you can still
+			use <a href="http://www.npmjs.com/package/metal-cli">metal-cli</a>, which
+			offers almost the same tools, but through the command line.
+		</p>
+	{/param}
+{/call}
+{/template}

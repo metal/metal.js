@@ -19,16 +19,7 @@
     "metal"
   ],
   "babel": {
-    "plugins": [
-      [
-        "incremental-dom",
-        {
-          "components": true,
-          "prefix": "IncrementalDOM",
-          "runtime": "iDOMHelpers"
-        }
-      ]
-    ]
+    "presets": ["metal-jsx"]
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
@@ -36,7 +27,7 @@
     "metal-karma-config": "^2.0.1"
   },
   "devDependencies": {
-    "babel-plugin-incremental-dom": "^3.1.0",
+    "babel-preset-metal-jsx": "^0.0.2",
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
     "metal-karma-config": "^2.1.0"

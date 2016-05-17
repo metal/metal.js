@@ -40,6 +40,26 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Adds a child element to the "children" tree. This tree is used by the
+	 * "children" function passed to component configs.
+	 * @param {!Array} args The arguments passed to the incremental dom call
+	 * @param {boolean=} opt_isText Optional flag indicating if the child is a
+	 *     text element.
+	 * @protected
+	 */
+	addChildToTree_(args, opt_isText) {
+		var { currentParent } = this.componentToRender_;
+		var child = {
+			args: args,
+			children: [],
+			isText: opt_isText,
+			parent: currentParent
+		};
+		currentParent.children.push(child);
+		return child;
+	}
+
+	/**
 	 * Adds all inline listener attributes included in the given config.
 	 * @param {!Array} listeners
 	 * @protected
@@ -73,12 +93,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Builds the "children" config property to be passed to the current
 	 * component.
-	 * @param {!Array<!{name: string, args: !Array}>} calls
+	 * @param {!Array<!Object>} children
 	 * @return {!function()}
 	 * @protected
 	 */
-	buildChildrenFn_(calls) {
-		if (calls.length === 0) {
+	buildChildrenFn_(children) {
+		if (children.length === 0) {
 			return emptyChildrenFn_;
 		}
 		var prefix = this.buildKey_();
@@ -87,13 +107,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.generatedKeyCount_[prefix] = 0;
 			this.currentPrefix_ = prefix;
 			this.intercept_();
-			for (var i = 0; i < calls.length; i++) {
-				IncrementalDOM[calls[i].name].apply(null, array.slice(calls[i].args, 1));
-			}
+			this.renderTree_(fn.children);
 			IncrementalDomAop.stopInterception();
 			this.currentPrefix_ = prevPrefix;
 		};
-		fn.iDomCalls = calls;
+		fn.children = children;
 		return fn;
 	}
 
@@ -236,24 +254,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Handles an intercepted call to the `elementClose` function from incremental
 	 * dom, while collecting a component's children.
-	 * @param {!function()} originalFn The original function before interception.
-	 * @param {string} callTag
 	 * @protected
 	 */
-	handleInterceptedChildrenCloseCall_(originalFn, callTag) {
-		if (this.isCurrentComponentTag_(callTag) &&
-				--this.componentToRender_.tagsCount === 0) {
-
-			var {calls, config, tag} = this.componentToRender_;
-			config.children = this.buildChildrenFn_(calls);
+	handleInterceptedChildrenCloseCall_() {
+		var { currentParent } = this.componentToRender_;
+		if (currentParent === this.componentToRender_) {
+			var {children, config, tag} = this.componentToRender_;
+			config.children = this.buildChildrenFn_(children);
 			this.componentToRender_ = null;
 			IncrementalDomAop.stopInterception();
 			return this.renderFromTag_(tag, config);
+		} else {
+			this.componentToRender_.currentParent = currentParent.parent;
 		}
-		this.componentToRender_.calls.push({
-			name: 'elementClose',
-			args: arguments
-		});
 	}
 
 	/**
@@ -263,26 +276,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @param {string} tag
 	 * @protected
 	 */
-	handleInterceptedChildrenOpenCall_(originalFn, tag) {
-		if (this.isCurrentComponentTag_(tag)) {
-			this.componentToRender_.tagsCount++;
-		}
-		this.componentToRender_.calls.push({
-			name: 'elementOpen',
-			args: arguments
-		});
+	handleInterceptedChildrenOpenCall_(originalFn, ...args) {
+		var child = this.addChildToTree_(args);
+		this.componentToRender_.currentParent = child;
 	}
 
 	/**
 	 * Handles an intercepted call to the `text` function from incremental dom,
 	 * while collecting a component's children.
+	 * @param {!function()} originalFn The original function before interception.
 	 * @protected
 	 */
-	handleInterceptedChildrenTextCall_() {
-		this.componentToRender_.calls.push({
-			name: 'text',
-			args: arguments
-		});
+	handleInterceptedChildrenTextCall_(originalFn, ...args) {
+		this.addChildToTree_(args, true);
 	}
 
 	/**
@@ -354,11 +360,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 		this.componentToRender_ = {
-			calls: [],
+			children: [],
 			config,
-			tag,
-			tagsCount: 1
+			tag
 		};
+		this.componentToRender_.currentParent = this.componentToRender_;
 		IncrementalDomAop.startInterception({
 			elementClose: this.handleInterceptedChildrenCloseCall_,
 			elementOpen: this.handleInterceptedChildrenOpenCall_,
@@ -397,16 +403,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	isComponentTag_(tag) {
 		return !core.isString(tag) || tag[0] === tag[0].toUpperCase();
-	}
-
-	/**
-	 * Checks if the given tag represents the metal component currently being
-	 * rendered.
-	 * @param {string} tag
-	 * @protected
-	 */
-	isCurrentComponentTag_(tag) {
-		return this.isComponentTag_(tag) && this.componentToRender_.tag === tag;
 	}
 
 	/**
@@ -523,6 +519,26 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		this.subComponentsFound_[key] = true;
 		return comp;
+	}
+
+	/**
+	 * Renders tree of nodes through incremental dom.
+	 * @param {Array<{args: !Array, children: Array}>}
+	 * @protected
+	 */
+	renderTree_(tree) {
+		if (!tree || tree.length === 0) {
+			return;
+		}
+		for (var i = 0; i < tree.length; i++) {
+			if (tree[i].isText) {
+				IncrementalDOM.text.apply(null, tree[i].args);
+			} else {
+				IncrementalDOM.elementOpen.apply(null, tree[i].args);
+				this.renderTree_(tree[i].children);
+				IncrementalDOM.elementClose(tree[i].args[0]);
+			}
+		}
 	}
 
 	/**

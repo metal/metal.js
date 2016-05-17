@@ -1029,7 +1029,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', grandChild.context.bar);
 		});
 
-		it('should pass array of incremental dom calls with the "children" function', function() {
+		it('should pass tree of incremental dom calls with the "children" function', function() {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.STATE = {
 				children: {
@@ -1050,11 +1050,16 @@ describe('IncrementalDomRenderer', function() {
 			var child = component.components.child;
 			assert.ok(child instanceof TestChildComponent);
 			assert.ok(child.children);
-			assert.ok(child.children.iDomCalls);
-			assert.strictEqual(3, child.children.iDomCalls.length);
-			assert.strictEqual('elementOpen', child.children.iDomCalls[0].name);
-			assert.strictEqual('text', child.children.iDomCalls[1].name);
-			assert.strictEqual('elementClose', child.children.iDomCalls[2].name);
+
+			var tree = child.children.children;
+			assert.ok(tree);
+			assert.strictEqual(1, tree.length);
+			assert.ok(!tree[0].isText);
+			assert.strictEqual('span', tree[0].args[0]);
+			assert.strictEqual(1, tree[0].children.length);
+			assert.ok(tree[0].children[0].isText);
+			assert.strictEqual('Hello World', tree[0].children[0].args[0]);
+			assert.strictEqual(0, tree[0].children[0].children.length);
 		});
 
 		it('should use the same element from sub component if no wrapper is given', function() {

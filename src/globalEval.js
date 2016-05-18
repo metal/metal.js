@@ -43,8 +43,8 @@ class globalEval {
 			dom.exitDocument(script);
 			opt_callback && opt_callback();
 		};
-		dom.on(script, 'load', callback);
-		dom.on(script, 'error', callback);
+		dom.once(script, 'load', callback);
+		dom.once(script, 'error', callback);
 
 		if (opt_appendFn) {
 			opt_appendFn(script);

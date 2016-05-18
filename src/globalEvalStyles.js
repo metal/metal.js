@@ -63,8 +63,8 @@ class globalEvalStyles {
 		if (style.tagName === 'STYLE') {
 			async.nextTick(callback);
 		} else {
-			dom.on(style, 'load', callback);
-			dom.on(style, 'error', callback);
+			dom.once(style, 'load', callback);
+			dom.once(style, 'error', callback);
 		}
 
 		if (opt_appendFn) {

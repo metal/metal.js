@@ -5,6 +5,7 @@ import { array, core, object } from 'metal';
 import dom from 'metal-dom';
 import { Component, ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
+import IncrementalDomChildren from './children/IncrementalDomChildren';
 
 /**
  * Class responsible for rendering components via incremental dom.
@@ -30,33 +31,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.handleInterceptedAttributesCall_.bind(this);
 		this.handleInterceptedOpenCall_ =
 			this.handleInterceptedOpenCall_.bind(this);
-		this.handleInterceptedChildrenCloseCall_ =
-			this.handleInterceptedChildrenCloseCall_.bind(this);
-		this.handleInterceptedChildrenOpenCall_ =
-			this.handleInterceptedChildrenOpenCall_.bind(this);
-		this.handleInterceptedChildrenTextCall_ =
-			this.handleInterceptedChildrenTextCall_.bind(this);
+		this.handleChildrenCaptured_ = this.handleChildrenCaptured_.bind(this);
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
-	}
-
-	/**
-	 * Adds a child element to the "children" tree. This tree is used by the
-	 * "children" function passed to component configs.
-	 * @param {!Array} args The arguments passed to the incremental dom call
-	 * @param {boolean=} opt_isText Optional flag indicating if the child is a
-	 *     text element.
-	 * @protected
-	 */
-	addChildToTree_(args, opt_isText) {
-		var { currentParent } = this.componentToRender_;
-		var child = {
-			args: args,
-			children: [],
-			isText: opt_isText,
-			parent: currentParent
-		};
-		currentParent.children.push(child);
-		return child;
 	}
 
 	/**
@@ -107,7 +83,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.generatedKeyCount_[prefix] = 0;
 			this.currentPrefix_ = prefix;
 			this.intercept_();
-			this.renderTree_(fn.children);
+			IncrementalDomChildren.render(fn);
 			IncrementalDomAop.stopInterception();
 			this.currentPrefix_ = prevPrefix;
 		};
@@ -252,43 +228,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles an intercepted call to the `elementClose` function from incremental
-	 * dom, while collecting a component's children.
+	 * Handles the event of children having finished being captured.
+	 * @param {!Object} The captured children in tree format.
 	 * @protected
 	 */
-	handleInterceptedChildrenCloseCall_() {
-		var { currentParent } = this.componentToRender_;
-		if (currentParent === this.componentToRender_) {
-			var {children, config, tag} = this.componentToRender_;
-			config.children = this.buildChildrenFn_(children);
-			this.componentToRender_ = null;
-			IncrementalDomAop.stopInterception();
-			return this.renderFromTag_(tag, config);
-		} else {
-			this.componentToRender_.currentParent = currentParent.parent;
-		}
-	}
-
-	/**
-	 * Handles an intercepted call to the `elementOpen` function from incremental
-	 * dom, while collecting a component's children.
-	 * @param {!function()} originalFn The original function before interception.
-	 * @param {string} tag
-	 * @protected
-	 */
-	handleInterceptedChildrenOpenCall_(originalFn, ...args) {
-		var child = this.addChildToTree_(args);
-		this.componentToRender_.currentParent = child;
-	}
-
-	/**
-	 * Handles an intercepted call to the `text` function from incremental dom,
-	 * while collecting a component's children.
-	 * @param {!function()} originalFn The original function before interception.
-	 * @protected
-	 */
-	handleInterceptedChildrenTextCall_(originalFn, ...args) {
-		this.addChildToTree_(args, true);
+	handleChildrenCaptured_(tree) {
+		var {config, tag} = this.componentToRender_;
+		config.children = this.buildChildrenFn_(tree.children);
+		this.componentToRender_ = null;
+		this.renderFromTag_(tag, config);
 	}
 
 	/**
@@ -360,16 +308,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 		this.componentToRender_ = {
-			children: [],
 			config,
 			tag
 		};
-		this.componentToRender_.currentParent = this.componentToRender_;
-		IncrementalDomAop.startInterception({
-			elementClose: this.handleInterceptedChildrenCloseCall_,
-			elementOpen: this.handleInterceptedChildrenOpenCall_,
-			text: this.handleInterceptedChildrenTextCall_
-		});
+		IncrementalDomChildren.capture(this.handleChildrenCaptured_);
 	}
 
 	/**
@@ -519,26 +461,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		this.subComponentsFound_[key] = true;
 		return comp;
-	}
-
-	/**
-	 * Renders tree of nodes through incremental dom.
-	 * @param {Array<{args: !Array, children: Array}>}
-	 * @protected
-	 */
-	renderTree_(tree) {
-		if (!tree || tree.length === 0) {
-			return;
-		}
-		for (var i = 0; i < tree.length; i++) {
-			if (tree[i].isText) {
-				IncrementalDOM.text.apply(null, tree[i].args);
-			} else {
-				IncrementalDOM.elementOpen.apply(null, tree[i].args);
-				this.renderTree_(tree[i].children);
-				IncrementalDOM.elementClose(tree[i].args[0]);
-			}
-		}
 	}
 
 	/**

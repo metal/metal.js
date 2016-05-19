@@ -29,17 +29,25 @@ class IncrementalDomChildren {
 	/**
 	 * Renders a children tree through incremental dom.
 	 * @param {!{args: Array, !children: Array, isText: ?boolean}}
+	 * @param {function()=} opt_skipNode Optional function that is called for
+	 *     each node to be rendered. If it returns true, the node will be skipped.
 	 * @protected
 	 */
-	static render(tree) {
+	static render(tree, opt_skipNode) {
+		if (opt_skipNode && opt_skipNode(tree)) {
+			return;
+		}
+
 		if (tree.isText) {
 			IncrementalDOM.text.apply(null, tree.args);
 		} else {
 			if (tree.args) {
 				IncrementalDOM.elementOpen.apply(null, tree.args);
 			}
-			for (var i = 0; i < tree.children.length; i++) {
-				IncrementalDomChildren.render(tree.children[i]);
+			if (tree.children) {
+				for (var i = 0; i < tree.children.length; i++) {
+					IncrementalDomChildren.render(tree.children[i], opt_skipNode);
+				}
 			}
 			if (tree.args) {
 				IncrementalDOM.elementClose(tree.args[0]);

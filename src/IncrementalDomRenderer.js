@@ -32,6 +32,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.handleInterceptedOpenCall_ =
 			this.handleInterceptedOpenCall_.bind(this);
 		this.handleChildrenCaptured_ = this.handleChildrenCaptured_.bind(this);
+		this.handleChildRender_ = this.handleChildRender_.bind(this);
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
 	}
 
@@ -83,12 +84,30 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.generatedKeyCount_[prefix] = 0;
 			this.currentPrefix_ = prefix;
 			this.intercept_();
-			IncrementalDomChildren.render(fn);
+			IncrementalDomChildren.render(fn, this.handleChildRender_);
 			IncrementalDomAop.stopInterception();
 			this.currentPrefix_ = prevPrefix;
 		};
 		fn.children = children;
 		return fn;
+	}
+
+	/**
+	 * Builds the component config object from its incremental dom call's
+	 * arguments.
+	 * @param {!Array} args
+	 * @return {!Object}
+	 * @protected
+	 */
+	buildConfigFromCall_(args) {
+		var config = {
+			key: args[1]
+		};
+		var attrsArr = (args[2] || []).concat(args.slice(3));
+		for (var i = 0; i < attrsArr.length; i += 2) {
+			config[attrsArr[i]] = attrsArr[i + 1];
+		}
+		return config;
 	}
 
 	/**
@@ -240,6 +259,23 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Handles a child being rendered via `IncrementalDomChildren.render`. Skips
+	 * component nodes so that they can be rendered the correct way without
+	 * having to recapture both them and their children via incremental dom.
+	 * @param {!Object} node
+	 * @return {boolean}
+	 * @protected
+	 */
+	handleChildRender_(node) {
+		if (node.args && !node.isText && this.isComponentTag_(node.args[0])) {
+			var config = this.buildConfigFromCall_(node.args);
+			config.children = this.buildChildrenFn_(node.children);
+			this.renderFromTag_(node.args[0], config);
+			return true;
+		}
+	}
+
+	/**
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom.
 	 * @param {!function()} originalFn The original function before interception.
@@ -295,21 +331,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * dom, done for a sub component element. Creates and updates the appropriate
 	 * sub component.
 	 * @param {!function()} originalFn The original function before interception.
-	 * @param {string} tag
-	 * @param {?string} key
-	 * @param {?Array} statics
 	 * @protected
 	 */
-	handleSubComponentCall_(originalFn, tag, key, statics) {
-		var config = {key};
-		var attrsArr = (statics || []).concat(array.slice(arguments, 4));
-		for (var i = 0; i < attrsArr.length; i += 2) {
-			config[attrsArr[i]] = attrsArr[i + 1];
-		}
-
+	handleSubComponentCall_(originalFn, ...args) {
 		this.componentToRender_ = {
-			config,
-			tag
+			config: this.buildConfigFromCall_(args),
+			tag: args[0]
 		};
 		IncrementalDomChildren.capture(this.handleChildrenCaptured_);
 	}

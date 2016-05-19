@@ -54,4 +54,39 @@ describe('IncrementalDomChildren', function() {
 		assert.strictEqual(1, spanElement.childNodes.length);
 		assert.strictEqual('Hello World', spanElement.childNodes[0].textContent);
 	});
+
+	it('should skip rendering children node when skipNode function returns true"', function() {
+		var element = document.createElement('div');
+
+		function skipNode(node) {
+			if (node.args && node.args[1] === 'skip') {
+				return true;
+			}
+		}
+		IncrementalDOM.patch(element, () => {
+			IncrementalDomChildren.render({
+				children: [
+					{
+						args: ['span', 'beforeSkip', ['id', 'node1']],
+						children: [
+							{
+								args: ['Hello World'],
+								isText: true
+							}
+						]
+					},
+					{
+						args: ['span', 'skip', ['id', 'node2']]
+					},
+					{
+						args: ['span', 'afterSkip', ['id', 'node3']]
+					}
+				]
+			}, skipNode);
+		});
+
+		assert.strictEqual(2, element.childNodes.length);
+		assert.strictEqual('node1', element.childNodes[0].id);
+		assert.strictEqual('node3', element.childNodes[1].id);
+	});
 });

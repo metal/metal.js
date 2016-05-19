@@ -62,7 +62,8 @@ class State extends EventEmitter {
 	 *     value that was set, and returns the value that should be stored.
 	 *
 	 *     validator - Function that validates state key values. When it returns
-	 *     false, the new value is ignored.
+	 *     false, the new value is ignored. When it returns an instance of Error,
+	 *     it will emit the error to the console.
 	 *
 	 *     value - The default value for the state key. Note that setting this to
 	 *     an object will cause all class instances to use the same reference to
@@ -211,7 +212,8 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Calls the state key's validator, if there is one.
+	 * Calls the state key's validator, if there is one. Emits console
+	 * warning if validator returns a string.
 	 * @param {string} name The name of the key.
 	 * @param {*} value The value to be validated.
 	 * @return {boolean} Flag indicating if value is valid or not.
@@ -221,7 +223,12 @@ class State extends EventEmitter {
 		var info = this.stateInfo_[name];
 		var config = info.config;
 		if (config.validator) {
-			return this.callFunction_(config.validator, [value, name, this]);
+			var validatorReturn = this.callFunction_(config.validator, [value, name, this]);
+
+			if (validatorReturn instanceof Error) {
+				console.error(`Warning: ${validatorReturn}`);
+			}
+			return validatorReturn;
 		}
 		return true;
 	}

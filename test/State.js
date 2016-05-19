@@ -355,6 +355,28 @@ describe('State', function() {
 		assert.strictEqual(-1, state.key1);
 	});
 
+	it('should emit error if validator returns an Error', function() {
+		sinon.stub(console, 'error');
+		var state = new State();
+		state.addToState(
+			{
+				key1: {
+					validator: function(val) {
+						return val;
+					}
+				}
+			}
+		);
+
+		state.key1 = 1;
+		assert.isFalse(console.error.called);
+
+		state.key1 = new Error('error');
+		assert.isTrue(console.error.called);
+
+		console.error.restore();
+	});
+
 	it('should change state new value through setter', function() {
 		var state = new State();
 		state.addToState({

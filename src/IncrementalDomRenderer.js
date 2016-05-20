@@ -340,6 +340,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Checks if the given object is an incremental dom node.
+	 * @param {!Object} node
+	 * @return {boolean}
+	 */
+	static isIncDomNode(node) {
+		return !!node[IncrementalDomChildren.CHILD_OWNER];
+	}
+
+	/**
 	 * Checks if the given attribute name is for a dom event listener.
 	 * @param {string} attr
 	 * @return {boolean}

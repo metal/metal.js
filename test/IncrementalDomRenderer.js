@@ -3,6 +3,7 @@
 import { object } from 'metal';
 import dom from 'metal-dom';
 import { Component, ComponentRegistry } from 'metal-component';
+import IncrementalDomChildren from '../src/children/IncrementalDomChildren';
 import IncrementalDomRenderer from '../src/IncrementalDomRenderer';
 
 var IncDom = IncrementalDOM;
@@ -1432,6 +1433,18 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.element.childNodes.length);
 			assert.strictEqual('SPAN', component.element.childNodes[0].tagName);
 			assert.strictEqual('children', component.element.childNodes[0].textContent);
+		});
+	});
+
+	describe('IncrementalDomRenderer.isIncDomNode', function() {
+		it('should check if given data is an incremental dom node', function() {
+			assert.ok(!IncrementalDomRenderer.isIncDomNode({}));
+			assert.ok(!IncrementalDomRenderer.isIncDomNode({
+				tag: 'span'
+			}));
+			assert.ok(IncrementalDomRenderer.isIncDomNode({
+				[IncrementalDomChildren.CHILD_OWNER]: true
+			}));
 		});
 	});
 

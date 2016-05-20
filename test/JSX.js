@@ -128,4 +128,68 @@ describe('JSX', function() {
 		assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
 		assert.strictEqual('Children Test', child.element.textContent);
 	});
+
+	it('should be able to render only some of the received children', function() {
+		class ChildComponent extends Component {
+			render() {
+				return <div class="child">
+					{this.config.children[1]}
+				</div>;
+			}
+		}
+		ChildComponent.RENDERER = JSX;
+
+		class TestComponent extends Component {
+			render() {
+				return (
+					<div class="test">
+						<ChildComponent key="child">
+							<span>Children Test</span>
+							<span>Children Test 2</span>
+							<span>Children Test 3</span>
+						</ChildComponent>
+					</div>
+				);
+			}
+		}
+		TestComponent.RENDERER = JSX;
+
+		component = new TestComponent();
+		var child = component.components.child;
+		assert.strictEqual(1, child.element.childNodes.length);
+		assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
+		assert.strictEqual('Children Test 2', child.element.textContent);
+	});
+
+	it('should be able to get the data passed to children', function() {
+		class ChildComponent extends Component {
+			render() {
+				return <div class="child">
+					{this.config.children[0].config.foo}
+					{this.config.children}
+				</div>;
+			}
+		}
+		ChildComponent.RENDERER = JSX;
+
+		class TestComponent extends Component {
+			render() {
+				return (
+					<div class="test">
+						<ChildComponent key="child">
+							<span foo="foo">Children Test</span>
+						</ChildComponent>
+					</div>
+				);
+			}
+		}
+		TestComponent.RENDERER = JSX;
+
+		component = new TestComponent();
+		var child = component.components.child;
+		assert.strictEqual(2, child.element.childNodes.length);
+		assert.strictEqual('foo', child.element.childNodes[0].textContent);
+		assert.strictEqual('SPAN', child.element.childNodes[1].tagName);
+		assert.strictEqual('Children Test', child.element.childNodes[1].textContent);
+	});
 });

@@ -1,5 +1,7 @@
 'use strict';
 
+import IncrementalDomRenderer from 'metal-incremental-dom';
+
 /**
  * These helpers are all from "babel-plugin-incremental-dom". See its README
  * file for more details:
@@ -38,7 +40,12 @@ window.iDOMHelpers.renderArbitrary = function(child) {
   } else if (Array.isArray(child)) {
     child.forEach(window.iDOMHelpers.renderArbitrary);
   } else if (String(child) === '[object Object]') {
-    window.iDOMHelpers.forOwn(child, window.iDOMHelpers.renderArbitrary);
+    // Renders special incremental dom nodes in a special way :)
+    if (IncrementalDomRenderer.isIncDomNode(child)) {
+      IncrementalDomRenderer.renderChild(child);
+    } else {
+      window.iDOMHelpers.forOwn(child, window.iDOMHelpers.renderArbitrary);
+    }
   }
 };
 

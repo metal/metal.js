@@ -220,7 +220,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleChildrenCaptured_(tree) {
 		var {config, tag} = this.componentToRender_;
-		config.children = this.buildChildren_(tree.children);
+		config.children = this.buildChildren_(tree.config.children);
 		this.componentToRender_ = null;
 		this.currentPrefix_ = this.prevPrefix_;
 		this.prevPrefix_ = null;
@@ -236,10 +236,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleChildRender_(node) {
-		if (node.args && !node.isText && IncrementalDomUtils.isComponentTag(node.args[0])) {
-			var config = IncrementalDomUtils.buildConfigFromCall(node.args);
-			config.children = this.buildChildren_(node.children);
-			this.renderFromTag_(node.args[0], config);
+		if (node.tag && IncrementalDomUtils.isComponentTag(node.tag)) {
+			node.config.children = this.buildChildren_(node.config.children);
+			this.renderFromTag_(node.tag, node.config);
 			return true;
 		}
 	}
@@ -363,7 +362,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @param {!Object} child
 	 */
 	static renderChild(child) {
-		child[IncrementalDomChildren.CHILDREN_OWNER].renderChild(child);
+		child[IncrementalDomChildren.CHILD_OWNER].renderChild(child);
 	}
 
 	/**

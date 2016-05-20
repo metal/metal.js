@@ -11,17 +11,18 @@ describe('IncrementalDomChildren', function() {
 		};
 
 		IncrementalDomChildren.capture(renderer, function(tree) {
-			assert.strictEqual(1, tree.children.length);
-			assert.ok(!tree.children[0].isText);
-			assert.strictEqual('span', tree.children[0].args[0]);
-			assert.strictEqual('key', tree.children[0].args[1]);
-			assert.deepEqual(['class', 'test'], tree.children[0].args[2]);
-			assert.strictEqual('foo', tree.children[0].args[3]);
-			assert.strictEqual('bar', tree.children[0].args[4]);
+			assert.strictEqual(1, tree.config.children.length);
 
-			assert.strictEqual(1, tree.children[0].children.length);
-			assert.ok(tree.children[0].children[0].isText);
-			assert.strictEqual('Hello World', tree.children[0].children[0].args[0]);
+			var node = tree.config.children[0];
+			assert.ok(!node.text);
+			assert.strictEqual('span', node.tag);
+			assert.ok(node.config);
+			assert.strictEqual('key', node.config.key);
+			assert.deepEqual('test', node.config.class);
+			assert.strictEqual('bar', node.config.foo);
+
+			assert.strictEqual(1, node.config.children.length);
+			assert.strictEqual('Hello World', node.config.children[0].text);
 			done();
 		});
 
@@ -38,16 +39,17 @@ describe('IncrementalDomChildren', function() {
 		};
 
 		IncrementalDomChildren.capture(renderer, function(tree) {
-			assert.strictEqual(1, tree.children.length);
-			assert.ok(!tree.children[0].args[1]);
-			assert.strictEqual('span', tree.children[0].args[0]);
-			assert.ok(!tree.children[0].args[1]);
+			assert.strictEqual(1, tree.config.children.length);
 
-			assert.strictEqual(2, tree.children[0].children.length);
-			assert.strictEqual(Component, tree.children[0].children[0].args[0]);
-			assert.strictEqual('key0', tree.children[0].children[0].args[1]);
-			assert.strictEqual(Component, tree.children[0].children[1].args[0]);
-			assert.strictEqual('key1', tree.children[0].children[1].args[1]);
+			var node = tree.config.children[0];
+			assert.strictEqual('span', node.tag);
+			assert.ok(!node.config.key);
+
+			assert.strictEqual(2, node.config.children.length);
+			assert.strictEqual(Component, node.config.children[0].tag);
+			assert.strictEqual('key0', node.config.children[0].config.key);
+			assert.strictEqual(Component, node.config.children[1].tag);
+			assert.strictEqual('key1', node.config.children[1].config.key);
 			done();
 		});
 
@@ -58,22 +60,48 @@ describe('IncrementalDomChildren', function() {
 		IncrementalDOM.elementClose('div');
 	});
 
-	it('should render captured children via incremental dom"', function() {
+	it('should store args for text nodes when they contain more than just the text', function(done) {
+		var renderer = {
+			buildKey: sinon.stub()
+		};
+
+		IncrementalDomChildren.capture(renderer, function(tree) {
+			var node = tree.config.children[0];
+			assert.strictEqual('No args', node.text);
+			assert.ok(!node.args);
+
+			node = tree.config.children[1];
+			assert.strictEqual('With args', node.text);
+			assert.deepEqual([
+				node.text,
+				formatFn
+			], node.args);
+			done();
+		});
+
+		var formatFn = val => val;
+		IncrementalDOM.text('No args');
+		IncrementalDOM.text('With args', formatFn);
+		IncrementalDOM.elementClose('div');
+	});
+
+	it('should render captured children via incremental dom', function() {
 		var element = document.createElement('div');
 
 		IncrementalDOM.patch(element, () => {
 			IncrementalDomChildren.render({
-				children: [
-					{
-						args: ['span', 'key', ['class', 'test'], 'foo', 'bar'],
-						children: [
-							{
-								args: ['Hello World'],
-								isText: true
-							}
-						]
-					}
-				]
+				tag: 'span',
+				config: {
+					children: [
+						{
+							args: ['Hello World'],
+							text: 'Hello World'
+						}
+					],
+					class: 'test',
+					foo: 'bar',
+					key: 'key'
+				}
 			});
 		});
 
@@ -87,38 +115,69 @@ describe('IncrementalDomChildren', function() {
 		assert.strictEqual('Hello World', spanElement.childNodes[0].textContent);
 	});
 
-	it('should skip rendering children node when skipNode function returns true"', function() {
+	it('should skip rendering children node when skipNode function returns true', function() {
 		var element = document.createElement('div');
 
 		function skipNode(node) {
-			if (node.args && node.args[1] === 'skip') {
+			if (node.config && node.config.id === 'skip') {
 				return true;
 			}
 		}
 		IncrementalDOM.patch(element, () => {
 			IncrementalDomChildren.render({
-				children: [
-					{
-						args: ['span', 'beforeSkip', ['id', 'node1']],
-						children: [
-							{
-								args: ['Hello World'],
-								isText: true
+				tag: 'span',
+				config: {
+					children: [
+						{
+							tag: 'span',
+							config: {
+								id: 'beforeSkip'
 							}
-						]
-					},
-					{
-						args: ['span', 'skip', ['id', 'node2']]
-					},
-					{
-						args: ['span', 'afterSkip', ['id', 'node3']]
-					}
-				]
+						},
+						{
+							tag: 'span',
+							config: {
+								id: 'skip'
+							}
+						},
+						{
+							tag: 'span',
+							config: {
+								id: 'afterSkip'
+							}
+						}
+					],
+					id: 'parent'
+				}
 			}, skipNode);
 		});
 
-		assert.strictEqual(2, element.childNodes.length);
-		assert.strictEqual('node1', element.childNodes[0].id);
-		assert.strictEqual('node3', element.childNodes[1].id);
+		assert.strictEqual(1, element.childNodes.length);
+
+		var child = element.childNodes[0];
+		assert.strictEqual(2, child.childNodes.length);
+		assert.strictEqual('beforeSkip', child.childNodes[0].id);
+		assert.strictEqual('afterSkip', child.childNodes[1].id);
+	});
+
+	it('should render text nodes that have been changed after capture', function(done) {
+		var renderer = {
+			buildKey: sinon.stub()
+		};
+
+		IncrementalDomChildren.capture(renderer, function(tree) {
+			var element = document.createElement('div');
+			tree.config.children[0].text = 'New Text';
+			IncrementalDOM.patch(element, () => {
+				IncrementalDomChildren.render(tree.config.children[0]);
+			});
+
+			assert.strictEqual(1, element.childNodes.length);
+			assert.strictEqual('New Text Formatted', element.childNodes[0].textContent);
+			done();
+		});
+
+		IncrementalDOM.text('Hello World', val => val + ' Formatted');
+		IncrementalDOM.elementClose('div');
 	});
 });

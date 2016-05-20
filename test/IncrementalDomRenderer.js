@@ -912,12 +912,12 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(children);
 
 			assert.strictEqual(1, children.length);
-			assert.ok(!children[0].isText);
-			assert.strictEqual('span', children[0].args[0]);
-			assert.strictEqual(1, children[0].children.length);
-			assert.ok(children[0].children[0].isText);
-			assert.strictEqual('Hello World', children[0].children[0].args[0]);
-			assert.strictEqual(0, children[0].children[0].children.length);
+			assert.ok(!children[0].text);
+			assert.strictEqual('span', children[0].tag);
+			assert.ok(children[0].config);
+			assert.strictEqual(1, children[0].config.children.length);
+			assert.strictEqual('Hello World', children[0].config.children[0].text);
+			assert.ok(!children[0].config.children[0].config);
 		});
 
 		it('should render children via "IncrementalDomRenderer.renderChild"', function() {

@@ -20,7 +20,9 @@ class IncrementalDomChildren {
 		renderer_ = renderer;
 		callback_ = callback;
 		tree_ = {
-			children: []
+			config: {
+				children: []
+			}
 		};
 		currentParent_ = tree_;
 		IncrementalDomAop.startInterception({
@@ -42,20 +44,19 @@ class IncrementalDomChildren {
 			return;
 		}
 
-		if (tree.isText) {
-			IncrementalDOM.text.apply(null, tree.args);
+		if (tree.text) {
+			let args = tree.args ? tree.args : [];
+			args[0] = tree.text;
+			IncrementalDOM.text.apply(null, args);
 		} else {
-			if (tree.args) {
-				IncrementalDOM.elementOpen.apply(null, tree.args);
-			}
-			if (tree.children) {
-				for (var i = 0; i < tree.children.length; i++) {
-					IncrementalDomChildren.render(tree.children[i], opt_skipNode);
+			let args = IncrementalDomUtils.buildCallFromConfig(tree.tag, tree.config);
+			IncrementalDOM.elementOpen.apply(null, args);
+			if (tree.config.children) {
+				for (var i = 0; i < tree.config.children.length; i++) {
+					IncrementalDomChildren.render(tree.config.children[i], opt_skipNode);
 				}
 			}
-			if (tree.args) {
-				IncrementalDOM.elementClose(tree.args[0]);
-			}
+			IncrementalDOM.elementClose(tree.tag);
 		}
 	}
 }
@@ -73,17 +74,26 @@ var tree_;
  * @protected
  */
 function addChildToTree_(args, opt_isText) {
-	if (!opt_isText && IncrementalDomUtils.isComponentTag(args[0])) {
-		args[1] = args[1] || renderer_.buildKey();
-	}
 	var child = {
-		args: args,
-		children: [],
-		isText: opt_isText,
 		parent: currentParent_,
-		[IncrementalDomChildren.CHILDREN_OWNER]: renderer_
+		[IncrementalDomChildren.CHILD_OWNER]: renderer_
 	};
-	currentParent_.children.push(child);
+
+	if (opt_isText) {
+		child.text = args[0];
+		if (args.length > 1) {
+			child.args = args;
+		}
+	} else {
+		if (IncrementalDomUtils.isComponentTag(args[0])) {
+			args[1] = args[1] || renderer_.buildKey();
+		}
+		child.tag = args[0];
+		child.config = IncrementalDomUtils.buildConfigFromCall(args);
+		child.config.children = [];
+	}
+
+	currentParent_.config.children.push(child);
 	return child;
 }
 
@@ -125,10 +135,11 @@ function handleInterceptedTextCall_(originalFn, ...args) {
 
 
 /**
- * Property identifying a specific object as a children array.
+ * Property identifying a specific object as a Metal.js child node, and
+ * pointing to the renderer instance that created it.
  * @type {string}
  * @static
  */
-IncrementalDomChildren.CHILDREN_OWNER = '__metalChildrenOwner';
+IncrementalDomChildren.CHILD_OWNER = '__metalChildOwner';
 
 export default IncrementalDomChildren;

@@ -1,6 +1,6 @@
 {
   "name": "metal-state",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "A class that adds support for watchable, configurable state",
   "license": "BSD",
   "repository": "metal/metal-state",

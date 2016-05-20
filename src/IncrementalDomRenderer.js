@@ -6,6 +6,7 @@ import dom from 'metal-dom';
 import { Component, ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
+import IncrementalDomUtils from './utils/IncrementalDomUtils';
 
 /**
  * Class responsible for rendering components via incremental dom.
@@ -71,51 +72,18 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Builds the "children" config property to be passed to the current
 	 * component.
 	 * @param {!Array<!Object>} children
-	 * @return {!function()}
+	 * @return {!Array<!Object>}
 	 * @protected
 	 */
-	buildChildrenFn_(children) {
-		if (children.length === 0) {
-			return emptyChildrenFn_;
-		}
-		var prefix = this.buildKey_();
-		var fn = () => {
-			var prevPrefix = this.currentPrefix_;
-			this.generatedKeyCount_[prefix] = 0;
-			this.currentPrefix_ = prefix;
-			this.intercept_();
-			IncrementalDomChildren.render(fn, this.handleChildRender_);
-			IncrementalDomAop.stopInterception();
-			this.currentPrefix_ = prevPrefix;
-		};
-		fn.children = children;
-		return fn;
-	}
-
-	/**
-	 * Builds the component config object from its incremental dom call's
-	 * arguments.
-	 * @param {!Array} args
-	 * @return {!Object}
-	 * @protected
-	 */
-	buildConfigFromCall_(args) {
-		var config = {
-			key: args[1]
-		};
-		var attrsArr = (args[2] || []).concat(args.slice(3));
-		for (var i = 0; i < attrsArr.length; i += 2) {
-			config[attrsArr[i]] = attrsArr[i + 1];
-		}
-		return config;
+	buildChildren_(children) {
+		return children.length === 0 ? emptyChildren_ : children;
 	}
 
 	/**
 	 * Builds the key for the next component that is found.
 	 * @return {string}
-	 * @protected
 	 */
-	buildKey_() {
+	buildKey() {
 		var count = this.generatedKeyCount_[this.currentPrefix_] || 0;
 		this.generatedKeyCount_[this.currentPrefix_] = count + 1;
 		return this.currentPrefix_ + 'sub' + count;
@@ -147,14 +115,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Gets the sub component referenced by the given tag and config data,
 	 * creating it if it doesn't yet exist.
-	 * @param {string} key The sub component's key.
 	 * @param {string|!Function} tagOrCtor The tag name.
 	 * @param {!Object} config The config object for the sub component.
 	 * @return {!Component} The sub component.
 	 * @protected
 	 */
-	getSubComponent_(key, tagOrCtor, config) {
-		var comp = this.component_.addSubComponent(key, tagOrCtor, config);
+	getSubComponent_(tagOrCtor, config) {
+		var comp = this.component_.addSubComponent(config.key, tagOrCtor, config);
 		if (comp.wasRendered) {
 			comp.setState(config);
 		}
@@ -253,8 +220,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleChildrenCaptured_(tree) {
 		var {config, tag} = this.componentToRender_;
-		config.children = this.buildChildrenFn_(tree.children);
+		config.children = this.buildChildren_(tree.children);
 		this.componentToRender_ = null;
+		this.currentPrefix_ = this.prevPrefix_;
+		this.prevPrefix_ = null;
 		this.renderFromTag_(tag, config);
 	}
 
@@ -267,9 +236,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleChildRender_(node) {
-		if (node.args && !node.isText && this.isComponentTag_(node.args[0])) {
-			var config = this.buildConfigFromCall_(node.args);
-			config.children = this.buildChildrenFn_(node.children);
+		if (node.args && !node.isText && IncrementalDomUtils.isComponentTag(node.args[0])) {
+			var config = IncrementalDomUtils.buildConfigFromCall(node.args);
+			config.children = this.buildChildren_(node.children);
 			this.renderFromTag_(node.args[0], config);
 			return true;
 		}
@@ -283,7 +252,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleInterceptedOpenCall_(originalFn, tag) {
-		if (this.isComponentTag_(tag)) {
+		if (IncrementalDomUtils.isComponentTag(tag)) {
 			return this.handleSubComponentCall_.apply(this, arguments);
 		} else {
 			return this.handleRegularCall_.apply(this, arguments);
@@ -334,11 +303,17 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleSubComponentCall_(originalFn, ...args) {
+		var config = IncrementalDomUtils.buildConfigFromCall(args);
+		config.key = config.key || this.buildKey();
 		this.componentToRender_ = {
-			config: this.buildConfigFromCall_(args),
+			config,
 			tag: args[0]
 		};
-		IncrementalDomChildren.capture(this.handleChildrenCaptured_);
+
+		this.prevPrefix_ = this.currentPrefix_;
+		this.currentPrefix_ = config.key;
+		this.generatedKeyCount_[this.currentPrefix_] = 0;
+		IncrementalDomChildren.capture(this, this.handleChildrenCaptured_);
 	}
 
 	/**
@@ -366,15 +341,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Checks if the given tag represents a metal component.
-	 * @param {string} tag
-	 * @protected
-	 */
-	isComponentTag_(tag) {
-		return !core.isString(tag) || tag[0] === tag[0].toUpperCase();
-	}
-
-	/**
 	 * Checks if the given attribute name is for a dom event listener.
 	 * @param {string} attr
 	 * @return {boolean}
@@ -390,6 +356,24 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	render() {
 		this.patch();
+	}
+
+	/**
+	 * Renders the given child node via its owner renderer.
+	 * @param {!Object} child
+	 */
+	static renderChild(child) {
+		child[IncrementalDomChildren.CHILDREN_OWNER].renderChild(child);
+	}
+
+	/**
+	 * Renders the given child node.
+	 * @param {!Object} child
+	 */
+	renderChild(child) {
+		this.intercept_();
+		IncrementalDomChildren.render(child, this.handleChildRender_);
+		IncrementalDomAop.stopInterception();
 	}
 
 	/**
@@ -469,8 +453,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	renderSubComponent_(tagOrCtor, config) {
-		var key = config.key || this.buildKey_();
-		var comp = this.getSubComponent_(key, tagOrCtor, config);
+		var comp = this.getSubComponent_(tagOrCtor, config);
 		this.updateContext_(comp);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
@@ -486,7 +469,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}
-		this.subComponentsFound_[key] = true;
+		this.subComponentsFound_[config.key] = true;
 		return comp;
 	}
 
@@ -620,8 +603,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 }
 
 var renderingComponents_ = [];
-function emptyChildrenFn_() {
-}
-emptyChildrenFn_.calls = [];
+var emptyChildren_ = [];
 
 export default IncrementalDomRenderer;

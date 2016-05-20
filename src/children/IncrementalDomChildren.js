@@ -1,6 +1,7 @@
 'use strict';
 
 import IncrementalDomAop from '../IncrementalDomAop';
+import IncrementalDomUtils from '../utils/IncrementalDomUtils';
 
 /**
  * Provides helpers for capturing children elements from incremental dom calls,
@@ -10,10 +11,13 @@ import IncrementalDomAop from '../IncrementalDomAop';
 class IncrementalDomChildren {
 	/**
 	 * Captures all child elements from incremental dom calls.
+	 * @param {!IncrementalDomRenderer} renderer The renderer that is capturing
+	 *   children.
 	 * @param {!function} callback Function to be called when children have all
 	 *     been captured.
  	 */
-	static capture(callback) {
+	static capture(renderer, callback) {
+		renderer_ = renderer;
 		callback_ = callback;
 		tree_ = {
 			children: []
@@ -58,6 +62,7 @@ class IncrementalDomChildren {
 
 var callback_;
 var currentParent_;
+var renderer_;
 var tree_;
 
 /**
@@ -68,11 +73,15 @@ var tree_;
  * @protected
  */
 function addChildToTree_(args, opt_isText) {
+	if (!opt_isText && IncrementalDomUtils.isComponentTag(args[0])) {
+		args[1] = args[1] || renderer_.buildKey();
+	}
 	var child = {
 		args: args,
 		children: [],
 		isText: opt_isText,
-		parent: currentParent_
+		parent: currentParent_,
+		[IncrementalDomChildren.CHILDREN_OWNER]: renderer_
 	};
 	currentParent_.children.push(child);
 	return child;
@@ -113,5 +122,13 @@ function handleInterceptedOpenCall_(originalFn, ...args) {
 function handleInterceptedTextCall_(originalFn, ...args) {
 	addChildToTree_(args, true);
 }
+
+
+/**
+ * Property identifying a specific object as a children array.
+ * @type {string}
+ * @static
+ */
+IncrementalDomChildren.CHILDREN_OWNER = '__metalChildrenOwner';
 
 export default IncrementalDomChildren;

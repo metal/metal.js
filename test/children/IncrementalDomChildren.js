@@ -1,11 +1,16 @@
 'use strict';
 
 import dom from 'metal-dom';
+import Component from 'metal-component';
 import IncrementalDomChildren from '../../src/children/IncrementalDomChildren';
 
 describe('IncrementalDomChildren', function() {
-	it('should capture children calls to incremental dom"', function(done) {
-		IncrementalDomChildren.capture(function(tree) {
+	it('should capture children calls to incremental dom', function(done) {
+		var renderer = {
+			buildKey: sinon.stub()
+		};
+
+		IncrementalDomChildren.capture(renderer, function(tree) {
 			assert.strictEqual(1, tree.children.length);
 			assert.ok(!tree.children[0].isText);
 			assert.strictEqual('span', tree.children[0].args[0]);
@@ -22,6 +27,33 @@ describe('IncrementalDomChildren', function() {
 
 		IncrementalDOM.elementOpen('span', 'key', ['class', 'test'], 'foo', 'bar');
 		IncrementalDOM.text('Hello World');
+		IncrementalDOM.elementClose('span');
+		IncrementalDOM.elementClose('div');
+	});
+
+	it('should set keys of component calls according to result of "buildKey" function', function(done) {
+		var counter = 0;
+		var renderer = {
+			buildKey: () => 'key' + counter++
+		};
+
+		IncrementalDomChildren.capture(renderer, function(tree) {
+			assert.strictEqual(1, tree.children.length);
+			assert.ok(!tree.children[0].args[1]);
+			assert.strictEqual('span', tree.children[0].args[0]);
+			assert.ok(!tree.children[0].args[1]);
+
+			assert.strictEqual(2, tree.children[0].children.length);
+			assert.strictEqual(Component, tree.children[0].children[0].args[0]);
+			assert.strictEqual('key0', tree.children[0].children[0].args[1]);
+			assert.strictEqual(Component, tree.children[0].children[1].args[0]);
+			assert.strictEqual('key1', tree.children[0].children[1].args[1]);
+			done();
+		});
+
+		IncrementalDOM.elementOpen('span');
+		IncrementalDOM.elementVoid(Component);
+		IncrementalDOM.elementVoid(Component);
 		IncrementalDOM.elementClose('span');
 		IncrementalDOM.elementClose('div');
 	});

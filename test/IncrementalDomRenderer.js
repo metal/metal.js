@@ -222,6 +222,7 @@ describe('IncrementalDomRenderer', function() {
 					IncDom.attr('checked', '');
 				}
 				IncDom.elementOpenEnd('input');
+				IncDom.elementClose('input');
 			};
 			TestComponent.STATE = {
 				checked: {
@@ -272,7 +273,7 @@ describe('IncrementalDomRenderer', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
 				IncDom.elementOpen('div');
-				IncDom.elementOpen('div', null, 'class', 'inner');
+				IncDom.elementOpen('div', null, [], 'class', 'inner');
 				IncDom.text('foo');
 				IncDom.elementClose('div');
 				IncDom.elementClose('div');
@@ -864,6 +865,7 @@ describe('IncrementalDomRenderer', function() {
 			var child = component.components.child;
 			assert.ok(child instanceof ChildComponent);
 			assert.strictEqual(child.element, component.element.childNodes[0]);
+			assert.strictEqual('CHILD', child.element.tagName);
 
 			component.switch = true;
 			component.once('stateSynced', function() {
@@ -871,6 +873,7 @@ describe('IncrementalDomRenderer', function() {
 				assert.notStrictEqual(child, newChild);
 				assert.ok(newChild instanceof TestChildComponent);
 				assert.strictEqual(newChild.element, component.element.childNodes[0]);
+				assert.strictEqual('DIV', newChild.element.tagName);
 				done();
 			});
 		});

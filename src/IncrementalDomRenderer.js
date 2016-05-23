@@ -121,7 +121,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	getSubComponent_(tagOrCtor, config) {
-		var comp = this.component_.addSubComponent(config.key, tagOrCtor, config);
+		var prevComp = this.component_.components[config.key];
+		var comp = this.component_.addSubComponent(config.key, tagOrCtor, config, true);
+		if (prevComp && prevComp !== comp) {
+			// If a previous component was replaced, dispose it, but only after making
+			// sure that its element won't be removed (otherwise incremental dom may
+			// throw an error when trying to remove it later).
+			prevComp.element = null;
+			prevComp.dispose();
+		}
 		if (comp.wasRendered) {
 			comp.setState(config);
 		}

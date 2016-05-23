@@ -31,7 +31,9 @@
     "babel-preset-es2015": "^6.3.13",
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0",
-    "incremental-dom": "^0.4.1",
+    "gulp-replace": "^0.5.4",
+    "gulp-wrapper": "^1.0.0",
+    "incremental-dom": "mairatma/incremental-dom#dist",
     "metal-karma-config": "^2.1.0"
   }
 }

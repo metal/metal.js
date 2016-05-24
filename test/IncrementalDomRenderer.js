@@ -1353,6 +1353,52 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should correctly reposition child component even if its "shouldUpdate" returns false', function(done) {
+			var TestChildComponent = createTestComponentClass();
+			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('span');
+				IncDom.text('Child');
+				IncDom.elementClose('span');
+			};
+			TestChildComponent.prototype.shouldUpdate = function() {
+				return false;
+			};
+
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				if (this.component_.wrap) {
+					IncDom.elementOpen('div', null, [], 'class', 'wrapper');
+				}
+				IncDom.elementVoid(TestChildComponent, 'child');
+				if (this.component_.wrap) {
+					IncDom.elementClose('div');
+				}
+				IncDom.elementClose('div');
+			};
+			TestComponent.STATE = {
+				wrap: {
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+			assert.strictEqual(1, component.element.childNodes.length);
+			assert.strictEqual(child.element, component.element.childNodes[0]);
+			assert.strictEqual('SPAN', child.element.tagName);
+			assert.strictEqual('Child', child.element.textContent);
+
+			component.wrap = true;
+			component.once('stateSynced', function() {
+				assert.strictEqual(1, component.element.childNodes.length);
+				assert.ok(dom.hasClass(component.element.childNodes[0], 'wrapper'));
+				assert.strictEqual(child.element, component.element.childNodes[0].childNodes[0]);
+				assert.strictEqual('SPAN', child.element.tagName);
+				assert.strictEqual('Child', child.element.textContent);
+				done();
+			});
+		});
+
 		it('should skip child update without error if it had no element before', function(done) {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.prototype.render = function() {

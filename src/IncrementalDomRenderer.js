@@ -427,8 +427,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * called by `patch`.
 	 */
 	renderInsidePatch() {
-		if (this.component_.wasRendered && !this.shouldUpdate(this.changes_)) {
-			this.skipRerender_();
+		if (this.component_.wasRendered &&
+			!this.shouldUpdate(this.changes_) &&
+			IncrementalDOM.currentPointer() === this.component_.element) {
+			if (this.component_.element) {
+				this.skipRerender_();
+			}
 			return;
 		}
 		this.renderInsidePatchDontSkip_();

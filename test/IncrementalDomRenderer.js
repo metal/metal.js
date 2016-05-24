@@ -1307,11 +1307,11 @@ describe('IncrementalDomRenderer', function() {
 
 		describe('Nested Components', function() {
 			beforeEach(function() {
-				sinon.spy(IncrementalDOM, 'skip');
+				sinon.spy(IncrementalDOM, 'skipNode');
 			});
 
 			afterEach(function() {
-				IncrementalDOM.skip.restore();
+				IncrementalDOM.skipNode.restore();
 			});
 
 			it('should not rerender child component if its "shouldUpdate" returns false', function(done) {
@@ -1343,7 +1343,7 @@ describe('IncrementalDomRenderer', function() {
 
 				component.foo = 'foo2';
 				component.once('stateSynced', function() {
-					assert.strictEqual(1, IncrementalDOM.skip.callCount);
+					assert.strictEqual(1, IncrementalDOM.skipNode.callCount);
 					assert.strictEqual('foo2', component.element.childNodes[0].textContent);
 					assert.strictEqual(child.element, component.element.childNodes[1]);
 					assert.strictEqual('SPAN', child.element.tagName);

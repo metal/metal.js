@@ -3,7 +3,7 @@
 import './incremental-dom';
 import { array, core, object } from 'metal';
 import dom from 'metal-dom';
-import { Component, ComponentRenderer, EventsCollector } from 'metal-component';
+import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
 import IncrementalDomUtils from './utils/IncrementalDomUtils';
@@ -21,7 +21,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		comp.context = {};
 		this.changes_ = {};
 		this.eventsCollector_ = new EventsCollector(comp);
-		this.lastElementCreationCall_ = [];
 		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		comp.on('attached', this.handleAttached_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
@@ -288,7 +287,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 		var node = originalFn.apply(null, args);
-		this.updateElementIfNotReached_(node, args);
+		this.updateElementIfNotReached_(node);
 		return node;
 	}
 
@@ -401,7 +400,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	renderFromTag_(tag, config) {
 		if (core.isString(tag) || tag.prototype.getRenderer) {
 			var comp = this.renderSubComponent_(tag, config);
-			this.updateElementIfNotReached_(comp);
+			this.updateElementIfNotReached_(comp.element);
 			return comp.element;
 		} else {
 			return tag(config);
@@ -431,7 +430,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			!this.shouldUpdate(this.changes_) &&
 			IncrementalDOM.currentPointer() === this.component_.element) {
 			if (this.component_.element) {
-				this.skipRerender_();
+				IncrementalDOM.skipNode();
 			}
 			return;
 		}
@@ -509,19 +508,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Skips rerendering the component by repeating the last incremental dom call
-	 * for creating its main element and then calling `IncrementalDOM.skip`.
-	 * @protected
-	 */
-	skipRerender_() {
-		if (this.lastElementCreationCall_.length > 0) {
-			IncrementalDOM.elementOpen.apply(null, this.lastElementCreationCall_);
-			IncrementalDOM.skip();
-			IncrementalDOM.elementClose(this.lastElementCreationCall_[0]);
-		}
-	}
-
-	/**
 	 * Stores the component that has just started being rendered.
 	 * @param {!Component} comp
 	 */
@@ -578,32 +564,17 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Updates this renderer's component's element with the given values, unless
 	 * it has already been reached by an earlier call.
-	 * @param {!Element|Component} nodeOrComponent
-	 * @param {Array=} opt_args The arguments that were used to create this
-	 *     element via incremental dom.
+	 * @param {!Element} node
 	 * @protected
 	 */
-	updateElementIfNotReached_(nodeOrComponent, opt_args) {
+	updateElementIfNotReached_(node) {
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
 		if (!currRenderer.rootElementReached_) {
 			currRenderer.rootElementReached_ = true;
-
-			var node = nodeOrComponent;
-			var args = opt_args;
-
-			if (nodeOrComponent instanceof Component) {
-				var renderer = nodeOrComponent.getRenderer();
-				args = renderer instanceof IncrementalDomRenderer ?
-					renderer.lastElementCreationCall_ :
-					[];
-				node = nodeOrComponent.element;
-			}
-
 			if (currComp.element !== node) {
 				currComp.element = node;
 			}
-			currRenderer.lastElementCreationCall_ = args;
 		}
 	}
 

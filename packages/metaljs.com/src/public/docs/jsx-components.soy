@@ -99,6 +99,39 @@ export default MyComponent;{/literal}
 			a <a href="http://npmjs.com/package/babel-preset-metal-jsx">babel preset</a> that
 			you can use instead.
 		</p>
+
+		<h2>Functional components</h2>
+
+		<p>
+			Sometimes you'll create very simple components, that have no other behavior
+			besides rendering their own contents. In this case you can drop using
+			classes, and instead create simple functions that just render the contents
+			instead.
+		</p>
+
+		<p>
+			For example, let's create a simple <strong>Button</strong> component as
+			a function:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}/**
+ * Functional components receive the configuration
+ * object as the first param.
+ */
+function Button({ cssClass, label }) {
+  return &lt;button type="button" class={cssClass}&gt;{label}&lt;/button&gt;;
+}{/literal}
+		</textarea>
+
+		<p>
+			You can then use it from parent components in the same way that you'd use
+			a component class, for example:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}&lt;Button cssClass="btn btn-primary" label="OK" /&gt;{/literal}
+		</textarea>
 	{/param}
 {/call}
 {/template}

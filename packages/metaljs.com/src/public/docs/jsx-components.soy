@@ -87,18 +87,61 @@ export default MyComponent;{/literal}
 			about <a href="/docs/state.html">state</a> to learn more about this.
 		</p>
 
-		<h2>JSX compilation</h2>
+		<h2>Children config</h2>
 
 		<p>
-			For the integration
-			between <strong>Metal.js</strong> and <strong>JSX</strong> to work, the
-			JSX code needs to be compiled via a babel plugin
-			called <a href="http://npmjs.com/package/babel-plugin-incremental-dom">babel-plugin-incremental-dom</a>.
-			Using it directly means you'd need to configure it manually though, so we
-			also provide
-			a <a href="http://npmjs.com/package/babel-preset-metal-jsx">babel preset</a> that
-			you can use instead.
+			Whenever content is passed inside a component's jsx tag, it will be
+			received through the <code>children</code> config property. That way the
+			component can decide if this content will be rendered at all, and where
+			exactly it should go.
 		</p>
+
+		<p>
+			For example, imagine a simple list component that receives its items as
+			its content, like this:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}&lt;List&gt;
+  &lt;li&gt;Item 1&lt;/li&gt;
+  &lt;li&gt;Item 2&lt;/li&gt;
+  &lt;li&gt;Item 3&lt;/li&gt;
+&lt;/List&gt;{/literal}
+		</textarea>
+
+		<p>
+			This could be implemented by using the <code>children</code> config:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}class List extends JSXComponent {
+  render() {
+    return &lt;ul&gt;{this.config.children}&lt;/ul&gt;
+  }
+}{/literal}
+		</textarea>
+
+		<p>
+			If you inspect <code>this.config.children</code> you'll notice that it's
+			an array of objects. That gives you a lot of power when handling your
+			component's contents. For example, you can choose to render only part of
+			your children, like this:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}// Renders only the second item.
+return &lt;ul&gt;{this.config.children[1]}&lt;/ul&gt;{/literal}
+		</textarea>
+
+		<p>Or even change the data that they should receive before being rendered:</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}// Forces all items to use the 'my-list-item-class' css class.
+this.config.children.forEach(child => {
+  child.class = 'my-list-item-class';
+};
+return &lt;ul&gt;{this.config.children}&lt;/ul&gt;{/literal}
+		</textarea>
 
 		<h2>Functional components</h2>
 
@@ -132,6 +175,19 @@ function Button({ cssClass, label }) {
 		<textarea class="code" data-mode="javascript">
 {literal}&lt;Button cssClass="btn btn-primary" label="OK" /&gt;{/literal}
 		</textarea>
+
+		<h2>JSX compilation</h2>
+
+		<p>
+			For the integration
+			between <strong>Metal.js</strong> and <strong>JSX</strong> to work, the
+			JSX code needs to be compiled via a babel plugin
+			called <a href="http://npmjs.com/package/babel-plugin-incremental-dom">babel-plugin-incremental-dom</a>.
+			Using it directly means you'd need to configure it manually though, so we
+			also provide
+			a <a href="http://npmjs.com/package/babel-preset-metal-jsx">babel preset</a> that
+			you can use instead.
+		</p>
 	{/param}
 {/call}
 {/template}

@@ -211,9 +211,11 @@ class Component extends State {
 	 * @param {string} key
 	 * @param {string|!Function} componentNameOrCtor
 	 * @param {Object=} opt_data
+	 * @param {boolean=} opt_dontDispose Optional flag indicating that if an
+	 *     existing sub component is replaced, it shouldn't be disposed as well.
 	 * @return {!Component}
 	 */
-	addSubComponent(key, componentNameOrCtor, opt_data) {
+	addSubComponent(key, componentNameOrCtor, opt_data, opt_dontDispose) {
 		var ConstructorFn = componentNameOrCtor;
 		if (core.isString(ConstructorFn)) {
 			ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
@@ -221,7 +223,9 @@ class Component extends State {
 
 		var component = this.components[key];
 		if (component && component.constructor !== ConstructorFn) {
-			component.dispose();
+			if (!opt_dontDispose) {
+				component.dispose();
+			}
 			component = null;
 		}
 

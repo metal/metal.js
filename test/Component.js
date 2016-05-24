@@ -801,6 +801,21 @@ describe('Component', function() {
 			assert.ok(newChild instanceof ChildComponent2);
 		});
 
+		it('should not dispose existing subcomponent when replaced if "opt_dontDispose" is true', function() {
+			var ChildComponent2 = createCustomComponentClass();
+
+			comp = new Component();
+			comp.addSubComponent('child', ChildComponent);
+			var child = comp.components.child;
+
+			comp.addSubComponent('child', ChildComponent2, {}, true);
+			var newChild = comp.components.child;
+			assert.notStrictEqual(child, newChild);
+			assert.ok(!child.isDisposed());
+			assert.ok(!newChild.isDisposed());
+			assert.ok(newChild instanceof ChildComponent2);
+		});
+
 		it('should dispose sub components when parent component is disposed', function() {
 			comp = new Component();
 			comp.addSubComponent('child', ChildComponent);

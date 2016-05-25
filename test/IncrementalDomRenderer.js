@@ -628,7 +628,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
 
-		it('should run component\'s "rendered" lifecycle method when rendered as sub component', function() {
+		it('should run component\'s lifecycle methods when rendered as sub component', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -639,11 +639,13 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			sinon.spy(ChildComponent.prototype, 'rendered');
+			sinon.spy(ChildComponent.prototype, 'attached');
 			component = new TestComponent();
 
 			var child = component.components.child;
 			assert.strictEqual(1, child.rendered.callCount);
 			assert.ok(child.rendered.args[0][0]);
+			assert.strictEqual(1, child.attached.callCount);
 		});
 
 		it('should pass state to sub component', function() {
@@ -687,7 +689,7 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should run component\'s "rendered" lifecycle method when updated as sub component', function(done) {
+		it('should run component\'s lifecycle methods when updated as sub component', function(done) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -703,6 +705,7 @@ describe('IncrementalDomRenderer', function() {
 			};
 
 			sinon.spy(ChildComponent.prototype, 'rendered');
+			sinon.spy(ChildComponent.prototype, 'attached');
 			component = new TestComponent();
 
 			component.foo = 'bar';
@@ -710,6 +713,7 @@ describe('IncrementalDomRenderer', function() {
 				var child = component.components.child;
 				assert.strictEqual(2, child.rendered.callCount);
 				assert.ok(!child.rendered.args[1][0]);
+				assert.strictEqual(1, child.attached.callCount);
 				done();
 			});
 		});
@@ -971,6 +975,36 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(newChild instanceof TestChildComponent);
 				assert.strictEqual(newChild.element, component.element.childNodes[0]);
 				assert.strictEqual('DIV', newChild.element.tagName);
+				done();
+			});
+		});
+
+		it('should call "detached" lifecycle function when sub component is removed', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					if (!this.remove) {
+						IncDom.elementVoid(ChildComponent, 'child');
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				remove: {
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+			assert.ok(!child.isDisposed());
+			sinon.spy(child, 'detached');
+
+			component.remove = true;
+			component.once('stateSynced', function() {
+				assert.ok(!component.components.child);
+				assert.ok(child.isDisposed());
+				assert.strictEqual(1, child.detached.callCount);
 				done();
 			});
 		});

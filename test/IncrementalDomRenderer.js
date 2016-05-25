@@ -895,149 +895,258 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', child.element.getAttribute('data-foo'));
 		});
 
-		it('should pass tree of incremental dom calls as "children"', function() {
-			var TestChildComponent = createTestComponentClass();
+		it('should use the same element from sub component if no wrapper is given', function() {
 			var TestComponent = createTestComponentClass();
 			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementOpen(TestChildComponent, 'child');
-				IncDom.elementOpen('span');
-				IncDom.text('Hello World');
-				IncDom.elementClose('span');
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose('div');
+				IncDom.elementVoid(ChildComponent, 'child');
 			};
 			component = new TestComponent();
 
 			var child = component.components.child;
-			assert.ok(child instanceof TestChildComponent);
-
-			var children = child.config.children;
-			assert.ok(children);
-
-			assert.strictEqual(1, children.length);
-			assert.ok(!children[0].text);
-			assert.strictEqual('span', children[0].tag);
-			assert.ok(children[0].config);
-			assert.strictEqual(1, children[0].config.children.length);
-			assert.strictEqual('Hello World', children[0].config.children[0].text);
-			assert.ok(!children[0].config.children[0].config);
+			assert.strictEqual(child.element, component.element);
 		});
 
-		it('should render children via "IncrementalDomRenderer.renderChild"', function() {
+		it('should position previously empty child component correctly inside parent', function(done) {
 			var TestChildComponent = createTestComponentClass();
 			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('child');
-				this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
-				IncDom.elementClose('child');
+				if (!this.component_.empty) {
+					IncrementalDOM.elementVoid('div');
+				}
 			};
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementOpen(TestChildComponent, 'child');
-				IncDom.elementOpen('span');
-				IncDom.text('Hello World');
-				IncDom.elementClose('span');
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			assert.ok(child instanceof TestChildComponent);
-			assert.strictEqual(1, child.element.childNodes.length);
-			assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
-			assert.strictEqual('Hello World', child.element.childNodes[0].textContent);
-		});
-
-		it('should render only selected nodes from "children" config', function() {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('child');
-				IncrementalDomRenderer.renderChild(this.component_.config.children[1]);
-				IncDom.elementClose('child');
-			};
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementOpen(TestChildComponent, 'child');
-				IncDom.elementVoid('span', null, ['class', 'first']);
-				IncDom.elementVoid('span', null, ['class', 'second']);
-				IncDom.elementVoid('span', null, ['class', 'third']);
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			assert.strictEqual(1, child.element.childNodes.length);
-			assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
-			assert.ok(dom.hasClass(child.element.childNodes[0], 'second'));
-		});
-
-		it('should render correctly when recursive children are used', function() {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('child');
-				this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
-				IncDom.elementClose('child');
-			};
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementOpen(TestChildComponent, 'child');
-				IncDom.elementOpen(TestChildComponent, 'child2');
-				IncDom.elementOpen(TestChildComponent, 'child3');
-				IncDom.elementOpen('span');
-				IncDom.text('Hello World');
-				IncDom.elementClose('span');
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			var child2 = component.components.child2;
-			var child3 = component.components.child3;
-			assert.ok(child instanceof TestChildComponent);
-			assert.ok(child2 instanceof TestChildComponent);
-			assert.ok(child3 instanceof TestChildComponent);
-			assert.ok(!child.components.child2);
-			assert.strictEqual(child.element, component.element.childNodes[0]);
-			assert.strictEqual(1, child.element.childNodes.length);
-			assert.strictEqual('CHILD', child.element.childNodes[0].tagName);
-			assert.strictEqual(child2.element, child.element.childNodes[0]);
-			assert.strictEqual(1, child2.element.childNodes.length);
-			assert.strictEqual('CHILD', child2.element.childNodes[0].tagName);
-			assert.strictEqual(child3.element, child2.element.childNodes[0]);
-			assert.strictEqual(1, child3.element.childNodes.length);
-			assert.strictEqual('Hello World', child2.element.childNodes[0].textContent);
-		});
-
-		it('should pass same children array when there are no children', function(done) {
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementVoid(ChildComponent, 'child', [], 'foo', this.component_.foo);
-				IncDom.elementClose('div');
-			};
-			TestComponent.STATE = {
-				foo: {
-					value: 'foo'
+			TestChildComponent.STATE = {
+				empty: {
+					value: true
 				}
 			};
 
+			var TestComponent = createTestComponentClass();
+			TestComponent.RENDERER.prototype.renderIncDom = function() {
+				IncDom.elementOpen('div');
+				IncDom.elementVoid(TestChildComponent, 'child');
+				IncDom.elementClose('div');
+			};
 			component = new TestComponent();
-			var child = component.components.child;
-			var children = child.config.children;
-			assert.ok(children);
 
-			component.foo = 'foo2';
-			component.once('stateSynced', function() {
-				assert.strictEqual(children, child.config.children);
+			var child = component.components.child;
+			assert.ok(!child.element);
+			assert.strictEqual(0, component.element.childNodes.length);
+
+			child.empty = false;
+			child.once('stateSynced', function() {
+				assert.ok(child.element);
+				assert.strictEqual(1, component.element.childNodes.length);
+				assert.strictEqual(child.element, component.element.childNodes[0]);
 				done();
+			});
+		});
+
+		describe('Children config', function() {
+			it('should pass tree of incremental dom calls as "children"', function() {
+				var TestChildComponent = createTestComponentClass();
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementOpen(TestChildComponent, 'child');
+					IncDom.elementOpen('span');
+					IncDom.text('Hello World');
+					IncDom.elementClose('span');
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+				component = new TestComponent();
+
+				var child = component.components.child;
+				assert.ok(child instanceof TestChildComponent);
+
+				var children = child.config.children;
+				assert.ok(children);
+
+				assert.strictEqual(1, children.length);
+				assert.ok(!children[0].text);
+				assert.strictEqual('span', children[0].tag);
+				assert.ok(children[0].config);
+				assert.strictEqual(1, children[0].config.children.length);
+				assert.strictEqual('Hello World', children[0].config.children[0].text);
+				assert.ok(!children[0].config.children[0].config);
+			});
+
+			it('should render children via "IncrementalDomRenderer.renderChild"', function() {
+				var TestChildComponent = createTestComponentClass();
+				TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('child');
+					this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
+					IncDom.elementClose('child');
+				};
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementOpen(TestChildComponent, 'child');
+					IncDom.elementOpen('span');
+					IncDom.text('Hello World');
+					IncDom.elementClose('span');
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+				component = new TestComponent();
+
+				var child = component.components.child;
+				assert.ok(child instanceof TestChildComponent);
+				assert.strictEqual(1, child.element.childNodes.length);
+				assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
+				assert.strictEqual('Hello World', child.element.childNodes[0].textContent);
+			});
+
+			it('should render only selected nodes from "children" config', function() {
+				var TestChildComponent = createTestComponentClass();
+				TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('child');
+					IncrementalDomRenderer.renderChild(this.component_.config.children[1]);
+					IncDom.elementClose('child');
+				};
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementOpen(TestChildComponent, 'child');
+					IncDom.elementVoid('span', null, ['class', 'first']);
+					IncDom.elementVoid('span', null, ['class', 'second']);
+					IncDom.elementVoid('span', null, ['class', 'third']);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+				component = new TestComponent();
+
+				var child = component.components.child;
+				assert.strictEqual(1, child.element.childNodes.length);
+				assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
+				assert.ok(dom.hasClass(child.element.childNodes[0], 'second'));
+			});
+
+			it('should render correctly when recursive children are used', function() {
+				var TestChildComponent = createTestComponentClass();
+				TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('child');
+					this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
+					IncDom.elementClose('child');
+				};
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementOpen(TestChildComponent, 'child');
+					IncDom.elementOpen(TestChildComponent, 'child2');
+					IncDom.elementOpen(TestChildComponent, 'child3');
+					IncDom.elementOpen('span');
+					IncDom.text('Hello World');
+					IncDom.elementClose('span');
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+				component = new TestComponent();
+
+				var child = component.components.child;
+				var child2 = component.components.child2;
+				var child3 = component.components.child3;
+				assert.ok(child instanceof TestChildComponent);
+				assert.ok(child2 instanceof TestChildComponent);
+				assert.ok(child3 instanceof TestChildComponent);
+				assert.ok(!child.components.child2);
+				assert.strictEqual(child.element, component.element.childNodes[0]);
+				assert.strictEqual(1, child.element.childNodes.length);
+				assert.strictEqual('CHILD', child.element.childNodes[0].tagName);
+				assert.strictEqual(child2.element, child.element.childNodes[0]);
+				assert.strictEqual(1, child2.element.childNodes.length);
+				assert.strictEqual('CHILD', child2.element.childNodes[0].tagName);
+				assert.strictEqual(child3.element, child2.element.childNodes[0]);
+				assert.strictEqual(1, child3.element.childNodes.length);
+				assert.strictEqual('Hello World', child2.element.childNodes[0].textContent);
+			});
+
+			it('should pass same children array when there are no children', function(done) {
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(ChildComponent, 'child', [], 'foo', this.component_.foo);
+					IncDom.elementClose('div');
+				};
+				TestComponent.STATE = {
+					foo: {
+						value: 'foo'
+					}
+				};
+
+				component = new TestComponent();
+				var child = component.components.child;
+				var children = child.config.children;
+				assert.ok(children);
+
+				component.foo = 'foo2';
+				component.once('stateSynced', function() {
+					assert.strictEqual(children, child.config.children);
+					done();
+				});
+			});
+
+			it('should use the same element from children sub component if no wrapper is given', function() {
+				var TestChildComponent = createTestComponentClass();
+				TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+					this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
+				};
+
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementOpen(TestChildComponent, 'child');
+					IncDom.elementVoid(ChildComponent, 'child2');
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+				component = new TestComponent();
+
+				var child = component.components.child;
+				var child2 = component.components.child2;
+				assert.strictEqual(child.element, child2.element);
+				assert.notStrictEqual(component.element, child.element);
+			});
+
+			it('should use same keys for children components when rerendered after update', function(done) {
+				var TestChildComponent = createTestComponentClass();
+				TestChildComponent.RENDERER.prototype.renderIncDom = function() {
+					IncrementalDOM.elementOpen('div');
+					IncrementalDOM.text(this.foo);
+					this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
+					IncrementalDOM.elementClose('div');
+				};
+				TestChildComponent.STATE = {
+					foo: {
+						value: 'foo'
+					}
+				};
+
+				var TestComponent = createTestComponentClass();
+				TestComponent.RENDERER.prototype.renderIncDom = function() {
+					IncDom.elementOpen('div');
+					IncDom.elementOpen(TestChildComponent, 'child');
+					IncDom.elementVoid(ChildComponent);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				};
+				component = new TestComponent();
+				assert.strictEqual(2, Object.keys(component.components).length);
+
+				var child = component.components.child;
+				var child2 = component.components.childsub0;
+				assert.ok(child);
+				assert.ok(child2);
+
+				child.foo = 'foo2';
+				child.once('stateSynced', function() {
+					assert.strictEqual(2, Object.keys(component.components).length);
+					assert.strictEqual(child, component.components.child);
+					assert.strictEqual(child2, component.components.childsub0);
+					assert.ok(!component.components.sub1);
+					done();
+				});
 			});
 		});
 
@@ -1084,113 +1193,6 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(!child.context.bar);
 			assert.strictEqual('foo', grandChild.context.foo);
 			assert.strictEqual('bar', grandChild.context.bar);
-		});
-
-		it('should use the same element from sub component if no wrapper is given', function() {
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementVoid(ChildComponent, 'child');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			assert.strictEqual(child.element, component.element);
-		});
-
-		it('should use the same element from children sub component if no wrapper is given', function() {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
-			};
-
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementOpen(TestChildComponent, 'child');
-				IncDom.elementVoid(ChildComponent, 'child2');
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			var child2 = component.components.child2;
-			assert.strictEqual(child.element, child2.element);
-			assert.notStrictEqual(component.element, child.element);
-		});
-
-		it('should use same keys for children components when rerendered after update', function(done) {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				IncrementalDOM.elementOpen('div');
-				IncrementalDOM.text(this.foo);
-				this.component_.config.children.forEach(IncrementalDomRenderer.renderChild);
-				IncrementalDOM.elementClose('div');
-			};
-			TestChildComponent.STATE = {
-				foo: {
-					value: 'foo'
-				}
-			};
-
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementOpen(TestChildComponent, 'child');
-				IncDom.elementVoid(ChildComponent);
-				IncDom.elementClose(TestChildComponent);
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-			assert.strictEqual(2, Object.keys(component.components).length);
-
-			var child = component.components.child;
-			var child2 = component.components.childsub0;
-			assert.ok(child);
-			assert.ok(child2);
-
-			child.foo = 'foo2';
-			child.once('stateSynced', function() {
-				assert.strictEqual(2, Object.keys(component.components).length);
-				assert.strictEqual(child, component.components.child);
-				assert.strictEqual(child2, component.components.childsub0);
-				assert.ok(!component.components.sub1);
-				done();
-			});
-		});
-
-		it('should position previously empty child component correctly inside parent', function(done) {
-			var TestChildComponent = createTestComponentClass();
-			TestChildComponent.RENDERER.prototype.renderIncDom = function() {
-				if (!this.component_.empty) {
-					IncrementalDOM.elementVoid('div');
-				}
-			};
-			TestChildComponent.STATE = {
-				empty: {
-					value: true
-				}
-			};
-
-			var TestComponent = createTestComponentClass();
-			TestComponent.RENDERER.prototype.renderIncDom = function() {
-				IncDom.elementOpen('div');
-				IncDom.elementVoid(TestChildComponent, 'child');
-				IncDom.elementClose('div');
-			};
-			component = new TestComponent();
-
-			var child = component.components.child;
-			assert.ok(!child.element);
-			assert.strictEqual(0, component.element.childNodes.length);
-
-			child.empty = false;
-			child.once('stateSynced', function() {
-				assert.ok(child.element);
-				assert.strictEqual(1, component.element.childNodes.length);
-				assert.strictEqual(child.element, component.element.childNodes[0]);
-				done();
-			});
 		});
 
 		describe('Non Incremental DOM sub component', function() {

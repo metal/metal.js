@@ -153,17 +153,75 @@ render() &lbrace;
 		</textarea>
 
 		<p>
-			Now run the demo again, go to the browser's console and type:
-			<code>modal.shown = false</code>. You'll notice that the modal will be
-			hidden as expected. If you now type <code>modal.shown = true</code>, it
+			Now run the demo again, go to the browser's console and
+			type: <code>modal.shown = false</code>. You'll notice that the modal will
+			be hidden as expected. If you now type <code>modal.shown = true</code>, it
 			will show up again.
 		</p>
 
 		<p>
-			If you want you can also turn <code>header</code> and <code>body</code>
-			into state properties. That way when you type something
-			like <code>modal.header = 'New Header'</code>, the contents will also be
-			updated automatically.
+			If you want you can also turn <code>header</code> and <code>body</code> into
+			state properties as well. All you have to do is:
+		</p>
+
+		<ol>
+			<li>
+				<p>
+					Add them to <code>STATE</code>, like this:
+				</p>
+
+				<textarea class="code" data-mode="javascript">
+		{literal}Modal.STATE = {
+	body: {
+		value: 'Default body'
+	},
+	header: {
+		value: 'Default header'
+	},
+	shown: {
+		value: true
+	}
+};{/literal}
+				</textarea>
+			</li>
+			<li>
+				<p>
+					If you're using JSX templates, change the calls
+					to <code>this.config</code> to call directly
+					from <code>this</code> instead, like this:
+				</p>
+				<textarea class="code" data-mode="javascript">
+{literal}render() &lbrace;
+	var cssClass = 'modal';
+	if (this.shown) {
+		cssClass += 'show';
+	}
+	return &lt;div class={cssClass}&gt;
+		&lt;div class="modal-dialog"&gt;
+			&lt;div class="modal-content"&gt;
+				&lt;header class="modal-header"&gt;
+					&lt;button type="button" class="close"&gt;
+						&lt;span&gt;×&lt;/span&gt;
+					&lt;/button&gt;
+					&lt;h4&gt;{this.header}&lt;/h4&gt;
+				&lt;/header&gt;
+				&lt;section class="modal-body"&gt;
+					{this.body}
+				&lt;/section&gt;
+				&lt;footer class="modal-footer"&gt;
+					&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
+				&lt;/footer&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;;
+}{/literal}
+				</textarea>
+			</li>
+		</ol>
+
+		<p>
+			Now if you type something like <code>modal.header = 'New Header'</code> on
+			the console, the contents will also be updated automatically.
 		</p>
 
 		<h2>Next steps</h2>

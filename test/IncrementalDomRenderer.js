@@ -1,6 +1,6 @@
 'use strict';
 
-import { object } from 'metal';
+import { async, object } from 'metal';
 import dom from 'metal-dom';
 import { Component, ComponentRegistry } from 'metal-component';
 import IncrementalDomChildren from '../src/children/IncrementalDomChildren';
@@ -1009,7 +1009,7 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should call "detached" lifecycle function when sub component is removed', function(done) {
+		it('should call "detached" lifecycle function and event when sub component is removed', function(done) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -1031,11 +1031,13 @@ describe('IncrementalDomRenderer', function() {
 			sinon.spy(child, 'detached');
 
 			component.remove = true;
-			component.once('stateSynced', function() {
-				assert.ok(!component.components.child);
-				assert.ok(child.isDisposed());
-				assert.strictEqual(1, child.detached.callCount);
-				done();
+			child.once('detached', function() {
+				async.nextTick(function() {
+					assert.ok(!component.components.child);
+					assert.ok(child.isDisposed());
+					assert.strictEqual(1, child.detached.callCount);
+					done();
+				});
 			});
 		});
 
@@ -1481,40 +1483,130 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should dispose sub components that are unused after an update', function(done) {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementOpen('div');
-					for (var i = 1; i <= this.count; i++) {
-						IncDom.elementVoid('ChildComponent', null, ['key', 'child' + i]);
+		describe('Dispose Unused Sub Components', function() {
+			it('should dispose sub components that are unused after an update', function(done) {
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen('div');
+						for (var i = 1; i <= this.count; i++) {
+							IncDom.elementVoid('ChildComponent', null, ['key', 'child' + i]);
+						}
+						IncDom.elementClose('div');
 					}
-					IncDom.elementClose('div');
 				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.STATE = {
-				count: {
-					value: 3
+				TestComponent.RENDERER = IncrementalDomRenderer;
+				TestComponent.STATE = {
+					count: {
+						value: 3
+					}
+				};
+				component = new TestComponent();
+				var subComps = object.mixin({}, component.components);
+				assert.strictEqual(3, Object.keys(subComps).length);
+				assert.ok(subComps.child1);
+				assert.ok(subComps.child2);
+				assert.ok(subComps.child3);
+
+				component.count = 2;
+				component.once('stateSynced', function() {
+					async.nextTick(function() {
+						assert.strictEqual(2, Object.keys(component.components).length);
+						assert.ok(component.components.child1);
+						assert.ok(component.components.child2);
+						assert.ok(!component.components.child3);
+
+						assert.ok(!subComps.child1.isDisposed());
+						assert.ok(!subComps.child2.isDisposed());
+						assert.ok(subComps.child3.isDisposed());
+						done();
+					});
+				});
+			});
+
+			it('should dispose sub components from "children" that are unused after an update', function(done) {
+				class TestChildComponent extends Component {
+					render() {
+						IncDom.elementOpen('div');
+						IncrementalDomRenderer.renderChild(
+							this.config.children[this.index]
+						);
+						IncDom.elementClose('div');
+					}
 				}
-			};
-			component = new TestComponent();
-			var subComps = object.mixin({}, component.components);
-			assert.strictEqual(3, Object.keys(subComps).length);
-			assert.ok(subComps.child1);
-			assert.ok(subComps.child2);
-			assert.ok(subComps.child3);
+				TestChildComponent.RENDERER = IncrementalDomRenderer;
+				TestChildComponent.STATE = {
+					index: {
+						value: 0
+					}
+				};
 
-			component.count = 2;
-			component.once('stateSynced', function() {
-				assert.strictEqual(2, Object.keys(component.components).length);
-				assert.ok(component.components.child1);
-				assert.ok(component.components.child2);
-				assert.ok(!component.components.child3);
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen(TestChildComponent, 'child');
+						IncDom.elementVoid(ChildComponent, 'item1');
+						IncDom.elementVoid(ChildComponent, 'item2');
+						IncDom.elementClose(TestChildComponent);
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
 
-				assert.ok(!subComps.child1.isDisposed());
-				assert.ok(!subComps.child2.isDisposed());
-				assert.ok(subComps.child3.isDisposed());
-				done();
+				component = new TestComponent();
+				var child = component.components.child;
+				var item1 = component.components.item1;
+				assert.ok(item1);
+				assert.ok(!component.components.item2);
+				assert.ok(!item1.isDisposed());
+
+				child.index = 1;
+				component.once('stateSynced', function() {
+					async.nextTick(function() {
+						assert.strictEqual(child, component.components.child);
+						assert.ok(!component.components.item1);
+						assert.ok(component.components.item2);
+						assert.ok(item1.isDisposed());
+						done();
+					});
+				});
+			});
+
+			it('should dispose sub components from sub components that are unused after a parent update', function(done) {
+				class TestChildComponent extends Component {
+					render() {
+						IncDom.elementOpen('div');
+						if (!this.config.remove) {
+							IncDom.elementOpen(ChildComponent, 'innerChild');
+						}
+						IncDom.elementClose('div');
+					}
+				}
+				TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementVoid(TestChildComponent, 'child', [], 'remove', this.remove);
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+				TestComponent.STATE = {
+					remove: {
+					}
+				};
+
+				component = new TestComponent();
+				var child = component.components.child;
+				var innerChild = child.components.innerChild;
+				assert.ok(innerChild);
+
+				component.remove = true;
+				component.once('stateSynced', function() {
+					async.nextTick(function() {
+						assert.strictEqual(child, component.components.child);
+						assert.ok(!child.isDisposed());
+						assert.ok(!child.components.innerChild);
+						assert.ok(innerChild.isDisposed());
+						done();
+					});
+				});
 			});
 		});
 	});

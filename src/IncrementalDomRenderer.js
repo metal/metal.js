@@ -6,6 +6,7 @@ import dom from 'metal-dom';
 import { ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
+import IncrementalDomUnusedComponents from './cleanup/IncrementalDomUnusedComponents';
 import IncrementalDomUtils from './utils/IncrementalDomUtils';
 
 /**
@@ -86,21 +87,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var count = this.generatedKeyCount_[this.currentPrefix_] || 0;
 		this.generatedKeyCount_[this.currentPrefix_] = count + 1;
 		return this.currentPrefix_ + 'sub' + count;
-	}
-
-	/**
-	 * Disposes all sub components that were not found after an update anymore.
-	 * @protected
-	 */
-	disposeUnusedSubComponents_() {
-		var keys = Object.keys(this.component_.components);
-		var unused = [];
-		for (var i = 0; i < keys.length; i++) {
-			if (!this.subComponentsFound_[keys[i]]) {
-				unused.push(keys[i]);
-			}
-		}
-		this.component_.disposeSubComponents(unused);
 	}
 
 	/**
@@ -366,6 +352,24 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Gets the component that is this component's parent (that is, the one that
+	 * actually rendered it), or null if there's no parent.
+	 * @return {Component}
+	 */
+	getParent() {
+		return this.parent_;
+	}
+
+	/**
+	 * Gets the component that is this component's owner (that is, the one that
+	 * passed its config properties and holds its ref), or null if there's none.
+	 * @return {Component}
+	 */
+	getOwner() {
+		return this.owner_;
+	}
+
+	/**
 	 * Renders the renderer's component for the first time, patching its element
 	 * through the incremental dom function calls done by `renderIncDom`.
 	 */
@@ -446,7 +450,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		IncrementalDomRenderer.startedRenderingComponent(this.component_);
 		this.changes_ = {};
 		this.rootElementReached_ = false;
-		this.subComponentsFound_ = {};
+		IncrementalDomUnusedComponents.schedule(this.childComponents_ || []);
+		this.childComponents_ = [];
 		this.generatedKeyCount_ = {};
 		this.listenersToAttach_ = [];
 		this.currentPrefix_ = '';
@@ -478,7 +483,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.updateContext_(comp);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
-			renderer.lastParentComponent_ = IncrementalDomRenderer.getComponentBeingRendered();
+			var parentComp = IncrementalDomRenderer.getComponentBeingRendered();
+			parentComp.getRenderer().childComponents_.push(comp);
+			renderer.parent_ = parentComp;
+			renderer.owner_ = this.component_;
 			renderer.renderInsidePatch();
 		} else {
 			console.warn(
@@ -490,7 +498,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!comp.wasRendered) {
 			comp.renderAsSubComponent();
 		}
-		this.subComponentsFound_[config.key] = true;
 		return comp;
 	}
 
@@ -522,11 +529,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * done by `renderIncDom`.
 	 */
 	patch() {
-		if (!this.component_.element && this.lastParentComponent_) {
+		if (!this.component_.element && this.parent_) {
 			// If the component has no content but was rendered from another component,
 			// we'll need to patch this parent to make sure that any new content will
 			// be added in the right place.
-			this.lastParentComponent_.getRenderer().patch();
+			this.parent_.getRenderer().patch();
 			return;
 		}
 
@@ -559,7 +566,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (this.hasChangedBesidesElement_() && this.shouldUpdate(this.changes_)) {
 			this.patch();
 			this.eventsCollector_.detachUnusedListeners();
-			this.disposeUnusedSubComponents_();
 		}
 	}
 

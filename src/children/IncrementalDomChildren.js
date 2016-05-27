@@ -1,5 +1,6 @@
 'use strict';
 
+import core from 'metal';
 import IncrementalDomAop from '../IncrementalDomAop';
 import IncrementalDomUtils from '../utils/IncrementalDomUtils';
 
@@ -44,7 +45,7 @@ class IncrementalDomChildren {
 			return;
 		}
 
-		if (tree.text) {
+		if (core.isDef(tree.text)) {
 			let args = tree.args ? tree.args : [];
 			args[0] = tree.text;
 			IncrementalDOM.text.apply(null, args);

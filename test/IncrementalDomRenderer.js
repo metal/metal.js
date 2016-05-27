@@ -1178,6 +1178,32 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('Hello World', child.element.childNodes[0].textContent);
 			});
 
+			it('should render empty string children', function() {
+				class TestChildComponent extends Component {
+					render() {
+						IncDom.elementOpen('child');
+						this.config.children.forEach(IncrementalDomRenderer.renderChild);
+						IncDom.elementClose('child');
+					}
+				}
+				TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen(TestChildComponent, 'child');
+						IncDom.text('foo');
+						IncDom.text('');
+						IncDom.text(' bar');
+						IncDom.elementClose(TestChildComponent);
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+				component = new TestComponent();
+
+				var child = component.components.child;
+				assert.strictEqual('foo bar', child.element.textContent);
+			});
+
 			it('should render only selected nodes from "children" config', function() {
 				class TestChildComponent extends Component {
 					render() {

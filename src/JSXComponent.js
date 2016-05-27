@@ -13,5 +13,19 @@ class JSXComponent extends Component {
 	}
 }
 
+/**
+ * State configuration.
+ */
+JSXComponent.STATE = {
+	/**
+	 * Children elements to be rendered inside the component.
+	 * @type {!Array}
+	 */
+	children: {
+		validator: Array.isArray,
+		valueFn: () => []
+	}
+};
+
 export default JSXComponent;
 export { JSX };

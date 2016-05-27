@@ -827,6 +827,23 @@ describe('Component', function() {
 			assert.ok(child.isDisposed());
 		});
 
+		it('should dispose specified sub components', function() {
+			comp = new Component();
+			comp.addSubComponent('child', ChildComponent);
+
+			var child = comp.components.child;
+			assert.ok(!child.isDisposed());
+
+			comp.disposeSubComponents(['child']);
+			assert.ok(child.isDisposed());
+		});
+
+		it('should not throw error if calling "disposeSubComponents" with unexisting keys', function() {
+			comp = new Component();
+			assert.ok(!comp.components.child);
+			assert.doesNotThrow(() => comp.disposeSubComponents(['child']));
+		});
+
 		it('should not throw error when disposing after subcomponents have already been disposed', function() {
 			comp = new Component();
 			comp.addSubComponent('child', ChildComponent);

@@ -327,7 +327,7 @@ class Component extends State {
 	disposeSubComponents(keys) {
 		for (var i = 0; i < keys.length; i++) {
 			var component = this.components[keys[i]];
-			if (!component.isDisposed()) {
+			if (component && !component.isDisposed()) {
 				component.dispose();
 				delete this.components[keys[i]];
 			}

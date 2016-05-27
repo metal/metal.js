@@ -301,6 +301,36 @@ describe('IncrementalDomRenderer', function() {
 				done();
 			});
 		});
+
+		it('should add/remove css classes by using both "class" and "elementClasses"', function(done) {
+			class TestComponent extends Component {
+				render() {
+					var cssClass = this.foo ? 'foo' : 'bar';
+					IncDom.elementVoid('button', null, [], 'class', cssClass);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: true
+				}
+			};
+
+			component = new TestComponent({
+				elementClasses: 'test'
+			});
+			assert.ok(dom.hasClass(component.element, 'foo'));
+			assert.ok(!dom.hasClass(component.element, 'bar'));
+			assert.ok(dom.hasClass(component.element, 'test'));
+
+			component.foo = false;
+			component.once('stateSynced', function() {
+				assert.ok(!dom.hasClass(component.element, 'foo'));
+				assert.ok(dom.hasClass(component.element, 'bar'));
+				assert.ok(dom.hasClass(component.element, 'test'));
+				done();
+			});
+		});
 	});
 
 	describe('Existing Content', function() {

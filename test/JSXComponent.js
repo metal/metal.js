@@ -44,4 +44,17 @@ describe('JSXComponent', function() {
 		assert.strictEqual('DIV', component.element.tagName);
 		assert.strictEqual('Hello World', component.element.textContent);
 	});
+
+	it('should not throw error if trying to render empty children', function() {
+		class TestComponent extends JSXComponent {
+			render() {
+				return <div>{this.children}</div>;
+			}
+		}
+
+		component = new TestComponent();
+		assert.strictEqual(0, component.element.childNodes.length);
+		assert.ok(component.children);
+		assert.strictEqual(0, component.children.length);
+	});
 });

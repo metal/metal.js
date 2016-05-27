@@ -670,7 +670,7 @@ Component.STATE = {
 
 	/**
 	 * CSS classes to be applied to the element.
-	 * @type {Array.<string>}
+	 * @type {string}
 	 */
 	elementClasses: {
 		validator: 'validatorElementClassesFn_'

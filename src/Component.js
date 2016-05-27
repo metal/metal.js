@@ -140,9 +140,8 @@ class Component extends State {
 
 	/**
 	 * Adds the necessary classes to the component's element.
-	 * @protected
 	 */
-	addElementClasses_() {
+	addElementClasses() {
 		var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
 		if (this.elementClasses) {
 			classesToAdd = classesToAdd + ' ' + this.elementClasses;
@@ -463,7 +462,7 @@ class Component extends State {
 
 		this.setUpProxy_();
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
-		this.addElementClasses_();
+		this.addElementClasses();
 		this.syncVisible(this.visible);
 	}
 
@@ -600,7 +599,7 @@ class Component extends State {
 		if (this.element && prevVal) {
 			dom.removeClasses(this.element, prevVal);
 		}
-		this.addElementClasses_();
+		this.addElementClasses();
 	}
 
 	/**

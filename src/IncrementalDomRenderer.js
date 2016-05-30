@@ -22,9 +22,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		comp.context = {};
 		this.changes_ = {};
 		this.eventsCollector_ = new EventsCollector(comp);
-		comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		comp.on('attached', this.handleAttached_.bind(this));
 		comp.on('detached', this.handleDetached_.bind(this));
+
+		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
+			// If the component is being updated synchronously we'll just reuse the
+			// `handleComponentRendererStateKeyChanged_` function from
+			// `ComponentRenderer`.
+			comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
+		}
 
 		// Binds functions that will be used many times, to avoid creating new
 		// functions each time.
@@ -234,6 +240,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.renderFromTag_(node.tag, node.config);
 			return true;
 		}
+	}
+
+	/**
+	 * Handles the `stateKeyChanged` event. Overrides original method from
+	 * `ComponentRenderer` to guarantee that `IncrementalDomRenderer`'s logic
+	 * will run first.
+	 * @param {!Object} data
+	 * @override
+	 * @protected
+	 */
+	handleComponentRendererStateKeyChanged_(data) {
+		this.handleStateKeyChanged_(data);
+		super.handleComponentRendererStateKeyChanged_(data);
 	}
 
 	/**

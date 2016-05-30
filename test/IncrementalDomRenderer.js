@@ -129,6 +129,29 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should update content synchronously when SYNC_UPDATES is true', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text(this.foo);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			TestComponent.SYNC_UPDATES = true;
+
+			component = new TestComponent();
+			assert.strictEqual('foo', component.element.textContent);
+
+			component.foo = 'bar';
+			assert.strictEqual('bar', component.element.textContent);
+		});
+
 		it('should run component\'s "rendered" lifecycle method on updates', function(done) {
 			var calledArgs = [];
 			class TestComponent extends Component {

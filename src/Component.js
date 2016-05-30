@@ -122,6 +122,7 @@ class Component extends State {
 		this.DEFAULT_ELEMENT_PARENT = document.body;
 
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
+		core.mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
 
 		this.renderer_ = this.createRenderer();
 		this.renderer_.on('rendered', this.rendered.bind(this));
@@ -713,6 +714,14 @@ Component.ELEMENT_CLASSES = '';
  * @static
  */
 Component.RENDERER = ComponentRenderer;
+
+/**
+ * Flag indicating if component updates will happen synchronously. Updates are
+ * done asynchronously by default, which allows changes to be batched and
+ * applied together.
+ * @type {boolean}
+ */
+Component.SYNC_UPDATES = false;
 
 /**
  * A list with state key names that will automatically be rejected as invalid.

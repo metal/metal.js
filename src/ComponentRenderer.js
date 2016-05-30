@@ -15,11 +15,27 @@ class ComponentRenderer extends EventEmitter {
 	constructor(component) {
 		super();
 		this.component_ = component;
+
 		this.componentRendererEvents_ = new EventHandler();
 		this.componentRendererEvents_.add(
-			this.component_.on('stateChanged', this.handleComponentRendererStateChanged_.bind(this)),
 			this.component_.once('render', this.render.bind(this))
 		);
+
+		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
+			this.componentRendererEvents_.add(
+				this.component_.on(
+					'stateKeyChanged',
+					this.handleComponentRendererStateKeyChanged_.bind(this)
+				)
+			);
+		} else {
+			this.componentRendererEvents_.add(
+				this.component_.on(
+					'stateChanged',
+					this.handleComponentRendererStateChanged_.bind(this)
+				)
+			);
+		}
 	}
 
 	/**
@@ -31,16 +47,34 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
-	 * Handles an `stateChanged` event from this renderer's component. Calls the
+	 * Handles a `stateChanged` event from this renderer's component. Calls the
 	 * `update` function if the component has already been rendered for the first
 	 * time.
-	 * @param {Object.<string, Object>} changes Object containing the names
+	 * @param {!Object<string, Object>} changes Object containing the names
 	 *     of all changed state keys, each mapped to an object with its new
 	 *     (newVal) and previous (prevVal) values.
+	 * @protected
 	 */
 	handleComponentRendererStateChanged_(changes) {
 		if (this.component_.wasRendered) {
 			this.update(changes);
+		}
+	}
+
+	/**
+	 * Handles a `stateKeyChanged` event from this renderer's component. This is
+	 * similar to `handleComponentRendererStateChanged_`, but only called for
+	 * components that have requested updates to happen synchronously.
+	 * @param {!{key: string, newVal: *, prevVal: *}} data
+	 * @protected
+	 */
+	handleComponentRendererStateKeyChanged_(data) {
+		if (this.component_.wasRendered) {
+			this.update({
+				changes: {
+					[data.key] : data
+				}
+			});
 		}
 	}
 

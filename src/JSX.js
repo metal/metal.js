@@ -20,6 +20,12 @@ import IncrementalDomRenderer from 'metal-incremental-dom';
  * tools, or create another renderer that integrates better with them.
  */
 class JSX extends IncrementalDomRenderer {
+	/**
+	 * @inheritDoc
+	 */
+	static render(...args) {
+		return IncrementalDomRenderer.render(...args);
+	}
 }
 
 export default JSX;

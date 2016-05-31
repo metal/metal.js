@@ -192,4 +192,62 @@ describe('JSX', function() {
 		assert.strictEqual('SPAN', child.element.childNodes[1].tagName);
 		assert.strictEqual('Children Test', child.element.childNodes[1].textContent);
 	});
+
+	it('should create and render components via "JSX.render"', function() {
+		class TestComponent extends Component {
+			render() {
+				return <div class="test">{this.config.foo}</div>;
+			}
+		}
+		TestComponent.RENDERER = JSX;
+
+		var container = document.createElement('div');
+		component = JSX.render(
+			TestComponent,
+			{
+				foo: 'fooValue'
+			},
+			container
+		);
+
+		assert.ok(component instanceof TestComponent);
+		assert.strictEqual(1, container.childNodes.length);
+		assert.strictEqual(component.element, container.childNodes[0]);
+		assert.strictEqual('DIV', component.element.tagName);
+		assert.ok(dom.hasClass(component.element, 'test'));
+		assert.strictEqual('fooValue', component.element.textContent);
+	});
+
+	it('should render componentless functions via "JSX.render"', function() {
+		var fn = config => {
+			return <div class="test">{config.foo}</div>;
+		}
+		var container = document.createElement('div');
+		JSX.render(
+			fn,
+			{
+				foo: 'fooValue'
+			},
+			container
+		);
+
+		assert.strictEqual(1, container.childNodes.length);
+		assert.strictEqual('DIV', container.childNodes[0].tagName);
+		assert.ok(dom.hasClass(container.childNodes[0], 'test'));
+		assert.strictEqual('fooValue', container.childNodes[0].textContent);
+	});
+
+	it('should render jsx element via "JSX.render"', function() {
+		var container = document.createElement('div');
+		JSX.render(
+			<div class="test">foo</div>,
+			null,
+			container
+		);
+
+		assert.strictEqual(1, container.childNodes.length);
+		assert.strictEqual('DIV', container.childNodes[0].tagName);
+		assert.ok(dom.hasClass(container.childNodes[0], 'test'));
+		assert.strictEqual('foo', container.childNodes[0].textContent);
+	});
 });

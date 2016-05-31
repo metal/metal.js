@@ -478,6 +478,21 @@ class Component extends State {
 	}
 
 	/**
+	 * Creates and renders a component for the given constructor function. This
+	 * will always make sure that the constructor runs without rendering the
+	 * component, having the `render` step happen only after it has finished.
+	 * @param {!function()} Ctor The component's constructor function.
+	 * @param {Object=} opt_data Optional config data for the component.
+	 * @param {Element=} opt_element Optional parent for the component.
+	 * @return {!Component} The rendered component's instance.
+	 */
+	static render(Ctor, opt_config, opt_element) {
+		var instance = new Ctor(opt_config, false);
+		instance.render_(opt_element);
+		return instance;
+	}
+
+	/**
 	 * Lifecycle. Renders the component into the DOM.
 	 *
 	 * Render Lifecycle:

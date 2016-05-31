@@ -354,6 +354,30 @@ describe('IncrementalDomRenderer', function() {
 				done();
 			});
 		});
+
+		it('should render component via "IncrementalDomRenderer.render"', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('span', null, null, 'foo', this.config.foo);
+					IncDom.text('bar');
+					IncDom.elementClose('span');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			var container = document.createElement('span');
+			component = IncrementalDomRenderer.render(
+				TestComponent,
+				{
+					foo: 'fooValue'
+				},
+				container
+			);
+
+			assert.strictEqual(container, component.element.parentNode);
+			assert.strictEqual('fooValue', component.element.getAttribute('foo'));
+			assert.strictEqual('bar', component.element.textContent);
+		});
 	});
 
 	describe('Existing Content', function() {
@@ -1938,6 +1962,27 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.element.childNodes.length);
 			assert.strictEqual('SPAN', component.element.childNodes[0].tagName);
 			assert.strictEqual('children', component.element.childNodes[0].textContent);
+		});
+
+		it('should render componentless function via "IncrementalDomRenderer.render"', function() {
+			var fn = config => {
+				IncDom.elementOpen('span', null, null, 'foo', config.foo);
+				IncDom.text('bar');
+				IncDom.elementClose('span');
+			};
+
+			var container = document.createElement('span');
+			IncrementalDomRenderer.render(
+				fn,
+				{
+					foo: 'fooValue'
+				},
+				container
+			);
+
+			assert.strictEqual(1, container.childNodes.length);
+			assert.strictEqual('fooValue', container.childNodes[0].getAttribute('foo'));
+			assert.strictEqual('bar', container.childNodes[0].textContent);
 		});
 	});
 

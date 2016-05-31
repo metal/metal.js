@@ -3,7 +3,7 @@
 import './incremental-dom';
 import { array, core, object } from 'metal';
 import dom from 'metal-dom';
-import { ComponentRenderer, EventsCollector } from 'metal-component';
+import { Component, ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
 import IncrementalDomUnusedComponents from './cleanup/IncrementalDomUnusedComponents';
@@ -387,6 +387,29 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	getOwner() {
 		return this.owner_;
+	}
+
+	/**
+	 * Creates and renders the given function, which can either be a simple
+	 * incremental dom function or a component constructor.
+	 * @param {!function()} fnOrCtor Either be a simple incremental dom function
+	 or a component constructor.
+	 * @param {Object=} opt_data Optional config data for the function.
+	 * @param {Element=} opt_element Optional parent for the rendered content.
+	 * @return {!Component} The rendered component's instance.
+	 */
+	static render(fnOrCtor, opt_data, opt_parent) {
+		if (!Component.isComponentCtor(fnOrCtor)) {
+			var fn = fnOrCtor;
+			class TempComponent extends Component {
+				render() {
+					fn(this.config);
+				}
+			}
+			TempComponent.RENDERER = IncrementalDomRenderer;
+			fnOrCtor = TempComponent;
+		}
+		return Component.render(fnOrCtor, opt_data, opt_parent);
 	}
 
 	/**

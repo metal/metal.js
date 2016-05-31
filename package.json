@@ -1,6 +1,6 @@
 {
   "name": "metal-incremental-dom",
-  "version": "1.0.0-rc.34",
+  "version": "1.0.0-rc.35",
   "description": "A Component renderer for templates compiled to incremental dom",
   "license": "BSD",
   "repository": "metal/metal-incremental-dom",

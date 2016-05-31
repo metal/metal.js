@@ -646,6 +646,18 @@ describe('State', function() {
 		assert.strictEqual(20, state.key2);
 	});
 
+	it('should not change properties that are not state keys via "setState"', function() {
+		var state = createStateInstance();
+		state.myVar = 1;
+		state.setState({
+			key1: 10,
+			myVar: 2
+		});
+
+		assert.strictEqual(10, state.key1);
+		assert.strictEqual(1, state.myVar);
+	});
+
 	it('should check if a state key\'s value has already been set', function() {
 		var state = new State();
 		state.addToState('key1', {}, 1);

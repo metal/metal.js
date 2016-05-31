@@ -335,6 +335,15 @@ class State extends EventEmitter {
 	}
 
 	/**
+	 * Checks if the given key is present in this instance's state.
+	 * @param {string} key
+	 * @return {boolean}
+	 */
+	hasStateKey(key) {
+		return !!this.stateInfo_[key];
+	}
+
+	/**
 	 * Informs of changes to a state key's value through an event. Won't trigger
 	 * the event if the value hasn't changed or if it's being initialized.
 	 * @param {string} name The name of the key.
@@ -452,7 +461,9 @@ class State extends EventEmitter {
 	 * @return {*}
 	 */
 	set(name, value) {
-		this[name] = value;
+		if (this.hasStateKey(name)) {
+			this[name] = value;
+		}
 	}
 
 	/**
@@ -494,10 +505,7 @@ class State extends EventEmitter {
 	 */
 	setState(values, opt_callback) {
 		this.updateConfig_(values);
-		var names = Object.keys(values);
-		for (var i = 0; i < names.length; i++) {
-			this[names[i]] = values[names[i]];
-		}
+		Object.keys(values).forEach(name => this.set(name, values[name]));
 		if (opt_callback && this.scheduledBatchData_) {
 			this.once('stateChanged', opt_callback);
 		}

@@ -1,6 +1,6 @@
 {
   "name": "metal-component",
-  "version": "1.0.0-rc.18",
+  "version": "1.0.0-rc.19",
   "description": "A component class for Metal.js",
   "license": "BSD",
   "repository": "metal/metal-component",

@@ -26,6 +26,7 @@ class IncrementalDomChildren {
 			}
 		};
 		currentParent_ = tree_;
+		isCapturing_ = true;
 		IncrementalDomAop.startInterception({
 			elementClose: handleInterceptedCloseCall_,
 			elementOpen: handleInterceptedOpenCall_,
@@ -41,6 +42,12 @@ class IncrementalDomChildren {
 	 * @protected
 	 */
 	static render(tree, opt_skipNode) {
+		if (isCapturing_) {
+			// If capturing, just add the node directly to the captured tree.
+			addChildToTree(tree);
+			return;
+		}
+
 		if (opt_skipNode && opt_skipNode(tree)) {
 			return;
 		}
@@ -64,6 +71,7 @@ class IncrementalDomChildren {
 
 var callback_;
 var currentParent_;
+var isCapturing_ = false;
 var renderer_;
 var tree_;
 
@@ -74,7 +82,7 @@ var tree_;
  *     text element.
  * @protected
  */
-function addChildToTree_(args, opt_isText) {
+function addChildCallToTree_(args, opt_isText) {
 	var child = {
 		parent: currentParent_,
 		[IncrementalDomChildren.CHILD_OWNER]: renderer_
@@ -94,8 +102,12 @@ function addChildToTree_(args, opt_isText) {
 		child.config.children = [];
 	}
 
-	currentParent_.config.children.push(child);
+	addChildToTree(child);
 	return child;
+}
+
+function addChildToTree(child) {
+	currentParent_.config.children.push(child);
 }
 
 /**
@@ -106,10 +118,12 @@ function addChildToTree_(args, opt_isText) {
 function handleInterceptedCloseCall_() {
 	if (currentParent_ === tree_) {
 		IncrementalDomAop.stopInterception();
+		isCapturing_ = false;
 		callback_(tree_);
-		tree_ = null;
 		callback_ = null;
 		currentParent_ = null;
+		renderer_ = null;
+		tree_ = null;
 	} else {
 		currentParent_ = currentParent_.parent;
 	}
@@ -122,7 +136,7 @@ function handleInterceptedCloseCall_() {
  * @protected
  */
 function handleInterceptedOpenCall_(originalFn, ...args) {
-	currentParent_ = addChildToTree_(args);
+	currentParent_ = addChildCallToTree_(args);
 }
 
 /**
@@ -131,7 +145,7 @@ function handleInterceptedOpenCall_(originalFn, ...args) {
  * @protected
  */
 function handleInterceptedTextCall_(originalFn, ...args) {
-	addChildToTree_(args, true);
+	addChildCallToTree_(args, true);
 }
 
 

@@ -1259,6 +1259,49 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(dom.hasClass(child.element.childNodes[0], 'second'));
 			});
 
+			it('should add children component instances to the component that defined them', function() {
+				class TestChildComponent extends Component {
+					render() {
+						IncDom.elementOpen('child');
+						this.config.children.forEach(IncrementalDomRenderer.renderChild);
+						IncDom.elementClose('child');
+					}
+				}
+				TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+				class TestNestedChildComponent extends Component {
+					render() {
+						IncDom.elementOpen(TestChildComponent, 'nestedChild1');
+						this.config.children.forEach(IncrementalDomRenderer.renderChild);
+						IncDom.elementClose(TestChildComponent);
+					}
+				}
+				TestNestedChildComponent.RENDERER = IncrementalDomRenderer;
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen('div');
+						IncDom.elementOpen(TestNestedChildComponent, 'child1');
+						IncDom.elementVoid(TestChildComponent, 'child2');
+						IncDom.elementClose(TestNestedChildComponent);
+						IncDom.elementClose('div');
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+				component = new TestComponent();
+
+				var child1 = component.components.child1;
+				var child2 = component.components.child2;
+				assert.ok(child1 instanceof TestNestedChildComponent);
+				assert.ok(child2 instanceof TestChildComponent);
+				assert.ok(child1.components.nestedChild1 instanceof TestChildComponent);
+				assert.ok(!child1.components.child1);
+				assert.ok(!child1.components.child2);
+
+				assert.strictEqual(child1.element, component.element.childNodes[0]);
+				assert.strictEqual(child2.element, child1.element.childNodes[0]);
+			});
+
 			it('should render correctly when recursive children are used', function() {
 				class TestChildComponent extends Component {
 					render() {

@@ -180,4 +180,46 @@ describe('IncrementalDomChildren', function() {
 		IncrementalDOM.text('Hello World', val => val + ' Formatted');
 		IncrementalDOM.elementClose('div');
 	});
+
+	it('should keep original renderer for children that have been recaptured by another1', function(done) {
+		var renderer1 = {
+			buildKey: sinon.stub()
+		};
+		var renderer2 = {
+			buildKey: sinon.stub()
+		};
+
+		IncrementalDomChildren.capture(renderer2, function(tree) {
+			var element = tree.config.children[0];
+			assert.strictEqual('div', element.tag);
+			assert.strictEqual(renderer2, element[IncrementalDomChildren.CHILD_OWNER]);
+			assert.strictEqual(1, element.config.children.length);
+
+			element = element.config.children[0];
+			assert.strictEqual('span', element.tag);
+			assert.strictEqual(renderer1, element[IncrementalDomChildren.CHILD_OWNER]);
+			assert.strictEqual(1, element.config.children.length);
+
+			element = element.config.children[0];
+			assert.strictEqual('Hello World', element.text);
+			assert.strictEqual(renderer1, element[IncrementalDomChildren.CHILD_OWNER]);
+			done();
+		});
+
+		IncrementalDOM.elementOpen('div');
+		IncrementalDomChildren.render({
+			tag: 'span',
+			config: {
+				children: [
+					{
+						text: 'Hello World',
+						[IncrementalDomChildren.CHILD_OWNER]: renderer1
+					},
+				]
+			},
+			[IncrementalDomChildren.CHILD_OWNER]: renderer1
+		});
+		IncrementalDOM.elementClose('div');
+		IncrementalDOM.elementClose('div');
+	});
 });

@@ -72,6 +72,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			var listener = this.listenersToAttach_[i];
 			this.eventsCollector_.attachListener(listener.eventName, listener.fn);
 		}
+		this.eventsCollector_.detachUnusedListeners();
 	}
 
 	/**
@@ -584,7 +585,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	update() {
 		if (this.hasChangedBesidesElement_() && this.shouldUpdate(this.changes_)) {
 			this.patch();
-			this.eventsCollector_.detachUnusedListeners();
 		}
 	}
 

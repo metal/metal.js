@@ -869,6 +869,43 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, child.handleClick.callCount);
 		});
 
+		it('should detach unused sub component inline listeners after parent update', function(done) {
+			class TestChildComponent extends Component {
+				render() {
+					if (this.config.removeEvent) {
+						IncDom.elementOpen('div');
+					} else {
+						IncDom.elementOpen('div', null, null, 'data-onclick', 'handleClick');
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestChildComponent.prototype.handleClick = sinon.stub();
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(TestChildComponent, 'child', null, 'removeEvent', this.removeEvent);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				removeEvent: {
+				}
+			};
+			component = new TestComponent();
+			var child = component.components.child;
+			sinon.spy(child, 'removeListener');
+
+			component.removeEvent = true;
+			component.once('stateSynced', function() {
+				assert.strictEqual(1, child.removeListener.callCount);
+				done();
+			});
+		});
+
 		it('should generate sub component key if none is given', function() {
 			class TestComponent extends Component {
 				render() {

@@ -431,6 +431,15 @@ class Component extends State {
 	}
 
 	/**
+	 * Checks if the given function is a component constructor.
+	 * @param {!function()} fn Any function
+	 * @return {boolean}
+	 */
+	static isComponentCtor(fn) {
+		return !!fn.prototype[Component.COMPONENT_FLAG];
+	}
+
+	/**
 	 * Merges an array of values for the ELEMENT_CLASSES property into a single object.
 	 * @param {!Array.<string>} values The values to be merged.
 	 * @return {!string} The merged value.
@@ -713,6 +722,8 @@ Component.STATE = {
 	}
 };
 
+Component.COMPONENT_FLAG = '__metal_component__';
+
 /**
  * CSS classes to be applied to the element.
  * @type {string}
@@ -743,5 +754,11 @@ Component.SYNC_UPDATES = false;
  * @type {!Array<string>}
  */
 Component.INVALID_KEYS = ['components', 'wasRendered'];
+
+/**
+ * Sets a prototype flag to easily determine if a given constructor is for
+ * a component or not.
+ */
+Component.prototype[Component.COMPONENT_FLAG] = true;
 
 export default Component;

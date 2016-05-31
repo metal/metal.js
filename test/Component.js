@@ -886,6 +886,14 @@ describe('Component', function() {
 		assert.ok(renderer instanceof ComponentRenderer);
 	});
 
+	it('should check if the given function is a component constructor', function() {
+		class TestComponent extends Component {
+		}
+		assert.ok(Component.isComponentCtor(Component));
+		assert.ok(Component.isComponentCtor(TestComponent));
+		assert.ok(!Component.isComponentCtor(() => {}));
+	});
+
 	function createCustomComponentClass(opt_rendererContentOrFn) {
 		class CustomComponent extends Component {
 		}

@@ -59,21 +59,8 @@ return &lt;div class="footer"&gt;{buttons}&lt;/div&gt;;{/literal}
 
 		<p>
 			But what if we need to access the created instances? That's possible by
-			using keys.
-		</p>
-
-		<p>
-			Since both <strong>soy</strong> and <strong>JSX</strong> components are
-			compiled
-			to <a href="http://google.github.io/incremental-dom">incremental DOM</a>,
-			one of the reasons for using keys is
-			to <a href="http://google.github.io/incremental-dom/#conditional-rendering/array-of-items">optimize rendering</a>.
-		</p>
-
-		<p>
-			<strong>Metal.js</strong> components also use keys to reference sub
-			components in the js code though. Let's add some keys to the previous
-			example and see what happens:
+			using <strong>ref</strong>. Let's add one to the previous example and see
+			what happens:
 		</p>
 
 		{call codeTabs.main}
@@ -82,14 +69,14 @@ return &lt;div class="footer"&gt;{buttons}&lt;/div&gt;;{/literal}
 				<textarea class="code" data-mode="x-soy">
 {literal}&lbrace;foreach $button as $buttons&rbrace;
   &lbrace;call Button.render&rbrace;
-    &lbrace;param key: 'button' + index($button) /&rbrace;
     &lbrace;param label: $button /&rbrace;
+    &lbrace;param ref: 'button' + index($button) /&rbrace;
   &lbrace;/call&rbrace;
 &lbrace;/foreach&rbrace;{/literal}
 				</textarea>
 				<textarea class="code hidden" data-mode="javascript">
 {literal}var buttons = this.config.buttons.map((button, index) => {
-  return &lt;Button label={button} key={'button' + index} /&gt;;
+  return &lt;Button label={button} ref={'button' + index} /&gt;;
 });{/literal}
 				</textarea>
 			{/param}

@@ -162,9 +162,9 @@ return &lt;ul&gt;{this.config.children}&lt;/ul&gt;{/literal}
  * Functional components receive the configuration
  * object as the first param.
  */
-function Button({ cssClass, label }) {
+var Button = ({ cssClass, label }) => {
   return &lt;button type="button" class={cssClass}&gt;{label}&lt;/button&gt;;
-}{/literal}
+};{/literal}
 		</textarea>
 
 		<p>
@@ -174,6 +174,42 @@ function Button({ cssClass, label }) {
 
 		<textarea class="code" data-mode="javascript">
 {literal}&lt;Button cssClass="btn btn-primary" label="OK" /&gt;{/literal}
+		</textarea>
+
+		<h2>Rendering JSX Components</h2>
+
+		<p>
+			JSX components can either be rendered in
+			the <a href="rendering-components.html">usual way</a>, or via
+			the <code>JSXComponent.render</code> function, like this:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}class Button extends JSXComponent {
+  render() {
+    // Your render logic
+  }
+}
+JSXComponent.render(Button, {label: 'OK'}, parent);{/literal}
+		</textarea>
+
+		<p>
+			You can also pass a functional component to it:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}var Button = config => {
+  // Your render logic
+};
+JSXComponent.render(Button, {label: 'OK'}, parent);{/literal}
+		</textarea>
+
+		<p>
+			Or even render directly via JSX:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+{literal}JSXComponent.render(<Button label="OK" />, parent);{/literal}
 		</textarea>
 
 		<h2>JSX compilation</h2>

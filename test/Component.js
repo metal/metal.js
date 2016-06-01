@@ -525,6 +525,26 @@ describe('Component', function() {
 			assert.strictEqual('fooValue', comp.config.foo);
 		});
 
+		it('should render component via Component.render without config', function() {
+			class CustomComponent extends Component {
+				constructor(...args) {
+					super(...args);
+					assert.ok(!this.wasRendered);
+				}
+			}
+
+			var container = document.createElement('div');
+			comp = Component.render(
+				CustomComponent,
+				container
+			);
+
+			assert.ok(comp instanceof CustomComponent);
+			assert.ok(comp.wasRendered);
+			assert.ok(comp.element);
+			assert.strictEqual(container, comp.element.parentNode);
+		});
+
 		it('should not emit "render" event when renderAsSubComponent is called', function() {
 			comp = new Component(
 				{

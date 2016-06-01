@@ -491,13 +491,20 @@ class Component extends State {
 	 * will always make sure that the constructor runs without rendering the
 	 * component, having the `render` step happen only after it has finished.
 	 * @param {!function()} Ctor The component's constructor function.
-	 * @param {Object=} opt_data Optional config data for the component.
+	 * @param {Object|Element=} opt_configOrElement Optional config data or parent
+	 *     for the component.
 	 * @param {Element=} opt_element Optional parent for the component.
 	 * @return {!Component} The rendered component's instance.
 	 */
-	static render(Ctor, opt_config, opt_element) {
-		var instance = new Ctor(opt_config, false);
-		instance.render_(opt_element);
+	static render(Ctor, opt_configOrElement, opt_element) {
+		var config = opt_configOrElement;
+		var element = opt_element;
+		if (core.isElement(opt_configOrElement)) {
+			config = null;
+			element = opt_configOrElement;
+		}
+		var instance = new Ctor(config, false);
+		instance.render_(element);
 		return instance;
 	}
 

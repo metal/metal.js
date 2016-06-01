@@ -236,7 +236,6 @@ describe('JSXComponent', function() {
 			var container = document.createElement('div');
 			JSXComponent.render(
 				<div class="test">foo</div>,
-				null,
 				container
 			);
 

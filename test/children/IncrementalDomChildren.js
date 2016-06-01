@@ -7,7 +7,7 @@ import IncrementalDomChildren from '../../src/children/IncrementalDomChildren';
 describe('IncrementalDomChildren', function() {
 	it('should capture children calls to incremental dom', function(done) {
 		var renderer = {
-			buildKey: sinon.stub()
+			buildRef: sinon.stub()
 		};
 
 		IncrementalDomChildren.capture(renderer, function(tree) {
@@ -32,10 +32,10 @@ describe('IncrementalDomChildren', function() {
 		IncrementalDOM.elementClose('div');
 	});
 
-	it('should set keys of component calls according to result of "buildKey" function', function(done) {
+	it('should set refs of component calls according to result of "buildRef" function', function(done) {
 		var counter = 0;
 		var renderer = {
-			buildKey: () => 'key' + counter++
+			buildRef: () => 'ref' + counter++
 		};
 
 		IncrementalDomChildren.capture(renderer, function(tree) {
@@ -43,13 +43,13 @@ describe('IncrementalDomChildren', function() {
 
 			var node = tree.config.children[0];
 			assert.strictEqual('span', node.tag);
-			assert.ok(!node.config.key);
+			assert.ok(!node.config.ref);
 
 			assert.strictEqual(2, node.config.children.length);
 			assert.strictEqual(Component, node.config.children[0].tag);
-			assert.strictEqual('key0', node.config.children[0].config.key);
+			assert.strictEqual('ref0', node.config.children[0].config.ref);
 			assert.strictEqual(Component, node.config.children[1].tag);
-			assert.strictEqual('key1', node.config.children[1].config.key);
+			assert.strictEqual('ref1', node.config.children[1].config.ref);
 			done();
 		});
 
@@ -62,7 +62,7 @@ describe('IncrementalDomChildren', function() {
 
 	it('should store args for text nodes when they contain more than just the text', function(done) {
 		var renderer = {
-			buildKey: sinon.stub()
+			buildRef: sinon.stub()
 		};
 
 		IncrementalDomChildren.capture(renderer, function(tree) {
@@ -162,7 +162,7 @@ describe('IncrementalDomChildren', function() {
 
 	it('should render text nodes that have been changed after capture', function(done) {
 		var renderer = {
-			buildKey: sinon.stub()
+			buildRef: sinon.stub()
 		};
 
 		IncrementalDomChildren.capture(renderer, function(tree) {
@@ -183,10 +183,10 @@ describe('IncrementalDomChildren', function() {
 
 	it('should keep original renderer for children that have been recaptured by another1', function(done) {
 		var renderer1 = {
-			buildKey: sinon.stub()
+			buildRef: sinon.stub()
 		};
 		var renderer2 = {
-			buildKey: sinon.stub()
+			buildRef: sinon.stub()
 		};
 
 		IncrementalDomChildren.capture(renderer2, function(tree) {

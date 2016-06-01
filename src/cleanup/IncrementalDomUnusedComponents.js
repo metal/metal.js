@@ -32,7 +32,7 @@ function disposeUnused_() {
 		if (!comps_[i].isDisposed()) {
 			var renderer = comps_[i].getRenderer();
 			if (!renderer.getParent()) {
-				renderer.getOwner().disposeSubComponents([comps_[i].config.key]);
+				renderer.getOwner().disposeSubComponents([comps_[i].config.ref]);
 			}
 		}
 	}

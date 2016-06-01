@@ -90,9 +90,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Builds the key for the next component that is found.
 	 * @return {string}
 	 */
-	buildKey() {
-		var count = this.generatedKeyCount_[this.currentPrefix_] || 0;
-		this.generatedKeyCount_[this.currentPrefix_] = count + 1;
+	buildRef() {
+		var count = this.generatedRefCount_[this.currentPrefix_] || 0;
+		this.generatedRefCount_[this.currentPrefix_] = count + 1;
 		return this.currentPrefix_ + 'sub' + count;
 	}
 
@@ -113,8 +113,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	getSubComponent_(tagOrCtor, config) {
-		var prevComp = this.component_.components[config.key];
-		var comp = this.component_.addSubComponent(config.key, tagOrCtor, config, true);
+		var prevComp = this.component_.components[config.ref];
+		var comp = this.component_.addSubComponent(config.ref, tagOrCtor, config, true);
 		if (prevComp && prevComp !== comp) {
 			// If a previous component was replaced, dispose it, but only after making
 			// sure that its element won't be removed (otherwise incremental dom may
@@ -316,15 +316,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleSubComponentCall_(originalFn, ...args) {
 		var config = IncrementalDomUtils.buildConfigFromCall(args);
-		config.key = config.key || this.buildKey();
+		config.ref = config.ref || this.buildRef();
 		this.componentToRender_ = {
 			config,
 			tag: args[0]
 		};
 
 		this.prevPrefix_ = this.currentPrefix_;
-		this.currentPrefix_ = config.key;
-		this.generatedKeyCount_[this.currentPrefix_] = 0;
+		this.currentPrefix_ = config.ref;
+		this.generatedRefCount_[this.currentPrefix_] = 0;
 		IncrementalDomChildren.capture(this, this.handleChildrenCaptured_);
 	}
 
@@ -495,7 +495,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.rootElementReached_ = false;
 		IncrementalDomUnusedComponents.schedule(this.childComponents_ || []);
 		this.childComponents_ = [];
-		this.generatedKeyCount_ = {};
+		this.generatedRefCount_ = {};
 		this.listenersToAttach_ = [];
 		this.currentPrefix_ = '';
 		this.intercept_();

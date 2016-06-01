@@ -94,11 +94,11 @@ function addChildCallToTree_(args, opt_isText) {
 			child.args = args;
 		}
 	} else {
-		if (IncrementalDomUtils.isComponentTag(args[0])) {
-			args[1] = args[1] || renderer_.buildKey();
-		}
 		child.tag = args[0];
 		child.config = IncrementalDomUtils.buildConfigFromCall(args);
+		if (IncrementalDomUtils.isComponentTag(child.tag)) {
+			child.config.ref = child.config.ref || renderer_.buildRef();
+		}
 		child.config.children = [];
 	}
 

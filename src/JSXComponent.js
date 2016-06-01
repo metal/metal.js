@@ -1,7 +1,8 @@
 'use strict';
 
+import './iDOMHelpers';
 import Component from 'metal-component';
-import JSX from './JSX';
+import IncrementalDomRenderer from 'metal-incremental-dom';
 
 class JSXComponent extends Component {
 	/**
@@ -9,7 +10,21 @@ class JSXComponent extends Component {
 	 * @return {!JSX}
 	 */
 	createRenderer() {
-		return new JSX(this);
+		return new IncrementalDomRenderer(this);
+	}
+
+	/**
+	 * Creates and renders the given function, which can either be a simple
+	 * JSX function or a component constructor.
+	 * @param {!function()} fnOrCtor Either be a simple jsx dom function or a
+	 *     component constructor.
+	 * @param {Object=} opt_data Optional config data for the function.
+	 * @param {Element=} opt_element Optional parent for the rendered content.
+	 * @return {!Component} The rendered component's instance.
+	 * @override
+	 */
+	static render(...args) {
+		return IncrementalDomRenderer.render(...args);
 	}
 }
 
@@ -28,4 +43,3 @@ JSXComponent.STATE = {
 };
 
 export default JSXComponent;
-export { JSX };

@@ -394,11 +394,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * incremental dom function or a component constructor.
 	 * @param {!function()} fnOrCtor Either be a simple incremental dom function
 	 or a component constructor.
-	 * @param {Object=} opt_data Optional config data for the function.
+	 * @param {Object|Element=} opt_dataOrElement Optional config data for the
+	 *     function or parent for the rendered content.
 	 * @param {Element=} opt_element Optional parent for the rendered content.
 	 * @return {!Component} The rendered component's instance.
 	 */
-	static render(fnOrCtor, opt_data, opt_parent) {
+	static render(fnOrCtor, opt_dataOrElement, opt_parent) {
 		if (!Component.isComponentCtor(fnOrCtor)) {
 			var fn = fnOrCtor;
 			class TempComponent extends Component {
@@ -409,7 +410,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			TempComponent.RENDERER = IncrementalDomRenderer;
 			fnOrCtor = TempComponent;
 		}
-		return Component.render(fnOrCtor, opt_data, opt_parent);
+		return Component.render(fnOrCtor, opt_dataOrElement, opt_parent);
 	}
 
 	/**

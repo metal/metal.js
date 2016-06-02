@@ -1,0 +1,41 @@
+{
+  "name": "metal-jsx",
+  "version": "1.0.0-rc.14",
+  "description": "A JSX templates renderer to be used with Metal.js's Component class",
+  "license": "BSD",
+  "repository": "metal/metal-jsx",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "jsnext:main": "src/JSXComponent.js",
+  "main": "lib/JSXComponent.js",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "gulp test"
+  },
+  "keywords": [
+    "metal"
+  ],
+  "babel": {
+    "presets": ["metal-jsx"]
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "metal-incremental-dom": "^1.0.0-rc.15",
+    "metal-karma-config": "^2.0.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-metal-jsx": "^0.0.2",
+    "gulp": "^3.8.11",
+    "gulp-metal": "^1.0.0",
+    "metal-karma-config": "^2.1.0"
+  }
+}

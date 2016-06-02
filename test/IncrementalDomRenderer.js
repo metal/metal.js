@@ -1737,6 +1737,59 @@ describe('IncrementalDomRenderer', function() {
 				});
 			});
 		});
+
+		it('should not remove reusable element from disposed component', function(done) {
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementOpen('child');
+					IncrementalDomRenderer.renderChild(this.config.children[this.index]);
+					IncDom.elementClose('child');
+				}
+			}
+			TestChildComponent.STATE = {
+				index: {
+					value: 0
+				}
+			};
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen(TestChildComponent, null, null, 'ref', 'child');
+					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo1');
+					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo2');
+					IncDom.elementClose(TestChildComponent);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			component = new TestComponent();
+
+			var child = component.components.child;
+			var child1 = component.components.childsub0;
+			assert.ok(child1);
+			assert.strictEqual('foo1', child1.foo);
+			assert.strictEqual(child1.element, child.element.childNodes[0]);
+			assert.ok(!child1.isDisposed());
+			assert.ok(!component.components.foo2);
+
+			var child1Element = child1.element;
+			child.index = 1;
+			child.once('stateSynced', function() {
+				// Wait until next tick for unused components to be disposed.
+				async.nextTick(function() {
+					assert.ok(!component.components.childsub0);
+					assert.ok(child1.isDisposed());
+
+					var child2 = component.components.childsub1;
+					assert.ok(child2);
+					assert.strictEqual('foo2', child2.foo);
+					assert.strictEqual(child2.element, child.element.childNodes[0]);
+					assert.strictEqual(child1Element, child2.element);
+					assert.ok(!child2.isDisposed());
+					done();
+				});
+			});
+		});
 	});
 
 	describe('Function - shouldUpdate', function() {

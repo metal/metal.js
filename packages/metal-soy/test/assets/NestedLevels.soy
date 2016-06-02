@@ -1,0 +1,14 @@
+{namespace NestedLevels}
+
+
+/**
+ * @param name
+ */
+{template .render}
+	<div>
+		{call Nested.render}
+			{param key: 'nested' /}
+			{param name: $name /}
+		{/call}
+	</div>
+{/template}

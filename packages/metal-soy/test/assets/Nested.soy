@@ -1,0 +1,14 @@
+{namespace Nested}
+
+
+/**
+ * @param name
+ */
+{template .render}
+	<div>
+		{call HelloWorld.render}
+			{param key: 'hello' /}
+			{param name: $name /}
+		{/call}
+	</div>
+{/template}

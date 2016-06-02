@@ -1,0 +1,14 @@
+{namespace NestedMultiple}
+
+/**
+ * @param count
+ */
+{template .render}
+	<div>
+		{for $i in range($count)}
+			{call HelloWorld.render}
+				{param key: 'hello' + ($i + 1) /}
+			{/call}
+		{/for}
+	</div>
+{/template}

@@ -2,24 +2,24 @@
 
 import dom from 'metal-dom';
 import Component from 'metal-component';
-import { HelloWorld as HelloWorldComponent, templates as helloWorldTemplates } from './assets/HelloWorld.soy';
-import { IJData as IJDataComponent } from './assets/IJData.soy';
-import { Events as EventsComponent } from './assets/Events.soy';
+import { HelloWorld as HelloWorldComponent, templates as helloWorldTemplates } from './assets/HelloWorld.soy.js';
+import { IJData as IJDataComponent } from './assets/IJData.soy.js';
+import { Events as EventsComponent } from './assets/Events.soy.js';
 
 // For now we can't follow alphabetical order here, since HelloWorld.soy needs
 // to be imported before ExternalTemplate.soy, since ExternalTemplate depends
 // on it.
 // TODO: We should have a better dependency management for soy files so that
 // the order in which they're required doesn't matter.
-import { ExternalTemplate as ExternalTemplateComponent } from './assets/ExternalTemplate.soy';
-import { Functions as FunctionsComponent } from './assets/Functions.soy';
-import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy';
-import { Nested as NestedComponent } from './assets/Nested.soy';
-import { NestedDataAll as NestedDataAllComponent } from './assets/NestedDataAll.soy';
-import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy';
-import { NestedMultiple as NestedMultipleComponent } from './assets/NestedMultiple.soy';
-import { NestedNoData as NestedNoDataComponent } from './assets/NestedNoData.soy';
-import { TemplateData as TemplateDataComponent } from './assets/TemplateData.soy';
+import { ExternalTemplate as ExternalTemplateComponent } from './assets/ExternalTemplate.soy.js';
+import { Functions as FunctionsComponent } from './assets/Functions.soy.js';
+import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy.js';
+import { Nested as NestedComponent } from './assets/Nested.soy.js';
+import { NestedDataAll as NestedDataAllComponent } from './assets/NestedDataAll.soy.js';
+import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy.js';
+import { NestedMultiple as NestedMultipleComponent } from './assets/NestedMultiple.soy.js';
+import { NestedNoData as NestedNoDataComponent } from './assets/NestedNoData.soy.js';
+import { TemplateData as TemplateDataComponent } from './assets/TemplateData.soy.js';
 import Soy from '../src/Soy';
 
 describe('Soy', function() {

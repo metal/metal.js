@@ -27,6 +27,7 @@
     "html2incdom": "^0.1.1",
     "metal": "^1.0.0-rc.1",
     "metal-component": "^1.0.0-rc.3",
+    "metal-dom": "^1.0.0-rc.7",
     "metal-incremental-dom": "^1.0.0-rc.15",
     "metal-soy-bundle": "^1.1.0"
   },

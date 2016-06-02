@@ -1,0 +1,38 @@
+{
+  "name": "metal-component",
+  "version": "1.0.0-rc.20",
+  "description": "A component class for Metal.js",
+  "license": "BSD",
+  "repository": "metal/metal-component",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "jsnext:main": "src/all/component.js",
+  "main": "lib/all/component.js",
+  "files": [
+    "lib",
+    "src",
+    "test"
+  ],
+  "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "gulp test"
+  },
+  "keywords": [
+    "metal"
+  ],
+  "dependencies": {
+    "metal": "^1.0.0-rc.1",
+    "metal-dom": "^1.0.0-rc.2",
+    "metal-events": "^1.0.0-rc.2",
+    "metal-state": "^1.0.0-rc.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "gulp": "^3.8.11",
+    "gulp-metal": "^1.0.0"
+  }
+}

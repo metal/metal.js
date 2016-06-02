@@ -198,6 +198,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			value = core.isDefAndNotNull(value) && value !== false;
 		}
 
+		if (name === 'value') {
+			// This is a temporary fix to account for incremental dom setting
+			// "value" as an attribute only, which can cause bugs since that won't
+			// necessarily update the input's content it's set on. See
+			// https://github.com/google/incremental-dom/issues/239 for more details.
+			element[name] = value;
+		}
+
 		if (core.isBoolean(value)) {
 			// Incremental dom sets boolean values as string data attributes, which
 			// is counter intuitive. This changes the behavior to use the actual

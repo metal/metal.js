@@ -325,6 +325,30 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should change input value via "value" attribute even after it\'s manually changed', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('input', null, [], 'value', this.value);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				value: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+			assert.strictEqual('foo', component.element.value);
+
+			component.element.value = 'userValue';
+			component.value = 'bar';
+			component.once('stateSynced', function() {
+				assert.strictEqual('bar', component.element.value);
+				done();
+			});
+		});
+
 		it('should add/remove css classes by using both "class" and "elementClasses"', function(done) {
 			class TestComponent extends Component {
 				render() {

@@ -24,7 +24,7 @@ describe('globalEval', function() {
 	});
 
 	it('should evaluate script file in global scope', function(done) {
-		var newScript = globalEval.runFile('base/fixtures/script.js');
+		var newScript = globalEval.runFile('fixtures/script.js');
 
 		dom.on(newScript, 'load', function() {
 			assert.strictEqual(5, window.testScript);
@@ -33,7 +33,7 @@ describe('globalEval', function() {
 	});
 
 	it('should remove created script tag after evaluated script file is loaded', function(done) {
-		var newScript = globalEval.runFile('base/fixtures/script.js');
+		var newScript = globalEval.runFile('fixtures/script.js');
 
 		dom.on(newScript, 'load', function() {
 			assert.ok(!newScript.parentNode);
@@ -42,7 +42,7 @@ describe('globalEval', function() {
 	});
 
 	it('should remove created script tag after evaluated script file throws error', function(done) {
-		var newScript = globalEval.runFile('base/fixtures/unexistingScript.js');
+		var newScript = globalEval.runFile('fixtures/unexistingScript.js');
 
 		dom.on(newScript, 'error', function() {
 			assert.ok(!newScript.parentNode);
@@ -51,7 +51,7 @@ describe('globalEval', function() {
 	});
 
 	it('should call callback function after script file is run', function(done) {
-		var newScript = globalEval.runFile('base/fixtures/script.js', function() {
+		var newScript = globalEval.runFile('fixtures/script.js', function() {
 			assert.strictEqual(5, window.testScript);
 			assert.ok(!newScript.parentNode);
 			done();
@@ -63,7 +63,7 @@ describe('globalEval', function() {
 		var script = document.createElement('script');
 		globalEval.runScript(script, null, appendFn);
 		assert.strictEqual(1, appendFn.callCount);
-		script.src = 'base/fixtures/script.js';
+		script.src = 'fixtures/script.js';
 		globalEval.runScript(script, null, appendFn);
 		assert.strictEqual(2, appendFn.callCount);
 	});
@@ -114,7 +114,7 @@ describe('globalEval', function() {
 
 	it('should run file referenced by specified script element in global scope', function(done) {
 		var script = document.createElement('script');
-		script.src = 'base/fixtures/script.js';
+		script.src = 'fixtures/script.js';
 		dom.enterDocument(script);
 
 		var newScript = globalEval.runScript(script);
@@ -126,7 +126,7 @@ describe('globalEval', function() {
 
 	it('should call callback function after script tag with file src is run', function(done) {
 		var script = document.createElement('script');
-		script.src = 'base/fixtures/script.js';
+		script.src = 'fixtures/script.js';
 		dom.enterDocument(script);
 
 		var newScript = globalEval.runScript(script, function() {
@@ -150,7 +150,7 @@ describe('globalEval', function() {
 
 	it('should run script tags inside given element in order', function(done) {
 		var element = dom.buildFragment(
-			'<script src="base/fixtures/script.js"></script><div><script>var testScript = 2 + 2;</script></div>'
+			'<script src="fixtures/script.js"></script><div><script>var testScript = 2 + 2;</script></div>'
 		);
 
 		globalEval.runScriptsInElement(element, function() {
@@ -162,7 +162,7 @@ describe('globalEval', function() {
 
 	it('should be able to overwrite append function from element', function(done) {
 		var element = dom.buildFragment(
-			'<script src="base/fixtures/script.js"></script><div><script>var testScript = 2 + 1;</script>'
+			'<script src="fixtures/script.js"></script><div><script>var testScript = 2 + 1;</script>'
 		);
 		var appendFn = sinon.spy(function(script) {
 			document.head.appendChild(script);

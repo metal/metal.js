@@ -22,7 +22,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should evaluate style file', function(done) {
-		var style = globalEvalStyles.runFile('base/fixtures/style.css', function() {
+		var style = globalEvalStyles.runFile('fixtures/style.css', function() {
 			assertComputedStyle('backgroundColor', 'rgb(0, 255, 0)');
 			dom.exitDocument(style);
 			done();
@@ -30,7 +30,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should leave created style file in document after code is evaluated', function(done) {
-		var style = globalEvalStyles.runFile('base/fixtures/style.css', function() {
+		var style = globalEvalStyles.runFile('fixtures/style.css', function() {
 			assert.ok(style.parentNode);
 			dom.exitDocument(style);
 			done();
@@ -73,7 +73,7 @@ describe('globalEvalStyles', function() {
 
 	it('should run file referenced by specified style element', function(done) {
 		var link = document.createElement('link');
-		link.href = 'base/fixtures/style.css';
+		link.href = 'fixtures/style.css';
 		link.rel = 'stylesheet';
 
 		var newStyle = globalEvalStyles.runStyle(link, function() {

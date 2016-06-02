@@ -7,7 +7,7 @@
 {template .render}
 	<div>
 		{call Nested.render}
-			{param key: 'nested' /}
+			{param ref: 'nested' /}
 			{param name: $name /}
 		{/call}
 	</div>

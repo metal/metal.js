@@ -1,6 +1,8 @@
 {
   "private": true,
   "scripts": {
+    "format": "gulp format",
+    "lint": "gulp lint",
     "pretest": "lerna run compile",
     "test": "gulp test",
     "pretest:coverage": "lerna run compile",

@@ -5,9 +5,21 @@ var gulp = require('gulp');
 var metal = require('gulp-metal');
 var replace = require('gulp-replace');
 
+var codeGlobs = [
+	'packages/metal*/src/**/*.js',
+	'packages/metal*/test/**/*.js',
+	// TODO: Find a way to lint/format jsx files (maybe use eslint instead of jshint).
+	'!packages/metal-jsx/test/**/*.js',
+	'gulpfile.js',
+	'karma.conf.js',
+	'karma-coverage.conf.js'
+];
+
 metal.registerTasks({
 	bundleFileName: 'metal.js',
-	karma: require('karma')
+	formatGlobs: codeGlobs,
+	karma: require('karma'),
+	lintGlobs: codeGlobs
 });
 
 gulp.task('soy', function() {

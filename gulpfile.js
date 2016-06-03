@@ -19,7 +19,13 @@ metal.registerTasks({
 	formatGlobs: codeGlobs,
 	karma: require('karma'),
 	// TODO: Find a way to lint jsx files (maybe use eslint instead of jshint).
-	lintGlobs: codeGlobs.concat('!packages/metal-jsx/test/**/*.js')
+	lintGlobs: codeGlobs.concat('!packages/metal-jsx/test/**/*.js'),
+	testNodeSrc: [
+		'env/test/node.js',
+		'packages/metal-events/test/**/*.js',
+		'packages/metal-state/test/**/*.js',
+		'packages/metal.js/test/**/*.js'
+	]
 });
 
 gulp.task('soy', function() {

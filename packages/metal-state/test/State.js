@@ -369,10 +369,10 @@ describe('State', function() {
 		);
 
 		state.key1 = 1;
-		assert.isFalse(console.error.called);
+		assert.ok(!console.error.called);
 
 		state.key1 = new Error('error');
-		assert.isTrue(console.error.called);
+		assert.ok(console.error.called);
 
 		console.error.restore();
 	});

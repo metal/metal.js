@@ -12,13 +12,11 @@
   "jsnext:main": "src/State.js",
   "files": [
     "lib",
-    "src",
-    "test"
+    "src"
   ],
   "scripts": {
     "compile": "babel --presets es2015 -d lib/ src/",
-    "prepublish": "npm run compile",
-    "test": "gulp test"
+    "prepublish": "npm run compile"
   },
   "keywords": [
     "metal"
@@ -29,9 +27,6 @@
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
-    "gulp": "^3.8.11",
-    "gulp-metal": "^1.0.0",
-    "sinon": "^1.17.3"
+    "babel-preset-es2015": "^6.3.13"
   }
 }

@@ -6,6 +6,7 @@
   "eqeqeq": true,
   "esnext": true,
   "evil": false,
+  "expr": true,
   "forin": false,
   "immed": true,
   "indent": 2,

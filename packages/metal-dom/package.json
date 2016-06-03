@@ -12,28 +12,22 @@
   "main": "lib/all/dom.js",
   "files": [
     "lib",
-    "src",
-    "test"
+    "src"
   ],
   "format": "es6",
   "scripts": {
     "compile": "babel --presets es2015 -d lib/ src/",
-    "prepublish": "npm run compile",
-    "test": "gulp test"
+    "prepublish": "npm run compile"
   },
   "keywords": [
     "metal"
   ],
   "dependencies": {
-    "bootstrap": "^3.3.6",
     "metal": "^1.0.0-rc.1",
     "metal-events": "^1.0.0-rc.1"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
-    "gulp": "^3.8.11",
-    "gulp-metal": "^1.0.0",
-    "metal-karma-config": "^2.0.0"
+    "babel-preset-es2015": "^6.3.13"
   }
 }

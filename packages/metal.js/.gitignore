@@ -1,6 +1,0 @@
-bower_components
-build
-coverage
-/lib
-node_modules
-test/**/assets/**/*.soy.js

@@ -7,20 +7,20 @@ module.exports = function (config) {
     files: [
       // Since all files will be added, we need to ensure manually that these
       // will be added first.
-      'packages/metal-incremental-dom/src/incremental-dom.js',
-      'packages/metal-incremental-dom/lib/incremental-dom.js',
-      'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js',
-      'packages/metal-soy/node_modules/html2incdom/lib/*.js',
+      {pattern: 'packages/metal-incremental-dom/src/incremental-dom.js', watched: false, included: true, served: true},
+      {pattern: 'packages/metal-incremental-dom/lib/incremental-dom.js', watched: false, included: true, served: true},
+      {pattern: 'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js', watched: false, included: true, served: true},
+      {pattern: 'packages/metal-soy/node_modules/html2incdom/lib/*.js', watched: false, included: true, served: true},
 
-      'packages/metal*/src/**/*.js',
-      'packages/metal*/test/**/*.js',
+      {pattern: 'packages/metal*/test/**/*.js', watched: false, included: true, served: true},
       {pattern: 'packages/metal-dom/fixtures/*', watched: true, included: false, served: true}
     ],
 
     preprocessors: {
+      'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
+      'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
       'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': ['browserify'],
       'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
-      'packages/metal*/src/**/*.js': ['browserify'],
       'packages/metal*/test/**/*.js': ['browserify']
     },
 
@@ -30,6 +30,8 @@ module.exports = function (config) {
         debug: true,
         transform: [ 'babelify' ]
     },
+
+    autoWatch: true,
 
     proxies: {
       '/fixtures/': '/base/packages/metal-dom/fixtures/'

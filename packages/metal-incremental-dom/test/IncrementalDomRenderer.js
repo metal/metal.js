@@ -222,8 +222,7 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should not throw error if no content is rendered for component', function() {
 			class TestComponent extends Component {
-				render() {
-				}
+				render() {}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
@@ -1954,8 +1953,7 @@ describe('IncrementalDomRenderer', function() {
 
 		it('should skip child update without error if it had no element before', function(done) {
 			class TestChildComponent extends Component {
-				render() {
-				}
+				render() {}
 
 				shouldUpdate() {
 					return false;

@@ -72,7 +72,7 @@ class ComponentRenderer extends EventEmitter {
 		if (this.component_.wasRendered) {
 			this.update({
 				changes: {
-					[data.key] : data
+					[data.key]: data
 				}
 			});
 		}

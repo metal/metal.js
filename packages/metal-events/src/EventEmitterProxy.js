@@ -140,7 +140,7 @@ class EventEmitterProxy extends Disposable {
 	 * @param {!EventEmitter} originEmitter
 	 */
 	setOriginEmitter(originEmitter) {
-		var events = this.originEmitter_?
+		var events = this.originEmitter_ ?
 			Object.keys(this.proxiedEvents_) :
 			this.pendingEvents_;
 		this.removeListeners_();

@@ -1,55 +1,90 @@
 'use strict';
 
-module.exports = function (config) {
-  config.set({
-    frameworks: ['browserify', 'mocha', 'chai', 'sinon', 'source-map-support'],
+module.exports = function(config) {
+	config.set({
+		frameworks: ['browserify', 'mocha', 'chai', 'sinon', 'source-map-support'],
 
-    files: [
-      // Since all files will be added, we need to ensure manually that these
-      // will be added first.
-      {pattern: 'packages/metal-incremental-dom/src/incremental-dom.js', watched: false, included: true, served: true},
-      {pattern: 'packages/metal-incremental-dom/lib/incremental-dom.js', watched: false, included: true, served: true},
-      {pattern: 'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js', watched: false, included: true, served: true},
-      {pattern: 'packages/metal-soy/node_modules/html2incdom/lib/*.js', watched: false, included: true, served: true},
+		files: [
+			// Since all files will be added, we need to ensure manually that these
+			// will be added first.
+			{
+				pattern: 'packages/metal-incremental-dom/src/incremental-dom.js',
+				watched: false,
+				included: true,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-incremental-dom/lib/incremental-dom.js',
+				watched: false,
+				included: true,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js',
+				watched: false,
+				included: true,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-soy/node_modules/html2incdom/lib/*.js',
+				watched: false,
+				included: true,
+				served: true
+			},
 
-      {pattern: 'packages/metal*/test/**/*.js', watched: false, included: true, served: true},
-      {pattern: 'packages/metal-dom/fixtures/*', watched: true, included: false, served: true}
-    ],
+			{
+				pattern: 'packages/metal*/test/**/*.js',
+				watched: false,
+				included: true,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-dom/fixtures/*',
+				watched: true,
+				included: false,
+				served: true
+			}
+		],
 
-    preprocessors: {
-      'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
-      'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
-      'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': ['browserify'],
-      'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
-      'packages/metal*/test/**/*.js': ['browserify']
-    },
+		preprocessors: {
+			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
+			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
+			'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': ['browserify'],
+			'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
+			'packages/metal*/test/**/*.js': ['browserify']
+		},
 
-    browsers: ['Chrome'],
+		browsers: ['Chrome'],
 
 		browserify: {
-        debug: true,
-        transform: [ require('browserify-istanbul')({
-	        instrumenter: require('isparta'),
-	        ignore: [
-						'**/packages/metal-incremental-dom/**/incremental-dom.js',
-						'**/packages/metal-jsx/**/iDOMHelpers.js'
-					]
-	      }), 'babelify' ]
-    },
+			debug: true,
+			transform: [require('browserify-istanbul')({
+				instrumenter: require('isparta'),
+				ignore: [
+					'**/packages/metal-incremental-dom/**/incremental-dom.js',
+					'**/packages/metal-jsx/**/iDOMHelpers.js'
+				]
+			}), 'babelify']
+		},
 
-    reporters: ['coverage', 'progress'],
+		reporters: ['coverage', 'progress'],
 
-    coverageReporter: {
+		coverageReporter: {
 			reporters: [
-				{type: 'lcov', subdir: 'lcov'},
-				{type: 'text-summary'}
+				{
+					type: 'lcov',
+					subdir: 'lcov'
+				},
+				{
+					type: 'text-summary'
+				}
 			]
-    },
+		},
 
-    autoWatch: true,
+		autoWatch: true,
 
-    proxies: {
-      '/fixtures/': '/base/packages/metal-dom/fixtures/'
-    }
-  });
+		proxies: {
+			'/fixtures/': '/base/packages/metal-dom/fixtures/'
+		}
+	});
 };

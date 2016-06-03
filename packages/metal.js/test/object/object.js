@@ -64,7 +64,7 @@ describe('object', function() {
 		assert.deepEqual(expectedObj, mappedObj);
 	});
 
-	it('should check if two objects are shallowly equal', function(){
+	it('should check if two objects are shallowly equal', function() {
 		var obj1 = {};
 		assert.ok(object.shallowEqual(obj1, obj1));
 

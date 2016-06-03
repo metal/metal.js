@@ -8,8 +8,7 @@ var replace = require('gulp-replace');
 var codeGlobs = [
 	'packages/metal*/src/**/*.js',
 	'packages/metal*/test/**/*.js',
-	// TODO: Find a way to lint/format jsx files (maybe use eslint instead of jshint).
-	'!packages/metal-jsx/test/**/*.js',
+	'!packages/metal-incremental-dom/**/incremental-dom.js',
 	'gulpfile.js',
 	'karma.conf.js',
 	'karma-coverage.conf.js'
@@ -19,7 +18,8 @@ metal.registerTasks({
 	bundleFileName: 'metal.js',
 	formatGlobs: codeGlobs,
 	karma: require('karma'),
-	lintGlobs: codeGlobs
+	// TODO: Find a way to lint jsx files (maybe use eslint instead of jshint).
+	lintGlobs: codeGlobs.concat('!packages/metal-jsx/test/**/*.js')
 });
 
 gulp.task('soy', function() {

@@ -239,8 +239,7 @@ class Component extends State {
 	 * Lifecycle. This is called when the component has just been created, before
 	 * it's rendered.
 	 */
-	created() {
-	}
+	created() {}
 
 	/**
 	 * Creates the renderer for this component. Sub classes can override this to
@@ -375,7 +374,7 @@ class Component extends State {
 			return this[fnName].bind(this);
 		} else {
 			console.error('No function named "' + fnName + '" was found in the ' +
-			  'component "' + core.getFunctionName(this.constructor) + '". Make ' +
+				'component "' + core.getFunctionName(this.constructor) + '". Make ' +
 				'sure that you specify valid function names when adding inline listeners.'
 			);
 		}
@@ -650,8 +649,7 @@ class Component extends State {
 	 * @param {boolean} firstRender Flag indicating if this was the component's
 	 *     first render.
 	 */
-	rendered() {
-	}
+	rendered() {}
 
 	/**
 	 * Validator logic for elementClasses state key.

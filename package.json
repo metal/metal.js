@@ -1,15 +1,16 @@
 {
   "private": true,
   "scripts": {
+    "compile": "lerna run compile",
     "format": "gulp format",
     "lint": "gulp lint",
-    "pretest": "lerna run compile",
+    "pretest": "npm run compile",
     "test": "gulp test",
-    "pretest:coverage": "lerna run compile",
+    "pretest:coverage": "npm run compile",
     "test:coverage": "gulp test:coverage",
-    "pretest:coverage:open": "lerna run compile",
+    "pretest:coverage:open": "npm run compile",
     "test:coverage:open": "gulp test:coverage:open",
-    "pretest:watch": "lerna run compile",
+    "pretest:watch": "npm run compile",
     "test:watch": "gulp test:watch"
   },
   "devDependencies": {

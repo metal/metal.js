@@ -10,7 +10,7 @@ class JSXComponent extends Component {
 	 * @return {!JSX}
 	 */
 	createRenderer() {
-		return new IncrementalDomRenderer(this);
+		return new JSXRenderer(this);
 	}
 
 	/**
@@ -41,5 +41,27 @@ JSXComponent.STATE = {
 		valueFn: () => []
 	}
 };
+
+/**
+ * Renderer that handles JSX.
+ */
+class JSXRenderer extends IncrementalDomRenderer {
+	/**
+	 * Overrides the original method from `IncrementalDomRenderer` to handle the
+	 * case where developers return a child node directly from the "render"
+	 * function.
+	 * @override
+	 */
+	renderIncDom() {
+		if (this.component_.render) {
+			var rendered = this.component_.render();
+			if (rendered && IncrementalDomRenderer.isIncDomNode(rendered)) {
+				IncrementalDomRenderer.renderChild(rendered);
+			}
+		} else {
+			super.renderIncDom();
+		}
+	}
+}
 
 export default JSXComponent;

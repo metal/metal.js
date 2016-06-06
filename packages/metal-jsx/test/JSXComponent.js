@@ -157,6 +157,34 @@ describe('JSXComponent', function() {
 			assert.strictEqual('Children Test 2', child.element.textContent);
 		});
 
+		it('should be able to render a child without wrapper element', function() {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return this.children[1];
+				}
+			}
+
+			class TestComponent extends JSXComponent {
+				render() {
+					return (
+						<div class="test">
+							<ChildComponent ref="child">
+								<span>Children Test</span>
+								<span>Children Test 2</span>
+								<span>Children Test 3</span>
+							</ChildComponent>
+						</div>
+					);
+				}
+			}
+
+			component = new TestComponent();
+			var child = component.components.child;
+			assert.strictEqual('SPAN', child.element.tagName);
+			assert.strictEqual(1, child.element.childNodes.length);
+			assert.strictEqual('Children Test 2', child.element.textContent);
+		});
+
 		it('should be able to get the data passed to children', function() {
 			class ChildComponent extends JSXComponent {
 				render() {

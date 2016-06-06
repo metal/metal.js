@@ -14,7 +14,7 @@ Metal.js is a JavaScript library for building UI components in a solid, flexible
   [sudo] npm install -g lerna
   ```
 
-3. Runs lerna to install local dependencies and link packages together:
+3. Run lerna to install local dependencies and link packages together:
 
   ```
   lerna bootstrap

@@ -19,6 +19,7 @@
     "browserify-istanbul": "^2.0.0",
     "chai": "^3.5.0",
     "gulp": "^3.8.11",
+    "gulp-babel": "^6.1.2",
     "gulp-metal": "^1.0.0",
     "gulp-replace": "^0.5.4",
     "isparta": "^4.0.0",

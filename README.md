@@ -1,5 +1,7 @@
 # Metal.js
 
+[![Build Status](http://img.shields.io/travis/mairatma/metal/master.svg?style=flat)](https://travis-ci.org/mairatma/metal)
+
 Metal.js is a JavaScript library for building UI components in a solid, flexible way.
 
 * [Official website](http://metaljs.com)

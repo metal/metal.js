@@ -1585,6 +1585,44 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', grandChild.context.bar);
 		});
 
+		it('should pass context data sub components rendered via "IncrementalDomRenderer.render"', function() {
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementVoid('child');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			var element = document.createElement('div');
+			var tempComp;
+			class TestComponent extends Component {
+				getChildContext() {
+					return {
+						foo: 'foo'
+					};
+				}
+
+				render() {
+					IncDom.elementVoid('div');
+				}
+
+				rendered() {
+					var fn = () => {
+						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child');
+					};
+					tempComp = IncrementalDomRenderer.render(fn, element);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			component = new TestComponent();
+
+			var child = tempComp.components.child;
+			assert.ok(child instanceof TestChildComponent);
+			assert.ok(!component.context.foo);
+			assert.ok(!component.context.bar);
+			assert.strictEqual('foo', child.context.foo);
+		});
+
 		describe('Non Incremental DOM sub component', function() {
 			beforeEach(function() {
 				sinon.stub(console, 'warn');

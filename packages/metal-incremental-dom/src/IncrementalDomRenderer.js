@@ -411,6 +411,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!Component.isComponentCtor(fnOrCtor)) {
 			var fn = fnOrCtor;
 			class TempComponent extends Component {
+				created() {
+					if (IncrementalDomRenderer.getComponentBeingRendered()) {
+						this.getRenderer().updateContext_(this);
+					}
+				}
+
 				render() {
 					fn(this.config);
 				}
@@ -511,13 +517,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
 		this.attachInlineListeners_();
-		IncrementalDomRenderer.finishedRenderingComponent();
 		if (!this.rootElementReached_) {
 			this.component_.element = null;
 		} else {
 			this.component_.addElementClasses();
 		}
 		this.emit('rendered', !this.component_.wasRendered);
+		IncrementalDomRenderer.finishedRenderingComponent();
 	}
 
 	/**

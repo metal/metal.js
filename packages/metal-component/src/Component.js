@@ -436,7 +436,7 @@ class Component extends State {
 	 * @return {boolean}
 	 */
 	static isComponentCtor(fn) {
-		return !!fn.prototype[Component.COMPONENT_FLAG];
+		return fn.prototype && fn.prototype[Component.COMPONENT_FLAG];
 	}
 
 	/**

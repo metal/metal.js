@@ -5,7 +5,7 @@ addons:
   sauce_connect: true
 before_install:
   - npm install -g npm@'>=3.0.0'
-  - npm install -g lerna
+  - npm install -g lerna@2.0.0-beta.13
   - lerna bootstrap
 before_script:
   - npm run compile

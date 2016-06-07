@@ -324,7 +324,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleSubComponentCall_(originalFn, ...args) {
 		var config = IncrementalDomUtils.buildConfigFromCall(args);
-		config.ref = config.ref || this.buildRef();
+		config.ref = core.isDefAndNotNull(config.ref) ? config.ref : this.buildRef();
 		this.componentToRender_ = {
 			config,
 			tag: args[0]

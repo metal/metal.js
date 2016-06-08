@@ -19,15 +19,29 @@
   "main": "lib/metal.js",
   "jsnext:main": "src/metal.js",
   "scripts": {
-    "compile": "babel --presets es2015 -d lib/ src/",
+    "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile"
   },
   "keywords": [
     "javascript",
     "library"
   ],
+  "babel": {
+    "plugins": [
+      [
+        "babel-plugin-transform-es2015-classes",
+        {
+          "loose": true
+        }
+      ]
+    ],
+    "presets": [
+      "es2015"
+    ]
+  },
   "devDependencies": {
     "babel-cli": "^6.4.5",
+    "babel-plugin-transform-es2015-classes": "^6.9.0",
     "babel-preset-es2015": "^6.3.13"
   }
 }

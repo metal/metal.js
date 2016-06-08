@@ -15,12 +15,25 @@
     "src"
   ],
   "scripts": {
-    "compile": "babel --presets es2015 -d lib/ src/",
+    "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile"
   },
   "keywords": [
     "metal"
   ],
+  "babel": {
+    "plugins": [
+      [
+        "babel-plugin-transform-es2015-classes",
+        {
+          "loose": true
+        }
+      ]
+    ],
+    "presets": [
+      "es2015"
+    ]
+  },
   "dependencies": {
     "metal": "^1.0.0-rc.1",
     "metal-dom": "^1.0.0-rc.2",
@@ -29,6 +42,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
+    "babel-plugin-transform-es2015-classes": "^6.9.0",
     "babel-preset-es2015": "^6.3.13"
   }
 }

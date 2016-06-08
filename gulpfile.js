@@ -42,9 +42,7 @@ gulp.task('soy', function() {
 var changedJsSrc;
 gulp.task('compile', function() {
 	return gulp.src(changedJsSrc)
-		.pipe(babel({
-			presets: ['es2015']
-		}))
+		.pipe(babel())
 		.pipe(gulp.dest(calcDestDir(changedJsSrc)));
 });
 

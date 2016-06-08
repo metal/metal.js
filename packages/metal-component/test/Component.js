@@ -670,6 +670,7 @@ describe('Component', function() {
 			comp.delegate('click', '.foo', listener);
 
 			var newElement = document.createElement('div');
+			dom.enterDocument(newElement);
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
 
@@ -713,6 +714,7 @@ describe('Component', function() {
 			comp.delegate('click', '.foo', listener);
 
 			var element = document.createElement('div');
+			dom.enterDocument(element);
 			dom.append(element, '<div class="foo"></div>');
 			comp.element = element;
 

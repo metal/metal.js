@@ -12,10 +12,24 @@ describe('JSXComponent', function() {
 		}
 	});
 
-	it('should render contents from component\'s jsx function', function() {
+	it('should render contents from component\'s "render" function', function() {
 		class TestComponent extends JSXComponent {
 			render() {
 				return <div class="test">Hello World</div>;
+			}
+		}
+
+		component = new TestComponent();
+		assert.strictEqual('DIV', component.element.tagName);
+		assert.ok(dom.hasClass(component.element, 'test'));
+		assert.strictEqual('Hello World', component.element.textContent);
+	});
+
+	it('should render returned contents from variable in "render" function', function() {
+		class TestComponent extends JSXComponent {
+			render() {
+				var jsx = <div class="test">Hello World</div>;
+				return jsx;
 			}
 		}
 

@@ -356,7 +356,8 @@ describe('State', function() {
 	});
 
 	it('should emit error if validator returns an Error', function() {
-		sinon.stub(console, 'error');
+		var originalConsoleFn = console.error;
+		console.error = sinon.stub();
 		var state = new State();
 		state.addToState(
 			{
@@ -374,7 +375,7 @@ describe('State', function() {
 		state.key1 = new Error('error');
 		assert.ok(console.error.called);
 
-		console.error.restore();
+		console.error = originalConsoleFn;
 	});
 
 	it('should change state new value through setter', function() {

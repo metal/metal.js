@@ -41,12 +41,13 @@ describe('EventsCollector', function() {
 		);
 		var collector = new EventsCollector(custom);
 
-		sinon.stub(console, 'error');
+		var originalConsoleFn = console.error;
+		console.error = sinon.stub();
 		collector.startCollecting();
 		collector.attachListener('click', 'handleClick');
 		assert.strictEqual(1, console.error.callCount);
 
-		console.error.restore();
+		console.error = originalConsoleFn;
 	});
 
 	it('should attach multiple listeners for the same element and event type', function() {

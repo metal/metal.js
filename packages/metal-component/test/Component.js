@@ -325,7 +325,8 @@ describe('Component', function() {
 			});
 
 			it('should warn if trying to attach event to unexisting function name', function() {
-				sinon.stub(console, 'error');
+				var originalConsoleFn = console.error;
+				console.error = sinon.stub();
 				comp = new Component({
 					events: {
 						event1: 'listener1'
@@ -333,7 +334,7 @@ describe('Component', function() {
 				});
 
 				assert.strictEqual(1, console.error.callCount);
-				console.error.restore();
+				console.error = originalConsoleFn;
 			});
 
 			it('should attach delegate events with specified selector', function() {
@@ -648,6 +649,7 @@ describe('Component', function() {
 			comp.on('click', listener);
 
 			var newElement = document.createElement('div');
+			dom.enterDocument(newElement);
 			comp.element = newElement;
 
 			dom.triggerEvent(element, 'click');
@@ -703,6 +705,7 @@ describe('Component', function() {
 			comp.on('click', listener);
 
 			var element = document.createElement('div');
+			dom.enterDocument(element);
 			comp.element = element;
 			dom.triggerEvent(element, 'click');
 			assert.strictEqual(1, listener.callCount);

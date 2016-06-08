@@ -3,12 +3,14 @@
 import ComponentRegistry from '../src/ComponentRegistry';
 
 describe('ComponentRegistry', function() {
+	var originalConsoleFn = console.error;
+
 	beforeEach(function() {
-		sinon.stub(console, 'error');
+		console.error = sinon.stub();
 	});
 
 	afterEach(function() {
-		console.error.restore();
+		console.error = originalConsoleFn;
 	});
 
 	it('should return undefined for getting constructor of unregistered component', function() {

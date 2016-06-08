@@ -1623,12 +1623,14 @@ describe('IncrementalDomRenderer', function() {
 		});
 
 		describe('Non Incremental DOM sub component', function() {
+			var originalWarnFn = console.warn;
+
 			beforeEach(function() {
-				sinon.stub(console, 'warn');
+				console.warn = sinon.stub();
 			});
 
 			afterEach(function() {
-				console.warn.restore();
+				console.warn = originalWarnFn;
 			});
 
 			it('should warn if rendering sub component that doesn\'t use incremental dom', function() {

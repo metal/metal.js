@@ -54,10 +54,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 */
 	renderIncDom() {
 		if (this.component_.render) {
-			var rendered = this.component_.render();
-			if (rendered && IncrementalDomRenderer.isIncDomNode(rendered)) {
-				IncrementalDomRenderer.renderChild(rendered);
-			}
+			iDOMHelpers.renderArbitrary(this.component_.render());
 		} else {
 			super.renderIncDom();
 		}

@@ -28,7 +28,64 @@ metal.registerTasks({
 		'packages/metal-events/test/**/*.js',
 		'packages/metal-state/test/**/*.js',
 		'packages/metal.js/test/**/*.js'
-	]
+	],
+	testSaucelabsBrowsers: {
+		sl_chrome: {
+			base: 'SauceLabs',
+			browserName: 'chrome'
+		},
+		sl_safari: {
+			base: 'SauceLabs',
+			browserName: 'safari',
+			platform: 'OS X 10.10'
+		},
+		sl_firefox: {
+			base: 'SauceLabs',
+			browserName: 'firefox'
+		},
+		sl_ie_9: {
+			base: 'SauceLabs',
+			browserName: 'internet explorer',
+			platform: 'Windows 7',
+			version: '9'
+		},
+		sl_ie_10: {
+			base: 'SauceLabs',
+			browserName: 'internet explorer',
+			platform: 'Windows 7',
+			version: '10'
+		},
+		sl_ie_11: {
+			base: 'SauceLabs',
+			browserName: 'internet explorer',
+			platform: 'Windows 8.1',
+			version: '11'
+		},
+		sl_edge_20: {
+			base: 'SauceLabs',
+			browserName: 'microsoftedge',
+			platform: 'Windows 10',
+			version: '20'
+		},
+		sl_iphone: {
+			base: 'SauceLabs',
+			browserName: 'iphone',
+			platform: 'OS X 10.10',
+			version: '7.1'
+		},
+		sl_android_4: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			platform: 'Linux',
+			version: '4.4'
+		},
+		sl_android_5: {
+			base: 'SauceLabs',
+			browserName: 'android',
+			platform: 'Linux',
+			version: '5.0'
+		}
+	}
 });
 
 gulp.task('soy', function() {

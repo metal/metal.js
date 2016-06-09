@@ -18,6 +18,8 @@ describe('core', function() {
 			}
 			class Class2 extends Class1 {
 			}
+			assert.strictEqual(core.getUid(Class1, true), core.getUid(Class1, true));
+			assert.strictEqual(core.getUid(Class2, true), core.getUid(Class2, true));
 			assert.notStrictEqual(core.getUid(Class1, true), core.getUid(Class2, true));
 		});
 	});

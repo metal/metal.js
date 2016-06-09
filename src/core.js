@@ -57,14 +57,19 @@ class core {
 	 * mutated with an unique id. Consecutive calls with the same object
 	 * reference won't mutate the object again, instead the current object uid
 	 * returns. See {@link core.UID_PROPERTY}.
-	 * @type {opt_object} Optional object to be mutated with the uid. If not
-	 *     specified this method only returns the uid.
+	 * @param {Object=} opt_object Optional object to be mutated with the uid. If
+	 *     not specified this method only returns the uid.
+	 * @param {boolean=} opt_noInheritance Optional flag indicating if this
+	 *     object's uid property can be inherited from parents or not.
 	 * @throws {Error} when invoked to indicate the method should be overridden.
 	 */
-	static getUid(opt_object) {
+	static getUid(opt_object, opt_noInheritance) {
 		if (opt_object) {
-			return opt_object[core.UID_PROPERTY] ||
-				(opt_object[core.UID_PROPERTY] = core.uniqueIdCounter_++);
+			var id = opt_object[core.UID_PROPERTY];
+			if (opt_noInheritance && !opt_object.hasOwnProperty[core.UID_PROPERTY]) {
+				id = null;
+			}
+			return id || (opt_object[core.UID_PROPERTY] = core.uniqueIdCounter_++);
 		}
 		return core.uniqueIdCounter_++;
 	}

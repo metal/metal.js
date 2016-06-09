@@ -12,6 +12,14 @@ describe('core', function() {
 			var obj = {};
 			assert.strictEqual(core.getUid(obj), core.getUid(obj));
 		});
+
+		it('should not use same uid for both an object and the one it inherits from', function() {
+			class Class1 {
+			}
+			class Class2 extends Class1 {
+			}
+			assert.notStrictEqual(core.getUid(Class1, true), core.getUid(Class2, true));
+		});
 	});
 
 	describe('Abstract Method', function() {

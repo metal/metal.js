@@ -1043,6 +1043,35 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should clear config variable on each sub component rerender', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					if (this.noBar) {
+						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
+					} else {
+						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'bar', 'bar');
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				noBar: {
+				}
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			assert.strictEqual('bar', child.config.bar);
+
+			component.noBar = true;
+			component.once('stateSynced', function() {
+				assert.ok(!child.config.bar);
+				done();
+			});
+		});
+
 		it('should render sub component via elementOpen/elementClose', function() {
 			class TestComponent extends Component {
 				render() {

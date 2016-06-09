@@ -126,6 +126,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			prevComp.dispose();
 		}
 		if (comp.wasRendered) {
+			// Reset config, to make sure that new values won't be merged with old ones.
+			comp.config = {};
 			comp.setState(config);
 		}
 		return comp;

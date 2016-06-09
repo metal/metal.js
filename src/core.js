@@ -66,7 +66,7 @@ class core {
 	static getUid(opt_object, opt_noInheritance) {
 		if (opt_object) {
 			var id = opt_object[core.UID_PROPERTY];
-			if (opt_noInheritance && !opt_object.hasOwnProperty[core.UID_PROPERTY]) {
+			if (opt_noInheritance && !opt_object.hasOwnProperty(core.UID_PROPERTY)) {
 				id = null;
 			}
 			return id || (opt_object[core.UID_PROPERTY] = core.uniqueIdCounter_++);

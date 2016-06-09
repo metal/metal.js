@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, object } from 'metal';
+import { array, async, object } from 'metal';
 import dom from 'metal-dom';
 import { Component, ComponentRegistry } from 'metal-component';
 import IncrementalDomChildren from '../src/children/IncrementalDomChildren';
@@ -965,7 +965,9 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.sub0;
+			var refs = Object.keys(component.components);
+			assert.strictEqual(1, refs.length);
+			var child = component.components[refs[0]];
 			assert.ok(child instanceof ChildComponent);
 		});
 
@@ -980,12 +982,63 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.sub0;
+			var key = Object.keys(component.components)[0];
+			var child = component.components[key];
 			child.foo = 'bar';
 			child.once('stateSynced', function() {
-				assert.strictEqual(child, component.components.sub0);
+				assert.strictEqual(child, component.components[key]);
 				assert.strictEqual(child.element, component.element.querySelector('child'));
 				assert.strictEqual('bar', child.element.textContent);
+				done();
+			});
+		});
+
+		it('should reuse correct children after an update', function(done) {
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementVoid('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					if (this.add) {
+						IncDom.elementVoid(TestChildComponent);
+					}
+					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'bar');
+					IncDom.elementVoid(ChildComponent);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				add: {
+				}
+			};
+			component = new TestComponent();
+
+			var refs = Object.keys(component.components).sort();
+			assert.strictEqual(2, refs.length);
+			var child1 = component.components[refs[0]];
+			var child2 = component.components[refs[1]];
+
+			component.add = true;
+			component.once('stateSynced', function() {
+				var refs2 = Object.keys(component.components).sort();
+				assert.strictEqual(3, refs2.length);
+				assert.strictEqual(child1, component.components[refs2[0]]);
+				assert.strictEqual(child2, component.components[refs2[1]]);
+				assert.ok(component.components[refs2[2]] instanceof TestChildComponent);
+
+				assert.strictEqual(3, component.element.childNodes.length);
+				assert.strictEqual(component.components[refs2[2]].element, component.element.childNodes[0]);
+				assert.strictEqual(child1.element, component.element.childNodes[1]);
+				assert.strictEqual(child2.element, component.element.childNodes[2]);
+
+				assert.strictEqual('bar', child1.foo);
+				assert.strictEqual('foo', child2.foo);
 				done();
 			});
 		});
@@ -1514,18 +1567,23 @@ describe('IncrementalDomRenderer', function() {
 				}
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
-				assert.strictEqual(2, Object.keys(component.components).length);
 
-				var child = component.components.child;
-				var child2 = component.components.childsub0;
-				assert.ok(child);
-				assert.ok(child2);
+				var components = object.mixin(component.components);
+				assert.strictEqual(2, Object.keys(components).length);
 
-				child.foo = 'foo2';
-				child.once('stateSynced', function() {
+				var keys = Object.keys(components).concat();
+				array.remove(keys, 'child');
+				var child2Key = keys[0];
+
+				components.child.foo = 'foo2';
+				components.child.once('stateSynced', function() {
 					assert.strictEqual(2, Object.keys(component.components).length);
-					assert.strictEqual(child, component.components.child);
-					assert.strictEqual(child2, component.components.childsub0);
+					assert.deepEqual(
+						Object.keys(components).sort(),
+						Object.keys(component.components).sort()
+					);
+					assert.strictEqual(components.child, component.components.child);
+					assert.strictEqual(components[child2Key], component.components[child2Key]);
 					assert.ok(!component.components.sub1);
 					done();
 				});
@@ -1818,8 +1876,8 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen(TestChildComponent, null, null, 'ref', 'child');
-					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo1');
-					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo2');
+					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo1', 'ref', 'grandchild1');
+					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo2', 'ref', 'grandchild2');
 					IncDom.elementClose(TestChildComponent);
 				}
 			}
@@ -1827,7 +1885,7 @@ describe('IncrementalDomRenderer', function() {
 			component = new TestComponent();
 
 			var child = component.components.child;
-			var child1 = component.components.childsub0;
+			var child1 = component.components.grandchild1;
 			assert.ok(child1);
 			assert.strictEqual('foo1', child1.foo);
 			assert.strictEqual(child1.element, child.element.childNodes[0]);
@@ -1839,10 +1897,10 @@ describe('IncrementalDomRenderer', function() {
 			child.once('stateSynced', function() {
 				// Wait until next tick for unused components to be disposed.
 				async.nextTick(function() {
-					assert.ok(!component.components.childsub0);
+					assert.ok(!component.components.grandchild1);
 					assert.ok(child1.isDisposed());
 
-					var child2 = component.components.childsub1;
+					var child2 = component.components.grandchild2;
 					assert.ok(child2);
 					assert.strictEqual('foo2', child2.foo);
 					assert.strictEqual(child2.element, child.element.childNodes[0]);

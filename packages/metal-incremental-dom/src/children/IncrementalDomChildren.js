@@ -99,7 +99,7 @@ function addChildCallToTree_(args, opt_isText) {
 		if (IncrementalDomUtils.isComponentTag(child.tag)) {
 			child.config.ref = core.isDefAndNotNull(child.config.ref) ?
 				child.config.ref :
-				renderer_.buildRef();
+				renderer_.buildRef(args[0]);
 		}
 		child.config.children = [];
 	}

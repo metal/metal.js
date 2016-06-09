@@ -3,7 +3,7 @@
 import './incremental-dom';
 import { array, core, object } from 'metal';
 import dom from 'metal-dom';
-import { Component, ComponentRenderer, EventsCollector } from 'metal-component';
+import { Component, ComponentRegistry, ComponentRenderer, EventsCollector } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
 import IncrementalDomUnusedComponents from './cleanup/IncrementalDomUnusedComponents';
@@ -88,12 +88,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 	/**
 	 * Builds the key for the next component that is found.
+	 * @param {string} tag The component's tag.
 	 * @return {string}
 	 */
-	buildRef() {
-		var count = this.generatedRefCount_[this.currentPrefix_] || 0;
-		this.generatedRefCount_[this.currentPrefix_] = count + 1;
-		return this.currentPrefix_ + 'sub' + count;
+	buildRef(tag) {
+		var ctor = core.isString(tag) ? ComponentRegistry.getConstructor(tag) : tag;
+		var prefix = this.currentPrefix_ + core.getUid(ctor, true);
+		var count = this.generatedRefCount_[prefix] || 0;
+		this.generatedRefCount_[prefix] = count + 1;
+		return prefix + 'sub' + count;
 	}
 
 	/**
@@ -123,6 +126,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			prevComp.dispose();
 		}
 		if (comp.wasRendered) {
+			// Reset config, to make sure that new values won't be merged with old ones.
+			comp.config = {};
 			comp.setState(config);
 		}
 		return comp;
@@ -324,7 +329,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleSubComponentCall_(originalFn, ...args) {
 		var config = IncrementalDomUtils.buildConfigFromCall(args);
-		config.ref = core.isDefAndNotNull(config.ref) ? config.ref : this.buildRef();
+		config.ref = core.isDefAndNotNull(config.ref) ? config.ref : this.buildRef(args[0]);
 		this.componentToRender_ = {
 			config,
 			tag: args[0]

@@ -52,7 +52,7 @@ describe('JSXComponent', function() {
 		class TestComponent extends JSXComponent {
 			render() {
 				return <div>
-					<button data-onclick={this.handleClick.bind(this)}></button>
+					<button onClick={this.handleClick.bind(this)}></button>
 				</div>;
 			}
 		}

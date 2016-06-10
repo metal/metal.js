@@ -343,7 +343,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	getEventFromListenerAttr_(attr) {
 		var matches = IncrementalDomRenderer.LISTENER_REGEX.exec(attr);
-		return matches ? matches[1].toLowerCase() : null;
+		var eventName = matches ? (matches[1] ? matches[1] : matches[2]) : null;
+		return eventName ? eventName.toLowerCase() : null;
 	}
 
 	/**
@@ -627,6 +628,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 var renderingComponents_ = [];
 var emptyChildren_ = [];
 
-IncrementalDomRenderer.LISTENER_REGEX = /^on([A-Z]\w+)$/;
+IncrementalDomRenderer.LISTENER_REGEX = /^(?:on([A-Z]\w+))|(?:data-on(\w+))$/;
 
 export default IncrementalDomRenderer;

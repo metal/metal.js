@@ -481,11 +481,11 @@ describe('IncrementalDomRenderer', function() {
 	});
 
 	describe('Inline Listeners', function() {
-		it('should attach listeners from "data-on<event>" attributes', function() {
+		it('should attach listeners from "on<EventName>" attributes', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+					IncDom.elementVoid('div', null, null, 'onClick', 'handleClick');
 					IncDom.elementClose('div');
 				}
 			}
@@ -505,7 +505,7 @@ describe('IncrementalDomRenderer', function() {
 		it('should attach listeners from root element', function() {
 			class TestComponent extends Component {
 				render() {
-					IncDom.elementOpen('div', null, null, 'data-onclick', 'handleClick');
+					IncDom.elementOpen('div', null, null, 'onClick', 'handleClick');
 					IncDom.elementVoid('div');
 					IncDom.elementClose('div');
 				}
@@ -525,7 +525,7 @@ describe('IncrementalDomRenderer', function() {
 				render() {
 					IncDom.elementOpen('div');
 					IncDom.elementOpenStart('div');
-					IncDom.attr('data-onclick', 'handleClick');
+					IncDom.attr('onClick', 'handleClick');
 					IncDom.elementOpenEnd();
 					IncDom.elementClose('div');
 				}
@@ -547,7 +547,7 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+					IncDom.elementVoid('div', null, null, 'onClick', 'handleClick');
 					IncDom.elementClose('div');
 				}
 			}
@@ -570,9 +570,11 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+					IncDom.elementVoid('div', null, null, 'onClick', 'handleClick');
 					if (this.keydown) {
-						IncDom.elementVoid('div', null, null, 'data-onkeydown', 'handleKeydown');
+						IncDom.elementVoid('div', null, null, 'onKeyDown', 'handleKeydown');
+					} else {
+						IncDom.elementVoid('div', null, null);
 					}
 					IncDom.elementClose('div');
 				}
@@ -590,42 +592,19 @@ describe('IncrementalDomRenderer', function() {
 			dom.triggerEvent(component.element.childNodes[1], 'keydown');
 			assert.strictEqual(1, component.handleKeydown.callCount);
 
-			sinon.spy(component, 'removeListener');
 			component.keydown = false;
 			component.once('stateSynced', function() {
-				assert.strictEqual(2, component.removeListener.callCount);
-				assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('keydown'));
-				assert.strictEqual('stateSynced', component.removeListener.args[1][0]);
+				dom.triggerEvent(component.element.childNodes[1], 'keydown');
+				assert.strictEqual(1, component.handleKeydown.callCount);
 				done();
 			});
 		});
 
-		it('should remove all inline listeners when element is detached', function() {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementOpen('div', null, null, 'data-onkeydown', 'handleKeydown');
-					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
-					IncDom.elementClose('div');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-			TestComponent.prototype.handleKeydown = sinon.stub();
-
-			component = new TestComponent();
-			sinon.spy(component, 'removeListener');
-			component.detach();
-
-			assert.strictEqual(2, component.removeListener.callCount);
-			assert.notStrictEqual(-1, component.removeListener.args[0][0][0].indexOf('keydown'));
-			assert.notStrictEqual(-1, component.removeListener.args[1][0][0].indexOf('click'));
-		});
-
-		it('should attach listeners functions passed to "data-on<event>" attributes', function() {
+		it('should attach listeners functions passed to "on<EventName>" attributes', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('div', null, null, 'data-onclick', this.handleClick);
+					IncDom.elementVoid('div', null, null, 'onClick', this.handleClick);
 					IncDom.elementClose('div');
 				}
 			}
@@ -647,7 +626,7 @@ describe('IncrementalDomRenderer', function() {
 				render() {
 					IncDom.elementOpen('div');
 					var fn = this.switch ? this.handleClick2 : this.handleClick;
-					IncDom.elementVoid('div', null, null, 'data-onclick', fn);
+					IncDom.elementVoid('div', null, null, 'onClick', fn);
 					IncDom.elementClose('div');
 				}
 			}
@@ -680,7 +659,7 @@ describe('IncrementalDomRenderer', function() {
 			class ChildComponentClass extends Component {
 				render() {
 					IncDom.elementOpen('child', null, null, 'data-child', '1');
-					IncDom.elementVoid('button', null, null, 'data-onclick', 'handleClick');
+					IncDom.elementVoid('button', null, null, 'onClick', 'handleClick');
 					IncDom.text(this.foo);
 					IncDom.elementClose('child');
 				}
@@ -913,6 +892,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(0, child.handleClick.callCount);
 
 			var button = child.element.querySelector('button');
+
 			dom.triggerEvent(button, 'click');
 			assert.strictEqual(1, child.handleClick.callCount);
 		});
@@ -923,7 +903,7 @@ describe('IncrementalDomRenderer', function() {
 					if (this.config.removeEvent) {
 						IncDom.elementOpen('div');
 					} else {
-						IncDom.elementOpen('div', null, null, 'data-onclick', 'handleClick');
+						IncDom.elementOpen('div', null, null, 'onClick', 'handleClick');
 					}
 					IncDom.elementClose('div');
 				}
@@ -945,11 +925,14 @@ describe('IncrementalDomRenderer', function() {
 			};
 			component = new TestComponent();
 			var child = component.components.child;
-			sinon.spy(child, 'removeListener');
+
+			dom.triggerEvent(child.element, 'click');
+			assert.strictEqual(1, child.handleClick.callCount);
 
 			component.removeEvent = true;
 			component.once('stateSynced', function() {
-				assert.strictEqual(1, child.removeListener.callCount);
+				dom.triggerEvent(child.element, 'click');
+				assert.strictEqual(1, child.handleClick.callCount);
 				done();
 			});
 		});

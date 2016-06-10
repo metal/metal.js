@@ -1,9 +1,9 @@
 'use strict';
 
 import './incremental-dom';
-import { array, core, object } from 'metal';
+import { core, object } from 'metal';
 import dom from 'metal-dom';
-import { Component, ComponentRegistry, ComponentRenderer, EventsCollector } from 'metal-component';
+import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
 import IncrementalDomUnusedComponents from './cleanup/IncrementalDomUnusedComponents';
@@ -21,9 +21,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		comp.context = {};
 		this.changes_ = {};
-		this.eventsCollector_ = new EventsCollector(comp);
 		comp.on('attached', this.handleAttached_.bind(this));
-		comp.on('detached', this.handleDetached_.bind(this));
 
 		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
 			// If the component is being updated synchronously we'll just reuse the
@@ -41,38 +39,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.handleChildrenCaptured_ = this.handleChildrenCaptured_.bind(this);
 		this.handleChildRender_ = this.handleChildRender_.bind(this);
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
-	}
-
-	/**
-	 * Adds all inline listener attributes included in the given config.
-	 * @param {!Array} listeners
-	 * @protected
-	 */
-	addInlineListeners_(listeners) {
-		for (var i = 0; i < listeners.length; i += 2) {
-			var name = listeners[i];
-			var fn = listeners[i + 1];
-			if (this.isListenerAttr_(name) && core.isString(fn)) {
-				this.listenersToAttach_.push({
-					eventName: name.substr(7),
-					fn
-				});
-			}
-		}
-	}
-
-	/**
-	 * Attaches any inline listeners found in the contents built via the last
-	 * incremental dom patch.
-	 * @protected
-	 */
-	attachInlineListeners_() {
-		this.eventsCollector_.startCollecting();
-		for (var i = 0; i < this.listenersToAttach_.length; i++) {
-			var listener = this.listenersToAttach_[i];
-			this.eventsCollector_.attachListener(listener.eventName, listener.fn);
-		}
-		this.eventsCollector_.detachUnusedListeners();
 	}
 
 	/**
@@ -168,14 +134,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles the `detached` listener. Removes all inline listeners.
-	 * @protected
-	 */
-	handleDetached_() {
-		this.eventsCollector_.detachAllListeners();
-	}
-
-	/**
 	 * Handles an intercepted call to the attributes default handler from
 	 * incremental dom.
 	 * @param {!function()} originalFn The original function before interception.
@@ -185,14 +143,23 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleInterceptedAttributesCall_(originalFn, element, name, value) {
-		if (this.isListenerAttr_(name)) {
-			var eventName = name.substr(7);
-			if (core.isFunction(element[name])) {
-				element.removeEventListener(eventName, element[name]);
+		var eventName = this.getEventFromListenerAttr_(name);
+		if (eventName) {
+			if (core.isDef(element[name + '__handle__'])) {
+				element[name + '__handle__'].removeListener();
 			}
-			if (core.isFunction(value)) {
-				dom.on(element, eventName, value);
+
+			element[name] = value;
+			if (value) {
+				var fn = value;
+				if (core.isString(fn)) {
+					fn = this.component_.getListenerFn(value);
+				}
+				element[name + '__handle__'] = dom.on(element, eventName, fn);
+			} else {
+				element[name + '__handle__'] = null;
 			}
+			return;
 		}
 
 		if (name === 'checked') {
@@ -289,16 +256,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * dom, done for a regular element. Adds any inline listeners found and makes
 	 * sure that component root elements are always reused.
 	 * @param {!function()} originalFn The original function before interception.
-	 * @param {string} tag
-	 * @param {?string} key
-	 * @param {?Array} statics
 	 * @protected
 	 */
-	handleRegularCall_(originalFn, tag, key, statics) {
-		var attrsArr = array.slice(arguments, 4);
-		this.addInlineListeners_((statics || []).concat(attrsArr));
-		var args = array.slice(arguments, 1);
-
+	handleRegularCall_(originalFn, ...args) {
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
 		if (!currRenderer.rootElementReached_ && currComp.config.key) {
@@ -375,13 +335,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Checks if the given attribute name is for a dom event listener.
+	 * Returns the event name if the given attribute is a listener (of the form
+	 * "on<EventName>"), or null if it isn't.
 	 * @param {string} attr
-	 * @return {boolean}
+	 * @return {?string}
 	 * @protected
 	 */
-	isListenerAttr_(attr) {
-		return attr.substr(0, 7) === 'data-on';
+	getEventFromListenerAttr_(attr) {
+		var matches = IncrementalDomRenderer.LISTENER_REGEX.exec(attr);
+		return matches ? matches[1].toLowerCase() : null;
 	}
 
 	/**
@@ -521,7 +483,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.intercept_();
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
-		this.attachInlineListeners_();
 		if (!this.rootElementReached_) {
 			this.component_.element = null;
 		} else {
@@ -665,5 +626,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 var renderingComponents_ = [];
 var emptyChildren_ = [];
+
+IncrementalDomRenderer.LISTENER_REGEX = /^on([A-Z]\w+)$/;
 
 export default IncrementalDomRenderer;

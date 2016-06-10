@@ -72,7 +72,7 @@ export default CloseHeader;{/literal}
  */
 &lbrace;template .render&rbrace;
 	&lt;header class="{$cssClass}"&gt;
-		&lt;button data-onclick="{$onClick}" type="button" class="close"&gt;
+		&lt;button onClick="{$onClick}" type="button" class="close"&gt;
 			&lt;span&gt;×&lt;/span&gt;
 		&lt;/button&gt;
 		&lt;h4&gt;{$title}&lt;/h4&gt;
@@ -82,7 +82,7 @@ export default CloseHeader;{/literal}
 				<textarea class="code hidden" data-mode="javascript">
 {literal}render() {
 	return &lt;header class={this.config.cssClass}&gt;
-		&lt;button data-onclick={this.config.onClick} type="button" class="close"&gt;
+		&lt;button onClick={this.config.onClick} type="button" class="close"&gt;
 			&lt;span&gt;×&lt;/span&gt;
 		&lt;/button&gt;
 		&lt;h4&gt;{this.config.title}&lt;/h4&gt;

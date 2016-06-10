@@ -109,7 +109,7 @@
 	<p>You can add DOM event listeners easily through your templates, like this:</p>
 
 	<textarea class="code" data-mode="javascript">
-		{literal}&lt;button data-onclick="close" type="button" class="close"&gt;{/literal}
+		{literal}&lt;button onClick="close" type="button" class="close"&gt;{/literal}
 	</textarea>
 
 	<p>
@@ -141,13 +141,13 @@
  */
 &lbrace;template .render&rbrace;
   // ...
-  &lt;button data-onclick="{$close}" type="button" class="close"&gt;
+  &lt;button onClick="{$close}" type="button" class="close"&gt;
   // ...
 &lbrace;/template&rbrace;{/literal}
 			</textarea>
 			<textarea class="code hidden" data-mode="javascript">
 	{literal}
-&lt;button data-onclick={this.close.bind(this)} type="button" class="close"&gt;{/literal}
+&lt;button onClick={this.close.bind(this)} type="button" class="close"&gt;{/literal}
 			</textarea>
 		{/param}
 	{/call}

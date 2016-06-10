@@ -200,7 +200,7 @@ render() &lbrace;
 		&lt;div class="modal-dialog"&gt;
 			&lt;div class="modal-content"&gt;
 				&lt;header class="modal-header"&gt;
-					&lt;button type="button" class="close"&gt;
+					&lt;button onClick={this.close.bind(this)} type="button" class="close"&gt;
 						&lt;span&gt;×&lt;/span&gt;
 					&lt;/button&gt;
 					&lt;h4&gt;{this.header}&lt;/h4&gt;

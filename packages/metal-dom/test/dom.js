@@ -1,6 +1,7 @@
 'use strict';
 
 import dom from '../src/dom';
+import { object } from 'metal';
 import DomEventHandle from '../src/DomEventHandle';
 
 describe('dom', function() {
@@ -378,122 +379,309 @@ describe('dom', function() {
 	});
 
 	describe('delegate', function() {
-		it('should trigger delegate listener for matched elements', function() {
-			var element = document.createElement('div');
-			element.innerHTML = '<div class="nomatch">' +
-				'<div class="match">' +
-				'<div class="nomatch">' +
-				'<div class="match">' +
-				'</div></div></div></div>';
-			document.body.appendChild(element);
-			var matchedElements = element.querySelectorAll('.match');
+		describe('selector', function() {
+			it('should trigger delegate listener for matched elements', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
 
-			var listenerTargets = [];
-			var listener = function(event) {
-				listenerTargets.push(event.delegateTarget);
-			};
-			dom.delegate(element, 'click', '.match', listener);
+				var listenerTargets = [];
+				var listener = function(event) {
+					listenerTargets.push(event.delegateTarget);
+				};
+				dom.delegate(element, 'click', '.match', listener);
 
-			dom.triggerEvent(matchedElements[1], 'click');
-			assert.strictEqual(2, listenerTargets.length);
-			assert.strictEqual(matchedElements[1], listenerTargets[0]);
-			assert.strictEqual(matchedElements[0], listenerTargets[1]);
+				dom.triggerEvent(matchedElements[1], 'click');
+				assert.strictEqual(2, listenerTargets.length);
+				assert.strictEqual(matchedElements[1], listenerTargets[0]);
+				assert.strictEqual(matchedElements[0], listenerTargets[1]);
+			});
+
+			it('should trigger delegate listener for "focus" event', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
+
+				var listenerTargets = [];
+				var listener = function(event) {
+					listenerTargets.push(event.delegateTarget);
+				};
+				dom.delegate(element, 'focus', '.match', listener);
+
+				dom.triggerEvent(matchedElements[1], 'focus');
+				assert.strictEqual(2, listenerTargets.length);
+				assert.strictEqual(matchedElements[1], listenerTargets[0]);
+				assert.strictEqual(matchedElements[0], listenerTargets[1]);
+			});
+
+			it('should only trigger delegate event starting from initial target', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
+
+				var listenerTargets = [];
+				var listener = function(event) {
+					listenerTargets.push(event.delegateTarget);
+				};
+				dom.delegate(element, 'click', '.match', listener);
+
+				dom.triggerEvent(matchedElements[0], 'click');
+				assert.strictEqual(1, listenerTargets.length);
+				assert.strictEqual(matchedElements[0], listenerTargets[0]);
+			});
+
+			it('should not trigger delegate event for parents of given element', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch"></div>';
+				element.className = 'match';
+				document.body.appendChild(element);
+
+				var childElement = element.childNodes[0];
+				var listener = sinon.stub();
+				dom.delegate(childElement, 'click', '.match', listener);
+
+				dom.triggerEvent(childElement, 'click');
+				assert.strictEqual(0, listener.callCount);
+			});
+
+			it('should stop triggering event if stopPropagation is called', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
+
+				var listenerTargets = [];
+				var listener = function(event) {
+					listenerTargets.push(event.delegateTarget);
+					event.stopPropagation();
+				};
+				dom.delegate(element, 'click', '.match', listener);
+
+				dom.triggerEvent(matchedElements[1], 'click');
+				assert.strictEqual(1, listenerTargets.length);
+				assert.strictEqual(matchedElements[1], listenerTargets[0]);
+			});
+
+			it('should stop triggering event if stopImmediatePropagation is called', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
+
+				var listenerTargets = [];
+				var listener = function(event) {
+					listenerTargets.push(event.delegateTarget);
+					event.stopImmediatePropagation();
+				};
+				dom.delegate(element, 'click', '.match', listener);
+
+				dom.triggerEvent(matchedElements[1], 'click');
+				assert.strictEqual(1, listenerTargets.length);
+				assert.strictEqual(matchedElements[1], listenerTargets[0]);
+			});
+
+			it('should clear delegateTarget from event object after event is done', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', '.match', listener);
+
+				dom.triggerEvent(matchedElements[1], 'click');
+				assert.ok(!listener.args[0][0].delegateTarget);
+			});
 		});
 
-		it('should only trigger delegate event starting from initial target', function() {
-			var element = document.createElement('div');
-			element.innerHTML = '<div class="nomatch">' +
-				'<div class="match">' +
-				'<div class="nomatch">' +
-				'<div class="match">' +
-				'</div></div></div></div>';
-			document.body.appendChild(element);
-			var matchedElements = element.querySelectorAll('.match');
+		describe('without selector', function() {
+			it('should trigger delegate listener for specified element', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+				var grandchild = document.createElement('div');
+				dom.append(child, grandchild);
 
-			var listenerTargets = [];
-			var listener = function(event) {
-				listenerTargets.push(event.delegateTarget);
-			};
-			dom.delegate(element, 'click', '.match', listener);
+				var eventCopy;
+				dom.delegate(element, 'click', child, function(event) {
+					eventCopy = object.mixin({}, event);
+				});
 
-			dom.triggerEvent(matchedElements[0], 'click');
-			assert.strictEqual(1, listenerTargets.length);
-			assert.strictEqual(matchedElements[0], listenerTargets[0]);
-		});
+				dom.triggerEvent(element, 'click');
+				assert.ok(!eventCopy);
 
-		it('should not trigger delegate event for parents of given element', function() {
-			var element = document.createElement('div');
-			element.innerHTML = '<div class="nomatch"></div>';
-			element.className = 'match';
-			document.body.appendChild(element);
+				dom.triggerEvent(child, 'click');
+				assert.ok(eventCopy);
+				assert.strictEqual(child, eventCopy.delegateTarget);
+				assert.strictEqual(child, eventCopy.target);
+				assert.strictEqual(element, eventCopy.currentTarget);
 
-			var childElement = element.childNodes[0];
-			var listener = sinon.stub();
-			dom.delegate(childElement, 'click', '.match', listener);
+				dom.triggerEvent(grandchild, 'click');
+				assert.ok(eventCopy);
+				assert.strictEqual(child, eventCopy.delegateTarget);
+				assert.strictEqual(grandchild, eventCopy.target);
+				assert.strictEqual(element, eventCopy.currentTarget);
+			});
 
-			dom.triggerEvent(childElement, 'click');
-			assert.strictEqual(0, listener.callCount);
-		});
+			it('should not add listener to container twice for the same event type', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child1 = document.createElement('div');
+				dom.append(element, child1);
+				var child2 = document.createElement('div');
+				dom.append(element, child2);
 
-		it('should stop triggering event if stopPropagation is called', function() {
-			var element = document.createElement('div');
-			element.innerHTML = '<div class="nomatch">' +
-				'<div class="match">' +
-				'<div class="nomatch">' +
-				'<div class="match">' +
-				'</div></div></div></div>';
-			document.body.appendChild(element);
-			var matchedElements = element.querySelectorAll('.match');
+				sinon.spy(element, 'addEventListener');
+				dom.delegate(element, 'click', child1, sinon.stub());
+				dom.delegate(element, 'click', child2, sinon.stub());
+				assert.strictEqual(1, element.addEventListener.callCount);
+			});
 
-			var listenerTargets = [];
-			var listener = function(event) {
-				listenerTargets.push(event.delegateTarget);
-				event.stopPropagation();
-			};
-			dom.delegate(element, 'click', '.match', listener);
+			it('should trigger all delegated listeners for right element', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child1 = document.createElement('div');
+				dom.append(element, child1);
+				var child2 = document.createElement('div');
+				dom.append(element, child2);
 
-			dom.triggerEvent(matchedElements[1], 'click');
-			assert.strictEqual(1, listenerTargets.length);
-			assert.strictEqual(matchedElements[1], listenerTargets[0]);
-		});
+				var child1Listener1 = sinon.stub();
+				var child1Listener2 = sinon.stub();
+				var child2Listener = sinon.stub();
+				dom.delegate(element, 'click', child1, child1Listener1);
+				dom.delegate(element, 'click', child1, child1Listener2);
+				dom.delegate(element, 'click', child2, child2Listener);
 
-		it('should stop triggering event if stopImmediatePropagation is called', function() {
-			var element = document.createElement('div');
-			element.innerHTML = '<div class="nomatch">' +
-				'<div class="match">' +
-				'<div class="nomatch">' +
-				'<div class="match">' +
-				'</div></div></div></div>';
-			document.body.appendChild(element);
-			var matchedElements = element.querySelectorAll('.match');
+				dom.triggerEvent(child1, 'click');
+				assert.strictEqual(1, child1Listener1.callCount);
+				assert.strictEqual(1, child1Listener2.callCount);
+				assert.strictEqual(0, child2Listener.callCount);
 
-			var listenerTargets = [];
-			var listener = function(event) {
-				listenerTargets.push(event.delegateTarget);
-				event.stopImmediatePropagation();
-			};
-			dom.delegate(element, 'click', '.match', listener);
+				dom.triggerEvent(child2, 'click');
+				assert.strictEqual(1, child1Listener1.callCount);
+				assert.strictEqual(1, child1Listener2.callCount);
+				assert.strictEqual(1, child2Listener.callCount);
+			});
 
-			dom.triggerEvent(matchedElements[1], 'click');
-			assert.strictEqual(1, listenerTargets.length);
-			assert.strictEqual(matchedElements[1], listenerTargets[0]);
-		});
+			it('should not trigger listener twice when two ancestors are delegating', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+				var grandchild = document.createElement('div');
+				dom.append(child, grandchild);
+				var greatgrandchild = document.createElement('div');
+				dom.append(grandchild, greatgrandchild);
 
-		it('should clear delegateTarget from event object after event is done', function() {
-			var element = document.createElement('div');
-			element.innerHTML = '<div class="nomatch">' +
-				'<div class="match">' +
-				'<div class="nomatch">' +
-				'<div class="match">' +
-				'</div></div></div></div>';
-			document.body.appendChild(element);
-			var matchedElements = element.querySelectorAll('.match');
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				dom.delegate(grandchild, 'click', greatgrandchild, listener1);
+				dom.delegate(element, 'click', child, listener2);
 
-			var listener = sinon.stub();
-			dom.delegate(element, 'click', '.match', listener);
+				dom.triggerEvent(greatgrandchild, 'click');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+			});
 
-			dom.triggerEvent(matchedElements[1], 'click');
-			assert.ok(!listener.args[0][0].delegateTarget);
+			it('should not trigger listeners from ancestors when stopPropagation is called', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+				var grandchild = document.createElement('div');
+				dom.append(child, grandchild);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				dom.delegate(element, 'click', grandchild, function(event) {
+					event.stopPropagation();
+				});
+				dom.delegate(element, 'click', grandchild, listener1);
+				dom.delegate(element, 'click', child, listener2);
+
+				dom.triggerEvent(grandchild, 'click');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+			});
+
+			it('should not trigger any other listeners when stopImmediatePropagation is called', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+				var grandchild = document.createElement('div');
+				dom.append(child, grandchild);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				dom.delegate(element, 'click', grandchild, function(event) {
+					event.stopImmediatePropagation();
+				});
+				dom.delegate(element, 'click', grandchild, listener1);
+				dom.delegate(element, 'click', child, listener2);
+
+				dom.triggerEvent(grandchild, 'click');
+				assert.strictEqual(0, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+			});
+
+			it('should cancel listener through returned handle', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var handle = dom.delegate(element, 'click', child, listener1);
+				dom.delegate(element, 'click', child, listener2);
+
+				handle.removeListener();
+				dom.triggerEvent(child, 'click');
+				assert.strictEqual(0, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+			});
+
+			it('should clear delegateTarget from event object after event is done', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', child, listener);
+
+				dom.triggerEvent(child, 'click');
+				assert.ok(!listener.args[0][0].delegateTarget);
+			});
 		});
 	});
 

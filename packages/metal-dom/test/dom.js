@@ -505,7 +505,7 @@ describe('dom', function() {
 
 			it('should run default listeners last', function() {
 				var element = document.createElement('div');
-				element.innerHTML = '<div><div class="match"></div></div>';
+				element.innerHTML = '<div class="root"><div class="match"></div></div>';
 				document.body.appendChild(element);
 
 				var listener1 = sinon.stub();
@@ -513,7 +513,7 @@ describe('dom', function() {
 				var listener3 = sinon.stub();
 				dom.delegate(element, 'click', '.match', listener1, true);
 				dom.delegate(element, 'click', '.match', listener2);
-				dom.delegate(element, 'click', '.match', listener3);
+				dom.delegate(element, 'click', '.root', listener3);
 
 				dom.triggerEvent(element.querySelector('.match'), 'click');
 				assert.strictEqual(1, listener1.callCount);
@@ -522,6 +522,22 @@ describe('dom', function() {
 				listener1.calledAfter(listener2);
 				listener1.calledAfter(listener3);
 				listener3.calledAfter(listener2);
+			});
+
+			it('should pass correct delegateTarget to default listener', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="root"><div class="match"></div></div>';
+				document.body.appendChild(element);
+
+				var target;
+				var listener = function(event) {
+					target = event.delegateTarget;
+				};
+				dom.delegate(element, 'click', '.match', listener, true);
+
+				dom.triggerEvent(element.querySelector('.match'), 'click');
+				assert.ok(target);
+				assert.strictEqual(element.querySelector('.match'), target);
 			});
 
 			it('should not run default listener if event is prevented', function() {
@@ -710,15 +726,17 @@ describe('dom', function() {
 				dom.enterDocument(element);
 				var child = document.createElement('div');
 				dom.append(element, child);
+				var grandchild = document.createElement('div');
+				dom.append(child, grandchild);
 
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
 				var listener3 = sinon.stub();
-				dom.delegate(element, 'click', child, listener1, true);
-				dom.delegate(element, 'click', child, listener2);
+				dom.delegate(element, 'click', grandchild, listener1, true);
+				dom.delegate(element, 'click', grandchild, listener2);
 				dom.delegate(element, 'click', child, listener3);
 
-				dom.triggerEvent(child, 'click');
+				dom.triggerEvent(grandchild, 'click');
 				assert.strictEqual(1, listener1.callCount);
 				assert.strictEqual(1, listener2.callCount);
 				assert.strictEqual(1, listener3.callCount);

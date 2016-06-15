@@ -503,6 +503,40 @@ describe('dom', function() {
 				assert.strictEqual(matchedElements[1], listenerTargets[0]);
 			});
 
+			it('should run default listeners last', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div><div class="match"></div></div>';
+				document.body.appendChild(element);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var listener3 = sinon.stub();
+				dom.delegate(element, 'click', '.match', listener1, true);
+				dom.delegate(element, 'click', '.match', listener2);
+				dom.delegate(element, 'click', '.match', listener3);
+
+				dom.triggerEvent(element.querySelector('.match'), 'click');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+				assert.strictEqual(1, listener3.callCount);
+				listener1.calledAfter(listener2);
+				listener1.calledAfter(listener3);
+				listener3.calledAfter(listener2);
+			});
+
+			it('should not run default listener if event is prevented', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div><div class="match"></div></div>';
+				document.body.appendChild(element);
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', '.match', listener, true);
+				dom.delegate(element, 'click', '.match', event => event.preventDefault());
+
+				dom.triggerEvent(element.querySelector('.match'), 'click');
+				assert.strictEqual(0, listener.callCount);
+			});
+
 			it('should cancel listener through returned handle', function() {
 				var element = document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
@@ -671,6 +705,42 @@ describe('dom', function() {
 				assert.strictEqual(0, listener2.callCount);
 			});
 
+			it('should run default listeners last', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var listener3 = sinon.stub();
+				dom.delegate(element, 'click', child, listener1, true);
+				dom.delegate(element, 'click', child, listener2);
+				dom.delegate(element, 'click', child, listener3);
+
+				dom.triggerEvent(child, 'click');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+				assert.strictEqual(1, listener3.callCount);
+				listener1.calledAfter(listener2);
+				listener1.calledAfter(listener3);
+				listener3.calledAfter(listener2);
+			});
+
+			it('should not run default listener if event is prevented', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', child, listener, true);
+				dom.delegate(element, 'click', child, event => event.preventDefault());
+
+				dom.triggerEvent(child, 'click');
+				assert.strictEqual(0, listener.callCount);
+			});
+
 			it('should cancel listener through returned handle', function() {
 				var element = document.createElement('div');
 				dom.enterDocument(element);
@@ -686,6 +756,20 @@ describe('dom', function() {
 				dom.triggerEvent(child, 'click');
 				assert.strictEqual(0, listener1.callCount);
 				assert.strictEqual(1, listener2.callCount);
+			});
+
+			it('should cancel default listener through returned handle', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+
+				var listener = sinon.stub();
+				var handle = dom.delegate(element, 'click', child, listener, true);
+
+				handle.removeListener();
+				dom.triggerEvent(child, 'click');
+				assert.strictEqual(0, listener.callCount);
 			});
 
 			it('should clear delegateTarget from event object after event is done', function() {

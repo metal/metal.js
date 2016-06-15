@@ -210,13 +210,23 @@ class dom {
 	 *     that should match the event for the listener to be triggered.
 	 * @param {!function(!Object)} callback Function to be called when the event
 	 *     is triggered. It will receive the normalized event object.
+	 * @param {boolean=} opt_default Optional flag indicating if this is a default
+	 *     listener. That means that it would only be executed after all non
+	 *     default listeners, and only if the event isn't prevented via
+	 *     `preventDefault`.
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
-	static delegate(element, eventName, selectorOrTarget, callback) {
+	static delegate(element, eventName, selectorOrTarget, callback, opt_default) {
 		var customConfig = dom.customEvents[eventName];
 		if (customConfig && customConfig.delegate) {
 			eventName = customConfig.originalEvent;
 			callback = customConfig.handler.bind(customConfig, callback);
+		}
+
+		if (opt_default) {
+			// Wrap callback so we don't set property directly on it.
+			callback = callback.bind();
+			callback.defaultListener_ = true;
 		}
 
 		dom.attachDelegateEvent_(element, eventName);
@@ -663,14 +673,25 @@ class dom {
 	 * Triggers the given listeners array.
 	 * @param {Array<!function()} listeners
 	 * @param {!Event} event
+	 * @param {Array=} opt_defaultFns Optional array to collect default listeners
+	 *     in, instead of running them. If not given, default listeners will be
+	 *     run (unless prevented).
 	 * @return {boolean} False if at least one of the triggered callbacks returns
 	 *     false, or true otherwise.
 	 * @protected
 	 */
-	static triggerListeners_(listeners, event) {
+	static triggerListeners_(listeners, event, opt_defaultFns) {
 		var ret = true;
 		listeners = listeners || [];
 		for (var i = 0; i < listeners.length && !event.stoppedImmediate; i++) {
+			if (listeners[i].defaultListener_) {
+				if (opt_defaultFns) {
+					opt_defaultFns.push(listeners[i]);
+					continue;
+				} else if (event.defaultPrevented) {
+					break;
+				}
+			}
 			ret &= listeners[i](event);
 		}
 		return ret;
@@ -688,16 +709,19 @@ class dom {
 	 */
 	static triggerMatchedListeners_(container, element, event) {
 		var data = metalData.get(element);
-		var ret = dom.triggerListeners_(data.listeners[event.type], event);
+		var defFns = [];
+		var ret = dom.triggerListeners_(data.listeners[event.type], event, defFns);
 
 		var selectorsMap = metalData.get(container).delegating[event.type].selectors;
 		var selectors = Object.keys(selectorsMap);
 		for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
 			if (dom.match(element, selectors[i])) {
-				ret &= dom.triggerListeners_(selectorsMap[selectors[i]], event);
+				ret &= dom.triggerListeners_(selectorsMap[selectors[i]], event, defFns);
 			}
 		}
 
+		// Run default fns last
+		dom.triggerListeners_(defFns, event);
 		return ret;
 	}
 }

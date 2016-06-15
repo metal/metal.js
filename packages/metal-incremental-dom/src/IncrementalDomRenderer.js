@@ -145,19 +145,18 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	handleInterceptedAttributesCall_(originalFn, element, name, value) {
 		var eventName = this.getEventFromListenerAttr_(name);
 		if (eventName) {
-			if (core.isDef(element[name + '__handle__'])) {
-				element[name + '__handle__'].removeListener();
+			var handleKey = eventName + '__handle__';
+			if (element[handleKey]) {
+				element[handleKey].removeListener();
+				element[handleKey] = null;
 			}
 
 			element[name] = value;
 			if (value) {
-				var fn = value;
-				if (core.isString(fn)) {
-					fn = this.component_.getListenerFn(value);
+				if (core.isString(value)) {
+					value = this.component_.getListenerFn(value);
 				}
-				element[name + '__handle__'] = dom.on(element, eventName, fn);
-			} else {
-				element[name + '__handle__'] = null;
+				element[handleKey] = dom.delegate(document, eventName, element, value);
 			}
 			return;
 		}

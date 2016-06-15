@@ -586,6 +586,40 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
+		it('should provide delegateTarget as the element that the listener was attached to', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div', null, null, 'onClick', 'handleElementClick');
+					IncDom.elementOpen('div', null, null, 'onClick', 'handleClick');
+					IncDom.elementVoid('div', null, null, 'class', 'inner');
+					IncDom.elementClose('div');
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			var event1;
+			TestComponent.prototype.handleElementClick = function(event) {
+				event1 = object.mixin({}, event);
+			};
+			var event2;
+			TestComponent.prototype.handleClick = function(event) {
+				event2 = object.mixin({}, event);
+			};
+
+			component = new TestComponent();
+			var innerElement = component.element.querySelector('.inner');
+			dom.triggerEvent(innerElement, 'click');
+
+			assert.ok(event1);
+			assert.strictEqual(innerElement, event1.target);
+			assert.strictEqual(component.element, event1.delegateTarget);
+
+			assert.ok(event2);
+			assert.strictEqual(innerElement, event2.target);
+			assert.strictEqual(component.element.childNodes[0], event2.delegateTarget);
+		});
+
 		it('should remove unused inline listeners when dom is updated', function(done) {
 			class TestComponent extends Component {
 				render() {

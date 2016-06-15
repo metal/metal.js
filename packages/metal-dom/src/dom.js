@@ -273,17 +273,23 @@ class dom {
 	 */
 	static handleDelegateEvent_(event) {
 		dom.normalizeDelegateEvent_(event);
-		var currentElement = core.isDef(event[NEXT_TARGET]) ?
+		var currElement = core.isDef(event[NEXT_TARGET]) ?
 			event[NEXT_TARGET] :
 			event.target;
 		var ret = true;
 		var container = event.currentTarget;
 		var limit = event.currentTarget.parentNode;
+		var defFns = [];
 
-		while (currentElement && currentElement !== limit && !event.stopped) {
-			event.delegateTarget = currentElement;
-			ret &= dom.triggerMatchedListeners_(container, currentElement, event);
-			currentElement = currentElement.parentNode;
+		while (currElement && currElement !== limit && !event.stopped) {
+			event.delegateTarget = currElement;
+			ret &= dom.triggerMatchedListeners_(container, currElement, event, defFns);
+			currElement = currElement.parentNode;
+		}
+
+		for (var i = 0; i < defFns.length && !event.defaultPrevented; i++) {
+			event.delegateTarget = defFns[i].element;
+			ret &= defFns[i].fn(event);
 		}
 
 		event.delegateTarget = null;
@@ -673,26 +679,25 @@ class dom {
 	 * Triggers the given listeners array.
 	 * @param {Array<!function()} listeners
 	 * @param {!Event} event
-	 * @param {Array=} opt_defaultFns Optional array to collect default listeners
-	 *     in, instead of running them. If not given, default listeners will be
-	 *     run (unless prevented).
+	 * @param {!Element} element
+	 * @param {!Array} defaultFns Array to collect default listeners in, instead
+	 *     of running them.
 	 * @return {boolean} False if at least one of the triggered callbacks returns
 	 *     false, or true otherwise.
 	 * @protected
 	 */
-	static triggerListeners_(listeners, event, opt_defaultFns) {
+	static triggerListeners_(listeners, event, element, defaultFns) {
 		var ret = true;
 		listeners = listeners || [];
 		for (var i = 0; i < listeners.length && !event.stoppedImmediate; i++) {
 			if (listeners[i].defaultListener_) {
-				if (opt_defaultFns) {
-					opt_defaultFns.push(listeners[i]);
-					continue;
-				} else if (event.defaultPrevented) {
-					break;
-				}
+				defaultFns.push({
+					element,
+					fn: listeners[i]
+				});
+			} else {
+				ret &= listeners[i](event);
 			}
-			ret &= listeners[i](event);
 		}
 		return ret;
 	}
@@ -703,25 +708,26 @@ class dom {
 	 * @param {!Element} container
 	 * @param {!Element} element
 	 * @param {!Event} event
+	 * @param {!Array} defaultFns Array to collect default listeners in, instead
+	 *     of running them.
 	 * @return {boolean} False if at least one of the triggered callbacks returns
 	 *     false, or true otherwise.
 	 * @protected
 	 */
-	static triggerMatchedListeners_(container, element, event) {
+	static triggerMatchedListeners_(container, element, event, defaultFns) {
 		var data = metalData.get(element);
-		var defFns = [];
-		var ret = dom.triggerListeners_(data.listeners[event.type], event, defFns);
+		var listeners = data.listeners[event.type];
+		var ret = dom.triggerListeners_(listeners, event, element, defaultFns);
 
 		var selectorsMap = metalData.get(container).delegating[event.type].selectors;
 		var selectors = Object.keys(selectorsMap);
 		for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
 			if (dom.match(element, selectors[i])) {
-				ret &= dom.triggerListeners_(selectorsMap[selectors[i]], event, defFns);
+				listeners = selectorsMap[selectors[i]];
+				ret &= dom.triggerListeners_(listeners, event, element, defaultFns);
 			}
 		}
 
-		// Run default fns last
-		dom.triggerListeners_(defFns, event);
 		return ret;
 	}
 }

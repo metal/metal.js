@@ -70,6 +70,68 @@ class dom {
 	}
 
 	/**
+	 * Adds an event listener to the given element, to be triggered via delegate.
+	 * @param {!Element} element
+	 * @param {string} eventName
+	 * @param {!function()} listener
+	 * @protected
+	 */
+	static addElementListener_(element, eventName, listener) {
+		var data = metalData.get(element);
+		dom.addToArr_(data.listeners, eventName, listener);
+	}
+
+	/**
+	 * Adds an event listener to the given element, to be triggered via delegate
+	 * selectors.
+	 * @param {!Element} element
+	 * @param {string} eventName
+	 * @param {string} selector
+	 * @param {!function()} listener
+	 * @protected
+	 */
+	static addSelectorListener_(element, eventName, selector, listener) {
+		var data = metalData.get(element);
+		dom.addToArr_(data.delegating[eventName].selectors, selector, listener);
+	}
+
+	/**
+	 * Adds a value to an array inside an object, creating it first if it doesn't
+	 * yet exist.
+	 * @param {!Array} arr
+	 * @param {string} key
+	 * @param {*} value
+	 * @protected
+	 */
+	static addToArr_(arr, key, value) {
+		if (!arr[key]) {
+			arr[key] = [];
+		}
+		arr[key].push(value);
+	}
+
+	/**
+	 * Attaches a delegate listener, unless there's already one attached.
+	 * @param {!Element} element
+	 * @param {string} eventName
+	 * @protected
+	 */
+	static attachDelegateEvent_(element, eventName) {
+		var data = metalData.get(element);
+		if (!data.delegating[eventName]) {
+			data.delegating[eventName] = {
+				handle: dom.on(
+					element,
+					eventName,
+					dom.handleDelegateEvent_,
+					!!USE_CAPTURE[eventName]
+				),
+				selectors: {}
+			};
+		}
+	}
+
+	/**
 	 * Gets the closest element up the tree from the given element (including
 	 * itself) that matches the specified selector, or null if none match.
 	 * @param {Element} element
@@ -107,31 +169,6 @@ class dom {
 	}
 
 	/**
-	 * Simulates bubbling an event up to its `currentTarget`.
-	 * @param {!Event} event The event payload.
-	 * @param {!function()} callback A function to be called for each element
-	 *     that receives the bubbled event.
-	 * @param {boolean=} opt_start An optional element to start the bubbling from.
-	 *     The event's `target` will be used by default.
-	 * @return {boolean} False if at least one of the triggered callbacks returns
-	 *     false, or true otherwise.
-	 * @protected
-	 */
-	static bubbleEvent_(event, callback, opt_start) {
-		dom.normalizeDelegateEvent_(event);
-		var currentElement = opt_start || event.target;
-		var returnValue = true;
-		var limit = event.currentTarget.parentNode;
-		while (currentElement && currentElement !== limit && !event.stopped) {
-			event.delegateTarget = currentElement;
-			callback(currentElement, event);
-			currentElement = currentElement.parentNode;
-		}
-		event.delegateTarget = null;
-		return returnValue;
-	}
-
-	/**
 	 * Helper for converting a HTML string into a document fragment.
 	 * @param {string} htmlString The HTML string to convert.
 	 * @return {!Element} The resulting document fragment.
@@ -165,15 +202,14 @@ class dom {
 
 	/**
 	 * Listens to the specified event on the given DOM element, but only calls the
-	 * callback with the event when it's triggered by elements that match the
+	 * given callback listener when it's triggered by elements that match the
 	 * given selector or target element.
-	 * @param {!Element} element The container DOM element to listen to the event on.
+	 * @param {!Element} element The DOM element the event should be listened on.
 	 * @param {string} eventName The name of the event to listen to.
-	 * @param {string} selectorOrTarget The selector that matches the child
-	 *   elements that the event should be triggered for, or a target element
-	 *   itself that should be listened to through the given container.
-	 * @param {!function(!Object)} callback Function to be called when the event is
-	 *   triggered. It will receive the normalized event object.
+	 * @param {!Element|string} selectorOrTarget Either an element or css selector
+	 *     that should match the event for the listener to be triggered.
+	 * @param {!function(!Object)} callback Function to be called when the event
+	 *     is triggered. It will receive the normalized event object.
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
 	static delegate(element, eventName, selectorOrTarget, callback) {
@@ -183,23 +219,19 @@ class dom {
 			callback = customConfig.handler.bind(customConfig, callback);
 		}
 
-		var capture = !!USE_CAPTURE[eventName];
+		dom.attachDelegateEvent_(element, eventName);
 		if (core.isString(selectorOrTarget)) {
-			return dom.on(
-				element,
-				eventName,
-				dom.handleDelegateEvent_.bind(null, selectorOrTarget, callback),
-				capture
-			);
+			dom.addSelectorListener_(element, eventName, selectorOrTarget, callback);
 		} else {
-			return dom.listenViaContainer_(
-				element,
-				eventName,
-				selectorOrTarget,
-				callback,
-				capture
-			);
+			dom.addElementListener_(selectorOrTarget, eventName, callback);
 		}
+
+		return new DomDelegatedEventHandle(
+			core.isString(selectorOrTarget) ? element : selectorOrTarget,
+			eventName,
+			callback,
+			core.isString(selectorOrTarget) ? selectorOrTarget : null
+		);
 	}
 
 	/**
@@ -221,46 +253,32 @@ class dom {
 	}
 
 	/**
-	 * This is called when an event is triggered by a delegate listener (see
-	 * `dom.delegate` for more details).
-	 * @param {string} selector The selector that matches the child elements that
-	 *     the event should be triggered for.
-	 *     be triggered.
-	 * @param {!function(!Object)} callback Function to be called when the event
-	 *     is triggered. It will receive the normalized event object.
+	 * This is called when an event is triggered by a delegate listener. All
+	 * matching listeners of this event type from `target` to `currentTarget` will
+	 * be triggered.
 	 * @param {!Event} event The event payload.
 	 * @return {boolean} False if at least one of the triggered callbacks returns
 	 *     false, or true otherwise.
 	 * @protected
 	 */
-	static handleDelegateEvent_(selector, callback, event) {
-		return dom.bubbleEvent_(
-			event,
-			currentElement => {
-				if (dom.match(currentElement, selector)) {
-					return callback(event);
-				}
-			}
-		);
-	}
+	static handleDelegateEvent_(event) {
+		dom.normalizeDelegateEvent_(event);
+		var currentElement = core.isDef(event[NEXT_TARGET]) ?
+			event[NEXT_TARGET] :
+			event.target;
+		var ret = true;
+		var container = event.currentTarget;
+		var limit = event.currentTarget.parentNode;
 
-	/**
-	 * This is called when an event is triggered by a delegate listener without
-	 * a selector string (see `dom.delegate` for more details). All listeners
-	 * of this event type from `target` to `currentTarget` will be triggered.
-	 * @param {!Event} event The event payload.
-	 * @return {boolean} False if at least one of the triggered callbacks returns
-	 *     false, or true otherwise.
-	 * @protected
-	 */
-	static handleDelegateNoSelector_(event) {
-		var returnVal = dom.bubbleEvent_(
-			event,
-			dom.triggerListeners_,
-			core.isDef(event[NEXT_TARGET]) ? event[NEXT_TARGET] : event.target
-		);
-		event[NEXT_TARGET] = event.currentTarget.parentNode;
-		return returnVal;
+		while (currentElement && currentElement !== limit && !event.stopped) {
+			event.delegateTarget = currentElement;
+			ret &= dom.triggerMatchedListeners_(container, currentElement, event);
+			currentElement = currentElement.parentNode;
+		}
+
+		event.delegateTarget = null;
+		event[NEXT_TARGET] = limit;
+		return ret;
 	}
 
 	/**
@@ -306,42 +324,6 @@ class dom {
 	 */
 	static isEmpty(element) {
 		return element.childNodes.length === 0;
-	}
-
-	/**
-	 * Listens to the specified event on the given DOM element, but only calls the
-	 * callback with the event when it's triggered by the given target element.
-	 * Note that calling this multiple times for the same container will only
-	 * cause a single event to be listened on it.
-	 * @param {!Element} container The container DOM element to listen to the
-	 *     event on.
-	 * @param {string} eventName The name of the event to listen to.
-	 * @param {string} target The target element that should be listened to
-	 *     through the given container.
-	 * @param {!function(!Object)} callback Function to be called when the event
-	 *     is triggered. It will receive the normalized event object.
-	 * @param {boolean} capture Flag indicating if the event will be listened on
-	 *     capture phase or not.
-	 * @return {!EventHandle} Can be used to remove the listener.
-	 * @protected
-	 */
-	static listenViaContainer_(container, eventName, target, callback, capture) {
-		var data = metalData.get(container);
-		if (!data.delegating[eventName]) {
-			data.delegating[eventName] = dom.on(
-				container,
-				eventName,
-				dom.handleDelegateNoSelector_,
-				capture
-			);
-		}
-
-		data = metalData.get(target);
-		if (!data.listeners[eventName]) {
-			data.listeners[eventName] = [];
-		}
-		data.listeners[eventName].push(callback);
-		return new DomDelegatedEventHandle(target, eventName, callback);
 	}
 
 	/**
@@ -584,25 +566,6 @@ class dom {
 	}
 
 	/**
-	 * Triggers all listeners for the given event type that are stored in the
-	 * specified element.
-	 * @param {!Element} element
-	 * @param {!Event} event
-	 * @return {boolean} False if at least one of the triggered callbacks returns
-	 *     false, or true otherwise.
-	 * @protected
-	 */
-	static triggerListeners_(element, event) {
-		var data = metalData.get(element);
-		var listeners = data.listeners[event.type] || [];
-		var ret = true;
-		for (var i = 0; i < listeners.length && !event.stoppedImmediate; i++) {
-			ret &= listeners[i](event);
-		}
-		return ret;
-	}
-
-	/**
 	 * Converts the given argument to a DOM element. Strings are assumed to
 	 * be selectors, and so a matched element will be returned. If the arg
 	 * is already a DOM element it will be the return value.
@@ -694,6 +657,48 @@ class dom {
 		eventObj.initEvent(eventName, true, true);
 		object.mixin(eventObj, opt_eventObj);
 		element.dispatchEvent(eventObj);
+	}
+
+	/**
+	 * Triggers the given listeners array.
+	 * @param {Array<!function()} listeners
+	 * @param {!Event} event
+	 * @return {boolean} False if at least one of the triggered callbacks returns
+	 *     false, or true otherwise.
+	 * @protected
+	 */
+	static triggerListeners_(listeners, event) {
+		var ret = true;
+		listeners = listeners || [];
+		for (var i = 0; i < listeners.length && !event.stoppedImmediate; i++) {
+			ret &= listeners[i](event);
+		}
+		return ret;
+	}
+
+	/**
+	 * Triggers all listeners for the given event type that are stored in the
+	 * specified element.
+	 * @param {!Element} container
+	 * @param {!Element} element
+	 * @param {!Event} event
+	 * @return {boolean} False if at least one of the triggered callbacks returns
+	 *     false, or true otherwise.
+	 * @protected
+	 */
+	static triggerMatchedListeners_(container, element, event) {
+		var data = metalData.get(element);
+		var ret = dom.triggerListeners_(data.listeners[event.type], event);
+
+		var selectorsMap = metalData.get(container).delegating[event.type].selectors;
+		var selectors = Object.keys(selectorsMap);
+		for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
+			if (dom.match(element, selectors[i])) {
+				ret &= dom.triggerListeners_(selectorsMap[selectors[i]], event);
+			}
+		}
+
+		return ret;
 	}
 }
 

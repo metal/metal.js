@@ -503,6 +503,24 @@ describe('dom', function() {
 				assert.strictEqual(matchedElements[1], listenerTargets[0]);
 			});
 
+			it('should cancel listener through returned handle', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<div class="nomatch">' +
+					'<div class="match">' +
+					'<div class="nomatch">' +
+					'<div class="match">' +
+					'</div></div></div></div>';
+				document.body.appendChild(element);
+				var matchedElements = element.querySelectorAll('.match');
+
+				var listener1 = sinon.stub();
+				var handle = dom.delegate(element, 'click', '.match', listener1);
+
+				handle.removeListener();
+				dom.triggerEvent(matchedElements[0], 'click');
+				assert.strictEqual(0, listener1.callCount);
+			});
+
 			it('should clear delegateTarget from event object after event is done', function() {
 				var element = document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +

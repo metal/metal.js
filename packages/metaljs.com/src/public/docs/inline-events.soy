@@ -97,6 +97,33 @@
 				</textarea>
 			{/param}
 		{/call}
+
+		<h2>Inline listeners - alternative usage</h2>
+
+		<p>
+			Besides the <code>on[EventName]</code> format you can also
+			use <code>data-on[eventname]</code> for adding inline listeners. For
+			example:
+		</p>
+
+		<textarea class="code" data-mode="javascript">
+			{literal}&lt;button data-onlick="close" type="button" class="close"&gt;{/literal}
+		</textarea>
+
+		<p>
+			Note that this format is supported mainly to enable
+			doing <a href="/docs/progressive-enhancement.html">progressive enhancement</a>,
+			when running soy templates via Java for example. When templates using
+			the <code>on[EventName]</code> format run in Java they will output
+			elements with these as actual attributes, which can cause errors in the
+			browser. In JavaScript these are used as element properties instead, so
+			this problem doesn't occur.
+		</p>
+
+		<p>
+			So feel free to use the format you like best, or that better fits your
+			needs.
+		</p>
 	{/param}
 {/call}
 {/template}

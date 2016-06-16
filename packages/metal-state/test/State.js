@@ -738,8 +738,7 @@ describe('State', function() {
 				key1: 1
 			};
 			var test = new Test(config);
-			assert.notStrictEqual(config, test.config);
-			assert.strictEqual(1, test.config.key1);
+			assert.strictEqual(config, test.config);
 		});
 
 		it('should update config object from setState calls', function() {
@@ -753,7 +752,7 @@ describe('State', function() {
 				key1: 10
 			});
 			assert.strictEqual(10, test.config.key1);
-			assert.strictEqual(2, test.config.key2);
+			assert.ok(!test.config.key2);
 		});
 
 		it('should emit event when config data changes', function() {

@@ -560,7 +560,7 @@ class State extends EventEmitter {
 	 */
 	updateConfig_(values) {
 		var prevConfig = this.config;
-		this.config = object.mixin({}, this.config, values);
+		this.config = values;
 		this.emit('configChanged', {
 			newVal: this.config,
 			prevVal: prevConfig

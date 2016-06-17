@@ -1147,6 +1147,42 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should call "configChanged" lifecycle event with new and previous config', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'bar', this.bar);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				bar: {
+					value: 'bar'
+				}
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			var config = child.config;
+			assert.strictEqual('bar', config.bar);
+
+			var listener = sinon.stub();
+			child.on('configChanged', listener);
+
+			component.bar = 'bar2';
+			component.once('stateSynced', function() {
+				var newConfig = child.config;
+				assert.notStrictEqual(config, newConfig);
+				assert.strictEqual('bar2', newConfig.bar);
+				assert.strictEqual(1, listener.callCount);
+				assert.ok(listener.args[0][0]);
+				assert.strictEqual(newConfig, listener.args[0][0].newVal);
+				assert.strictEqual(config, listener.args[0][0].prevVal);
+				done();
+			});
+		});
+
 		it('should render sub component via elementOpen/elementClose', function() {
 			class TestComponent extends Component {
 				render() {

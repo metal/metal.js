@@ -537,6 +537,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (core.isFunction(comp.configChanged)) {
 			comp.configChanged(config, prevConfig || {});
 		}
+		comp.emit('configChanged', {
+			prevVal: prevConfig,
+			newVal: config
+		});
 	}
 
 	/**

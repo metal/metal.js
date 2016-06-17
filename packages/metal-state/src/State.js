@@ -30,14 +30,6 @@ class State extends EventEmitter {
 		 */
 		this.stateInfo_ = {};
 
-		/**
-		 * Object with the most recent values that state properties were set to
-		 * through either the constructor or setState calls.
-		 * @type {!Object<string, *>}
-		 */
-		this.config = {};
-
-		this.updateConfig_(opt_config || {});
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
 		this.addToStateFromStaticHint_(opt_config);
@@ -504,7 +496,6 @@ class State extends EventEmitter {
 	 *   after the next batched update is triggered.
 	 */
 	setState(values, opt_callback) {
-		this.updateConfig_(values);
 		Object.keys(values).forEach(name => this.set(name, values[name]));
 		if (opt_callback && this.scheduledBatchData_) {
 			this.once('stateChanged', opt_callback);
@@ -554,20 +545,6 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Updates the config data object with the given values.
-	 * @param {!Object} values
-	 * @protected
-	 */
-	updateConfig_(values) {
-		var prevConfig = this.config;
-		this.config = values;
-		this.emit('configChanged', {
-			newVal: this.config,
-			prevVal: prevConfig
-		});
-	}
-
-	/**
 	 * Validates the state key's value, which includes calling the validator
 	 * defined in the key's configuration object, if there is one.
 	 * @param {string} name The name of the key.
@@ -589,7 +566,7 @@ class State extends EventEmitter {
  * constructors, which will be merged together and handled automatically.
  * @type {!Array<string>}
  */
-State.INVALID_KEYS = ['config', 'state', 'stateKey'];
+State.INVALID_KEYS = ['state', 'stateKey'];
 
 /**
  * Constants that represent the states that an a state key can be in.

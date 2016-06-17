@@ -523,7 +523,7 @@ describe('Component', function() {
 			assert.ok(comp.wasRendered);
 			assert.ok(comp.element);
 			assert.strictEqual(container, comp.element.parentNode);
-			assert.strictEqual('fooValue', comp.config.foo);
+			assert.strictEqual('fooValue', comp.getInitialConfig().foo);
 		});
 
 		it('should render component via Component.render without config', function() {

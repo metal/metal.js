@@ -378,7 +378,7 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should render component via "IncrementalDomRenderer.render"', function() {
+		it('should pass config data via the constructor', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('span', null, null, 'foo', this.config.foo);
@@ -1105,6 +1105,43 @@ describe('IncrementalDomRenderer', function() {
 			component.noBar = true;
 			component.once('stateSynced', function() {
 				assert.ok(!child.config.bar);
+				done();
+			});
+		});
+
+		it('should call "configChanged" lifecycle function with new and previous config', function(done) {
+			ChildComponent.prototype.configChanged = sinon.stub();
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'bar', this.bar);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				bar: {
+					value: 'bar'
+				}
+			};
+			component = new TestComponent();
+
+			var child = component.components.child;
+			var config = child.config;
+			assert.strictEqual('bar', config.bar);
+			assert.strictEqual(1, child.configChanged.callCount);
+			assert.strictEqual(config, child.configChanged.args[0][0]);
+			assert.deepEqual({}, child.configChanged.args[0][1]);
+
+			component.bar = 'bar2';
+			component.once('stateSynced', function() {
+				var newConfig = child.config;
+				assert.notStrictEqual(config, newConfig);
+				assert.strictEqual('bar2', newConfig.bar);
+				assert.strictEqual(2, child.configChanged.callCount);
+				assert.strictEqual(newConfig, child.configChanged.args[1][0]);
+				assert.strictEqual(config, child.configChanged.args[1][1]);
 				done();
 			});
 		});

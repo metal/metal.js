@@ -14,8 +14,7 @@
     "test:watch": "gulp test:watch"
   },
   "devDependencies": {
-    "babel-plugin-transform-es2015-classes": "^6.9.0",
-    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-metal": "^4.0.0",
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "browserify-istanbul": "^2.0.0",

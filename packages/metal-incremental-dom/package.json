@@ -15,25 +15,12 @@
     "src"
   ],
   "scripts": {
-    "compile": "babel -d lib/ src/",
+    "compile": "babel --presets metal -d lib/ src/",
     "prepublish": "npm run compile"
   },
   "keywords": [
     "metal"
   ],
-  "babel": {
-    "plugins": [
-      [
-        "babel-plugin-transform-es2015-classes",
-        {
-          "loose": true
-        }
-      ]
-    ],
-    "presets": [
-      "es2015"
-    ]
-  },
   "dependencies": {
     "metal": "^1.0.0-rc.2",
     "metal-component": "^1.0.0-rc.9",
@@ -41,8 +28,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-plugin-transform-es2015-classes": "^6.9.0",
-    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-metal": "^4.0.0",
     "incremental-dom": "mairatma/incremental-dom#dist"
   }
 }

@@ -20,6 +20,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		super(comp);
 
 		comp.context = {};
+		this.setConfig_(comp, comp.getInitialConfig());
 		this.changes_ = {};
 		comp.on('attached', this.handleAttached_.bind(this));
 
@@ -92,6 +93,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			prevComp.dispose();
 		}
 		if (comp.wasRendered) {
+			this.setConfig_(comp, config);
 			comp.setState(config);
 		}
 		return comp;
@@ -521,6 +523,20 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			comp.renderAsSubComponent();
 		}
 		return comp;
+	}
+
+	/**
+	 * Sets the component's config object with its new value.
+	 * @param {!Component} comp The component to set the config for.
+	 * @param {!Object} config
+	 * @protected
+	 */
+	setConfig_(comp, config) {
+		var prevConfig = comp.config;
+		comp.config = config;
+		if (core.isFunction(comp.configChanged)) {
+			comp.configChanged(config, prevConfig || {});
+		}
 	}
 
 	/**

@@ -175,6 +175,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	static finishedRenderingComponent() {
 		renderingComponents_.pop();
+		if (renderingComponents_.length === 0) {
+			IncrementalDomUnusedComponents.disposeUnused();
+		}
 	}
 
 	/**

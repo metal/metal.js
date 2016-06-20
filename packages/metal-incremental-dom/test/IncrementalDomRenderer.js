@@ -501,6 +501,20 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
+		it('should not set "on<EventName>" string values as dom attributes', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent();
+			assert.ok(!component.element.getAttribute('onclick'));
+			assert.ok(!component.element.getAttribute('onClick'));
+		});
+
 		it('should attach listeners from "data-on<eventname>" attributes', function() {
 			class TestComponent extends Component {
 				render() {
@@ -520,6 +534,19 @@ describe('IncrementalDomRenderer', function() {
 
 			dom.triggerEvent(component.element.childNodes[0], 'click');
 			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
+		it('should set "data-on<eventname>" string values as dom attributes', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent();
+			assert.strictEqual('handleClick', component.element.getAttribute('data-onclick'));
 		});
 
 		it('should attach listeners from root element', function() {

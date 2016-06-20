@@ -154,6 +154,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			element[name] = value;
 			if (value) {
 				if (core.isString(value)) {
+					if (name[0] === 'd') {
+						// Allow data-on[eventname] listeners to stay in the dom, as they
+						// won't cause conflicts.
+						originalFn(element, name, value);
+					}
 					value = this.component_.getListenerFn(value);
 				}
 				element[handleKey] = dom.delegate(document, eventName, element, value);

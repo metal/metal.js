@@ -43,6 +43,59 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Attaches inline listeners found on the first component render, since those
+	 * may come from existing elements on the page that already have
+	 * data-on[eventname] attributes set to its final value. This won't trigger
+	 * `handleInterceptedAttributesCall_`, so we need manual work to guarantee
+	 * that projects using progressive enhancement like this will still work.
+	 * @param {!Element} node
+	 * @param {!Array} args
+	 * @protected
+	 */
+	attachDecoratedListeners_(node, args) {
+		if (!this.component_.wasRendered) {
+			var attrs = (args[2] || []).concat(args.slice(3));
+			for (var i = 0; i < attrs.length; i += 2) {
+				var eventName = this.getEventFromListenerAttr_(attrs[i]);
+				if (eventName && !node[eventName + '__handle__']) {
+					this.attachEvent_(node, attrs[i], eventName, attrs[i + 1]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Listens to the specified event, attached via incremental dom calls.
+	 * @param {!Element} element
+	 * @param {string} key
+	 * @param {string} eventName
+	 * @param {function()|string} fn
+	 * @protected
+	 */
+	attachEvent_(element, key, eventName, fn) {
+		var handleKey = eventName + '__handle__';
+		if (element[handleKey]) {
+			element[handleKey].removeListener();
+			element[handleKey] = null;
+		}
+
+		element[key] = fn;
+		if (fn) {
+			if (core.isString(fn)) {
+				if (key[0] === 'd') {
+					// Allow data-on[eventkey] listeners to stay in the dom, as they
+					// won't cause conflicts.
+					element.setAttribute(key, fn);
+				}
+				fn = this.component_.getListenerFn(fn);
+			}
+			element[handleKey] = dom.delegate(document, eventName, element, fn);
+		} else {
+			element.removeAttribute(key);
+		}
+	}
+
+	/**
 	 * Builds the "children" config property to be passed to the current
 	 * component.
 	 * @param {!Array<!Object>} children
@@ -145,24 +198,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	handleInterceptedAttributesCall_(originalFn, element, name, value) {
 		var eventName = this.getEventFromListenerAttr_(name);
 		if (eventName) {
-			var handleKey = eventName + '__handle__';
-			if (element[handleKey]) {
-				element[handleKey].removeListener();
-				element[handleKey] = null;
-			}
-
-			element[name] = value;
-			if (value) {
-				if (core.isString(value)) {
-					if (name[0] === 'd') {
-						// Allow data-on[eventname] listeners to stay in the dom, as they
-						// won't cause conflicts.
-						originalFn(element, name, value);
-					}
-					value = this.component_.getListenerFn(value);
-				}
-				element[handleKey] = dom.delegate(document, eventName, element, value);
-			}
+			this.attachEvent_(element, name, eventName, value);
 			return;
 		}
 
@@ -270,6 +306,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 		var node = originalFn.apply(null, args);
+		this.attachDecoratedListeners_(node, args);
 		this.updateElementIfNotReached_(node);
 		return node;
 	}

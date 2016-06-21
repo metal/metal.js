@@ -2,7 +2,6 @@
 
 import { array, core, object } from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
-import ComponentRegistry from './ComponentRegistry';
 import ComponentRenderer from './ComponentRenderer';
 import { EventHandler } from 'metal-events';
 import State from 'metal-state';
@@ -207,32 +206,12 @@ class Component extends State {
 	attached() {}
 
 	/**
-	 * Adds a sub component, creating it if it doesn't yet exist.
-	 * @param {string} key
-	 * @param {string|!Function} componentNameOrCtor
-	 * @param {Object=} opt_data
-	 * @param {boolean=} opt_dontDispose Optional flag indicating that if an
-	 *     existing sub component is replaced, it shouldn't be disposed as well.
-	 * @return {!Component}
+	 * Adds the given sub component, replacing any existing one with the same ref.
+	 * @param {string} ref
+	 * @param {!Component} component
 	 */
-	addSubComponent(key, componentNameOrCtor, opt_data, opt_dontDispose) {
-		var ConstructorFn = componentNameOrCtor;
-		if (core.isString(ConstructorFn)) {
-			ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
-		}
-
-		var component = this.components[key];
-		if (component && component.constructor !== ConstructorFn) {
-			if (!opt_dontDispose) {
-				component.dispose();
-			}
-			component = null;
-		}
-
-		if (!component) {
-			this.components[key] = new ConstructorFn(opt_data, false);
-		}
-		return this.components[key];
+	addSubComponent(ref, component) {
+		this.components[ref] = component;
 	}
 
 	/**

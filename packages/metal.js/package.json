@@ -4,10 +4,6 @@
   "description": "Build UI components in a solid, flexible way",
   "license": "BSD-3-Clause",
   "repository": "metal/metal.js",
-  "author": {
-    "name": "Eduardo Lundgren",
-    "email": "eduardo.lundgren@liferay.com"
-  },
   "engines": {
     "node": ">=0.10.0",
     "npm": ">=3.0.0"

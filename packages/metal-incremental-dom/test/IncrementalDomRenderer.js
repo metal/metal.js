@@ -504,7 +504,7 @@ describe('IncrementalDomRenderer', function() {
 		it('should not set "on<EventName>" string values as dom attributes', function() {
 			class TestComponent extends Component {
 				render() {
-					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+					IncDom.elementVoid('div', null, null, 'onClick', 'handleClick');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
@@ -547,6 +547,28 @@ describe('IncrementalDomRenderer', function() {
 
 			component = new TestComponent();
 			assert.strictEqual('handleClick', component.element.getAttribute('data-onclick'));
+		});
+
+		it('should attach listeners from attributes in existing elements', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			var element = document.createElement('div');
+			element.setAttribute('data-onclick', 'handleClick');
+			dom.enterDocument(element);
+
+			component = new TestComponent({
+				element: element
+			});
+
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+			assert.strictEqual(component.element, element);
 		});
 
 		it('should attach listeners from root element', function() {
@@ -1925,17 +1947,44 @@ describe('IncrementalDomRenderer', function() {
 
 				component.count = 2;
 				component.once('stateSynced', function() {
-					async.nextTick(function() {
-						assert.strictEqual(2, Object.keys(component.components).length);
-						assert.ok(component.components.child1);
-						assert.ok(component.components.child2);
-						assert.ok(!component.components.child3);
+					assert.strictEqual(2, Object.keys(component.components).length);
+					assert.ok(component.components.child1);
+					assert.ok(component.components.child2);
+					assert.ok(!component.components.child3);
 
-						assert.ok(!subComps.child1.isDisposed());
-						assert.ok(!subComps.child2.isDisposed());
-						assert.ok(subComps.child3.isDisposed());
-						done();
-					});
+					assert.ok(!subComps.child1.isDisposed());
+					assert.ok(!subComps.child2.isDisposed());
+					assert.ok(subComps.child3.isDisposed());
+					done();
+				});
+			});
+
+			it('should dispose unused sub component before triggering update rerender', function(done) {
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen('div');
+						if (this.foo === 'foo') {
+							IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child');
+						}
+						IncDom.elementClose('div');
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+				TestComponent.STATE = {
+					foo: {
+						value: 'foo'
+					}
+				};
+				component = new TestComponent();
+				var child = component.components.child;
+				sinon.spy(child, 'render');
+
+				component.foo = 'bar';
+				child.foo = 'bar';
+				component.once('stateSynced', function() {
+					assert.strictEqual(0, child.render.callCount);
+					assert.ok(child.isDisposed());
+					done();
 				});
 			});
 
@@ -1975,13 +2024,11 @@ describe('IncrementalDomRenderer', function() {
 
 				child.index = 1;
 				component.once('stateSynced', function() {
-					async.nextTick(function() {
-						assert.strictEqual(child, component.components.child);
-						assert.ok(!component.components.item1);
-						assert.ok(component.components.item2);
-						assert.ok(item1.isDisposed());
-						done();
-					});
+					assert.strictEqual(child, component.components.child);
+					assert.ok(!component.components.item1);
+					assert.ok(component.components.item2);
+					assert.ok(item1.isDisposed());
+					done();
 				});
 			});
 
@@ -2015,13 +2062,11 @@ describe('IncrementalDomRenderer', function() {
 
 				component.remove = true;
 				component.once('stateSynced', function() {
-					async.nextTick(function() {
-						assert.strictEqual(child, component.components.child);
-						assert.ok(!child.isDisposed());
-						assert.ok(!child.components.innerChild);
-						assert.ok(innerChild.isDisposed());
-						done();
-					});
+					assert.strictEqual(child, component.components.child);
+					assert.ok(!child.isDisposed());
+					assert.ok(!child.components.innerChild);
+					assert.ok(innerChild.isDisposed());
+					done();
 				});
 			});
 		});
@@ -2063,19 +2108,16 @@ describe('IncrementalDomRenderer', function() {
 			var child1Element = child1.element;
 			child.index = 1;
 			child.once('stateSynced', function() {
-				// Wait until next tick for unused components to be disposed.
-				async.nextTick(function() {
-					assert.ok(!component.components.grandchild1);
-					assert.ok(child1.isDisposed());
+				assert.ok(!component.components.grandchild1);
+				assert.ok(child1.isDisposed());
 
-					var child2 = component.components.grandchild2;
-					assert.ok(child2);
-					assert.strictEqual('foo2', child2.foo);
-					assert.strictEqual(child2.element, child.element.childNodes[0]);
-					assert.strictEqual(child1Element, child2.element);
-					assert.ok(!child2.isDisposed());
-					done();
-				});
+				var child2 = component.components.grandchild2;
+				assert.ok(child2);
+				assert.strictEqual('foo2', child2.foo);
+				assert.strictEqual(child2.element, child.element.childNodes[0]);
+				assert.strictEqual(child1Element, child2.element);
+				assert.ok(!child2.isDisposed());
+				done();
 			});
 		});
 	});

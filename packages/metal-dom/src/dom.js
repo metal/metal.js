@@ -8,7 +8,9 @@ import DomEventHandle from './DomEventHandle';
 const NEXT_TARGET = '__metal_next_target__';
 const USE_CAPTURE = {
 	blur: true,
+	error: true,
 	focus: true,
+	load: true,
 	scroll: true
 };
 

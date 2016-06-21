@@ -1356,6 +1356,8 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(newChild instanceof TestChildComponent);
 				assert.strictEqual(newChild.element, component.element.childNodes[0]);
 				assert.strictEqual('DIV', newChild.element.tagName);
+				assert.ok(child.isDisposed());
+				assert.ok(!newChild.isDisposed());
 				done();
 			});
 		});

@@ -1355,6 +1355,8 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(newChild instanceof TestChildComponent);
 				assert.strictEqual(newChild.element, component.element.childNodes[0]);
 				assert.strictEqual('DIV', newChild.element.tagName);
+				assert.ok(child.isDisposed());
+				assert.ok(!newChild.isDisposed());
 				done();
 			});
 		});
@@ -2117,6 +2119,46 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(child2.element, child.element.childNodes[0]);
 				assert.strictEqual(child1Element, child2.element);
 				assert.ok(!child2.isDisposed());
+				done();
+			});
+		});
+
+		it('should not dispose new sub component with same ref as unused sub component', function(done) {
+			class TestChildComponent extends Component {
+				render() {
+					IncrementalDOM.elementVoid('child');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					if (this.switch) {
+						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child');
+					} else {
+						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				switch: {
+				}
+			};
+			component = new TestComponent();
+			var child = component.components.child;
+			assert.ok(child instanceof ChildComponent);
+
+			component.switch = true;
+			component.once('stateSynced', function() {
+				var newChild = component.components.child;
+				assert.ok(newChild instanceof TestChildComponent);
+				assert.notStrictEqual(child, newChild);
+				assert.ok(child.isDisposed());
+				assert.ok(!newChild.isDisposed());
+				assert.strictEqual(newChild.element, component.element.childNodes[0]);
 				done();
 			});
 		});

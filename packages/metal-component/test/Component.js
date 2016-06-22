@@ -795,96 +795,57 @@ describe('Component', function() {
 			ComponentRegistry.register(ChildComponent, 'ChildComponent');
 		});
 
-		it('should add a new sub component from constructor name', function() {
+		it('should add sub components', function() {
 			comp = new Component();
-			comp.addSubComponent('child', 'ChildComponent');
-			assert.strictEqual(1, Object.keys(comp.components).length);
 
-			var sub = comp.components.child;
-			assert.ok(sub instanceof ChildComponent);
+			comp.addSubComponent('child1', new ChildComponent());
+			comp.addSubComponent('child2', new ChildComponent());
+			assert.deepEqual(['child1', 'child2'], Object.keys(comp.components).sort());
+
+			assert.ok(comp.components.child1 instanceof ChildComponent);
+			assert.ok(comp.components.child2 instanceof ChildComponent);
 		});
 
-		it('should add a new sub component from constructor', function() {
+		it('should replace existing sub components with the same ref', function() {
 			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
-			assert.strictEqual(1, Object.keys(comp.components).length);
 
-			var sub = comp.components.child;
-			assert.ok(sub instanceof ChildComponent);
-		});
-
-		it('should add a new sub component with data', function() {
-			comp = new Component();
-			comp.addSubComponent('child', ChildComponent, {
-				foo: 'foo'
-			});
-
-			var sub = comp.components.child;
-			assert.ok(sub instanceof ChildComponent);
-			assert.strictEqual('foo', sub.foo);
-		});
-
-		it('should not create a new component when one with the given key and constructor already exists', function() {
-			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
-			var child = comp.components.child;
-
-			comp.addSubComponent('child', ChildComponent);
+			var child = new ChildComponent();
+			comp.addSubComponent('child', child);
 			assert.strictEqual(child, comp.components.child);
-		});
 
-		it('should create a new component when one with the given key but different constructor already', function() {
-			var ChildComponent2 = createCustomComponentClass();
-
-			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
-			var child = comp.components.child;
-			assert.ok(child instanceof ChildComponent);
-			assert.ok(!child.isDisposed());
-
-			comp.addSubComponent('child', ChildComponent2);
-			var newChild = comp.components.child;
-			assert.notStrictEqual(child, newChild);
-			assert.ok(child.isDisposed());
-			assert.ok(!newChild.isDisposed());
-			assert.ok(newChild instanceof ChildComponent2);
-		});
-
-		it('should not dispose existing subcomponent when replaced if "opt_dontDispose" is true', function() {
-			var ChildComponent2 = createCustomComponentClass();
-
-			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
-			var child = comp.components.child;
-
-			comp.addSubComponent('child', ChildComponent2, {}, true);
-			var newChild = comp.components.child;
-			assert.notStrictEqual(child, newChild);
-			assert.ok(!child.isDisposed());
-			assert.ok(!newChild.isDisposed());
-			assert.ok(newChild instanceof ChildComponent2);
+			var child2 = new ChildComponent();
+			comp.addSubComponent('child', child2);
+			assert.strictEqual(child2, comp.components.child);
 		});
 
 		it('should dispose sub components when parent component is disposed', function() {
 			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
+			comp.addSubComponent('child1', new ChildComponent());
+			comp.addSubComponent('child2', new ChildComponent());
 
-			var child = comp.components.child;
-			assert.ok(!child.isDisposed());
+			var child1 = comp.components.child1;
+			var child2 = comp.components.child2;
+			assert.ok(!child1.isDisposed());
+			assert.ok(!child2.isDisposed());
 
 			comp.dispose();
-			assert.ok(child.isDisposed());
+			assert.ok(child1.isDisposed());
+			assert.ok(child2.isDisposed());
 		});
 
 		it('should dispose specified sub components', function() {
 			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
+			comp.addSubComponent('child1', new ChildComponent());
+			comp.addSubComponent('child2', new ChildComponent());
 
-			var child = comp.components.child;
-			assert.ok(!child.isDisposed());
+			var child1 = comp.components.child1;
+			var child2 = comp.components.child2;
+			assert.ok(!child1.isDisposed());
+			assert.ok(!child2.isDisposed());
 
-			comp.disposeSubComponents(['child']);
-			assert.ok(child.isDisposed());
+			comp.disposeSubComponents(['child1']);
+			assert.ok(child1.isDisposed());
+			assert.ok(!child2.isDisposed());
 		});
 
 		it('should not throw error if calling "disposeSubComponents" with unexisting keys', function() {
@@ -895,7 +856,7 @@ describe('Component', function() {
 
 		it('should not throw error when disposing after subcomponents have already been disposed', function() {
 			comp = new Component();
-			comp.addSubComponent('child', ChildComponent);
+			comp.addSubComponent('child', new ChildComponent());
 
 			comp.components.child.dispose();
 			assert.doesNotThrow(comp.dispose.bind(comp));

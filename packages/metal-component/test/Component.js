@@ -848,6 +848,20 @@ describe('Component', function() {
 			assert.ok(!child2.isDisposed());
 		});
 
+		it('should not detach elements from disposed sub components', function() {
+			comp = new Component();
+			comp.addSubComponent('child', new ChildComponent());
+
+			var child = comp.components.child;
+			var parent = document.createElement('div');
+			var element = child.element;
+			dom.append(parent, element);
+
+			comp.disposeSubComponents(['child']);
+			assert.ok(child.isDisposed());
+			assert.strictEqual(parent, element.parentNode);
+		});
+
 		it('should not throw error if calling "disposeSubComponents" with unexisting keys', function() {
 			comp = new Component();
 			assert.ok(!comp.components.child);

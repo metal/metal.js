@@ -24,7 +24,7 @@
     "metal"
   ],
   "dependencies": {
-    "metal-component": "metal/metal-component#reuse"
+    "metal-component": "^1.0.0-rc.22"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

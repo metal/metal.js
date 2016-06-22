@@ -2122,6 +2122,49 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should not remove reusable element from disposed component\'s sub components', function(done) {
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					if (this.switch) {
+						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child2');
+					} else {
+						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child1');
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				switch: {
+				}
+			};
+			component = new TestComponent();
+
+			var child = component.components.child1;
+			assert.ok(child instanceof TestChildComponent);
+			assert.strictEqual(child.element, component.element.childNodes[0]);
+
+			component.switch = true;
+			component.once('stateSynced', function() {
+				assert.ok(!component.components.child1);
+				assert.ok(child.isDisposed());
+
+				child = component.components.child2;
+				assert.ok(child instanceof ChildComponent);
+				assert.strictEqual(child.element, component.element.childNodes[0]);
+				assert.ok(!child.isDisposed());
+				done();
+			});
+		});
+
 		it('should not dispose new sub component with same ref as unused sub component', function(done) {
 			class TestChildComponent extends Component {
 				render() {

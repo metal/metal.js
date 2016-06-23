@@ -10,6 +10,7 @@ const USE_CAPTURE = {
 	blur: true,
 	error: true,
 	focus: true,
+	invalid: true,
 	load: true,
 	scroll: true
 };

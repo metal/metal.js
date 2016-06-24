@@ -452,8 +452,10 @@ class Component extends State {
 
 		this.setUpProxy_();
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
-		this.addElementClasses();
-		this.syncVisible(this.visible);
+		if (event.newVal) {
+			this.addElementClasses();
+			this.syncVisible(this.visible);
+		}
 	}
 
 	/**

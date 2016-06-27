@@ -1,7 +1,7 @@
 'use strict';
 
 import { core, object } from 'metal';
-import metalData from './metalData';
+import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
 
@@ -80,7 +80,7 @@ class dom {
 	 * @protected
 	 */
 	static addElementListener_(element, eventName, listener) {
-		var data = metalData.get(element);
+		var data = domData.get(element);
 		dom.addToArr_(data.listeners, eventName, listener);
 	}
 
@@ -94,7 +94,7 @@ class dom {
 	 * @protected
 	 */
 	static addSelectorListener_(element, eventName, selector, listener) {
-		var data = metalData.get(element);
+		var data = domData.get(element);
 		dom.addToArr_(data.delegating[eventName].selectors, selector, listener);
 	}
 
@@ -120,7 +120,7 @@ class dom {
 	 * @protected
 	 */
 	static attachDelegateEvent_(element, eventName) {
-		var data = metalData.get(element);
+		var data = domData.get(element);
 		if (!data.delegating[eventName]) {
 			data.delegating[eventName] = {
 				handle: dom.on(
@@ -718,11 +718,11 @@ class dom {
 	 * @protected
 	 */
 	static triggerMatchedListeners_(container, element, event, defaultFns) {
-		var data = metalData.get(element);
+		var data = domData.get(element);
 		var listeners = data.listeners[event.type];
 		var ret = dom.triggerListeners_(listeners, event, element, defaultFns);
 
-		var selectorsMap = metalData.get(container).delegating[event.type].selectors;
+		var selectorsMap = domData.get(container).delegating[event.type].selectors;
 		var selectors = Object.keys(selectorsMap);
 		for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
 			if (dom.match(element, selectors[i])) {

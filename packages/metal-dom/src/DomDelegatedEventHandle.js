@@ -1,7 +1,7 @@
 'use strict';
 
 import { array, core } from 'metal';
-import metalData from './metalData';
+import domData from './domData';
 import { EventHandle } from 'metal-events';
 
 /**
@@ -28,7 +28,7 @@ class DomDelegatedEventHandle extends EventHandle {
 	 * @inheritDoc
 	 */
 	removeListener() {
-		var data = metalData.get(this.emitter_);
+		var data = domData.get(this.emitter_);
 		var selector = this.selector_;
 		var arr = core.isString(selector) ? data.delegating[this.event_].selectors : data.listeners;
 		var key = core.isString(selector) ? selector : this.event_;

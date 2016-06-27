@@ -1,12 +1,12 @@
 'use strict';
 
-import metalData from '../src/metalData';
+import domData from '../src/domData';
 import DomDelegatedEventHandle from '../src/DomDelegatedEventHandle';
 
 describe('DomDelegatedEventHandle', function() {
 	it('should remove listener from the metal data listeners array', function() {
 		var element = document.createElement('div');
-		var data = metalData.get(element);
+		var data = domData.get(element);
 		data.listeners.click = [() => {}, () => {}, () => {}];
 		var fn = data.listeners.click[1];
 
@@ -18,7 +18,7 @@ describe('DomDelegatedEventHandle', function() {
 
 	it('should not throw error if trying to remove unexisting listener', function() {
 		var element = document.createElement('div');
-		var data = metalData.get(element);
+		var data = domData.get(element);
 		data.listeners.click = [() => {}, () => {}, () => {}];
 
 		var handle = new DomDelegatedEventHandle(element, 'click', () => {});

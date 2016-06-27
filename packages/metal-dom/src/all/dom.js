@@ -1,6 +1,7 @@
 'use strict';
 
 import dom from '../dom';
+import domData from '../domData';
 import DomEventEmitterProxy from '../DomEventEmitterProxy';
 import DomEventHandle from '../DomEventHandle';
 import features from '../features';
@@ -9,4 +10,4 @@ import globalEvalStyles from '../globalEvalStyles';
 import '../events';
 
 export default dom;
-export { dom, DomEventEmitterProxy, DomEventHandle, features, globalEval, globalEvalStyles };
+export { dom, domData, DomEventEmitterProxy, DomEventHandle, features, globalEval, globalEvalStyles };

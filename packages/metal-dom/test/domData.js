@@ -1,10 +1,10 @@
 'use strict';
 
-import metalData from '../src/metalData';
+import domData from '../src/domData';
 
-describe('metalData', function() {
+describe('domData', function() {
 	it('should get data object from element', function() {
-		var data = metalData.get(document.createElement('div'));
+		var data = domData.get(document.createElement('div'));
 		assert.ok(data);
 		assert.ok(data.delegating);
 		assert.ok(data.listeners);
@@ -12,12 +12,12 @@ describe('metalData', function() {
 
 	it('should return same data object for the same element', function() {
 		var element = document.createElement('div');
-		assert.strictEqual(metalData.get(element), metalData.get(element));
+		assert.strictEqual(domData.get(element), domData.get(element));
 	});
 
 	it('should return different data objects for the different elements', function() {
 		var element1 = document.createElement('div');
 		var element2 = document.createElement('div');
-		assert.notStrictEqual(metalData.get(element1), metalData.get(element2));
+		assert.notStrictEqual(domData.get(element1), domData.get(element2));
 	});
 });

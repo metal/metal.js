@@ -3,6 +3,7 @@
 import './incremental-dom';
 import { core, object } from 'metal';
 import dom from 'metal-dom';
+import { domData } from 'metal-dom';
 import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
@@ -35,6 +36,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		// functions each time.
 		this.handleInterceptedAttributesCall_ =
 			this.handleInterceptedAttributesCall_.bind(this);
+		this.handleInterceptedCloseCall_ =
+			this.handleInterceptedCloseCall_.bind(this);
 		this.handleInterceptedOpenCall_ =
 			this.handleInterceptedOpenCall_.bind(this);
 		this.handleChildrenCaptured_ = this.handleChildrenCaptured_.bind(this);
@@ -107,16 +110,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Builds the key for the next component that is found.
-	 * @param {string} tag The component's tag.
-	 * @return {string}
+	 * Removes the most recent component from the queue of rendering components.
 	 */
-	buildRef(tag) {
-		var ctor = core.isString(tag) ? ComponentRegistry.getConstructor(tag) : tag;
-		var prefix = this.currentPrefix_ + core.getUid(ctor, true);
-		var count = this.generatedRefCount_[prefix] || 0;
-		this.generatedRefCount_[prefix] = count + 1;
-		return prefix + 'sub' + count;
+	static finishedRenderingComponent() {
+		renderingComponents_.pop();
+		if (renderingComponents_.length === 0) {
+			IncrementalDomUnusedComponents.disposeUnused();
+		}
 	}
 
 	/**
@@ -128,6 +128,65 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Gets the data object that should be currently used. This object will either
+	 * come from the current element being rendered by incremental dom or from
+	 * the component instance being rendered (only when the current element is the
+	 * component's direct parent).
+	 * @return {!Object}
+	 */
+	static getCurrentData() {
+		var element = IncrementalDOM.currentElement();
+		var comp = IncrementalDomRenderer.getComponentBeingRendered();
+		var renderer = comp.getRenderer();
+		var obj = renderer;
+		if (renderer.rootElementReached_ && element !== comp.element.parentNode) {
+			obj = domData.get(element);
+		}
+		obj.incDomData_ = obj.incDomData_ || {
+			currComps: {
+				keys: {},
+				order: {}
+			},
+			prevComps: {
+				keys: {},
+				order: {}
+			}
+		};
+		return obj.incDomData_;
+	}
+
+	/**
+	 * Returns the event name if the given attribute is a listener (of the form
+	 * "on<EventName>"), or null if it isn't.
+	 * @param {string} attr
+	 * @return {?string}
+	 * @protected
+	 */
+	getEventFromListenerAttr_(attr) {
+		var matches = IncrementalDomRenderer.LISTENER_REGEX.exec(attr);
+		var eventName = matches ? (matches[1] ? matches[1] : matches[2]) : null;
+		return eventName ? eventName.toLowerCase() : null;
+	}
+
+	/**
+	 * Gets the component that is this component's owner (that is, the one that
+	 * passed its config properties and holds its ref), or null if there's none.
+	 * @return {Component}
+	 */
+	getOwner() {
+		return this.owner_;
+	}
+
+	/**
+	 * Gets the component that is this component's parent (that is, the one that
+	 * actually rendered it), or null if there's no parent.
+	 * @return {Component}
+	 */
+	getParent() {
+		return this.parent_;
+	}
+
+	/**
 	 * Gets the sub component referenced by the given tag and config data,
 	 * creating it if it doesn't yet exist.
 	 * @param {string|!Function} tagOrCtor The tag name.
@@ -136,27 +195,27 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	getSubComponent_(tagOrCtor, config) {
-		var ConstructorFn = tagOrCtor;
-		if (core.isString(ConstructorFn)) {
-			ConstructorFn = ComponentRegistry.getConstructor(tagOrCtor);
+		var Ctor = tagOrCtor;
+		if (core.isString(Ctor)) {
+			Ctor = ComponentRegistry.getConstructor(tagOrCtor);
 		}
 
-		var comp = this.component_.components[config.ref];
-		if (comp && comp.constructor !== ConstructorFn) {
-			comp = null;
-		}
-
-		if (!comp) {
-			comp = new ConstructorFn(config, false);
+		var data = IncrementalDomRenderer.getCurrentData();
+		var comp;
+		if (core.isDef(config.ref)) {
+			comp = this.match_(this.component_.components[config.ref], Ctor, config);
 			this.component_.addSubComponent(config.ref, comp);
+		} else if (core.isDef(config.key)) {
+			comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
+			data.currComps.keys[config.key] = comp;
+		} else {
+			var type = core.getUid(Ctor, true);
+			data.currComps.order[type] = data.currComps.order[type] || [];
+			var order = data.currComps.order[type];
+			comp = this.match_((data.prevComps.order[type] || [])[order.length], Ctor, config);
+			order.push(comp);
 		}
 
-		if (comp.wasRendered) {
-			this.setConfig_(comp, config);
-			comp.getRenderer().startSkipUpdates();
-			comp.setState(config);
-			comp.getRenderer().stopSkipUpdates();
-		}
 		return comp;
 	}
 
@@ -179,22 +238,53 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Removes the most recent component from the queue of rendering components.
-	 */
-	static finishedRenderingComponent() {
-		renderingComponents_.pop();
-		if (renderingComponents_.length === 0) {
-			IncrementalDomUnusedComponents.disposeUnused();
-		}
-	}
-
-	/**
 	 * Handles the `attached` listener. Stores attach data.
 	 * @param {!Object} data
 	 * @protected
 	 */
 	handleAttached_(data) {
 		this.attachData_ = data;
+	}
+
+	/**
+	 * Handles the event of children having finished being captured.
+	 * @param {!Object} The captured children in tree format.
+	 * @protected
+	 */
+	handleChildrenCaptured_(tree) {
+		var {config, tag} = this.componentToRender_;
+		config.children = this.buildChildren_(tree.config.children);
+		this.componentToRender_ = null;
+		this.renderFromTag_(tag, config);
+	}
+
+	/**
+	 * Handles a child being rendered via `IncrementalDomChildren.render`. Skips
+	 * component nodes so that they can be rendered the correct way without
+	 * having to recapture both them and their children via incremental dom.
+	 * @param {!Object} node
+	 * @return {boolean}
+	 * @protected
+	 */
+	handleChildRender_(node) {
+		if (node.tag && IncrementalDomUtils.isComponentTag(node.tag)) {
+			node.config.children = this.buildChildren_(node.config.children);
+			this.renderFromTag_(node.tag, node.config);
+			return true;
+		}
+	}
+
+	/**
+	 * Handles the `stateKeyChanged` event. Overrides original method from
+	 * `ComponentRenderer` to guarantee that `IncrementalDomRenderer`'s logic
+	 * will run first.
+	 * @param {!Object} data
+	 * @override
+	 * @protected
+	 */
+	handleComponentRendererStateKeyChanged_(data) {
+		this.handleStateKeyChanged_(data);
+		super.handleComponentRendererStateKeyChanged_(data);
 	}
 
 	/**
@@ -248,46 +338,16 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles the event of children having finished being captured.
-	 * @param {!Object} The captured children in tree format.
+	 * Handles an intercepted call to the `elementClose` function from incremental
+	 * dom.
+	 * @param {!function()} originalFn The original function before interception.
+	 * @param {string} tag
 	 * @protected
 	 */
-	handleChildrenCaptured_(tree) {
-		var {config, tag} = this.componentToRender_;
-		config.children = this.buildChildren_(tree.config.children);
-		this.componentToRender_ = null;
-		this.currentPrefix_ = this.prevPrefix_;
-		this.prevPrefix_ = null;
-		this.renderFromTag_(tag, config);
-	}
-
-	/**
-	 * Handles a child being rendered via `IncrementalDomChildren.render`. Skips
-	 * component nodes so that they can be rendered the correct way without
-	 * having to recapture both them and their children via incremental dom.
-	 * @param {!Object} node
-	 * @return {boolean}
-	 * @protected
-	 */
-	handleChildRender_(node) {
-		if (node.tag && IncrementalDomUtils.isComponentTag(node.tag)) {
-			node.config.children = this.buildChildren_(node.config.children);
-			this.renderFromTag_(node.tag, node.config);
-			return true;
-		}
-	}
-
-	/**
-	 * Handles the `stateKeyChanged` event. Overrides original method from
-	 * `ComponentRenderer` to guarantee that `IncrementalDomRenderer`'s logic
-	 * will run first.
-	 * @param {!Object} data
-	 * @override
-	 * @protected
-	 */
-	handleComponentRendererStateKeyChanged_(data) {
-		this.handleStateKeyChanged_(data);
-		super.handleComponentRendererStateKeyChanged_(data);
+	handleInterceptedCloseCall_(originalFn, tag) {
+		var element = originalFn(tag);
+		this.resetData_(domData.get(element).incDomData_);
+		return element;
 	}
 
 	/**
@@ -307,8 +367,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 	/**
 	 * Handles an intercepted call to the `elementOpen` function from incremental
-	 * dom, done for a regular element. Adds any inline listeners found and makes
-	 * sure that component root elements are always reused.
+	 * dom, done for a regular element. Adds any inline listeners found on the
+	 * first render and makes sure that component root elements are always reused.
 	 * @param {!function()} originalFn The original function before interception.
 	 * @protected
 	 */
@@ -344,15 +404,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleSubComponentCall_(originalFn, ...args) {
 		var config = IncrementalDomUtils.buildConfigFromCall(args);
-		config.ref = core.isDefAndNotNull(config.ref) ? config.ref : this.buildRef(args[0]);
 		this.componentToRender_ = {
 			config,
 			tag: args[0]
 		};
-
-		this.prevPrefix_ = this.currentPrefix_;
-		this.currentPrefix_ = config.ref;
-		this.generatedRefCount_[this.currentPrefix_] = 0;
 		IncrementalDomChildren.capture(this, this.handleChildrenCaptured_);
 	}
 
@@ -363,6 +418,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	intercept_() {
 		IncrementalDomAop.startInterception({
 			attributes: this.handleInterceptedAttributesCall_,
+			elementClose: this.handleInterceptedCloseCall_,
 			elementOpen: this.handleInterceptedOpenCall_
 		});
 	}
@@ -377,34 +433,58 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Returns the event name if the given attribute is a listener (of the form
-	 * "on<EventName>"), or null if it isn't.
-	 * @param {string} attr
-	 * @return {?string}
+	 * Returns the given component if it matches the specified constructor
+	 * function. Otherwise, returns a new instance of the given constructor. On
+	 * both cases the component's state and config will be updated.
+	 * @param {Component} comp
+	 * @param {!function()} Ctor
+	 * @param {!Object} config
+	 * @return {!Component}
 	 * @protected
 	 */
-	getEventFromListenerAttr_(attr) {
-		var matches = IncrementalDomRenderer.LISTENER_REGEX.exec(attr);
-		var eventName = matches ? (matches[1] ? matches[1] : matches[2]) : null;
-		return eventName ? eventName.toLowerCase() : null;
+	match_(comp, Ctor, config) {
+		if (!comp || comp.constructor !== Ctor) {
+			comp = new Ctor(config, false);
+		}
+		if (comp.wasRendered) {
+			this.setConfig_(comp, config);
+			comp.getRenderer().startSkipUpdates();
+			comp.setState(config);
+			comp.getRenderer().stopSkipUpdates();
+		}
+		return comp;
 	}
 
 	/**
-	 * Gets the component that is this component's parent (that is, the one that
-	 * actually rendered it), or null if there's no parent.
-	 * @return {Component}
+	 * Patches the component's element with the incremental dom function calls
+	 * done by `renderInsidePatchDontSkip_`.
 	 */
-	getParent() {
-		return this.parent_;
-	}
+	patch() {
+		if (!this.component_.element && this.parent_) {
+			// If the component has no content but was rendered from another component,
+			// we'll need to patch this parent to make sure that any new content will
+			// be added in the right place.
+			this.parent_.getRenderer().patch();
+			return;
+		}
 
-	/**
-	 * Gets the component that is this component's owner (that is, the one that
-	 * passed its config properties and holds its ref), or null if there's none.
-	 * @return {Component}
-	 */
-	getOwner() {
-		return this.owner_;
+		var tempParent = this.guaranteeParent_();
+		if (tempParent) {
+			IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
+			dom.exitDocument(this.component_.element);
+			if (this.component_.element && this.component_.inDocument) {
+				this.component_.renderElement_(
+					this.attachData_.parent,
+					this.attachData_.sibling
+				);
+			}
+		} else {
+			var element = this.component_.element;
+			IncrementalDOM.patchOuter(element, this.renderInsidePatchDontSkip_);
+			if (!this.component_.element) {
+				dom.exitDocument(element);
+			}
+		}
 	}
 
 	/**
@@ -520,9 +600,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.rootElementReached_ = false;
 		IncrementalDomUnusedComponents.schedule(this.childComponents_ || []);
 		this.childComponents_ = [];
-		this.generatedRefCount_ = {};
-		this.listenersToAttach_ = [];
-		this.currentPrefix_ = '';
 		this.intercept_();
 		this.renderIncDom();
 		IncrementalDomAop.stopInterception();
@@ -533,6 +610,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		this.emit('rendered', !this.isRendered_);
 		IncrementalDomRenderer.finishedRenderingComponent();
+		this.resetData_(this.incDomData_);
 	}
 
 	/**
@@ -566,6 +644,21 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			comp.renderAsSubComponent();
 		}
 		return comp;
+	}
+
+	/**
+	 * Resets the given incremental dom data object, preparing it for the next
+	 * pass.
+	 * @param {Object}
+	 * @protected
+	 */
+	resetData_(data) {
+		if (data) {
+			data.prevComps.keys = data.currComps.keys;
+			data.prevComps.order = data.currComps.order;
+			data.currComps.keys = {};
+			data.currComps.order = {};
+		}
 	}
 
 	/**
@@ -607,38 +700,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	static startedRenderingComponent(comp) {
 		renderingComponents_.push(comp);
-	}
-
-	/**
-	 * Patches the component's element with the incremental dom function calls
-	 * done by `renderIncDom`.
-	 */
-	patch() {
-		if (!this.component_.element && this.parent_) {
-			// If the component has no content but was rendered from another component,
-			// we'll need to patch this parent to make sure that any new content will
-			// be added in the right place.
-			this.parent_.getRenderer().patch();
-			return;
-		}
-
-		var tempParent = this.guaranteeParent_();
-		if (tempParent) {
-			IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
-			dom.exitDocument(this.component_.element);
-			if (this.component_.element && this.component_.inDocument) {
-				this.component_.renderElement_(
-					this.attachData_.parent,
-					this.attachData_.sibling
-				);
-			}
-		} else {
-			var element = this.component_.element;
-			IncrementalDOM.patchOuter(element, this.renderInsidePatchDontSkip_);
-			if (!this.component_.element) {
-				dom.exitDocument(element);
-			}
-		}
 	}
 
 	/**

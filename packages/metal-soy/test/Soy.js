@@ -332,15 +332,10 @@ describe('Soy', function() {
 			assert.strictEqual('Hello Foo!', nested.element.textContent);
 		});
 
-		it('should render and instantiate nested components even without key', function() {
+		it('should render and instantiate nested components even without ref', function() {
 			comp = new NestedNoDataComponent();
-			var keys = Object.keys(comp.components);
-			assert.strictEqual(1, keys.length);
-
-			var nested = comp.components[keys[0]];
-			assert.ok(nested instanceof HelloWorldComponent);
-			assert.strictEqual(nested.element, comp.element.childNodes[0]);
-			assert.strictEqual('Hello World!', nested.element.textContent);
+			assert.strictEqual(1, comp.element.childNodes.length);
+			assert.strictEqual('Hello World!', comp.element.childNodes[0].textContent);
 		});
 
 		it('should render and instantiate nested components inside nested components', function() {

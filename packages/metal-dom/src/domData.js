@@ -2,7 +2,7 @@
 
 const METAL_DATA = '__metal_data__';
 
-export default class {
+class domData {
 	/**
 	 * Gets Metal.js's data for the given element.
 	 * @param {!Element} element
@@ -18,3 +18,5 @@ export default class {
 		return element[METAL_DATA];
 	}
 }
+
+export default domData;

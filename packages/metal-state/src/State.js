@@ -18,12 +18,21 @@ class State extends EventEmitter {
 	 * @param {string=} opt_objName Optional name of the object inside `this` that
 	 *     should hold the state properties. If none is given, they will be added
 	 *     directly to `this` instead.
+	 * @param {Object=} opt_commonOpts Optional common option values to be used
+	 *     by all this instance's state properties.
 	 */
-	constructor(opt_config, opt_objName) {
+	constructor(opt_config, opt_objName, opt_commonOpts) {
 		super();
 
 		/**
-		 * Nname of the object inside `this` that should hold the state properties.
+		 * Common option values to be used by all this instance's state properties.
+		 * @type {Object}
+		 * @protected
+		 */
+		this.commonOpts_ = opt_commonOpts;
+
+		/**
+		 * Name of the object inside `this` that should hold the state properties.
 		 * If none is given, they will be added directly to `this` instead.
 		 * @type {?string}
 		 * @protected
@@ -166,7 +175,9 @@ class State extends EventEmitter {
 	 */
 	buildKeyInfo_(name, config, initialValue) {
 		this.assertValidStateKeyName_(name);
-
+		if (this.commonOpts_) {
+			config = object.mixin({}, config, this.commonOpts_);
+		}
 		this.stateInfo_[name] = {
 			config: config || {},
 			initialValue: initialValue,

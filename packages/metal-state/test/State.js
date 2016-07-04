@@ -819,6 +819,26 @@ describe('State', function() {
 			assert.strictEqual(1, state.obj.key1);
 		});
 
+		it('should share given common options with all state properties', function() {
+			class Test extends State {
+			}
+			Test.STATE = {
+				key1: {
+					value: 1
+				},
+				key2: {
+					value: 2
+				}
+			};
+
+			var state = new Test({}, 'obj', {
+				setter: val => val + 1
+			});
+			assert.ok(state.obj);
+			assert.strictEqual(2, state.obj.key1);
+			assert.strictEqual(3, state.obj.key2);
+		});
+
 		it('should remove state properties from object under given name', function() {
 			var state = new State({}, 'obj');
 			assert.ok(state.obj);

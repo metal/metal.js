@@ -792,6 +792,76 @@ describe('State', function() {
 			}, ChildTest.STATE_MERGED);
 		});
 	});
+
+	describe('Object Name', function() {
+		it('should add state properties to object under given name', function() {
+			var state = new State({}, 'obj');
+			state.addToState('key1');
+			state.addToState('key2');
+			assert.ok(state.obj);
+
+			var keys = Object.keys(state.obj);
+			assert.strictEqual(2, keys.length);
+			assert.deepEqual(['key1', 'key2'], keys.sort());
+		});
+
+		it('should add state properties from STATE static variable to object under given name', function() {
+			class Test extends State {
+			}
+			Test.STATE = {
+				key1: {
+					value: 1
+				}
+			};
+
+			var state = new Test({}, 'obj');
+			assert.ok(state.obj);
+			assert.strictEqual(1, state.obj.key1);
+		});
+
+		it('should remove state properties from object under given name', function() {
+			var state = new State({}, 'obj');
+			assert.ok(state.obj);
+
+			state.addToState('key1');
+			state.addToState('key2');
+			state.removeStateKey('key1');
+
+			var keys = Object.keys(state.obj);
+			assert.strictEqual(1, keys.length);
+			assert.deepEqual('key2', keys[0]);
+		});
+
+		it('should create new object with same state properties when getState is called', function() {
+			var state = new State({}, 'obj');
+			state.addToState('key1');
+			state.addToState('key2');
+
+			assert.deepEqual(state.obj, state.getState());
+			assert.notStrictEqual(state.obj, state.getState());
+		});
+
+		it('should emit event when state property changes', function() {
+			var state = new State({}, 'obj');
+			state.addToState('key1');
+			state.addToState('key2');
+
+			var listener = sinon.stub();
+			state.on('key1Changed', listener);
+
+			state.obj.key1 = 'newVal';
+			assert.strictEqual('newVal', state.obj.key1);
+			assert.strictEqual(1, listener.callCount);
+			assert.strictEqual('newVal', listener.args[0][0].newVal);
+			assert.strictEqual(undefined, listener.args[0][0].prevVal);
+
+			state.obj.key1 = 'newVal';
+			assert.strictEqual(1, listener.callCount);
+
+			state.obj.key1 = 'newVal2';
+			assert.strictEqual(2, listener.callCount);
+		});
+	});
 });
 
 function createStateInstance() {

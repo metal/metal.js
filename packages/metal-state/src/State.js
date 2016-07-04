@@ -8,12 +8,27 @@ import { EventEmitter } from 'metal-events';
  * changes, as well as configured with validators, setters and other options.
  * See the `addToState` method for a complete list of available configuration
  * options for each state key.
- * @constructor
  * @extends {EventEmitter}
  */
 class State extends EventEmitter {
-	constructor(opt_config) {
+	/**
+	 * Constructor function for `State`.
+	 * @param {Object=} opt_config Optional config object with initial values to
+	 *     set state properties to.
+	 * @param {string=} opt_objName Optional name of the object inside `this` that
+	 *     should hold the state properties. If none is given, they will be added
+	 *     directly to `this` instead.
+	 */
+	constructor(opt_config, opt_objName) {
 		super();
+
+		/**
+		 * Nname of the object inside `this` that should hold the state properties.
+		 * If none is given, they will be added directly to `this` instead.
+		 * @type {?string}
+		 * @protected
+		 */
+		this.objName_ = opt_objName;
 
 		/**
 		 * Object with information about the batch event that is currently
@@ -32,6 +47,7 @@ class State extends EventEmitter {
 
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
+		this.prepareStateObj_();
 		this.addToStateFromStaticHint_(opt_config);
 	}
 
@@ -44,7 +60,11 @@ class State extends EventEmitter {
 	 */
 	addKeyToState(name, config, initialValue) {
 		this.buildKeyInfo_(name, config, initialValue);
-		Object.defineProperty(this, name, this.buildKeyPropertyDef_(name));
+		Object.defineProperty(
+			this.getStateObj(),
+			name,
+			this.buildKeyPropertyDef_(name)
+		);
 	}
 
 	/**
@@ -101,7 +121,10 @@ class State extends EventEmitter {
 		}
 
 		if (opt_contextOrInitialValue !== false) {
-			Object.defineProperties(opt_contextOrInitialValue || this, props);
+			Object.defineProperties(
+				opt_contextOrInitialValue || this.getStateObj(),
+				props
+			);
 		}
 	}
 
@@ -113,9 +136,10 @@ class State extends EventEmitter {
 	 */
 	addToStateFromStaticHint_(opt_config) {
 		var ctor = this.constructor;
-		var defineContext = false;
-		if (State.mergeStateStatic(ctor)) {
-			defineContext = ctor.prototype;
+		var defineContext;
+		var merged = State.mergeStateStatic(ctor);
+		if (!core.isDef(this.objName_)) {
+			defineContext = merged ? ctor.prototype : false;
 		}
 		this.addToState(ctor.STATE_MERGED, opt_config, defineContext);
 	}
@@ -157,14 +181,15 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	buildKeyPropertyDef_(name) {
+		var self = this;
 		return {
 			configurable: true,
 			enumerable: true,
 			get: function() {
-				return this.getStateKeyValue_(name);
+				return self.getStateKeyValue_(name);
 			},
 			set: function(val) {
-				this.setStateKeyValue_(name, val);
+				self.setStateKeyValue_(name, val);
 			}
 		};
 	}
@@ -265,7 +290,7 @@ class State extends EventEmitter {
 	 * @return {*}
 	 */
 	get(name) {
-		return this[name];
+		return this.getStateObj()[name];
 	}
 
 	/**
@@ -279,7 +304,7 @@ class State extends EventEmitter {
 		var names = opt_names || this.getStateKeys();
 
 		for (var i = 0; i < names.length; i++) {
-			state[names[i]] = this[names[i]];
+			state[names[i]] = this.get(names[i]);
 		}
 
 		return state;
@@ -316,6 +341,15 @@ class State extends EventEmitter {
 	}
 
 	/**
+	 * Gets the object that contains this instance's state properties.
+	 * @return {!Object}
+	 */
+	getStateObj() {
+		var name = this.objName_;
+		return core.isDef(name) ? this[name] : this;
+	}
+
+	/**
 	 * Checks if the value of the state key with the given name has already been
 	 * set. Note that this doesn't run the key's getter.
 	 * @param {string} name The name of the key.
@@ -346,7 +380,7 @@ class State extends EventEmitter {
 		if (this.shouldInformChange_(name, prevVal)) {
 			var data = {
 				key: name,
-				newVal: this[name],
+				newVal: this.get(name),
 				prevVal: prevVal
 			};
 			this.emit(name + 'Changed', data);
@@ -413,12 +447,23 @@ class State extends EventEmitter {
 	}
 
 	/**
+	 * Prepares the object that will hold state properties, creating it if it
+	 * doesn't exist yet.
+	 * @protected
+	 */
+	prepareStateObj_() {
+		if (this.objName_ && !this[this.objName_]) {
+			this[this.objName_] = {};
+		}
+	}
+
+	/**
 	 * Removes the requested state key.
 	 * @param {string} name The name of the key.
 	 */
 	removeStateKey(name) {
 		this.stateInfo_[name] = null;
-		delete this[name];
+		delete this.getStateObj()[name];
 	}
 
 	/**
@@ -454,7 +499,7 @@ class State extends EventEmitter {
 	 */
 	set(name, value) {
 		if (this.hasStateKey(name)) {
-			this[name] = value;
+			this.getStateObj()[name] = value;
 		}
 	}
 
@@ -468,9 +513,9 @@ class State extends EventEmitter {
 		var config = this.stateInfo_[name].config;
 
 		if (config.value !== undefined) {
-			this[name] = config.value;
+			this.set(name, config.value);
 		} else {
-			this[name] = this.callFunction_(config.valueFn);
+			this.set(name, this.callFunction_(config.valueFn));
 		}
 	}
 
@@ -483,7 +528,7 @@ class State extends EventEmitter {
 	setInitialValue_(name) {
 		var info = this.stateInfo_[name];
 		if (info.initialValue !== undefined) {
-			this[name] = info.initialValue;
+			this.set(name, info.initialValue);
 			info.initialValue = undefined;
 		}
 	}
@@ -520,7 +565,7 @@ class State extends EventEmitter {
 			info.state = State.KeyStates.INITIALIZED;
 		}
 
-		var prevVal = this[name];
+		var prevVal = this.get(name);
 		info.value = this.callSetter_(name, value, prevVal);
 		info.written = true;
 		this.informChange_(name, prevVal);
@@ -541,7 +586,7 @@ class State extends EventEmitter {
 	shouldInformChange_(name, prevVal) {
 		var info = this.stateInfo_[name];
 		return (info.state === State.KeyStates.INITIALIZED) &&
-			(core.isObject(prevVal) || prevVal !== this[name]);
+			(core.isObject(prevVal) || prevVal !== this.get(name));
 	}
 
 	/**
@@ -569,7 +614,7 @@ class State extends EventEmitter {
 State.INVALID_KEYS = ['state', 'stateKey'];
 
 /**
- * Constants that represent the states that an a state key can be in.
+ * Constants that represent the states that a state key can be in.
  * @type {!Object}
  */
 State.KeyStates = {

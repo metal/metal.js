@@ -3,7 +3,7 @@
   "version": "1.0.0-rc.24",
   "description": "A component class for Metal.js",
   "license": "BSD",
-  "repository": "metal/metal-component",
+  "repository": "https://github.com/metal/metal/tree/master/packages/metal-component",
   "engines": {
     "node": ">=0.12.0",
     "npm": ">=3.0.0"

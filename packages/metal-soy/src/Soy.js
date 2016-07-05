@@ -53,12 +53,6 @@ class Soy extends IncrementalDomRenderer {
 		var component = this.component_;
 		var data = object.mixin({}, component.config);
 		component.getStateKeys().forEach(key => {
-			// Get all state values except "element", since it helps performance
-			// and the element shouldn't be referenced inside a soy template anyway.
-			if (key === 'element') {
-				return;
-			}
-
 			var value = component[key];
 			if (this.isHtmlParam_(key)) {
 				value = Soy.toIncDom(value);

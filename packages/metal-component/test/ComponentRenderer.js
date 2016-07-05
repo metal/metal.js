@@ -69,11 +69,6 @@ describe('ComponentRenderer', function() {
 		component.once('stateChanged', function() {
 			assert.strictEqual(1, renderer.update.callCount);
 			var expectedData = {
-				element: {
-					key: 'element',
-					prevVal: undefined,
-					newVal: component.element
-				},
 				foo: {
 					key: 'foo',
 					prevVal: undefined,
@@ -98,63 +93,6 @@ describe('ComponentRenderer', function() {
 		});
 	});
 
-	it('should call the update method synchronously if state changes and SYNC_UPDATES is true', function() {
-		class TestComponent extends Component {
-		}
-		TestComponent.SYNC_UPDATES = true;
-
-		var component = new TestComponent();
-		renderer = new ComponentRenderer(component);
-		sinon.spy(renderer, 'update');
-
-		component.addToState('foo');
-		component.emit('render');
-
-		component.foo = 'foo';
-		var expectedData = {
-			foo: {
-				key: 'foo',
-				prevVal: undefined,
-				newVal: 'foo'
-			}
-		};
-		assert.strictEqual(1, renderer.update.callCount);
-		assert.deepEqual(expectedData, renderer.update.args[0][0].changes);
-
-		component.foo = 'bar';
-		expectedData = {
-			foo: {
-				key: 'foo',
-				prevVal: 'foo',
-				newVal: 'bar'
-			}
-		};
-		assert.strictEqual(2, renderer.update.callCount);
-		assert.deepEqual(expectedData, renderer.update.args[1][0].changes);
-	});
-
-	it('should not call the update method if state changes while skipping updates', function(done) {
-		var component = new Component();
-		renderer = new ComponentRenderer(component);
-		sinon.spy(renderer, 'update');
-
-		component.addToState('foo');
-		component.emit('render');
-
-		renderer.startSkipUpdates();
-		component.foo = 'foo';
-		component.once('stateChanged', function() {
-			assert.strictEqual(0, renderer.update.callCount);
-
-			renderer.stopSkipUpdates();
-			component.foo = 'foo2';
-			component.once('stateChanged', function() {
-				assert.strictEqual(1, renderer.update.callCount);
-				done();
-			});
-		});
-	});
-
 	it('should not call update method after disposed', function(done) {
 		var component = new Component();
 		renderer = new ComponentRenderer(component);
@@ -168,6 +106,79 @@ describe('ComponentRenderer', function() {
 		component.once('stateChanged', function() {
 			assert.strictEqual(0, renderer.update.callCount);
 			done();
+		});
+	});
+
+	describe('SYNC_UPDATES', function() {
+		it('should call the update method synchronously if state changes', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.SYNC_UPDATES = true;
+
+			var component = new TestComponent();
+			renderer = new ComponentRenderer(component);
+			sinon.spy(renderer, 'update');
+
+			component.addToState('foo');
+			component.emit('render');
+
+			component.foo = 'foo';
+			var expectedData = {
+				foo: {
+					key: 'foo',
+					prevVal: undefined,
+					newVal: 'foo'
+				}
+			};
+			assert.strictEqual(1, renderer.update.callCount);
+			assert.deepEqual(expectedData, renderer.update.args[0][0].changes);
+
+			component.foo = 'bar';
+			expectedData = {
+				foo: {
+					key: 'foo',
+					prevVal: 'foo',
+					newVal: 'bar'
+				}
+			};
+			assert.strictEqual(2, renderer.update.callCount);
+			assert.deepEqual(expectedData, renderer.update.args[1][0].changes);
+		});
+
+		it('should not call the update method when state changes before render', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.SYNC_UPDATES = true;
+
+			var component = new TestComponent({}, false);
+			renderer = new ComponentRenderer(component);
+			sinon.spy(renderer, 'update');
+
+			component.addToState('foo');
+			component.foo = 'foo';
+			assert.strictEqual(0, renderer.update.callCount);
+		});
+
+		it('should not call the update method if state changes while skipping updates', function(done) {
+			var component = new Component();
+			renderer = new ComponentRenderer(component);
+			sinon.spy(renderer, 'update');
+
+			component.addToState('foo');
+			component.emit('render');
+
+			renderer.startSkipUpdates();
+			component.foo = 'foo';
+			component.once('stateChanged', function() {
+				assert.strictEqual(0, renderer.update.callCount);
+
+				renderer.stopSkipUpdates();
+				component.foo = 'foo2';
+				component.once('stateChanged', function() {
+					assert.strictEqual(1, renderer.update.callCount);
+					done();
+				});
+			});
 		});
 	});
 });

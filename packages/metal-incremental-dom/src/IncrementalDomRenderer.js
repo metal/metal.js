@@ -709,8 +709,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * "element" property.
 	 */
 	update() {
-		if (this.hasChangedBesidesElement_(this.changes_) &&
-			this.shouldUpdate(this.changes_)) {
+		var changed = Object.keys(this.changes_).length > 0;
+		if (changed && this.shouldUpdate(this.changes_)) {
 			this.patch();
 		}
 	}

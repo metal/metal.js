@@ -123,6 +123,8 @@ class Component extends State {
 		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
 		core.mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
 
+		this.element = this.initialConfig_.element;
+
 		this.renderer_ = this.createRenderer();
 		this.renderer_.on('rendered', this.rendered.bind(this));
 
@@ -132,6 +134,7 @@ class Component extends State {
 		this.addListenersFromObj_(this.events);
 
 		this.created();
+		this.componentCreated_ = true;
 		if (opt_parentElement !== false) {
 			this.render_(opt_parentElement);
 		}
@@ -147,6 +150,14 @@ class Component extends State {
 			classesToAdd = classesToAdd + ' ' + this.elementClasses;
 		}
 		dom.addClasses(this.element, classesToAdd);
+	}
+
+	/**
+	 * Getter logic for the element property.
+	 * @return {Element}
+	 */
+	get element() {
+		return this.elementVal_;
 	}
 
 	/**
@@ -442,13 +453,6 @@ class Component extends State {
 	 * @protected
 	 */
 	onElementChanged_(event) {
-		if (event.prevVal === event.newVal) {
-			// The `elementChanged` event will be fired whenever the element is set,
-			// even if its value hasn't actually changed, since that's how State
-			// handles objects. We need to check manually here.
-			return;
-		}
-
 		this.setUpProxy_();
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		if (event.newVal) {
@@ -546,18 +550,28 @@ class Component extends State {
 	}
 
 	/**
-	 * Setter logic for element state key.
-	 * @param {string|Element} newVal
-	 * @param {Element} currentVal
-	 * @return {Element}
-	 * @protected
+	 * Setter logic for the element property.
+	 * @param {?string|Element} val
 	 */
-	setterElementFn_(newVal, currentVal) {
-		var element = newVal;
-		if (element) {
-			element = dom.toElement(newVal) || currentVal;
+	set element(val) {
+		if (!core.isElement(val) && !core.isString(val) && core.isDefAndNotNull(val)) {
+			return;
 		}
-		return element;
+
+		if (val) {
+			val = dom.toElement(val) || this.elementVal_;
+		}
+
+		if (this.elementVal_ !== val) {
+			var prev = this.elementVal_;
+			this.elementVal_ = val;
+			if (this.componentCreated_) {
+				this.emit('elementChanged', {
+					prevVal: prev,
+					newVal: val
+				});
+			}
+		}
 	}
 
 	/**
@@ -644,16 +658,6 @@ class Component extends State {
 	}
 
 	/**
-	 * Validator logic for element state key.
-	 * @param {?string|Element} val
-	 * @return {boolean} True if val is a valid element.
-	 * @protected
-	 */
-	validatorElementFn_(val) {
-		return core.isElement(val) || core.isString(val) || !core.isDefAndNotNull(val);
-	}
-
-	/**
 	 * Validator logic for the `events` state key.
 	 * @param {Object} val
 	 * @return {boolean}
@@ -670,16 +674,6 @@ class Component extends State {
  * @static
  */
 Component.STATE = {
-	/**
-	 * Component element bounding box.
-	 * @type {Element}
-	 * @writeOnce
-	 */
-	element: {
-		setter: 'setterElementFn_',
-		validator: 'validatorElementFn_'
-	},
-
 	/**
 	 * CSS classes to be applied to the element.
 	 * @type {string}
@@ -740,7 +734,7 @@ Component.SYNC_UPDATES = false;
  * A list with state key names that will automatically be rejected as invalid.
  * @type {!Array<string>}
  */
-Component.INVALID_KEYS = ['components', 'wasRendered'];
+Component.INVALID_KEYS = ['components', 'element', 'wasRendered'];
 
 /**
  * Sets a prototype flag to easily determine if a given constructor is for

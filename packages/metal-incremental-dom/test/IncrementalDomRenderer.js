@@ -2134,7 +2134,7 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(!item1.isDisposed());
 
 				child.index = 1;
-				component.once('stateSynced', function() {
+				child.once('stateSynced', function() {
 					assert.strictEqual(child, component.components.child);
 					assert.ok(!component.components.item1);
 					assert.ok(component.components.item2);

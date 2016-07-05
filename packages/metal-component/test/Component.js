@@ -191,6 +191,13 @@ describe('Component', function() {
 			assert.strictEqual(element, comp.element);
 		});
 
+		it('should not set component element to value with invalid type', function() {
+			comp = new Component();
+			comp.element = 2;
+			assert.ok(comp.element);
+			assert.notStrictEqual(2, comp.element);
+		});
+
 		it('should set component elementClasses', function(done) {
 			comp = new Component({
 				elementClasses: 'foo bar'

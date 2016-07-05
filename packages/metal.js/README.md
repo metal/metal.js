@@ -9,11 +9,12 @@ Metal.js is a JavaScript library for building UI components in a solid, flexible
 Even though it's powerful, Metal.js is very small, being only around 9kb after compressed with gzip. It's also really well tested, currently with 99% coverage of unit tests, besides having great performance.
 
 * [Official website](http://metaljs.com)
+* [Website repository](https://github.com/liferay/metaljs.com)
 * [Documentation](https://github.com/metal/metal.js/wiki)
 
 ## Install
 
-Install via [npm](https://www.npmjs.com/), or [download as a zip](https://github.com/metal/metal.js/archive/master.zip):
+Install via [npm](https://www.npmjs.com/), [Bower](http://bower.io/), or [download as a zip](https://github.com/metal/metal.js/archive/master.zip):
 
 ```
 npm install metal
@@ -35,6 +36,15 @@ Note that Metal.js is written in [ES6](https://babeljs.io/docs/learn-es6/) (a.k.
 ## Tools
 
 Metal.js comes together with a set of [gulp](http://gulpjs.com) tasks designed to help develop with it. To learn more about them and use them, take a look at [gulp-metal](https://github.com/metal/gulp-metal).
+
+## Team
+
+*Metal.js* was made with love by these people and a bunch of [awesome contributors](https://github.com/liferay/metal.js/graphs/contributors).
+
+| Author | Maintainer |
+|:-:|:-:|
+| [![Eduardo Lundgren](https://avatars3.githubusercontent.com/u/113087?s=70)](https://github.com/eduardolundgren) | [![Maira Bello](https://avatars2.githubusercontent.com/u/5216049?s=70)](https://github.com/mairatma) |
+| [Eduardo Lundgren](https://github.com/eduardolundgren) | [Maira Bello](https://github.com/mairatma) |
 
 ## Browser Support
 

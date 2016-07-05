@@ -24,7 +24,13 @@ Metal.js is a JavaScript library for building UI components in a solid, flexible
   lerna bootstrap
   ```
 
-4. Run tests:
+4. Install local dependencies
+
+  ```
+  npm install
+  ```
+
+5. Run tests:
 
   ```
   npm test

@@ -1,6 +1,6 @@
 {
   "name": "metal",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0",
   "description": "Build UI components in a solid, flexible way",
   "license": "BSD-3-Clause",
   "repository": "https://github.com/metal/metal/tree/master/packages/metal.js",

@@ -1,6 +1,6 @@
 {
   "name": "metal-events",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0",
   "description": "Classes responsible for emitting and listening to events",
   "license": "BSD",
   "repository": "https://github.com/metal/metal/tree/master/packages/metal-events",
@@ -22,7 +22,7 @@
     "metal"
   ],
   "dependencies": {
-    "metal": "^1.0.0-rc.1"
+    "metal": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

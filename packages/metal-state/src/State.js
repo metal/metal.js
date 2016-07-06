@@ -15,13 +15,13 @@ class State extends EventEmitter {
 	 * Constructor function for `State`.
 	 * @param {Object=} opt_config Optional config object with initial values to
 	 *     set state properties to.
-	 * @param {string=} opt_objName Optional name of the object inside `this` that
-	 *     should hold the state properties. If none is given, they will be added
-	 *     directly to `this` instead.
+	 * @param {Object=} opt_obj Optional object that should hold the state
+	 *     properties. If none is given, they will be added directly to `this`
+	 *     instead.
 	 * @param {Object=} opt_commonOpts Optional common option values to be used
 	 *     by all this instance's state properties.
 	 */
-	constructor(opt_config, opt_objName, opt_commonOpts) {
+	constructor(opt_config, opt_obj, opt_commonOpts) {
 		super();
 
 		/**
@@ -32,12 +32,12 @@ class State extends EventEmitter {
 		this.commonOpts_ = opt_commonOpts;
 
 		/**
-		 * Name of the object inside `this` that should hold the state properties.
-		 * If none is given, they will be added directly to `this` instead.
-		 * @type {?string}
+		 * Object that should hold the state properties. If none is given, they will
+		 * be added directly to `this` instead.
+		 * @type {!Object}
 		 * @protected
 		 */
-		this.objName_ = opt_objName;
+		this.obj_ = opt_obj || this;
 
 		/**
 		 * Object with information about the batch event that is currently
@@ -56,7 +56,6 @@ class State extends EventEmitter {
 
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
-		this.prepareStateObj_();
 		this.addToStateFromStaticHint_(opt_config);
 	}
 
@@ -70,7 +69,7 @@ class State extends EventEmitter {
 	addKeyToState(name, config, initialValue) {
 		this.buildKeyInfo_(name, config, initialValue);
 		Object.defineProperty(
-			this.getStateObj(),
+			this.obj_,
 			name,
 			this.buildKeyPropertyDef_(name)
 		);
@@ -131,7 +130,7 @@ class State extends EventEmitter {
 
 		if (opt_contextOrInitialValue !== false) {
 			Object.defineProperties(
-				opt_contextOrInitialValue || this.getStateObj(),
+				opt_contextOrInitialValue || this.obj_,
 				props
 			);
 		}
@@ -147,7 +146,7 @@ class State extends EventEmitter {
 		var ctor = this.constructor;
 		var defineContext;
 		var merged = State.mergeStateStatic(ctor);
-		if (!core.isDef(this.objName_)) {
+		if (this.obj_ === this) {
 			defineContext = merged ? ctor.prototype : false;
 		}
 		this.addToState(ctor.STATE_MERGED, opt_config, defineContext);
@@ -301,7 +300,7 @@ class State extends EventEmitter {
 	 * @return {*}
 	 */
 	get(name) {
-		return this.getStateObj()[name];
+		return this.obj_[name];
 	}
 
 	/**
@@ -349,15 +348,6 @@ class State extends EventEmitter {
 	getStateKeyValue_(name) {
 		this.initStateKey_(name);
 		return this.stateInfo_[name].value;
-	}
-
-	/**
-	 * Gets the object that contains this instance's state properties.
-	 * @return {!Object}
-	 */
-	getStateObj() {
-		var name = this.objName_;
-		return core.isDef(name) ? this[name] : this;
 	}
 
 	/**
@@ -458,23 +448,12 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Prepares the object that will hold state properties, creating it if it
-	 * doesn't exist yet.
-	 * @protected
-	 */
-	prepareStateObj_() {
-		if (this.objName_ && !this[this.objName_]) {
-			this[this.objName_] = {};
-		}
-	}
-
-	/**
 	 * Removes the requested state key.
 	 * @param {string} name The name of the key.
 	 */
 	removeStateKey(name) {
 		this.stateInfo_[name] = null;
-		delete this.getStateObj()[name];
+		delete this.obj_[name];
 	}
 
 	/**
@@ -510,7 +489,7 @@ class State extends EventEmitter {
 	 */
 	set(name, value) {
 		if (this.hasStateKey(name)) {
-			this.getStateObj()[name] = value;
+			this.obj_[name] = value;
 		}
 	}
 

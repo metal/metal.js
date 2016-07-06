@@ -78,7 +78,7 @@ describe('Soy', function() {
 
 			it('should not trigger update when changed state key is not used by template', function(done) {
 				comp = new HelloWorldComponent();
-				comp.addToState('foo');
+				comp.getDataManager().getStateInstance().addToState('foo');
 
 				comp.foo = 'Bar';
 				comp.once('stateSynced', function() {
@@ -105,7 +105,7 @@ describe('Soy', function() {
 					return true;
 				};
 				comp = new HelloWorldComponent();
-				comp.addToState('foo');
+				comp.getDataManager().getStateInstance().addToState('foo');
 
 				comp.foo = 'Bar';
 				comp.once('stateSynced', function() {

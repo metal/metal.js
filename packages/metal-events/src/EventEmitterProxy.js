@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, Disposable } from 'metal';
+import { array, object, Disposable } from 'metal';
 
 /**
  * EventEmitterProxy utility. It's responsible for linking two EventEmitter
@@ -25,7 +25,9 @@ class EventEmitterProxy extends Disposable {
 		 * @type {Object}
 		 * @protected
 		 */
-		this.blacklist_ = opt_blacklist || {};
+		this.blacklist_ = object.mixin({
+			newListener: true
+		}, opt_blacklist);
 
 		/**
 		 * The origin emitter. This emitter's events will be proxied through the

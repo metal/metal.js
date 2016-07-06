@@ -71,6 +71,21 @@ describe('State Tests', function() {
 		});
 	});
 
+	it('should not allow adding state key with name contained in key blacklist', function() {
+		class Test extends State {
+		}
+
+		var test = new Test();
+		test.setKeysBlacklist_({
+			invalid: true
+		});
+		assert.throws(function() {
+			test.addToState({
+				invalid: {}
+			});
+		});
+	});
+
 	it('should not allow adding state key named "state" on subclasses', function() {
 		class Test extends State {
 		}
@@ -819,6 +834,29 @@ describe('State Tests', function() {
 			assert.strictEqual(1, obj.key1);
 		});
 
+		it('should use given context object when calling functions', function() {
+			class Test extends State {
+				setFn(val) {
+					return 'Test: ' + val;
+				}
+			}
+			Test.prototype.setFn = sinon.stub();
+			Test.STATE = {
+				key1: {
+					setter: 'setFn',
+					value: 1
+				}
+			};
+
+			var obj = {
+				setFn(val) {
+					return 'obj:' + val;
+				}
+			};
+			new Test({}, obj, obj);
+			assert.strictEqual('obj:1', obj.key1);
+		});
+
 		it('should share given common options with all state properties', function() {
 			class Test extends State {
 			}
@@ -832,7 +870,7 @@ describe('State Tests', function() {
 			};
 
 			var obj = {};
-			new Test({}, obj, {
+			new Test({}, obj, obj, {
 				setter: val => val + 1
 			});
 			assert.strictEqual(2, obj.key1);

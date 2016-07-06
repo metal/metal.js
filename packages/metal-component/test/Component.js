@@ -3,6 +3,7 @@
 import { async, core } from 'metal';
 import { dom, features } from 'metal-dom';
 import Component from '../src/Component';
+import ComponentDataManager from '../src/ComponentDataManager';
 import ComponentRegistry from '../src/ComponentRegistry';
 import ComponentRenderer from '../src/ComponentRenderer';
 
@@ -145,7 +146,7 @@ describe('Component', function() {
 		});
 	});
 
-	describe('State', function() {
+	describe('Element', function() {
 		it('should create default value for component element after render', function() {
 			comp = new Component();
 			assert.ok(comp.element);
@@ -197,7 +198,9 @@ describe('Component', function() {
 			assert.ok(comp.element);
 			assert.notStrictEqual(2, comp.element);
 		});
+	});
 
+	describe('State', function() {
 		it('should set component elementClasses', function(done) {
 			comp = new Component({
 				elementClasses: 'foo bar'
@@ -293,6 +296,34 @@ describe('Component', function() {
 			var config = {};
 			comp = new Component(config);
 			assert.strictEqual(config, comp.getInitialConfig());
+		});
+
+		it('should return an array with all state property names', function() {
+			comp = new Component();
+			var expected = ['elementClasses', 'events', 'visible'];
+			assert.deepEqual(expected, comp.getStateKeys().sort());
+		});
+
+		it('should return an object with all state properties', function() {
+			comp = new Component({
+				elementClasses: 'myClass'
+			});
+			var expected = {
+				elementClasses: 'myClass',
+				events: null,
+				visible: true
+			};
+			assert.deepEqual(expected, comp.getState());
+		});
+
+		it('should set state values via the "setState" function', function() {
+			comp = new Component();
+			comp.setState({
+				elementClasses: 'myClass',
+				visible: false
+			});
+			assert.strictEqual('myClass', comp.elementClasses);
+			assert.ok(!comp.visible);
 		});
 
 		describe('events state key', function() {
@@ -890,6 +921,13 @@ describe('Component', function() {
 
 		var renderer = comp.getRenderer();
 		assert.ok(renderer instanceof ComponentRenderer);
+	});
+
+	it('should get the data manager instance', function() {
+		class TestComponent extends Component {
+		}
+		comp = new TestComponent();
+		assert.ok(comp.getDataManager() instanceof ComponentDataManager);
 	});
 
 	it('should check if the given function is a component constructor', function() {

@@ -18,10 +18,12 @@ class State extends EventEmitter {
 	 * @param {Object=} opt_obj Optional object that should hold the state
 	 *     properties. If none is given, they will be added directly to `this`
 	 *     instead.
+	 * @param {Object=} opt_context Optional context to call functions (like
+	 *     validators and setters) on. Defaults to `this`.
 	 * @param {Object=} opt_commonOpts Optional common option values to be used
 	 *     by all this instance's state properties.
 	 */
-	constructor(opt_config, opt_obj, opt_commonOpts) {
+	constructor(opt_config, opt_obj, opt_context, opt_commonOpts) {
 		super();
 
 		/**
@@ -32,8 +34,21 @@ class State extends EventEmitter {
 		this.commonOpts_ = opt_commonOpts;
 
 		/**
-		 * Object that should hold the state properties. If none is given, they will
-		 * be added directly to `this` instead.
+		 * Context to call functions (like validators and setters) on.
+		 * @type {!Object}
+		 * @protected
+		 */
+		this.context_ = opt_context || this;
+
+		/**
+		 * Map of keys that can not be used as state keys.
+		 * @param {!Object<string, boolean>}
+		 * @protected
+		 */
+		this.keysBlacklist_ = {};
+
+		/**
+		 * Object that should hold the state properties.
 		 * @type {!Object}
 		 * @protected
 		 */
@@ -160,7 +175,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	assertValidStateKeyName_(name) {
-		if (this.constructor.INVALID_KEYS_MERGED[name]) {
+		if (this.constructor.INVALID_KEYS_MERGED[name] || this.keysBlacklist_[name]) {
 			throw new Error('It\'s not allowed to create a state key with the name "' + name + '".');
 		}
 	}
@@ -215,9 +230,9 @@ class State extends EventEmitter {
 	 */
 	callFunction_(fn, args) {
 		if (core.isString(fn)) {
-			return this[fn].apply(this, args);
+			return this.context_[fn].apply(this.context_, args);
 		} else if (core.isFunction(fn)) {
-			return fn.apply(this, args);
+			return fn.apply(this.context_, args);
 		}
 	}
 
@@ -521,6 +536,14 @@ class State extends EventEmitter {
 			this.set(name, info.initialValue);
 			info.initialValue = undefined;
 		}
+	}
+
+	/**
+	 * Sets a map of keys that are not valid state keys.
+	 * @param {!Object<string, boolean>}
+	 */
+	setKeysBlacklist_(blacklist) {
+		this.keysBlacklist_ = blacklist;
 	}
 
 	/**

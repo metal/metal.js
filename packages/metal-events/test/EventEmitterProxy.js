@@ -48,7 +48,7 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(1, listener.callCount);
 	});
 
-	it('should not proxy whitelisted and blacklisted events at the same time', function() {
+	it('should not proxy event that is both whitelisted and blacklisted', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();
 		new EventEmitterProxy(origin, target, {
@@ -62,6 +62,18 @@ describe('EventEmitterProxy', function() {
 		target.on('event2', listener);
 		origin.emit('event1', 1, 2);
 		origin.emit('event2', 1, 2);
+
+		assert.strictEqual(0, listener.callCount);
+	});
+
+	it('should not proxy "newListener" event from origin to target', function() {
+		var origin = new EventEmitter();
+		var target = new EventEmitter();
+		new EventEmitterProxy(origin, target);
+
+		var listener = sinon.stub();
+		target.on('newListener', listener);
+		origin.emit('newListener');
 
 		assert.strictEqual(0, listener.callCount);
 	});

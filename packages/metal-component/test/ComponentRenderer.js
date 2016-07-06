@@ -44,11 +44,11 @@ describe('ComponentRenderer', function() {
 	});
 
 	it('should not call the update method if state changes before render', function(done) {
-		var component = new Component({}, false);
+		var TestComponent = createTestComponent();
+		var component = new TestComponent({}, false);
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
-		component.addToState('foo');
 		component.foo = 'foo';
 		component.once('stateChanged', function() {
 			assert.strictEqual(0, renderer.update.callCount);
@@ -57,13 +57,12 @@ describe('ComponentRenderer', function() {
 	});
 
 	it('should call the update method asynchronously if state changes', function(done) {
-		var component = new Component();
+		var TestComponent = createTestComponent();
+		var component = new TestComponent();
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
-		component.addToState('foo');
 		component.emit('render');
-
 		component.foo = 'foo';
 		assert.strictEqual(0, renderer.update.callCount);
 		component.once('stateChanged', function() {
@@ -93,12 +92,33 @@ describe('ComponentRenderer', function() {
 		});
 	});
 
-	it('should not call update method after disposed', function(done) {
-		var component = new Component();
+	it('should not call the update method if state changes while skipping updates', function(done) {
+		var TestComponent = createTestComponent();
+		var component = new TestComponent();
 		renderer = new ComponentRenderer(component);
 		sinon.spy(renderer, 'update');
 
-		component.addToState('foo');
+		component.emit('render');
+		renderer.startSkipUpdates();
+		component.foo = 'foo';
+		component.once('stateChanged', function() {
+			assert.strictEqual(0, renderer.update.callCount);
+
+			renderer.stopSkipUpdates();
+			component.foo = 'foo2';
+			component.once('stateChanged', function() {
+				assert.strictEqual(1, renderer.update.callCount);
+				done();
+			});
+		});
+	});
+
+	it('should not call update method after disposed', function(done) {
+		var TestComponent = createTestComponent();
+		var component = new TestComponent();
+		renderer = new ComponentRenderer(component);
+		sinon.spy(renderer, 'update');
+
 		component.emit('render');
 		renderer.dispose();
 
@@ -111,17 +131,14 @@ describe('ComponentRenderer', function() {
 
 	describe('SYNC_UPDATES', function() {
 		it('should call the update method synchronously if state changes', function() {
-			class TestComponent extends Component {
-			}
+			var TestComponent = createTestComponent();
 			TestComponent.SYNC_UPDATES = true;
 
 			var component = new TestComponent();
 			renderer = new ComponentRenderer(component);
 			sinon.spy(renderer, 'update');
 
-			component.addToState('foo');
 			component.emit('render');
-
 			component.foo = 'foo';
 			var expectedData = {
 				foo: {
@@ -146,39 +163,25 @@ describe('ComponentRenderer', function() {
 		});
 
 		it('should not call the update method when state changes before render', function() {
-			class TestComponent extends Component {
-			}
+			var TestComponent = createTestComponent();
 			TestComponent.SYNC_UPDATES = true;
 
 			var component = new TestComponent({}, false);
 			renderer = new ComponentRenderer(component);
 			sinon.spy(renderer, 'update');
 
-			component.addToState('foo');
 			component.foo = 'foo';
 			assert.strictEqual(0, renderer.update.callCount);
 		});
-
-		it('should not call the update method if state changes while skipping updates', function(done) {
-			var component = new Component();
-			renderer = new ComponentRenderer(component);
-			sinon.spy(renderer, 'update');
-
-			component.addToState('foo');
-			component.emit('render');
-
-			renderer.startSkipUpdates();
-			component.foo = 'foo';
-			component.once('stateChanged', function() {
-				assert.strictEqual(0, renderer.update.callCount);
-
-				renderer.stopSkipUpdates();
-				component.foo = 'foo2';
-				component.once('stateChanged', function() {
-					assert.strictEqual(1, renderer.update.callCount);
-					done();
-				});
-			});
-		});
 	});
+
+	function createTestComponent() {
+		class TestComponent extends Component {
+		}
+		TestComponent.STATE = {
+			foo: {
+			}
+		};
+		return TestComponent;
+	}
 });

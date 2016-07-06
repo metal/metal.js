@@ -2,9 +2,9 @@
 
 import { array, core, object } from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
+import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
-import { EventHandler } from 'metal-events';
-import State from 'metal-state';
+import { EventEmitter, EventHandler } from 'metal-events';
 
 /**
  * Component collects common behaviors to be followed by UI components, such
@@ -50,7 +50,7 @@ import State from 'metal-state';
  *
  * @extends {State}
  */
-class Component extends State {
+class Component extends EventEmitter {
 	/**
 	 * Constructor function for `Component`.
 	 * @param {Object=} opt_config An object with the initial values for this
@@ -62,7 +62,7 @@ class Component extends State {
 	 * @constructor
 	 */
 	constructor(opt_config, opt_parentElement) {
-		super(opt_config);
+		super();
 
 		/**
 		 * All listeners that were attached until the `DomEventEmitterProxy` instance
@@ -125,13 +125,15 @@ class Component extends State {
 
 		this.element = this.initialConfig_.element;
 
+		this.dataManager_ = this.createDataManager();
+
 		this.renderer_ = this.createRenderer();
 		this.renderer_.on('rendered', this.rendered.bind(this));
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
 		this.on('eventsChanged', this.onEventsChanged_);
-		this.addListenersFromObj_(this.events);
+		this.addListenersFromObj_(this.dataManager_.get('events'));
 
 		this.created();
 		this.componentCreated_ = true;
@@ -146,8 +148,9 @@ class Component extends State {
 	 */
 	addElementClasses() {
 		var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
-		if (this.elementClasses) {
-			classesToAdd = classesToAdd + ' ' + this.elementClasses;
+		var elementClasses = this.dataManager_.get('elementClasses');
+		if (elementClasses) {
+			classesToAdd = classesToAdd + ' ' + elementClasses;
 		}
 		dom.addClasses(this.element, classesToAdd);
 	}
@@ -232,6 +235,16 @@ class Component extends State {
 	created() {}
 
 	/**
+	 * Creates the data manager for this component. Sub classes can override this
+	 * to return a custom manager as needed.
+	 * @return {!ComponentDataManager}
+	 */
+	createDataManager() {
+		core.mergeSuperClassesProperty(this.constructor, 'DATA_MANAGER', array.firstDefinedValue);
+		return new this.constructor.DATA_MANAGER_MERGED(this, Component.DATA);
+	}
+
+	/**
 	 * Creates the renderer for this component. Sub classes can override this to
 	 * return a custom renderer as needed.
 	 * @return {!ComponentRenderer}
@@ -304,6 +317,9 @@ class Component extends State {
 		this.disposeSubComponents(Object.keys(this.components));
 		this.components = null;
 
+		this.dataManager_.dispose();
+		this.dataManager_ = null;
+
 		this.renderer_.dispose();
 		this.renderer_ = null;
 
@@ -346,6 +362,14 @@ class Component extends State {
 	}
 
 	/**
+	 * Gets the `ComponentDataManager` instance being used.
+	 * @return {!ComponentDataManager}
+	 */
+	getDataManager() {
+		return this.dataManager_;
+	}
+
+	/**
 	 * Gets the configuration object that was passed to this component's constructor.
 	 * @return {!Object}
 	 */
@@ -369,6 +393,22 @@ class Component extends State {
 				'sure that you specify valid function names when adding inline listeners.'
 			);
 		}
+	}
+
+	/**
+	 * Gets state data for this component.
+	 * @return {!Object}
+	 */
+	getState() {
+		return this.dataManager_.getState();
+	}
+
+	/**
+	 * Gets the keys for the state data.
+	 * @return {!Array<string>}
+	 */
+	getStateKeys() {
+		return this.dataManager_.getStateKeys();
 	}
 
 	/**
@@ -457,7 +497,7 @@ class Component extends State {
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		if (event.newVal) {
 			this.addElementClasses();
-			this.syncVisible(this.visible);
+			this.syncVisible(this.dataManager_.get('visible'));
 		}
 	}
 
@@ -575,6 +615,17 @@ class Component extends State {
 	}
 
 	/**
+	 * Sets the value of all the specified state keys.
+	 * @param {!Object.<string,*>} values A map of state keys to the values they
+	 *   should be set to.
+	 * @param {function()=} opt_callback An optional function that will be run
+	 *   after the next batched update is triggered.
+	 */
+	setState(state, opt_callback) {
+		this.dataManager_.setState(state, opt_callback);
+	}
+
+	/**
 	 * Creates the `DomEventEmitterProxy` instance and has it start proxying any
 	 * listeners that have already been listened to.
 	 * @protected
@@ -599,7 +650,7 @@ class Component extends State {
 	 * @protected
 	 */
 	syncState_() {
-		var keys = this.getStateKeys();
+		var keys = this.dataManager_.getStateKeys();
 		for (var i = 0; i < keys.length; i++) {
 			this.fireStateKeyChange_(keys[i]);
 		}
@@ -669,11 +720,11 @@ class Component extends State {
 }
 
 /**
- * Component state definition.
+ * Component data definition.
  * @type {Object}
  * @static
  */
-Component.STATE = {
+Component.DATA = {
 	/**
 	 * CSS classes to be applied to the element.
 	 * @type {string}
@@ -706,6 +757,13 @@ Component.STATE = {
 Component.COMPONENT_FLAG = '__metal_component__';
 
 /**
+ * The `ComponentDataManager` class that should be used. This class will be
+ * responsible for handling the component's data. Each component may have its
+ * own implementation.
+ */
+Component.DATA_MANAGER = ComponentDataManager;
+
+/**
  * CSS classes to be applied to the element.
  * @type {string}
  * @protected
@@ -729,12 +787,6 @@ Component.RENDERER = ComponentRenderer;
  * @type {boolean}
  */
 Component.SYNC_UPDATES = false;
-
-/**
- * A list with state key names that will automatically be rejected as invalid.
- * @type {!Array<string>}
- */
-Component.INVALID_KEYS = ['components', 'element', 'wasRendered'];
 
 /**
  * Sets a prototype flag to easily determine if a given constructor is for

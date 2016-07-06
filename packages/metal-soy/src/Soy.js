@@ -33,9 +33,10 @@ class Soy extends IncrementalDomRenderer {
 
 		var keys = elementTemplate.params || [];
 		var component = this.component_;
+		var state = component.getDataManager().getStateInstance();
 		for (var i = 0; i < keys.length; i++) {
-			if (!component.getStateKeyConfig(keys[i]) && !component[keys[i]]) {
-				component.addToState(keys[i], {}, component.getInitialConfig()[keys[i]]);
+			if (!state.hasStateKey(keys[i]) && !component[keys[i]]) {
+				state.addToState(keys[i], {}, component.getInitialConfig()[keys[i]]);
 			}
 		}
 	}
@@ -109,7 +110,8 @@ class Soy extends IncrementalDomRenderer {
 	 * @protected
 	 */
 	isHtmlParam_(name) {
-		if (this.component_.getStateKeyConfig(name).isHtml) {
+		var state = this.component_.getDataManager().getStateInstance();
+		if (state.getStateKeyConfig(name).isHtml) {
 			return true;
 		}
 		var type = this.soyParamTypes_[name] || '';

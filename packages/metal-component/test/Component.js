@@ -110,7 +110,6 @@ describe('Component', function() {
 			comp = new TestComponent();
 
 			var renderer = comp.getRenderer();
-			renderer.emit('rendered', true);
 			assert.strictEqual(1, comp.rendered.callCount);
 			assert.ok(comp.rendered.args[0][0]);
 

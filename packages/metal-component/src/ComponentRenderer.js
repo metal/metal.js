@@ -20,6 +20,7 @@ class ComponentRenderer extends EventEmitter {
 		this.componentRendererEvents_.add(
 			this.component_.once('render', this.render.bind(this))
 		);
+		this.on('rendered', this.handleRendered_);
 
 		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
 			this.componentRendererEvents_.add(
@@ -56,7 +57,7 @@ class ComponentRenderer extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentRendererStateChanged_(changes) {
-		if (this.component_.wasRendered) {
+		if (this.isRendered_ && !this.skipUpdates_) {
 			this.update(changes);
 		}
 	}
@@ -69,7 +70,7 @@ class ComponentRenderer extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentRendererStateKeyChanged_(data) {
-		if (this.component_.wasRendered) {
+		if (this.isRendered_ && !this.skipUpdates_) {
 			this.update({
 				changes: {
 					[data.key]: data
@@ -79,17 +80,40 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
+	 * Handles the "rendered" event.
+	 * @protected
+	 */
+	handleRendered_() {
+		this.isRendered_ = true;
+	}
+
+	/**
 	 * Renders the component's whole content (including its main element).
 	 */
 	render() {
 		if (!this.component_.element) {
 			this.component_.element = document.createElement('div');
 		}
+		this.emit('rendered', !this.isRendered_);
 	}
 
 	/**
-	 * Updates the component's element html. This is automatically called by
-	 * the component when the value of at least one of its state keys has changed.
+	 * Skips updates until `stopSkipUpdates` is called.
+	 */
+	startSkipUpdates() {
+		this.skipUpdates_ = true;
+	}
+
+	/**
+	 * Stops skipping updates.
+	 */
+	stopSkipUpdates() {
+		this.skipUpdates_ = false;
+	}
+
+	/**
+	 * Updates the component's element html. This is automatically called when
+	 * the value of at least one of the component's state keys has changed.
 	 * @param {Object.<string, Object>} changes Object containing the names
 	 *     of all changed state keys, each mapped to an object with its new
 	 *     (newVal) and previous (prevVal) values.

@@ -152,6 +152,31 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
+		it('should rerender immediately if state is changed inside "rendered" and SYNC_UPDATES is true', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text(this.foo);
+					IncDom.elementClose('div');
+				}
+
+				rendered() {
+					if (!this.foo) {
+						this.foo = 'foo';
+					}
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+				}
+			};
+			TestComponent.SYNC_UPDATES = true;
+
+			component = new TestComponent();
+			assert.strictEqual('foo', component.element.textContent);
+		});
+
 		it('should run component\'s "rendered" lifecycle method on updates', function(done) {
 			var calledArgs = [];
 			class TestComponent extends Component {
@@ -1462,6 +1487,34 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(child.element);
 				assert.strictEqual(1, component.element.childNodes.length);
 				assert.strictEqual(child.element, component.element.childNodes[0]);
+				done();
+			});
+		});
+
+		it('should not render sub component with SYNC_UPDATES twice', function(done) {
+			ChildComponent.SYNC_UPDATES = true;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+			sinon.spy(child, 'render');
+
+			component.foo = 'bar';
+			component.once('stateSynced', function() {
+				assert.strictEqual(1, child.render.callCount);
 				done();
 			});
 		});

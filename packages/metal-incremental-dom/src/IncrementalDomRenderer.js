@@ -153,7 +153,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		if (comp.wasRendered) {
 			this.setConfig_(comp, config);
+			comp.getRenderer().startSkipUpdates();
 			comp.setState(config);
+			comp.getRenderer().stopSkipUpdates();
 		}
 		return comp;
 	}
@@ -539,7 +541,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		} else {
 			this.component_.addElementClasses();
 		}
-		this.emit('rendered', !this.component_.wasRendered);
+		this.emit('rendered', !this.isRendered_);
 		IncrementalDomRenderer.finishedRenderingComponent();
 	}
 

@@ -1,6 +1,6 @@
 {
   "name": "metal-incremental-dom",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Component renderer for templates compiled to incremental dom",
   "license": "BSD",
   "repository": "https://github.com/metal/metal/tree/master/packages/metal-incremental-dom",
@@ -23,7 +23,7 @@
   ],
   "dependencies": {
     "metal": "^1.0.0",
-    "metal-component": "^1.0.0",
+    "metal-component": "^1.0.1",
     "metal-dom": "^1.0.0"
   },
   "devDependencies": {

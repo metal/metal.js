@@ -22,18 +22,19 @@ class ComponentRenderer extends EventEmitter {
 		);
 		this.on('rendered', this.handleRendered_);
 
+		var manager = component.getDataManager();
 		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
 			this.componentRendererEvents_.add(
-				this.component_.on(
-					'stateKeyChanged',
-					this.handleComponentRendererStateKeyChanged_.bind(this)
+				manager.on(
+					'dataPropChanged',
+					this.handleManagerDataPropChanged_.bind(this)
 				)
 			);
 		} else {
 			this.componentRendererEvents_.add(
-				this.component_.on(
-					'stateChanged',
-					this.handleComponentRendererStateChanged_.bind(this)
+				manager.on(
+					'dataChanged',
+					this.handleManagerDataChanged_.bind(this)
 				)
 			);
 		}
@@ -48,7 +49,7 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
-	 * Handles a `stateChanged` event from this renderer's component. Calls the
+	 * Handles a `dataChanged` event from the component's data manager. Calls the
 	 * `update` function if the component has already been rendered for the first
 	 * time.
 	 * @param {!Object<string, Object>} changes Object containing the names
@@ -56,20 +57,20 @@ class ComponentRenderer extends EventEmitter {
 	 *     (newVal) and previous (prevVal) values.
 	 * @protected
 	 */
-	handleComponentRendererStateChanged_(changes) {
+	handleManagerDataChanged_(changes) {
 		if (this.shouldRerender_()) {
 			this.update(changes);
 		}
 	}
 
 	/**
-	 * Handles a `stateKeyChanged` event from this renderer's component. This is
-	 * similar to `handleComponentRendererStateChanged_`, but only called for
+	 * Handles a `dataPropChanged` event from the component's data manager. This
+	 * is similar to `handleManagerDataChanged_`, but only called for
 	 * components that have requested updates to happen synchronously.
 	 * @param {!{key: string, newVal: *, prevVal: *}} data
 	 * @protected
 	 */
-	handleComponentRendererStateKeyChanged_(data) {
+	handleManagerDataPropChanged_(data) {
 		if (this.shouldRerender_()) {
 			this.update({
 				changes: {

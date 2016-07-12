@@ -25,14 +25,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.changes_ = {};
 		comp.on('attached', this.handleAttached_.bind(this));
 
+		var manager = comp.getDataManager();
 		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
 			// If the component is being updated synchronously we'll just reuse the
 			// `handleComponentRendererStateKeyChanged_` function from
 			// `ComponentRenderer`.
-			comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
+			manager.on('dataPropChanged', this.handleDataPropChanged_.bind(this));
 		}
 
-		comp.getDataManager().add(
+		manager.add(
 			'children',
 			{
 				validator: Array.isArray,
@@ -283,16 +284,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles the `stateKeyChanged` event. Overrides original method from
-	 * `ComponentRenderer` to guarantee that `IncrementalDomRenderer`'s logic
-	 * will run first.
+	 * Handles the `dataPropChanged` event. Stores data that has changed since the
+	 * last render.
 	 * @param {!Object} data
-	 * @override
 	 * @protected
 	 */
-	handleComponentRendererStateKeyChanged_(data) {
-		this.handleStateKeyChanged_(data);
-		super.handleComponentRendererStateKeyChanged_(data);
+	handleDataPropChanged_(data) {
+		this.changes_[data.key] = data;
 	}
 
 	/**
@@ -374,6 +372,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Handles the `dataPropChanged` event. Overrides original method from
+	 * `ComponentRenderer` to guarantee that `IncrementalDomRenderer`'s logic
+	 * will run first.
+	 * @param {!Object} data
+	 * @override
+	 * @protected
+	 */
+	handleManagerDataPropChanged_(data) {
+		this.handleDataPropChanged_(data);
+		super.handleManagerDataPropChanged_(data);
+	}
+
+	/**
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom, done for a regular element. Adds any inline listeners found on the
 	 * first render and makes sure that component root elements are always reused.
@@ -391,16 +402,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.attachDecoratedListeners_(node, args);
 		this.updateElementIfNotReached_(node);
 		return node;
-	}
-
-	/**
-	 * Handles the `stateKeyChanged` event. Stores state properties that have
-	 * changed since the last render.
-	 * @param {!Object} data
-	 * @protected
-	 */
-	handleStateKeyChanged_(data) {
-		this.changes_[data.key] = data;
 	}
 
 	/**

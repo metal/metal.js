@@ -30,7 +30,8 @@
   "dependencies": {
     "metal-component": "^1.0.4",
     "metal-dom": "^1.0.4",
-    "metal-incremental-dom": "^1.0.4"
+    "metal-incremental-dom": "^1.0.4",
+    "metal-state": "^1.0.4"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

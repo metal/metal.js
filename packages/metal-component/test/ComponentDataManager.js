@@ -132,6 +132,17 @@ describe('ComponentDataManager', function() {
 		assert.deepEqual(['foo'], manager.getStateKeys());
 	});
 
+	it('should return list of sync keys', function() {
+		component = new Component();
+		manager = new ComponentDataManager(component, {
+			foo: {
+				value: 'fooValue'
+			}
+		});
+
+		assert.deepEqual(['foo'], manager.getSyncKeys());
+	});
+
 	it('should get value from state key', function() {
 		component = new Component();
 		manager = new ComponentDataManager(component, {

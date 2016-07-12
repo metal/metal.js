@@ -87,16 +87,12 @@ describe('JSXComponent', function() {
 		assert.strictEqual(child.element, component.element.childNodes[0]);
 	});
 
-	it('should receive state data from parent components', function() {
+	it('should receive props from parent components', function() {
 		class ChildComponent extends JSXComponent {
 			render() {
-				return <div class="child">{this.foo}</div>;
+				return <div class="child">{this.props.foo}</div>;
 			}
 		}
-		ChildComponent.STATE = {
-			foo: {
-			}
-		};
 
 		class TestComponent extends JSXComponent {
 			render() {
@@ -112,10 +108,10 @@ describe('JSXComponent', function() {
 	});
 
 	describe('Children', function() {
-		it('should be able to render children through the state property', function() {
+		it('should be able to render children through props', function() {
 			class ChildComponent extends JSXComponent {
 				render() {
-					return <div>{this.children}</div>;
+					return <div>{this.props.children}</div>;
 				}
 			}
 
@@ -135,21 +131,21 @@ describe('JSXComponent', function() {
 		it('should not throw error if trying to render empty children', function() {
 			class TestComponent extends JSXComponent {
 				render() {
-					return <div>{this.children}</div>;
+					return <div>{this.props.children}</div>;
 				}
 			}
 
 			component = new TestComponent();
 			assert.strictEqual(0, component.element.childNodes.length);
-			assert.ok(component.children);
-			assert.strictEqual(0, component.children.length);
+			assert.ok(component.props.children);
+			assert.strictEqual(0, component.props.children.length);
 		});
 
 		it('should be able to render only some of the received children', function() {
 			class ChildComponent extends JSXComponent {
 				render() {
 					return <div class="child">
-						{this.children[1]}
+						{this.props.children[1]}
 					</div>;
 				}
 			}
@@ -178,7 +174,7 @@ describe('JSXComponent', function() {
 		it('should be able to render a child without wrapper element', function() {
 			class ChildComponent extends JSXComponent {
 				render() {
-					return this.children[1];
+					return this.props.children[1];
 				}
 			}
 
@@ -207,8 +203,8 @@ describe('JSXComponent', function() {
 			class ChildComponent extends JSXComponent {
 				render() {
 					return <div class="child">
-						{this.children[0].config.foo}
-						{this.children}
+						{this.props.children[0].config.foo}
+						{this.props.children}
 					</div>;
 				}
 			}
@@ -238,13 +234,9 @@ describe('JSXComponent', function() {
 		it('should create and render components via "JSXComponent.render"', function() {
 			class TestComponent extends JSXComponent {
 				render() {
-					return <div class="test">{this.foo}</div>;
+					return <div class="test">{this.props.foo}</div>;
 				}
 			}
-			TestComponent.STATE = {
-				foo: {
-				}
-			};
 
 			var container = document.createElement('div');
 			component = JSXComponent.render(
@@ -264,8 +256,8 @@ describe('JSXComponent', function() {
 		});
 
 		it('should render componentless functions via "JSXComponent.render"', function() {
-			var fn = config => {
-				return <div class="test">{config.foo}</div>;
+			var fn = props => {
+				return <div class="test">{props.foo}</div>;
 			}
 			var container = document.createElement('div');
 			JSXComponent.render(
@@ -293,6 +285,56 @@ describe('JSXComponent', function() {
 			assert.strictEqual('DIV', container.childNodes[0].tagName);
 			assert.ok(dom.hasClass(container.childNodes[0], 'test'));
 			assert.strictEqual('foo', container.childNodes[0].textContent);
+		});
+	});
+
+	describe('STATE and PROPS', function() {
+		it('should allow specifying configuration for props', function() {
+			class TestComponent extends JSXComponent {
+			}
+			TestComponent.PROPS = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			}
+
+			component = new TestComponent();
+			assert.strictEqual('defaultFoo', component.props.foo);
+		});
+
+		it('should allow specifying internal state', function() {
+			class TestComponent extends JSXComponent {
+			}
+			TestComponent.STATE = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			}
+
+			component = new TestComponent();
+			assert.strictEqual('defaultFoo', component.state.foo);
+		});
+
+		it('should update if state changes', function(done) {
+			class TestComponent extends JSXComponent {
+				render() {
+					return <div>{this.state.foo}</div>
+				}
+			}
+			TestComponent.STATE = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			}
+
+			component = new TestComponent();
+			assert.strictEqual('defaultFoo', component.element.textContent);
+
+			component.state.foo = 'foo';
+			component.once('rendered', function() {
+				assert.strictEqual('foo', component.element.textContent);
+				done();
+			});
 		});
 	});
 });

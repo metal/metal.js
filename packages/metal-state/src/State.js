@@ -430,9 +430,8 @@ class State extends EventEmitter {
 	 * @param {!Array} values The values to be merged.
 	 * @return {!Object} The merged value.
 	 * @static
-	 * @protected
 	 */
-	static mergeState_(values) {
+	static mergeState(values) {
 		return object.mixin.apply(null, [{}].concat(values.reverse()));
 	}
 
@@ -443,7 +442,7 @@ class State extends EventEmitter {
 	 * @static
 	 */
 	static mergeStateStatic(ctor) {
-		return core.mergeSuperClassesProperty(ctor, 'STATE', State.mergeState_);
+		return core.mergeSuperClassesProperty(ctor, 'STATE', State.mergeState);
 	}
 
 	/**

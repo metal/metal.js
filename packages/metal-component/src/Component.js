@@ -128,7 +128,7 @@ class Component extends EventEmitter {
 		this.dataManager_ = this.createDataManager();
 
 		this.renderer_ = this.createRenderer();
-		this.renderer_.on('rendered', this.rendered.bind(this));
+		this.renderer_.on('rendered', this.handleRendererRendered_.bind(this));
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
@@ -440,6 +440,16 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Handles a `rendered` event from the current renderer instance.
+	 * @parma {!Object}
+	 * @protected
+	 */
+	handleRendererRendered_(data) {
+		this.rendered(data);
+		this.emit('rendered', data);
+	}
+
+	/**
 	 * Handles state batch changes. Calls any existing `sync` functions that
 	 * match the changed state keys.
 	 * @param {Event} event
@@ -650,7 +660,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	syncState_() {
-		var keys = this.dataManager_.getStateKeys();
+		var keys = this.dataManager_.getSyncKeys();
 		for (var i = 0; i < keys.length; i++) {
 			this.fireStateKeyChange_(keys[i]);
 		}

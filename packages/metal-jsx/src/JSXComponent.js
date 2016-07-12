@@ -3,16 +3,9 @@
 import './iDOMHelpers';
 import Component from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
+import JSXDataManager from './JSXDataManager';
 
 class JSXComponent extends Component {
-	/**
-	 * Overrides the original method to create a JSX renderer.
-	 * @return {!JSX}
-	 */
-	createRenderer() {
-		return new JSXRenderer(this);
-	}
-
 	/**
 	 * Creates and renders the given function, which can either be a simple
 	 * JSX function or a component constructor.
@@ -46,5 +39,8 @@ class JSXRenderer extends IncrementalDomRenderer {
 		}
 	}
 }
+
+JSXComponent.DATA_MANAGER = JSXDataManager;
+JSXComponent.RENDERER = JSXRenderer;
 
 export default JSXComponent;

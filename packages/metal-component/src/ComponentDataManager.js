@@ -1,6 +1,6 @@
 'use strict';
 
-import { object } from 'metal';
+import { array, core, object } from 'metal';
 import { EventEmitter, EventEmitterProxy } from 'metal-events';
 import State from 'metal-state';
 
@@ -13,12 +13,15 @@ class ComponentDataManager extends EventEmitter {
 	constructor(component, data) {
 		super();
 		this.component_ = component;
-		this.blacklist_ = {
-			components: true,
-			element: true,
-			wasRendered: true
-		};
-		this.createState_(data);
+
+		core.mergeSuperClassesProperty(
+			this.constructor,
+			'BLACKLIST',
+			array.firstDefinedValue
+		);
+		State.mergeStateStatic(this.component_.constructor);
+
+		this.createState_(data, this.component_);
 	}
 
 	/**
@@ -32,19 +35,32 @@ class ComponentDataManager extends EventEmitter {
 	}
 
 	/**
-	 * Creates the `State` instance that will handle the main component data.
+	 * Builds the configuration data that will be passed to the `State` instance.
 	 * @param {!Object} data
+	 * @return {!Object}
 	 * @protected
 	 */
-	createState_(data) {
-		State.mergeStateStatic(this.component_.constructor);
-		data = object.mixin({}, data, this.component_.constructor.STATE_MERGED);
+	buildStateInstanceData_(data) {
+		return object.mixin({}, data, this.component_.constructor.STATE_MERGED);
+	}
 
-		var state = new State({}, this.component_, this.component_);
-		state.setKeysBlacklist_(this.blacklist_);
-		state.addToState(data, this.component_.getInitialConfig());
-		state.on('stateChanged', data => this.emit('dataChanged', data));
-		state.on('stateKeyChanged', data => this.emit('dataPropChanged', data));
+	/**
+	 * Creates the `State` instance that will handle the main component data.
+	 * @param {!Object} data
+	 * @param {!Object} holder The object that should hold the data properties.
+	 * @protected
+	 */
+	createState_(data, holder) {
+		const state = new State({}, holder, this.component_);
+		state.setKeysBlacklist_(this.constructor.BLACKLIST_MERGED);
+		state.addToState(
+			this.buildStateInstanceData_(data),
+			this.component_.getInitialConfig()
+		);
+
+		const listener = this.emit_.bind(this);
+		state.on('stateChanged', listener);
+		state.on('stateKeyChanged', listener);
 		this.state_ = state;
 
 		this.proxy_ = new EventEmitterProxy(state, this.component_);
@@ -64,6 +80,18 @@ class ComponentDataManager extends EventEmitter {
 	}
 
 	/**
+	 * Emits the specified event.
+	 * @param {!Object} data
+	 * @param {!Object} event
+	 * @protected
+	 */
+	emit_(data, event) {
+		const orig = event.type;
+		const name = orig === 'stateChanged' ? 'dataChanged' : 'dataPropChanged';
+		this.emit(name, data);
+	}
+
+	/**
 	 * Gets the data with the given name.
 	 * @param {string} name
 	 * @return {*}
@@ -73,7 +101,15 @@ class ComponentDataManager extends EventEmitter {
 	}
 
 	/**
-	 * Gets the keys for the state data.
+	 * Gets the keys for state data that can be synced via `sync` functions.
+	 * @return {!Array<string>}
+	 */
+	getSyncKeys() {
+		return this.state_.getStateKeys();
+	}
+
+	/**
+	 * Gets the keys for state data.
 	 * @return {!Array<string>}
 	 */
 	getStateKeys() {
@@ -102,14 +138,24 @@ class ComponentDataManager extends EventEmitter {
 	 * @param {!Object} data
 	 */
 	replaceNonInternal(data) {
-		const keys = this.state_.getStateKeys();
+		ComponentDataManager.replaceNonInternal(data, this.state_);
+	}
+
+	/**
+	 * Updates all non internal data with the given values (or to the default
+	 * value if none is given).
+	 * @param {!Object} data
+	 * @param {!State} state
+	 */
+	static replaceNonInternal(data, state) {
+		const keys = state.getStateKeys();
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
-			if (!this.state_.getStateKeyConfig(key).internal) {
+			if (!state.getStateKeyConfig(key).internal) {
 				if (data.hasOwnProperty(key)) {
-					this.state_.set(key, data[key]);
+					state.set(key, data[key]);
 				} else {
-					this.state_.setDefaultValue(key);
+					state.setDefaultValue(key);
 				}
 			}
 		}
@@ -126,5 +172,11 @@ class ComponentDataManager extends EventEmitter {
 		this.state_.setState(state, opt_callback);
 	}
 }
+
+ComponentDataManager.BLACKLIST = {
+	components: true,
+	element: true,
+	wasRendered: true
+};
 
 export default ComponentDataManager;

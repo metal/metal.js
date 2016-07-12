@@ -119,6 +119,23 @@ describe('Component', function() {
 			assert.ok(!comp.rendered.args[1][0]);
 		});
 
+		it('should emit "rendered" event when the renderer indicates the component was rendered', function() {
+			class TestComponent extends Component {
+			}
+			comp = new TestComponent();
+
+			var listener = sinon.stub();
+			comp.on('rendered', listener);
+
+			comp.getRenderer().emit('rendered', true);
+			assert.strictEqual(1, listener.callCount);
+			assert.ok(listener.args[0][0]);
+
+			comp.getRenderer().emit('rendered', false);
+			assert.strictEqual(2, listener.callCount);
+			assert.ok(!listener.args[1][0]);
+		});
+
 		it('should return component instance from lifecycle triggering methods', function() {
 			comp = new Component();
 			assert.strictEqual(comp, comp.detach());

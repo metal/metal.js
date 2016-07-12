@@ -52,7 +52,7 @@ class Soy extends IncrementalDomRenderer {
 	 */
 	buildTemplateData_(params) {
 		var component = this.component_;
-		var data = object.mixin({}, component.config);
+		var data = object.mixin({}, this.config_);
 		component.getStateKeys().forEach(key => {
 			var value = component[key];
 			if (this.isHtmlParam_(key)) {

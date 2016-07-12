@@ -22,6 +22,16 @@ class ComponentDataManager extends EventEmitter {
 	}
 
 	/**
+	 * Adds a state property to the component.
+	 * @param {string} name
+	 * @param {!Object} config
+	 * @param {*} opt_initialValue
+	 */
+	add(name, config, opt_initialValue) {
+		this.state_.addToState(name, config, opt_initialValue);
+	}
+
+	/**
 	 * Creates the `State` instance that will handle the main component data.
 	 * @param {!Object} data
 	 * @protected
@@ -84,6 +94,25 @@ class ComponentDataManager extends EventEmitter {
 	 */
 	getStateInstance() {
 		return this.state_;
+	}
+
+	/**
+	 * Updates all non internal data with the given values (or to the default
+	 * value if none is given).
+	 * @param {!Object} data
+	 */
+	replaceNonInternal(data) {
+		const keys = this.state_.getStateKeys();
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
+			if (!this.state_.getStateKeyConfig(key).internal) {
+				if (data.hasOwnProperty(key)) {
+					this.state_.set(key, data[key]);
+				} else {
+					this.state_.setDefaultValue(key);
+				}
+			}
+		}
 	}
 
 	/**

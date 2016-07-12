@@ -87,17 +87,21 @@ describe('JSXComponent', function() {
 		assert.strictEqual(child.element, component.element.childNodes[0]);
 	});
 
-	it('should receive data from parent components through "config" property', function() {
+	it('should receive state data from parent components', function() {
 		class ChildComponent extends JSXComponent {
 			render() {
-				return <div class="child">{this.config.foo}</div>;
+				return <div class="child">{this.foo}</div>;
 			}
 		}
+		ChildComponent.STATE = {
+			foo: {
+			}
+		};
 
 		class TestComponent extends JSXComponent {
 			render() {
 				return <div class="test">
-					<ChildComponent ref="child" foo="Foo"></ChildComponent>
+					<ChildComponent ref="child" foo="Foo" />
 				</div>;
 			}
 		}
@@ -234,9 +238,13 @@ describe('JSXComponent', function() {
 		it('should create and render components via "JSXComponent.render"', function() {
 			class TestComponent extends JSXComponent {
 				render() {
-					return <div class="test">{this.config.foo}</div>;
+					return <div class="test">{this.foo}</div>;
 				}
 			}
+			TestComponent.STATE = {
+				foo: {
+				}
+			};
 
 			var container = document.createElement('div');
 			component = JSXComponent.render(

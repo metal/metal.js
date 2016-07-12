@@ -420,7 +420,7 @@ class State extends EventEmitter {
 		this.setInitialValue_(name);
 		if (!info.written) {
 			info.state = State.KeyStates.INITIALIZING_DEFAULT;
-			this.setDefaultValue_(name);
+			this.setDefaultValue(name);
 		}
 		info.state = State.KeyStates.INITIALIZED;
 	}
@@ -512,9 +512,8 @@ class State extends EventEmitter {
 	 * Sets the default value of the requested state key.
 	 * @param {string} name The name of the key.
 	 * @return {*}
-	 * @protected
 	 */
-	setDefaultValue_(name) {
+	setDefaultValue(name) {
 		var config = this.stateInfo_[name].config;
 
 		if (config.value !== undefined) {

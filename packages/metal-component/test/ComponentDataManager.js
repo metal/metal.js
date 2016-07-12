@@ -60,6 +60,47 @@ describe('ComponentDataManager', function() {
 		assert.strictEqual('fooValue', component.foo);
 	});
 
+	it('should add the state properties via the "add" function', function() {
+		component = new Component();
+		manager = new ComponentDataManager(component, {});
+		manager.add('foo', {
+			value: 'fooValue'
+		});
+
+		assert.strictEqual('fooValue', component.foo);
+	});
+
+	it('should replace all non internal data with given values or default', function() {
+		class TestComponent extends Component {
+		}
+		TestComponent.STATE = {
+			bar: {
+				internal: true,
+				value: 'initialBar'
+			},
+			foo: {
+				value: 'initialFoo'
+			},
+			foo2: {
+				value: 'initialFoo2'
+			}
+		};
+
+		component = new TestComponent({
+			bar: 'bar',
+			foo: 'foo',
+			foo2: 'foo2'
+		});
+		manager = new ComponentDataManager(component, {});
+
+		manager.replaceNonInternal({
+			foo: 'newFoo'
+		});
+		assert.strictEqual('newFoo', component.foo);
+		assert.strictEqual('initialFoo2', component.foo2);
+		assert.strictEqual('bar', component.bar);
+	});
+
 	it('should return state instance', function() {
 		component = new Component();
 		manager = new ComponentDataManager(component, {});

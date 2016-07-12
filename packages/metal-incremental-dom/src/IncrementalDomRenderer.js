@@ -21,7 +21,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		super(comp);
 
 		comp.context = {};
-		this.setConfig_(comp, comp.getInitialConfig());
+		this.config_ = comp.getInitialConfig();
 		this.changes_ = {};
 		comp.on('attached', this.handleAttached_.bind(this));
 
@@ -31,6 +31,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			// `ComponentRenderer`.
 			comp.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		}
+
+		comp.getDataManager().add(
+			'children',
+			{
+				validator: Array.isArray,
+				value: emptyChildren_
+			},
+			this.config_.children || emptyChildren_
+		);
 
 		// Binds functions that will be used many times, to avoid creating new
 		// functions each time.
@@ -99,8 +108,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Builds the "children" config property to be passed to the current
-	 * component.
+	 * Builds the "children" array to be passed to the current component.
 	 * @param {!Array<!Object>} children
 	 * @return {!Array<!Object>}
 	 * @protected
@@ -170,7 +178,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 	/**
 	 * Gets the component that is this component's owner (that is, the one that
-	 * passed its config properties and holds its ref), or null if there's none.
+	 * passed its data and holds its ref), or null if there's none.
 	 * @return {Component}
 	 */
 	getOwner() {
@@ -375,8 +383,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	handleRegularCall_(originalFn, ...args) {
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
-		if (!currRenderer.rootElementReached_ && currComp.config.key) {
-			args[1] = currComp.config.key;
+		if (!currRenderer.rootElementReached_ && currRenderer.config_.key) {
+			args[1] = currRenderer.config_.key;
 		}
 
 		var node = originalFn.apply(null, args);
@@ -447,11 +455,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			comp = new Ctor(config, false);
 		}
 		if (comp.wasRendered) {
-			this.setConfig_(comp, config);
 			comp.getRenderer().startSkipUpdates();
-			comp.setState(config);
+			comp.getDataManager().replaceNonInternal(config);
 			comp.getRenderer().stopSkipUpdates();
 		}
+		comp.getRenderer().config_ = config;
 		return comp;
 	}
 
@@ -494,7 +502,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 or a component constructor.
 	 * @param {Object|Element=} opt_dataOrElement Optional config data for the
 	 *     function or parent for the rendered content.
-	 * @param {Element=} opt_element Optional parent for the rendered content.
+	 * @param {Element=} opt_parent Optional parent for the rendered content.
 	 * @return {!Component} The rendered component's instance.
 	 */
 	static render(fnOrCtor, opt_dataOrElement, opt_parent) {
@@ -508,7 +516,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				}
 
 				render() {
-					fn(this.config);
+					fn(this.getRenderer().config_);
 				}
 			}
 			TempComponent.RENDERER = IncrementalDomRenderer;
@@ -659,24 +667,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			data.currComps.keys = {};
 			data.currComps.order = {};
 		}
-	}
-
-	/**
-	 * Sets the component's config object with its new value.
-	 * @param {!Component} comp The component to set the config for.
-	 * @param {!Object} config
-	 * @protected
-	 */
-	setConfig_(comp, config) {
-		var prevConfig = comp.config;
-		comp.config = config;
-		if (core.isFunction(comp.configChanged)) {
-			comp.configChanged(config, prevConfig || {});
-		}
-		comp.emit('configChanged', {
-			prevVal: prevConfig,
-			newVal: config
-		});
 	}
 
 	/**

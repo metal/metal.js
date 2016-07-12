@@ -29,20 +29,6 @@ class JSXComponent extends Component {
 }
 
 /**
- * State configuration.
- */
-JSXComponent.STATE = {
-	/**
-	 * Children elements to be rendered inside the component.
-	 * @type {!Array}
-	 */
-	children: {
-		validator: Array.isArray,
-		valueFn: () => []
-	}
-};
-
-/**
  * Renderer that handles JSX.
  */
 class JSXRenderer extends IncrementalDomRenderer {

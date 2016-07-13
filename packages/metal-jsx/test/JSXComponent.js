@@ -315,6 +315,28 @@ describe('JSXComponent', function() {
 			assert.strictEqual('defaultFoo', component.state.foo);
 		});
 
+		it('should update if props change', function(done) {
+			class TestComponent extends JSXComponent {
+				render() {
+					return <div>{this.props.foo}</div>
+				}
+			}
+			TestComponent.PROPS = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			}
+
+			component = new TestComponent();
+			assert.strictEqual('defaultFoo', component.element.textContent);
+
+			component.props.foo = 'foo';
+			component.once('rendered', function() {
+				assert.strictEqual('foo', component.element.textContent);
+				done();
+			});
+		});
+
 		it('should update if state changes', function(done) {
 			class TestComponent extends JSXComponent {
 				render() {
@@ -367,6 +389,90 @@ describe('JSXComponent', function() {
 				var prevProps = child.propsChanged.args[0][0];
 				assert.strictEqual('foo', prevProps.foo);
 				assert.strictEqual('foo2', child.props.foo);
+				done();
+			});
+		});
+	});
+
+	describe('shouldUpdate', function() {
+		it('should pass both state and prop changes to shouldUpdate', function(done) {
+			class TestComponent extends JSXComponent {
+				shouldUpdate() {
+				}
+			}
+			TestComponent.PROPS = {
+				bar: {
+				}
+			}
+			TestComponent.STATE = {
+				foo: {
+				}
+			}
+
+			component = new TestComponent();
+			sinon.stub(component, 'shouldUpdate');
+			component.props.bar = 'bar';
+			component.state.foo = 'foo';
+			component.getDataManager().once('dataChanged', function() {
+				assert.strictEqual(1, component.shouldUpdate.callCount);
+
+				const stateChanges = component.shouldUpdate.args[0][0];
+				assert.ok(stateChanges.foo);
+				assert.strictEqual('foo', stateChanges.foo.newVal);
+				assert.strictEqual(undefined, stateChanges.foo.prevVal);
+
+				const propChanges = component.shouldUpdate.args[0][1];
+				assert.ok(propChanges.bar);
+				assert.strictEqual('bar', propChanges.bar.newVal);
+				assert.strictEqual(undefined, propChanges.bar.prevVal);
+				done();
+			});
+		});
+
+		it('should not rerender after props change if shouldUpdate returns false', function(done) {
+			class TestComponent extends JSXComponent {
+				render() {
+				}
+
+				shouldUpdate() {
+					return false;
+				}
+			}
+			TestComponent.PROPS = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			}
+			component = new TestComponent();
+
+			sinon.stub(component, 'render');
+			component.props.foo = 'foo';
+			component.getDataManager().once('dataChanged', function() {
+				assert.strictEqual(0, component.render.callCount);
+				done();
+			});
+		});
+
+		it('should not rerender after state change if shouldUpdate returns false', function(done) {
+			class TestComponent extends JSXComponent {
+				render() {
+				}
+
+				shouldUpdate() {
+					return false;
+				}
+			}
+			TestComponent.STATE = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			}
+			component = new TestComponent();
+
+			sinon.stub(component, 'render');
+			component.state.foo = 'foo';
+			component.getDataManager().once('dataChanged', function() {
+				assert.strictEqual(0, component.render.callCount);
 				done();
 			});
 		});

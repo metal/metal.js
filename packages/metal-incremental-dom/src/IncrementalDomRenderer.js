@@ -22,7 +22,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		comp.context = {};
 		this.config_ = comp.getInitialConfig();
-		this.changes_ = {};
+		this.clearChanges_();
 		comp.on('attached', this.handleAttached_.bind(this));
 
 		var manager = comp.getDataManager();
@@ -116,6 +116,25 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	buildChildren_(children) {
 		return children.length === 0 ? emptyChildren_ : children;
+	}
+
+	/**
+	 * Returns an array with the args that should be passed to the component's
+	 * `shouldUpdate` method. This can be overridden by sub classes to change
+	 * what the method should receive.
+	 * @return {!Array}
+	 * @protected
+	 */
+	buildShouldUpdateArgs_() {
+		return [this.changes_];
+	}
+
+	/**
+	 * Clears the changes object.
+	 * @protected;
+	 */
+	clearChanges_() {
+		this.changes_ = {};
 	}
 
 	/**
@@ -421,6 +440,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Checks if the component's data has changed.
+	 * @return {boolean}
+	 * @protected
+	 */
+	hasDataChanged_() {
+		return Object.keys(this.changes_).length > 0;
+	}
+
+	/**
 	 * Intercepts incremental dom calls from this component.
 	 * @protected
 	 */
@@ -588,7 +616,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	renderInsidePatch() {
 		if (this.component_.wasRendered &&
-			!this.shouldUpdate(this.changes_) &&
+			!this.shouldUpdate() &&
 			IncrementalDOM.currentPointer() === this.component_.element) {
 			if (this.component_.element) {
 				IncrementalDOM.skipNode();
@@ -605,7 +633,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	renderInsidePatchDontSkip_() {
 		IncrementalDomRenderer.startedRenderingComponent(this.component_);
-		this.changes_ = {};
+		this.clearChanges_();
 		this.rootElementReached_ = false;
 		IncrementalDomUnusedComponents.schedule(this.childComponents_ || []);
 		this.childComponents_ = [];
@@ -675,12 +703,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Can be overridden by subclasses or implemented by components to provide
 	 * customized behavior (only updating when a state property used by the
 	 * template changes, for example).
-	 * @param {!Object} changes
 	 * @return {boolean}
 	 */
-	shouldUpdate(changes) {
+	shouldUpdate() {
+		if (!this.hasDataChanged_()) {
+			return false;
+		}
 		if (this.component_.shouldUpdate) {
-			return this.component_.shouldUpdate(changes);
+			return this.component_.shouldUpdate(...this.buildShouldUpdateArgs_());
 		}
 		return true;
 	}
@@ -700,8 +730,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * "element" property.
 	 */
 	update() {
-		var changed = Object.keys(this.changes_).length > 0;
-		if (changed && this.shouldUpdate(this.changes_)) {
+		if (this.shouldUpdate()) {
 			this.patch();
 		}
 	}

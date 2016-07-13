@@ -164,11 +164,10 @@ class Soy extends IncrementalDomRenderer {
 	/**
 	 * Overrides the original `IncrementalDomRenderer` method so that only
 	 * state keys used by the main template can cause updates.
-	 * @param {!Object} changes
 	 * @return {boolean}
 	 */
-	shouldUpdate(changes) {
-		var should = super.shouldUpdate(changes);
+	shouldUpdate() {
+		var should = super.shouldUpdate();
 		if (!should || this.component_.shouldUpdate) {
 			return should;
 		}
@@ -176,7 +175,7 @@ class Soy extends IncrementalDomRenderer {
 		var fn = this.component_.constructor.TEMPLATE;
 		var params = fn ? SoyAop.getOriginalFn(fn).params : [];
 		for (var i = 0; i < params.length; i++) {
-			if (changes[params[i]]) {
+			if (this.changes_[params[i]]) {
 				return true;
 			}
 		}

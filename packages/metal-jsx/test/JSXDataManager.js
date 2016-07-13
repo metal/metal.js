@@ -380,5 +380,27 @@ describe('JSXDataManager', function() {
 			assert.strictEqual('bar', component.props.bar);
 			assert.strictEqual('foo', component.props.foo);
 		});
+
+		it('should call "propsChanged" lifecycle method when props are replaced', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.prototype.propsChanged = sinon.stub();
+			TestComponent.DATA_MANAGER = JSXDataManager;
+			TestComponent.PROPS = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			};
+
+			component = new TestComponent();
+			var manager = component.getDataManager();
+			manager.replaceNonInternal({
+				foo: 'foo'
+			});
+
+			assert.strictEqual(1, component.propsChanged.callCount);
+			assert.strictEqual('defaultFoo', component.propsChanged.args[0][0].foo);
+			assert.strictEqual('foo', component.props.foo);
+		});
 	});
 });

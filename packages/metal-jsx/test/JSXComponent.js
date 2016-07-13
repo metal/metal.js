@@ -336,5 +336,39 @@ describe('JSXComponent', function() {
 				done();
 			});
 		});
+
+		it('should call "propsChanged" when new props are passed', function(done) {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <div class="child">{this.props.foo}</div>;
+				}
+			}
+			ChildComponent.prototype.propsChanged = sinon.stub();
+
+			class TestComponent extends JSXComponent {
+				render() {
+					return <ChildComponent ref="child" foo={this.state.foo} />;
+				}
+			}
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+			var child = component.components.child;
+
+			component.state.foo = 'foo2';
+			component.once('rendered', function() {
+				assert.strictEqual('foo2', child.element.textContent);
+				assert.strictEqual(1, child.propsChanged.callCount);
+
+				var prevProps = child.propsChanged.args[0][0];
+				assert.strictEqual('foo', prevProps.foo);
+				assert.strictEqual('foo2', child.props.foo);
+				done();
+			});
+		});
 	});
 });

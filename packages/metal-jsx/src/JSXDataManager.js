@@ -126,8 +126,12 @@ class JSXDataManager extends ComponentDataManager {
 	 * @override
 	 */
 	replaceNonInternal(data) {
+		var prevProps = object.mixin({}, this.component_.props);
 		ComponentDataManager.replaceNonInternal(data, this.props_);
 		this.addUnconfiguredProps_(data);
+		if (this.component_.propsChanged) {
+			this.component_.propsChanged(prevProps);
+		}
 	}
 }
 

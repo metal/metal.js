@@ -422,8 +422,9 @@ class Component extends EventEmitter {
 		var fn = this['sync' + key.charAt(0).toUpperCase() + key.slice(1)];
 		if (core.isFunction(fn)) {
 			if (!opt_change) {
+				var manager = this.getDataManager();
 				opt_change = {
-					newVal: this[key],
+					newVal: manager.get(key),
 					prevVal: undefined
 				};
 			}

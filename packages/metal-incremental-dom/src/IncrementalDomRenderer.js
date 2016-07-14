@@ -354,19 +354,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Checks if any other state property besides "element" has changed since the
-	 * last render.
-	 * @protected
-	 */
-	hasChangedBesidesElement_() {
-		var count = Object.keys(this.changes_).length;
-		if (this.changes_.hasOwnProperty('element')) {
-			count--;
-		}
-		return count > 0;
-	}
-
-	/**
 	 * Intercepts incremental dom calls from this component.
 	 * @protected
 	 */
@@ -658,7 +645,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * "element" property.
 	 */
 	update() {
-		if (this.hasChangedBesidesElement_() && this.shouldUpdate(this.changes_)) {
+		if (this.hasChangedBesidesElement_(this.changes_) &&
+			this.shouldUpdate(this.changes_)) {
 			this.patch();
 		}
 	}

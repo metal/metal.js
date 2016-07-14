@@ -57,7 +57,7 @@ class ComponentRenderer extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentRendererStateChanged_(changes) {
-		if (this.isRendered_ && !this.skipUpdates_) {
+		if (this.shouldRerender_(changes)) {
 			this.update(changes);
 		}
 	}
@@ -70,12 +70,13 @@ class ComponentRenderer extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentRendererStateKeyChanged_(data) {
-		if (this.isRendered_ && !this.skipUpdates_) {
-			this.update({
-				changes: {
-					[data.key]: data
-				}
-			});
+		const changes = {
+			changes: {
+				[data.key]: data
+			}
+		};
+		if (this.shouldRerender_(changes)) {
+			this.update(changes);
 		}
 	}
 
@@ -88,6 +89,20 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
+	 * Checks if any other state property besides "element" has changed.
+	 * @param {!Object} changes
+	 * @return {boolean}
+	 * @protected
+	 */
+	hasChangedBesidesElement_(changes) {
+		var count = Object.keys(changes).length;
+		if (changes.hasOwnProperty('element')) {
+			count--;
+		}
+		return count > 0;
+	}
+
+	/**
 	 * Renders the component's whole content (including its main element).
 	 */
 	render() {
@@ -95,6 +110,18 @@ class ComponentRenderer extends EventEmitter {
 			this.component_.element = document.createElement('div');
 		}
 		this.emit('rendered', !this.isRendered_);
+	}
+
+	/**
+	 * Checks if the given changes object should cause a rerender.
+	 * @param {!Object} changes
+	 * @return {boolean}
+	 * @protected
+	 */
+	shouldRerender_(changes) {
+		return this.isRendered_ &&
+			!this.skipUpdates_ &&
+			this.hasChangedBesidesElement_(changes.changes);
 	}
 
 	/**

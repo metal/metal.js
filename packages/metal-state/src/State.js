@@ -88,11 +88,15 @@ class State extends EventEmitter {
 			name,
 			this.buildKeyPropertyDef_(name)
 		);
+		this.assertGivenIfRequired_(name);
 	}
 
 	/**
 	 * Adds the given key(s) to the state, together with its(their) configs.
 	 * Config objects support the given settings:
+	 *     required - When set to `true`, causes errors to be printed (via
+	 *     `console.error`) if no value is given for the property.
+	 *
 	 *     setter - Function for normalizing state key values. It receives the new
 	 *     value that was set, and returns the value that should be stored.
 	 *
@@ -141,6 +145,7 @@ class State extends EventEmitter {
 			var name = names[i];
 			this.buildKeyInfo_(name, configsOrName[name], initialValues[name]);
 			props[name] = this.buildKeyPropertyDef_(name);
+			this.assertGivenIfRequired_(name);
 		}
 
 		if (opt_contextOrInitialValue !== false) {
@@ -165,6 +170,26 @@ class State extends EventEmitter {
 			defineContext = merged ? ctor.prototype : false;
 		}
 		this.addToState(ctor.STATE_MERGED, opt_config, defineContext);
+	}
+
+	/**
+	 * Logs an error if the given property is required but wasn't given.
+	 * @param {string} name
+	 * @protected
+	 */
+	assertGivenIfRequired_(name) {
+		var info = this.stateInfo_[name];
+		if (info.config.required) {
+			var value = info.state === State.KeyStates.INITIALIZED ?
+				this.get(name) :
+				info.initialValue;
+			if (!core.isDefAndNotNull(value)) {
+				console.error(
+					'The property called "' + name + '" is required but didn\n\'t ' +
+					'receive a value.'
+				);
+			}
+		}
 	}
 
 	/**
@@ -578,6 +603,7 @@ class State extends EventEmitter {
 
 		var prevVal = this.get(name);
 		info.value = this.callSetter_(name, value, prevVal);
+		this.assertGivenIfRequired_(name);
 		info.written = true;
 		this.informChange_(name, prevVal);
 	}

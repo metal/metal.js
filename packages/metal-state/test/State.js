@@ -3,7 +3,7 @@
 import { async } from 'metal';
 import State from '../src/State';
 
-describe('State Tests', function() {
+describe('State', function() {
 	it('should add a key to the state', function() {
 		var state = new State();
 		state.addToState('key1');
@@ -483,6 +483,87 @@ describe('State Tests', function() {
 		assert.strictEqual(1, state.key1);
 		state.key1 = 2;
 		assert.strictEqual(1, state.key1);
+	});
+
+	describe('required', function() {
+		let originalConsoleFn;
+
+		beforeEach(function() {
+			originalConsoleFn = console.error;
+			console.error = sinon.stub();
+		});
+
+		afterEach(function() {
+			console.error = originalConsoleFn;
+		});
+
+		it('should log error if required property gets no initial value via addToState', function() {
+			var state = new State();
+			state.addToState({
+				key1: {}
+			});
+			assert.strictEqual(0, console.error.callCount);
+
+			state.addToState(
+				{
+					key2: {
+						required: true
+					}
+				},
+				{
+					key2: 'initialValue'
+				}
+			);
+			assert.strictEqual(0, console.error.callCount);
+
+			state.addToState({
+				key3: {
+					required: true
+				}
+			});
+			assert.strictEqual(1, console.error.callCount);
+		});
+
+		it('should log error if required property gets no initial value via addKeyToState', function() {
+			var state = new State();
+			state.addKeyToState('key1');
+			assert.strictEqual(0, console.error.callCount);
+
+			state.addKeyToState(
+				'key2',
+				{
+					required: true
+				},
+				'initialValue'
+			);
+			assert.strictEqual(0, console.error.callCount);
+
+			state.addKeyToState('key3', {
+					required: true
+				}
+			);
+			assert.strictEqual(1, console.error.callCount);
+		});
+
+		it('should log error if required property is set to null or undefined', function() {
+			var state = new State();
+
+			state.addToState('key', {
+					required: true
+				},
+				'initialValue'
+			);
+			assert.strictEqual(0, console.error.callCount);
+
+			state.key = 'value';
+			assert.strictEqual(0, console.error.callCount);
+
+			state.key = null;
+			assert.strictEqual(1, console.error.callCount);
+
+			state.key = undefined;
+			assert.strictEqual(2, console.error.callCount);
+		});
 	});
 
 	it('should emit event when a state key\'s value changes', function() {

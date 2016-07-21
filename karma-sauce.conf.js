@@ -61,6 +61,12 @@ module.exports = function(config) {
 			transform: ['babelify']
 		},
 
+		client: {
+			mocha: {
+				timeout: 4000
+			}
+		},
+
 		autoWatch: true,
 
 		proxies: {

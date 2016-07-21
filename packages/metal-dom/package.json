@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A collection of utility functions for handling dom elements",
   "license": "BSD",
-  "repository": "https://github.com/metal/metal/tree/master/packages/metal-dom",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-dom",
   "engines": {
     "node": ">=0.12.0",
     "npm": ">=3.0.0"

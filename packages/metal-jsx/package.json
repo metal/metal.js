@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "description": "A JSX templates renderer to be used with Metal.js's Component class",
   "license": "BSD",
-  "repository": "https://github.com/metal/metal/tree/master/packages/metal-jsx",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-jsx",
   "engines": {
     "node": ">=0.12.0",
     "npm": ">=3.0.0"

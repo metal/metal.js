@@ -1,9 +1,9 @@
 {
   "name": "metal",
   "version": "1.0.0",
-  "description": "Build UI components in a solid, flexible way",
+  "description": "Core functions from Metal.js, with utilities for dealing with arrays, objects and others.",
   "license": "BSD-3-Clause",
-  "repository": "https://github.com/metal/metal/tree/master/packages/metal.js",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal",
   "engines": {
     "node": ">=0.10.0",
     "npm": ">=3.0.0"

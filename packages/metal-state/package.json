@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A class that adds support for watchable, configurable state",
   "license": "BSD",
-  "repository": "https://github.com/metal/metal/tree/master/packages/metal-state",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-state",
   "engines": {
     "node": ">=0.12.0",
     "npm": ">=3.0.0"

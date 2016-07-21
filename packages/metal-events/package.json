@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Classes responsible for emitting and listening to events",
   "license": "BSD",
-  "repository": "https://github.com/metal/metal/tree/master/packages/metal-events",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-events",
   "engines": {
     "node": ">=0.12.0",
     "npm": ">=3.0.0"

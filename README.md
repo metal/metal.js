@@ -1,6 +1,6 @@
 # Metal.js
 
-[![Build Status](http://img.shields.io/travis/metal/metal/master.svg?style=flat)](https://travis-ci.org/metal/metal)
+[![Build Status](https://img.shields.io/travis/metal/metal.js/master.svg?style=flat)](https://travis-ci.org/metal/metal.js)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/metal/metal)
 

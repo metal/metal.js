@@ -58,13 +58,15 @@ module.exports = function(config) {
 
 		browserify: {
 			debug: true,
-			transform: [require('browserify-istanbul')({
-				instrumenter: require('isparta'),
-				ignore: [
-					'**/packages/metal-incremental-dom/**/incremental-dom.js',
-					'**/packages/metal-jsx/**/iDOMHelpers.js'
+			transform: [
+				[
+					'babelify',
+					{
+						plugins: ['istanbul'],
+						presets: ['metal']
+					}
 				]
-			}), 'babelify']
+			]
 		},
 
 		reporters: ['coverage', 'progress'],

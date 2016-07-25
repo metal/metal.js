@@ -99,7 +99,9 @@ gulp.task('soy', function() {
 var changedJsSrc;
 gulp.task('compile', function() {
 	return gulp.src(changedJsSrc)
-		.pipe(babel())
+		.pipe(babel({
+			presets: ['metal']
+		}))
 		.pipe(gulp.dest(calcDestDir(changedJsSrc)));
 });
 

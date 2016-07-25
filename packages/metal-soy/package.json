@@ -1,6 +1,6 @@
 {
   "name": "metal-soy",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A soy templates renderer to be used with Metal.js's Component class",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-soy",

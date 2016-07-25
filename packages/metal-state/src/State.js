@@ -144,7 +144,7 @@ class State extends EventEmitter {
 		for (var i = 0; i < names.length; i++) {
 			var name = names[i];
 			this.buildKeyInfo_(name, configsOrName[name], initialValues[name]);
-			props[name] = this.buildKeyPropertyDef_(name);
+			props[name] = this.buildKeyPropertyDef_(name, opt_contextOrInitialValue);
 			this.assertGivenIfRequired_(name);
 		}
 
@@ -227,19 +227,20 @@ class State extends EventEmitter {
 	/**
 	 * Builds the property definition object for the specified state key.
 	 * @param {string} name The name of the key.
+	 * @param {Object=} opt_context The object where the property will be added.
 	 * @return {!Object}
 	 * @protected
 	 */
-	buildKeyPropertyDef_(name) {
-		var self = this;
+	buildKeyPropertyDef_(name, opt_context) {
+		var stateObj = opt_context === this.constructor.prototype ? null : this;
 		return {
 			configurable: true,
 			enumerable: true,
 			get: function() {
-				return self.getStateKeyValue_(name);
+				return (stateObj || this).getStateKeyValue_(name);
 			},
 			set: function(val) {
-				self.setStateKeyValue_(name, val);
+				(stateObj || this).setStateKeyValue_(name, val);
 			}
 		};
 	}

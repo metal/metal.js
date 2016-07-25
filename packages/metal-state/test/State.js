@@ -887,6 +887,25 @@ describe('State', function() {
 				}
 			}, ChildTest.STATE_MERGED);
 		});
+
+		it('should conflict STATE properties from instance with previous instances', function() {
+			var Test = createTestClass();
+			Test.STATE = {
+				key1: {
+				}
+			};
+
+			var test1 = new Test({
+				key1: 'foo1'
+			});
+			assert.strictEqual('foo1', test1.key1);
+
+			var test2 = new Test({
+				key1: 'foo2'
+			});
+			assert.strictEqual('foo2', test2.key1);
+			assert.strictEqual('foo1', test1.key1);
+		});
 	});
 
 	describe('Separate object', function() {

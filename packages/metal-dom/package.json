@@ -14,7 +14,6 @@
     "lib",
     "src"
   ],
-  "format": "es6",
   "scripts": {
     "compile": "babel --presets metal -d lib/ src/",
     "prepublish": "npm run compile"

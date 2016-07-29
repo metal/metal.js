@@ -1,6 +1,7 @@
 'use strict';
 
 import './iDOMHelpers';
+import { validators, Config } from 'metal-state';
 import Component from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXDataManager from './JSXDataManager';
@@ -77,3 +78,4 @@ JSXComponent.DATA_MANAGER = JSXDataManager;
 JSXComponent.RENDERER = JSXRenderer;
 
 export default JSXComponent;
+export { validators, Config, JSXComponent };

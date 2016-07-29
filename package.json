@@ -16,6 +16,7 @@
   "devDependencies": {
     "babel-plugin-istanbul": "^1.0.3",
     "babel-preset-metal": "^4.0.0",
+    "babel-preset-metal-jsx": "^0.0.2",
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "chai": "^3.5.0",

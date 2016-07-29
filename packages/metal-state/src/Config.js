@@ -29,10 +29,10 @@ import validators from './validators';
 const Config = {
 	/**
 	 * Adds the `required` flag to the `State` configuration.
-	 * @param {boolean} required
+	 * @param {boolean} required Flag to set "required" to. True by default.
 	 * @return {!Object} `State` configuration object.
 	 */
-	required(required) {
+	required(required = true) {
 		return mergeConfig(this, {required});
 	},
 

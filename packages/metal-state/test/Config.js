@@ -4,9 +4,19 @@ import core from 'metal';
 import Config from '../src/Config';
 
 describe('Config', function() {
-	it('should return config with specified "required" flag', function() {
-		var required = true;
-		var config = Config.required(true);
+	it('should return config with "required" flag set to true by default', function() {
+		var config = Config.required();
+		assert.ok(core.isObject(config));
+
+		var expected = {
+			required: true
+		};
+		assert.deepEqual(expected, config.config);
+	});
+
+	it('should return config with "required" flag set to the given vaue', function() {
+		var required = false;
+		var config = Config.required(required);
 		assert.ok(core.isObject(config));
 		assert.deepEqual({required}, config.config);
 	});

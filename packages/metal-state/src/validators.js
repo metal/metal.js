@@ -7,7 +7,7 @@ import { core } from 'metal';
  * instance of Error when validation fails.
  */
 const validators = {
-	any: () => true,
+	any: () => () => true,
 	array: validateType('array'),
 	bool: validateType('boolean'),
 	func: validateType('function'),
@@ -197,12 +197,17 @@ function getStateType(value) {
 }
 
 /**
- * Creates a validator that checks against a specific primitive type.
+ * Creates a validator that checks against a specific primitive type. If this
+ * validator is called with no arguments, it will return the actual validator
+ * function instead of running it. That's done to allow all validators to be
+ * used consistently, since some (like `arrayOf`) always require that you call
+ * the function before receiving the actual validator.
  * @param {string} expectedType Type to check against.
- * @return {function()} Validator.
+ * @return {function()} Validator if called with arguments, or wrapper function
+ *     that returns the validator otherwise.
  */
 function validateType(expectedType) {
-	return (value, name, context) => {
+	const validatorFn = (value, name, context) => {
 		const type = getStateType(value);
 
 		if (type !== expectedType) {
@@ -210,6 +215,13 @@ function validateType(expectedType) {
 		}
 
 		return true;
+	};
+	return (...args) => {
+		if (args.length === 0) {
+			return validatorFn;
+		} else {
+			return validatorFn(...args);
+		}
 	};
 }
 

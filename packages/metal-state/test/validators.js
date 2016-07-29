@@ -1,5 +1,6 @@
 'use strict';
 
+import core from 'metal';
 import validators from '../src/validators';
 
 describe('validators', function() {
@@ -46,12 +47,12 @@ describe('validators', function() {
 	});
 
 	it('should validate any type', function() {
-		validators.any('testString');
-		validators.any(false);
-		validators.any({});
-		validators.any(1);
-		validators.any(function() {});
-
+		const validator = validators.any();
+		assert.isTrue(validator('testString'));
+		assert.isTrue(validator(false));
+		assert.isTrue(validator({}));
+		assert.isTrue(validator(1));
+		assert.isTrue(validator(function() {}));
 	});
 
 	it('should validate an array of a single type', function() {
@@ -189,6 +190,13 @@ describe('validators', function() {
 		assert.instanceOf(shape({
 			a: 1
 		}), Error);
+	});
+
+	it('should return validator function instead of running it if no arg is passed to type validator', function() {
+		var validatorFn = validators.bool();
+		assert.ok(core.isFunction(validatorFn));
+		assert.isTrue(validatorFn(true));
+		assert.instanceOf(validatorFn('true'), Error);
 	});
 
 	it('should fail if an object is not supplied to shape', function() {

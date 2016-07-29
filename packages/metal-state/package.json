@@ -8,8 +8,8 @@
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "main": "lib/State.js",
-  "jsnext:main": "src/State.js",
+  "main": "lib/all/state.js",
+  "jsnext:main": "src/all/state.js",
   "files": [
     "lib",
     "src"

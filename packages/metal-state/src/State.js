@@ -214,12 +214,13 @@ class State extends EventEmitter {
 	 */
 	buildKeyInfo_(name, config, initialValue) {
 		this.assertValidStateKeyName_(name);
+		config = (config && config.config) ? config.config : (config || {});
 		if (this.commonOpts_) {
 			config = object.mixin({}, config, this.commonOpts_);
 		}
 		this.stateInfo_[name] = {
-			config: config || {},
-			initialValue: initialValue,
+			config,
+			initialValue,
 			state: State.KeyStates.UNINITIALIZED
 		};
 	}

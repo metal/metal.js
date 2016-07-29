@@ -107,9 +107,26 @@ describe('State', function() {
 			}
 		});
 
-		assert.deepEqual({
+		var expected = {
 			a: 2
-		}, state.getStateKeyConfig('key1'));
+		};
+		assert.deepEqual(expected, state.getStateKeyConfig('key1'));
+	});
+
+	it('should use config object from "config" key', function() {
+		var state = new State();
+		state.addToState({
+			key1: {
+				config: {
+					a: 2
+				}
+			}
+		});
+
+		var expected = {
+			a: 2
+		};
+		assert.deepEqual(expected, state.getStateKeyConfig('key1'));
 	});
 
 	it('should return null if requesting config object of non existing key', function() {
@@ -965,7 +982,9 @@ describe('State', function() {
 					value: 1
 				},
 				key2: {
-					value: 2
+					config: {
+						value: 2
+					}
 				}
 			};
 

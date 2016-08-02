@@ -22,20 +22,15 @@ const validators = {
 	 */
 	arrayOf: function(validator) {
 		return (value, name, context) => {
-			if (!Array.isArray(value)) {
-				return composeError('Expected an array.', name, context);
-			} else {
-				const testArray = value.every(
-					item => {
-						return !(validator(item, name) instanceof Error);
-					}
-				);
-
-				if (!testArray) {
+			var result = validators.array(value, name, context);
+			if (isInvalid(result)) {
+				return result;
+			}
+			for (var i = 0; i < value.length; i++) {
+				if (isInvalid(validator(value[i], name, context))) {
 					return composeError('Expected an array of single type', name, context);
 				}
 			}
-
 			return true;
 		};
 	},
@@ -48,26 +43,28 @@ const validators = {
 	instanceOf: function(expectedClass) {
 		return (value, name, context) => {
 			if (!(value instanceof expectedClass)) {
-				return composeError(`Expected instance of ${expectedClass}`, name, context);
+				return composeError(
+					`Expected instance of ${expectedClass}`,
+					name,
+					context
+				);
 			}
-
 			return true;
 		};
 	},
 
 	/**
-	 * Creates a validator that checks a value against a single type, null, or undefined.
+	 * Creates a validator that checks a value against a single type, null, or
+	 * undefined.
 	 * @param {function()} typeValidator Validator to check value against.
 	 * @return {function()} Validator.
 	 */
 	maybe: function(typeValidator) {
 		return (value, name, context) => {
 			const validation = typeValidator(value, name);
-
-			if (!core.isDef(value) || core.isNull(value) || !(validation instanceof Error)) {
+			if (!core.isDef(value) || core.isNull(value) || !isInvalid(validation)) {
 				return true;
 			}
-
 			return composeError(`${validation.toString()} or null`, name, context);
 		};
 	},
@@ -79,16 +76,11 @@ const validators = {
 	 */
 	objectOf: function(typeValidator) {
 		return (value, name, context) => {
-			let success = true;
-
 			for (let key in value) {
-				success = !(typeValidator(value[key], null) instanceof Error);
+				if (isInvalid(typeValidator(value[key]))) {
+					return composeError('Expected object of one type', name, context);
+				}
 			}
-
-			if (!success) {
-				return composeError('Expected object of one type', name, context);
-			}
-
 			return true;
 		};
 	},
@@ -99,14 +91,14 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	oneOf: function(arrayOfValues) {
-		if (!Array.isArray(arrayOfValues)) {
-			return (value, name, context) => composeError(`Expected an array, but received type '${getStateType(arrayOfValues)}'.`, name, context);
-		}
-
 		return (value, name, context) => {
+			const result = validators.array(arrayOfValues, name, context);
+			if (isInvalid(result)) {
+				return result;
+			}
+
 			for (let i = 0; i < arrayOfValues.length; i++) {
 				const oneOfValue = arrayOfValues[i];
-
 				if (value === oneOfValue) {
 					return true;
 				}
@@ -117,20 +109,21 @@ const validators = {
 	},
 
 	/**
-	 * Creates a validator that checks a value against multiple types and only has to pass one.
-	 * @param {!Array} arrayOfTypeValidators Array of validators to check value against.
+	 * Creates a validator that checks a value against multiple types and only has
+	 * to pass one.
+	 * @param {!Array} arrayOfTypeValidators Array of validators to check value
+	 *     against.
 	 * @return {function()} Validator.
 	 */
 	oneOfType: function(arrayOfTypeValidators) {
-		if (!Array.isArray(arrayOfTypeValidators)) {
-			return (value, name, context) => composeError(`Expected an array, but received type '${getStateType(arrayOfTypeValidators)}'.`, name, context);
-		}
-
 		return (value, name, context) => {
-			for (let i = 0; i < arrayOfTypeValidators.length; i++) {
-				const validator = arrayOfTypeValidators[i];
+			const result = validators.array(arrayOfTypeValidators, name, context);
+			if (isInvalid(result)) {
+				return result;
+			}
 
-				if (!(validator(value, name) instanceof Error)) {
+			for (let i = 0; i < arrayOfTypeValidators.length; i++) {
+				if (!isInvalid(arrayOfTypeValidators[i](value, name, context))) {
 					return true;
 				}
 			}
@@ -145,18 +138,20 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	shapeOf: function(shape) {
-		const type = getStateType(shape);
-		if (type !== 'object') {
-			return (value, name, context) => composeError(`Expected an object, but received type '${type}'.`, name, context);
-		}
-
 		return (value, name, context) => {
+			const result = validators.object(shape, name, context);
+			if (isInvalid(result)) {
+				return result;
+			}
+
 			for (let key in shape) {
 				const validator = shape[key];
-				const valueForKey = value[key];
-
-				if (validator(valueForKey, null) instanceof Error) {
-					return composeError('Expected object with a specific shape', name, context);
+				if (isInvalid(validator(value[key]))) {
+					return composeError(
+						'Expected object with a specific shape',
+						name,
+						context
+					);
 				}
 			}
 
@@ -169,31 +164,42 @@ const validators = {
  * Composes a warning a warning message.
  * @param {string} error Error message to display to console.
  * @param {?string} name Name of state property that is giving the error.
- * @param {Object} context.
+ * @param {Object} context
  * @return {!Error} Instance of Error class.
  */
 function composeError(error, name, context) {
-	const componentName = context ? core.getFunctionName(context.constructor) : null;
-	const parentComponent = context && context.getRenderer ? context.getRenderer().lastParentComponent_ : null;
-	const parentComponentName = parentComponent ? core.getFunctionName(parentComponent.constructor) : null;
-
-	const location = parentComponentName ? `Check render method of '${parentComponentName}'.` : '';
-
-	return new Error(`Warning: Invalid state passed to '${name}'. ${error} Passed to '${componentName}'. ${location}`);
+	const compName = context ? core.getFunctionName(context.constructor) : null;
+	const parent = context && context.getRenderer ?
+		context.getRenderer().getParent() :
+		null;
+	const parentName = parent ? core.getFunctionName(parent.constructor) : null;
+	const location = parentName ? `Check render method of '${parentName}'.` : '';
+	return new Error(
+		`Warning: Invalid state passed to '${name}'. ` +
+		`${error} Passed to '${compName}'. ${location}`
+	);
 }
 
 /**
- * Checks type of given value.
+ * Returns the type of the given value.
  * @param {*} value Any value.
  * @return {string} Type of value.
  */
-function getStateType(value) {
-	const stateType = typeof value;
+function getType(value) {
+	const type = typeof value;
 	if (Array.isArray(value)) {
 		return 'array';
 	}
+	return type;
+}
 
-	return stateType;
+/**
+ * Checks if the given validator result says that the value is invalid.
+ * @param {boolean|!Error} result
+ * @return {boolean}
+ */
+function isInvalid(result) {
+	return result instanceof Error;
 }
 
 /**
@@ -208,12 +214,14 @@ function getStateType(value) {
  */
 function validateType(expectedType) {
 	const validatorFn = (value, name, context) => {
-		const type = getStateType(value);
-
+		const type = getType(value);
 		if (type !== expectedType) {
-			return composeError(`Expected type '${expectedType}', but received type '${type}'.`, name, context);
+			return composeError(
+				`Expected type '${expectedType}', but received type '${type}'.`,
+				name,
+				context
+			);
 		}
-
 		return true;
 	};
 	return (...args) => {

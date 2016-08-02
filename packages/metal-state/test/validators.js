@@ -79,17 +79,15 @@ describe('validators', function() {
 	});
 
 	it('should validate a single type or null', function() {
-		let validator = validators.maybe(validators.number);
+		assert.isTrue(validators.number(1));
+		assert.isTrue(validators.number(null));
+		assert.isTrue(validators.number(undefined));
+		assert.instanceOf(validators.number('1'), Error);
 
-		assert.isTrue(validator(1));
-		assert.isTrue(validator(null));
-		assert.instanceOf(validator('1'), Error);
-
-		validator = validators.maybe(validators.object);
-
-		assert.isTrue(validator({}));
-		assert.isTrue(validator(null));
-		assert.instanceOf(validator(1), Error);
+		assert.isTrue(validators.object({}));
+		assert.isTrue(validators.object(null));
+		assert.isTrue(validators.object(undefined));
+		assert.instanceOf(validators.object(1), Error);
 	});
 
 	it('should validate equality against an array of values', function() {
@@ -108,8 +106,7 @@ describe('validators', function() {
 
 	it('should fail if an array is not supplied to oneOf', function() {
 		const validator = validators.oneOf({});
-
-		assert.instanceOf(validator(), Error);
+		assert.instanceOf(validator({}), Error);
 	});
 
 	it('should validate one of certain types', function() {
@@ -134,7 +131,7 @@ describe('validators', function() {
 			}
 		);
 
-		assert.instanceOf(validator(), Error);
+		assert.instanceOf(validator({}), Error);
 	});
 
 	it('should validate an object with certain types of values', function() {
@@ -171,7 +168,12 @@ describe('validators', function() {
 	it('should validate a shape nested within a shape', function() {
 		const shape = validators.shapeOf({
 			a: validators.shapeOf({
-				b: validators.string
+				b: {
+					config: {
+						required: true,
+						validator: validators.string
+					}
+				}
 			})
 		});
 
@@ -201,7 +203,7 @@ describe('validators', function() {
 
 	it('should fail if an object is not supplied to shape', function() {
 		const validator = validators.shapeOf(1);
-		assert.instanceOf(validator(), Error);
+		assert.instanceOf(validator({}), Error);
 	});
 
 	it('should emit warning message', function() {
@@ -210,16 +212,19 @@ describe('validators', function() {
 		const PARENT_COMPONENT_NAME = 'parentComponent';
 
 		const ERROR_MESSAGE = `Error: Warning: Invalid state passed to '${NAME}'. ` +
-			`Expected type 'string', but received type 'number'. Passed to '${COMPONENT_NAME}'. Check render ` +
+			`Expected type 'string', but received type 'number'. ` +
+			`Passed to '${COMPONENT_NAME}'. Check render ` +
 			`method of '${PARENT_COMPONENT_NAME}'.`;
 
 		const context = {
 			getRenderer: function() {
 				return {
-					lastParentComponent_: {
-						constructor: {
-							name: PARENT_COMPONENT_NAME
-						}
+					getParent: () => {
+						return {
+							constructor: {
+								name: PARENT_COMPONENT_NAME
+							}
+						};
 					}
 				};
 			},

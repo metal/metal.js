@@ -4,7 +4,9 @@ import { core } from 'metal';
 
 /**
  * Provides access to various type validators that will return an
- * instance of Error when validation fails.
+ * instance of Error when validation fails. Note that all type validators
+ * will also accept null or undefined values. To not accept these you should
+ * instead make your state property required.
  */
 const validators = {
 	any: () => () => true,
@@ -21,7 +23,7 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	arrayOf: function(validator) {
-		return (value, name, context) => {
+		return maybe((value, name, context) => {
 			var result = validators.array(value, name, context);
 			if (isInvalid(result)) {
 				return result;
@@ -32,7 +34,7 @@ const validators = {
 				}
 			}
 			return true;
-		};
+		});
 	},
 
 	/**
@@ -41,7 +43,7 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	instanceOf: function(expectedClass) {
-		return (value, name, context) => {
+		return maybe((value, name, context) => {
 			if (!(value instanceof expectedClass)) {
 				return composeError(
 					`Expected instance of ${expectedClass}`,
@@ -50,23 +52,7 @@ const validators = {
 				);
 			}
 			return true;
-		};
-	},
-
-	/**
-	 * Creates a validator that checks a value against a single type, null, or
-	 * undefined.
-	 * @param {function()} typeValidator Validator to check value against.
-	 * @return {function()} Validator.
-	 */
-	maybe: function(typeValidator) {
-		return (value, name, context) => {
-			const validation = typeValidator(value, name);
-			if (!core.isDef(value) || core.isNull(value) || !isInvalid(validation)) {
-				return true;
-			}
-			return composeError(`${validation.toString()} or null`, name, context);
-		};
+		});
 	},
 
 	/**
@@ -75,14 +61,14 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	objectOf: function(typeValidator) {
-		return (value, name, context) => {
+		return maybe((value, name, context) => {
 			for (let key in value) {
 				if (isInvalid(typeValidator(value[key]))) {
 					return composeError('Expected object of one type', name, context);
 				}
 			}
 			return true;
-		};
+		});
 	},
 
 	/**
@@ -91,7 +77,7 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	oneOf: function(arrayOfValues) {
-		return (value, name, context) => {
+		return maybe((value, name, context) => {
 			const result = validators.array(arrayOfValues, name, context);
 			if (isInvalid(result)) {
 				return result;
@@ -105,7 +91,7 @@ const validators = {
 			}
 
 			return composeError('Expected one of given values.', name, context);
-		};
+		});
 	},
 
 	/**
@@ -116,7 +102,7 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	oneOfType: function(arrayOfTypeValidators) {
-		return (value, name, context) => {
+		return maybe((value, name, context) => {
 			const result = validators.array(arrayOfTypeValidators, name, context);
 			if (isInvalid(result)) {
 				return result;
@@ -129,7 +115,7 @@ const validators = {
 			}
 
 			return composeError('Expected one of given types.', name, context);
-		};
+		});
 	},
 
 	/**
@@ -138,15 +124,21 @@ const validators = {
 	 * @return {function()} Validator.
 	 */
 	shapeOf: function(shape) {
-		return (value, name, context) => {
+		return maybe((value, name, context) => {
 			const result = validators.object(shape, name, context);
 			if (isInvalid(result)) {
 				return result;
 			}
 
 			for (let key in shape) {
-				const validator = shape[key];
-				if (isInvalid(validator(value[key]))) {
+				let required = false;
+				let validator = shape[key];
+				if (validator.config) {
+					required = validator.config.required;
+					validator = validator.config.validator;
+				}
+				if ((required && !core.isDefAndNotNull(value[key])) ||
+					isInvalid(validator(value[key]))) {
 					return composeError(
 						'Expected object with a specific shape',
 						name,
@@ -156,7 +148,7 @@ const validators = {
 			}
 
 			return true;
-		};
+		});
 	}
 };
 
@@ -203,6 +195,21 @@ function isInvalid(result) {
 }
 
 /**
+ * Creates a validator that checks a value against a single type, null, or
+ * undefined.
+ * @param {function()} typeValidator Validator to check value against.
+ * @return {function()} Validator.
+ */
+function maybe(typeValidator) {
+	return (value, name, context) => {
+		if (!core.isDef(value) || core.isNull(value)) {
+			return true;
+		}
+		return typeValidator(value, name, context);
+	};
+}
+
+/**
  * Creates a validator that checks against a specific primitive type. If this
  * validator is called with no arguments, it will return the actual validator
  * function instead of running it. That's done to allow all validators to be
@@ -213,7 +220,7 @@ function isInvalid(result) {
  *     that returns the validator otherwise.
  */
 function validateType(expectedType) {
-	const validatorFn = (value, name, context) => {
+	const validatorFn = maybe((value, name, context) => {
 		const type = getType(value);
 		if (type !== expectedType) {
 			return composeError(
@@ -223,7 +230,7 @@ function validateType(expectedType) {
 			);
 		}
 		return true;
-	};
+	});
 	return (...args) => {
 		if (args.length === 0) {
 			return validatorFn;

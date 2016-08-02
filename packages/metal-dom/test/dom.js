@@ -23,6 +23,25 @@ describe('dom', function() {
 			assertClassesAdded();
 		});
 
+		it('should add css classes to requested elements', function() {
+			function assertClassesAdded(element) {
+				assert.strictEqual(2, getClassNames(element).length);
+				assert.strictEqual('class1', getClassNames(element)[0]);
+				assert.strictEqual('class2', getClassNames(element)[1]);
+			}
+
+			var element1 = document.createElement('div');
+			var element2 = document.createElement('div');
+			dom.append(document.body, element1);
+			dom.append(document.body, element2);
+			var elements = document.querySelectorAll('div');
+
+			dom.addClasses(elements, 'class1 class2');
+
+			assertClassesAdded(element1);
+			assertClassesAdded(element2);
+		});
+
 		it('should not throw error if addClasses is called with empty string', function() {
 			var element = document.createElement('div');
 			assert.doesNotThrow(() => dom.addClasses(element, ''));
@@ -53,6 +72,25 @@ describe('dom', function() {
 			dom.removeClasses(element, 'class1');
 			assert.ok(!dom.hasClass(element, 'class1'));
 			assert.ok(dom.hasClass(element, 'class2'));
+		});
+
+		it('should check if css classes are being removed from multiple elements', function() {
+			function assertClassesRemoved(element) {
+				assert.ok(!dom.hasClass(element, 'class1'));
+				assert.ok(dom.hasClass(element, 'class2'));
+			}
+
+			var element1 = document.createElement('div');
+			var element2 = document.createElement('div');
+			dom.append(document.body, element1);
+			dom.append(document.body, element2);
+			var elements = document.querySelectorAll('div');
+			dom.addClasses(elements, 'class1 class2');
+
+			dom.removeClasses(elements, 'class1');
+
+			assertClassesRemoved(element1);
+			assertClassesRemoved(element2);
 		});
 
 		it('should not throw error if removeClasses is called with empty string', function() {

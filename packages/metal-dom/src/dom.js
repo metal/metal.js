@@ -18,19 +18,25 @@ const USE_CAPTURE = {
 class dom {
 	/**
 	 * Adds the requested CSS classes to an element.
-	 * @param {!Element} element The element to add CSS classes to.
+	 * @param {!Element|!Nodelist} elements The element or elements to add CSS classes to.
 	 * @param {string} classes CSS classes to add.
 	 */
-	static addClasses(element, classes) {
-		if (!core.isObject(element) || !core.isString(classes)) {
+	static addClasses(elements, classes) {
+		if (!core.isObject(elements) || !core.isString(classes)) {
 			return;
 		}
 
-		if ('classList' in element) {
-			dom.addClassesWithNative_(element, classes);
-		} else {
-			dom.addClassesWithoutNative_(element, classes);
+		if (!elements.length) {
+			elements = [elements];
 		}
+
+		elements.forEach(function(element) {
+			if ('classList' in element) {
+				dom.addClassesWithNative_(element, classes);
+			} else {
+				dom.addClassesWithoutNative_(element, classes);
+			}
+		});
 	}
 
 	/**
@@ -486,19 +492,25 @@ class dom {
 
 	/**
 	 * Removes the requested CSS classes from an element.
-	 * @param {!Element} element The element to remove CSS classes from.
+	 * @param {!Element|!NodeList} elements The element or elements to remove CSS classes from.
 	 * @param {string} classes CSS classes to remove.
 	 */
-	static removeClasses(element, classes) {
-		if (!core.isObject(element) || !core.isString(classes)) {
+	static removeClasses(elements, classes) {
+		if (!core.isObject(elements) || !core.isString(classes)) {
 			return;
 		}
 
-		if ('classList' in element) {
-			dom.removeClassesWithNative_(element, classes);
-		} else {
-			dom.removeClassesWithoutNative_(element, classes);
+		if (!elements.length) {
+			elements = [elements];
 		}
+
+		elements.forEach(function(element) {
+			if ('classList' in element) {
+				dom.removeClassesWithNative_(element, classes);
+			} else {
+				dom.removeClassesWithoutNative_(element, classes);
+			}
+		});
 	}
 
 	/**

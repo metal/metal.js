@@ -292,7 +292,10 @@ class State extends EventEmitter {
 		var info = this.stateInfo_[name];
 		var config = info.config;
 		if (config.validator) {
-			var validatorReturn = this.callFunction_(config.validator, [value, name, this]);
+			var validatorReturn = this.callFunction_(
+				config.validator,
+				[value, name, this.context_]
+			);
 
 			if (validatorReturn instanceof Error) {
 				console.error(`Warning: ${validatorReturn}`);

@@ -974,6 +974,27 @@ describe('State', function() {
 			assert.strictEqual('obj:1', obj.key1);
 		});
 
+		it('should pass given context object when calling validator', function() {
+			var validator = sinon.stub().returns(true);
+			class Test extends State {
+			}
+			Test.STATE = {
+				key1: {
+					validator
+				}
+			};
+
+			var obj = {};
+			var context = {};
+			var key1 = 1;
+			new Test({key1}, obj, context);
+			assert.strictEqual(1, obj.key1);
+			assert.strictEqual(1, validator.callCount);
+			assert.strictEqual(1, validator.args[0][0]);
+			assert.strictEqual('key1', validator.args[0][1]);
+			assert.strictEqual(context, validator.args[0][2]);
+		});
+
 		it('should share given common options with all state properties', function() {
 			class Test extends State {
 			}

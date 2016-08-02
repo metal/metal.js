@@ -15,14 +15,8 @@
     "src"
   ],
   "scripts": {
-    "compile": "babel -d lib/ src/",
+    "compile": "babel --presets metal -d lib/ src/",
     "prepublish": "npm run compile"
-  },
-  "babel": {
-    "presets": [
-      "metal",
-      "metal-jsx"
-    ]
   },
   "keywords": [
     "metal"

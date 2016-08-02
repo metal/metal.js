@@ -9,19 +9,20 @@ class IncrementalDomUnusedComponents {
 	 */
 	static disposeUnused() {
 		for (var i = 0; i < comps_.length; i++) {
-			if (!comps_[i].isDisposed()) {
-				var renderer = comps_[i].getRenderer();
+			var comp = comps_[i];
+			if (!comp.isDisposed()) {
+				var renderer = comp.getRenderer();
 				if (!renderer.getParent()) {
 					// Don't let disposing cause the element to be removed, since it may
 					// be currently being reused by another component.
-					comps_[i].element = null;
+					comp.element = null;
 
 					var ref = renderer.config_.ref;
 					var owner = renderer.getOwner();
-					if (owner.components[ref] === comps_[i]) {
+					if (owner && !owner.isDisposed() && owner.components[ref] === comp) {
 						owner.disposeSubComponents([ref]);
 					} else {
-						comps_[i].dispose();
+						comp.dispose();
 					}
 				}
 			}

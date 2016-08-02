@@ -6,9 +6,20 @@ import IncrementalDomUnusedComponents from '../../src/cleanup/IncrementalDomUnus
 
 describe('IncrementalDomUnusedComponents', function() {
 	var comp;
+	var grandchild;
 
 	beforeEach(function() {
+		class GrandChild extends Component {
+			created() {
+				grandchild = this;
+			}
+		}
+		GrandChild.RENDERER = IncrementalDomRenderer;
+
 		class Child extends Component {
+			render() {
+				IncrementalDOM.elementVoid(GrandChild);
+			}
 		}
 		Child.RENDERER = IncrementalDomRenderer;
 
@@ -74,5 +85,11 @@ describe('IncrementalDomUnusedComponents', function() {
 		assert.ok(comps[0].isDisposed());
 		assert.ok(comps[1].isDisposed());
 		assert.ok(!newChild1.isDisposed());
+	});
+
+	it('should not throw error when disposing component that has previously disposed owner', function() {
+		var comps = [comp.components.child2, grandchild];
+		IncrementalDomUnusedComponents.schedule(comps);
+		assert.doesNotThrow(() => IncrementalDomUnusedComponents.disposeUnused());
 	});
 });

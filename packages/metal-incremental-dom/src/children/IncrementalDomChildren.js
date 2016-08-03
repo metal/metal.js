@@ -21,10 +21,11 @@ class IncrementalDomChildren {
 		renderer_ = renderer;
 		callback_ = callback;
 		tree_ = {
-			config: {
+			props: {
 				children: []
 			}
 		};
+		tree_.config = tree_.props;
 		currentParent_ = tree_;
 		isCapturing_ = true;
 		IncrementalDomAop.startInterception({
@@ -57,11 +58,11 @@ class IncrementalDomChildren {
 			args[0] = tree.text;
 			IncrementalDOM.text.apply(null, args);
 		} else {
-			let args = IncrementalDomUtils.buildCallFromConfig(tree.tag, tree.config);
+			let args = IncrementalDomUtils.buildCallFromConfig(tree.tag, tree.props);
 			IncrementalDOM.elementOpen.apply(null, args);
-			if (tree.config.children) {
-				for (var i = 0; i < tree.config.children.length; i++) {
-					IncrementalDomChildren.render(tree.config.children[i], opt_skipNode);
+			if (tree.props.children) {
+				for (var i = 0; i < tree.props.children.length; i++) {
+					IncrementalDomChildren.render(tree.props.children[i], opt_skipNode);
 				}
 			}
 			IncrementalDOM.elementClose(tree.tag);
@@ -95,8 +96,9 @@ function addChildCallToTree_(args, opt_isText) {
 		}
 	} else {
 		child.tag = args[0];
-		child.config = IncrementalDomUtils.buildConfigFromCall(args);
-		child.config.children = [];
+		child.props = IncrementalDomUtils.buildConfigFromCall(args);
+		child.props.children = [];
+		child.config = child.props;
 	}
 
 	addChildToTree(child);
@@ -104,7 +106,7 @@ function addChildCallToTree_(args, opt_isText) {
 }
 
 function addChildToTree(child) {
-	currentParent_.config.children.push(child);
+	currentParent_.props.children.push(child);
 }
 
 /**

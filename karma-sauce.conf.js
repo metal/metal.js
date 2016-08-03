@@ -1,5 +1,7 @@
 'use strict';
 
+var lernaJson = require('./lerna.json');
+
 module.exports = function(config) {
 	config.set({
 		frameworks: ['browserify', 'mocha', 'chai', 'sinon'],
@@ -60,7 +62,12 @@ module.exports = function(config) {
 			debug: true,
 			transform: [
 				['babelify', {presets: ['metal']}]
-			]
+			],
+			insertGlobalVars: {
+				METAL_VERSION: function() {
+					return '\'' + lernaJson.version + '\'';
+				}
+			}
 		},
 
 		client: {

@@ -1,8 +1,9 @@
 {
   "mocha": true,
   "globals": {
-    "assert": true,
-    "sinon": true
+		"assert": true,
+		"sinon": true,
+		"METAL_VERSION": true
   },
   "extends": "../.jshintrc"
 }

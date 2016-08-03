@@ -1596,10 +1596,10 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(1, children.length);
 				assert.ok(!children[0].text);
 				assert.strictEqual('span', children[0].tag);
-				assert.ok(children[0].config);
-				assert.strictEqual(1, children[0].config.children.length);
-				assert.strictEqual('Hello World', children[0].config.children[0].text);
-				assert.ok(!children[0].config.children[0].config);
+				assert.ok(children[0].props);
+				assert.strictEqual(1, children[0].props.children.length);
+				assert.strictEqual('Hello World', children[0].props.children[0].text);
+				assert.ok(!children[0].props.children[0].props);
 			});
 
 			it('should render children via "IncrementalDomRenderer.renderChild"', function() {
@@ -2554,8 +2554,8 @@ describe('IncrementalDomRenderer', function() {
 		});
 
 		it('should render componentless function via "IncrementalDomRenderer.render"', function() {
-			var fn = config => {
-				IncDom.elementOpen('span', null, null, 'foo', config.foo);
+			var fn = props => {
+				IncDom.elementOpen('span', null, null, 'foo', props.foo);
 				IncDom.text('bar');
 				IncDom.elementClose('span');
 			};

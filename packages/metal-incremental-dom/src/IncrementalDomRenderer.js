@@ -57,6 +57,26 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Adds the given css classes to the specified arguments for an incremental
+	 * dom call, merging with the existing value if there is one.
+	 * @param {string} elementClasses
+	 * @param {!Array} args
+	 * @protected
+	 */
+	addElementClasses_(elementClasses, args) {
+		for (var i = 3; i < args.length; i += 2) {
+			if (args[i] === 'class') {
+				args[i + 1] += ' ' + elementClasses;
+				return;
+			}
+		}
+		while (args.length < 3) {
+			args.push(null);
+		}
+		args.push('class', elementClasses);
+	}
+
+	/**
 	 * Attaches inline listeners found on the first component render, since those
 	 * may come from existing elements on the page that already have
 	 * data-on[eventname] attributes set to its final value. This won't trigger
@@ -428,8 +448,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	handleRegularCall_(originalFn, ...args) {
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
-		if (!currRenderer.rootElementReached_ && currRenderer.config_.key) {
-			args[1] = currRenderer.config_.key;
+		if (!currRenderer.rootElementReached_) {
+			if (currRenderer.config_.key) {
+				args[1] = currRenderer.config_.key;
+			}
+			var elementClasses = currComp.getDataManager().get('elementClasses');
+			if (elementClasses) {
+				this.addElementClasses_(elementClasses, args);
+			}
 		}
 
 		var node = originalFn.apply(null, args);
@@ -657,8 +683,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		IncrementalDomAop.stopInterception();
 		if (!this.rootElementReached_) {
 			this.component_.element = null;
-		} else {
-			this.component_.addElementClasses();
 		}
 		this.emit('rendered', !this.isRendered_);
 		IncrementalDomRenderer.finishedRenderingComponent();

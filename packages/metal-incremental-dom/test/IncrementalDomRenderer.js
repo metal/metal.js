@@ -373,11 +373,32 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should add/remove css classes via "elementClasses"', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent({
+				elementClasses: 'test'
+			});
+			assert.ok(dom.hasClass(component.element, 'test'));
+
+			component.elementClasses = 'test2';
+			component.once('stateSynced', function() {
+				assert.ok(!dom.hasClass(component.element, 'test'));
+				assert.ok(dom.hasClass(component.element, 'test2'));
+				done();
+			});
+		});
+
 		it('should add/remove css classes by using both "class" and "elementClasses"', function(done) {
 			class TestComponent extends Component {
 				render() {
 					var cssClass = this.foo ? 'foo' : 'bar';
-					IncDom.elementVoid('button', null, [], 'class', cssClass);
+					IncDom.elementVoid('button', null, [], 'foo', 'foo', 'class', cssClass);
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;

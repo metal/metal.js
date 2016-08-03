@@ -218,31 +218,14 @@ describe('Component', function() {
 	});
 
 	describe('State', function() {
-		it('should set component elementClasses', function(done) {
-			comp = new Component({
-				elementClasses: 'foo bar'
-			});
-
-			assert.strictEqual(2, getClassNames(comp.element).length);
-			assert.strictEqual('foo', getClassNames(comp.element)[0]);
-			assert.strictEqual('bar', getClassNames(comp.element)[1]);
-
-			comp.elementClasses = 'other';
-			async.nextTick(function() {
-				assert.strictEqual(1, getClassNames(comp.element).length);
-				assert.strictEqual('other', getClassNames(comp.element)[0]);
-				done();
-			});
-		});
-
-		it('should add default component elementClasses from static hint', function() {
+		it('should merge elementClasses with ELEMENT_CLASSES static hint', function() {
 			var CustomComponent = createCustomComponentClass();
-			CustomComponent.ELEMENT_CLASSES = 'overwritten1 overwritten2';
+			CustomComponent.ELEMENT_CLASSES = 'static';
 
-			comp = new CustomComponent();
-			assert.strictEqual(2, getClassNames(comp.element).length);
-			assert.strictEqual('overwritten1', getClassNames(comp.element)[0]);
-			assert.strictEqual('overwritten2', getClassNames(comp.element)[1]);
+			comp = new CustomComponent({
+				elementClasses: 'class'
+			});
+			assert.strictEqual('class static', comp.elementClasses);
 		});
 
 		it('should allow setting element to null', function() {
@@ -256,23 +239,6 @@ describe('Component', function() {
 			comp.element = null;
 			assert.doesNotThrow(() => comp.detach());
 			assert.ok(!comp.inDocument);
-		});
-
-		it('should set elementClasses on new element when changed', function() {
-			comp = new Component({
-				elementClasses: 'testClass'
-			});
-			comp.element = document.createElement('div');
-			assert.ok(dom.hasClass(comp.element, 'testClass'));
-		});
-
-		it('should set elementClasses on new element when changed after being set to null', function() {
-			comp = new Component({
-				elementClasses: 'testClass'
-			});
-			comp.element = null;
-			comp.element = document.createElement('div');
-			assert.ok(dom.hasClass(comp.element, 'testClass'));
 		});
 
 		it('should update element display value according to visible state', function(done) {
@@ -977,9 +943,5 @@ describe('Component', function() {
 			}
 		}
 		return CustomRenderer;
-	}
-
-	function getClassNames(element) {
-		return element.className.trim().split(' ');
 	}
 });

@@ -144,18 +144,6 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Adds the necessary classes to the component's element.
-	 */
-	addElementClasses() {
-		var classesToAdd = this.constructor.ELEMENT_CLASSES_MERGED;
-		var elementClasses = this.dataManager_.get('elementClasses');
-		if (elementClasses) {
-			classesToAdd = classesToAdd + ' ' + elementClasses;
-		}
-		dom.addClasses(this.element, classesToAdd);
-	}
-
-	/**
 	 * Getter logic for the element property.
 	 * @return {Element}
 	 */
@@ -507,7 +495,6 @@ class Component extends EventEmitter {
 		this.setUpProxy_();
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		if (event.newVal) {
-			this.addElementClasses();
 			this.syncVisible(this.dataManager_.get('visible'));
 		}
 	}
@@ -637,6 +624,20 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Setter for the `elementClasses` data property. Appends given value with
+	 * the one specified in `ELEMENT_CLASSES`.
+	 * @param {string} val
+	 * @return {string}
+	 * @protected
+	 */
+	setterElementClassesFn_(val) {
+		if (this.constructor.ELEMENT_CLASSES_MERGED) {
+			val += ' ' + this.constructor.ELEMENT_CLASSES_MERGED;
+		}
+		return val.trim();
+	}
+
+	/**
 	 * Creates the `DomEventEmitterProxy` instance and has it start proxying any
 	 * listeners that have already been listened to.
 	 * @protected
@@ -680,18 +681,6 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * State synchronization logic for the `elementClasses` state key.
-	 * @param {string} newVal
-	 * @param {string} prevVal
-	 */
-	syncElementClasses(newVal, prevVal) {
-		if (this.element && prevVal) {
-			dom.removeClasses(this.element, prevVal);
-		}
-		this.addElementClasses();
-	}
-
-	/**
 	 * State synchronization logic for `visible` state key.
 	 * Updates the element's display value according to its visibility.
 	 * @param {boolean} newVal
@@ -708,16 +697,6 @@ class Component extends EventEmitter {
 	 *     first render.
 	 */
 	rendered() {}
-
-	/**
-	 * Validator logic for elementClasses state key.
-	 * @param {string} val
-	 * @return {boolean} True if val is a valid element classes.
-	 * @protected
-	 */
-	validatorElementClassesFn_(val) {
-		return core.isString(val);
-	}
 
 	/**
 	 * Validator logic for the `events` state key.
@@ -741,7 +720,9 @@ Component.DATA = {
 	 * @type {string}
 	 */
 	elementClasses: {
-		validator: 'validatorElementClassesFn_'
+		setter: 'setterElementClassesFn_',
+		validator: core.isString,
+		value: ''
 	},
 
 	/**

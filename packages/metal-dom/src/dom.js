@@ -30,13 +30,13 @@ class dom {
 			elements = [elements];
 		}
 
-		elements.forEach(function(element) {
-			if ('classList' in element) {
-				dom.addClassesWithNative_(element, classes);
+		for (let i = 0; i < elements.length; i++) {
+			if ('classList' in elements[i]) {
+				dom.addClassesWithNative_(elements[i], classes);
 			} else {
-				dom.addClassesWithoutNative_(element, classes);
+				dom.addClassesWithoutNative_(elements[i], classes);
 			}
-		});
+		}
 	}
 
 	/**
@@ -504,13 +504,13 @@ class dom {
 			elements = [elements];
 		}
 
-		elements.forEach(function(element) {
-			if ('classList' in element) {
-				dom.removeClassesWithNative_(element, classes);
+		for (let i = 0; i < elements.length; i++) {
+			if ('classList' in elements[i]) {
+				dom.removeClassesWithNative_(elements[i], classes);
 			} else {
-				dom.removeClassesWithoutNative_(element, classes);
+				dom.removeClassesWithoutNative_(elements[i], classes);
 			}
-		});
+		}
 	}
 
 	/**

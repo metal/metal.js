@@ -22,6 +22,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		comp.context = {};
 		this.config_ = comp.getInitialConfig();
+		this.childComponents_ = [];
 		this.clearChanges_();
 		comp.on('attached', this.handleAttached_.bind(this));
 
@@ -135,6 +136,20 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	clearChanges_() {
 		this.changes_ = {};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	disposeInternal() {
+		super.disposeInternal();
+		for (var i = 0; i < this.childComponents_.length; i++) {
+			const child = this.childComponents_[i];
+			if (!child.isDisposed()) {
+				child.element = null;
+				child.dispose();
+			}
+		}
 	}
 
 	/**
@@ -635,7 +650,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		IncrementalDomRenderer.startedRenderingComponent(this.component_);
 		this.clearChanges_();
 		this.rootElementReached_ = false;
-		IncrementalDomUnusedComponents.schedule(this.childComponents_ || []);
+		IncrementalDomUnusedComponents.schedule(this.childComponents_);
 		this.childComponents_ = [];
 		this.intercept_();
 		this.renderIncDom();

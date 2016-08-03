@@ -1437,6 +1437,35 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should dispose sub components when component is disposed', function() {
+			const children = [];
+			class TestChildComponent extends Component {
+				created() {
+					children.push(this);
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(TestChildComponent);
+					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child');
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			assert.strictEqual(2, children.length);
+			assert.ok(!children[0].isDisposed());
+			assert.ok(!children[1].isDisposed());
+
+			component.dispose();
+			assert.ok(children[0].isDisposed());
+			assert.ok(children[1].isDisposed());
+		});
+
 		it('should use the same element from sub component if no wrapper is given', function() {
 			class TestComponent extends Component {
 				render() {

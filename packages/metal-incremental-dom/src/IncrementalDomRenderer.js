@@ -163,6 +163,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	disposeInternal() {
 		super.disposeInternal();
+
+		var comp = this.component_;
+		var ref = this.config_.ref;
+		var owner = this.getOwner();
+		if (owner && owner.components && owner.components[ref] === comp) {
+			delete owner.components[ref];
+		}
+
 		for (var i = 0; i < this.childComponents_.length; i++) {
 			const child = this.childComponents_[i];
 			if (!child.isDisposed()) {
@@ -170,6 +178,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				child.dispose();
 			}
 		}
+		this.childComponents_ = null;
 	}
 
 	/**

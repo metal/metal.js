@@ -2575,6 +2575,50 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
+	describe('Dispose', function() {
+		it('should remove component with ref from owner', function() {
+			class Child extends Component {
+			}
+			Child.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncrementalDOM.elementVoid(Child, null, null, 'ref', 'child');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			var child = component.components.child;
+
+			child.dispose();
+			assert.ok(child.isDisposed());
+			assert.ok(!component.components.child);
+		});
+
+		it('should not remove different component with same ref from owner', function() {
+			class Child extends Component {
+			}
+			Child.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncrementalDOM.elementVoid(Child, null, null, 'ref', 'child');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			var child = component.components.child;
+			component.components.child = new Child();
+
+			child.dispose();
+			assert.ok(child.isDisposed());
+			assert.ok(component.components.child);
+			assert.ok(!component.components.child.isDisposed());
+		});
+	});
+
 	describe('IncrementalDomRenderer.isIncDomNode', function() {
 		it('should check if given data is an incremental dom node', function() {
 			assert.ok(!IncrementalDomRenderer.isIncDomNode({}));

@@ -50,7 +50,7 @@ describe('IncrementalDomUnusedComponents', function() {
 		assert.ok(comps[1].isDisposed());
 	});
 
-	it('should not dispose scheduled components that have parent again', function() {
+	it('should not dispose scheduled components that have received a new parent', function() {
 		var comps = [comp.components.child1, comp.components.child2];
 		IncrementalDomUnusedComponents.schedule(comps);
 		comps[0].getRenderer().parent_ = comp;
@@ -60,7 +60,19 @@ describe('IncrementalDomUnusedComponents', function() {
 		assert.ok(comps[1].isDisposed());
 	});
 
-	it('should not dispose scheduled components that have already been disposed', function() {
+	it('should not dispose scheduled components that have been disposed before scheduled', function() {
+		var comps = [comp.components.child1, comp.components.child2];
+		comps[0].dispose();
+		IncrementalDomUnusedComponents.schedule(comps);
+		sinon.spy(comps[0], 'dispose');
+		sinon.spy(comps[1], 'dispose');
+		IncrementalDomUnusedComponents.disposeUnused();
+
+		assert.strictEqual(0, comps[0].dispose.callCount);
+		assert.strictEqual(1, comps[1].dispose.callCount);
+	});
+
+	it('should not dispose scheduled components that have been disposed after scheduled', function() {
 		var comps = [comp.components.child1, comp.components.child2];
 		IncrementalDomUnusedComponents.schedule(comps);
 		comps[0].dispose();
@@ -72,22 +84,19 @@ describe('IncrementalDomUnusedComponents', function() {
 		assert.strictEqual(1, comps[1].dispose.callCount);
 	});
 
-	it('should not dispose different component with same ref as a scheduled component', function() {
-		var comps = [comp.components.child1, comp.components.child2];
+	it('should not throw error when `disposeUnused` is called during another `disposeUnused` call', function() {
+		sinon.stub(comp.components.child1, 'disposed', () => {
+			IncrementalDomUnusedComponents.disposeUnused();
+		});
+
+		var comps = [comp.components.child1];
 		IncrementalDomUnusedComponents.schedule(comps);
 
-		comp.addSubComponent('child1', new Component());
-		var newChild1 = comp.components.child1;
-		assert.notStrictEqual(comps[0], newChild1);
-
-		IncrementalDomUnusedComponents.disposeUnused();
-
+		assert.doesNotThrow(() => IncrementalDomUnusedComponents.disposeUnused());
 		assert.ok(comps[0].isDisposed());
-		assert.ok(comps[1].isDisposed());
-		assert.ok(!newChild1.isDisposed());
 	});
 
-	it('should not throw error when disposing component that has previously disposed owner', function() {
+	it('should not throw error when disposing component that has an owner that was previously disposed', function() {
 		var comps = [comp.components.child2, grandchild];
 		IncrementalDomUnusedComponents.schedule(comps);
 		assert.doesNotThrow(() => IncrementalDomUnusedComponents.disposeUnused());

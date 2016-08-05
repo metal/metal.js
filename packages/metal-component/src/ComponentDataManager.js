@@ -30,8 +30,8 @@ class ComponentDataManager extends EventEmitter {
 	 * @param {!Object} config
 	 * @param {*} opt_initialValue
 	 */
-	add(name, config, opt_initialValue) {
-		this.state_.addToState(name, config, opt_initialValue);
+	add() {
+		this.state_.addToState(...arguments);
 	}
 
 	/**

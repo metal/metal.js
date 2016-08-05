@@ -82,7 +82,7 @@ class State extends EventEmitter {
 	 * @param {*} initialValue The initial value of the new key.
 	 */
 	addKeyToState(name, config, initialValue) {
-		this.buildKeyInfo_(name, config, initialValue);
+		this.buildKeyInfo_(name, config, initialValue, arguments.length > 2);
 		Object.defineProperty(
 			this.obj_,
 			name,
@@ -130,11 +130,7 @@ class State extends EventEmitter {
 	 */
 	addToState(configsOrName, opt_initialValuesOrConfig, opt_contextOrInitialValue) {
 		if (core.isString(configsOrName)) {
-			return this.addKeyToState(
-				configsOrName,
-				opt_initialValuesOrConfig,
-				opt_contextOrInitialValue
-			);
+			return this.addKeyToState(...arguments);
 		}
 
 		var initialValues = opt_initialValuesOrConfig || {};
@@ -143,7 +139,12 @@ class State extends EventEmitter {
 		var props = {};
 		for (var i = 0; i < names.length; i++) {
 			var name = names[i];
-			this.buildKeyInfo_(name, configsOrName[name], initialValues[name]);
+			this.buildKeyInfo_(
+				name,
+				configsOrName[name],
+				initialValues[name],
+				initialValues.hasOwnProperty(name)
+			);
 			props[name] = this.buildKeyPropertyDef_(name, opt_contextOrInitialValue);
 			this.assertGivenIfRequired_(name);
 		}
@@ -210,9 +211,11 @@ class State extends EventEmitter {
 	 * @param {string} name The name of the key.
 	 * @param {Object} config The config object for the key.
 	 * @param {*} initialValue The initial value of the key.
+	 * @param {boolean} hasInitialValue Flag indicating if an initial value was
+	 *     given or not (important since `initialValue` can also be `undefined`).
 	 * @protected
 	 */
-	buildKeyInfo_(name, config, initialValue) {
+	buildKeyInfo_(name, config, initialValue, hasInitialValue) {
 		this.assertValidStateKeyName_(name);
 		config = (config && config.config) ? config.config : (config || {});
 		if (this.commonOpts_) {
@@ -220,9 +223,11 @@ class State extends EventEmitter {
 		}
 		this.stateInfo_[name] = {
 			config,
-			initialValue,
 			state: State.KeyStates.UNINITIALIZED
 		};
+		if (hasInitialValue && this.callValidator_(name, initialValue)) {
+			this.stateInfo_[name].initialValue = initialValue;
+		}
 	}
 
 	/**
@@ -403,7 +408,18 @@ class State extends EventEmitter {
 	 */
 	hasBeenSet(name) {
 		var info = this.stateInfo_[name];
-		return info.state === State.KeyStates.INITIALIZED || info.initialValue;
+		return info.state === State.KeyStates.INITIALIZED ||
+			this.hasInitialValue_(name);
+	}
+	
+	/**
+	 * Checks if an initial value was given to the specified state property.
+	 * @param {string} name The name of the key.
+	 * @return {boolean}
+	 * @protected
+	 */
+	hasInitialValue_(name) {
+		return this.stateInfo_[name].hasOwnProperty('initialValue');
 	}
 
 	/**
@@ -449,7 +465,6 @@ class State extends EventEmitter {
 		info.state = State.KeyStates.INITIALIZING;
 		this.setInitialValue_(name);
 		if (!info.written) {
-			info.state = State.KeyStates.INITIALIZING_DEFAULT;
 			this.setDefaultValue(name);
 		}
 		info.state = State.KeyStates.INITIALIZED;
@@ -559,8 +574,8 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	setInitialValue_(name) {
-		var info = this.stateInfo_[name];
-		if (info.initialValue !== undefined) {
+		if (this.hasInitialValue_(name)) {
+			var info = this.stateInfo_[name];
 			this.set(name, info.initialValue);
 			info.initialValue = undefined;
 		}
@@ -602,7 +617,7 @@ class State extends EventEmitter {
 		}
 
 		var info = this.stateInfo_[name];
-		if (info.initialValue === undefined && info.state === State.KeyStates.UNINITIALIZED) {
+		if (!this.hasInitialValue_(name) && info.state === State.KeyStates.UNINITIALIZED) {
 			info.state = State.KeyStates.INITIALIZED;
 		}
 
@@ -642,7 +657,7 @@ class State extends EventEmitter {
 	validateKeyValue_(name, value) {
 		var info = this.stateInfo_[name];
 
-		return info.state === State.KeyStates.INITIALIZING_DEFAULT ||
+		return info.state === State.KeyStates.INITIALIZING ||
 			this.callValidator_(name, value);
 	}
 }
@@ -662,8 +677,7 @@ State.INVALID_KEYS = ['state', 'stateKey'];
 State.KeyStates = {
 	UNINITIALIZED: 0,
 	INITIALIZING: 1,
-	INITIALIZING_DEFAULT: 2,
-	INITIALIZED: 3
+	INITIALIZED: 2
 };
 
 export default State;

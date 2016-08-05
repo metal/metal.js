@@ -400,6 +400,27 @@ describe('State', function() {
 		console.error = originalConsoleFn;
 	});
 
+	it('should emit validator error even for "undefined" initial values', function() {
+		var originalConsoleFn = console.error;
+		console.error = sinon.stub();
+		class Test extends State {
+		}
+		Test.STATE = {
+			key1: {
+				validator: function() {
+					return new Error();
+				}
+			}
+		};
+		
+		new Test({
+			key1: undefined
+		});
+		assert.ok(console.error.called);
+
+		console.error = originalConsoleFn;
+	});
+
 	it('should change state new value through setter', function() {
 		var state = new State();
 		state.addToState({

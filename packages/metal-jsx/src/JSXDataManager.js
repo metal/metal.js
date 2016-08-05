@@ -12,8 +12,8 @@ class JSXDataManager extends ComponentDataManager {
 	 * @param {*} opt_initialValue
 	 * @override
 	 */
-	add(name, config, opt_initialValue) {
-		this.props_.addToState(name, config, opt_initialValue);
+	add() {
+		this.props_.addToState(...arguments);
 	}
 
 	/**

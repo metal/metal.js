@@ -187,10 +187,10 @@ class core {
 	/**
 	 * Returns true if value is a string.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isString(val) {
-		return typeof val === 'string';
+		return typeof val === 'string' || val instanceof String;
 	}
 
 	/**

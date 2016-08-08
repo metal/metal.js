@@ -171,6 +171,7 @@ describe('core', function() {
 			assert.ok(!core.isString(undefined));
 
 			assert.ok(core.isString(''));
+			assert.ok(core.isString(new String(''))); // jshint ignore:line
 		});
 
 		it('should check if var is boolean', function() {

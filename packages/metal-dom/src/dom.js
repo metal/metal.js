@@ -254,6 +254,31 @@ class dom {
 	}
 
 	/**
+	 * Verifies if the element is able to trigger the Click event,
+	 * simulating browsers behaviour, avoiding event listeners to be called by dom.triggerEvent method.
+	 * @param {Element} node Element to be checked.
+	 * @param {string} eventName The event name.
+	 */
+	static isAbleToInteract_(node, eventName) {
+		var currElement = node;
+		var isAble = true;
+		var matchesSelector = 'button, input, select, textarea, fieldset';
+
+		if (eventName === 'click') {
+			while (currElement && currElement.tagName !== 'LEGEND') {
+				if (currElement.disabled && dom.match(currElement, matchesSelector)) {
+					isAble = false;
+					break;
+				}
+
+				currElement = currElement.parentNode;
+			}
+		}
+
+		return isAble;
+	}
+
+	/**
 	 * Inserts node in document as last element.
 	 * @param {Element} node Element to remove children from.
 	 */
@@ -684,10 +709,12 @@ class dom {
 	 *   triggered event's payload.
 	 */
 	static triggerEvent(element, eventName, opt_eventObj) {
-		var eventObj = document.createEvent('HTMLEvents');
-		eventObj.initEvent(eventName, true, true);
-		object.mixin(eventObj, opt_eventObj);
-		element.dispatchEvent(eventObj);
+		if (dom.isAbleToInteract_(element, eventName)) {
+			var eventObj = document.createEvent('HTMLEvents');
+			eventObj.initEvent(eventName, true, true);
+			object.mixin(eventObj, opt_eventObj);
+			element.dispatchEvent(eventObj);
+		}
 	}
 
 	/**

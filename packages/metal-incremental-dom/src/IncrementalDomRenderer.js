@@ -26,23 +26,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.clearChanges_();
 		comp.on('attached', this.handleAttached_.bind(this));
 
-		var manager = comp.getDataManager();
-		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
-			// If the component is being updated synchronously we'll just reuse the
-			// `handleComponentRendererStateKeyChanged_` function from
-			// `ComponentRenderer`.
-			manager.on('dataPropChanged', this.handleDataPropChanged_.bind(this));
-		}
-
-		manager.add(
-			'children',
-			{
-				validator: Array.isArray,
-				value: emptyChildren_
-			},
-			this.config_.children || emptyChildren_
-		);
-
 		// Binds functions that will be used many times, to avoid creating new
 		// functions each time.
 		this.handleInterceptedAttributesCall_ =
@@ -344,6 +327,30 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			this.renderFromTag_(node.tag, node.config);
 			return true;
 		}
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	handleDataManagerCreated_() {
+		super.handleDataManagerCreated_();
+
+		var manager = this.component_.getDataManager();
+		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
+			// If the component is being updated synchronously we'll just reuse the
+			// `handleComponentRendererStateKeyChanged_` function from
+			// `ComponentRenderer`.
+			manager.on('dataPropChanged', this.handleDataPropChanged_.bind(this));
+		}
+
+		manager.add(
+			'children',
+			{
+				validator: Array.isArray,
+				value: emptyChildren_
+			},
+			this.config_.children || emptyChildren_
+		);
 	}
 
 	/**

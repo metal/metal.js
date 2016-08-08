@@ -2,6 +2,7 @@
 
 import { async, core } from 'metal';
 import { dom, features } from 'metal-dom';
+import { validators } from 'metal-state';
 import Component from '../src/Component';
 import ComponentDataManager from '../src/ComponentDataManager';
 import ComponentRegistry from '../src/ComponentRegistry';
@@ -894,6 +895,32 @@ describe('Component', function() {
 
 			comp.components.child.dispose();
 			assert.doesNotThrow(comp.dispose.bind(comp));
+		});
+	});
+
+	describe('Validators', function() {
+		let originalConsoleErrorFn = console.error;
+
+		beforeEach(function() {
+			console.error = sinon.stub();
+		});
+
+		afterEach(function() {
+			console.error = originalConsoleErrorFn;
+		});
+
+		it('should warn if validator fails on initial value', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.STATE = {
+				foo: {
+					validator: validators.string
+				}
+			};
+			comp = new TestComponent({
+				foo: 10
+			});
+			assert.strictEqual(1, console.error.callCount);
 		});
 	});
 

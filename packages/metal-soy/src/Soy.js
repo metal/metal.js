@@ -12,13 +12,6 @@ var ijData = {};
 
 class Soy extends IncrementalDomRenderer {
 	/**
-	 * @inheritDoc
-	 */
-	constructor(comp) {
-		super(comp);
-		this.addMissingStateKeys_();
-	}
-	/**
 	 * Adds the template params to the component's state, if they don't exist yet.
 	 * @protected
 	 */
@@ -85,6 +78,14 @@ class Soy extends IncrementalDomRenderer {
 			}
 			return goog.loadedModules_[namespace][templateName](opt_data, opt_ignored, opt_ijData);
 		};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	handleDataManagerCreated_() {
+		super.handleDataManagerCreated_();
+		this.addMissingStateKeys_();
 	}
 
 	/**

@@ -125,10 +125,11 @@ class Component extends EventEmitter {
 
 		this.element = this.initialConfig_.element;
 
-		this.dataManager_ = this.createDataManager();
-
 		this.renderer_ = this.createRenderer();
 		this.renderer_.on('rendered', this.handleRendererRendered_.bind(this));
+
+		this.dataManager_ = this.createDataManager();
+		this.emit('dataManagerCreated');
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);

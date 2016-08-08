@@ -21,8 +21,24 @@ class ComponentRenderer extends EventEmitter {
 			this.component_.once('render', this.render.bind(this))
 		);
 		this.on('rendered', this.handleRendered_);
+		component.on('dataManagerCreated', this.handleDataManagerCreated_.bind(this));
+	}
 
-		var manager = component.getDataManager();
+	/**
+	 * @inheritDoc
+	 */
+	disposeInternal() {
+		this.componentRendererEvents_.removeAllListeners();
+		this.componentRendererEvents_ = null;
+	}
+
+	/**
+	 * Handles a `dataManagerCreated` event from the component. Listens to events
+	 * on the manager that has been created.
+	 * @protected
+	 */
+	handleDataManagerCreated_() {
+		const manager = this.component_.getDataManager();
 		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
 			this.componentRendererEvents_.add(
 				manager.on(
@@ -38,14 +54,6 @@ class ComponentRenderer extends EventEmitter {
 				)
 			);
 		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	disposeInternal() {
-		this.componentRendererEvents_.removeAllListeners();
-		this.componentRendererEvents_ = null;
 	}
 
 	/**

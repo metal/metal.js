@@ -5,17 +5,16 @@ import Component from '../src/Component';
 import ComponentRenderer from '../src/ComponentRenderer';
 
 describe('ComponentRenderer', function() {
-	var renderer;
+	var component;
 
 	afterEach(function() {
-		renderer.dispose();
+		component.dispose();
 	});
 
 	it('should call the render method when the component is rendered', function() {
-		var component = new Component();
-
 		sinon.spy(ComponentRenderer.prototype, 'render');
-		renderer = new ComponentRenderer(component);
+		component = new Component();
+		const renderer = component.getRenderer();
 
 		component.emit('render');
 		assert.strictEqual(1, renderer.render.callCount);
@@ -23,19 +22,15 @@ describe('ComponentRenderer', function() {
 	});
 
 	it('should set element to simple empty div as the default render implementation', function() {
-		var component = new Component();
-		renderer = new ComponentRenderer(component);
-		component.emit('render');
-
+		component = new Component();
 		assert.ok(core.isElement(component.element));
 		assert.strictEqual('DIV', component.element.tagName);
 	});
 
 	it('should not call the render method after disposed', function() {
-		var component = new Component();
-
 		sinon.spy(ComponentRenderer.prototype, 'render');
-		renderer = new ComponentRenderer(component);
+		component = new Component({}, false);
+		const renderer = component.getRenderer();
 
 		renderer.dispose();
 		component.emit('render');
@@ -45,8 +40,8 @@ describe('ComponentRenderer', function() {
 
 	it('should not call the update method if state changes before render', function(done) {
 		var TestComponent = createTestComponent();
-		var component = new TestComponent({}, false);
-		renderer = new ComponentRenderer(component);
+		component = new TestComponent({}, false);
+		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
 		component.foo = 'foo';
@@ -58,8 +53,8 @@ describe('ComponentRenderer', function() {
 
 	it('should call the update method asynchronously if state changes', function(done) {
 		var TestComponent = createTestComponent();
-		var component = new TestComponent();
-		renderer = new ComponentRenderer(component);
+		component = new TestComponent();
+		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
 		component.emit('render');
@@ -94,8 +89,8 @@ describe('ComponentRenderer', function() {
 
 	it('should not call the update method if state changes while skipping updates', function(done) {
 		var TestComponent = createTestComponent();
-		var component = new TestComponent();
-		renderer = new ComponentRenderer(component);
+		component = new TestComponent();
+		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
 		component.emit('render');
@@ -115,8 +110,8 @@ describe('ComponentRenderer', function() {
 
 	it('should not call update method after disposed', function(done) {
 		var TestComponent = createTestComponent();
-		var component = new TestComponent();
-		renderer = new ComponentRenderer(component);
+		component = new TestComponent();
+		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
 		component.emit('render');
@@ -134,8 +129,8 @@ describe('ComponentRenderer', function() {
 			var TestComponent = createTestComponent();
 			TestComponent.SYNC_UPDATES = true;
 
-			var component = new TestComponent();
-			renderer = new ComponentRenderer(component);
+			component = new TestComponent();
+			const renderer = component.getRenderer();
 			sinon.spy(renderer, 'update');
 
 			component.emit('render');
@@ -166,8 +161,8 @@ describe('ComponentRenderer', function() {
 			var TestComponent = createTestComponent();
 			TestComponent.SYNC_UPDATES = true;
 
-			var component = new TestComponent({}, false);
-			renderer = new ComponentRenderer(component);
+			component = new TestComponent({}, false);
+			const renderer = component.getRenderer();
 			sinon.spy(renderer, 'update');
 
 			component.foo = 'foo';

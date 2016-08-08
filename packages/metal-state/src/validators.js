@@ -161,7 +161,8 @@ const validators = {
  */
 function composeError(error, name, context) {
 	const compName = context ? core.getFunctionName(context.constructor) : null;
-	const parent = context && context.getRenderer ?
+	var renderer = context && context.getRenderer && context.getRenderer();
+	const parent = renderer && renderer.getParent ?
 		context.getRenderer().getParent() :
 		null;
 	const parentName = parent ? core.getFunctionName(parent.constructor) : null;

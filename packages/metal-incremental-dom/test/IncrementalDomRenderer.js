@@ -1732,6 +1732,51 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(child2.element, child1.element.childNodes[0]);
 			});
 
+			it('should render children components with changed props', function() {
+				class TestChildComponent extends Component {
+					render() {
+						IncrementalDOM.elementOpen('child');
+						if (this.children.length) {
+							this.children[0].props = object.mixin({}, this.children[0].props, {
+								foo: 'changedFoo'
+							});
+							this.children.forEach(IncrementalDomRenderer.renderChild);
+						}
+						if (this.foo) {
+							IncrementalDOM.text(this.foo);
+						}
+						IncrementalDOM.elementClose('child');
+					}
+				}
+				TestChildComponent.RENDERER = IncrementalDomRenderer;
+				TestChildComponent.STATE = {
+					foo: {
+					}
+				};
+
+				class TestNestedChildComponent extends Component {
+					render() {
+						IncDom.elementOpen(TestChildComponent);
+						this.children.forEach(IncrementalDomRenderer.renderChild);
+						IncDom.elementClose(TestChildComponent);
+					}
+				}
+				TestNestedChildComponent.RENDERER = IncrementalDomRenderer;
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen(TestNestedChildComponent);
+						IncDom.elementVoid(TestChildComponent, null, null, 'foo', 'foo');
+						IncDom.elementClose(TestNestedChildComponent);
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+				component = new TestComponent();
+
+				assert.strictEqual(1, component.element.childNodes.length);
+				assert.strictEqual('changedFoo', component.element.childNodes[0].textContent);
+			});
+
 			it('should render correctly when recursive children are used', function() {
 				class TestChildComponent extends Component {
 					render() {

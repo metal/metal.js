@@ -307,10 +307,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleChildrenCaptured_(tree) {
-		var {config, tag} = this.componentToRender_;
-		config.children = this.buildChildren_(tree.config.children);
+		var {props, tag} = this.componentToRender_;
+		props.children = this.buildChildren_(tree.props.children);
 		this.componentToRender_ = null;
-		this.renderFromTag_(tag, config);
+		this.renderFromTag_(tag, props);
 	}
 
 	/**
@@ -323,8 +323,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleChildRender_(node) {
 		if (node.tag && IncrementalDomUtils.isComponentTag(node.tag)) {
-			node.config.children = this.buildChildren_(node.config.children);
-			this.renderFromTag_(node.tag, node.config);
+			node.props.children = this.buildChildren_(node.props.children);
+			this.renderFromTag_(node.tag, node.props);
 			return true;
 		}
 	}
@@ -488,9 +488,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleSubComponentCall_(originalFn, ...args) {
-		var config = IncrementalDomUtils.buildConfigFromCall(args);
+		var props = IncrementalDomUtils.buildConfigFromCall(args);
 		this.componentToRender_ = {
-			config,
+			props,
 			tag: args[0]
 		};
 		IncrementalDomChildren.capture(this, this.handleChildrenCaptured_);

@@ -625,6 +625,124 @@ describe('dom', function() {
 				dom.triggerEvent(matchedElements[1], 'click');
 				assert.ok(!listener.args[0][0].delegateTarget);
 			});
+
+			it('should not trigger delegate click event for disabled elements', function() {
+				var parent = document.createElement('div');
+				document.body.appendChild(parent);
+
+				var input = document.createElement('input');
+				var select = document.createElement('select');
+				var button = document.createElement('button');
+				input.disabled = true;
+				select.disabled = true;
+				button.disabled = true;
+				parent.appendChild(input);
+				parent.appendChild(select);
+				parent.appendChild(button);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var listener3 = sinon.stub();
+
+				dom.delegate(parent, 'click', input, listener1);
+				dom.delegate(parent, 'click', select, listener2);
+				dom.delegate(parent, 'click', button, listener3);
+
+				dom.triggerEvent(input, 'click');
+				dom.triggerEvent(select, 'click');
+				dom.triggerEvent(button, 'click');
+				assert.strictEqual(0, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+				assert.strictEqual(0, listener3.callCount);
+			});
+
+			it('should not trigger delegate click event to an element which its valid parent is disabled', function() {
+				var parent = document.createElement('fieldset');
+				parent.disabled = true;
+				document.body.appendChild(parent);
+
+				var input = document.createElement('input');
+				var select = document.createElement('select');
+				var button = document.createElement('button');
+				parent.appendChild(input);
+				parent.appendChild(select);
+				parent.appendChild(button);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var listener3 = sinon.stub();
+
+				dom.delegate(parent, 'click', input, listener1);
+				dom.delegate(parent, 'click', select, listener2);
+				dom.delegate(parent, 'click', button, listener3);
+
+				dom.triggerEvent(input, 'click');
+				dom.triggerEvent(select, 'click');
+				dom.triggerEvent(button, 'click');
+				assert.strictEqual(0, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+				assert.strictEqual(0, listener3.callCount);
+			});
+
+			it('it should trigger delegate click event on elements wrapped by a "legend" tag and with disabled parent', function() {
+				var fieldset = document.createElement('fieldset');
+				var legend = document.createElement('legend');
+				fieldset.disabled = true;
+				fieldset.appendChild(legend);
+				document.body.appendChild(fieldset);
+
+				var input = document.createElement('input');
+				var select = document.createElement('select');
+				var button = document.createElement('button');
+				legend.appendChild(input);
+				legend.appendChild(select);
+				legend.appendChild(button);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var listener3 = sinon.stub();
+
+				dom.delegate(fieldset, 'click', input, listener1);
+				dom.delegate(fieldset, 'click', select, listener2);
+				dom.delegate(fieldset, 'click', button, listener3);
+
+				dom.triggerEvent(input, 'click');
+				dom.triggerEvent(select, 'click');
+				dom.triggerEvent(button, 'click');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+				assert.strictEqual(1, listener3.callCount);
+			});
+
+			it('should not trigger delegate click event to an element which its valid parent is disabled even it is wrapped by another element different of legend', function() {
+				var fieldset = document.createElement('fieldset');
+				var wrapper = document.createElement('div');
+				fieldset.disabled = true;
+				fieldset.appendChild(wrapper);
+				document.body.appendChild(fieldset);
+
+				var input = document.createElement('input');
+				var select = document.createElement('select');
+				var button = document.createElement('button');
+				wrapper.appendChild(input);
+				wrapper.appendChild(select);
+				wrapper.appendChild(button);
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				var listener3 = sinon.stub();
+
+				dom.delegate(fieldset, 'click', input, listener1);
+				dom.delegate(fieldset, 'click', select, listener2);
+				dom.delegate(fieldset, 'click', button, listener3);
+
+				dom.triggerEvent(input, 'click');
+				dom.triggerEvent(select, 'click');
+				dom.triggerEvent(button, 'click');
+				assert.strictEqual(0, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+				assert.strictEqual(0, listener3.callCount);
+			});
 		});
 
 		describe('without selector', function() {

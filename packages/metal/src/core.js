@@ -104,7 +104,7 @@ class core {
 	/**
 	 * Returns true if value is not undefined or null.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isDefAndNotNull(val) {
 		return core.isDef(val) && !core.isNull(val);
@@ -113,7 +113,7 @@ class core {
 	/**
 	 * Returns true if value is a document.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isDocument(val) {
 		return val && typeof val === 'object' && val.nodeType === 9;
@@ -122,7 +122,7 @@ class core {
 	/**
 	 * Returns true if value is a dom element.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isElement(val) {
 		return val && typeof val === 'object' && val.nodeType === 1;
@@ -140,7 +140,7 @@ class core {
 	/**
 	 * Returns true if value is null.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isNull(val) {
 		return val === null;
@@ -158,7 +158,7 @@ class core {
 	/**
 	 * Returns true if value is a window.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isWindow(val) {
 		return val !== null && val === val.window;
@@ -178,7 +178,7 @@ class core {
 	/**
 	 * Returns true if value is a Promise.
 	 * @param {*} val
-	 * @return {Boolean}
+	 * @return {boolean}
 	 */
 	static isPromise(val) {
 		return val && typeof val === 'object' && typeof val.then === 'function';

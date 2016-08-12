@@ -425,6 +425,20 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
+	it('should not cause css classes to be added twice due to "elementClasses"', function() {
+		class TestComponent extends Component {
+			render() {
+				IncDom.elementVoid('div', null, null, 'class', this.elementClasses);
+			}
+		}
+		TestComponent.RENDERER = IncrementalDomRenderer;
+
+		component = new TestComponent({
+			elementClasses: 'test'
+		});
+		assert.strictEqual('test', component.element.getAttribute('class'));
+	});
+
 	describe('Existing Content', function() {
 		it('should not change existing content if the same that would be rendered', function() {
 			class TestComponent extends Component {

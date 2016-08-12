@@ -48,7 +48,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	addElementClasses_(elementClasses, args) {
 		for (var i = 3; i < args.length; i += 2) {
-			if (args[i] === 'class') {
+			if (args[i] === 'class' && args[i + 1].indexOf(elementClasses) === -1) {
 				args[i + 1] += ' ' + elementClasses;
 				return;
 			}

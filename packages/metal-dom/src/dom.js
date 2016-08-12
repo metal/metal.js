@@ -259,7 +259,7 @@ class dom {
 	 * @param {Element} node Element to be checked.
 	 * @param {string} eventName The event name.
 	 */
-	static isAbleToInteract_(node, eventName) {
+	static isAbleToInteractWith_(node, eventName) {
 		var currElement = node;
 		var isAble = true;
 		var matchesSelector = 'button, input, select, textarea, fieldset';
@@ -709,7 +709,7 @@ class dom {
 	 *   triggered event's payload.
 	 */
 	static triggerEvent(element, eventName, opt_eventObj) {
-		if (dom.isAbleToInteract_(element, eventName)) {
+		if (dom.isAbleToInteractWith_(element, eventName)) {
 			var eventObj = document.createEvent('HTMLEvents');
 			eventObj.initEvent(eventName, true, true);
 			object.mixin(eventObj, opt_eventObj);

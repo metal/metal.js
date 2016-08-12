@@ -633,27 +633,34 @@ describe('dom', function() {
 				var input = document.createElement('input');
 				var select = document.createElement('select');
 				var button = document.createElement('button');
+				var textarea = document.createElement('textarea');
 				input.disabled = true;
 				select.disabled = true;
 				button.disabled = true;
+				textarea.disabled = true;
 				parent.appendChild(input);
 				parent.appendChild(select);
 				parent.appendChild(button);
+				parent.appendChild(textarea);
 
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
 				var listener3 = sinon.stub();
+				var listener4 = sinon.stub();
 
 				dom.delegate(parent, 'click', input, listener1);
 				dom.delegate(parent, 'click', select, listener2);
 				dom.delegate(parent, 'click', button, listener3);
+				dom.delegate(parent, 'click', button, listener4);
 
 				dom.triggerEvent(input, 'click');
 				dom.triggerEvent(select, 'click');
 				dom.triggerEvent(button, 'click');
+				dom.triggerEvent(textarea, 'click');
 				assert.strictEqual(0, listener1.callCount);
 				assert.strictEqual(0, listener2.callCount);
 				assert.strictEqual(0, listener3.callCount);
+				assert.strictEqual(0, listener4.callCount);
 			});
 
 			it('should not trigger delegate click event to an element which its valid parent is disabled', function() {
@@ -664,17 +671,21 @@ describe('dom', function() {
 				var input = document.createElement('input');
 				var select = document.createElement('select');
 				var button = document.createElement('button');
+				var textarea = document.createElement('textarea');
 				parent.appendChild(input);
 				parent.appendChild(select);
 				parent.appendChild(button);
+				parent.appendChild(textarea);
 
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
 				var listener3 = sinon.stub();
+				var listener4 = sinon.stub();
 
 				dom.delegate(parent, 'click', input, listener1);
 				dom.delegate(parent, 'click', select, listener2);
 				dom.delegate(parent, 'click', button, listener3);
+				dom.delegate(parent, 'click', textarea, listener4);
 
 				dom.triggerEvent(input, 'click');
 				dom.triggerEvent(select, 'click');
@@ -682,6 +693,7 @@ describe('dom', function() {
 				assert.strictEqual(0, listener1.callCount);
 				assert.strictEqual(0, listener2.callCount);
 				assert.strictEqual(0, listener3.callCount);
+				assert.strictEqual(0, listener4.callCount);
 			});
 
 			it('it should trigger delegate click event on elements wrapped by a "legend" tag and with disabled parent', function() {
@@ -694,24 +706,30 @@ describe('dom', function() {
 				var input = document.createElement('input');
 				var select = document.createElement('select');
 				var button = document.createElement('button');
+				var textarea = document.createElement('textarea');
 				legend.appendChild(input);
 				legend.appendChild(select);
 				legend.appendChild(button);
+				legend.appendChild(textarea);
 
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
 				var listener3 = sinon.stub();
+				var listener4 = sinon.stub();
 
 				dom.delegate(fieldset, 'click', input, listener1);
 				dom.delegate(fieldset, 'click', select, listener2);
 				dom.delegate(fieldset, 'click', button, listener3);
+				dom.delegate(fieldset, 'click', textarea, listener4);
 
 				dom.triggerEvent(input, 'click');
 				dom.triggerEvent(select, 'click');
 				dom.triggerEvent(button, 'click');
+				dom.triggerEvent(textarea, 'click');
 				assert.strictEqual(1, listener1.callCount);
 				assert.strictEqual(1, listener2.callCount);
 				assert.strictEqual(1, listener3.callCount);
+				assert.strictEqual(1, listener4.callCount);
 			});
 
 			it('should not trigger delegate click event to an element which its valid parent is disabled even it is wrapped by another element different of legend', function() {
@@ -724,24 +742,30 @@ describe('dom', function() {
 				var input = document.createElement('input');
 				var select = document.createElement('select');
 				var button = document.createElement('button');
+				var textarea = document.createElement('textarea');
 				wrapper.appendChild(input);
 				wrapper.appendChild(select);
 				wrapper.appendChild(button);
+				wrapper.appendChild(textarea);
 
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
 				var listener3 = sinon.stub();
+				var listener4 = sinon.stub();
 
 				dom.delegate(fieldset, 'click', input, listener1);
 				dom.delegate(fieldset, 'click', select, listener2);
 				dom.delegate(fieldset, 'click', button, listener3);
+				dom.delegate(fieldset, 'click', textarea, listener4);
 
 				dom.triggerEvent(input, 'click');
 				dom.triggerEvent(select, 'click');
 				dom.triggerEvent(button, 'click');
+				dom.triggerEvent(textarea, 'click');
 				assert.strictEqual(0, listener1.callCount);
 				assert.strictEqual(0, listener2.callCount);
 				assert.strictEqual(0, listener3.callCount);
+				assert.strictEqual(0, listener4.callCount);
 			});
 		});
 

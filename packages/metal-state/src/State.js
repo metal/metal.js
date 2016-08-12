@@ -382,10 +382,10 @@ class State extends EventEmitter {
 
 	/**
 	 * Returns an array with all state keys.
-	 * @return {Array.<string>}
+	 * @return {!Array.<string>}
 	 */
 	getStateKeys() {
-		return Object.keys(this.stateInfo_);
+		return this.stateInfo_ ? Object.keys(this.stateInfo_) : [];
 	}
 
 	/**
@@ -396,8 +396,10 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	getStateKeyValue_(name) {
-		this.initStateKey_(name);
-		return this.stateInfo_[name].value;
+		if (!this.warnIfDisposed_(name)) {
+			this.initStateKey_(name);
+			return this.stateInfo_[name].value;
+		}
 	}
 
 	/**
@@ -411,7 +413,7 @@ class State extends EventEmitter {
 		return info.state === State.KeyStates.INITIALIZED ||
 			this.hasInitialValue_(name);
 	}
-	
+
 	/**
 	 * Checks if an initial value was given to the specified state property.
 	 * @param {string} name The name of the key.
@@ -428,7 +430,9 @@ class State extends EventEmitter {
 	 * @return {boolean}
 	 */
 	hasStateKey(key) {
-		return !!this.stateInfo_[key];
+		if (!this.warnIfDisposed_(key)) {
+			return !!this.stateInfo_[key];
+		}
 	}
 
 	/**
@@ -612,7 +616,9 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	setStateKeyValue_(name, value) {
-		if (!this.canSetState(name) || !this.validateKeyValue_(name, value)) {
+		if (this.warnIfDisposed_(name) ||
+			!this.canSetState(name) ||
+			!this.validateKeyValue_(name, value)) {
 			return;
 		}
 
@@ -659,6 +665,22 @@ class State extends EventEmitter {
 
 		return info.state === State.KeyStates.INITIALIZING ||
 			this.callValidator_(name, value);
+	}
+
+	/**
+	 * Warns if this instance has already been disposed.
+	 * @param {string} name Name of the property to be accessed if not disposed.
+	 * @return {boolean} True if disposed, or false otherwise.
+	 * @protected
+	 */
+	warnIfDisposed_(name) {
+		const disposed = this.isDisposed();
+		if (disposed) {
+			console.warn(
+				`Error. Trying to access property "${name}" on disposed instance`
+			);
+		}
+		return disposed;
 	}
 }
 

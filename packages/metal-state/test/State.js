@@ -412,7 +412,7 @@ describe('State', function() {
 				}
 			}
 		};
-		
+
 		new Test({
 			key1: undefined
 		});
@@ -713,16 +713,6 @@ describe('State', function() {
 		state.key2 = 21;
 	});
 
-	it('should not throw error when trying to emit scheduled stateChanged after disposed', function(done) {
-		var state = createStateInstance();
-
-		state.key1 = 10;
-		state.dispose();
-		async.nextTick(function() {
-			done();
-		});
-	});
-
 	it('should call callback function from setState asynchronously after the batch event is triggered', function(done) {
 		var state = createStateInstance();
 
@@ -814,14 +804,6 @@ describe('State', function() {
 		state.key1 = -100;
 		assert.strictEqual(-100, state.key1);
 		assert.strictEqual(0, listener.callCount);
-	});
-
-	it('should not allow getting state data after disposed', function() {
-		var state = createStateInstance();
-		state.dispose();
-		assert.throws(function() {
-			state.getState();
-		});
 	});
 
 	describe('Static STATE', function() {
@@ -1081,6 +1063,59 @@ describe('State', function() {
 
 			obj.key1 = 'newVal2';
 			assert.strictEqual(2, listener.callCount);
+		});
+	});
+
+	describe('Dispose', function() {
+		const originalWarnFn = console.warn;
+
+		beforeEach(function() {
+			console.warn = sinon.stub();
+		});
+
+		afterEach(function() {
+			console.warn = originalWarnFn;
+		});
+
+		it('should not throw error when trying to emit scheduled stateChanged after disposed', function(done) {
+			var state = createStateInstance();
+
+			state.key1 = 10;
+			state.dispose();
+			async.nextTick(function() {
+				done();
+			});
+		});
+
+		it('should warn if trying to get state property after disposed', function() {
+			var state = createStateInstance();
+			state.dispose();
+			assert.doesNotThrow(() => state.key1);
+			assert.strictEqual(1, console.warn.callCount);
+		});
+
+		it('should warn if trying to set state property after disposed', function() {
+			var state = createStateInstance();
+			state.dispose();
+			assert.doesNotThrow(() => state.key1 = 'new');
+			assert.strictEqual(1, console.warn.callCount);
+		});
+
+		it('should warn if trying to use "setState" after disposed', function() {
+			var state = createStateInstance();
+			state.dispose();
+			assert.doesNotThrow(() => {
+				state.setState({
+					key1: 'new'
+				});
+			});
+			assert.strictEqual(1, console.warn.callCount);
+		});
+
+		it('should not throw error if trying to use "getState" after disposed', function() {
+			var state = createStateInstance();
+			state.dispose();
+			assert.doesNotThrow(() => state.getState());
 		});
 	});
 });

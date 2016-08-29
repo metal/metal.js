@@ -48,8 +48,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	addElementClasses_(elementClasses, args) {
 		for (var i = 3; i < args.length; i += 2) {
-			if (args[i] === 'class' && args[i + 1].indexOf(elementClasses) === -1) {
-				args[i + 1] += ' ' + elementClasses;
+			if (args[i] === 'class') {
+				args[i + 1] = this.removeDuplicateClasses_(
+					args[i + 1] + ' ' + elementClasses
+				);
 				return;
 			}
 		}
@@ -579,6 +581,25 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				dom.exitDocument(element);
 			}
 		}
+	}
+
+	/**
+	 * Removes duplicate css classes from the given string.
+	 * @param {string} cssClasses
+	 * @return {string}
+	 * @protected
+	 */
+	removeDuplicateClasses_(cssClasses) {
+		var noDuplicates = [];
+		var all = cssClasses.split(/\s+/);
+		var used = {};
+		for (var i = 0; i < all.length; i++) {
+			if (!used[all[i]]) {
+				used[all[i]] = true;
+				noDuplicates.push(all[i]);
+			}
+		}
+		return noDuplicates.join(' ');
 	}
 
 	/**

@@ -730,6 +730,13 @@ class dom {
 	 * @protected
 	 */
 	static triggerMatchedListeners_(container, element, event, defaultFns) {
+		if (event.type === 'click' && event.button === 2) {
+			// Firefox triggers "click" events on the document for right clicks. This
+			// causes our delegate logic to trigger it for regular elements too, which
+			// shouldn't happen. Ignoring them here.
+			return;
+		}
+
 		var data = domData.get(element);
 		var listeners = data.listeners[event.type];
 		var ret = dom.triggerListeners_(listeners, event, element, defaultFns);

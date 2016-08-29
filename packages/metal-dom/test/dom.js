@@ -759,6 +759,20 @@ describe('dom', function() {
 				assert.strictEqual(0, listener2.callCount);
 			});
 
+			it('should not trigger delegate "click" listener for right clicks', function() {
+				var element = document.createElement('div');
+				dom.enterDocument(element);
+				var child = document.createElement('div');
+				dom.append(element, child);
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', child, listener);
+				dom.triggerEvent(child, 'click', {
+					button: 2
+				});
+				assert.strictEqual(0, listener.callCount);
+			});
+
 			it('should run default listeners last', function() {
 				var element = document.createElement('div');
 				dom.enterDocument(element);

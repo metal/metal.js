@@ -431,7 +431,7 @@ class Component extends EventEmitter {
 
 	/**
 	 * Handles a `rendered` event from the current renderer instance.
-	 * @parma {!Object}
+	 * @param {!Object}
 	 * @protected
 	 */
 	handleRendererRendered_(data) {

@@ -83,7 +83,7 @@ class globalEval {
 
 	/**
 	 * Evaluates any script tags present in the given element.
-	 * @params {!Element} element
+	 * @param {!Element} element
 	 * @param {function()=} opt_callback Optional function to be called
 	 *   when the script has been run.
 	 * @param {function()=} opt_appendFn Optional function to append the node

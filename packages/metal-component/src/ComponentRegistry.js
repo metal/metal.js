@@ -12,7 +12,7 @@ class ComponentRegistry {
 	 * Gets the constructor function for the given component name, or
 	 * undefined if it hasn't been registered yet.
 	 * @param {string} name The component's name.
-	 * @return {?function}
+	 * @return {?function()}
 	 * @static
 	 */
 	static getConstructor(name) {

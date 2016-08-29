@@ -42,7 +42,7 @@ class State extends EventEmitter {
 
 		/**
 		 * Map of keys that can not be used as state keys.
-		 * @param {!Object<string, boolean>}
+		 * @type {!Object<string, boolean>}
 		 * @protected
 		 */
 		this.keysBlacklist_ = {};

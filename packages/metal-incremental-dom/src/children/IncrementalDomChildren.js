@@ -14,7 +14,7 @@ class IncrementalDomChildren {
 	 * Captures all child elements from incremental dom calls.
 	 * @param {!IncrementalDomRenderer} renderer The renderer that is capturing
 	 *   children.
-	 * @param {!function} callback Function to be called when children have all
+	 * @param {!function()} callback Function to be called when children have all
 	 *     been captured.
  	 */
 	static capture(renderer, callback) {
@@ -37,7 +37,7 @@ class IncrementalDomChildren {
 
 	/**
 	 * Renders a children tree through incremental dom.
-	 * @param {!{args: Array, !children: Array, isText: ?boolean}}
+	 * @param {!{args: Array, children: !Array, isText: ?boolean}}
 	 * @param {function()=} opt_skipNode Optional function that is called for
 	 *     each node to be rendered. If it returns true, the node will be skipped.
 	 * @protected

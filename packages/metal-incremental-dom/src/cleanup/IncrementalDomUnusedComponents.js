@@ -30,7 +30,7 @@ class IncrementalDomUnusedComponents {
 	/**
 	 * Schedules the given components to be checked and disposed if not used
 	 * anymore, when `IncrementalDomUnusedComponents.disposeUnused` is called.
-	 * @param {!Array<!Component} comps
+	 * @param {!Array<!Component>} comps
 	 */
 	static schedule(comps) {
 		for (var i = 0; i < comps.length; i++) {

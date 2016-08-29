@@ -11,7 +11,7 @@ import { EventEmitterProxy } from 'metal-events';
 class DomEventEmitterProxy extends EventEmitterProxy {
 	/**
 	 * Adds the given listener for the given event.
-	 * @param {string} event.
+	 * @param {string} event
 	 * @param {!function()} listener
 	 * @return {!EventHandle} The listened event's handle.
 	 * @protected

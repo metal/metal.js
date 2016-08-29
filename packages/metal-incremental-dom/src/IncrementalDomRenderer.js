@@ -762,7 +762,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Resets the given incremental dom data object, preparing it for the next
 	 * pass.
-	 * @param {Object}
+	 * @param {Object} data
 	 * @protected
 	 */
 	resetData_(data) {

@@ -44,7 +44,7 @@ class IncrementalDomUtils {
 	/**
 	 * Checks if the given tag represents a metal component.
 	 * @param {string} tag
-	 * @param {boolean}
+	 * @return {boolean}
 	 */
 	static isComponentTag(tag) {
 		return !core.isString(tag) || tag[0] === tag[0].toUpperCase();

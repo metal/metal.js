@@ -78,7 +78,7 @@ class globalEvalStyles {
 
 	/**
 	 * Evaluates any style present in the given element.
-	 * @params {!Element} element
+	 * @param {!Element} element
 	 * @param {function()=} opt_callback Optional function to be called when the
 	 *   style has been run.
 	 * @param {function()=} opt_appendFn Optional function to append the node

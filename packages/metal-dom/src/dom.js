@@ -692,7 +692,7 @@ class dom {
 
 	/**
 	 * Triggers the given listeners array.
-	 * @param {Array<!function()} listeners
+	 * @param {Array<!function()>} listeners
 	 * @param {!Event} event
 	 * @param {!Element} element
 	 * @param {!Array} defaultFns Array to collect default listeners in, instead

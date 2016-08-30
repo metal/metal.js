@@ -25,20 +25,6 @@ describe('JSXComponent', function() {
 		assert.strictEqual('Hello World', component.element.textContent);
 	});
 
-	it('should render returned contents from variable in "render" function', function() {
-		class TestComponent extends JSXComponent {
-			render() {
-				var jsx = <div class="test">Hello World</div>;
-				return jsx;
-			}
-		}
-
-		component = new TestComponent();
-		assert.strictEqual('DIV', component.element.tagName);
-		assert.ok(dom.hasClass(component.element, 'test'));
-		assert.strictEqual('Hello World', component.element.textContent);
-	});
-
 	it('should not throw error if no jsx function is implemented', function() {
 		class TestComponent extends JSXComponent {
 		}
@@ -171,34 +157,6 @@ describe('JSXComponent', function() {
 			assert.strictEqual('Children Test 2', child.element.textContent);
 		});
 
-		it('should be able to render a child without wrapper element', function() {
-			class ChildComponent extends JSXComponent {
-				render() {
-					return this.props.children[1];
-				}
-			}
-
-			class TestComponent extends JSXComponent {
-				render() {
-					return (
-						<div class="test">
-							<ChildComponent ref="child">
-								<span>Children Test</span>
-								<span>Children Test 2</span>
-								<span>Children Test 3</span>
-							</ChildComponent>
-						</div>
-					);
-				}
-			}
-
-			component = new TestComponent();
-			var child = component.components.child;
-			assert.strictEqual('SPAN', child.element.tagName);
-			assert.strictEqual(1, child.element.childNodes.length);
-			assert.strictEqual('Children Test 2', child.element.textContent);
-		});
-
 		it('should be able to get the data passed to children', function() {
 			class ChildComponent extends JSXComponent {
 				render() {
@@ -315,50 +273,6 @@ describe('JSXComponent', function() {
 			assert.strictEqual('defaultFoo', component.state.foo);
 		});
 
-		it('should update if props change', function(done) {
-			class TestComponent extends JSXComponent {
-				render() {
-					return <div>{this.props.foo}</div>
-				}
-			}
-			TestComponent.PROPS = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			}
-
-			component = new TestComponent();
-			assert.strictEqual('defaultFoo', component.element.textContent);
-
-			component.props.foo = 'foo';
-			component.once('rendered', function() {
-				assert.strictEqual('foo', component.element.textContent);
-				done();
-			});
-		});
-
-		it('should update if state changes', function(done) {
-			class TestComponent extends JSXComponent {
-				render() {
-					return <div>{this.state.foo}</div>
-				}
-			}
-			TestComponent.STATE = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			}
-
-			component = new TestComponent();
-			assert.strictEqual('defaultFoo', component.element.textContent);
-
-			component.state.foo = 'foo';
-			component.once('rendered', function() {
-				assert.strictEqual('foo', component.element.textContent);
-				done();
-			});
-		});
-
 		it('should call "propsChanged" when new props are passed', function(done) {
 			class ChildComponent extends JSXComponent {
 				render() {
@@ -395,40 +309,6 @@ describe('JSXComponent', function() {
 	});
 
 	describe('shouldUpdate', function() {
-		it('should pass both state and prop changes to shouldUpdate', function(done) {
-			class TestComponent extends JSXComponent {
-				shouldUpdate() {
-				}
-			}
-			TestComponent.PROPS = {
-				bar: {
-				}
-			}
-			TestComponent.STATE = {
-				foo: {
-				}
-			}
-
-			component = new TestComponent();
-			sinon.stub(component, 'shouldUpdate');
-			component.props.bar = 'bar';
-			component.state.foo = 'foo';
-			component.getDataManager().once('dataChanged', function() {
-				assert.strictEqual(1, component.shouldUpdate.callCount);
-
-				const stateChanges = component.shouldUpdate.args[0][0];
-				assert.ok(stateChanges.foo);
-				assert.strictEqual('foo', stateChanges.foo.newVal);
-				assert.strictEqual(undefined, stateChanges.foo.prevVal);
-
-				const propChanges = component.shouldUpdate.args[0][1];
-				assert.ok(propChanges.bar);
-				assert.strictEqual('bar', propChanges.bar.newVal);
-				assert.strictEqual(undefined, propChanges.bar.prevVal);
-				done();
-			});
-		});
-
 		it('should not rerender after props change if shouldUpdate returns false', function(done) {
 			class TestComponent extends JSXComponent {
 				render() {

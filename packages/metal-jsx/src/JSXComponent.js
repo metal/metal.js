@@ -5,7 +5,19 @@ import { validators, Config } from 'metal-state';
 import Component from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXDataManager from './JSXDataManager';
+import JSXRenderer from './JSXRenderer';
 
+/**
+ * A component that has built-in integration with JSX templates. Example:
+ *
+ * <code>
+ * class MyComponent extends JSXComponent {
+ *   render() {
+ *     return <div>Hello World</div>
+ *   }
+ * }
+ * </code>
+ */
 class JSXComponent extends Component {
 	/**
 	 * Creates and renders the given function, which can either be a simple
@@ -19,58 +31,6 @@ class JSXComponent extends Component {
 	 */
 	static render(...args) {
 		return IncrementalDomRenderer.render(...args);
-	}
-}
-
-/**
- * Renderer that handles JSX.
- */
-class JSXRenderer extends IncrementalDomRenderer {
-	/**
-	 * @inheritDoc
-	 */
-	buildShouldUpdateArgs_() {
-		return [this.changes_, this.propChanges_];
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clearChanges_() {
-		super.clearChanges_();
-		this.propChanges_ = {};
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	handleDataPropChanged_(data) {
-		if (data.type === 'props') {
-			this.propChanges_[data.key] = data;
-		} else {
-			super.handleDataPropChanged_(data);
-		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	hasDataChanged_() {
-		return super.hasDataChanged_() || Object.keys(this.propChanges_).length > 0;
-	}
-
-	/**
-	 * Overrides the original method from `IncrementalDomRenderer` to handle the
-	 * case where developers return a child node directly from the "render"
-	 * function.
-	 * @override
-	 */
-	renderIncDom() {
-		if (this.component_.render) {
-			iDOMHelpers.renderArbitrary(this.component_.render());
-		} else {
-			super.renderIncDom();
-		}
 	}
 }
 

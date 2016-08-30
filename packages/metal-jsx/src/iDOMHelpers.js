@@ -1,6 +1,7 @@
 'use strict';
 
 import IncrementalDomRenderer from 'metal-incremental-dom';
+import JSXRenderer from './JSXRenderer';
 
 /**
  * These helpers are all from "babel-plugin-incremental-dom". See its README
@@ -46,6 +47,8 @@ window.iDOMHelpers.renderArbitrary = function(child) {
 		} else {
 			window.iDOMHelpers.forOwn(child, window.iDOMHelpers.renderArbitrary);
 		}
+	} else if (!child) {
+		JSXRenderer.skipChild();
 	}
 };
 

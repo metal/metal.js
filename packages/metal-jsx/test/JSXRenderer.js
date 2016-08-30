@@ -138,4 +138,48 @@ describe('JSXRenderer', function() {
 			done();
 		});
 	});
+
+	it('should reuse component rendered after a conditionally rendered component', function(done) {
+		var createdChildren = [];
+		class ChildComponent extends TestJSXComponent {
+			constructor(...args) {
+				super(...args);
+				createdChildren.push(this);
+			}
+			render() {
+				return <span>Child</span>;
+			}
+		}
+
+		class ChildComponent2 extends ChildComponent {
+		}
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <div>
+					{!this.props.hide && <div><ChildComponent /></div>}
+					<div><ChildComponent2 /></div>
+				</div>
+			}
+		}
+		TestComponent.PROPS = {
+			hide: {
+			}
+		}
+
+		component = new TestComponent();
+		assert.strictEqual(2, createdChildren.length);
+		assert.ok(createdChildren[0] instanceof ChildComponent);
+		assert.ok(createdChildren[1] instanceof ChildComponent2);
+		assert.ok(!createdChildren[0].isDisposed());
+		assert.ok(!createdChildren[1].isDisposed());
+
+		component.props.hide = true;
+		component.once('stateSynced', function() {
+			assert.strictEqual(2, createdChildren.length);
+			assert.ok(createdChildren[0].isDisposed());
+			assert.ok(!createdChildren[1].isDisposed());
+			done();
+		});
+	});
 });

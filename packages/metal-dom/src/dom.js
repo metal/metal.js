@@ -265,7 +265,7 @@ class dom {
 		var matchesSelector = 'button, input, select, textarea, fieldset';
 
 		if (eventName === 'click') {
-			while (currElement && currElement.tagName !== 'LEGEND') {
+			while (currElement) {
 				if (currElement.disabled && dom.match(currElement, matchesSelector)) {
 					isAble = false;
 					break;

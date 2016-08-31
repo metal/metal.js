@@ -1,6 +1,6 @@
 {
   "name": "metal-dom",
-  "version": "2.2.6",
+  "version": "2.3.0",
   "description": "A collection of utility functions for handling dom elements",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-dom",

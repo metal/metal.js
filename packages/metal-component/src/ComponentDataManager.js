@@ -175,7 +175,9 @@ class ComponentDataManager extends EventEmitter {
 
 ComponentDataManager.BLACKLIST = {
 	components: true,
+	context: true,
 	element: true,
+	refs: true,
 	wasRendered: true
 };
 

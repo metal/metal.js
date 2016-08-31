@@ -423,20 +423,37 @@ describe('IncrementalDomRenderer', function() {
 				done();
 			});
 		});
-	});
 
-	it('should not cause css classes to be added twice due to "elementClasses"', function() {
-		class TestComponent extends Component {
-			render() {
-				IncDom.elementVoid('div', null, null, 'class', 'test1   test2');
+		it('should not cause css classes to be added twice due to "elementClasses"', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div', null, null, 'class', 'test1   test2');
+				}
 			}
-		}
-		TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.RENDERER = IncrementalDomRenderer;
 
-		component = new TestComponent({
-			elementClasses: 'test2 test3'
+			component = new TestComponent({
+				elementClasses: 'test2 test3'
+			});
+			assert.strictEqual('test1 test2 test3', component.element.getAttribute('class'));
 		});
-		assert.strictEqual('test1 test2 test3', component.element.getAttribute('class'));
+
+		it('should store references to node elements via "ref"', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div', null, null, 'ref', 'root');
+					IncDom.elementVoid('span', null, null, 'ref', 'child1');
+					IncDom.elementVoid('span', null, null, 'ref', 'child2');
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			assert.strictEqual(component.element, component.refs.root);
+			assert.strictEqual(component.element.childNodes[0], component.refs.child1);
+			assert.strictEqual(component.element.childNodes[1], component.refs.child2);
+		});
 	});
 
 	describe('Existing Content', function() {
@@ -828,6 +845,7 @@ describe('IncrementalDomRenderer', function() {
 			var child = component.components.child;
 			assert.ok(child);
 			assert.ok(child instanceof ChildComponent);
+			assert.strictEqual(child, component.refs.child);
 		});
 
 		it('should render sub component at specified place', function() {

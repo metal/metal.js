@@ -157,8 +157,8 @@ describe('JSXRenderer', function() {
 		class TestComponent extends TestJSXComponent {
 			render() {
 				return <div>
-					{!this.props.hide && <div><ChildComponent /></div>}
-					<div><ChildComponent2 /></div>
+					{!this.props.hide && <div class="child1"><ChildComponent /></div>}
+					<div class="child1"><ChildComponent2 /></div>
 				</div>
 			}
 		}

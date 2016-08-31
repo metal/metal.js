@@ -56,7 +56,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 	handleJSXElementOpened_({args}) {
 		if (childrenCount.length > 0) {
 			const count = ++childrenCount[childrenCount.length - 1];
-			if (!core.isDef(args[1])) {
+			if (!core.isDefAndNotNull(args[1])) {
 				args[1] = JSXRenderer.KEY_PREFIX + count;
 			}
 		}

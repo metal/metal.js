@@ -66,7 +66,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 				// If this is the first node being patched, just repeat the key it
 				// used before (if it has been used before).
 				const node = IncrementalDOM.currentPointer();
-				if (node) {
+				if (node && node.__incrementalDOMData) {
 					args[1] = node.__incrementalDOMData.key;
 				}
 			}

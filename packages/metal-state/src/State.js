@@ -88,6 +88,7 @@ class State extends EventEmitter {
 			name,
 			this.buildKeyPropertyDef_(name)
 		);
+		this.validateInitialValue_(name);
 		this.assertGivenIfRequired_(name);
 	}
 
@@ -137,7 +138,7 @@ class State extends EventEmitter {
 		var names = Object.keys(configsOrName);
 
 		var props = {};
-		for (var i = 0; i < names.length; i++) {
+		for (let i = 0; i < names.length; i++) {
 			var name = names[i];
 			this.buildKeyInfo_(
 				name,
@@ -154,6 +155,12 @@ class State extends EventEmitter {
 				opt_contextOrInitialValue || this.obj_,
 				props
 			);
+		}
+
+		// Validate initial values after all properties have been defined, otherwise
+		// it won't be possible to access those properties within validators.
+		for (let i = 0; i < names.length; i++) {
+			this.validateInitialValue_(names[i]);
 		}
 	}
 
@@ -225,7 +232,7 @@ class State extends EventEmitter {
 			config,
 			state: State.KeyStates.UNINITIALIZED
 		};
-		if (hasInitialValue && this.callValidator_(name, initialValue)) {
+		if (hasInitialValue) {
 			this.stateInfo_[name].initialValue = initialValue;
 		}
 	}
@@ -650,6 +657,18 @@ class State extends EventEmitter {
 		var info = this.stateInfo_[name];
 		return (info.state === State.KeyStates.INITIALIZED) &&
 			(core.isObject(prevVal) || prevVal !== this.get(name));
+	}
+
+	/**
+	 * Validates the initial value for the state property with the given name.
+	 * @param {string} name
+	 * @protected
+	 */
+	validateInitialValue_(name) {
+		var info = this.stateInfo_[name];
+		if (this.hasInitialValue_(name) && !this.callValidator_(name, info.initialValue)) {
+			delete info.initialValue;
+		}
 	}
 
 	/**

@@ -363,6 +363,32 @@ describe('State', function() {
 		assert.strictEqual(1, state.key1);
 	});
 
+	it('should allow accessing other state properties in validator', function() {
+		var state = new State();
+		state.addToState(
+			{
+				key1: {
+					validator: function(val) {
+						return val < this.key2;
+					}
+				},
+				key2: {
+					value: 2
+				}
+			},
+			{
+				key1: 1
+			}
+		);
+		assert.strictEqual(1, state.key1);
+
+		state.key1 = 3;
+		assert.strictEqual(1, state.key1);
+
+		state.key1 = 0;
+		assert.strictEqual(0, state.key1);
+	});
+
 	it('should not validate default state values', function() {
 		var state = new State();
 		state.addToState({

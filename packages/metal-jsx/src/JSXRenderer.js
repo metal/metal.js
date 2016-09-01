@@ -54,10 +54,21 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * @protected
 	 */
 	handleJSXElementOpened_({args}) {
+		let count = 0;
 		if (childrenCount.length > 0) {
-			const count = ++childrenCount[childrenCount.length - 1];
-			if (!core.isDefAndNotNull(args[1])) {
+			count = ++childrenCount[childrenCount.length - 1];
+		}
+
+		if (!core.isDefAndNotNull(args[1])) {
+			if (count) {
 				args[1] = JSXRenderer.KEY_PREFIX + count;
+			} else {
+				// If this is the first node being patched, just repeat the key it
+				// used before (if it has been used before).
+				const node = IncrementalDOM.currentPointer();
+				if (node) {
+					args[1] = node.__incrementalDOMData.key;
+				}
 			}
 		}
 		childrenCount.push(0);

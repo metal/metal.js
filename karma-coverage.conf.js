@@ -65,7 +65,7 @@ module.exports = function(config) {
 					'babelify',
 					{
 						plugins: ['istanbul'],
-						presets: ['metal']
+						presets: ['es2015']
 					}
 				]
 			],

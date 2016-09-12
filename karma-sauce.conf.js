@@ -61,7 +61,7 @@ module.exports = function(config) {
 		browserify: {
 			debug: true,
 			transform: [
-				['babelify', {presets: ['metal']}]
+				['babelify', {presets: ['es2015']}]
 			],
 			insertGlobalVars: {
 				METAL_VERSION: function() {

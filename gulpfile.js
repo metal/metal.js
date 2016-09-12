@@ -100,7 +100,7 @@ var changedJsSrc;
 gulp.task('compile', function() {
 	return gulp.src(changedJsSrc)
 		.pipe(babel({
-			presets: ['metal']
+			presets: ['es2015']
 		}))
 		.pipe(gulp.dest(calcDestDir(changedJsSrc)));
 });

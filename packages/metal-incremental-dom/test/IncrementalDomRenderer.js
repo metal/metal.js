@@ -1034,6 +1034,26 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should pass key to sub components until root element is reached', function() {
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementVoid(ChildComponent, null, ['ref', 'child']);
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid(TestChildComponent, 'rootKey', ['ref', 'child']);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			component = new TestComponent();
+
+			const lastChild = component.components.child.components.child;
+			assert.strictEqual('rootKey', lastChild.element.__incrementalDOMData.key);
+		});
+
 		it('should attach sub component inline listeners', function() {
 			class TestComponent extends Component {
 				render() {

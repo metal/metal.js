@@ -759,10 +759,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.updateContext_(comp);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
-			var parentComp = IncrementalDomRenderer.getComponentBeingRendered();
-			parentComp.getRenderer().childComponents_.push(comp);
+			const parentComp = IncrementalDomRenderer.getComponentBeingRendered();
+			const parentRenderer = parentComp.getRenderer();
+			parentRenderer.childComponents_.push(comp);
 			renderer.parent_ = parentComp;
 			renderer.owner_ = this.component_;
+			if (!config.key && !parentRenderer.rootElementReached_) {
+				config.key = parentRenderer.config_.key;
+			}
 			renderer.renderInsidePatch();
 		} else {
 			console.warn(

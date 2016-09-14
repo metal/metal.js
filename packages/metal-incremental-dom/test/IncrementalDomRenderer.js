@@ -1324,6 +1324,43 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should not throw error trying to reuse component that was disposed', function(done) {
+			const childInstances = [];
+			class TestChildComponent extends Component {
+				created() {
+					childInstances.push(this);
+				}
+				render() {
+					IncDom.elementVoid('span');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid(TestChildComponent);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+				}
+			};
+
+			component = new TestComponent();
+			assert.strictEqual(1, childInstances.length);
+			childInstances[0].dispose();
+
+			component.foo = true;
+			component.once('stateSynced', function() {
+				assert.strictEqual(2, childInstances.length);
+				assert.ok(childInstances[0].isDisposed());
+				assert.ok(!childInstances[1].isDisposed());
+				assert.strictEqual(component.element, childInstances[1].element);
+				done();
+			});
+		});
+
 		it('should reuse previous internal state data on sub component rerender', function(done) {
 			ChildComponent.STATE = {
 				foo: {

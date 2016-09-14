@@ -539,12 +539,16 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Checks if this renderer's component is the owner of the given component.
+	 * Checks if the given component can be a match for a constructor.
 	 * @param {!Component} comp
+	 * @param {!function()} Ctor
 	 * @return {boolean}
 	 * @protected
 	 */
-	isOwner_(comp) {
+	isMatch_(comp, Ctor) {
+		if (!comp || comp.constructor !== Ctor || comp.isDisposed()) {
+			return false;
+		}
 		return comp.getRenderer().getOwner() === this.component_;
 	}
 
@@ -559,7 +563,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	match_(comp, Ctor, config) {
-		if (!comp || comp.constructor !== Ctor || !this.isOwner_(comp)) {
+		if (!this.isMatch_(comp, Ctor)) {
 			comp = new Ctor(config, false);
 		}
 		if (comp.wasRendered) {

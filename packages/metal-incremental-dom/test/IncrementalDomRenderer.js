@@ -1258,6 +1258,52 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should not reuse component that was created in another parent', function(done) {
+			const grandChildInstances = [];
+			class GrandChildComponent extends Component {
+				created() {
+					grandChildInstances.push(this);
+				}
+				render() {
+					IncDom.elementVoid('span');
+				}
+			}
+			GrandChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(GrandChildComponent);
+					IncDom.elementClose('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child' + this.number);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				number: {
+					value: 1
+				}
+			};
+
+			component = new TestComponent();
+			assert.strictEqual(1, grandChildInstances.length);
+
+			component.number = 2;
+			component.once('stateSynced', function() {
+				assert.strictEqual(2, grandChildInstances.length);
+				assert.ok(grandChildInstances[0].isDisposed());
+				assert.ok(!grandChildInstances[1].isDisposed());
+				assert.strictEqual(grandChildInstances[1].element, component.element.querySelector('span'));
+				done();
+			});
+		});
+
 		it('should reuse previous internal state data on sub component rerender', function(done) {
 			ChildComponent.STATE = {
 				foo: {

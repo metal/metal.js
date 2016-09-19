@@ -193,7 +193,7 @@ class State extends EventEmitter {
 				info.initialValue;
 			if (!core.isDefAndNotNull(value)) {
 				console.error(
-					'The property called "' + name + '" is required but didn\n\'t ' +
+					'The property called "' + name + '" is required but didn\'t ' +
 					'receive a value.'
 				);
 			}

@@ -2,6 +2,7 @@
 
 import { async, core, object } from 'metal';
 import dom from 'metal-dom';
+import { sunset } from '../../../test-utils';
 import { Component, ComponentRegistry } from 'metal-component';
 import IncrementalDomChildren from '../src/children/IncrementalDomChildren';
 import IncrementalDomRenderer from '../src/IncrementalDomRenderer';
@@ -2589,6 +2590,21 @@ describe('IncrementalDomRenderer', function() {
 				component = new TestComponent();
 				assert.ok(!component.components.child);
 			});
+
+			describe('Sunset Tests', sunset(function() {
+				it('should not store component references via "key" on compatibility mode after version 3.x', function() {
+					core.enableCompatibilityMode();
+					class TestComponent extends Component {
+						render() {
+							IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+						}
+					}
+					TestComponent.RENDERER = IncrementalDomRenderer;
+
+					component = new TestComponent();
+					assert.ok(!component.components.child);
+				});
+			}));
 		});
 	});
 

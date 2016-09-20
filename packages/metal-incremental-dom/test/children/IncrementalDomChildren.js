@@ -1,8 +1,8 @@
 'use strict';
 
 import dom from 'metal-dom';
-import IncrementalDomChildren from '../../src/children/IncrementalDomChildren';
 import { sunset } from '../../../../test-utils';
+import IncrementalDomChildren from '../../src/children/IncrementalDomChildren';
 
 describe('IncrementalDomChildren', function() {
 	it('should capture children calls to incremental dom', function(done) {

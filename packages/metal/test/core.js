@@ -265,4 +265,23 @@ describe('core', function() {
 			assert.strictEqual('myFunction', core.getFunctionName(myFunction));
 		});
 	});
+
+	describe('Compatibility Mode', function() {
+		it('should return no data if compatibility mode is not enabled', function() {
+			assert.ok(!core.getCompatibilityModeData());
+		});
+
+		it('should return the data specified when enabling compatibility mode', function() {
+			const data = {};
+			core.enableCompatibilityMode(data);
+			assert.strictEqual(data, core.getCompatibilityModeData());
+		});
+
+		it('should return no data if compatibility mode is disabled', function() {
+			const data = {};
+			core.enableCompatibilityMode(data);
+			core.disableCompatibilityMode();
+			assert.ok(!core.getCompatibilityModeData());
+		});
+	});
 });

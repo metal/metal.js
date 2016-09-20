@@ -1,5 +1,7 @@
 'use strict';
 
+let compatibilityModeData_;
+
 /**
  * A collection of core utility functions.
  * @const
@@ -35,6 +37,41 @@ class core {
 			propertyValues.push(constructor[propertyName]);
 		}
 		return propertyValues;
+	}
+
+	/**
+	 * Disables Metal.js's compatibility mode.
+	 */
+	static disableCompatibilityMode() {
+		compatibilityModeData_ = null;
+	}
+
+	/**
+	 * Enables Metal.js's compatibility mode with the following features from rc
+	 * and 1.x versions:
+	 *     - Using "key" to reference component instances. In the current version
+	 *       this should be done via "ref" instead. This allows old code still
+	 *       using "key" to keep working like before. NOTE: this may cause
+	 *       problems, since "key" is meant to be used differently. Only use this
+	 *       if it's not possible to upgrade the code to use "ref" instead.
+	 * @param {Object=} opt_data Optional object with data to specify more
+	 *     details, such as:
+	 *         - renderers {Array} the template renderers that should be in
+	 *           compatibility mode. By default, all the ones that extend from
+	 *           IncrementalDomRenderer.
+	 * @type {Object}
+	 */
+	static enableCompatibilityMode(opt_data = {}) {
+		compatibilityModeData_ = opt_data;
+	}
+
+	/**
+	 * Returns the data used for compatibility mode, or nothing if it hasn't been
+	 * enabled.
+	 * @return {Object}
+	 */
+	static getCompatibilityModeData() {
+		return compatibilityModeData_;
 	}
 
 	/**

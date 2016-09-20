@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, object } from 'metal';
+import { async, core, object } from 'metal';
 import dom from 'metal-dom';
 import { Component, ComponentRegistry } from 'metal-component';
 import IncrementalDomChildren from '../src/children/IncrementalDomChildren';
@@ -2504,6 +2504,90 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(0, child.render.callCount);
 				assert.ok(!child.isDisposed());
 				done();
+			});
+		});
+
+		describe('Compatibility Mode', function() {
+			afterEach(function() {
+				core.disableCompatibilityMode();
+			});
+
+			it('should not store component references via "key" when not on compatibility mode', function() {
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+
+				component = new TestComponent();
+				assert.ok(!component.components.child);
+			});
+
+			it('should store component references via "key" on compatibility mode', function() {
+				core.enableCompatibilityMode();
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+
+				component = new TestComponent();
+				assert.ok(component.components.child);
+				assert.ok(component.components.child instanceof ChildComponent);
+			});
+
+			it('should store component references via "ref" instead of "key" when both are present', function() {
+				core.enableCompatibilityMode();
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementVoid(ChildComponent, null, null, 'key', 'keyChild', 'ref', 'refChild');
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+
+				component = new TestComponent();
+				assert.ok(!component.components.keyChild);
+				assert.ok(component.components.refChild);
+				assert.ok(component.components.refChild instanceof ChildComponent);
+			});
+
+			it('should store component references via "key" when renderer is not enabled by compatibility mode', function() {
+				class TestRenderer extends IncrementalDomRenderer {
+				}
+				core.enableCompatibilityMode({
+					renderers: [TestRenderer]
+				});
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+					}
+				}
+				TestComponent.RENDERER = TestRenderer;
+
+				component = new TestComponent();
+				assert.ok(component.components.child);
+				assert.ok(component.components.child instanceof ChildComponent);
+			});
+
+			it('should not store component references via "key" when renderer is not enabled by compatibility mode', function() {
+				class TestRenderer extends IncrementalDomRenderer {
+				}
+				core.enableCompatibilityMode({
+					renderers: [TestRenderer]
+				});
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+
+				component = new TestComponent();
+				assert.ok(!component.components.child);
 			});
 		});
 	});

@@ -258,6 +258,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			Ctor = ComponentRegistry.getConstructor(tagOrCtor);
 		}
 
+		this.normalizeConfig_(config);
 		var data = IncrementalDomRenderer.getCurrentData();
 		var comp;
 		if (core.isDef(config.ref)) {
@@ -573,6 +574,23 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		comp.getRenderer().config_ = config;
 		return comp;
+	}
+
+	/**
+	 * Normalizes the given config object. Uses "key" as "ref" when compatibility
+	 * mode is on for the current renderer.
+	 * @param {!Object} config
+	 * @protected
+	 */
+	normalizeConfig_(config) {
+		const compatData = core.getCompatibilityModeData();
+		if (compatData) {
+			const renderers = compatData.renderers;
+			const useKey = !renderers || renderers.indexOf(this.constructor) !== -1;
+			if (useKey && config.key && !config.ref) {
+				config.ref = config.key;
+			}
+		}
 	}
 
 	/**

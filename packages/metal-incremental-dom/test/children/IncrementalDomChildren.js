@@ -2,6 +2,7 @@
 
 import dom from 'metal-dom';
 import IncrementalDomChildren from '../../src/children/IncrementalDomChildren';
+import { sunset } from '../../../../test-utils';
 
 describe('IncrementalDomChildren', function() {
 	it('should capture children calls to incremental dom', function(done) {
@@ -179,14 +180,8 @@ describe('IncrementalDomChildren', function() {
 		IncrementalDOM.elementClose('div');
 	});
 
-	describe('Sunset Tests', function() {
+	describe('Sunset Tests', sunset(function() {
 		it('should not have "config" object inside each child after version 3.x', function(done) {
-			var major = parseInt(METAL_VERSION.split('.')[0], 10);
-			if (major <= 2) {
-				done();
-				return;
-			}
-
 			IncrementalDomChildren.capture({}, function(tree) {
 				assert.strictEqual(1, tree.props.children.length);
 
@@ -198,5 +193,5 @@ describe('IncrementalDomChildren', function() {
 			IncrementalDOM.elementVoid('span', null, null, 'foo', 'bar');
 			IncrementalDOM.elementClose('div');
 		});
-	});
+	}));
 });

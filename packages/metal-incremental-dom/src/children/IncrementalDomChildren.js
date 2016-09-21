@@ -36,6 +36,15 @@ class IncrementalDomChildren {
 	}
 
 	/**
+	 * Gets the node's original owner's renderer.
+	 * @param {!Object} node
+	 * @return {ComponentRenderer}
+	 */
+	static getOwner(node) {
+		return node[IncrementalDomChildren.CHILD_OWNER];
+	}
+
+	/**
 	 * Renders a children tree through incremental dom.
 	 * @param {!{args: Array, children: !Array, isText: ?boolean}}
 	 * @param {function()=} opt_skipNode Optional function that is called for

@@ -270,10 +270,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * creating it if it doesn't yet exist.
 	 * @param {string|!Function} tagOrCtor The tag name.
 	 * @param {!Object} config The config object for the sub component.
+	 * @param {Component=} opt_owner
 	 * @return {!Component} The sub component.
 	 * @protected
 	 */
-	getSubComponent_(tagOrCtor, config) {
+	getSubComponent_(tagOrCtor, config, opt_owner) {
 		var Ctor = tagOrCtor;
 		if (core.isString(Ctor)) {
 			Ctor = ComponentRegistry.getConstructor(tagOrCtor);
@@ -283,9 +284,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var data = IncrementalDomRenderer.getCurrentData();
 		var comp;
 		if (core.isDef(ref)) {
-			comp = this.match_(this.component_.components[ref], Ctor, config);
-			this.component_.addSubComponent(ref, comp);
-			this.component_.refs[ref] = comp;
+			const owner = opt_owner || this.component_;
+			comp = this.match_(owner.components[ref], Ctor, config);
+			owner.addSubComponent(ref, comp);
+			owner.refs[ref] = comp;
 		} else if (core.isDef(config.key)) {
 			comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
 			data.currComps.keys[config.key] = comp;
@@ -350,7 +352,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	handleChildRender_(node) {
 		if (node.tag && IncrementalDomUtils.isComponentTag(node.tag)) {
 			node.props.children = this.buildChildren_(node.props.children);
-			this.renderFromTag_(node.tag, node.props);
+			const owner = IncrementalDomChildren.getOwner(node);
+			this.renderFromTag_(
+				node.tag,
+				node.props,
+				owner && owner.getComponent()
+			);
 			return true;
 		}
 	}
@@ -705,11 +712,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Renders the contents for the given tag.
 	 * @param {!function()|string} tag
 	 * @param {!Object} config
+	 * @param {Component=} opt_owner
 	 * @protected
 	 */
-	renderFromTag_(tag, config) {
+	renderFromTag_(tag, config, opt_owner) {
 		if (core.isString(tag) || tag.prototype.getRenderer) {
-			var comp = this.renderSubComponent_(tag, config);
+			var comp = this.renderSubComponent_(tag, config, opt_owner);
 			this.updateElementIfNotReached_(comp.element);
 			return comp.element;
 		} else {
@@ -777,11 +785,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * updated instead.
 	 * @param {string|!function()} tagOrCtor The tag name or constructor function.
 	 * @param {!Object} config The config object for the sub component.
+	 * @param {Component=} opt_owner
 	 * @return {!Component} The updated sub component.
 	 * @protected
 	 */
-	renderSubComponent_(tagOrCtor, config) {
-		var comp = this.getSubComponent_(tagOrCtor, config);
+	renderSubComponent_(tagOrCtor, config, opt_owner) {
+		var comp = this.getSubComponent_(tagOrCtor, config, opt_owner);
 		this.updateContext_(comp);
 		var renderer = comp.getRenderer();
 		if (renderer instanceof IncrementalDomRenderer) {
@@ -789,7 +798,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			const parentRenderer = parentComp.getRenderer();
 			parentRenderer.childComponents_.push(comp);
 			renderer.parent_ = parentComp;
-			renderer.owner_ = this.component_;
+			renderer.owner_ = opt_owner || this.component_;
 			if (!config.key && !parentRenderer.rootElementReached_) {
 				config.key = parentRenderer.config_.key;
 			}

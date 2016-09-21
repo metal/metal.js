@@ -29,6 +29,20 @@ describe('IncrementalDomChildren', function() {
 		IncrementalDOM.elementClose('div');
 	});
 
+	it('should return the captured tree\'s given owner object', function(done) {
+		const owner = {};
+		IncrementalDomChildren.capture(owner, function(tree) {
+			assert.strictEqual(
+				owner,
+				IncrementalDomChildren.getOwner(tree.props.children[0])
+			);
+			done();
+		});
+
+		IncrementalDOM.text('Hello World');
+		IncrementalDOM.elementClose('div');
+	});
+
 	it('should store args for text nodes when they contain more than just the text', function(done) {
 		IncrementalDomChildren.capture({}, function(tree) {
 			var node = tree.props.children[0];

@@ -11,6 +11,12 @@ describe('ComponentRenderer', function() {
 		component.dispose();
 	});
 
+	it('should return the component via getComponent()', function() {
+		component = new Component();
+		const renderer = component.getRenderer();
+		assert.strictEqual(component, renderer.getComponent());
+	});
+
 	it('should call the render method when the component is rendered', function() {
 		sinon.spy(ComponentRenderer.prototype, 'render');
 		component = new Component();

@@ -33,6 +33,14 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
+	 * Returns this renderer's component.
+	 * @return {!Component}
+	 */
+	getComponent() {
+		return this.component_;
+	}
+
+	/**
 	 * Handles a `dataManagerCreated` event from the component. Listens to events
 	 * on the manager that has been created.
 	 * @protected

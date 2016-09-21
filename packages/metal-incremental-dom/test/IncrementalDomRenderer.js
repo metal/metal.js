@@ -1838,7 +1838,9 @@ describe('IncrementalDomRenderer', function() {
 				class TestNestedChildComponent extends Component {
 					render() {
 						IncDom.elementOpen(TestChildComponent, null, null, 'ref', 'nestedChild1');
+						IncDom.elementOpen('div');
 						this.children.forEach(IncrementalDomRenderer.renderChild);
+						IncDom.elementClose('div');
 						IncDom.elementClose(TestChildComponent);
 					}
 				}
@@ -1865,7 +1867,7 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(!child1.components.child2);
 
 				assert.strictEqual(child1.element, component.element.childNodes[0]);
-				assert.strictEqual(child2.element, child1.element.childNodes[0]);
+				assert.strictEqual(child2.element, child1.element.childNodes[0].childNodes[0]);
 			});
 
 			it('should render children components with changed props', function() {

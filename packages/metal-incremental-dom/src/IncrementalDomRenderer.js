@@ -245,6 +245,27 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Returns the "ref" to be used for a component. Uses "key" as "ref" when
+	 * compatibility mode is on for the current renderer.
+	 * @param {!Object} config
+	 * @param {?string} ref
+	 * @protected
+	 */
+	getRef_(config) {
+		const compatData = core.getCompatibilityModeData();
+		if (compatData) {
+			const renderers = compatData.renderers;
+			const useKey = !renderers ||
+				renderers.indexOf(this.constructor) !== -1 ||
+				renderers.indexOf(this.constructor.RENDERER_NAME) !== -1;
+			if (useKey && config.key && !config.ref) {
+				return config.key;
+			}
+		}
+		return config.ref;
+	}
+
+	/**
 	 * Gets the sub component referenced by the given tag and config data,
 	 * creating it if it doesn't yet exist.
 	 * @param {string|!Function} tagOrCtor The tag name.
@@ -258,13 +279,13 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			Ctor = ComponentRegistry.getConstructor(tagOrCtor);
 		}
 
-		this.normalizeConfig_(config);
+		const ref = this.getRef_(config);
 		var data = IncrementalDomRenderer.getCurrentData();
 		var comp;
-		if (core.isDef(config.ref)) {
-			comp = this.match_(this.component_.components[config.ref], Ctor, config);
-			this.component_.addSubComponent(config.ref, comp);
-			this.component_.refs[config.ref] = comp;
+		if (core.isDef(ref)) {
+			comp = this.match_(this.component_.components[ref], Ctor, config);
+			this.component_.addSubComponent(ref, comp);
+			this.component_.refs[ref] = comp;
 		} else if (core.isDef(config.key)) {
 			comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
 			data.currComps.keys[config.key] = comp;
@@ -574,25 +595,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		comp.getRenderer().config_ = config;
 		return comp;
-	}
-
-	/**
-	 * Normalizes the given config object. Uses "key" as "ref" when compatibility
-	 * mode is on for the current renderer.
-	 * @param {!Object} config
-	 * @protected
-	 */
-	normalizeConfig_(config) {
-		const compatData = core.getCompatibilityModeData();
-		if (compatData) {
-			const renderers = compatData.renderers;
-			const useKey = !renderers ||
-				renderers.indexOf(this.constructor) !== -1 ||
-				renderers.indexOf(this.constructor.RENDERER_NAME) !== -1;
-			if (useKey && config.key && !config.ref) {
-				config.ref = config.key;
-			}
-		}
 	}
 
 	/**

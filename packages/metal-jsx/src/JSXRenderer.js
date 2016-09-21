@@ -115,5 +115,6 @@ class JSXRenderer extends IncrementalDomRenderer {
 }
 
 JSXRenderer.KEY_PREFIX = '_metal_jsx_';
+JSXRenderer.RENDERER_NAME = 'jsx';
 
 export default JSXRenderer;

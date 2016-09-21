@@ -586,7 +586,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		const compatData = core.getCompatibilityModeData();
 		if (compatData) {
 			const renderers = compatData.renderers;
-			const useKey = !renderers || renderers.indexOf(this.constructor) !== -1;
+			const useKey = !renderers ||
+				renderers.indexOf(this.constructor) !== -1 ||
+				renderers.indexOf(this.constructor.RENDERER_NAME) !== -1;
 			if (useKey && config.key && !config.ref) {
 				config.ref = config.key;
 			}
@@ -906,5 +908,10 @@ IncrementalDomRenderer.ELEMENT_CLOSED = 'elementClosed';
 
 // Regex pattern used to find inline listeners.
 IncrementalDomRenderer.LISTENER_REGEX = /^(?:on([A-Z]\w+))|(?:data-on(\w+))$/;
+
+// Name of this renderer. Renderers should provide this as a way to identify
+// them via a simple string (when calling core.enableCompatibilityMode to
+// add support to old features for specific renderers for example).
+IncrementalDomRenderer.RENDERER_NAME = 'incremental-dom';
 
 export default IncrementalDomRenderer;

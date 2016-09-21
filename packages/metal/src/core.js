@@ -57,8 +57,9 @@ class core {
 	 * @param {Object=} opt_data Optional object with data to specify more
 	 *     details, such as:
 	 *         - renderers {Array} the template renderers that should be in
-	 *           compatibility mode. By default, all the ones that extend from
-	 *           IncrementalDomRenderer.
+	 *           compatibility mode, either their constructors or strings
+	 *           representing them (e.g. 'soy' or 'jsx'). By default, all the ones
+	 *           that extend from IncrementalDomRenderer.
 	 * @type {Object}
 	 */
 	static enableCompatibilityMode(opt_data = {}) {

@@ -210,5 +210,7 @@ class Soy extends IncrementalDomRenderer {
 	}
 }
 
+Soy.RENDERER_NAME = 'soy';
+
 export default Soy;
 export { Soy, SoyAop };

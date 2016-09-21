@@ -268,7 +268,9 @@ describe('core', function() {
 
 	describe('Compatibility Mode', function() {
 		afterEach(function() {
-			delete window.__METAL_COMPATIBILITY__;
+			if (typeof window !== 'undefined') {
+				delete window.__METAL_COMPATIBILITY__;
+			}
 			core.disableCompatibilityMode();
 		});
 
@@ -283,6 +285,10 @@ describe('core', function() {
 		});
 
 		it('should return the data specified by global var', function() {
+			if (typeof window === 'undefined') {
+				// Skip this test in Node.js environment.
+				return;
+			}
 			const data = {};
 			window.__METAL_COMPATIBILITY__ = data;
 			assert.strictEqual(data, core.getCompatibilityModeData());

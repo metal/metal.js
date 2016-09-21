@@ -27,7 +27,7 @@ metal.registerTasks({
 		'env/test/node.js',
 		'packages/metal-events/test/**/*.js',
 		'packages/metal-state/test/**/*.js',
-		'packages/metal.js/test/**/*.js'
+		'packages/metal/test/**/*.js'
 	],
 	testSaucelabsBrowsers: {
 		sl_chrome: {

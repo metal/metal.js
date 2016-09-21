@@ -46,8 +46,8 @@ describe('Config', function() {
 		var config = Config.number();
 		assert.ok(core.isObject(config));
 		assert.ok(core.isFunction(config.config.validator));
-		assert.isTrue(config.config.validator(10));
-		assert.instanceOf(config.config.validator('test'), Error);
+		assert.ok(config.config.validator(10));
+		assert.ok(config.config.validator('test') instanceof Error);
 	});
 
 	it('should return config with data from multiple calls', function() {
@@ -60,7 +60,7 @@ describe('Config', function() {
 		assert.strictEqual(10, config.config.value);
 		assert.strictEqual(setter, config.config.setter);
 		assert.ok(core.isFunction(config.config.validator));
-		assert.isTrue(config.config.validator(10));
-		assert.instanceOf(config.config.validator('test'), Error);
+		assert.ok(config.config.validator(10));
+		assert.ok(config.config.validator('test') instanceof Error);
 	});
 });

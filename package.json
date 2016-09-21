@@ -43,7 +43,8 @@
       "packages/metal-incremental-dom/src/incremental-dom.js",
       "packages/metal-incremental-dom/lib/incremental-dom.js",
       "packages/metal-jsx/src/iDOMHelpers.js",
-      "packages/metal*/test/**/*.js"
+      "packages/metal*/test/**/*.js",
+      "test-utils.js"
     ]
   }
 }

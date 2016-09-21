@@ -71,6 +71,12 @@ class core {
 	 * @return {Object}
 	 */
 	static getCompatibilityModeData() {
+		// Compatibility mode can be set via the __METAL_COMPATIBILITY__ global var.
+		if (!compatibilityModeData_) {
+			if (typeof window !== 'undefined' && window.__METAL_COMPATIBILITY__) {
+				core.enableCompatibilityMode(window.__METAL_COMPATIBILITY__);
+			}
+		}
 		return compatibilityModeData_;
 	}
 

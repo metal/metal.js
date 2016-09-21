@@ -267,6 +267,11 @@ describe('core', function() {
 	});
 
 	describe('Compatibility Mode', function() {
+		afterEach(function() {
+			delete window.__METAL_COMPATIBILITY__;
+			core.disableCompatibilityMode();
+		});
+
 		it('should return no data if compatibility mode is not enabled', function() {
 			assert.ok(!core.getCompatibilityModeData());
 		});
@@ -274,6 +279,12 @@ describe('core', function() {
 		it('should return the data specified when enabling compatibility mode', function() {
 			const data = {};
 			core.enableCompatibilityMode(data);
+			assert.strictEqual(data, core.getCompatibilityModeData());
+		});
+
+		it('should return the data specified by global var', function() {
+			const data = {};
+			window.__METAL_COMPATIBILITY__ = data;
 			assert.strictEqual(data, core.getCompatibilityModeData());
 		});
 

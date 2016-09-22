@@ -1,6 +1,6 @@
 'use strict';
 
-import { core } from 'metal';
+import { getFunctionName } from 'metal';
 
 /**
  * The component registry is used to register components, so they can
@@ -41,7 +41,7 @@ class ComponentRegistry {
 			if (constructorFn.hasOwnProperty('NAME')) {
 				name = constructorFn.NAME;
 			} else {
-				name = core.getFunctionName(constructorFn);
+				name = getFunctionName(constructorFn);
 			}
 		}
 		constructorFn.NAME = name;

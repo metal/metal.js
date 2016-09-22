@@ -1,6 +1,6 @@
 'use strict';
 
-import { core } from 'metal';
+import { getFunctionName, isDef, isDefAndNotNull, isNull } from 'metal';
 
 /**
  * Provides access to various type validators that will return an
@@ -137,7 +137,7 @@ const validators = {
 					required = validator.config.required;
 					validator = validator.config.validator;
 				}
-				if ((required && !core.isDefAndNotNull(value[key])) ||
+				if ((required && !isDefAndNotNull(value[key])) ||
 					isInvalid(validator(value[key]))) {
 					return composeError(
 						'Expected object with a specific shape',
@@ -160,12 +160,12 @@ const validators = {
  * @return {!Error} Instance of Error class.
  */
 function composeError(error, name, context) {
-	const compName = context ? core.getFunctionName(context.constructor) : null;
+	const compName = context ? getFunctionName(context.constructor) : null;
 	var renderer = context && context.getRenderer && context.getRenderer();
 	const parent = renderer && renderer.getParent ?
 		context.getRenderer().getParent() :
 		null;
-	const parentName = parent ? core.getFunctionName(parent.constructor) : null;
+	const parentName = parent ? getFunctionName(parent.constructor) : null;
 	const location = parentName ? `Check render method of '${parentName}'.` : '';
 	return new Error(
 		`Warning: Invalid state passed to '${name}'. ` +
@@ -203,7 +203,7 @@ function isInvalid(result) {
  */
 function maybe(typeValidator) {
 	return (value, name, context) => {
-		if (!core.isDef(value) || core.isNull(value)) {
+		if (!isDef(value) || isNull(value)) {
 			return true;
 		}
 		return typeValidator(value, name, context);

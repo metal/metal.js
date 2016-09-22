@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, core, object } from 'metal';
+import { array, mergeSuperClassesProperty, object } from 'metal';
 import { EventEmitter, EventEmitterProxy } from 'metal-events';
 import State from 'metal-state';
 
@@ -14,7 +14,7 @@ class ComponentDataManager extends EventEmitter {
 		super();
 		this.component_ = component;
 
-		core.mergeSuperClassesProperty(
+		mergeSuperClassesProperty(
 			this.constructor,
 			'BLACKLIST',
 			array.firstDefinedValue

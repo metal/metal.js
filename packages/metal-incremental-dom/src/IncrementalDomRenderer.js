@@ -1,7 +1,15 @@
 'use strict';
 
 import './incremental-dom';
-import { core, object } from 'metal';
+import {
+	getCompatibilityModeData,
+	getUid,
+	isBoolean,
+	isDef,
+	isDefAndNotNull,
+	isString,
+	object
+} from 'metal';
 import dom from 'metal-dom';
 import { domData } from 'metal-dom';
 import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
@@ -101,7 +109,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		element[key] = fn;
 		if (fn) {
-			if (core.isString(fn)) {
+			if (isString(fn)) {
 				if (key[0] === 'd') {
 					// Allow data-on[eventkey] listeners to stay in the dom, as they
 					// won't cause conflicts.
@@ -252,7 +260,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	getRef_(config) {
-		const compatData = core.getCompatibilityModeData();
+		const compatData = getCompatibilityModeData();
 		if (compatData) {
 			const renderers = compatData.renderers;
 			const useKey = !renderers ||
@@ -276,22 +284,22 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	getSubComponent_(tagOrCtor, config, owner) {
 		var Ctor = tagOrCtor;
-		if (core.isString(Ctor)) {
+		if (isString(Ctor)) {
 			Ctor = ComponentRegistry.getConstructor(tagOrCtor);
 		}
 
 		const ref = this.getRef_(config);
 		var data = IncrementalDomRenderer.getCurrentData();
 		var comp;
-		if (core.isDef(ref)) {
+		if (isDef(ref)) {
 			comp = this.match_(owner.components[ref], Ctor, config);
 			owner.addSubComponent(ref, comp);
 			owner.refs[ref] = comp;
-		} else if (core.isDef(config.key)) {
+		} else if (isDef(config.key)) {
 			comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
 			data.currComps.keys[config.key] = comp;
 		} else {
-			var type = core.getUid(Ctor, true);
+			var type = getUid(Ctor, true);
 			data.currComps.order[type] = data.currComps.order[type] || [];
 			var order = data.currComps.order[type];
 			comp = this.match_((data.prevComps.order[type] || [])[order.length], Ctor, config);
@@ -411,7 +419,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			// "checked" as an attribute only, which can cause bugs since that won't
 			// necessarily check/uncheck the element it's set on. See
 			// https://github.com/google/incremental-dom/issues/198 for more details.
-			value = core.isDefAndNotNull(value) && value !== false;
+			value = isDefAndNotNull(value) && value !== false;
 		}
 
 		if (name === 'value' && element.value !== value) {
@@ -425,7 +433,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			element[name] = value;
 		}
 
-		if (core.isBoolean(value)) {
+		if (isBoolean(value)) {
 			// Incremental dom sets boolean values as string data attributes, which
 			// is counter intuitive. This changes the behavior to use the actual
 			// boolean value.
@@ -509,7 +517,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.updateElementIfNotReached_(node);
 
 		const config = IncrementalDomUtils.buildConfigFromCall(args);
-		if (core.isDefAndNotNull(config.ref)) {
+		if (isDefAndNotNull(config.ref)) {
 			const owner = IncrementalDomChildren.getCurrentOwner() || this;
 			owner.getComponent().refs[config.ref] = node;
 		}
@@ -710,7 +718,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	renderFromTag_(tag, config) {
-		if (core.isString(tag) || tag.prototype.getRenderer) {
+		if (isString(tag) || tag.prototype.getRenderer) {
 			var comp = this.renderSubComponent_(tag, config);
 			this.updateElementIfNotReached_(comp.element);
 			return comp.element;
@@ -916,8 +924,8 @@ IncrementalDomRenderer.ELEMENT_CLOSED = 'elementClosed';
 IncrementalDomRenderer.LISTENER_REGEX = /^(?:on([A-Z]\w+))|(?:data-on(\w+))$/;
 
 // Name of this renderer. Renderers should provide this as a way to identify
-// them via a simple string (when calling core.enableCompatibilityMode to
-// add support to old features for specific renderers for example).
+// them via a simple string (when calling enableCompatibilityMode to add
+// support to old features for specific renderers for example).
 IncrementalDomRenderer.RENDERER_NAME = 'incremental-dom';
 
 export default IncrementalDomRenderer;

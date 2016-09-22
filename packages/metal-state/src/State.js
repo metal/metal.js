@@ -1,6 +1,15 @@
 'use strict';
 
-import { array, async, core, object } from 'metal';
+import {
+	array,
+	async,
+	isDefAndNotNull,
+	isFunction,
+	isObject,
+	isString,
+	mergeSuperClassesProperty,
+	object
+} from 'metal';
 import { EventEmitter } from 'metal-events';
 
 /**
@@ -130,7 +139,7 @@ class State extends EventEmitter {
 	 *     single key name though, this should be its initial value.
 	 */
 	addToState(configsOrName, opt_initialValuesOrConfig, opt_contextOrInitialValue) {
-		if (core.isString(configsOrName)) {
+		if (isString(configsOrName)) {
 			return this.addKeyToState(...arguments);
 		}
 
@@ -191,7 +200,7 @@ class State extends EventEmitter {
 			var value = info.state === State.KeyStates.INITIALIZED ?
 				this.get(name) :
 				info.initialValue;
-			if (!core.isDefAndNotNull(value)) {
+			if (!isDefAndNotNull(value)) {
 				console.error(
 					'The property called "' + name + '" is required but didn\'t ' +
 					'receive a value.'
@@ -268,9 +277,9 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	callFunction_(fn, args) {
-		if (core.isString(fn)) {
+		if (isString(fn)) {
 			return this.context_[fn].apply(this.context_, args);
-		} else if (core.isFunction(fn)) {
+		} else if (isFunction(fn)) {
 			return fn.apply(this.context_, args);
 		}
 	}
@@ -498,7 +507,7 @@ class State extends EventEmitter {
 	 * @static
 	 */
 	static mergeStateStatic(ctor) {
-		return core.mergeSuperClassesProperty(ctor, 'STATE', State.mergeState);
+		return mergeSuperClassesProperty(ctor, 'STATE', State.mergeState);
 	}
 
 	/**
@@ -507,7 +516,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	mergeInvalidKeys_() {
-		core.mergeSuperClassesProperty(this.constructor, 'INVALID_KEYS', function(values) {
+		mergeSuperClassesProperty(this.constructor, 'INVALID_KEYS', function(values) {
 			return array.flatten(values).reduce(function(merged, val) {
 				if (val) {
 					merged[val] = true;
@@ -656,7 +665,7 @@ class State extends EventEmitter {
 	shouldInformChange_(name, prevVal) {
 		var info = this.stateInfo_[name];
 		return (info.state === State.KeyStates.INITIALIZED) &&
-			(core.isObject(prevVal) || prevVal !== this.get(name));
+			(isObject(prevVal) || prevVal !== this.get(name));
 	}
 
 	/**

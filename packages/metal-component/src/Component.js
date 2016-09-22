@@ -1,6 +1,17 @@
 'use strict';
 
-import { array, core, object } from 'metal';
+import {
+	array,
+	getFunctionName,
+	isBoolean,
+	isDefAndNotNull,
+	isElement,
+	isFunction,
+	isObject,
+	isString,
+	mergeSuperClassesProperty,
+	object
+} from 'metal';
 import { dom, DomEventEmitterProxy } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
@@ -120,8 +131,8 @@ class Component extends EventEmitter {
 		 */
 		this.DEFAULT_ELEMENT_PARENT = document.body;
 
-		core.mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
-		core.mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
+		mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
+		mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
 
 		this.element = this.initialConfig_.element;
 
@@ -229,7 +240,7 @@ class Component extends EventEmitter {
 	 * @return {!ComponentDataManager}
 	 */
 	createDataManager() {
-		core.mergeSuperClassesProperty(this.constructor, 'DATA_MANAGER', array.firstDefinedValue);
+		mergeSuperClassesProperty(this.constructor, 'DATA_MANAGER', array.firstDefinedValue);
 		return new this.constructor.DATA_MANAGER_MERGED(this, Component.DATA);
 	}
 
@@ -239,7 +250,7 @@ class Component extends EventEmitter {
 	 * @return {!ComponentRenderer}
 	 */
 	createRenderer() {
-		core.mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
+		mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
 		return new this.constructor.RENDERER_MERGED(this);
 	}
 
@@ -340,11 +351,11 @@ class Component extends EventEmitter {
 		var info = {
 			fn: value
 		};
-		if (core.isObject(value) && !core.isFunction(value)) {
+		if (isObject(value) && !isFunction(value)) {
 			info.selector = value.selector;
 			info.fn = value.fn;
 		}
-		if (core.isString(info.fn)) {
+		if (isString(info.fn)) {
 			info.fn = this.getListenerFn(info.fn);
 		}
 		return info;
@@ -374,11 +385,11 @@ class Component extends EventEmitter {
 	 * @return {function()}
 	 */
 	getListenerFn(fnName) {
-		if (core.isFunction(this[fnName])) {
+		if (isFunction(this[fnName])) {
 			return this[fnName].bind(this);
 		} else {
 			console.error('No function named "' + fnName + '" was found in the ' +
-				'component "' + core.getFunctionName(this.constructor) + '". Make ' +
+				'component "' + getFunctionName(this.constructor) + '". Make ' +
 				'sure that you specify valid function names when adding inline listeners.'
 			);
 		}
@@ -409,7 +420,7 @@ class Component extends EventEmitter {
 	 */
 	fireStateKeyChange_(key, opt_change) {
 		var fn = this['sync' + key.charAt(0).toUpperCase() + key.slice(1)];
-		if (core.isFunction(fn)) {
+		if (isFunction(fn)) {
 			if (!opt_change) {
 				var manager = this.getDataManager();
 				opt_change = {
@@ -523,7 +534,7 @@ class Component extends EventEmitter {
 	static render(Ctor, opt_configOrElement, opt_element) {
 		var config = opt_configOrElement;
 		var element = opt_element;
-		if (core.isElement(opt_configOrElement)) {
+		if (isElement(opt_configOrElement)) {
 			config = null;
 			element = opt_configOrElement;
 		}
@@ -593,7 +604,7 @@ class Component extends EventEmitter {
 	 * @param {?string|Element} val
 	 */
 	set element(val) {
-		if (!core.isElement(val) && !core.isString(val) && core.isDefAndNotNull(val)) {
+		if (!isElement(val) && !isString(val) && isDefAndNotNull(val)) {
 			return;
 		}
 
@@ -706,7 +717,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	validatorEventsFn_(val) {
-		return !core.isDefAndNotNull(val) || core.isObject(val);
+		return !isDefAndNotNull(val) || isObject(val);
 	}
 }
 
@@ -722,7 +733,7 @@ Component.DATA = {
 	 */
 	elementClasses: {
 		setter: 'setterElementClassesFn_',
-		validator: core.isString,
+		validator: isString,
 		value: ''
 	},
 
@@ -742,7 +753,7 @@ Component.DATA = {
 	 * @type {boolean}
 	 */
 	visible: {
-		validator: core.isBoolean,
+		validator: isBoolean,
 		value: true
 	}
 };

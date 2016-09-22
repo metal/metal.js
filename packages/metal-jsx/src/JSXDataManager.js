@@ -1,6 +1,6 @@
 'use strict';
 
-import { core, object } from 'metal';
+import { mergeSuperClassesProperty, object } from 'metal';
 import { ComponentDataManager } from 'metal-component';
 import State from 'metal-state';
 
@@ -40,7 +40,7 @@ class JSXDataManager extends ComponentDataManager {
 	 */
 	buildStateInstanceData_(data) {
 		const ctor = this.component_.constructor;
-		core.mergeSuperClassesProperty(ctor, 'PROPS', State.mergeState);
+		mergeSuperClassesProperty(ctor, 'PROPS', State.mergeState);
 		return object.mixin({}, data, this.component_.constructor.PROPS_MERGED);
 	}
 

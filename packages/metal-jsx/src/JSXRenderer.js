@@ -1,6 +1,6 @@
 'use strict';
 
-import core from 'metal';
+import { isDefAndNotNull } from 'metal';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
 const childrenCount = [];
@@ -59,7 +59,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 			count = ++childrenCount[childrenCount.length - 1];
 		}
 
-		if (!core.isDefAndNotNull(args[1])) {
+		if (!isDefAndNotNull(args[1])) {
 			if (count) {
 				args[1] = JSXRenderer.KEY_PREFIX + count;
 			} else {

@@ -1,6 +1,6 @@
 'use strict';
 
-import core from 'metal';
+import { isString } from 'metal';
 
 /**
  * Utility functions used to handle incremental dom calls.
@@ -47,7 +47,7 @@ class IncrementalDomUtils {
 	 * @return {boolean}
 	 */
 	static isComponentTag(tag) {
-		return !core.isString(tag) || tag[0] === tag[0].toUpperCase();
+		return !isString(tag) || tag[0] === tag[0].toUpperCase();
 	}
 }
 

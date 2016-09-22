@@ -1,6 +1,6 @@
 'use strict';
 
-import { core, array, Disposable } from 'metal';
+import { array, Disposable, isFunction, isString } from 'metal';
 import EventHandle from './EventHandle';
 
 /**
@@ -230,7 +230,7 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	normalizeEvents_(events) {
-		return core.isString(events) ? [events] : events;
+		return isString(events) ? [events] : events;
 	}
 
 	/**
@@ -349,7 +349,7 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	validateListener_(listener) {
-		if (!core.isFunction(listener)) {
+		if (!isFunction(listener)) {
 			throw new TypeError('Listener must be a function');
 		}
 	}

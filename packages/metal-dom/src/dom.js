@@ -1,6 +1,6 @@
 'use strict';
 
-import { core, object } from 'metal';
+import { isDef, isDocument, isElement, isObject, isString, object } from 'metal';
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
@@ -22,7 +22,7 @@ class dom {
 	 * @param {string} classes CSS classes to add.
 	 */
 	static addClasses(elements, classes) {
-		if (!core.isObject(elements) || !core.isString(classes)) {
+		if (!isObject(elements) || !isString(classes)) {
 			return;
 		}
 
@@ -163,7 +163,7 @@ class dom {
 	 * @return {!Element} The appended child.
 	 */
 	static append(parent, child) {
-		if (core.isString(child)) {
+		if (isString(child)) {
 			child = dom.buildFragment(child);
 		}
 		if (child instanceof NodeList) {
@@ -201,7 +201,7 @@ class dom {
 	 * @return {boolean}
 	 */
 	static contains(element1, element2) {
-		if (core.isDocument(element1)) {
+		if (isDocument(element1)) {
 			// document.contains is not defined on IE9, so call it on documentElement instead.
 			return element1.documentElement.contains(element2);
 		} else {
@@ -239,17 +239,17 @@ class dom {
 		}
 
 		dom.attachDelegateEvent_(element, eventName);
-		if (core.isString(selectorOrTarget)) {
+		if (isString(selectorOrTarget)) {
 			dom.addSelectorListener_(element, eventName, selectorOrTarget, callback);
 		} else {
 			dom.addElementListener_(selectorOrTarget, eventName, callback);
 		}
 
 		return new DomDelegatedEventHandle(
-			core.isString(selectorOrTarget) ? element : selectorOrTarget,
+			isString(selectorOrTarget) ? element : selectorOrTarget,
 			eventName,
 			callback,
-			core.isString(selectorOrTarget) ? selectorOrTarget : null
+			isString(selectorOrTarget) ? selectorOrTarget : null
 		);
 	}
 
@@ -307,7 +307,7 @@ class dom {
 	 */
 	static handleDelegateEvent_(event) {
 		dom.normalizeDelegateEvent_(event);
-		var currElement = core.isDef(event[NEXT_TARGET]) ?
+		var currElement = isDef(event[NEXT_TARGET]) ?
 			event[NEXT_TARGET] :
 			event.target;
 		var ret = true;
@@ -453,7 +453,7 @@ class dom {
 	 * @return {!DomEventHandle} Can be used to remove the listener.
 	 */
 	static on(element, eventName, callback, opt_capture) {
-		if (core.isString(element)) {
+		if (isString(element)) {
 			return dom.delegate(document, eventName, element, callback);
 		}
 		var customConfig = dom.customEvents[eventName];
@@ -521,7 +521,7 @@ class dom {
 	 * @param {string} classes CSS classes to remove.
 	 */
 	static removeClasses(elements, classes) {
-		if (!core.isObject(elements) || !core.isString(classes)) {
+		if (!isObject(elements) || !isString(classes)) {
 			return;
 		}
 
@@ -612,7 +612,7 @@ class dom {
 			return true;
 		}
 
-		if (core.isString(element)) {
+		if (isString(element)) {
 			if (!elementsByTag[element]) {
 				elementsByTag[element] = document.createElement(element);
 			}
@@ -629,9 +629,9 @@ class dom {
 	 * @return {Element} The converted element, or null if none was found.
 	 */
 	static toElement(selectorOrElement) {
-		if (core.isElement(selectorOrElement) || core.isDocument(selectorOrElement)) {
+		if (isElement(selectorOrElement) || isDocument(selectorOrElement)) {
 			return selectorOrElement;
-		} else if (core.isString(selectorOrElement)) {
+		} else if (isString(selectorOrElement)) {
 			if (selectorOrElement[0] === '#' && selectorOrElement.indexOf(' ') === -1) {
 				return document.getElementById(selectorOrElement.substr(1));
 			} else {
@@ -649,7 +649,7 @@ class dom {
 	 * @param {string} classes The classes which have to added or removed from the element.
 	 */
 	static toggleClasses(element, classes) {
-		if (!core.isObject(element) || !core.isString(classes)) {
+		if (!isObject(element) || !isString(classes)) {
 			return;
 		}
 

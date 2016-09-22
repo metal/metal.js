@@ -1,7 +1,7 @@
 'use strict';
 
 import 'metal-soy-bundle';
-import { core, object } from 'metal';
+import { isFunction, isObject, isString, object } from 'metal';
 import { ComponentRegistry } from 'metal-component';
 import HTML2IncDom from 'html2incdom';
 import IncrementalDomRenderer from 'metal-incremental-dom';
@@ -17,7 +17,7 @@ class Soy extends IncrementalDomRenderer {
 	 */
 	addMissingStateKeys_() {
 		var elementTemplate = this.component_.constructor.TEMPLATE;
-		if (!core.isFunction(elementTemplate)) {
+		if (!isFunction(elementTemplate)) {
 			return;
 		}
 
@@ -54,7 +54,7 @@ class Soy extends IncrementalDomRenderer {
 			data[key] = value;
 		});
 		for (var i = 0; i < params.length; i++) {
-			if (!data[params[i]] && core.isFunction(component[params[i]])) {
+			if (!data[params[i]] && isFunction(component[params[i]])) {
 				data[params[i]] = component[params[i]].bind(component);
 			}
 		}
@@ -144,7 +144,7 @@ class Soy extends IncrementalDomRenderer {
 	 */
 	renderIncDom() {
 		var elementTemplate = this.component_.constructor.TEMPLATE;
-		if (core.isFunction(elementTemplate) && !this.component_.render) {
+		if (isFunction(elementTemplate) && !this.component_.render) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
 			SoyAop.startInterception(Soy.handleInterceptedCall_);
 			elementTemplate(this.buildTemplateData_(elementTemplate.params || []), null, ijData);
@@ -200,10 +200,10 @@ class Soy extends IncrementalDomRenderer {
 	 * @return {!function()}
 	 */
 	static toIncDom(value) {
-		if (core.isObject(value) && core.isString(value.content) && (value.contentKind === 'HTML')) {
+		if (isObject(value) && isString(value.content) && (value.contentKind === 'HTML')) {
 			value = value.content;
 		}
-		if (core.isString(value)) {
+		if (isString(value)) {
 			value = HTML2IncDom.buildFn(value);
 		}
 		return value;

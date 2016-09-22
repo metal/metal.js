@@ -1,6 +1,6 @@
 'use strict';
 
-import core from '../core';
+import { isDef } from '../core';
 
 class array {
 	/**
@@ -90,7 +90,7 @@ class array {
 	 */
 	static slice(arr, start, opt_end) {
 		var sliced = [];
-		var end = core.isDef(opt_end) ? opt_end : arr.length;
+		var end = isDef(opt_end) ? opt_end : arr.length;
 		for (var i = start; i < end; i++) {
 			sliced.push(arr[i]);
 		}

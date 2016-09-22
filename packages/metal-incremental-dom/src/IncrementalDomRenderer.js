@@ -10,8 +10,7 @@ import {
 	isString,
 	object
 } from 'metal';
-import dom from 'metal-dom';
-import { domData } from 'metal-dom';
+import { append, delegate, domData, exitDocument } from 'metal-dom';
 import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
@@ -117,7 +116,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				}
 				fn = this.component_.getListenerFn(fn);
 			}
-			element[handleKey] = dom.delegate(document, eventName, element, fn);
+			element[handleKey] = delegate(document, eventName, element, fn);
 		} else {
 			element.removeAttribute(key);
 		}
@@ -321,7 +320,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!element || !element.parentNode) {
 			var parent = document.createElement('div');
 			if (element) {
-				dom.append(parent, element);
+				append(parent, element);
 			}
 			return parent;
 		}
@@ -623,7 +622,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var tempParent = this.guaranteeParent_();
 		if (tempParent) {
 			IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
-			dom.exitDocument(this.component_.element);
+			exitDocument(this.component_.element);
 			if (this.component_.element && this.component_.inDocument) {
 				this.component_.renderElement_(
 					this.attachData_.parent,

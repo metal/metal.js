@@ -1,7 +1,7 @@
 'use strict';
 
 import { async } from 'metal';
-import dom from '../src/dom';
+import * as dom from '../src/dom';
 import globalEvalStyles from '../src/globalEvalStyles';
 
 describe('globalEvalStyles', function() {

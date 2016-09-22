@@ -1,6 +1,6 @@
 'use strict';
 
-import dom from '../src/dom';
+import * as dom from '../src/dom';
 import features from '../src/features';
 import DomEventEmitterProxy from '../src/DomEventEmitterProxy';
 import { EventEmitter } from 'metal-events';

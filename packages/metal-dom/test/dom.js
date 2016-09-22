@@ -1,6 +1,6 @@
 'use strict';
 
-import dom from '../src/dom';
+import dom from '../src/all/dom';
 import { object } from 'metal';
 import DomEventHandle from '../src/DomEventHandle';
 
@@ -268,16 +268,14 @@ describe('dom', function() {
 
 		it('should append string as document fragment to parent element', function() {
 			var parent = document.createElement('div');
-			var fragment = document.createDocumentFragment();
-			sinon.stub(dom, 'buildFragment').returns(fragment);
-			sinon.spy(parent, 'appendChild');
+			sinon.stub(parent, 'appendChild');
 
 			dom.append(parent, '<div></div>');
-			assert.strictEqual(1, dom.buildFragment.callCount);
-			assert.strictEqual('<div></div>', dom.buildFragment.args[0][0]);
 			assert.strictEqual(1, parent.appendChild.callCount);
-			assert.strictEqual(fragment, parent.appendChild.args[0][0]);
-			dom.buildFragment.restore();
+
+			const frag = parent.appendChild.args[0][0];
+			assert.ok(frag);
+			assert.strictEqual(11, frag.nodeType);
 		});
 
 		it('should create document fragment from string', function() {

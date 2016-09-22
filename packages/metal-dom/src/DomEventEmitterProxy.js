@@ -1,6 +1,6 @@
 'use strict';
 
-import dom from './dom';
+import { delegate, on, supportsEvent } from './dom';
 import { EventEmitterProxy } from 'metal-events';
 
 /**
@@ -23,9 +23,9 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 				var index = event.indexOf(':', 9);
 				var eventName = event.substring(9, index);
 				var selector = event.substring(index + 1);
-				return dom.delegate(this.originEmitter_, eventName, selector, listener);
+				return delegate(this.originEmitter_, eventName, selector, listener);
 			} else {
-				return dom.on(this.originEmitter_, event, listener);
+				return on(this.originEmitter_, event, listener);
 			}
 		} else {
 			return super.addListener_(event, listener);
@@ -52,7 +52,7 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 			return true;
 		}
 		return (this.isDelegateEvent_(event) && event.indexOf(':', 9) !== -1) ||
-			dom.supportsEvent(this.originEmitter_, event);
+			supportsEvent(this.originEmitter_, event);
 	}
 
 	/**

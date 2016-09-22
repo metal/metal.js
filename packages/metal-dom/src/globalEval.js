@@ -1,7 +1,7 @@
 'use strict';
 
 import { async } from 'metal';
-import dom from './dom';
+import { exitDocument, once } from './dom';
 
 /**
  * Utility functions for running javascript code in the global scope.
@@ -22,7 +22,7 @@ class globalEval {
 		} else {
 			document.head.appendChild(script);
 		}
-		dom.exitDocument(script);
+		exitDocument(script);
 		return script;
 	}
 
@@ -40,11 +40,11 @@ class globalEval {
 		script.src = src;
 
 		var callback = function() {
-			dom.exitDocument(script);
+			exitDocument(script);
 			opt_callback && opt_callback();
 		};
-		dom.once(script, 'load', callback);
-		dom.once(script, 'error', callback);
+		once(script, 'load', callback);
+		once(script, 'error', callback);
 
 		if (opt_appendFn) {
 			opt_appendFn(script);
@@ -72,7 +72,7 @@ class globalEval {
 			async.nextTick(callback);
 			return;
 		}
-		dom.exitDocument(script);
+		exitDocument(script);
 		if (script.src) {
 			return globalEval.runFile(script.src, opt_callback, opt_appendFn);
 		} else {

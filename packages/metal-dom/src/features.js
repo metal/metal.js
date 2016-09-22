@@ -1,6 +1,6 @@
 'use strict';
 
-import dom from './dom';
+import { append } from './dom';
 import { string } from 'metal';
 
 /**
@@ -50,7 +50,7 @@ class features {
 		if (features.attrOrderChange_ === undefined) {
 			var originalContent = '<div data-component="" data-ref=""></div>';
 			var element = document.createElement('div');
-			dom.append(element, originalContent);
+			append(element, originalContent);
 			features.attrOrderChange_ = originalContent !== element.innerHTML;
 		}
 		return features.attrOrderChange_;

@@ -1,7 +1,7 @@
 'use strict';
 
 import { async } from 'metal';
-import dom from './dom';
+import { once } from './dom';
 
 /**
  * Utility functions for running styles.
@@ -63,8 +63,8 @@ class globalEvalStyles {
 		if (style.tagName === 'STYLE') {
 			async.nextTick(callback);
 		} else {
-			dom.once(style, 'load', callback);
-			dom.once(style, 'error', callback);
+			once(style, 'load', callback);
+			once(style, 'error', callback);
 		}
 
 		if (opt_appendFn) {

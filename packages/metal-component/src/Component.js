@@ -12,7 +12,7 @@ import {
 	mergeSuperClassesProperty,
 	object
 } from 'metal';
-import { dom, DomEventEmitterProxy } from 'metal-dom';
+import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
 import { EventEmitter, EventHandler } from 'metal-events';
@@ -594,8 +594,8 @@ class Component extends EventEmitter {
 	renderElement_(opt_parentElement, opt_siblingElement) {
 		var element = this.element;
 		if (element && (opt_siblingElement || !element.parentNode)) {
-			var parent = dom.toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
-			parent.insertBefore(element, dom.toElement(opt_siblingElement));
+			var parent = toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
+			parent.insertBefore(element, toElement(opt_siblingElement));
 		}
 	}
 
@@ -609,7 +609,7 @@ class Component extends EventEmitter {
 		}
 
 		if (val) {
-			val = dom.toElement(val) || this.elementVal_;
+			val = toElement(val) || this.elementVal_;
 		}
 
 		if (this.elementVal_ !== val) {

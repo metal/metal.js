@@ -1,6 +1,6 @@
 'use strict';
 
-import dom from './dom';
+import { registerCustomEvent } from './dom';
 import features from './features';
 
 var mouseEventMap = {
@@ -10,7 +10,7 @@ var mouseEventMap = {
 	pointerleave: 'pointerout'
 };
 Object.keys(mouseEventMap).forEach(function(eventName) {
-	dom.registerCustomEvent(eventName, {
+	registerCustomEvent(eventName, {
 		delegate: true,
 		handler: function(callback, event) {
 			var related = event.relatedTarget;
@@ -30,7 +30,7 @@ var animationEventMap = {
 };
 Object.keys(animationEventMap).forEach(function(eventType) {
 	var eventName = animationEventMap[eventType];
-	dom.registerCustomEvent(eventName, {
+	registerCustomEvent(eventName, {
 		event: true,
 		delegate: true,
 		handler: function(callback, event) {

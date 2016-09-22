@@ -36,6 +36,15 @@ class IncrementalDomChildren {
 	}
 
 	/**
+	 * Returns the owner of the current child node being rendered (or nothing
+	 * if there's no child being rendered).
+	 * @return {ComponentRenderer}
+	 */
+	static getCurrentOwner() {
+		return currNodeOwner_;
+	}
+
+	/**
 	 * Gets the node's original owner's renderer.
 	 * @param {!Object} node
 	 * @return {ComponentRenderer}
@@ -58,7 +67,9 @@ class IncrementalDomChildren {
 			return;
 		}
 
+		currNodeOwner_ = IncrementalDomChildren.getOwner(tree);
 		if (opt_skipNode && opt_skipNode(tree)) {
+			currNodeOwner_ = null;
 			return;
 		}
 
@@ -76,10 +87,12 @@ class IncrementalDomChildren {
 			}
 			IncrementalDOM.elementClose(tree.tag);
 		}
+		currNodeOwner_ = null;
 	}
 }
 
 var callback_;
+var currNodeOwner_;
 var currentParent_;
 var isCapturing_ = false;
 var renderer_;

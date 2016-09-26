@@ -1,3 +1,5 @@
+'use strict';
+
 var gulp = require('gulp');
 var compass = require('gulp-compass');
 var connect = require('gulp-connect');
@@ -17,7 +19,9 @@ gulp.task('cname', function() {
 
 gulp.task('deploy', ['cname', 'build'], function() {
 	return gulp.src('dist/public/**/*')
-		.pipe(ghpages());
+		.pipe(ghpages({
+			branch: 'wedeploy'
+		}));
 });
 
 gulp.task('downloads', function() {

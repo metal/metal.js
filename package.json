@@ -22,7 +22,7 @@
     "chai": "^3.5.0",
     "gulp": "^3.8.11",
     "gulp-babel": "^6.1.2",
-    "gulp-metal": "^1.0.0",
+    "gulp-metal": "mairatma/gulp-metal#travis",
     "gulp-replace": "^0.5.4",
     "karma": "^1.1.0",
     "karma-browserify": "^5.0.5",

@@ -412,6 +412,111 @@ describe('dom', function() {
 			assert.strictEqual('test', listener.args[0][0].test);
 			document.body.removeChild(element);
 		});
+
+		it('should not trigger dom click event for disabled elements', function() {
+			var input = document.createElement('input');
+			var select = document.createElement('select');
+			var button = document.createElement('button');
+			var textarea = document.createElement('textarea');
+			input.disabled = true;
+			select.disabled = true;
+			button.disabled = true;
+			textarea.disabled = true;
+			document.body.appendChild(input);
+			document.body.appendChild(select);
+			document.body.appendChild(button);
+			document.body.appendChild(textarea);
+
+			var listener1 = sinon.stub();
+			var listener2 = sinon.stub();
+			var listener3 = sinon.stub();
+			var listener4 = sinon.stub();
+
+			input.addEventListener('click', listener1);
+			select.addEventListener('click', listener2);
+			button.addEventListener('click', listener3);
+			textarea.addEventListener('click', listener4);
+
+			dom.triggerEvent(input, 'click');
+			dom.triggerEvent(select, 'click');
+			dom.triggerEvent(button, 'click');
+			dom.triggerEvent(textarea, 'click');
+			assert.strictEqual(0, listener1.callCount);
+			assert.strictEqual(0, listener2.callCount);
+			assert.strictEqual(0, listener3.callCount);
+			assert.strictEqual(0, listener4.callCount);
+		});
+
+		it('should not trigger dom click event on a form control with a disabled fieldset parent', function() {
+			var parent = document.createElement('fieldset');
+			parent.disabled = true;
+			document.body.appendChild(parent);
+
+			var input = document.createElement('input');
+			var select = document.createElement('select');
+			var button = document.createElement('button');
+			var textarea = document.createElement('textarea');
+			parent.appendChild(input);
+			parent.appendChild(select);
+			parent.appendChild(button);
+			parent.appendChild(textarea);
+
+			var listener1 = sinon.stub();
+			var listener2 = sinon.stub();
+			var listener3 = sinon.stub();
+			var listener4 = sinon.stub();
+
+			input.addEventListener('click', listener1);
+			select.addEventListener('click', listener2);
+			button.addEventListener('click', listener3);
+			textarea.addEventListener('click', listener4);
+
+			dom.triggerEvent(input, 'click');
+			dom.triggerEvent(select, 'click');
+			dom.triggerEvent(button, 'click');
+			assert.strictEqual(0, listener1.callCount);
+			assert.strictEqual(0, listener2.callCount);
+			assert.strictEqual(0, listener3.callCount);
+			assert.strictEqual(0, listener4.callCount);
+		});
+
+		it('should trigger click event listeners for non-disabled elements even with its parent being disabled', function() {
+			var element = document.createElement('div');
+			element.innerHTML = '<button disabled>' +
+				'<span class="match"></span></button>';
+			document.body.appendChild(element);
+
+			var target = element.querySelector('.match');
+
+			var listener1 = sinon.stub();
+			var listener2 = sinon.stub();
+			dom.delegate(element, 'click', 'button', listener1);
+			dom.delegate(element, 'click', target, listener2);
+
+			dom.triggerEvent(target, 'click');
+
+			assert.strictEqual(0, listener1.callCount);
+			assert.strictEqual(1, listener2.callCount);
+		});
+
+		it('should keep bubling and triggering click event listeners for non-disabled elements', function() {
+			var element = document.createElement('div');
+			element.innerHTML = '<div class="match"><button disabled>' +
+				'<span class="match"></span></button></div>';
+			document.body.appendChild(element);
+
+			var span = element.querySelector('span');
+
+			var unNableListener = sinon.stub();
+			var enableListener = sinon.stub();
+			dom.delegate(element, 'click', 'button', unNableListener);
+			dom.delegate(element, 'click', '.match', enableListener);
+
+			dom.triggerEvent(span, 'click');
+
+			assert.strictEqual(0, unNableListener.callCount);
+			assert.strictEqual(2, enableListener.callCount);
+		});
 	});
 
 	describe('delegate', function() {
@@ -693,6 +798,46 @@ describe('dom', function() {
 				assert.strictEqual(0, listener2.callCount);
 				assert.strictEqual(0, listener3.callCount);
 				assert.strictEqual(0, listener4.callCount);
+			});
+
+			it('should run click event listeners to an element that have not the disabled attribute which its valid parent is disabled using "dispatchEvent()"', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<button class="nomatch" disabled>' +
+					'<span class="match"></span></button>';
+				document.body.appendChild(element);
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', '.match', listener);
+
+				var eventObj = document.createEvent('HTMLEvents');
+				eventObj.initEvent('click', true, true);
+
+				var target = element.querySelector('.match');
+				target.dispatchEvent(eventObj);
+
+				assert.strictEqual(1, listener.callCount);
+			});
+
+			it('should run click event listeners for non-disabled elements even its parent being disabled using "dispatchEvent()"', function() {
+				var element = document.createElement('div');
+				element.innerHTML = '<button disabled>' +
+					'<span class="match"></span></button>';
+				document.body.appendChild(element);
+
+				var target = element.querySelector('.match');
+
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+				dom.delegate(element, 'click', 'button', listener1);
+				dom.delegate(element, 'click', target, listener2);
+
+				var eventObj = document.createEvent('HTMLEvents');
+				eventObj.initEvent('click', true, true);
+
+				target.dispatchEvent(eventObj);
+
+				assert.strictEqual(0, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
 			});
 		});
 

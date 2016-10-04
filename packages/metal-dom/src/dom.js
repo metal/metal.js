@@ -314,16 +314,8 @@ function handleDelegateEvent_(event) {
 	var limit = event.currentTarget.parentNode;
 	var defFns = [];
 
-	while (currElement && currElement !== limit && !event.stopped) {
-		event.delegateTarget = currElement;
-		ret &= triggerMatchedListeners_(container, currElement, event, defFns);
-		currElement = currElement.parentNode;
-	}
-
-	for (var i = 0; i < defFns.length && !event.defaultPrevented; i++) {
-		event.delegateTarget = defFns[i].element;
-		ret &= defFns[i].fn(event);
-	}
+	ret &= triggerDelegatedListeners_(container, currElement, event, limit, defFns);
+	ret &= triggerDefaultDelegatedListeners_(defFns, event);
 
 	event.delegateTarget = null;
 	event[NEXT_TARGET] = limit;
@@ -621,6 +613,52 @@ export function supportsEvent(element, eventName) {
 		element = elementsByTag_[element];
 	}
 	return 'on' + eventName in element;
+}
+
+/**
+ * This triggers all default matched delegated listeners of a given event type.
+ * @param {!Array} defaultFns Array to collect default listeners in, instead
+ * @param {!Event} event
+ * @return {boolean} False if at least one of the triggered callbacks returns
+ *     false, or true otherwise.
+ * @private
+ */
+function triggerDefaultDelegatedListeners_(defFns, event) {
+	let ret = true;
+
+	for (var i = 0; i < defFns.length && !event.defaultPrevented; i++) {
+		event.delegateTarget = defFns[i].element;
+		ret &= defFns[i].fn(event);
+	}
+
+	return ret;
+}
+
+/**
+ * This triggers all matched delegated listeners of a given event type when its
+ * delegated target is able to interact.
+ * @param {!Element} container
+ * @param {!Element} currElement
+ * @param {!Event} event
+ * @param {!Element} limit the fartest parent of the given element
+ * @param {!Array} defaultFns Array to collect default listeners in, instead
+ *     of running them.
+ * @return {boolean} False if at least one of the triggered callbacks returns
+ *     false, or true otherwise.
+ * @private
+ */
+function triggerDelegatedListeners_(container, currElement, event, limit, defaultFns) {
+	let ret = true;
+
+	while (currElement && currElement !== limit && !event.stopped) {
+		if (isAbleToInteractWith_(currElement, event.type, event)) {
+			event.delegateTarget = currElement;
+			ret &= triggerMatchedListeners_(container, currElement, event, defaultFns);
+		}
+		currElement = currElement.parentNode;
+	}
+
+	return ret;
 }
 
 /**

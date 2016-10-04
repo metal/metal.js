@@ -624,7 +624,7 @@ describe('dom', function() {
 				assert.ok(!listener.args[0][0].delegateTarget);
 			});
 
-			it('should not trigger delegate click event for disabled elements', function() {
+			it('should not run click event listeners for disabled elements', function() {
 				var parent = document.createElement('div');
 				document.body.appendChild(parent);
 
@@ -661,7 +661,7 @@ describe('dom', function() {
 				assert.strictEqual(0, listener4.callCount);
 			});
 
-			it('should not trigger delegate click event to an element which its valid parent is disabled', function() {
+			it('should not run click event listeners to an element with an disabled valid parent', function() {
 				var parent = document.createElement('fieldset');
 				parent.disabled = true;
 				document.body.appendChild(parent);

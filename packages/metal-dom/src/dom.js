@@ -262,23 +262,19 @@ export function delegate(element, eventName, selectorOrTarget, callback, opt_def
  * @param {string} eventName The event name.
  * @private
  */
-function isAbleToInteractWith_(node, eventName) {
-	var currElement = node;
-	var isAble = true;
-	var matchesSelector = 'button, input, select, textarea, fieldset';
-
-	if (eventName === 'click') {
-		while (currElement) {
-			if (currElement.disabled && match(currElement, matchesSelector)) {
-				isAble = false;
-				break;
-			}
-
-			currElement = currElement.parentNode;
-		}
+function isAbleToInteractWith_(node, eventName, opt_eventObj) {
+	if (opt_eventObj && eventName === 'click' && opt_eventObj.button === 2) {
+		// Firefox triggers "click" events on the document for right clicks. This
+		// causes our delegate logic to trigger it for regular elements too, which
+		// shouldn't happen. Ignoring them here.
+		return false;
 	}
 
-	return isAble;
+  var matchesSelector = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'FIELDSET'];
+  if (eventName === 'click' && matchesSelector.indexOf(node.tagName) > -1) {
+    return !(node.disabled || parent(node, 'fieldset[disabled]'));
+  }
+  return true;
 }
 
 /**
@@ -717,7 +713,7 @@ function toggleClassesWithoutNative_(element, classes) {
  *   triggered event's payload.
  */
 export function triggerEvent(element, eventName, opt_eventObj) {
-	if (isAbleToInteractWith_(element, eventName)) {
+	if (isAbleToInteractWith_(element, eventName, opt_eventObj)) {
 		var eventObj = document.createEvent('HTMLEvents');
 		eventObj.initEvent(eventName, true, true);
 		object.mixin(eventObj, opt_eventObj);
@@ -765,13 +761,6 @@ function triggerListeners_(listeners, event, element, defaultFns) {
  * @private
  */
 function triggerMatchedListeners_(container, element, event, defaultFns) {
-	if (event.type === 'click' && event.button === 2) {
-		// Firefox triggers "click" events on the document for right clicks. This
-		// causes our delegate logic to trigger it for regular elements too, which
-		// shouldn't happen. Ignoring them here.
-		return;
-	}
-
 	var data = domData.get(element);
 	var listeners = data.listeners[event.type];
 	var ret = triggerListeners_(listeners, event, element, defaultFns);

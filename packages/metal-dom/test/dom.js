@@ -688,6 +688,7 @@ describe('dom', function() {
 				dom.triggerEvent(input, 'click');
 				dom.triggerEvent(select, 'click');
 				dom.triggerEvent(button, 'click');
+				dom.triggerEvent(textarea, 'click');
 				assert.strictEqual(0, listener1.callCount);
 				assert.strictEqual(0, listener2.callCount);
 				assert.strictEqual(0, listener3.callCount);

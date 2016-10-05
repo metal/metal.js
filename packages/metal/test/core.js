@@ -1,6 +1,6 @@
 'use strict';
 
-import * as core from '../src/core';
+import core from '../src/core';
 
 describe('core', function() {
 	describe('Uid', function() {

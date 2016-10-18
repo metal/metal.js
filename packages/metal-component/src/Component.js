@@ -506,7 +506,7 @@ class Component extends EventEmitter {
 	onElementChanged_(event) {
 		this.setUpProxy_();
 		this.elementEventProxy_.setOriginEmitter(event.newVal);
-		if (event.newVal) {
+		if (event.newVal && this.wasRendered) {
 			this.syncVisible(this.dataManager_.get('visible'));
 		}
 	}

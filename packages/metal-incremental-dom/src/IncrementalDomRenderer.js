@@ -445,7 +445,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleInterceptedCloseCall_(originalFn, tag) {
-		this.emit(IncrementalDomRenderer.ELEMENT_CLOSED, {tag});
 		var element = originalFn(tag);
 		this.resetData_(domData.get(element).incDomData_);
 		return element;
@@ -487,7 +486,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleRegularCall_(originalFn, ...args) {
-		this.emit(IncrementalDomRenderer.ELEMENT_OPENED, {args});
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
 		if (!currRenderer.rootElementReached_) {
@@ -906,9 +904,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 var renderingComponents_ = [];
 var emptyChildren_ = [];
 
-// Constants used as event names.
-IncrementalDomRenderer.ELEMENT_OPENED = 'elementOpened';
-IncrementalDomRenderer.ELEMENT_CLOSED = 'elementClosed';
 
 // Regex pattern used to find inline listeners.
 IncrementalDomRenderer.LISTENER_REGEX = /^(?:on([A-Z]\w+))|(?:data-on(\w+))$/;

@@ -137,7 +137,6 @@ class EventEmitter extends Disposable {
 			}
 		}
 
-
 		if (event !== '*') {
 			this.emit.apply(this, ['*', event].concat(args));
 		}

@@ -12,16 +12,6 @@ class JSXRenderer extends IncrementalDomRenderer {
 	/**
 	 * @inheritDoc
 	 */
-	constructor(comp) {
-		super(comp);
-
-		this.on(IncrementalDomRenderer.ELEMENT_OPENED, this.handleJSXElementOpened_);
-		this.on(IncrementalDomRenderer.ELEMENT_CLOSED, this.handleJSXElementClosed_);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
 	buildShouldUpdateArgs_() {
 		return [this.changes_, this.propChanges_];
 	}
@@ -50,10 +40,10 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * keys to elements that don't have one yet, according to their position in
 	 * the parent. This helps use cases that use conditionally rendered elements,
 	 * which is very common in JSX.
-	 * @param {!{args: !Array}} data
+	 * @param {!function()} originalFn The original function before interception.
 	 * @protected
 	 */
-	handleJSXElementOpened_({args}) {
+	handleRegularCall_(originalFn, ...args) {
 		let count = 0;
 		if (childrenCount.length > 0) {
 			count = ++childrenCount[childrenCount.length - 1];
@@ -72,14 +62,18 @@ class JSXRenderer extends IncrementalDomRenderer {
 			}
 		}
 		childrenCount.push(0);
+		return super.handleRegularCall_(originalFn, ...args);
 	}
 
 	/**
 	 * Called when an element is closed during render via incremental dom.
+	 * @param {!function()} originalFn The original function before interception.
+	 * @param {string} tag
 	 * @protected
 	 */
-	handleJSXElementClosed_() {
+	handleInterceptedCloseCall_(originalFn, tag) {
 		childrenCount.pop();
+		return super.handleInterceptedCloseCall_(originalFn, tag);
 	}
 
 	/**

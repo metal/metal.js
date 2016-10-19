@@ -81,10 +81,12 @@ function getFn(name) {
 
 function handleCall(name, ...args) {
 	if (fnStack.length > 0) {
-		return getFn(name)(originalFns[name], ...args);
-	} else {
-		return originalFns[name](...args);
+		var fn = getFn(name);
+		if (fn) {
+			return fn(originalFns[name], ...args);
+		}
 	}
+	return originalFns[name](...args);
 }
 
 IncrementalDOM.attr = handleCall.bind(null, 'attr');

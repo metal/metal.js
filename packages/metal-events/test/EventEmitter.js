@@ -131,15 +131,6 @@ describe('EventEmitter', function() {
 		assert.strictEqual(0, listener.callCount);
 	});
 
-	it('should emit special "*" event for all other events that are emitted', function() {
-		var listener = sinon.stub();
-
-		this.emitter.on('*', listener);
-		this.emitter.emit('event', 1, 2);
-		assert.strictEqual(1, listener.callCount);
-		assert.deepEqual(['event', 1, 2], listener.args[0]);
-	});
-
 	it('should run listeners in the order they were added', function() {
 		var order = '';
 		var listener1 = function() {

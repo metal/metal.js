@@ -108,9 +108,12 @@ class EventEmitter extends Disposable {
 	 * @return {boolean} Returns true if event had listeners, false otherwise.
 	 */
 	emit(event) {
-		var args = array.slice(arguments, 1);
 		var listeners = (this.events_[event] || []).concat();
+		if (listeners.length === 0) {
+			return false;
+		}
 
+		var args = array.slice(arguments, 1);
 		var facade;
 		if (this.getShouldUseFacade()) {
 			facade = {
@@ -137,11 +140,7 @@ class EventEmitter extends Disposable {
 			}
 		}
 
-		if (event !== '*') {
-			this.emit.apply(this, ['*', event].concat(args));
-		}
-
-		return listeners.length > 0;
+		return true;
 	}
 
 	/**

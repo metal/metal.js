@@ -17,7 +17,12 @@ gulp.task('cname', function() {
 		.pipe(gulp.dest('dist/public'));
 });
 
-gulp.task('deploy', ['cname', 'build'], function() {
+gulp.task('container', function() {
+	return gulp.src('src/public/container.json')
+		.pipe(gulp.dest('dist/public'));
+});
+
+gulp.task('deploy', ['cname', 'container', 'build'], function() {
 	return gulp.src('dist/public/**/*')
 		.pipe(ghpages({
 			branch: 'wedeploy'

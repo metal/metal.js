@@ -201,10 +201,11 @@ class Component extends EventEmitter {
 		if (!this.inDocument) {
 			this.renderElement_(opt_parentElement, opt_siblingElement);
 			this.inDocument = true;
-			this.emit('attached', {
+			this.attachData_ = {
 				parent: opt_parentElement,
 				sibling: opt_siblingElement
-			});
+			};
+			this.emit('attached', this.attachData_);
 			this.attached();
 		}
 		return this;
@@ -359,6 +360,14 @@ class Component extends EventEmitter {
 			info.fn = this.getListenerFn(info.fn);
 		}
 		return info;
+	}
+
+	/**
+	 * Gets data about where this component was attached at.
+	 * @return {!Object}
+	 */
+	getAttachData() {
+		return this.attachData_;
 	}
 
 	/**

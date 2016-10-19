@@ -32,7 +32,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.config_ = comp.getInitialConfig();
 		this.childComponents_ = [];
 		this.clearChanges_();
-		comp.on('attached', this.handleAttached_.bind(this));
 
 		// Binds functions that will be used many times, to avoid creating new
 		// functions each time.
@@ -327,15 +326,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles the `attached` listener. Stores attach data.
-	 * @param {!Object} data
-	 * @protected
-	 */
-	handleAttached_(data) {
-		this.attachData_ = data;
-	}
-
-	/**
 	 * Handles the event of children having finished being captured.
 	 * @param {!Object} The captured children in tree format.
 	 * @protected
@@ -624,9 +614,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
 			exitDocument(this.component_.element);
 			if (this.component_.element && this.component_.inDocument) {
+				var attachData = this.component_.getAttachData();
 				this.component_.renderElement_(
-					this.attachData_.parent,
-					this.attachData_.sibling
+					attachData.parent,
+					attachData.sibling
 				);
 			}
 		} else {

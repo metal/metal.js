@@ -412,6 +412,28 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Gets the `sync` methods for this component's state.
+	 * @return {!Object}
+	 * @protected
+	 */
+	getSyncFns_() {
+		const ctor = this.constructor;
+		if (!ctor.hasOwnProperty('__METAL_SYNC_FNS__')) {
+			const fns = {};
+			const keys = this.dataManager_.getSyncKeys();
+			for (let i = 0; i < keys.length; i++) {
+				const name = 'sync' + keys[i].charAt(0).toUpperCase() + keys[i].slice(1);
+				const fn = ctor.prototype[name];
+				if (fn) {
+					fns[keys[i]] = fn;
+				}
+			}
+			ctor.__METAL_SYNC_FNS__ = fns;
+		}
+		return ctor.__METAL_SYNC_FNS__;
+	}
+
+	/**
 	 * Calls the synchronization function for the state key.
 	 * @param {string} key
 	 * @param {Object.<string, Object>=} opt_change Object containing newVal and
@@ -419,7 +441,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	fireStateKeyChange_(key, opt_change) {
-		var fn = this['sync' + key.charAt(0).toUpperCase() + key.slice(1)];
+		var fn = this.getSyncFns_()[key];
 		if (isFunction(fn)) {
 			if (!opt_change) {
 				var manager = this.getDataManager();
@@ -674,7 +696,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	syncState_() {
-		var keys = this.dataManager_.getSyncKeys();
+		const keys = Object.keys(this.getSyncFns_());
 		for (var i = 0; i < keys.length; i++) {
 			this.fireStateKeyChange_(keys[i]);
 		}

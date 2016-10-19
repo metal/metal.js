@@ -1,7 +1,6 @@
 'use strict';
 
 import './incremental-dom';
-import { array, object } from 'metal';
 
 /**
  * Class responsible for intercepting incremental dom functions through AOP.
@@ -12,7 +11,7 @@ class IncrementalDomAop {
 	 * @return {!Object}
 	 */
 	static getOriginalFns() {
-		return fnStack[0];
+		return originalFns;
 	}
 
 	/**
@@ -28,14 +27,11 @@ class IncrementalDomAop {
 	 *     from the original call following it.
 	 */
 	static startInterception(fns) {
-		var originals = IncrementalDomAop.getOriginalFns();
-		fns = object.map(fns, (name, value) => value.bind(null, originals[name]));
-		fnStack.push(object.mixin({}, originals, fns, {
-			attr: fnAttr,
-			elementOpenEnd: fnOpenEnd,
-			elementOpenStart: fnOpenStart,
-			elementVoid: fnVoid
-		}));
+		fns.attr = fnAttr;
+		fns.elementOpenEnd = fnOpenEnd;
+		fns.elementOpenStart = fnOpenStart;
+		fns.elementVoid = fnVoid;
+		fnStack.push(fns);
 	}
 
 	/**
@@ -43,13 +39,11 @@ class IncrementalDomAop {
 	 * implementation it used before the last call to `startInterception`.
 	 */
 	static stopInterception() {
-		if (fnStack.length > 1) {
-			fnStack.pop();
-		}
+		fnStack.pop();
 	}
 }
 
-var fnStack = [{
+var originalFns = {
 	attr: IncrementalDOM.attr,
 	attributes: IncrementalDOM.attributes[IncrementalDOM.symbols.default],
 	elementClose: IncrementalDOM.elementClose,
@@ -58,33 +52,39 @@ var fnStack = [{
 	elementOpenStart: IncrementalDOM.elementOpenStart,
 	elementVoid: IncrementalDOM.elementVoid,
 	text: IncrementalDOM.text
-}];
+};
+
+var fnStack = [];
 
 var collectedArgs = [];
 
-function fnAttr(name, value) {
+function fnAttr(orig, name, value) {
 	collectedArgs.push(name, value);
 }
 
-function fnOpenStart(tag, key, statics) {
+function fnOpenStart(orig, tag, key, statics) {
 	collectedArgs = [tag, key, statics];
 }
 
 function fnOpenEnd() {
-	return getFn('elementOpen').apply(null, collectedArgs);
+	return IncrementalDOM.elementOpen(...collectedArgs);
 }
 
-function fnVoid(tag) {
-	getFn('elementOpen').apply(null, arguments);
-	return getFn('elementClose')(tag);
+function fnVoid(orig, tag, ...args) {
+	IncrementalDOM.elementOpen(tag, ...args);
+	return IncrementalDOM.elementClose(tag);
 }
 
 function getFn(name) {
 	return fnStack[fnStack.length - 1][name];
 }
 
-function handleCall(name) {
-	return getFn(name).apply(null, array.slice(arguments, 1));
+function handleCall(name, ...args) {
+	if (fnStack.length > 0) {
+		return getFn(name)(originalFns[name], ...args);
+	} else {
+		return originalFns[name](...args);
+	}
 }
 
 IncrementalDOM.attr = handleCall.bind(null, 'attr');

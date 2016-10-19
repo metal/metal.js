@@ -12,7 +12,7 @@ import {
 	mergeSuperClassesProperty,
 	object
 } from 'metal';
-import { DomEventEmitterProxy, toElement } from 'metal-dom';
+import { toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
 import { EventEmitter, EventHandler } from 'metal-events';
@@ -76,26 +76,10 @@ class Component extends EventEmitter {
 		super();
 
 		/**
-		 * All listeners that were attached until the `DomEventEmitterProxy` instance
-		 * was created.
-		 * @type {!Object<string, bool>}
-		 * @protected
-		 */
-		this.attachedListeners_ = {};
-
-		/**
 		 * Gets all nested components.
 		 * @type {!Array<!Component>}
 		 */
 		this.components = {};
-
-		/**
-		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
-		 * element to the component itself.
-		 * @type {DomEventEmitterProxy}
-		 * @protected
-		 */
-		this.elementEventProxy_ = null;
 
 		/**
 		 * The `EventHandler` instance for events attached from the `events` state key.
@@ -143,7 +127,6 @@ class Component extends EventEmitter {
 		this.emit('dataManagerCreated');
 
 		this.on('stateChanged', this.handleStateChanged_);
-		this.newListenerHandle_ = this.on('newListener', this.handleNewListener_);
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get('events'));
 
@@ -309,11 +292,6 @@ class Component extends EventEmitter {
 		this.disposed();
 
 		this.detach();
-
-		if (this.elementEventProxy_) {
-			this.elementEventProxy_.dispose();
-			this.elementEventProxy_ = null;
-		}
 
 		this.disposeSubComponents(Object.keys(this.components));
 		this.components = null;
@@ -493,16 +471,6 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Handles the `newListener` event. Just flags that this event type has been
-	 * attached, so we can start proxying it when `DomEventEmitterProxy` is created.
-	 * @param {string} event
-	 * @protected
-	 */
-	handleNewListener_(event) {
-		this.attachedListeners_[event] = true;
-	}
-
-	/**
 	 * Checks if the given function is a component constructor.
 	 * @param {!function()} fn Any function
 	 * @return {boolean}
@@ -535,8 +503,6 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	onElementChanged_(event) {
-		this.setUpProxy_();
-		this.elementEventProxy_.setOriginEmitter(event.newVal);
 		if (event.newVal && this.wasRendered) {
 			this.syncVisible(this.dataManager_.get('visible'));
 		}
@@ -596,7 +562,6 @@ class Component extends EventEmitter {
 		if (!opt_skipRender) {
 			this.emit('render');
 		}
-		this.setUpProxy_();
 		this.syncState_();
 		this.attach(opt_parentElement);
 		this.wasRendered = true;
@@ -678,26 +643,6 @@ class Component extends EventEmitter {
 			val += ' ' + this.constructor.ELEMENT_CLASSES_MERGED;
 		}
 		return val.trim();
-	}
-
-	/**
-	 * Creates the `DomEventEmitterProxy` instance and has it start proxying any
-	 * listeners that have already been listened to.
-	 * @protected
-	 */
-	setUpProxy_() {
-		if (this.elementEventProxy_) {
-			return;
-		}
-
-		var proxy = new DomEventEmitterProxy(this.element, this);
-		this.elementEventProxy_ = proxy;
-
-		object.map(this.attachedListeners_, proxy.proxyEvent.bind(proxy));
-		this.attachedListeners_ = null;
-
-		this.newListenerHandle_.removeListener();
-		this.newListenerHandle_ = null;
 	}
 
 	/**

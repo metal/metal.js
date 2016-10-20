@@ -156,7 +156,7 @@ function handleInterceptedCloseCall_() {
  * @param {!function()} originalFn The original function before interception.
  * @protected
  */
-function handleInterceptedOpenCall_(originalFn, ...args) {
+function handleInterceptedOpenCall_(...args) {
 	currentParent_ = addChildCallToTree_(args);
 }
 
@@ -165,7 +165,7 @@ function handleInterceptedOpenCall_(originalFn, ...args) {
  * @param {!function()} originalFn The original function before interception.
  * @protected
  */
-function handleInterceptedTextCall_(originalFn, ...args) {
+function handleInterceptedTextCall_(...args) {
 	addChildCallToTree_(args, true);
 }
 

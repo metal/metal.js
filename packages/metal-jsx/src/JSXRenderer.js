@@ -40,10 +40,9 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * keys to elements that don't have one yet, according to their position in
 	 * the parent. This helps use cases that use conditionally rendered elements,
 	 * which is very common in JSX.
-	 * @param {!function()} originalFn The original function before interception.
 	 * @protected
 	 */
-	handleRegularCall_(originalFn, ...args) {
+	handleRegularCall_(...args) {
 		let count = 0;
 		if (childrenCount.length > 0) {
 			count = ++childrenCount[childrenCount.length - 1];
@@ -62,7 +61,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 			}
 		}
 		childrenCount.push(0);
-		return super.handleRegularCall_(originalFn, ...args);
+		return super.handleRegularCall_(...args);
 	}
 
 	/**
@@ -71,9 +70,9 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * @param {string} tag
 	 * @protected
 	 */
-	handleInterceptedCloseCall_(originalFn, tag) {
+	handleInterceptedCloseCall_(tag) {
 		childrenCount.pop();
-		return super.handleInterceptedCloseCall_(originalFn, tag);
+		return super.handleInterceptedCloseCall_(tag);
 	}
 
 	/**

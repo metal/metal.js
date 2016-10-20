@@ -15,6 +15,14 @@ class IncrementalDomAop {
 	}
 
 	/**
+	 * Gets the original functions that are intercepted by `IncrementalDomAop`.
+	 * @return {!Object}
+	 */
+	static getOriginalFn(name) {
+		return originalFns[name];
+	}
+
+	/**
 	 * Starts intercepting calls to incremental dom, replacing them with the given
 	 * functions. Note that `elementVoid`, `elementOpenStart`, `elementOpenEnd`
 	 * and `attr` are the only ones that can't be intercepted, since they'll
@@ -58,11 +66,11 @@ var fnStack = [];
 
 var collectedArgs = [];
 
-function fnAttr(orig, name, value) {
+function fnAttr(name, value) {
 	collectedArgs.push(name, value);
 }
 
-function fnOpenStart(orig, tag, key, statics) {
+function fnOpenStart(tag, key, statics) {
 	collectedArgs = [tag, key, statics];
 }
 
@@ -70,35 +78,36 @@ function fnOpenEnd() {
 	return IncrementalDOM.elementOpen(...collectedArgs);
 }
 
-function fnVoid(orig, tag, ...args) {
-	IncrementalDOM.elementOpen(tag, ...args);
-	return IncrementalDOM.elementClose(tag);
+function fnVoid() {
+	IncrementalDOM.elementOpen.apply(null, arguments);
+	return IncrementalDOM.elementClose.apply(null, arguments);
 }
 
 function getFn(name) {
-	return fnStack[fnStack.length - 1][name];
+	return fnStack.length > 0 && fnStack[fnStack.length - 1][name];
 }
 
-function handleCall(name, ...args) {
-	if (fnStack.length > 0) {
-		var fn = getFn(name);
-		if (fn) {
-			return fn(originalFns[name], ...args);
-		}
-	}
-	return originalFns[name](...args);
+function buildHandleCall(name) {
+	var data = {name};
+	var fn = handleCall.bind(data);
+	return fn;
 }
 
-IncrementalDOM.attr = handleCall.bind(null, 'attr');
-IncrementalDOM.elementClose = handleCall.bind(null, 'elementClose');
-IncrementalDOM.elementOpen = handleCall.bind(null, 'elementOpen');
-IncrementalDOM.elementOpenEnd = handleCall.bind(null, 'elementOpenEnd');
-IncrementalDOM.elementOpenStart = handleCall.bind(null, 'elementOpenStart');
-IncrementalDOM.elementVoid = handleCall.bind(null, 'elementVoid');
-IncrementalDOM.text = handleCall.bind(null, 'text');
+function handleCall() {
+	const name = this.name; // jshint ignore:line
+	var fn = getFn(name) || originalFns[name];
+	return fn.apply(null, arguments);
+}
 
-IncrementalDOM.attributes[IncrementalDOM.symbols.default] = handleCall.bind(
-	null,
+IncrementalDOM.attr = buildHandleCall('attr');
+IncrementalDOM.elementClose = buildHandleCall('elementClose');
+IncrementalDOM.elementOpen = buildHandleCall('elementOpen');
+IncrementalDOM.elementOpenEnd = buildHandleCall('elementOpenEnd');
+IncrementalDOM.elementOpenStart = buildHandleCall('elementOpenStart');
+IncrementalDOM.elementVoid = buildHandleCall('elementVoid');
+IncrementalDOM.text = buildHandleCall('text');
+
+IncrementalDOM.attributes[IncrementalDOM.symbols.default] = buildHandleCall(
 	'attributes'
 );
 

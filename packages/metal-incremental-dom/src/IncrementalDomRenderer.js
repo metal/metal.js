@@ -390,13 +390,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Handles an intercepted call to the attributes default handler from
 	 * incremental dom.
-	 * @param {!function()} originalFn The original function before interception.
 	 * @param {!Element} element
 	 * @param {string} name
 	 * @param {*} value
 	 * @protected
 	 */
-	handleInterceptedAttributesCall_(originalFn, element, name, value) {
+	handleInterceptedAttributesCall_(element, name, value) {
 		var eventName = this.getEventFromListenerAttr_(name);
 		if (eventName) {
 			this.attachEvent_(element, name, eventName, value);
@@ -433,19 +432,18 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				element.removeAttribute(name);
 			}
 		} else {
-			originalFn(element, name, value);
+			IncrementalDomAop.getOriginalFn('attributes')(element, name, value);
 		}
 	}
 
 	/**
 	 * Handles an intercepted call to the `elementClose` function from incremental
 	 * dom.
-	 * @param {!function()} originalFn The original function before interception.
 	 * @param {string} tag
 	 * @protected
 	 */
-	handleInterceptedCloseCall_(originalFn, tag) {
-		var element = originalFn(tag);
+	handleInterceptedCloseCall_(tag) {
+		var element = IncrementalDomAop.getOriginalFn('elementClose')(tag);
 		this.resetData_(domData.get(element).incDomData_);
 		return element;
 	}
@@ -453,11 +451,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	/**
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom.
-	 * @param {!function()} originalFn The original function before interception.
 	 * @param {string} tag
 	 * @protected
 	 */
-	handleInterceptedOpenCall_(originalFn, tag) {
+	handleInterceptedOpenCall_(tag) {
 		if (IncrementalDomUtils.isComponentTag(tag)) {
 			return this.handleSubComponentCall_.apply(this, arguments);
 		} else {
@@ -482,10 +479,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom, done for a regular element. Adds any inline listeners found on the
 	 * first render and makes sure that component root elements are always reused.
-	 * @param {!function()} originalFn The original function before interception.
 	 * @protected
 	 */
-	handleRegularCall_(originalFn, ...args) {
+	handleRegularCall_(...args) {
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
 		if (!currRenderer.rootElementReached_) {
@@ -499,7 +495,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 
-		var node = originalFn.apply(null, args);
+		var node = IncrementalDomAop.getOriginalFn('elementOpen').apply(null, args);
 		this.attachDecoratedListeners_(node, args);
 		this.updateElementIfNotReached_(node);
 
@@ -515,10 +511,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom, done for a sub component element. Creates and updates the appropriate
 	 * sub component.
-	 * @param {!function()} originalFn The original function before interception.
 	 * @protected
 	 */
-	handleSubComponentCall_(originalFn, ...args) {
+	handleSubComponentCall_(...args) {
 		var props = IncrementalDomUtils.buildConfigFromCall(args);
 		this.componentToRender_ = {
 			props,

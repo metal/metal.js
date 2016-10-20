@@ -83,6 +83,12 @@ class State extends EventEmitter {
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
 		this.addToStateFromStaticHint_(opt_config);
+
+		Object.defineProperty(this.obj_, State.STATE_REF_KEY, {
+			configurable: true,
+			enumerable: false,
+			value: this
+		});
 	}
 
 	/**
@@ -157,7 +163,7 @@ class State extends EventEmitter {
 				initialValues[name],
 				initialValues.hasOwnProperty(name)
 			);
-			props[name] = this.buildKeyPropertyDef_(name, opt_contextOrInitialValue);
+			props[name] = this.buildKeyPropertyDef_(name);
 			this.assertGivenIfRequired_(name);
 		}
 
@@ -251,20 +257,18 @@ class State extends EventEmitter {
 	/**
 	 * Builds the property definition object for the specified state key.
 	 * @param {string} name The name of the key.
-	 * @param {Object=} opt_context The object where the property will be added.
 	 * @return {!Object}
 	 * @protected
 	 */
-	buildKeyPropertyDef_(name, opt_context) {
-		var stateObj = opt_context === this.constructor.prototype ? null : this;
+	buildKeyPropertyDef_(name) {
 		return {
 			configurable: true,
 			enumerable: true,
 			get: function() {
-				return (stateObj || this).getStateKeyValue_(name);
+				return this[State.STATE_REF_KEY].getStateKeyValue_(name);
 			},
 			set: function(val) {
-				(stateObj || this).setStateKeyValue_(name, val);
+				this[State.STATE_REF_KEY].setStateKeyValue_(name, val);
 			}
 		};
 	}
@@ -725,6 +729,8 @@ class State extends EventEmitter {
  * @type {!Array<string>}
  */
 State.INVALID_KEYS = ['state', 'stateKey'];
+
+State.STATE_REF_KEY = '__METAL_STATE_REF_KEY__';
 
 /**
  * Constants that represent the states that a state key can be in.

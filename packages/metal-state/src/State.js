@@ -157,6 +157,7 @@ class State extends EventEmitter {
 
 		var initialValues = opt_initialValuesOrConfig || {};
 		var names = Object.keys(configsOrName);
+		var shouldDefine = opt_contextOrInitialValue !== false;
 
 		var props = {};
 		for (let i = 0; i < names.length; i++) {
@@ -167,11 +168,13 @@ class State extends EventEmitter {
 				initialValues[name],
 				initialValues.hasOwnProperty(name)
 			);
-			props[name] = this.buildKeyPropertyDef_(name);
+			if (shouldDefine) {
+				props[name] = this.buildKeyPropertyDef_(name);
+			}
 			this.assertGivenIfRequired_(name);
 		}
 
-		if (opt_contextOrInitialValue !== false) {
+		if (shouldDefine) {
 			Object.defineProperties(
 				opt_contextOrInitialValue || this.obj_,
 				props

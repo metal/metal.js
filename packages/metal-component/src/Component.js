@@ -135,7 +135,6 @@ class Component extends EventEmitter {
 		if (opt_parentElement !== false) {
 			this.render_(opt_parentElement);
 		}
-		this.on('elementChanged', this.onElementChanged_);
 	}
 
 	/**
@@ -498,17 +497,6 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Fired when the `element` state value is changed.
-	 * @param {!Object} event
-	 * @protected
-	 */
-	onElementChanged_(event) {
-		if (event.newVal && this.wasRendered) {
-			this.syncVisible(this.dataManager_.get('visible'));
-		}
-	}
-
-	/**
 	 * Fired when the `events` state value is changed.
 	 * @param {!Object} event
 	 * @protected
@@ -616,6 +604,9 @@ class Component extends EventEmitter {
 					prevVal: prev,
 					newVal: val
 				});
+				if (val && this.wasRendered) {
+					this.syncVisible(this.dataManager_.get('visible'));
+				}
 			}
 		}
 	}

@@ -21,8 +21,6 @@ describe('ComponentRenderer', function() {
 		sinon.spy(ComponentRenderer.prototype, 'render');
 		component = new Component();
 		const renderer = component.getRenderer();
-
-		component.emit('render');
 		assert.strictEqual(1, renderer.render.callCount);
 		ComponentRenderer.prototype.render.restore();
 	});
@@ -31,17 +29,6 @@ describe('ComponentRenderer', function() {
 		component = new Component();
 		assert.ok(core.isElement(component.element));
 		assert.strictEqual('DIV', component.element.tagName);
-	});
-
-	it('should not call the render method after disposed', function() {
-		sinon.spy(ComponentRenderer.prototype, 'render');
-		component = new Component({}, false);
-		const renderer = component.getRenderer();
-
-		renderer.dispose();
-		component.emit('render');
-		assert.strictEqual(0, renderer.render.callCount);
-		ComponentRenderer.prototype.render.restore();
 	});
 
 	it('should not call the update method if state changes before render', function(done) {
@@ -63,7 +50,7 @@ describe('ComponentRenderer', function() {
 		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
-		component.emit('render');
+		renderer.render();
 		component.foo = 'foo';
 		assert.strictEqual(0, renderer.update.callCount);
 		component.once('stateChanged', function() {
@@ -99,7 +86,7 @@ describe('ComponentRenderer', function() {
 		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
-		component.emit('render');
+		renderer.render();
 		renderer.startSkipUpdates();
 		component.foo = 'foo';
 		component.once('stateChanged', function() {
@@ -120,7 +107,7 @@ describe('ComponentRenderer', function() {
 		const renderer = component.getRenderer();
 		sinon.spy(renderer, 'update');
 
-		component.emit('render');
+		renderer.render();
 		renderer.dispose();
 
 		component.foo = 'foo';
@@ -139,7 +126,7 @@ describe('ComponentRenderer', function() {
 			const renderer = component.getRenderer();
 			sinon.spy(renderer, 'update');
 
-			component.emit('render');
+			renderer.render();
 			component.foo = 'foo';
 			var expectedData = {
 				foo: {

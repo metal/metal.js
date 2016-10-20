@@ -17,11 +17,6 @@ class ComponentRenderer extends EventEmitter {
 		this.component_ = component;
 
 		this.componentRendererEvents_ = new EventHandler();
-		this.componentRendererEvents_.add(
-			this.component_.once('render', this.render.bind(this))
-		);
-		this.on('rendered', this.handleRendered_);
-
 		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
 			this.componentRendererEvents_.add(
 				this.component_.on(
@@ -56,7 +51,7 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	handleDataManagerCreated_() {
-		
+
 	}
 
 	/**
@@ -96,6 +91,7 @@ class ComponentRenderer extends EventEmitter {
 	 * @protected
 	 */
 	handleRendered_() {
+		this.emit('rendered', !this.isRendered_);
 		this.isRendered_ = true;
 	}
 
@@ -106,7 +102,7 @@ class ComponentRenderer extends EventEmitter {
 		if (!this.component_.element) {
 			this.component_.element = document.createElement('div');
 		}
-		this.emit('rendered', !this.isRendered_);
+		this.handleRendered_();
 	}
 
 	/**

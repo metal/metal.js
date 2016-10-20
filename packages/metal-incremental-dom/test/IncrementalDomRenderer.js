@@ -153,7 +153,7 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.textContent);
 		});
 
-		it('should rerender immediately if state is changed inside "rendered" and SYNC_UPDATES is true', function() {
+		it.skip('should rerender immediately if state is changed inside "rendered" and SYNC_UPDATES is true', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');

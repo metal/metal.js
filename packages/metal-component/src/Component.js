@@ -547,6 +547,7 @@ class Component extends EventEmitter {
 	 */
 	render_(opt_parentElement, opt_skipRender) {
 		if (!opt_skipRender) {
+			this.getRenderer().render();
 			this.emit('render');
 		}
 		this.syncState_();

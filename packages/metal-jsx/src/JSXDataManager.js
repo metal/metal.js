@@ -62,10 +62,6 @@ class JSXDataManager extends ComponentDataManager {
 			internal: true
 		});
 		this.state_.addToState(this.component_.constructor.STATE_MERGED);
-
-		const listener = (...args) => this.emit_(...args, 'state');
-		this.state_.on('stateChanged', listener);
-		this.state_.on('stateKeyChanged', listener);
 	}
 
 	/**
@@ -81,14 +77,13 @@ class JSXDataManager extends ComponentDataManager {
 	/**
 	 * Overrides the original method so we can add the data type to the event.
 	 * @param {!Object} data
-	 * @param {!Object} event
 	 * @param {string=} opt_type Either 'props' or 'state'.
 	 * @protected
 	 * @override
 	 */
-	emit_(data, event, opt_type = 'props') {
-		data.type = opt_type;
-		super.emit_(data, event);
+	emit_(orig, data) {
+		data.type = data.state === this.state_ ? 'state' : 'props';
+		super.emit_(orig, data);
 	}
 
 	/**

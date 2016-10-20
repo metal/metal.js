@@ -72,7 +72,8 @@ describe('ComponentRenderer', function() {
 				foo: {
 					key: 'foo',
 					prevVal: undefined,
-					newVal: 'foo'
+					newVal: 'foo',
+					state: component.getDataManager().state_
 				}
 			};
 			assert.deepEqual(expectedData, renderer.update.args[0][0].changes);
@@ -84,8 +85,9 @@ describe('ComponentRenderer', function() {
 					foo: {
 						key: 'foo',
 						prevVal: 'foo',
-						newVal: 'bar'
-					}
+						newVal: 'bar',
+						state: component.getDataManager().state_
+					},
 				};
 				assert.deepEqual(expectedData, renderer.update.args[1][0].changes);
 				done();
@@ -145,7 +147,8 @@ describe('ComponentRenderer', function() {
 				foo: {
 					key: 'foo',
 					prevVal: undefined,
-					newVal: 'foo'
+					newVal: 'foo',
+					state: component.getDataManager().state_
 				}
 			};
 			assert.strictEqual(1, renderer.update.callCount);
@@ -156,7 +159,8 @@ describe('ComponentRenderer', function() {
 				foo: {
 					key: 'foo',
 					prevVal: 'foo',
-					newVal: 'bar'
+					newVal: 'bar',
+					state: component.getDataManager().state_
 				}
 			};
 			assert.strictEqual(2, renderer.update.callCount);

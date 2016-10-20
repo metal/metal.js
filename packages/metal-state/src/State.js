@@ -353,7 +353,7 @@ class State extends EventEmitter {
 		if (!this.isDisposed()) {
 			var data = this.scheduledBatchData_;
 			this.scheduledBatchData_ = null;
-			this.emit('stateChanged', data);
+			this.context_.emit('stateChanged', data);
 		}
 	}
 
@@ -463,10 +463,11 @@ class State extends EventEmitter {
 			var data = {
 				key: name,
 				newVal: this.get(name),
-				prevVal: prevVal
+				prevVal: prevVal,
+				state: this
 			};
-			this.emit(name + 'Changed', data);
-			this.emit('stateKeyChanged', data);
+			this.context_.emit(name + 'Changed', data);
+			this.context_.emit('stateKeyChanged', data);
 			this.scheduleBatchEvent_(data);
 		}
 	}
@@ -544,7 +545,8 @@ class State extends EventEmitter {
 		if (!this.scheduledBatchData_) {
 			async.nextTick(this.emitBatchEvent_, this);
 			this.scheduledBatchData_ = {
-				changes: {}
+				changes: {},
+				state: this
 			};
 		}
 

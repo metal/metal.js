@@ -1,7 +1,7 @@
 'use strict';
 
 import { array, mergeSuperClassesProperty, object } from 'metal';
-import { EventEmitter, EventEmitterProxy } from 'metal-events';
+import { EventEmitter } from 'metal-events';
 import State from 'metal-state';
 
 class ComponentDataManager extends EventEmitter {
@@ -58,12 +58,9 @@ class ComponentDataManager extends EventEmitter {
 			this.component_.getInitialConfig()
 		);
 
-		const listener = this.emit_.bind(this);
-		state.on('stateChanged', listener);
-		state.on('stateKeyChanged', listener);
+		this.component_.on('stateChanged', this.emit_.bind(this, 'stateChanged'));
+		this.component_.on('stateKeyChanged', this.emit_.bind(this, 'stateKeyChanged'));
 		this.state_ = state;
-
-		this.proxy_ = new EventEmitterProxy(state, this.component_);
 	}
 
 	/**
@@ -74,9 +71,6 @@ class ComponentDataManager extends EventEmitter {
 
 		this.state_.dispose();
 		this.state_ = null;
-
-		this.proxy_.dispose();
-		this.proxy_ = null;
 	}
 
 	/**
@@ -85,8 +79,7 @@ class ComponentDataManager extends EventEmitter {
 	 * @param {!Object} event
 	 * @protected
 	 */
-	emit_(data, event) {
-		const orig = event.type;
+	emit_(orig, data) {
 		const name = orig === 'stateChanged' ? 'dataChanged' : 'dataPropChanged';
 		this.emit(name, data);
 	}

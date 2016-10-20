@@ -386,28 +386,6 @@ describe('EventEmitter', function() {
 		assert.strictEqual(1, listener3.callCount);
 	});
 
-	it('should warn when max number of listeners is reached', function() {
-		var originalWarningFn = console.warn;
-		console.warn = sinon.stub();
-
-		this.emitter.setMaxListeners(2);
-		this.emitter.on('event', sinon.stub());
-		this.emitter.on('event', sinon.stub());
-		this.emitter.on('event1', sinon.stub());
-		assert.strictEqual(0, console.warn.callCount, 'Should not warn before max');
-
-		this.emitter.on(['event', 'event1'], sinon.stub());
-		assert.strictEqual(1, console.warn.callCount, 'Max listeners reached for event');
-
-		this.emitter.on('event', sinon.stub());
-		assert.strictEqual(1, console.warn.callCount, 'Should not warn twice for same type');
-
-		this.emitter.on('event1', sinon.stub());
-		assert.strictEqual(2, console.warn.callCount, 'Max listeners reached for event1');
-
-		console.warn = originalWarningFn;
-	});
-
 	it('should only allow functions as listeners', function() {
 		var self = this;
 

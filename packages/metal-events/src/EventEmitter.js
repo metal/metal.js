@@ -78,17 +78,6 @@ class EventEmitter extends Disposable {
 			fn: listener,
 			origin: opt_origin
 		});
-
-		var listeners = this.events_[event];
-		if (listeners.length > this.maxListeners_ && !listeners.warned) {
-			console.warn(
-				'Possible EventEmitter memory leak detected. %d listeners added ' +
-				'for event %s. Use emitter.setMaxListeners() to increase limit.',
-				listeners.length,
-				event
-			);
-			listeners.warned = true;
-		}
 	}
 
 	/**

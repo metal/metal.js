@@ -80,6 +80,7 @@ class State extends EventEmitter {
 		 */
 		this.stateInfo_ = {};
 
+		this.stateConfigs_ = {};
 
 		this.initialValues_ = opt_config || {};
 
@@ -200,14 +201,22 @@ class State extends EventEmitter {
 		this.addToState(ctor.STATE_MERGED, opt_config, defineContext);
 	}
 
+	getStateInfo(name) {
+		if (!this.stateInfo_[name]) {
+			this.stateInfo_[name] = {};
+		}
+		return this.stateInfo_[name];
+	}
+
 	/**
 	 * Logs an error if the given property is required but wasn't given.
 	 * @param {string} name
 	 * @protected
 	 */
 	assertGivenIfRequired_(name) {
-		var info = this.stateInfo_[name];
-		if (info.config.required) {
+		var config = this.stateConfigs_[name];
+		if (config.required) {
+			var info = this.getStateInfo(name);
 			var value = info.state === State.KeyStates.INITIALIZED ?
 				this.get(name) :
 				this.initialValues_[name];
@@ -248,9 +257,7 @@ class State extends EventEmitter {
 		if (this.commonOpts_) {
 			config = object.mixin({}, config, this.commonOpts_);
 		}
-		this.stateInfo_[name] = {
-			config
-		};
+		this.stateConfigs_[name] = config;
 		if (hasInitialValue) {
 			this.initialValues_[name] = initialValue;
 		}
@@ -301,8 +308,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	callSetter_(name, value, currentValue) {
-		var info = this.stateInfo_[name];
-		var config = info.config;
+		var config = this.stateConfigs_[name];
 		if (config.setter) {
 			value = this.callFunction_(config.setter, [value, currentValue]);
 		}
@@ -318,8 +324,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	callValidator_(name, value) {
-		var info = this.stateInfo_[name];
-		var config = info.config;
+		var config = this.stateConfigs_[name];
 		if (config.validator) {
 			var validatorReturn = this.callFunction_(
 				config.validator,
@@ -340,8 +345,8 @@ class State extends EventEmitter {
 	 * @return {boolean}
 	 */
 	canSetState(name) {
-		var info = this.stateInfo_[name];
-		return !info.config.writeOnce || !info.written;
+		var info = this.getStateInfo(name);
+		return !this.stateConfigs_[name].writeOnce || !info.written;
 	}
 
 	/**
@@ -350,6 +355,7 @@ class State extends EventEmitter {
 	disposeInternal() {
 		super.disposeInternal();
 		this.stateInfo_ = null;
+		this.stateConfigs_ = null;
 		this.scheduledBatchData_ = null;
 	}
 
@@ -401,7 +407,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	getStateKeyConfig(name) {
-		return (this.stateInfo_[name] || {}).config;
+		return this.stateConfigs_ ? this.stateConfigs_[name] : null;
 	}
 
 	/**
@@ -409,7 +415,7 @@ class State extends EventEmitter {
 	 * @return {!Array.<string>}
 	 */
 	getStateKeys() {
-		return this.stateInfo_ ? Object.keys(this.stateInfo_) : [];
+		return this.stateConfigs_ ? Object.keys(this.stateConfigs_) : [];
 	}
 
 	/**
@@ -422,7 +428,7 @@ class State extends EventEmitter {
 	getStateKeyValue_(name) {
 		if (!this.warnIfDisposed_(name)) {
 			this.initStateKey_(name);
-			return this.stateInfo_[name].value;
+			return this.getStateInfo(name).value;
 		}
 	}
 
@@ -433,7 +439,7 @@ class State extends EventEmitter {
 	 * @return {boolean}
 	 */
 	hasBeenSet(name) {
-		var info = this.stateInfo_[name];
+		var info = this.getStateInfo(name);
 		return info.state === State.KeyStates.INITIALIZED ||
 			this.hasInitialValue_(name);
 	}
@@ -455,7 +461,7 @@ class State extends EventEmitter {
 	 */
 	hasStateKey(key) {
 		if (!this.warnIfDisposed_(key)) {
-			return !!this.stateInfo_[key];
+			return !!this.stateConfigs_[key];
 		}
 	}
 
@@ -485,7 +491,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	initStateKey_(name) {
-		var info = this.stateInfo_[name];
+		var info = this.getStateInfo(name);
 		if (info.state !== State.KeyStates.UNINITIALIZED) {
 			return;
 		}
@@ -540,6 +546,7 @@ class State extends EventEmitter {
 	 */
 	removeStateKey(name) {
 		this.stateInfo_[name] = null;
+		this.stateConfigs_[name] = null;
 		delete this.obj_[name];
 	}
 
@@ -586,7 +593,7 @@ class State extends EventEmitter {
 	 * @return {*}
 	 */
 	setDefaultValue(name) {
-		var config = this.stateInfo_[name].config;
+		var config = this.stateConfigs_[name];
 
 		if (config.value !== undefined) {
 			this.set(name, config.value);
@@ -649,7 +656,7 @@ class State extends EventEmitter {
 			return;
 		}
 
-		var info = this.stateInfo_[name];
+		var info = this.getStateInfo(name);
 		if (!this.hasInitialValue_(name) && info.state === State.KeyStates.UNINITIALIZED) {
 			info.state = State.KeyStates.INITIALIZED;
 		}
@@ -674,7 +681,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	shouldInformChange_(name, prevVal) {
-		var info = this.stateInfo_[name];
+		var info = this.getStateInfo(name);
 		return (info.state === State.KeyStates.INITIALIZED) &&
 			(isObject(prevVal) || prevVal !== this.get(name));
 	}
@@ -699,8 +706,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateKeyValue_(name, value) {
-		var info = this.stateInfo_[name];
-
+		var info = this.getStateInfo(name);
 		return info.state === State.KeyStates.INITIALIZING ||
 			this.callValidator_(name, value);
 	}

@@ -80,6 +80,9 @@ class State extends EventEmitter {
 		 */
 		this.stateInfo_ = {};
 
+
+		this.initialValues_ = opt_config || {};
+
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
 		this.addToStateFromStaticHint_(opt_config);
@@ -207,7 +210,7 @@ class State extends EventEmitter {
 		if (info.config.required) {
 			var value = info.state === State.KeyStates.INITIALIZED ?
 				this.get(name) :
-				info.initialValue;
+				this.initialValues_[name];
 			if (!isDefAndNotNull(value)) {
 				console.error(
 					'The property called "' + name + '" is required but didn\'t ' +
@@ -246,11 +249,10 @@ class State extends EventEmitter {
 			config = object.mixin({}, config, this.commonOpts_);
 		}
 		this.stateInfo_[name] = {
-			config,
-			state: State.KeyStates.UNINITIALIZED
+			config
 		};
 		if (hasInitialValue) {
-			this.stateInfo_[name].initialValue = initialValue;
+			this.initialValues_[name] = initialValue;
 		}
 	}
 
@@ -443,7 +445,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	hasInitialValue_(name) {
-		return this.stateInfo_[name].hasOwnProperty('initialValue');
+		return this.initialValues_.hasOwnProperty(name);
 	}
 
 	/**
@@ -605,9 +607,8 @@ class State extends EventEmitter {
 	 */
 	setInitialValue_(name) {
 		if (this.hasInitialValue_(name)) {
-			var info = this.stateInfo_[name];
-			this.set(name, info.initialValue);
-			info.initialValue = undefined;
+			this.set(name, this.initialValues_[name]);
+			this.initialValues_[name] = undefined;
 		}
 	}
 
@@ -684,9 +685,8 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateInitialValue_(name) {
-		var info = this.stateInfo_[name];
-		if (this.hasInitialValue_(name) && !this.callValidator_(name, info.initialValue)) {
-			delete info.initialValue;
+		if (this.hasInitialValue_(name) && !this.callValidator_(name, this.initialValues_[name])) {
+			delete this.initialValues_[name];
 		}
 	}
 
@@ -737,7 +737,7 @@ State.STATE_REF_KEY = '__METAL_STATE_REF_KEY__';
  * @type {!Object}
  */
 State.KeyStates = {
-	UNINITIALIZED: 0,
+	UNINITIALIZED: undefined,
 	INITIALIZING: 1,
 	INITIALIZED: 2
 };

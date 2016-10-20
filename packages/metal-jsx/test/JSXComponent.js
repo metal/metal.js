@@ -327,7 +327,7 @@ describe('JSXComponent', function() {
 
 			sinon.stub(component, 'render');
 			component.props.foo = 'foo';
-			component.getDataManager().once('dataChanged', function() {
+			component.once('stateChanged', function() {
 				assert.strictEqual(0, component.render.callCount);
 				done();
 			});
@@ -351,7 +351,7 @@ describe('JSXComponent', function() {
 
 			sinon.stub(component, 'render');
 			component.state.foo = 'foo';
-			component.getDataManager().once('dataChanged', function() {
+			component.once('stateChanged', function() {
 				assert.strictEqual(0, component.render.callCount);
 				done();
 			});

@@ -57,9 +57,6 @@ class ComponentDataManager extends EventEmitter {
 			this.buildStateInstanceData_(data),
 			this.component_.getInitialConfig()
 		);
-
-		this.component_.on('stateChanged', this.emit_.bind(this, 'stateChanged'));
-		this.component_.on('stateKeyChanged', this.emit_.bind(this, 'stateKeyChanged'));
 		this.state_ = state;
 	}
 
@@ -71,17 +68,6 @@ class ComponentDataManager extends EventEmitter {
 
 		this.state_.dispose();
 		this.state_ = null;
-	}
-
-	/**
-	 * Emits the specified event.
-	 * @param {!Object} data
-	 * @param {!Object} event
-	 * @protected
-	 */
-	emit_(orig, data) {
-		const name = orig === 'stateChanged' ? 'dataChanged' : 'dataPropChanged';
-		this.emit(name, data);
 	}
 
 	/**

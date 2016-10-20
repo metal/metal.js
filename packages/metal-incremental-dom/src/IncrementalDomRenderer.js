@@ -44,6 +44,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		this.handleChildrenCaptured_ = this.handleChildrenCaptured_.bind(this);
 		this.handleChildRender_ = this.handleChildRender_.bind(this);
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
+
+
+		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
+			// If the component is being updated synchronously we'll just reuse the
+			// `handleComponentRendererStateKeyChanged_` function from
+			// `ComponentRenderer`.
+			this.component_.on('stateKeyChanged', this.handleDataPropChanged_.bind(this));
+		}
 	}
 
 	/**
@@ -360,12 +368,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		super.handleDataManagerCreated_();
 
 		var manager = this.component_.getDataManager();
-		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
-			// If the component is being updated synchronously we'll just reuse the
-			// `handleComponentRendererStateKeyChanged_` function from
-			// `ComponentRenderer`.
-			manager.on('dataPropChanged', this.handleDataPropChanged_.bind(this));
-		}
 
 		manager.add(
 			'children',

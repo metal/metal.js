@@ -63,6 +63,8 @@ class State extends EventEmitter {
 		 */
 		this.obj_ = opt_obj || this;
 
+		this.eventData_ = {};
+
 		/**
 		 * Object with information about the batch event that is currently
 		 * scheduled, or null if none is.
@@ -460,12 +462,11 @@ class State extends EventEmitter {
 	 */
 	informChange_(name, prevVal) {
 		if (this.shouldInformChange_(name, prevVal)) {
-			var data = {
+			var data = object.mixin({
 				key: name,
 				newVal: this.get(name),
-				prevVal: prevVal,
-				state: this
-			};
+				prevVal: prevVal
+			}, this.eventData_);
 			this.context_.emit(name + 'Changed', data);
 			this.context_.emit('stateKeyChanged', data);
 			this.scheduleBatchEvent_(data);
@@ -544,10 +545,9 @@ class State extends EventEmitter {
 	scheduleBatchEvent_(changeData) {
 		if (!this.scheduledBatchData_) {
 			async.nextTick(this.emitBatchEvent_, this);
-			this.scheduledBatchData_ = {
-				changes: {},
-				state: this
-			};
+			this.scheduledBatchData_ = object.mixin({
+				changes: {}
+			}, this.eventData_);
 		}
 
 		var name = changeData.key;
@@ -587,6 +587,10 @@ class State extends EventEmitter {
 		} else {
 			this.set(name, this.callFunction_(config.valueFn));
 		}
+	}
+
+	setEventData(data) {
+		this.eventData_ = data;
 	}
 
 	/**

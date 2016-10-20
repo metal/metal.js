@@ -61,6 +61,9 @@ class JSXDataManager extends ComponentDataManager {
 		this.state_ = new State({}, this.component_.state, this.component_, {
 			internal: true
 		});
+		this.state_.setEventData({
+			type: 'state'
+		});
 		this.state_.addToState(this.component_.constructor.STATE_MERGED);
 	}
 
@@ -72,18 +75,6 @@ class JSXDataManager extends ComponentDataManager {
 
 		this.props_.dispose();
 		this.props_ = null;
-	}
-
-	/**
-	 * Overrides the original method so we can add the data type to the event.
-	 * @param {!Object} data
-	 * @param {string=} opt_type Either 'props' or 'state'.
-	 * @protected
-	 * @override
-	 */
-	emit_(orig, data) {
-		data.type = data.state === this.state_ ? 'state' : 'props';
-		super.emit_(orig, data);
 	}
 
 	/**

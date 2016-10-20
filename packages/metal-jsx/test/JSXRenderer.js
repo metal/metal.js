@@ -5,8 +5,6 @@ import Component from 'metal-component';
 import JSXRenderer from '../src/JSXRenderer';
 import JSXDataManager from '../src/JSXDataManager';
 
-
-
 describe('JSXRenderer', function() {
 	let component;
 	let createdComps;
@@ -134,7 +132,7 @@ describe('JSXRenderer', function() {
 		sinon.stub(component, 'shouldUpdate');
 		component.props.bar = 'bar';
 		component.state.foo = 'foo';
-		component.getDataManager().once('dataChanged', function() {
+		component.once('stateChanged', function() {
 			assert.strictEqual(1, component.shouldUpdate.callCount);
 
 			const stateChanges = component.shouldUpdate.args[0][0];
@@ -146,6 +144,7 @@ describe('JSXRenderer', function() {
 			assert.ok(propChanges.bar);
 			assert.strictEqual('bar', propChanges.bar.newVal);
 			assert.strictEqual(undefined, propChanges.bar.prevVal);
+
 			done();
 		});
 	});

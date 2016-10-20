@@ -81,53 +81,6 @@ describe('JSXDataManager', function() {
 			assert.ok(!component.state.hasOwnProperty('events'));
 			assert.ok(!component.state.hasOwnProperty('visible'));
 		});
-
-		it('should emit "dataChanged" event with "state" type when state changes', function(done) {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
-			TestComponent.STATE = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			};
-
-			component = new TestComponent();
-
-			component.state.foo = 'newFoo';
-			component.getDataManager().once('dataChanged', function(data) {
-				assert.strictEqual('state', data.type);
-				assert.strictEqual('newFoo', data.changes.foo.newVal);
-				assert.strictEqual(undefined, data.changes.foo.prevVal);
-				assert.strictEqual('newFoo', component.state.foo);
-				done();
-			});
-		});
-
-		it('should emit "dataPropChanged" event with "state" type when state changes', function() {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
-			TestComponent.STATE = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			};
-
-			component = new TestComponent();
-			var listener = sinon.stub();
-			component.getDataManager().on('dataPropChanged', listener);
-
-			component.state.foo = 'newFoo';
-			assert.strictEqual(1, listener.callCount);
-
-			var data = listener.args[0][0];
-			assert.strictEqual('state', data.type);
-			assert.strictEqual('foo', data.key);
-			assert.strictEqual('newFoo', data.newVal);
-			assert.strictEqual(undefined, data.prevVal);
-			assert.strictEqual('newFoo', component.state.foo);
-		});
 	});
 
 	describe('props', function() {
@@ -188,53 +141,6 @@ describe('JSXDataManager', function() {
 			assert.ok(component.props.hasOwnProperty('elementClasses'));
 			assert.ok(component.props.hasOwnProperty('events'));
 			assert.ok(component.props.hasOwnProperty('visible'));
-		});
-
-		it('should emit "dataChanged" event with "props" type when props change', function(done) {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
-			TestComponent.PROPS = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			};
-
-			component = new TestComponent();
-
-			component.props.foo = 'newFoo';
-			component.getDataManager().once('dataChanged', function(data) {
-				assert.strictEqual('props', data.type);
-				assert.strictEqual('newFoo', data.changes.foo.newVal);
-				assert.strictEqual(undefined, data.changes.foo.prevVal);
-				assert.strictEqual('newFoo', component.props.foo);
-				done();
-			});
-		});
-
-		it('should emit "dataPropChanged" event with "props" type when props change', function() {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
-			TestComponent.PROPS = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			};
-
-			component = new TestComponent();
-			var listener = sinon.stub();
-			component.getDataManager().on('dataPropChanged', listener);
-
-			component.props.foo = 'newFoo';
-			assert.strictEqual(1, listener.callCount);
-
-			var data = listener.args[0][0];
-			assert.strictEqual('props', data.type);
-			assert.strictEqual('foo', data.key);
-			assert.strictEqual('newFoo', data.newVal);
-			assert.strictEqual(undefined, data.prevVal);
-			assert.strictEqual('newFoo', component.props.foo);
 		});
 
 		it('should return value from "props" when "get" is called', function() {

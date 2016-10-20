@@ -28,10 +28,10 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * @inheritDoc
 	 */
 	handleDataPropChanged_(data) {
-		if (data.type === 'props') {
-			this.propChanges_[data.key] = data;
-		} else {
+		if (data.type === 'state') {
 			super.handleDataPropChanged_(data);
+		} else {
+			this.propChanges_[data.key] = data;
 		}
 	}
 

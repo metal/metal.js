@@ -9,8 +9,7 @@ import {
 	isFunction,
 	isObject,
 	isString,
-	mergeSuperClassesProperty,
-	object
+	mergeSuperClassesProperty
 } from 'metal';
 import { toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
@@ -124,7 +123,7 @@ class Component extends EventEmitter {
 		this.renderer_.on('rendered', this.handleRendererRendered_.bind(this));
 
 		this.dataManager_ = this.createDataManager();
-		this.emit('dataManagerCreated');
+		this.renderer_.handleDataManagerCreated_();
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.on('eventsChanged', this.onEventsChanged_);

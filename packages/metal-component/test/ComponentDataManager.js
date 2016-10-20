@@ -183,37 +183,4 @@ describe('ComponentDataManager', function() {
 		assert.strictEqual(1, listener.callCount);
 		assert.strictEqual('fooValue2', listener.args[0][0].newVal);
 	});
-
-	it('should emit "dataChanged" when state changes', function(done) {
-		component = new Component();
-		manager = new ComponentDataManager(component, {
-			foo: {
-				value: 'fooValue'
-			}
-		});
-
-		component.foo = 'fooValue2';
-		manager.on('dataChanged', function(data) {
-			assert.ok(data.changes.foo);
-			assert.strictEqual('fooValue2', data.changes.foo.newVal);
-			done();
-		});
-	});
-
-	it('should emit "dataPropChanged" when each state property changes', function() {
-		component = new Component();
-		manager = new ComponentDataManager(component, {
-			foo: {
-				value: 'fooValue'
-			}
-		});
-
-		var listener = sinon.stub();
-		manager.on('dataPropChanged', listener);
-
-		component.foo = 'fooValue2';
-		assert.strictEqual(1, listener.callCount);
-		assert.strictEqual('foo', listener.args[0][0].key);
-		assert.strictEqual('fooValue2', listener.args[0][0].newVal);
-	});
 });

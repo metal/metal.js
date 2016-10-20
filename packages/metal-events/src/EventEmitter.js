@@ -70,8 +70,6 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	addSingleListener_(event, listener, opt_default, opt_origin) {
-		this.emit('newListener', event, listener);
-
 		if (!this.events_[event]) {
 			this.events_[event] = [];
 		}

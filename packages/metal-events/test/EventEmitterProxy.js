@@ -3,7 +3,7 @@
 import EventEmitter from '../src/EventEmitter';
 import EventEmitterProxy from '../src/EventEmitterProxy';
 
-describe('EventEmitterProxy', function() {
+describe.skip('EventEmitterProxy', function() {
 	it('should proxy event from origin to target', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

@@ -5,7 +5,7 @@ import features from '../src/features';
 import DomEventEmitterProxy from '../src/DomEventEmitterProxy';
 import { EventEmitter } from 'metal-events';
 
-describe('DomEventEmitterProxy', function() {
+describe.skip('DomEventEmitterProxy', function() {
 	afterEach(function() {
 		document.body.innerHTML = '';
 	});

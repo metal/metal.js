@@ -362,24 +362,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	handleDataManagerCreated_() {
-		super.handleDataManagerCreated_();
-
-		var manager = this.component_.getDataManager();
-
-		manager.add(
-			'children',
-			{
-				validator: Array.isArray,
-				value: emptyChildren_
-			},
-			this.config_.children || emptyChildren_
-		);
-	}
-
-	/**
 	 * Handles the `dataPropChanged` event. Stores data that has changed since the
 	 * last render.
 	 * @param {!Object} data

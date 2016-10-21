@@ -50,12 +50,13 @@ class ComponentDataManager extends EventEmitter {
 	 * @param {!Object} holder The object that should hold the data properties.
 	 * @protected
 	 */
-	createState_(data, holder) {
+	createState_(data, holder, define) {
 		const state = new State({}, holder, this.component_);
 		state.setKeysBlacklist_(this.constructor.BLACKLIST_MERGED);
 		state.addToState(
 			this.buildStateInstanceData_(data),
-			this.component_.getInitialConfig()
+			this.component_.getInitialConfig(),
+			define
 		);
 		this.state_ = state;
 	}

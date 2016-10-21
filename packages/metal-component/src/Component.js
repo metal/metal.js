@@ -694,6 +694,11 @@ class Component extends EventEmitter {
  * @static
  */
 Component.DATA = {
+	children: {
+		validator: Array.isArray,
+		value: []
+	},
+
 	/**
 	 * CSS classes to be applied to the element.
 	 * @type {string}

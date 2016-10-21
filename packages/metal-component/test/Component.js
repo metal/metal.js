@@ -284,7 +284,7 @@ describe('Component', function() {
 
 		it('should return an array with all state property names', function() {
 			comp = new Component();
-			var expected = ['elementClasses', 'events', 'visible'];
+			var expected = ['children', 'elementClasses', 'events', 'visible'];
 			assert.deepEqual(expected, comp.getStateKeys().sort());
 		});
 
@@ -293,6 +293,7 @@ describe('Component', function() {
 				elementClasses: 'myClass'
 			});
 			var expected = {
+				children: [],
 				elementClasses: 'myClass',
 				events: null,
 				visible: true

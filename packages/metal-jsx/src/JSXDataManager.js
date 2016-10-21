@@ -52,19 +52,32 @@ class JSXDataManager extends ComponentDataManager {
 	 * @override
 	 */
 	createState_(data) {
-		this.component_.props = {};
-		super.createState_(data, this.component_.props);
+		var define = false;
+		if (!this.component_.constructor.hasOwnProperty('__PROPS_PROTOTYPE__')) {
+			this.component_.constructor.__PROPS_PROTOTYPE__ = {};
+			this.component_.constructor.__STATE_PROTOTYPE__ = {};
+			define = null;
+		}
+
+		this.component_.props = this.component_.constructor.__PROPS_PROTOTYPE__;
+		if (define === false) {
+			this.component_.props = Object.create(this.component_.props);
+		}
+		super.createState_(data, this.component_.props, define);
 		this.props_ = this.state_;
 		this.addUnconfiguredProps_(this.component_.getInitialConfig());
 
-		this.component_.state = {};
+		this.component_.state = this.component_.constructor.__STATE_PROTOTYPE__;
+		if (define === false) {
+			this.component_.state = Object.create(this.component_.state);
+		}
 		this.state_ = new State({}, this.component_.state, this.component_, {
 			internal: true
 		});
 		this.state_.setEventData({
 			type: 'state'
 		});
-		this.state_.addToState(this.component_.constructor.STATE_MERGED);
+		this.state_.addToState(this.component_.constructor.STATE_MERGED, {}, define);
 	}
 
 	/**

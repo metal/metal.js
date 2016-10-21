@@ -478,15 +478,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			}
 		}
 
-
 		var node = IncrementalDomAop.getOriginalFn('elementOpen').apply(null, args);
 		this.attachDecoratedListeners_(node, args);
 		this.updateElementIfNotReached_(node);
 
-		const config = IncrementalDomUtils.buildConfigFromCall(args);
-		if (isDefAndNotNull(config.ref)) {
+		const ref = node.getAttribute('ref');
+		if (isDefAndNotNull(ref)) {
 			const owner = IncrementalDomChildren.getCurrentOwner() || this;
-			owner.getComponent().refs[config.ref] = node;
+			owner.getComponent().refs[ref] = node;
 		}
 		return node;
 	}

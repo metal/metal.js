@@ -78,9 +78,7 @@ describe('Soy', function() {
 
 			it('should not trigger update when changed state key is not used by template', function(done) {
 				comp = new HelloWorldComponent();
-				comp.getDataManager().getStateInstance().addToState('foo');
-
-				comp.foo = 'Bar';
+				comp.visible = false;
 				comp.once('stateSynced', function() {
 					assert.strictEqual(0, IncrementalDOM.patchOuter.callCount);
 					done();
@@ -105,7 +103,7 @@ describe('Soy', function() {
 					return true;
 				};
 				comp = new HelloWorldComponent();
-				comp.getDataManager().getStateInstance().addToState('foo');
+				comp.visible = false;
 
 				comp.foo = 'Bar';
 				comp.once('stateSynced', function() {

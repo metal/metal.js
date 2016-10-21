@@ -15,7 +15,7 @@ import { EventEmitter } from 'metal-events';
 /**
  * State adds support for having object properties that can be watched for
  * changes, as well as configured with validators, setters and other options.
- * See the `addToState` method for a complete list of available configuration
+ * See the `configState` method for a complete list of available configuration
  * options for each state key.
  * @extends {EventEmitter}
  */
@@ -29,18 +29,9 @@ class State extends EventEmitter {
 	 *     instead.
 	 * @param {Object=} opt_context Optional context to call functions (like
 	 *     validators and setters) on. Defaults to `this`.
-	 * @param {Object=} opt_commonOpts Optional common option values to be used
-	 *     by all this instance's state properties.
 	 */
-	constructor(opt_config, opt_obj, opt_context, opt_commonOpts) {
+	constructor(opt_config, opt_obj, opt_context) {
 		super();
-
-		/**
-		 * Common option values to be used by all this instance's state properties.
-		 * @type {Object}
-		 * @protected
-		 */
-		this.commonOpts_ = opt_commonOpts;
 
 		/**
 		 * Context to call functions (like validators and setters) on.
@@ -82,133 +73,17 @@ class State extends EventEmitter {
 
 		this.stateConfigs_ = {};
 
-		this.initialValues_ = opt_config || {};
+		this.initialValues_ = object.mixin({}, opt_config);
 
 		this.setShouldUseFacade(true);
 		this.mergeInvalidKeys_();
-		this.addToStateFromStaticHint_(opt_config);
+		this.configStateFromStaticHint_();
 
 		Object.defineProperty(this.obj_, State.STATE_REF_KEY, {
 			configurable: true,
 			enumerable: false,
 			value: this
 		});
-	}
-
-	/**
-	 * Adds the given key to the state.
-	 * @param {string} name The name of the new state key.
-	 * @param {Object.<string, *>=} config The configuration object for the new
-	 *     key. See `addToState` for supported settings.
-	 * @param {*} initialValue The initial value of the new key.
-	 */
-	addKeyToState(name, config, initialValue) {
-		this.buildKeyInfo_(name, config, initialValue, arguments.length > 2);
-		Object.defineProperty(
-			this.obj_,
-			name,
-			this.buildKeyPropertyDef_(name)
-		);
-		this.validateInitialValue_(name);
-		this.assertGivenIfRequired_(name);
-	}
-
-	/**
-	 * Adds the given key(s) to the state, together with its(their) configs.
-	 * Config objects support the given settings:
-	 *     required - When set to `true`, causes errors to be printed (via
-	 *     `console.error`) if no value is given for the property.
-	 *
-	 *     setter - Function for normalizing state key values. It receives the new
-	 *     value that was set, and returns the value that should be stored.
-	 *
-	 *     validator - Function that validates state key values. When it returns
-	 *     false, the new value is ignored. When it returns an instance of Error,
-	 *     it will emit the error to the console.
-	 *
-	 *     value - The default value for the state key. Note that setting this to
-	 *     an object will cause all class instances to use the same reference to
-	 *     the object. To have each instance use a different reference for objects,
-	 *     use the `valueFn` option instead.
-	 *
-	 *     valueFn - A function that returns the default value for a state key.
-	 *
-	 *     writeOnce - Ignores writes to the state key after it's been first
-	 *     written to. That is, allows writes only when setting the value for the
-	 *     first time.
-	 * @param {!Object.<string, !Object>|string} configsOrName An object that maps
-	 *     configuration options for keys to be added to the state or the name of
-	 *     a single key to be added.
-	 * @param {Object.<string, *>=} opt_initialValuesOrConfig An object that maps
-	 *     state keys to their initial values. These values have higher precedence
-	 *     than the default values specified in the configurations. If a single
-	 *     key name was passed as the first param instead though, then this should
-	 *     be the configuration object for that key.
-	 * @param {boolean|Object|*=} opt_contextOrInitialValue If the first
-	 *     param passed to this method was a config object, this should be the
-	 *     context where the added state keys will be defined (defaults to `this`),
-	 *     or false if they shouldn't be defined at all. If the first param was a
-	 *     single key name though, this should be its initial value.
-	 */
-	addToState(configsOrName, opt_initialValuesOrConfig, opt_contextOrInitialValue) {
-		if (isString(configsOrName)) {
-			return this.addKeyToState(...arguments);
-		}
-
-		var initialValues = opt_initialValuesOrConfig || {};
-		var names = Object.keys(configsOrName);
-		var shouldDefine = opt_contextOrInitialValue !== false;
-
-		var props = {};
-		for (let i = 0; i < names.length; i++) {
-			var name = names[i];
-			this.buildKeyInfo_(
-				name,
-				configsOrName[name],
-				initialValues[name],
-				initialValues.hasOwnProperty(name)
-			);
-			if (shouldDefine) {
-				props[name] = this.buildKeyPropertyDef_(name);
-			}
-			this.assertGivenIfRequired_(name);
-		}
-
-		if (shouldDefine) {
-			Object.defineProperties(
-				opt_contextOrInitialValue || this.obj_,
-				props
-			);
-		}
-
-		// Validate initial values after all properties have been defined, otherwise
-		// it won't be possible to access those properties within validators.
-		for (let i = 0; i < names.length; i++) {
-			this.validateInitialValue_(names[i]);
-		}
-	}
-
-	/**
-	 * Adds state keys from super classes static hint `MyClass.STATE = {};`.
-	 * @param {Object.<string, !Object>=} opt_config An object that maps all the
-	 *     configurations for state keys.
-	 * @protected
-	 */
-	addToStateFromStaticHint_(opt_config) {
-		var ctor = this.constructor;
-		var defineContext;
-		var merged = State.mergeStateStatic(ctor);
-		if (this.obj_ === this) {
-			defineContext = merged ? ctor.prototype : false;
-		}
-		this.addToState(ctor.STATE_MERGED, opt_config, defineContext);
-	}
-
-	getStateInfo(name) {
-		if (!this.stateInfo_[name]) {
-			this.stateInfo_[name] = {};
-		}
-		return this.stateInfo_[name];
 	}
 
 	/**
@@ -242,27 +117,6 @@ class State extends EventEmitter {
 	assertValidStateKeyName_(name) {
 		if (this.constructor.INVALID_KEYS_MERGED[name] || this.keysBlacklist_[name]) {
 			throw new Error('It\'s not allowed to create a state key with the name "' + name + '".');
-		}
-	}
-
-	/**
-	 * Builds the info object for the specified state key.
-	 * @param {string} name The name of the key.
-	 * @param {Object} config The config object for the key.
-	 * @param {*} initialValue The initial value of the key.
-	 * @param {boolean} hasInitialValue Flag indicating if an initial value was
-	 *     given or not (important since `initialValue` can also be `undefined`).
-	 * @protected
-	 */
-	buildKeyInfo_(name, config, initialValue, hasInitialValue) {
-		this.assertValidStateKeyName_(name);
-		config = (config && config.config) ? config.config : (config || {});
-		if (this.commonOpts_) {
-			config = object.mixin({}, config, this.commonOpts_);
-		}
-		this.stateConfigs_[name] = config;
-		if (hasInitialValue) {
-			this.initialValues_[name] = initialValue;
 		}
 	}
 
@@ -353,10 +207,81 @@ class State extends EventEmitter {
 	}
 
 	/**
+	 * Adds the given key(s) to the state, together with its(their) configs.
+	 * Config objects support the given settings:
+	 *     required - When set to `true`, causes errors to be printed (via
+	 *     `console.error`) if no value is given for the property.
+	 *
+	 *     setter - Function for normalizing state key values. It receives the new
+	 *     value that was set, and returns the value that should be stored.
+	 *
+	 *     validator - Function that validates state key values. When it returns
+	 *     false, the new value is ignored. When it returns an instance of Error,
+	 *     it will emit the error to the console.
+	 *
+	 *     value - The default value for the state key. Note that setting this to
+	 *     an object will cause all class instances to use the same reference to
+	 *     the object. To have each instance use a different reference for objects,
+	 *     use the `valueFn` option instead.
+	 *
+	 *     valueFn - A function that returns the default value for a state key.
+	 *
+	 *     writeOnce - Ignores writes to the state key after it's been first
+	 *     written to. That is, allows writes only when setting the value for the
+	 *     first time.
+	 * @param {!Object.<string, !Object>|string} configs An object that maps
+	 *     configuration options for keys to be added to the state.
+	 * @param {boolean|Object|*=} opt_context The context where the added state
+	 *     keys will be defined (defaults to `this`), or false if they shouldn't
+	 *     be defined at all.
+	 */
+	configState(configs, opt_context) {
+		if (opt_context !== false) {
+			const props = {};
+			const names = Object.keys(configs);
+			for (let i = 0; i < names.length; i++) {
+				const name = names[i];
+				this.assertValidStateKeyName_(name);
+				props[name] = this.buildKeyPropertyDef_(name);
+			}
+			Object.defineProperties(
+				opt_context || this.obj_,
+				props
+			);
+		}
+
+		this.stateConfigs_ = configs;
+		const names = Object.keys(configs);
+		for (let i = 0; i < names.length; i++) {
+			const name = names[i];
+			configs[name] = configs[name].config ? configs[name].config : configs[name];
+			this.assertGivenIfRequired_(names[i]);
+			this.validateInitialValue_(names[i]);
+		}
+	}
+
+	/**
+	 * Adds state keys from super classes static hint `MyClass.STATE = {};`.
+	 * @param {Object.<string, !Object>=} opt_config An object that maps all the
+	 *     configurations for state keys.
+	 * @protected
+	 */
+	configStateFromStaticHint_() {
+		var ctor = this.constructor;
+		var defineContext;
+		var merged = State.mergeStateStatic(ctor);
+		if (this.obj_ === this) {
+			defineContext = merged ? ctor.prototype : false;
+		}
+		this.configState(ctor.STATE_MERGED, defineContext);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	disposeInternal() {
 		super.disposeInternal();
+		this.initialValues_ = null;
 		this.stateInfo_ = null;
 		this.stateConfigs_ = null;
 		this.scheduledBatchData_ = null;
@@ -401,6 +326,18 @@ class State extends EventEmitter {
 		}
 
 		return state;
+	}
+
+	/**
+	 * Gets information about the specified state property.
+	 * @param {string} name
+	 * @return {!Object}
+	 */
+	getStateInfo(name) {
+		if (!this.stateInfo_[name]) {
+			this.stateInfo_[name] = {};
+		}
+		return this.stateInfo_[name];
 	}
 
 	/**
@@ -605,6 +542,10 @@ class State extends EventEmitter {
 		}
 	}
 
+	/**
+	 * Sets data to be sent with all events emitted from this instance.
+	 * @param {Object}
+	 */
 	setEventData(data) {
 		this.eventData_ = data;
 	}

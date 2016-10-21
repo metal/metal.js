@@ -56,21 +56,6 @@ describe('JSXDataManager', function() {
 			assert.strictEqual('defaultFoo', component.state.foo);
 		});
 
-		it('should automatically make all STATE properties "internal"', function() {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
-			TestComponent.STATE = {
-				foo: {
-					value: 'defaultFoo'
-				}
-			};
-
-			component = new TestComponent();
-			var stateInstance = component.getDataManager().getStateInstance();
-			assert.ok(stateInstance.getStateKeyConfig('foo').internal);
-		});
-
 		it('should not include default component data in "state"', function() {
 			class TestComponent extends Component {
 			}
@@ -164,20 +149,6 @@ describe('JSXDataManager', function() {
 
 			var manager = component.getDataManager();
 			assert.strictEqual('defaultPropsFoo', manager.get('foo'));
-		});
-
-		it('should add value to "props" when "add" is called', function() {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
-
-			component = new TestComponent();
-
-			var manager = component.getDataManager();
-			manager.add('foo', {
-				value: 'defaultFoo'
-			});
-			assert.strictEqual('defaultFoo', component.props.foo);
 		});
 
 		it('should return keys from "props" when "getSyncKeys" is called', function() {

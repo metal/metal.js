@@ -60,16 +60,6 @@ describe('ComponentDataManager', function() {
 		assert.strictEqual('fooValue', component.foo);
 	});
 
-	it('should add the state properties via the "add" function', function() {
-		component = new Component();
-		manager = new ComponentDataManager(component, {});
-		manager.add('foo', {
-			value: 'fooValue'
-		});
-
-		assert.strictEqual('fooValue', component.foo);
-	});
-
 	it('should replace all non internal data with given values or default', function() {
 		class TestComponent extends Component {
 		}

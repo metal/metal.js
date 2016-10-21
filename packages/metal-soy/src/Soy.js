@@ -15,7 +15,7 @@ class Soy extends IncrementalDomRenderer {
 	 * Adds the template params to the component's state, if they don't exist yet.
 	 * @protected
 	 */
-	addMissingStateKeys_() {
+	getExtraDataConfig() {
 		var elementTemplate = this.component_.constructor.TEMPLATE;
 		if (!isFunction(elementTemplate)) {
 			return;
@@ -26,12 +26,13 @@ class Soy extends IncrementalDomRenderer {
 
 		var keys = elementTemplate.params || [];
 		var component = this.component_;
-		var state = component.getDataManager().getStateInstance();
+		var configs = {};
 		for (var i = 0; i < keys.length; i++) {
-			if (!state.hasStateKey(keys[i]) && !component[keys[i]]) {
-				state.addToState(keys[i], {}, component.getInitialConfig()[keys[i]]);
+			if (!component[keys[i]]) {
+				configs[keys[i]] = {};
 			}
 		}
+		return configs;
 	}
 
 	/**
@@ -78,14 +79,6 @@ class Soy extends IncrementalDomRenderer {
 			}
 			return goog.loadedModules_[namespace][templateName](opt_data, opt_ignored, opt_ijData);
 		};
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	handleDataManagerCreated_() {
-		super.handleDataManagerCreated_();
-		this.addMissingStateKeys_();
 	}
 
 	/**

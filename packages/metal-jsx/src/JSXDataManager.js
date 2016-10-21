@@ -77,7 +77,7 @@ class JSXDataManager extends ComponentDataManager {
 		this.state_.setEventData({
 			type: 'state'
 		});
-		this.state_.addToState(this.component_.constructor.STATE_MERGED, {}, define);
+		this.state_.configState(this.component_.constructor.STATE_MERGED, define);
 	}
 
 	/**

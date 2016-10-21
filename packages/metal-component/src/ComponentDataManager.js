@@ -25,16 +25,6 @@ class ComponentDataManager extends EventEmitter {
 	}
 
 	/**
-	 * Adds a state property to the component.
-	 * @param {string} name
-	 * @param {!Object} config
-	 * @param {*} opt_initialValue
-	 */
-	add() {
-		this.state_.addToState(...arguments);
-	}
-
-	/**
 	 * Builds the configuration data that will be passed to the `State` instance.
 	 * @param {!Object} data
 	 * @return {!Object}
@@ -51,13 +41,9 @@ class ComponentDataManager extends EventEmitter {
 	 * @protected
 	 */
 	createState_(data, holder, define) {
-		const state = new State({}, holder, this.component_);
+		const state = new State(this.component_.getInitialConfig(), holder, this.component_);
 		state.setKeysBlacklist_(this.constructor.BLACKLIST_MERGED);
-		state.addToState(
-			this.buildStateInstanceData_(data),
-			this.component_.getInitialConfig(),
-			define
-		);
+		state.configState(this.buildStateInstanceData_(data), define);
 		this.state_ = state;
 	}
 

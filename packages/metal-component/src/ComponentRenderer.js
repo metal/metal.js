@@ -50,8 +50,12 @@ class ComponentRenderer extends EventEmitter {
 		return this.component_;
 	}
 
-	handleDataManagerCreated_() {
-
+	/**
+	 * Returns extra configuration for data that should be added to the manager.
+	 * @return {Object}
+	 */
+	getExtraDataConfig() {
+		return null;
 	}
 
 	/**

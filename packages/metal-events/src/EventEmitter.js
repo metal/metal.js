@@ -20,6 +20,12 @@ class EventEmitter extends Disposable {
 		this.events_ = [];
 
 		/**
+		 * Handlers that are triggered when an event is listened to.
+		 * @type {Array}
+		 */
+		this.listenerHandlers_ = [];
+
+		/**
 		 * The maximum number of listeners allowed for each event type. If the number
 		 * becomes higher than the max, a warning will be issued.
 		 * @type {number}
@@ -70,6 +76,9 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	addSingleListener_(event, listener, opt_default, opt_origin) {
+		for (var i = 0; i < this.listenerHandlers_.length; i++) {
+			this.listenerHandlers_[i](event);
+		}
 		if (!this.events_[event]) {
 			this.events_[event] = [];
 		}
@@ -245,6 +254,15 @@ class EventEmitter extends Disposable {
 	 */
 	on() {
 		return this.addListener.apply(this, arguments);
+	}
+
+	/**
+	 * Adds handler that gets triggered when an event is listened to on this
+	 * instance.
+	 * @param {!function()}
+	 */
+	onListener(handler) {
+		this.listenerHandlers_.push(handler);
 	}
 
 	/**

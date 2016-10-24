@@ -66,18 +66,6 @@ describe('EventEmitterProxy', function() {
 		assert.strictEqual(0, listener.callCount);
 	});
 
-	it('should not proxy "newListener" event from origin to target', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		new EventEmitterProxy(origin, target);
-
-		var listener = sinon.stub();
-		target.on('newListener', listener);
-		origin.emit('newListener');
-
-		assert.strictEqual(0, listener.callCount);
-	});
-
 	it('should only emit proxied event once per listener', function() {
 		var origin = new EventEmitter();
 		var target = new EventEmitter();

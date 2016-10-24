@@ -87,7 +87,15 @@ class Component extends EventEmitter {
 		 * @type {!DomEventEmitterProxy}
 		 * @protected
 		 */
-		this.elementEventProxy_ = new DomEventEmitterProxy(null, this);
+		this.elementEventProxy_ = new DomEventEmitterProxy(
+			null,
+			this,
+			{
+				eventsChanged: true,
+				stateChanged: true,
+				stateKeyChanged: true
+			}
+		);
 
 		/**
 		 * The `EventHandler` instance for events attached from the `events` state key.

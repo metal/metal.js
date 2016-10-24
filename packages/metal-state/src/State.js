@@ -236,9 +236,13 @@ class State extends EventEmitter {
 	 *     be defined at all.
 	 */
 	configState(configs, opt_context) {
+		const names = Object.keys(configs);
+		if (names.length === 0) {
+			return;
+		}
+
 		if (opt_context !== false) {
 			const props = {};
-			const names = Object.keys(configs);
 			for (let i = 0; i < names.length; i++) {
 				const name = names[i];
 				this.assertValidStateKeyName_(name);
@@ -251,7 +255,6 @@ class State extends EventEmitter {
 		}
 
 		this.stateConfigs_ = configs;
-		const names = Object.keys(configs);
 		for (let i = 0; i < names.length; i++) {
 			const name = names[i];
 			configs[name] = configs[name].config ? configs[name].config : configs[name];

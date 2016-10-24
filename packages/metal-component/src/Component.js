@@ -12,7 +12,7 @@ import {
 	mergeSuperClassesProperty,
 	object
 } from 'metal';
-import { toElement } from 'metal-dom';
+import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
 import { EventEmitter, EventHandler } from 'metal-events';
@@ -80,6 +80,14 @@ class Component extends EventEmitter {
 		 * @type {!Array<!Component>}
 		 */
 		this.components = {};
+
+		/**
+		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
+		 * element to the component itself.
+		 * @type {!DomEventEmitterProxy}
+		 * @protected
+		 */
+		this.elementEventProxy_ = new DomEventEmitterProxy(null, this);
 
 		/**
 		 * The `EventHandler` instance for events attached from the `events` state key.
@@ -293,6 +301,11 @@ class Component extends EventEmitter {
 		this.disposed();
 
 		this.detach();
+
+		if (this.elementEventProxy_) {
+			this.elementEventProxy_.dispose();
+			this.elementEventProxy_ = null;
+		}
 
 		this.disposeSubComponents(Object.keys(this.components));
 		this.components = null;
@@ -602,6 +615,7 @@ class Component extends EventEmitter {
 		if (this.elementVal_ !== val) {
 			var prev = this.elementVal_;
 			this.elementVal_ = val;
+			this.elementEventProxy_.setOriginEmitter(val);
 			if (this.componentCreated_) {
 				this.emit('elementChanged', {
 					prevVal: prev,

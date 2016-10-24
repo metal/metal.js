@@ -1,6 +1,6 @@
 {
   "name": "metal-component",
-  "version": "2.4.7",
+  "version": "2.5.0",
   "description": "A component class for Metal.js",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-component",
@@ -23,9 +23,9 @@
   ],
   "dependencies": {
     "metal": "^2.4.7",
-    "metal-dom": "^2.4.7",
-    "metal-events": "^2.4.7",
-    "metal-state": "^2.4.7"
+    "metal-dom": "^2.5.0",
+    "metal-events": "^2.5.0",
+    "metal-state": "^2.5.0"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

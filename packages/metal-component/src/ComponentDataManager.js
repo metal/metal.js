@@ -144,6 +144,8 @@ ComponentDataManager.BLACKLIST = {
 	context: true,
 	element: true,
 	refs: true,
+	state: true,
+	stateKey: true,
 	wasRendered: true
 };
 

@@ -1,7 +1,6 @@
 'use strict';
 
 import {
-	array,
 	async,
 	isDefAndNotNull,
 	isFunction,
@@ -76,7 +75,6 @@ class State extends EventEmitter {
 		this.initialValues_ = object.mixin({}, opt_config);
 
 		this.setShouldUseFacade(true);
-		this.mergeInvalidKeys_();
 		this.configStateFromStaticHint_();
 
 		Object.defineProperty(this.obj_, State.STATE_REF_KEY, {
@@ -115,7 +113,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	assertValidStateKeyName_(name) {
-		if (this.constructor.INVALID_KEYS_MERGED[name] || this.keysBlacklist_[name]) {
+		if (this.keysBlacklist_[name]) {
 			throw new Error('It\'s not allowed to create a state key with the name "' + name + '".');
 		}
 	}
@@ -468,22 +466,6 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Merges the values of the `INVALID_KEYS` static for the whole hierarchy of
-	 * the current instance.
-	 * @protected
-	 */
-	mergeInvalidKeys_() {
-		mergeSuperClassesProperty(this.constructor, 'INVALID_KEYS', function(values) {
-			return array.flatten(values).reduce(function(merged, val) {
-				if (val) {
-					merged[val] = true;
-				}
-				return merged;
-			}, {});
-		});
-	}
-
-	/**
 	 * Removes the requested state key.
 	 * @param {string} name The name of the key.
 	 */
@@ -674,14 +656,6 @@ class State extends EventEmitter {
 		return disposed;
 	}
 }
-
-/**
- * A list with state key names that will automatically be rejected as invalid.
- * Subclasses can define their own invalid keys by setting this static on their
- * constructors, which will be merged together and handled automatically.
- * @type {!Array<string>}
- */
-State.INVALID_KEYS = ['state', 'stateKey'];
 
 State.STATE_REF_KEY = '__METAL_STATE_REF_KEY__';
 

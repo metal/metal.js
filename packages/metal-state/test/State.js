@@ -29,39 +29,6 @@ describe('State', function() {
 		assert.notStrictEqual(-1, keys.indexOf('key2'));
 	});
 
-	it('should not allow adding key named "state"', function() {
-		var state = new State();
-
-		assert.throws(function() {
-			state.configState({
-				state: {}
-			});
-		});
-	});
-
-	it('should not allow adding key named "stateKey"', function() {
-		var state = new State();
-
-		assert.throws(function() {
-			state.configState({
-				stateKey: {}
-			});
-		});
-	});
-
-	it('should not allow adding state key with name contained in INVALID_KEYS', function() {
-		class Test extends State {
-		}
-		Test.INVALID_KEYS = ['invalid'];
-
-		var test = new Test();
-		assert.throws(function() {
-			test.configState({
-				invalid: {}
-			});
-		});
-	});
-
 	it('should not allow adding state key with name contained in key blacklist', function() {
 		class Test extends State {
 		}
@@ -73,19 +40,6 @@ describe('State', function() {
 		assert.throws(function() {
 			test.configState({
 				invalid: {}
-			});
-		});
-	});
-
-	it('should not allow adding state key named "state" on subclasses', function() {
-		class Test extends State {
-		}
-		Test.INVALID_KEYS = ['invalid'];
-
-		var test = new Test();
-		assert.throws(function() {
-			test.configState({
-				state: {}
 			});
 		});
 	});

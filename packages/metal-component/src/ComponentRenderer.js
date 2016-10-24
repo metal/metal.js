@@ -21,14 +21,14 @@ class ComponentRenderer extends EventEmitter {
 			this.componentRendererEvents_.add(
 				this.component_.on(
 					'stateKeyChanged',
-					this.handleManagerDataPropChanged_.bind(this)
+					this.handleRendererStateKeyChanged_.bind(this)
 				)
 			);
 		} else {
 			this.componentRendererEvents_.add(
 				this.component_.on(
 					'stateChanged',
-					this.handleManagerDataChanged_.bind(this)
+					this.handleRendererStateChanged_.bind(this)
 				)
 			);
 		}
@@ -59,6 +59,16 @@ class ComponentRenderer extends EventEmitter {
 	}
 
 	/**
+	 * Handles the "rendered" event.
+	 * @protected
+	 */
+	handleRendered_() {
+		var firstRender = !this.isRendered_;
+		this.isRendered_ = true;
+		this.emit('rendered', firstRender);
+	}
+
+	/**
 	 * Handles a `dataChanged` event from the component's data manager. Calls the
 	 * `update` function if the component has already been rendered for the first
 	 * time.
@@ -67,7 +77,7 @@ class ComponentRenderer extends EventEmitter {
 	 *     (newVal) and previous (prevVal) values.
 	 * @protected
 	 */
-	handleManagerDataChanged_(changes) {
+	handleRendererStateChanged_(changes) {
 		if (this.shouldRerender_()) {
 			this.update(changes);
 		}
@@ -75,12 +85,12 @@ class ComponentRenderer extends EventEmitter {
 
 	/**
 	 * Handles a `dataPropChanged` event from the component's data manager. This
-	 * is similar to `handleManagerDataChanged_`, but only called for
+	 * is similar to `handleRendererStateChanged_`, but only called for
 	 * components that have requested updates to happen synchronously.
 	 * @param {!{key: string, newVal: *, prevVal: *}} data
 	 * @protected
 	 */
-	handleManagerDataPropChanged_(data) {
+	handleRendererStateKeyChanged_(data) {
 		if (this.shouldRerender_()) {
 			this.update({
 				changes: {
@@ -88,15 +98,6 @@ class ComponentRenderer extends EventEmitter {
 				}
 			});
 		}
-	}
-
-	/**
-	 * Handles the "rendered" event.
-	 * @protected
-	 */
-	handleRendered_() {
-		this.emit('rendered', !this.isRendered_);
-		this.isRendered_ = true;
 	}
 
 	/**

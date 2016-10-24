@@ -25,17 +25,6 @@ class JSXRenderer extends IncrementalDomRenderer {
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	handleDataPropChanged_(data) {
-		if (data.type === 'state') {
-			super.handleDataPropChanged_(data);
-		} else {
-			this.propChanges_[data.key] = data;
-		}
-	}
-
-	/**
 	 * Called when an element is opened during render via incremental dom. Adds
 	 * keys to elements that don't have one yet, according to their position in
 	 * the parent. This helps use cases that use conditionally rendered elements,
@@ -73,6 +62,17 @@ class JSXRenderer extends IncrementalDomRenderer {
 	handleInterceptedCloseCall_(tag) {
 		childrenCount.pop();
 		return super.handleInterceptedCloseCall_(tag);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	handleStateKeyChanged_(data) {
+		if (data.type === 'state') {
+			super.handleStateKeyChanged_(data);
+		} else {
+			this.propChanges_[data.key] = data;
+		}
 	}
 
 	/**

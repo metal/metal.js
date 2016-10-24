@@ -48,9 +48,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
 			// If the component is being updated synchronously we'll just reuse the
-			// `handleComponentRendererStateKeyChanged_` function from
-			// `ComponentRenderer`.
-			this.component_.on('stateKeyChanged', this.handleDataPropChanged_.bind(this));
+			// `handleRendererStateKeyChanged_` function from `ComponentRenderer`.
+			this.component_.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 		}
 	}
 
@@ -362,16 +361,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles the `dataPropChanged` event. Stores data that has changed since the
-	 * last render.
-	 * @param {!Object} data
-	 * @protected
-	 */
-	handleDataPropChanged_(data) {
-		this.changes_[data.key] = data;
-	}
-
-	/**
 	 * Handles an intercepted call to the attributes default handler from
 	 * incremental dom.
 	 * @param {!Element} element
@@ -454,9 +443,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @override
 	 * @protected
 	 */
-	handleManagerDataPropChanged_(data) {
-		this.handleDataPropChanged_(data);
-		super.handleManagerDataPropChanged_(data);
+	handleRendererStateKeyChanged_(data) {
+		this.handleStateKeyChanged_(data);
+		super.handleRendererStateKeyChanged_(data);
 	}
 
 	/**
@@ -488,6 +477,16 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			owner.getComponent().refs[ref] = node;
 		}
 		return node;
+	}
+
+	/**
+	 * Handles the `stateKeyChanged` event. Stores data that has changed since the
+	 * last render.
+	 * @param {!Object} data
+	 * @protected
+	 */
+	handleStateKeyChanged_(data) {
+		this.changes_[data.key] = data;
 	}
 
 	/**

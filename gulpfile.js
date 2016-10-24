@@ -69,8 +69,8 @@ metal.registerTasks({
 		},
 		sl_iphone: {
 			base: 'SauceLabs',
-			browserName: 'iphone',
-			platform: 'OS X 10.10',
+			browserName: 'Safari',
+			platform: 'iOS',
 			version: '7.1'
 		},
 		sl_android_4: {

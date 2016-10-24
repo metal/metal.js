@@ -310,10 +310,8 @@ class Component extends EventEmitter {
 
 		this.detach();
 
-		if (this.elementEventProxy_) {
-			this.elementEventProxy_.dispose();
-			this.elementEventProxy_ = null;
-		}
+		this.elementEventProxy_.dispose();
+		this.elementEventProxy_ = null;
 
 		this.disposeSubComponents(Object.keys(this.components));
 		this.components = null;

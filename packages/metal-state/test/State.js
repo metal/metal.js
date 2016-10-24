@@ -1,6 +1,7 @@
 'use strict';
 
 import { async } from 'metal';
+import EventEmitter from 'metal-events';
 import State from '../src/State';
 
 describe('State', function() {
@@ -660,6 +661,31 @@ describe('State', function() {
 		state.key2 = 21;
 	});
 
+	it('should pass given event data with change events', function() {
+		var state = new State({
+			key1: 10
+		});
+		state.configState({
+			key1: {}
+		});
+		state.setEventData({
+			foo: 'bar'
+		});
+
+		var listener = sinon.stub();
+		state.on('key1Changed', listener);
+
+		state.key1 = 2;
+		const expected = {
+			foo: 'bar',
+			key: 'key1',
+			newVal: 2,
+			prevVal: 10
+		};
+		assert.strictEqual(1, listener.callCount);
+		assert.deepEqual(expected, listener.args[0][0]);
+	});
+
 	it('should call callback function from setState asynchronously after the batch event is triggered', function(done) {
 		var state = createStateInstance();
 
@@ -932,6 +958,34 @@ describe('State', function() {
 			assert.strictEqual('obj:1', obj.key1);
 		});
 
+		it('should use given context object when emitting change events', function() {
+			class Test extends State {
+			}
+			Test.STATE = {
+				key1: {
+				}
+			};
+
+			class Test2 extends EventEmitter {
+			}
+			const obj = new Test2();
+			const listener = sinon.stub();
+			obj.on('key1Changed', listener);
+
+			new Test({}, obj, obj);
+			assert.strictEqual(0, listener.callCount);
+
+			obj.key1 = 2;
+			assert.strictEqual(1, listener.callCount);
+
+			const expected = {
+				key: 'key1',
+				newVal: 2,
+				prevVal: undefined
+			};
+			assert.deepEqual(expected, listener.args[0][0]);
+		});
+
 		it('should pass given context object when calling validator', function() {
 			var validator = sinon.stub().returns(true);
 			class Test extends State {
@@ -1055,6 +1109,12 @@ describe('State', function() {
 			var state = createStateInstance();
 			state.dispose();
 			assert.doesNotThrow(() => state.getState());
+		});
+
+		it('should not throw error if trying to use "getStateKeyConfig" after disposed', function() {
+			var state = createStateInstance();
+			state.dispose();
+			assert.doesNotThrow(() => state.getStateKeyConfig());
 		});
 	});
 });

@@ -322,19 +322,6 @@ class EventEmitter extends Disposable {
 	}
 
 	/**
-	 * By default EventEmitters will print a warning if more than 10 listeners
-	 * are added for a particular event. This is a useful default which helps
-	 * finding memory leaks. Obviously not all Emitters should be limited to 10.
-	 * This function allows that to be increased. Set to zero for unlimited.
-	 * @param {number} max The maximum number of listeners.
-	 * @return {!Object} Returns emitter, so calls can be chained.
-	 */
-	setMaxListeners(max) {
-		this.maxListeners_ = max;
-		return this;
-	}
-
-	/**
 	 * Sets the configuration option which determines if an event facade should
 	 * be sent as a param of listeners when emitting events. If set to true, the
 	 * facade will be passed as the first argument of the listener.

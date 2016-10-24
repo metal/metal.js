@@ -105,6 +105,15 @@ describe('Component', function() {
 			assert.strictEqual('.sibling', listener.args[0][0].sibling);
 		});
 
+		it('should return attach data via the `getAttachData` function', function() {
+			comp = new Component({}, false);
+			comp.attach('.parent', '.sibling');
+			var attachData = comp.getAttachData();
+			assert.ok(attachData);
+			assert.strictEqual('.parent', attachData.parent);
+			assert.strictEqual('.sibling', attachData.sibling);
+		});
+
 		it('should run "rendered" lifecycle method when rendered indicates that component was rerendered', function() {
 			class TestComponent extends Component {
 			}

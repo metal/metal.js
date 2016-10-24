@@ -6,17 +6,6 @@ import State from 'metal-state';
 
 class JSXDataManager extends ComponentDataManager {
 	/**
-	 * Overrides the original method so we can add properties to `props` by default.
-	 * @param {string} name
-	 * @param {!Object} config
-	 * @param {*} opt_initialValue
-	 * @override
-	 */
-	add() {
-		this.props_.addToState(...arguments);
-	}
-
-	/**
 	 * Manually adds props that weren't configured via `PROPS`.
 	 * @param {!Object} data
 	 * @protected

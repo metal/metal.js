@@ -5,10 +5,14 @@ import JSXDataManager from '../src/JSXDataManager';
 
 describe('JSXDataManager', function() {
 	var component;
+	var component2;
 
 	afterEach(function() {
 		if (component) {
 			component.dispose();
+		}
+		if (component2) {
+			component2.dispose();
 		}
 	});
 
@@ -66,6 +70,29 @@ describe('JSXDataManager', function() {
 			assert.ok(!component.state.hasOwnProperty('events'));
 			assert.ok(!component.state.hasOwnProperty('visible'));
 		});
+
+		it('should keep state objects different between component instances', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.DATA_MANAGER = JSXDataManager;
+			TestComponent.STATE = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			};
+
+			component = new TestComponent();
+			component2 = new TestComponent();
+			assert.notEqual(component.state, component2.state);
+
+			component.state.foo = 'foo1';
+			assert.equal('foo1', component.state.foo);
+			assert.equal('defaultFoo', component2.state.foo);
+
+			component2.state.foo = 'foo2';
+			assert.equal('foo1', component.state.foo);
+			assert.equal('foo2', component2.state.foo);
+		});
 	});
 
 	describe('props', function() {
@@ -102,7 +129,18 @@ describe('JSXDataManager', function() {
 			assert.strictEqual('foo', component.props.foo);
 		});
 
-		it('should automatically make all PROPS properties not "internal"', function() {
+		it('should include default component data in "props"', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.DATA_MANAGER = JSXDataManager;
+
+			component = new TestComponent();
+			assert.ok(component.props.hasOwnProperty('elementClasses'));
+			assert.ok(component.props.hasOwnProperty('events'));
+			assert.ok(component.props.hasOwnProperty('visible'));
+		});
+
+		it('should keep prop objects different between component instances', function() {
 			class TestComponent extends Component {
 			}
 			TestComponent.DATA_MANAGER = JSXDataManager;
@@ -113,19 +151,16 @@ describe('JSXDataManager', function() {
 			};
 
 			component = new TestComponent();
-			var propsInstance = component.getDataManager().getPropsInstance();
-			assert.ok(!propsInstance.getStateKeyConfig('foo').internal);
-		});
+			component2 = new TestComponent();
+			assert.notEqual(component.props, component2.props);
 
-		it('should include default component data in "props"', function() {
-			class TestComponent extends Component {
-			}
-			TestComponent.DATA_MANAGER = JSXDataManager;
+			component.props.foo = 'foo1';
+			assert.equal('foo1', component.props.foo);
+			assert.equal('defaultFoo', component2.props.foo);
 
-			component = new TestComponent();
-			assert.ok(component.props.hasOwnProperty('elementClasses'));
-			assert.ok(component.props.hasOwnProperty('events'));
-			assert.ok(component.props.hasOwnProperty('visible'));
+			component2.props.foo = 'foo2';
+			assert.equal('foo1', component.props.foo);
+			assert.equal('foo2', component2.props.foo);
 		});
 
 		it('should return value from "props" when "get" is called', function() {
@@ -149,6 +184,27 @@ describe('JSXDataManager', function() {
 
 			var manager = component.getDataManager();
 			assert.strictEqual('defaultPropsFoo', manager.get('foo'));
+		});
+
+		it('should return the "State" instance for props from "getPropsInstance"', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.DATA_MANAGER = JSXDataManager;
+			TestComponent.PROPS = {
+				foo: {
+					value: 'defaultPropsFoo'
+				}
+			};
+			TestComponent.STATE = {
+				foo: {
+					value: 'defaultStateFoo'
+				}
+			};
+
+			component = new TestComponent();
+			var propsInstance = component.getDataManager().getPropsInstance();
+			assert.ok(propsInstance);
+			assert.equal('defaultPropsFoo', propsInstance.get('foo'));
 		});
 
 		it('should return keys from "props" when "getSyncKeys" is called', function() {

@@ -61,11 +61,11 @@ metal.registerTasks({
 			platform: 'Windows 8.1',
 			version: '11'
 		},
-		sl_edge_20: {
+		sl_edge_13: {
 			base: 'SauceLabs',
 			browserName: 'microsoftedge',
 			platform: 'Windows 10',
-			version: '20'
+			version: '13'
 		},
 		sl_iphone: {
 			base: 'SauceLabs',

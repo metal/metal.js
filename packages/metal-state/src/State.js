@@ -269,12 +269,14 @@ class State extends EventEmitter {
 	 */
 	configStateFromStaticHint_() {
 		var ctor = this.constructor;
-		var defineContext;
-		var merged = State.mergeStateStatic(ctor);
-		if (this.obj_ === this) {
-			defineContext = merged ? ctor.prototype : false;
+		if (ctor !== State) {
+			var defineContext;
+			var merged = State.mergeStateStatic(ctor);
+			if (this.obj_ === this) {
+				defineContext = merged ? ctor.prototype : false;
+			}
+			this.configState(ctor.STATE_MERGED, defineContext);
 		}
-		this.configState(ctor.STATE_MERGED, defineContext);
 	}
 
 	/**

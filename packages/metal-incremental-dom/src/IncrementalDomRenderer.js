@@ -461,7 +461,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			if (currRenderer.config_.key) {
 				args[1] = currRenderer.config_.key;
 			}
-			var elementClasses = currComp.getDataManager().get('elementClasses');
+			var elementClasses = currComp.getDataManager().get(currComp, 'elementClasses');
 			if (elementClasses) {
 				this.addElementClasses_(elementClasses, args);
 			}
@@ -564,7 +564,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		if (comp.wasRendered) {
 			comp.getRenderer().startSkipUpdates();
-			comp.getDataManager().replaceNonInternal(config);
+			comp.getDataManager().replaceNonInternal(comp, config);
 			comp.getRenderer().stopSkipUpdates();
 		}
 		comp.getRenderer().config_ = config;

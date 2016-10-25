@@ -943,11 +943,11 @@ describe('Component', function() {
 		assert.ok(renderer instanceof ComponentRenderer);
 	});
 
-	it('should get the data manager instance', function() {
+	it('should get the data manager', function() {
 		class TestComponent extends Component {
 		}
 		comp = new TestComponent();
-		assert.ok(comp.getDataManager() instanceof ComponentDataManager);
+		assert.strictEqual(ComponentDataManager, comp.getDataManager());
 	});
 
 	it('should check if the given function is a component constructor', function() {

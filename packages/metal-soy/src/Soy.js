@@ -104,7 +104,7 @@ class Soy extends IncrementalDomRenderer {
 	 * @protected
 	 */
 	isHtmlParam_(name) {
-		var state = this.component_.getDataManager().getStateInstance();
+		var state = this.component_.getDataManager().getStateInstance(this.component_);
 		if (state.getStateKeyConfig(name).isHtml) {
 			return true;
 		}

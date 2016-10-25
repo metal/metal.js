@@ -4,128 +4,144 @@ import { mergeSuperClassesProperty, object } from 'metal';
 import { ComponentDataManager } from 'metal-component';
 import State from 'metal-state';
 
-class JSXDataManager extends ComponentDataManager {
+// TODO: Maybe change this to use regular `class` and `extend`, but export an
+// instance of it instead of the constructor (though we need the constructor
+// as a named export at least so we can extend it in JSXDataManager).
+
+const JSXDataManager = Object.create(ComponentDataManager);
+object.mixin(JSXDataManager, {
 	/**
 	 * Manually adds props that weren't configured via `PROPS`.
+	 * @param {!Component} component
+	 * @param {!State} props
 	 * @param {!Object} data
 	 * @protected
 	 */
-	addUnconfiguredProps_(data) {
+	addUnconfiguredProps_(component, props, data) {
 		let keys = Object.keys(data);
 		for (let i = 0; i < keys.length; i++) {
-			if (!this.props_.hasStateKey(keys[i])) {
-				this.component_.props[keys[i]] = data[keys[i]];
+			if (!props.hasStateKey(keys[i])) {
+				component.props[keys[i]] = data[keys[i]];
 			}
 		}
-	}
+	},
 
 	/**
-	 * Overrides the original method so that the main `State` instance's data can
-	 * come from `PROPS` instead of `STATE`.
-	 * @param {!Object} data
-	 * @return {!Object}
+	 * Creates the objects that will hold props and state in the component.
+	 * @param {!function()} ctor Component constructor.
+	 * @return {boolean} Flag indicating if the objects were defined for the
+	 *     first time for this type of component.
 	 * @protected
-	 * @override
 	 */
-	buildStateInstanceData_(data) {
-		const ctor = this.component_.constructor;
-		mergeSuperClassesProperty(ctor, 'PROPS', State.mergeState);
-		return object.mixin({}, data, this.component_.constructor.PROPS_MERGED);
-	}
+	createPropertyObjects_(component) {
+		const ctor = component.constructor;
+		let firstTime = false;
+		if (!ctor.hasOwnProperty('__METAL_PROPERTY_OBJS__')) {
+			ctor.__METAL_PROPERTY_OBJS__ = {
+				props: {},
+				state: {}
+			};
+			firstTime = true;
+		}
+
+		const types = ['props', 'state'];
+		for (let i = 0; i < types.length; i++) {
+			const obj = ctor.__METAL_PROPERTY_OBJS__[types[i]];
+			component[types[i]] = firstTime ? obj : Object.create(obj);
+		}
+
+		return firstTime;
+	},
 
 	/**
 	 * Overrides the original method so that we can have two separate `State`
 	 * instances: one responsible for `state` and another for `props`.
-	 * @param {!Object} data
+	 * @param {!Component} comp
+	 * @param {!Object} config
 	 * @protected
 	 * @override
 	 */
-	createState_(data) {
-		var define = false;
-		if (!this.component_.constructor.hasOwnProperty('__PROPS_PROTOTYPE__')) {
-			this.component_.constructor.__PROPS_PROTOTYPE__ = {};
-			this.component_.constructor.__STATE_PROTOTYPE__ = {};
-			define = null;
-		}
+	createState_(comp, config) {
+		const ctor = comp.constructor;
+		const firstTime = this.createPropertyObjects_(comp, ctor);
+		const context = firstTime ? null : false;
+		const data = this.getManagerData(comp);
 
-		this.component_.props = this.component_.constructor.__PROPS_PROTOTYPE__;
-		if (define === false) {
-			this.component_.props = Object.create(this.component_.props);
-		}
-		super.createState_(data, this.component_.props, define);
-		this.props_ = this.state_;
-		this.addUnconfiguredProps_(this.component_.getInitialConfig());
+		mergeSuperClassesProperty(ctor, 'PROPS', State.mergeState);
+		data.props_ = new State(comp.getInitialConfig(), comp.props, comp);
+		data.props_.configState(
+			object.mixin({}, config, comp.constructor.PROPS_MERGED),
+			context
+		);
+		this.addUnconfiguredProps_(comp, data.props_, comp.getInitialConfig());
 
-		this.component_.state = this.component_.constructor.__STATE_PROTOTYPE__;
-		if (define === false) {
-			this.component_.state = Object.create(this.component_.state);
-		}
-		this.state_ = new State({}, this.component_.state, this.component_, {
-			internal: true
-		});
-		this.state_.setEventData({
+		data.state_ = new State({}, comp.state, comp);
+		data.state_.setEventData({
 			type: 'state'
 		});
-		this.state_.configState(this.component_.constructor.STATE_MERGED, define);
-	}
+		data.state_.configState(ctor.STATE_MERGED, context);
+	},
 
 	/**
 	 * @inheritDoc
 	 */
-	disposeInternal() {
-		super.disposeInternal();
-
-		this.props_.dispose();
-		this.props_ = null;
-	}
+	dispose(component) {
+		var data = this.getManagerData(component);
+		data.props_.dispose();
+		ComponentDataManager.dispose.call(this, component);
+	},
 
 	/**
 	 * Overrides the original method so we can get properties from `props` by
 	 * default.
+	 * @param {!Component} component
 	 * @param {string} name
 	 * @return {*}
 	 * @override
 	 */
-	get(name) {
-		return this.props_.get(name);
-	}
+	get(component, name) {
+		return this.getManagerData(component).props_.get(name);
+	},
 
 	/**
 	 * Gets the `State` instance being used for "props".
+	 * @param {!Component} component
 	 * @return {!Object}
 	 */
-	getPropsInstance() {
-		return this.props_;
-	}
+	getPropsInstance(component) {
+		return this.getManagerData(component).props_;
+	},
 
 	/**
 	 * Overrides the original method so we can enable "sync" methods just for
 	 * `props`.
+	 * @param {!Component} component
 	 * @return {!Array<string>}
 	 * @override
 	 */
-	getSyncKeys() {
-		return this.props_.getStateKeys();
-	}
+	getSyncKeys(component) {
+		return this.getManagerData(component).props_.getStateKeys();
+	},
 
 	/**
 	 * Overrides the original method so we can replace values in `props`.
+	 * @param {!Component} component
 	 * @param {!Object} data
 	 * @override
 	 */
-	replaceNonInternal(data) {
+	replaceNonInternal(component, data) {
 		var prevProps;
-		if (this.component_.propsChanged) {
-			 prevProps = object.mixin({}, this.component_.props);
+		if (component.propsChanged) {
+			 prevProps = object.mixin({}, component.props);
 		}
-		ComponentDataManager.replaceNonInternal(data, this.props_);
-		this.addUnconfiguredProps_(data);
-		if (this.component_.propsChanged) {
-			this.component_.propsChanged(prevProps);
+
+		const props = this.getManagerData(component).props_;
+		ComponentDataManager.replaceNonInternal.call(this, component, data, props);
+		this.addUnconfiguredProps_(component, props, data);
+		if (component.propsChanged) {
+			component.propsChanged(prevProps);
 		}
 	}
-}
-
-JSXDataManager.BLACKLIST = {};
+});
 
 export default JSXDataManager;

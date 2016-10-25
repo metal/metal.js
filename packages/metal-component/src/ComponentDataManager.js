@@ -1,119 +1,110 @@
 'use strict';
 
-import { array, mergeSuperClassesProperty, object } from 'metal';
-import { EventEmitter } from 'metal-events';
+import { object } from 'metal';
 import State from 'metal-state';
 
-class ComponentDataManager extends EventEmitter {
-	/**
-	 * Constructor for `ComponentDataManager`.
-	 * @param {!Component} component
-	 * @param {!Object} data
-	 */
-	constructor(component, data) {
-		super();
-		this.component_ = component;
-
-		mergeSuperClassesProperty(
-			this.constructor,
-			'BLACKLIST',
-			array.firstDefinedValue
-		);
-		State.mergeStateStatic(this.component_.constructor);
-
-		this.createState_(data, this.component_);
-	}
-
-	/**
-	 * Builds the configuration data that will be passed to the `State` instance.
-	 * @param {!Object} data
-	 * @return {!Object}
-	 * @protected
-	 */
-	buildStateInstanceData_(data) {
-		return object.mixin({}, data, this.component_.constructor.STATE_MERGED);
-	}
+const ComponentDataManager = {
+	BLACKLIST: {
+		components: true,
+		context: true,
+		element: true,
+		refs: true,
+		state: true,
+		stateKey: true,
+		wasRendered: true
+	},
 
 	/**
 	 * Creates the `State` instance that will handle the main component data.
+	 * @param {!Component} component
 	 * @param {!Object} data
-	 * @param {!Object} holder The object that should hold the data properties.
 	 * @protected
 	 */
-	createState_(data, holder, define) {
-		const state = new State(this.component_.getInitialConfig(), holder, this.component_);
-		state.setKeysBlacklist_(this.constructor.BLACKLIST_MERGED);
-		state.configState(this.buildStateInstanceData_(data), define);
-		this.state_ = state;
-	}
+	createState_(component, data) {
+		const state = new State(component.getInitialConfig(), component, component);
+		state.setKeysBlacklist_(this.BLACKLIST);
+		state.configState(
+			object.mixin({}, data, component.constructor.STATE_MERGED)
+		);
+		this.getManagerData(component).state_ = state;
+	},
 
 	/**
-	 * @inheritDoc
+	 * Disposes of any data being used by the manager in this component.
+	 * @param {!Component} component
 	 */
-	disposeInternal() {
-		super.disposeInternal();
-
-		this.state_.dispose();
-		this.state_ = null;
-	}
+	dispose(component) {
+		var data = this.getManagerData(component);
+		if (data.state_) {
+			data.state_.dispose();
+		}
+		component.__DATA_MANAGER_DATA__ = null;
+	},
 
 	/**
 	 * Gets the data with the given name.
+	 * @param {!Component} component
 	 * @param {string} name
 	 * @return {*}
 	 */
-	get(name) {
-		return this.state_.get(name);
-	}
+	get(component, name) {
+		return this.getManagerData(component).state_.get(name);
+	},
+
+	/**
+	 * Gets the manager data for the given component.
+	 * @param {!Component} component
+	 * @return {Object}
+	 */
+	getManagerData(component) {
+		return component.__DATA_MANAGER_DATA__;
+	},
 
 	/**
 	 * Gets the keys for state data that can be synced via `sync` functions.
+	 * @param {!Component} component
 	 * @return {!Array<string>}
 	 */
-	getSyncKeys() {
-		return this.state_.getStateKeys();
-	}
+	getSyncKeys(component) {
+		return this.getManagerData(component).state_.getStateKeys();
+	},
 
 	/**
 	 * Gets the keys for state data.
+	 * @param {!Component} component
 	 * @return {!Array<string>}
 	 */
-	getStateKeys() {
-		return this.state_.getStateKeys();
-	}
+	getStateKeys(component) {
+		return this.getManagerData(component).state_.getStateKeys();
+	},
 
 	/**
 	 * Gets the whole state data.
+	 * @param {!Component} component
 	 * @return {!Object}
 	 */
-	getState() {
-		return this.state_.getState();
-	}
+	getState(component) {
+		return this.getManagerData(component).state_.getState();
+	},
 
 	/**
 	 * Gets the `State` instance being used.
+	 * @param {!Component} component
 	 * @return {!Object}
 	 */
-	getStateInstance() {
-		return this.state_;
-	}
+	getStateInstance(component) {
+		return this.getManagerData(component).state_;
+	},
 
 	/**
 	 * Updates all non internal data with the given values (or to the default
 	 * value if none is given).
+	 * @param {!Component} component
 	 * @param {!Object} data
+	 * @param {State=} opt_state
 	 */
-	replaceNonInternal(data) {
-		ComponentDataManager.replaceNonInternal(data, this.state_);
-	}
-
-	/**
-	 * Updates all non internal data with the given values (or to the default
-	 * value if none is given).
-	 * @param {!Object} data
-	 * @param {!State} state
-	 */
-	static replaceNonInternal(data, state) {
+	replaceNonInternal(component, data, opt_state) {
+		const state = opt_state || this.getManagerData(component).state_;
 		const keys = state.getStateKeys();
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
@@ -125,28 +116,30 @@ class ComponentDataManager extends EventEmitter {
 				}
 			}
 		}
-	}
+	},
 
 	/**
 	 * Sets the value of all the specified state keys.
+	 * @param {!Component} component
 	 * @param {!Object.<string,*>} values A map of state keys to the values they
 	 *   should be set to.
 	 * @param {function()=} opt_callback An optional function that will be run
 	 *   after the next batched update is triggered.
 	 */
-	setState(state, opt_callback) {
-		this.state_.setState(state, opt_callback);
-	}
-}
+	setState(component, state, opt_callback) {
+		this.getManagerData(component).state_.setState(state, opt_callback);
+	},
 
-ComponentDataManager.BLACKLIST = {
-	components: true,
-	context: true,
-	element: true,
-	refs: true,
-	state: true,
-	stateKey: true,
-	wasRendered: true
+	/**
+	 * Sets up the specified component's data.
+	 * @param {!Component} component
+	 * @param {!Object} data
+	 */
+	setUp(component, data) {
+		component.__DATA_MANAGER_DATA__ = {};
+		State.mergeStateStatic(component.constructor);
+		this.createState_(component, data);
+	}
 };
 
 export default ComponentDataManager;

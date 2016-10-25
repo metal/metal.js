@@ -131,7 +131,9 @@ class Component extends EventEmitter {
 		 */
 		this.DEFAULT_ELEMENT_PARENT = document.body;
 
+		mergeSuperClassesProperty(this.constructor, 'DATA_MANAGER', array.firstDefinedValue);
 		mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
+		mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
 		mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
 
 		this.element = this.initialConfig_.element;
@@ -139,11 +141,15 @@ class Component extends EventEmitter {
 		this.renderer_ = this.createRenderer();
 		this.renderer_.on('rendered', this.handleRendererRendered_.bind(this));
 
-		this.dataManager_ = this.createDataManager();
+		this.dataManager_ = this.constructor.DATA_MANAGER_MERGED;
+		this.dataManager_.setUp(
+			this,
+			object.mixin({}, Component.DATA, this.getRenderer().getExtraDataConfig())
+		);
 
 		this.on('stateChanged', this.handleStateChanged_);
 		this.on('eventsChanged', this.onEventsChanged_);
-		this.addListenersFromObj_(this.dataManager_.get('events'));
+		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
 
 		this.created();
 		this.componentCreated_ = true;
@@ -233,25 +239,11 @@ class Component extends EventEmitter {
 	created() {}
 
 	/**
-	 * Creates the data manager for this component. Sub classes can override this
-	 * to return a custom manager as needed.
-	 * @return {!ComponentDataManager}
-	 */
-	createDataManager() {
-		mergeSuperClassesProperty(this.constructor, 'DATA_MANAGER', array.firstDefinedValue);
-		return new this.constructor.DATA_MANAGER_MERGED(
-			this,
-			object.mixin({}, Component.DATA, this.getRenderer().getExtraDataConfig())
-		);
-	}
-
-	/**
 	 * Creates the renderer for this component. Sub classes can override this to
 	 * return a custom renderer as needed.
 	 * @return {!ComponentRenderer}
 	 */
 	createRenderer() {
-		mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
 		return new this.constructor.RENDERER_MERGED(this);
 	}
 
@@ -316,7 +308,7 @@ class Component extends EventEmitter {
 		this.disposeSubComponents(Object.keys(this.components));
 		this.components = null;
 
-		this.dataManager_.dispose();
+		this.dataManager_.dispose(this);
 		this.dataManager_ = null;
 
 		this.renderer_.dispose();
@@ -369,7 +361,7 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Gets the `ComponentDataManager` instance being used.
+	 * Gets the `ComponentDataManager` being used.
 	 * @return {!ComponentDataManager}
 	 */
 	getDataManager() {
@@ -407,7 +399,7 @@ class Component extends EventEmitter {
 	 * @return {!Object}
 	 */
 	getState() {
-		return this.dataManager_.getState();
+		return this.dataManager_.getState(this);
 	}
 
 	/**
@@ -415,7 +407,7 @@ class Component extends EventEmitter {
 	 * @return {!Array<string>}
 	 */
 	getStateKeys() {
-		return this.dataManager_.getStateKeys();
+		return this.dataManager_.getStateKeys(this);
 	}
 
 	/**
@@ -427,7 +419,7 @@ class Component extends EventEmitter {
 		const ctor = this.constructor;
 		if (!ctor.hasOwnProperty('__METAL_SYNC_FNS__')) {
 			const fns = {};
-			const keys = this.dataManager_.getSyncKeys();
+			const keys = this.dataManager_.getSyncKeys(this);
 			for (let i = 0; i < keys.length; i++) {
 				const name = 'sync' + keys[i].charAt(0).toUpperCase() + keys[i].slice(1);
 				const fn = ctor.prototype[name];
@@ -453,7 +445,7 @@ class Component extends EventEmitter {
 			if (!opt_change) {
 				var manager = this.getDataManager();
 				opt_change = {
-					newVal: manager.get(key),
+					newVal: manager.get(this, key),
 					prevVal: undefined
 				};
 			}
@@ -628,7 +620,7 @@ class Component extends EventEmitter {
 					newVal: val
 				});
 				if (val && this.wasRendered) {
-					this.syncVisible(this.dataManager_.get('visible'));
+					this.syncVisible(this.dataManager_.get(this, 'visible'));
 				}
 			}
 		}
@@ -642,7 +634,7 @@ class Component extends EventEmitter {
 	 *   after the next batched update is triggered.
 	 */
 	setState(state, opt_callback) {
-		this.dataManager_.setState(state, opt_callback);
+		this.dataManager_.setState(this, state, opt_callback);
 	}
 
 	/**

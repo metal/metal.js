@@ -183,7 +183,7 @@ describe('JSXDataManager', function() {
 			assert.strictEqual('defaultStateFoo', component.state.foo);
 
 			var manager = component.getDataManager();
-			assert.strictEqual('defaultPropsFoo', manager.get('foo'));
+			assert.strictEqual('defaultPropsFoo', manager.get(component, 'foo'));
 		});
 
 		it('should return the "State" instance for props from "getPropsInstance"', function() {
@@ -202,7 +202,7 @@ describe('JSXDataManager', function() {
 			};
 
 			component = new TestComponent();
-			var propsInstance = component.getDataManager().getPropsInstance();
+			var propsInstance = component.getDataManager().getPropsInstance(component);
 			assert.ok(propsInstance);
 			assert.equal('defaultPropsFoo', propsInstance.get('foo'));
 		});
@@ -223,7 +223,7 @@ describe('JSXDataManager', function() {
 			component = new TestComponent();
 			var manager = component.getDataManager();
 			var expected = ['children', 'elementClasses', 'events', 'foo', 'visible'];
-			assert.deepEqual(expected, manager.getSyncKeys().sort());
+			assert.deepEqual(expected, manager.getSyncKeys(component).sort());
 		});
 	});
 
@@ -243,7 +243,7 @@ describe('JSXDataManager', function() {
 
 			component = new TestComponent();
 			var manager = component.getDataManager();
-			manager.replaceNonInternal({
+			manager.replaceNonInternal(component, {
 				bar: 'bar',
 				foo: 'foo'
 			});
@@ -267,7 +267,7 @@ describe('JSXDataManager', function() {
 
 			component = new TestComponent();
 			var manager = component.getDataManager();
-			manager.replaceNonInternal({
+			manager.replaceNonInternal(component, {
 				bar: 'bar'
 			});
 
@@ -287,7 +287,7 @@ describe('JSXDataManager', function() {
 
 			component = new TestComponent();
 			var manager = component.getDataManager();
-			manager.replaceNonInternal({
+			manager.replaceNonInternal(component, {
 				foo: 'foo'
 			});
 			assert.strictEqual('defaultFoo', component.state.foo);
@@ -305,7 +305,7 @@ describe('JSXDataManager', function() {
 
 			component = new TestComponent();
 			var manager = component.getDataManager();
-			manager.replaceNonInternal({
+			manager.replaceNonInternal(component, {
 				bar: 'bar',
 				foo: 'foo'
 			});
@@ -327,7 +327,7 @@ describe('JSXDataManager', function() {
 
 			component = new TestComponent();
 			var manager = component.getDataManager();
-			manager.replaceNonInternal({
+			manager.replaceNonInternal(component, {
 				foo: 'foo'
 			});
 

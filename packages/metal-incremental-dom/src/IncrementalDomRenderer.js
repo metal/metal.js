@@ -191,6 +191,19 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Generates a key for the next element to be rendered.
+	 * @return {?string}
+	 * @protected
+	 */
+	generateKey_() {
+		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
+		var currRenderer = currComp.getRenderer();
+		if (!currRenderer.rootElementReached_ && currRenderer.config_.key) {
+			return currRenderer.config_.key;
+		}
+	}
+
+	/**
 	 * Gets the component being currently rendered via `IncrementalDomRenderer`.
 	 * @return {Component}
 	 */
@@ -455,12 +468,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleRegularCall_(...args) {
+		args[1] = this.generateKey_(args[1]);
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
 		if (!currRenderer.rootElementReached_) {
-			if (currRenderer.config_.key) {
-				args[1] = currRenderer.config_.key;
-			}
 			var elementClasses = currComp.getDataManager().get(currComp, 'elementClasses');
 			if (elementClasses) {
 				this.addElementClasses_(elementClasses, args);

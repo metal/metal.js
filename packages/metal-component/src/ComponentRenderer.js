@@ -1,6 +1,6 @@
 'use strict';
 
-import { EventEmitter, EventHandler } from 'metal-events';
+import { EventEmitter } from 'metal-events';
 
 /**
  * Base class that component renderers should extend from. It defines the
@@ -16,30 +16,17 @@ class ComponentRenderer extends EventEmitter {
 		super();
 		this.component_ = component;
 
-		this.componentRendererEvents_ = new EventHandler();
 		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
-			this.componentRendererEvents_.add(
-				this.component_.on(
-					'stateKeyChanged',
-					this.handleRendererStateKeyChanged_.bind(this)
-				)
+			this.component_.on(
+				'stateKeyChanged',
+				this.handleRendererStateKeyChanged_.bind(this)
 			);
 		} else {
-			this.componentRendererEvents_.add(
-				this.component_.on(
-					'stateChanged',
-					this.handleRendererStateChanged_.bind(this)
-				)
+			this.component_.on(
+				'stateChanged',
+				this.handleRendererStateChanged_.bind(this)
 			);
 		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	disposeInternal() {
-		this.componentRendererEvents_.removeAllListeners();
-		this.componentRendererEvents_ = null;
 	}
 
 	/**

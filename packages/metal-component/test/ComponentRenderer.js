@@ -101,22 +101,6 @@ describe('ComponentRenderer', function() {
 		});
 	});
 
-	it('should not call update method after disposed', function(done) {
-		var TestComponent = createTestComponent();
-		component = new TestComponent();
-		const renderer = component.getRenderer();
-		sinon.spy(renderer, 'update');
-
-		renderer.render();
-		renderer.dispose();
-
-		component.foo = 'foo';
-		component.once('stateChanged', function() {
-			assert.strictEqual(0, renderer.update.callCount);
-			done();
-		});
-	});
-
 	describe('SYNC_UPDATES', function() {
 		it('should call the update method synchronously if state changes', function() {
 			var TestComponent = createTestComponent();

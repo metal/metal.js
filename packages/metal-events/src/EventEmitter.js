@@ -17,7 +17,7 @@ class EventEmitter extends Disposable {
 		 * @type {!Object<string, !Array<!function()>>}
 		 * @protected
 		 */
-		this.events_ = [];
+		this.events_ = {};
 
 		/**
 		 * Handlers that are triggered when an event is listened to.
@@ -79,9 +79,6 @@ class EventEmitter extends Disposable {
 		for (var i = 0; i < this.listenerHandlers_.length; i++) {
 			this.listenerHandlers_[i](event);
 		}
-		if (!this.events_[event]) {
-			this.events_[event] = [];
-		}
 		if (opt_default || opt_origin) {
 			listener = {
 				default: opt_default,
@@ -89,7 +86,14 @@ class EventEmitter extends Disposable {
 				origin: opt_origin
 			};
 		}
-		this.events_[event].push(listener);
+		if (!this.events_[event]) {
+			this.events_[event] = listener;
+		} else {
+			if (!Array.isArray(this.events_[event])) {
+				this.events_[event] = [this.events_[event]];
+			}
+			this.events_[event].push(listener);
+		}
 	}
 
 	/**
@@ -97,7 +101,7 @@ class EventEmitter extends Disposable {
 	 * @override
 	 */
 	disposeInternal() {
-		this.events_ = [];
+		this.events_ = {};
 	}
 
 	/**
@@ -107,7 +111,7 @@ class EventEmitter extends Disposable {
 	 * @return {boolean} Returns true if event had listeners, false otherwise.
 	 */
 	emit(event) {
-		var listeners = (this.events_[event] || []).concat();
+		var listeners = toArray(this.events_[event]).concat();
 		if (listeners.length === 0) {
 			return false;
 		}
@@ -159,7 +163,7 @@ class EventEmitter extends Disposable {
 	 * @return {Array} Array of listeners.
 	 */
 	listeners(event) {
-		return (this.events_[event] || []).map(
+		return toArray(this.events_[event]).map(
 			listener => listener.fn ? listener.fn : listener
 		);
 	}
@@ -246,8 +250,10 @@ class EventEmitter extends Disposable {
 
 		events = this.normalizeEvents_(events);
 		for (var i = 0; i < events.length; i++) {
-			var listenerObjs = this.events_[events[i]] || [];
-			this.removeMatchingListenerObjs_(listenerObjs, listener);
+			this.events_[events[i]] = this.removeMatchingListenerObjs_(
+				toArray(this.events_[events[i]]),
+				listener
+			);
 		}
 
 		return this;
@@ -305,8 +311,9 @@ class EventEmitter extends Disposable {
 	/**
 	 * Removes all listener objects from the given array that match the given
 	 * listener function.
-	 * @param {!Array.<Object>} listenerObjs
+	 * @param {Array.<Object>} listenerObjs
 	 * @param {!Function} listener
+	 * @return {Array.<Object>|Object} The new listeners array for this event.
 	 * @protected
 	 */
 	removeMatchingListenerObjs_(listenerObjs, listener) {
@@ -315,6 +322,7 @@ class EventEmitter extends Disposable {
 				listenerObjs.splice(i, 1);
 			}
 		}
+		return listenerObjs.length > 0 ? listenerObjs : null;
 	}
 
 	/**
@@ -350,6 +358,11 @@ class EventEmitter extends Disposable {
 			throw new TypeError('Listener must be a function');
 		}
 	}
+}
+
+function toArray(val) {
+	val = val || [];
+	return Array.isArray(val) ? val : [val];
 }
 
 export default EventEmitter;

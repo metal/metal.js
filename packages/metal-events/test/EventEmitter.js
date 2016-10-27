@@ -437,6 +437,7 @@ describe('EventEmitter', function() {
 		this.emitter.once('event', listener);
 		this.emitter.emit('event');
 
+		assert.equal(1, listener.callCount);
 		assert.ok(listener.args[0][0].preventedDefault);
 	});
 

@@ -319,21 +319,23 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		} else {
 			var data = IncrementalDomRenderer.getCurrentData();
 			if (isDef(config.key)) {
-				if (!data.prevComps.keys) {
-					data.prevComps.keys = {};
-					data.currComps.keys = {};
-				}
-				comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
+				comp = this.match_(
+					data.prevComps.keys ? data.prevComps.keys[config.key] : null,
+					Ctor,
+					config
+				);
+				data.currComps.keys = data.currComps.keys || {};
 				data.currComps.keys[config.key] = comp;
 			} else {
-				if (!data.prevComps.order) {
-					data.prevComps.order = {};
-					data.currComps.order = {};
-				}
 				var type = getUid(Ctor, true);
+				data.currComps.order = data.currComps.order || [];
 				data.currComps.order[type] = data.currComps.order[type] || [];
 				var order = data.currComps.order[type];
-				comp = this.match_((data.prevComps.order[type] || [])[order.length], Ctor, config);
+				comp = this.match_(
+					data.prevComps.order ? (data.prevComps.order[type] || [])[order.length] : null,
+					Ctor,
+					config
+				);
 				order.push(comp);
 			}
 		}
@@ -824,11 +826,11 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (data) {
 			if (data.currComps.keys) {
 				data.prevComps.keys = data.currComps.keys;
-				data.currComps.keys = {};
+				data.currComps.keys = null;
 			}
 			if (data.currComps.order) {
 				data.prevComps.order = data.currComps.order;
-				data.currComps.order = {};
+				data.currComps.order = null;
 			}
 		}
 	}

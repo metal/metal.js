@@ -82,11 +82,14 @@ class EventEmitter extends Disposable {
 		if (!this.events_[event]) {
 			this.events_[event] = [];
 		}
-		this.events_[event].push({
-			default: opt_default,
-			fn: listener,
-			origin: opt_origin
-		});
+		if (opt_default || opt_origin) {
+			listener = {
+				default: opt_default,
+				fn: listener,
+				origin: opt_origin
+			};
+		}
+		this.events_[event].push(listener);
 	}
 
 	/**
@@ -124,15 +127,16 @@ class EventEmitter extends Disposable {
 
 		var defaultListeners = [];
 		for (var i = 0; i < listeners.length; i++) {
+			const listener = listeners[i].fn || listeners[i];
 			if (listeners[i].default) {
-				defaultListeners.push(listeners[i]);
+				defaultListeners.push(listener);
 			} else {
-				listeners[i].fn.apply(this, args);
+				listener.apply(this, args);
 			}
 		}
 		if (!facade || !facade.preventedDefault) {
 			for (var j = 0; j < defaultListeners.length; j++) {
-				defaultListeners[j].fn.apply(this, args);
+				defaultListeners[j].apply(this, args);
 			}
 		}
 
@@ -155,7 +159,9 @@ class EventEmitter extends Disposable {
 	 * @return {Array} Array of listeners.
 	 */
 	listeners(event) {
-		return (this.events_[event] || []).map(listener => listener.fn);
+		return (this.events_[event] || []).map(
+			listener => listener.fn ? listener.fn : listener
+		);
 	}
 
 	/**
@@ -213,7 +219,8 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	matchesListener_(listenerObj, listener) {
-		return listenerObj.fn === listener ||
+		const fn = listenerObj.fn || listenerObj;
+		return fn === listener ||
 			(listenerObj.origin && listenerObj.origin === listener);
 	}
 

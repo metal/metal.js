@@ -99,10 +99,10 @@ class Component extends EventEmitter {
 
 		/**
 		 * The `EventHandler` instance for events attached from the `events` state key.
-		 * @type {!EventHandler}
+		 * @type {EventHandler}
 		 * @protected
 		 */
-		this.eventsStateKeyHandler_ = new EventHandler();
+		this.eventsStateKeyHandler_ = null;
 
 		/**
 		 * Whether the element is in document.
@@ -182,6 +182,9 @@ class Component extends EventEmitter {
 					handler = this.delegate(eventNames[i], info.selector, info.fn);
 				} else {
 					handler = this.on(eventNames[i], info.fn);
+				}
+				if (!this.eventsStateKeyHandler_) {
+					this.eventsStateKeyHandler_ = new EventHandler();
 				}
 				this.eventsStateKeyHandler_.add(handler);
 			}
@@ -516,7 +519,9 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	onEventsChanged_(event) {
-		this.eventsStateKeyHandler_.removeAllListeners();
+		if (this.eventsStateKeyHandler_) {
+			this.eventsStateKeyHandler_.removeAllListeners();
+		}
 		this.addListenersFromObj_(event.newVal);
 	}
 

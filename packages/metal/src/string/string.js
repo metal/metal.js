@@ -2,6 +2,26 @@
 
 class string {
 	/**
+	 * Compares the given strings without taking the case into account.
+	 * @param {string|number} str1
+	 * @param {string|number} str2
+	 * @return {number} Either -1, 0 or 1, according to if the first string is
+	 *     "smaller", equal or "bigger" than the second given string.
+	 */
+	static caseInsensitiveCompare(str1, str2) {
+	  var test1 = String(str1).toLowerCase();
+	  var test2 = String(str2).toLowerCase();
+
+	  if (test1 < test2) {
+	    return -1;
+	  } else if (test1 === test2) {
+	    return 0;
+	  } else {
+	    return 1;
+	  }
+	}
+
+	/**
 	 * Removes the breaking spaces from the left and right of the string and
 	 * collapses the sequences of breaking spaces in the middle into single spaces.
 	 * The original and the result strings render the same way in HTML.

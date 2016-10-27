@@ -25,7 +25,7 @@ class EventEmitterProxy extends Disposable {
 		 * @type {Object}
 		 * @protected
 		 */
-		this.blacklist_ = opt_blacklist || {};
+		this.blacklist_ = opt_blacklist;
 
 		/**
 		 * The origin emitter. This emitter's events will be proxied through the
@@ -39,17 +39,17 @@ class EventEmitterProxy extends Disposable {
 		 * A list of events that are pending to be listened by an actual origin
 		 * emitter. Events are stored here when the origin doesn't exist, so they
 		 * can be set on a new origin when one is set.
-		 * @type {!Array}
+		 * @type {Array}
 		 * @protected
 		 */
-		this.pendingEvents_ = [];
+		this.pendingEvents_ = null;
 
 		/**
 		 * Holds a map of events from the origin emitter that are already being proxied.
 		 * @type {Object<string, !EventHandle>}
 		 * @protected
 		 */
-		this.proxiedEvents_ = {};
+		this.proxiedEvents_ = null;
 
 		/**
 		 * The target emitter. This emitter will emit all events that come from
@@ -125,12 +125,14 @@ class EventEmitterProxy extends Disposable {
 	 * @protected
 	 */
 	removeListeners_() {
-		var events = Object.keys(this.proxiedEvents_);
-		for (var i = 0; i < events.length; i++) {
-			this.proxiedEvents_[events[i]].removeListener();
+		if (this.proxiedEvents_) {
+			var events = Object.keys(this.proxiedEvents_);
+			for (var i = 0; i < events.length; i++) {
+				this.proxiedEvents_[events[i]].removeListener();
+			}
+			this.proxiedEvents_ = null;
 		}
-		this.proxiedEvents_ = {};
-		this.pendingEvents_ = [];
+		this.pendingEvents_ = null;
 	}
 
 	/**
@@ -140,12 +142,14 @@ class EventEmitterProxy extends Disposable {
 	 * @param {!EventEmitter} originEmitter
 	 */
 	setOriginEmitter(originEmitter) {
-		var events = this.originEmitter_ ?
+		var events = this.originEmitter_ && this.proxiedEvents_ ?
 			Object.keys(this.proxiedEvents_) :
 			this.pendingEvents_;
-		this.removeListeners_();
 		this.originEmitter_ = originEmitter;
-		events.forEach(event => this.proxyEvent(event));
+		if (events) {
+			this.removeListeners_();
+			events.forEach(event => this.proxyEvent(event));
+		}
 	}
 
 	/**
@@ -158,10 +162,10 @@ class EventEmitterProxy extends Disposable {
 		if (this.whitelist_ && !this.whitelist_[event]) {
 			return false;
 		}
-		if (this.blacklist_[event]) {
+		if (this.blacklist_ && this.blacklist_[event]) {
 			return false;
 		}
-		return !this.proxiedEvents_[event];
+		return !this.proxiedEvents_ || !this.proxiedEvents_[event];
 	}
 
 	/**
@@ -180,8 +184,10 @@ class EventEmitterProxy extends Disposable {
 	 */
 	tryToAddListener_(event) {
 		if (this.originEmitter_) {
+			this.proxiedEvents_ = this.proxiedEvents_ || {};
 			this.proxiedEvents_[event] = this.addListenerForEvent_(event);
 		} else {
+			this.pendingEvents_ = this.pendingEvents_ || [];
 			this.pendingEvents_.push(event);
 		}
 	}

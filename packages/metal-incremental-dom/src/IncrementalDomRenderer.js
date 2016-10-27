@@ -237,14 +237,8 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			obj = domData.get(element);
 		}
 		obj.incDomData_ = obj.incDomData_ || {
-			currComps: {
-				keys: {},
-				order: {}
-			},
-			prevComps: {
-				keys: {},
-				order: {}
-			}
+			currComps: {},
+			prevComps: {}
 		};
 		return obj.incDomData_;
 	}
@@ -317,21 +311,31 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 		const ref = this.getRef_(config);
-		var data = IncrementalDomRenderer.getCurrentData();
 		var comp;
 		if (isDef(ref)) {
 			comp = this.match_(owner.components[ref], Ctor, config);
 			owner.addSubComponent(ref, comp);
 			owner.refs[ref] = comp;
-		} else if (isDef(config.key)) {
-			comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
-			data.currComps.keys[config.key] = comp;
 		} else {
-			var type = getUid(Ctor, true);
-			data.currComps.order[type] = data.currComps.order[type] || [];
-			var order = data.currComps.order[type];
-			comp = this.match_((data.prevComps.order[type] || [])[order.length], Ctor, config);
-			order.push(comp);
+			var data = IncrementalDomRenderer.getCurrentData();
+			if (isDef(config.key)) {
+				if (!data.prevComps.keys) {
+					data.prevComps.keys = {};
+					data.currComps.keys = {};
+				}
+				comp = this.match_(data.prevComps.keys[config.key], Ctor, config);
+				data.currComps.keys[config.key] = comp;
+			} else {
+				if (!data.prevComps.order) {
+					data.prevComps.order = {};
+					data.currComps.order = {};
+				}
+				var type = getUid(Ctor, true);
+				data.currComps.order[type] = data.currComps.order[type] || [];
+				var order = data.currComps.order[type];
+				comp = this.match_((data.prevComps.order[type] || [])[order.length], Ctor, config);
+				order.push(comp);
+			}
 		}
 
 		return comp;
@@ -440,7 +444,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	handleInterceptedCloseCall_(tag) {
 		var element = IncrementalDomAop.getOriginalFn('elementClose')(tag);
-		this.resetData_(domData.get(element).incDomData_);
+		if (domData.has(element)) {
+			this.resetData_(domData.get(element).incDomData_);
+		}
 		return element;
 	}
 
@@ -815,10 +821,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	resetData_(data) {
 		if (data) {
-			data.prevComps.keys = data.currComps.keys;
-			data.prevComps.order = data.currComps.order;
-			data.currComps.keys = {};
-			data.currComps.order = {};
+			if (data.currComps.keys) {
+				data.prevComps.keys = data.currComps.keys;
+				data.currComps.keys = {};
+			}
+			if (data.currComps.order) {
+				data.prevComps.order = data.currComps.order;
+				data.currComps.order = {};
+			}
 		}
 	}
 

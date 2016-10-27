@@ -17,6 +17,15 @@ class domData {
 		}
 		return element[METAL_DATA];
 	}
+
+	/**
+	 * Checks if the given element has data stored in it.
+	 * @param {!Element} element
+	 * @return {boolean}
+	 */
+	static has(element) {
+		return !!element[METAL_DATA];
+	}
 }
 
 export default domData;

@@ -30,7 +30,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		comp.context = {};
 		comp.refs = {};
 		this.config_ = comp.getInitialConfig();
-		this.childComponents_ = [];
 		this.clearChanges_();
 
 		// Binds functions that will be used many times, to avoid creating new
@@ -170,14 +169,16 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			delete owner.components[ref];
 		}
 
-		for (var i = 0; i < this.childComponents_.length; i++) {
-			const child = this.childComponents_[i];
-			if (!child.isDisposed()) {
-				child.element = null;
-				child.dispose();
+		if (this.childComponents_) {
+			for (var i = 0; i < this.childComponents_.length; i++) {
+				const child = this.childComponents_[i];
+				if (!child.isDisposed()) {
+					child.element = null;
+					child.dispose();
+				}
 			}
+			this.childComponents_ = null;
 		}
-		this.childComponents_ = null;
 	}
 
 	/**
@@ -201,6 +202,15 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!currRenderer.rootElementReached_ && currRenderer.config_.key) {
 			return currRenderer.config_.key;
 		}
+	}
+
+	/**
+	 * Gets this renderer's current child components.
+	 * @return {!Array<!Component>}
+	 */
+	getChildComponents() {
+		this.childComponents_ = this.childComponents_ || [];
+		return this.childComponents_;
 	}
 
 	/**
@@ -742,8 +752,10 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		IncrementalDomRenderer.startedRenderingComponent(this.component_);
 		this.clearChanges_();
 		this.rootElementReached_ = false;
-		IncrementalDomUnusedComponents.schedule(this.childComponents_);
-		this.childComponents_ = [];
+		if (this.childComponents_) {
+			IncrementalDomUnusedComponents.schedule(this.childComponents_);
+			this.childComponents_ = null;
+		}
 		this.component_.refs = {};
 		this.intercept_();
 		this.renderIncDom();
@@ -775,7 +787,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (renderer instanceof IncrementalDomRenderer) {
 			const parentComp = IncrementalDomRenderer.getComponentBeingRendered();
 			const parentRenderer = parentComp.getRenderer();
-			parentRenderer.childComponents_.push(comp);
+			parentRenderer.getChildComponents().push(comp);
 			renderer.parent_ = parentComp;
 			renderer.owner_ = owner;
 			if (!config.key && !parentRenderer.rootElementReached_) {
@@ -834,7 +846,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * render update cycles.
 	 */
 	skipNextChildrenDisposal() {
-		this.childComponents_ = [];
+		this.childComponents_ = null;
 	}
 
 	/**

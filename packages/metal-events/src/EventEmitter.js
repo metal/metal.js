@@ -3,6 +3,8 @@
 import { array, Disposable, isFunction, isString } from 'metal';
 import EventHandle from './EventHandle';
 
+const singleArray_ = [0];
+
 /**
  * EventEmitter utility.
  * @constructor
@@ -45,22 +47,22 @@ class EventEmitter extends Disposable {
 
 	/**
 	 * Adds a listener to the end of the listeners array for the specified events.
-	 * @param {!(Array|string)} events
+	 * @param {!(Array|string)} event
 	 * @param {!Function} listener
 	 * @param {boolean} opt_default Flag indicating if this listener is a default
 	 *   action for this event. Default actions are run last, and only if no previous
 	 *   listener call `preventDefault()` on the received event facade.
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
-	addListener(events, listener, opt_default) {
+	addListener(event, listener, opt_default) {
 		this.validateListener_(listener);
 
-		events = this.normalizeEvents_(events);
+		const events = this.toEventsArray_(event);
 		for (var i = 0; i < events.length; i++) {
 			this.addSingleListener_(events[i], listener, opt_default);
 		}
 
-		return new EventHandle(this, events, listener);
+		return new EventHandle(this, event, listener);
 	}
 
 	/**
@@ -172,19 +174,19 @@ class EventEmitter extends Disposable {
 	 * Adds a listener that will be invoked a fixed number of times for the
 	 * events. After each event is triggered the specified amount of times, the
 	 * listener is removed for it.
-	 * @param {!(Array|string)} events
+	 * @param {!(Array|string)} event
 	 * @param {number} amount The amount of times this event should be listened
 	 * to.
 	 * @param {!Function} listener
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
-	many(events, amount, listener) {
-		events = this.normalizeEvents_(events);
+	many(event, amount, listener) {
+		const events = this.toEventsArray_(event);
 		for (var i = 0; i < events.length; i++) {
 			this.many_(events[i], amount, listener);
 		}
 
-		return new EventHandle(this, events, listener);
+		return new EventHandle(this, event, listener);
 	}
 
 	/**
@@ -229,26 +231,16 @@ class EventEmitter extends Disposable {
 	}
 
 	/**
-	 * Converts the parameter to an array if only one event is given.
-	 * @param  {!(Array|string)} events
-	 * @return {!Array}
-	 * @protected
-	 */
-	normalizeEvents_(events) {
-		return isString(events) ? [events] : events;
-	}
-
-	/**
 	 * Removes a listener for the specified events.
 	 * Caution: changes array indices in the listener array behind the listener.
 	 * @param {!(Array|string)} events
 	 * @param {!Function} listener
 	 * @return {!Object} Returns emitter, so calls can be chained.
 	 */
-	off(events, listener) {
+	off(event, listener) {
 		this.validateListener_(listener);
 
-		events = this.normalizeEvents_(events);
+		const events = this.toEventsArray_(event);
 		for (var i = 0; i < events.length; i++) {
 			this.events_[events[i]] = this.removeMatchingListenerObjs_(
 				toArray(this.events_[events[i]]),
@@ -298,7 +290,7 @@ class EventEmitter extends Disposable {
 	 */
 	removeAllListeners(opt_events) {
 		if (opt_events) {
-			var events = this.normalizeEvents_(opt_events);
+			var events = this.toEventsArray_(opt_events);
 			for (var i = 0; i < events.length; i++) {
 				this.events_[events[i]] = null;
 			}
@@ -346,6 +338,22 @@ class EventEmitter extends Disposable {
 	setShouldUseFacade(shouldUseFacade) {
 		this.shouldUseFacade_ = shouldUseFacade;
 		return this;
+	}
+
+	/**
+	 * Converts the parameter to an array if only one event is given. Reuses the
+	 * same array each time this conversion is done, to avoid using more memory
+	 * than necessary.
+	 * @param  {!(Array|string)} events
+	 * @return {!Array}
+	 * @protected
+	 */
+	toEventsArray_(events) {
+		if (isString(events)) {
+			singleArray_[0] = events;
+			events = singleArray_;
+		}
+		return events;
 	}
 
 	/**

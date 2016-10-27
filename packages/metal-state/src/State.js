@@ -41,10 +41,10 @@ class State extends EventEmitter {
 
 		/**
 		 * Map of keys that can not be used as state keys.
-		 * @type {!Object<string, boolean>}
+		 * @type {Object<string, boolean>}
 		 * @protected
 		 */
-		this.keysBlacklist_ = {};
+		this.keysBlacklist_ = null;
 
 		/**
 		 * Object that should hold the state properties.
@@ -53,7 +53,7 @@ class State extends EventEmitter {
 		 */
 		this.obj_ = opt_obj || this;
 
-		this.eventData_ = {};
+		this.eventData_ = null;
 
 		/**
 		 * Object with information about the batch event that is currently
@@ -113,7 +113,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	assertValidStateKeyName_(name) {
-		if (this.keysBlacklist_[name]) {
+		if (this.keysBlacklist_ && this.keysBlacklist_[name]) {
 			throw new Error('It\'s not allowed to create a state key with the name "' + name + '".');
 		}
 	}

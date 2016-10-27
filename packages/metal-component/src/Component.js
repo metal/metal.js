@@ -136,6 +136,7 @@ class Component extends EventEmitter {
 		mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
 		mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
 
+		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;
 
 		this.renderer_ = this.createRenderer();

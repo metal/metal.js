@@ -16,10 +16,10 @@ class EventEmitter extends Disposable {
 
 		/**
 		 * Holds event listeners scoped by event type.
-		 * @type {!Object<string, !Array<!function()>>}
+		 * @type {Object<string, !Array<!function()>>}
 		 * @protected
 		 */
-		this.events_ = {};
+		this.events_ = null;
 
 		/**
 		 * Handlers that are triggered when an event is listened to.
@@ -86,6 +86,7 @@ class EventEmitter extends Disposable {
 				origin: opt_origin
 			};
 		}
+		this.events_ = this.events_ || {};
 		if (!this.events_[event]) {
 			this.events_[event] = listener;
 		} else {
@@ -101,7 +102,7 @@ class EventEmitter extends Disposable {
 	 * @override
 	 */
 	disposeInternal() {
-		this.events_ = {};
+		this.events_ = null;
 	}
 
 	/**
@@ -111,7 +112,7 @@ class EventEmitter extends Disposable {
 	 * @return {boolean} Returns true if event had listeners, false otherwise.
 	 */
 	emit(event) {
-		var listeners = toArray(this.events_[event]).concat();
+		var listeners = toArray(this.getRawListeners_(event)).concat();
 		if (listeners.length === 0) {
 			return false;
 		}
@@ -148,6 +149,16 @@ class EventEmitter extends Disposable {
 	}
 
 	/**
+	 * Gets the listener objects for the given event, if there are any.
+	 * @param {string} event
+	 * @return {Array}
+	 * @protected
+	 */
+	getRawListeners_(event) {
+		return this.events_ && this.events_[event];
+	}
+
+	/**
 	 * Gets the configuration option which determines if an event facade should
 	 * be sent as a param of listeners when emitting events. If set to true, the
 	 * facade will be passed as the first argument of the listener.
@@ -163,7 +174,7 @@ class EventEmitter extends Disposable {
 	 * @return {Array} Array of listeners.
 	 */
 	listeners(event) {
-		return toArray(this.events_[event]).map(
+		return toArray(this.getRawListeners_(event)).map(
 			listener => listener.fn ? listener.fn : listener
 		);
 	}
@@ -237,6 +248,9 @@ class EventEmitter extends Disposable {
 	 */
 	off(event, listener) {
 		this.validateListener_(listener);
+		if (!this.events_) {
+			return this;
+		}
 
 		const events = this.toEventsArray_(event);
 		for (var i = 0; i < events.length; i++) {
@@ -288,13 +302,15 @@ class EventEmitter extends Disposable {
 	 * @return {!Object} Returns emitter, so calls can be chained.
 	 */
 	removeAllListeners(opt_events) {
-		if (opt_events) {
-			var events = this.toEventsArray_(opt_events);
-			for (var i = 0; i < events.length; i++) {
-				this.events_[events[i]] = null;
+		if (this.events_) {
+			if (opt_events) {
+				var events = this.toEventsArray_(opt_events);
+				for (var i = 0; i < events.length; i++) {
+					this.events_[events[i]] = null;
+				}
+			} else {
+				this.events_ = null;
 			}
-		} else {
-			this.events_ = {};
 		}
 		return this;
 	}

@@ -145,7 +145,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	buildShouldUpdateArgs_() {
-		return [this.changes_];
+		return [this.changes_ || {}];
 	}
 
 	/**
@@ -153,7 +153,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected;
 	 */
 	clearChanges_() {
-		this.changes_ = {};
+		this.changes_ = null;
 	}
 
 	/**
@@ -513,6 +513,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	handleStateKeyChanged_(data) {
+		this.changes_ = this.changes_ || {};
 		this.changes_[data.key] = data;
 	}
 
@@ -537,7 +538,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	hasDataChanged_() {
-		return Object.keys(this.changes_).length > 0;
+		return this.changes_ && Object.keys(this.changes_).length > 0;
 	}
 
 	/**

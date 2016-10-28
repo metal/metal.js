@@ -57,7 +57,7 @@ export function collectSuperClassesProperty(constructor, propertyName) {
  * Disables Metal.js's compatibility mode.
  */
 export function disableCompatibilityMode() {
-	compatibilityModeData_ = null;
+	compatibilityModeData_ = undefined;
 }
 
 /**
@@ -87,7 +87,7 @@ export function enableCompatibilityMode(opt_data = {}) {
  */
 export function getCompatibilityModeData() {
 	// Compatibility mode can be set via the __METAL_COMPATIBILITY__ global var.
-	if (!compatibilityModeData_) {
+	if (compatibilityModeData_ === undefined) {
 		if (typeof window !== 'undefined' && window.__METAL_COMPATIBILITY__) {
 			enableCompatibilityMode(window.__METAL_COMPATIBILITY__);
 		}

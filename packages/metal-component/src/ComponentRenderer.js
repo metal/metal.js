@@ -21,11 +21,6 @@ class ComponentRenderer extends Disposable {
 				'stateKeyChanged',
 				this.handleRendererStateKeyChanged_.bind(this)
 			);
-		} else {
-			this.component_.on(
-				'stateChanged',
-				this.handleRendererStateChanged_.bind(this)
-			);
 		}
 	}
 
@@ -54,21 +49,6 @@ class ComponentRenderer extends Disposable {
 		this.isRendered_ = true;
 		this.component_.rendered(firstRender);
 		this.component_.emit('rendered', firstRender);
-	}
-
-	/**
-	 * Handles a `dataChanged` event from the component's data manager. Calls the
-	 * `update` function if the component has already been rendered for the first
-	 * time.
-	 * @param {!Object<string, Object>} changes Object containing the names
-	 *     of all changed state keys, each mapped to an object with its new
-	 *     (newVal) and previous (prevVal) values.
-	 * @protected
-	 */
-	handleRendererStateChanged_(changes) {
-		if (this.shouldRerender_()) {
-			this.update(changes);
-		}
 	}
 
 	/**
@@ -105,6 +85,19 @@ class ComponentRenderer extends Disposable {
 	 */
 	shouldRerender_() {
 		return this.isRendered_ && !this.skipUpdates_;
+	}
+
+	/**
+	 * Rerenders the component according to the given changes.
+	 * @param {!Object<string, Object>} changes Object containing the names
+	 *     of all changed state keys, each mapped to an object with its new
+	 *     (newVal) and previous (prevVal) values.
+	 */
+	sync(changes) {
+		if (!this.component_.constructor.SYNC_UPDATES_MERGED &&
+			this.shouldRerender_()) {
+			this.update(changes);
+		}
 	}
 
 	/**

@@ -466,6 +466,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleStateChanged_(event) {
+		this.getRenderer().sync(event);
 		this.syncStateFromChanges_(event.changes);
 		this.emit('stateSynced', event);
 	}

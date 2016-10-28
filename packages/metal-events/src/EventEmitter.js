@@ -46,6 +46,28 @@ class EventEmitter extends Disposable {
 	}
 
 	/**
+	 * Adds a handler to given holder variable. If the holder doesn't have a
+	 * value yet, it will receive the handler directly. If the holder is an array,
+	 * the value will just be added to it. Otherwise, the holder will be set to a
+	 * new array containing its previous value plus the new handler.
+	 * @param {*} holder
+	 * @param {!function()|Object} handler
+	 * @return {*} The holder's new value.
+	 * @protected
+	 */
+	addHandler_(holder, handler) {
+		if (!holder) {
+			holder = handler;
+		} else {
+			if (!Array.isArray(holder)) {
+				holder = [holder];
+			}
+			holder.push(handler);
+		}
+		return holder;
+	}
+
+	/**
 	 * Adds a listener to the end of the listeners array for the specified events.
 	 * @param {!(Array|string)} event
 	 * @param {!Function} listener
@@ -87,14 +109,7 @@ class EventEmitter extends Disposable {
 			};
 		}
 		this.events_ = this.events_ || {};
-		if (!this.events_[event]) {
-			this.events_[event] = listener;
-		} else {
-			if (!Array.isArray(this.events_[event])) {
-				this.events_[event] = [this.events_[event]];
-			}
-			this.events_[event].push(listener);
-		}
+		this.events_[event] = this.addHandler_(this.events_[event], listener);
 	}
 
 	/**
@@ -279,8 +294,7 @@ class EventEmitter extends Disposable {
 	 * @param {!function()}
 	 */
 	onListener(handler) {
-		this.listenerHandlers_ = this.listenerHandlers_ || [];
-		this.listenerHandlers_.push(handler);
+		this.listenerHandlers_ = this.addHandler_(this.listenerHandlers_, handler);
 	}
 
 	/**
@@ -349,9 +363,11 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	runListenerHandlers_(event) {
-		if (this.listenerHandlers_) {
-			for (var i = 0; i < this.listenerHandlers_.length; i++) {
-				this.listenerHandlers_[i](event);
+		let handlers = this.listenerHandlers_;
+		if (handlers) {
+			handlers = toArray(handlers);
+			for (var i = 0; i < handlers.length; i++) {
+				handlers[i](event);
 			}
 		}
 	}

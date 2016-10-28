@@ -90,11 +90,7 @@ class Component extends EventEmitter {
 		this.elementEventProxy_ = new DomEventEmitterProxy(
 			null,
 			this,
-			{
-				eventsChanged: true,
-				stateChanged: true,
-				stateKeyChanged: true
-			}
+			proxyBlackList_
 		);
 
 		/**
@@ -778,5 +774,11 @@ Component.SYNC_UPDATES = false;
  * a component or not.
  */
 Component.prototype[Component.COMPONENT_FLAG] = true;
+
+const proxyBlackList_ = {
+	eventsChanged: true,
+	stateChanged: true,
+	stateKeyChanged: true
+};
 
 export default Component;

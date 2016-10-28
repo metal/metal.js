@@ -908,7 +908,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	updateContext_(comp) {
 		var context = comp.context;
 		var parent = IncrementalDomRenderer.getComponentBeingRendered();
-		var childContext = parent.getChildContext ? parent.getChildContext() : {};
+		var childContext = parent.getChildContext ? parent.getChildContext() : null;
 		object.mixin(context, parent.context, childContext);
 		comp.context = context;
 	}

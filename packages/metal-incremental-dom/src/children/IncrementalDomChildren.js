@@ -58,9 +58,11 @@ class IncrementalDomChildren {
 	 * @param {!{args: Array, children: !Array, isText: ?boolean}}
 	 * @param {function()=} opt_skipNode Optional function that is called for
 	 *     each node to be rendered. If it returns true, the node will be skipped.
+	 * @param {Object=} opt_context Optional context that will be used when
+	 *     calling the given functions.
 	 * @protected
 	 */
-	static render(tree, opt_skipNode) {
+	static render(tree, opt_skipNode, opt_context) {
 		if (isCapturing_) {
 			// If capturing, just add the node directly to the captured tree.
 			addChildToTree(tree);
@@ -68,7 +70,7 @@ class IncrementalDomChildren {
 		}
 
 		currNodeOwner_ = IncrementalDomChildren.getOwner(tree);
-		if (opt_skipNode && opt_skipNode(tree)) {
+		if (opt_skipNode && opt_skipNode.call(opt_context, tree)) {
 			currNodeOwner_ = null;
 			return;
 		}
@@ -82,7 +84,11 @@ class IncrementalDomChildren {
 			IncrementalDOM.elementOpen.apply(null, args);
 			if (tree.props.children) {
 				for (var i = 0; i < tree.props.children.length; i++) {
-					IncrementalDomChildren.render(tree.props.children[i], opt_skipNode);
+					IncrementalDomChildren.render(
+						tree.props.children[i],
+						opt_skipNode,
+						opt_context
+					);
 				}
 			}
 			IncrementalDOM.elementClose(tree.tag);
@@ -140,7 +146,7 @@ function handleInterceptedCloseCall_() {
 	if (currentParent_ === tree_) {
 		IncrementalDomAop.stopInterception();
 		isCapturing_ = false;
-		callback_(tree_);
+		callback_.call(renderer_, tree_);
 		callback_ = null;
 		currentParent_ = null;
 		renderer_ = null;

@@ -33,12 +33,15 @@ class IncrementalDomAop {
 	 *     to the function that should intercept it. All interceptors will receive
 	 *     the original function as the first argument, the actual arguments from
 	 *     from the original call following it.
+	 * @param {Object=} opt_context Optional context that will be used when
+	 *     calling the given functions.
 	 */
-	static startInterception(fns) {
+	static startInterception(fns, opt_context) {
 		fns.attr = fnAttr;
 		fns.elementOpenEnd = fnOpenEnd;
 		fns.elementOpenStart = fnOpenStart;
 		fns.elementVoid = fnVoid;
+		fns.context = opt_context;
 		fnStack.push(fns);
 	}
 
@@ -83,8 +86,8 @@ function fnVoid() {
 	return IncrementalDOM.elementClose.apply(null, arguments);
 }
 
-function getFn(name) {
-	return fnStack.length > 0 && fnStack[fnStack.length - 1][name];
+function getStack() {
+	return fnStack.length > 0 ? fnStack[fnStack.length - 1] : null;
 }
 
 function buildHandleCall(name) {
@@ -95,8 +98,9 @@ function buildHandleCall(name) {
 
 function handleCall() {
 	const name = this.name; // jshint ignore:line
-	var fn = getFn(name) || originalFns[name];
-	return fn.apply(null, arguments);
+	const stack = getStack();
+	const fn = (stack && stack[name]) || originalFns[name];
+	return fn.apply(stack ? stack.context : null, arguments);
 }
 
 IncrementalDOM.attr = buildHandleCall('attr');

@@ -34,16 +34,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 		// Binds functions that will be used many times, to avoid creating new
 		// functions each time.
-		this.handleInterceptedAttributesCall_ =
-			this.handleInterceptedAttributesCall_.bind(this);
-		this.handleInterceptedCloseCall_ =
-			this.handleInterceptedCloseCall_.bind(this);
-		this.handleInterceptedOpenCall_ =
-			this.handleInterceptedOpenCall_.bind(this);
-		this.handleChildrenCaptured_ = this.handleChildrenCaptured_.bind(this);
-		this.handleChildRender_ = this.handleChildRender_.bind(this);
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
-
 
 		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
 			// If the component is being updated synchronously we'll just reuse the
@@ -552,7 +543,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			attributes: this.handleInterceptedAttributesCall_,
 			elementClose: this.handleInterceptedCloseCall_,
 			elementOpen: this.handleInterceptedOpenCall_
-		});
+		}, this);
 	}
 
 	/**
@@ -702,7 +693,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	renderChild(child) {
 		this.intercept_();
-		IncrementalDomChildren.render(child, this.handleChildRender_);
+		IncrementalDomChildren.render(child, this.handleChildRender_, this);
 		IncrementalDomAop.stopInterception();
 	}
 

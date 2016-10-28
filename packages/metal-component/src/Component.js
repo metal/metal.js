@@ -140,12 +140,10 @@ class Component extends EventEmitter {
 		this.element = this.initialConfig_.element;
 
 		this.renderer_ = this.createRenderer();
-		this.renderer_.on('rendered', this.handleRendererRendered_.bind(this));
-
 		this.dataManager_ = this.constructor.DATA_MANAGER_MERGED;
 		this.dataManager_.setUp(
 			this,
-			object.mixin({}, Component.DATA, this.getRenderer().getExtraDataConfig())
+			object.mixin({}, Component.DATA, this.renderer_.getExtraDataConfig())
 		);
 
 		this.on('stateChanged', this.handleStateChanged_);
@@ -463,16 +461,6 @@ class Component extends EventEmitter {
 	 */
 	getRenderer() {
 		return this.renderer_;
-	}
-
-	/**
-	 * Handles a `rendered` event from the current renderer instance.
-	 * @param {!Object}
-	 * @protected
-	 */
-	handleRendererRendered_(data) {
-		this.rendered(data);
-		this.emit('rendered', data);
 	}
 
 	/**

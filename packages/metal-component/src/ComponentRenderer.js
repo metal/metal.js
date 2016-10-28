@@ -1,12 +1,12 @@
 'use strict';
 
-import { EventEmitter } from 'metal-events';
+import { Disposable } from 'metal';
 
 /**
  * Base class that component renderers should extend from. It defines the
  * required methods all renderers should have.
  */
-class ComponentRenderer extends EventEmitter {
+class ComponentRenderer extends Disposable {
 	/**
 	 * Constructor function for `ComponentRenderer`.
 	 * @param {!Component} component The component that this renderer is
@@ -52,7 +52,8 @@ class ComponentRenderer extends EventEmitter {
 	handleRendered_() {
 		var firstRender = !this.isRendered_;
 		this.isRendered_ = true;
-		this.emit('rendered', firstRender);
+		this.component_.rendered(firstRender);
+		this.component_.emit('rendered', firstRender);
 	}
 
 	/**

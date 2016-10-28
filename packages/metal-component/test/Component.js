@@ -114,36 +114,27 @@ describe('Component', function() {
 			assert.strictEqual('.sibling', attachData.sibling);
 		});
 
-		it('should run "rendered" lifecycle method when rendered indicates that component was rerendered', function() {
+		it('should run "rendered" lifecycle method when the component is rendered', function() {
 			class TestComponent extends Component {
 			}
 			sinon.spy(TestComponent.prototype, 'rendered');
 			comp = new TestComponent();
 
-			var renderer = comp.getRenderer();
 			assert.strictEqual(1, comp.rendered.callCount);
 			assert.ok(comp.rendered.args[0][0]);
-
-			renderer.emit('rendered', false);
-			assert.strictEqual(2, comp.rendered.callCount);
-			assert.ok(!comp.rendered.args[1][0]);
 		});
 
-		it('should emit "rendered" event when the renderer indicates the component was rendered', function() {
+		it('should emit "rendered" event when the component is rendered', function() {
+			var listener = sinon.stub();
 			class TestComponent extends Component {
+				created() {
+					this.on('rendered', listener);
+				}
 			}
 			comp = new TestComponent();
 
-			var listener = sinon.stub();
-			comp.on('rendered', listener);
-
-			comp.getRenderer().emit('rendered', true);
 			assert.strictEqual(1, listener.callCount);
 			assert.ok(listener.args[0][0]);
-
-			comp.getRenderer().emit('rendered', false);
-			assert.strictEqual(2, listener.callCount);
-			assert.ok(!listener.args[1][0]);
 		});
 
 		it('should return component instance from lifecycle triggering methods', function() {

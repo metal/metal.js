@@ -89,8 +89,7 @@ function addClassesWithoutNative_(element, classes) {
  * @private
  */
 function addElementListener_(element, eventName, listener) {
-	var data = domData.get(element);
-	addToArr_(data.listeners, eventName, listener);
+	addToArr_(domData.get(element, 'listeners', {}), eventName, listener);
 }
 
 /**
@@ -103,8 +102,8 @@ function addElementListener_(element, eventName, listener) {
  * @private
  */
 function addSelectorListener_(element, eventName, selector, listener) {
-	var data = domData.get(element);
-	addToArr_(data.delegating[eventName].selectors, selector, listener);
+	const delegatingData = domData.get(element, 'delegating', {});
+	addToArr_(delegatingData[eventName].selectors, selector, listener);
 }
 
 /**
@@ -129,9 +128,9 @@ function addToArr_(arr, key, value) {
  * @private
  */
 function attachDelegateEvent_(element, eventName) {
-	var data = domData.get(element);
-	if (!data.delegating[eventName]) {
-		data.delegating[eventName] = {
+	var delegatingData = domData.get(element, 'delegating', {});
+	if (!delegatingData[eventName]) {
+		delegatingData[eventName] = {
 			handle: on(
 				element,
 				eventName,
@@ -806,11 +805,11 @@ function triggerListeners_(listeners, event, element, defaultFns) {
  * @private
  */
 function triggerMatchedListeners_(container, element, event, defaultFns) {
-	var data = domData.get(element);
-	var listeners = data.listeners[event.type];
+	var listeners = domData.get(element, 'listeners', {})[event.type];
 	var ret = triggerListeners_(listeners, event, element, defaultFns);
 
-	var selectorsMap = domData.get(container).delegating[event.type].selectors;
+	const delegatingData = domData.get(container, 'delegating', {});
+	var selectorsMap = delegatingData[event.type].selectors;
 	var selectors = Object.keys(selectorsMap);
 	for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
 		if (match(element, selectors[i])) {

@@ -322,8 +322,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				data.currComps.order = data.currComps.order || [];
 				data.currComps.order[type] = data.currComps.order[type] || [];
 				var order = data.currComps.order[type];
+				var prevOrder = data.prevComps.order && data.prevComps.order[type];
 				comp = this.match_(
-					data.prevComps.order ? (data.prevComps.order[type] || [])[order.length] : null,
+					prevOrder ? prevOrder[order.length] : null,
 					Ctor,
 					config
 				);

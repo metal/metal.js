@@ -227,10 +227,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (renderer.rootElementReached_ && element !== comp.element.parentNode) {
 			obj = domData.get(element);
 		}
-		obj.incDomData_ = obj.incDomData_ || {
-			currComps: {},
-			prevComps: {}
-		};
+		obj.incDomData_ = obj.incDomData_ || {};
 		return obj.incDomData_;
 	}
 
@@ -296,40 +293,34 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	getSubComponent_(tagOrCtor, config, owner) {
-		var Ctor = tagOrCtor;
+		let Ctor = tagOrCtor;
 		if (isString(Ctor)) {
 			Ctor = ComponentRegistry.getConstructor(tagOrCtor);
 		}
 
 		const ref = this.getRef_(config);
-		var comp;
+		let comp;
 		if (isDef(ref)) {
 			comp = this.match_(owner.components[ref], Ctor, config);
 			owner.addSubComponent(ref, comp);
 			owner.refs[ref] = comp;
 		} else {
-			var data = IncrementalDomRenderer.getCurrentData();
-			if (isDef(config.key)) {
-				comp = this.match_(
-					data.prevComps.keys ? data.prevComps.keys[config.key] : null,
-					Ctor,
-					config
-				);
-				data.currComps.keys = data.currComps.keys || {};
-				data.currComps.keys[config.key] = comp;
-			} else {
-				var type = getUid(Ctor, true);
-				data.currComps.order = data.currComps.order || [];
-				data.currComps.order[type] = data.currComps.order[type] || [];
-				var order = data.currComps.order[type];
-				var prevOrder = data.prevComps.order && data.prevComps.order[type];
-				comp = this.match_(
-					prevOrder ? prevOrder[order.length] : null,
-					Ctor,
-					config
-				);
-				order.push(comp);
+			const data = IncrementalDomRenderer.getCurrentData();
+			let key = config.key;
+			if (!isDef(key)) {
+				const type = getUid(Ctor, true);
+				data.currCount = data.currCount || {};
+				data.currCount[type] = data.currCount[type] || 0;
+				key = '__METAL_IC__' + type + '_' + data.currCount[type];
+				data.currCount[type]++;
 			}
+			comp = this.match_(
+				data.prevComps ? data.prevComps[key] : null,
+				Ctor,
+				config
+			);
+			data.currComps = data.currComps || {};
+			data.currComps[key] = comp;
 		}
 
 		return comp;
@@ -816,14 +807,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	resetData_(data) {
 		if (data) {
-			if (data.currComps.keys) {
-				data.prevComps.keys = data.currComps.keys;
-				data.currComps.keys = null;
-			}
-			if (data.currComps.order) {
-				data.prevComps.order = data.currComps.order;
-				data.currComps.order = null;
-			}
+			data.prevComps = data.currComps;
+			data.currComps = null;
+			data.currCount = null;
 		}
 	}
 

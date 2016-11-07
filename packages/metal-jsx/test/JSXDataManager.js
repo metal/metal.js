@@ -1,6 +1,7 @@
 'use strict';
 
 import Component from 'metal-component';
+import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXDataManager from '../src/JSXDataManager';
 
 describe('JSXDataManager', function() {
@@ -92,6 +93,30 @@ describe('JSXDataManager', function() {
 			component2.state.foo = 'foo2';
 			assert.equal('foo1', component.state.foo);
 			assert.equal('foo2', component2.state.foo);
+		});
+
+		it('should run setState\'s callback after component is rerendered', function(done) {
+			class TestComponent extends Component {
+				render() {
+				}
+			}
+			TestComponent.DATA_MANAGER = JSXDataManager;
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			};
+
+			component = new TestComponent();
+			sinon.spy(component, 'render');
+
+			component.setState({
+				foo: 'newFoo'
+			}, () => {
+				assert.strictEqual(1, component.render.callCount);
+				done();
+			});
 		});
 	});
 

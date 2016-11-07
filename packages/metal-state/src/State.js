@@ -568,7 +568,7 @@ class State extends EventEmitter {
 	setState(values, opt_callback) {
 		Object.keys(values).forEach(name => this.set(name, values[name]));
 		if (opt_callback && this.scheduledBatchData_) {
-			this.once('stateChanged', opt_callback);
+			this.context_.once('stateChanged', opt_callback);
 		}
 	}
 

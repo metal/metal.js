@@ -67,15 +67,6 @@ metal.registerTasks({
 			platform: 'Windows 10',
 			version: '13'
 		},
-		sl_iphone: {
-			appiumVersion: '1.6.0',
-			base: 'SauceLabs',
-			browserName: 'Safari',
-			deviceName: 'iPhone 6 Simulator',
-			deviceOrientation: 'portrait',
-			platformName: 'iOS',
-			platformVersion: '9.3'
-		},
 		sl_android_4: {
 			base: 'SauceLabs',
 			browserName: 'android',

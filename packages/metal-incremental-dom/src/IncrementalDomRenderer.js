@@ -1,15 +1,7 @@
 'use strict';
 
 import './incremental-dom';
-import {
-	getCompatibilityModeData,
-	getUid,
-	isBoolean,
-	isDef,
-	isDefAndNotNull,
-	isString,
-	object
-} from 'metal';
+import { getCompatibilityModeData, getUid, isBoolean, isDef, isDefAndNotNull, isString, object } from 'metal';
 import { append, delegate, domData, exitDocument } from 'metal-dom';
 import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';

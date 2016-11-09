@@ -1,14 +1,6 @@
 'use strict';
 
-import {
-	async,
-	isDefAndNotNull,
-	isFunction,
-	isObject,
-	isString,
-	mergeSuperClassesProperty,
-	object
-} from 'metal';
+import { async, isDefAndNotNull, isFunction, isObject, isString, mergeSuperClassesProperty, object } from 'metal';
 import { EventEmitter } from 'metal-events';
 
 /**

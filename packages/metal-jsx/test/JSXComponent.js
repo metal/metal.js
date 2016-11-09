@@ -146,7 +146,7 @@ describe('JSXComponent', function() {
 								<span>Children Test 3</span>
 							</ChildComponent>
 						</div>
-					);
+						);
 				}
 			}
 
@@ -175,7 +175,7 @@ describe('JSXComponent', function() {
 								<span foo="foo">Children Test</span>
 							</ChildComponent>
 						</div>
-					);
+						);
 				}
 			}
 
@@ -311,8 +311,7 @@ describe('JSXComponent', function() {
 	describe('shouldUpdate', function() {
 		it('should not rerender after props change if shouldUpdate returns false', function(done) {
 			class TestComponent extends JSXComponent {
-				render() {
-				}
+				render() {}
 
 				shouldUpdate() {
 					return false;
@@ -335,8 +334,7 @@ describe('JSXComponent', function() {
 
 		it('should not rerender after state change if shouldUpdate returns false', function(done) {
 			class TestComponent extends JSXComponent {
-				render() {
-				}
+				render() {}
 
 				shouldUpdate() {
 					return false;

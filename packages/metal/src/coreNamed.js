@@ -281,4 +281,5 @@ export function mergeSuperClassesProperty(constructor, propertyName, opt_mergeFn
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */
-export function nullFunction() {}
+export function nullFunction() {
+}

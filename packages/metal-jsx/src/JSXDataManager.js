@@ -132,7 +132,7 @@ object.mixin(JSXDataManager, {
 	replaceNonInternal(component, data) {
 		var prevProps;
 		if (component.propsChanged) {
-			 prevProps = object.mixin({}, component.props);
+			prevProps = object.mixin({}, component.props);
 		}
 
 		const props = this.getManagerData(component).props_;

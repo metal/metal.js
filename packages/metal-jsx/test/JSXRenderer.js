@@ -59,7 +59,7 @@ describe('JSXRenderer', function() {
 							<span>Children Test 3</span>
 						</ChildComponent>
 					</div>
-				);
+					);
 			}
 		}
 
@@ -116,8 +116,7 @@ describe('JSXRenderer', function() {
 
 	it('should pass both state and prop changes to shouldUpdate', function(done) {
 		class TestComponent extends TestJSXComponent {
-			shouldUpdate() {
-			}
+			shouldUpdate() {}
 		}
 		TestComponent.PROPS = {
 			bar: {

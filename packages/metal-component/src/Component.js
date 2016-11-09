@@ -1,17 +1,6 @@
 'use strict';
 
-import {
-	array,
-	getFunctionName,
-	isBoolean,
-	isDefAndNotNull,
-	isElement,
-	isFunction,
-	isObject,
-	isString,
-	mergeSuperClassesProperty,
-	object
-} from 'metal';
+import { array, getFunctionName, isBoolean, isDefAndNotNull, isElement, isFunction, isObject, isString, mergeSuperClassesProperty, object } from 'metal';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';

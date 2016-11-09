@@ -9,16 +9,16 @@ class string {
 	 *     "smaller", equal or "bigger" than the second given string.
 	 */
 	static caseInsensitiveCompare(str1, str2) {
-	  var test1 = String(str1).toLowerCase();
-	  var test2 = String(str2).toLowerCase();
+		var test1 = String(str1).toLowerCase();
+		var test2 = String(str2).toLowerCase();
 
-	  if (test1 < test2) {
-	    return -1;
-	  } else if (test1 === test2) {
-	    return 0;
-	  } else {
-	    return 1;
-	  }
+		if (test1 < test2) {
+			return -1;
+		} else if (test1 === test2) {
+			return 0;
+		} else {
+			return 1;
+		}
 	}
 
 	/**

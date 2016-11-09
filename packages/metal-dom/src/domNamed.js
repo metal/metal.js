@@ -270,11 +270,11 @@ function isAbleToInteractWith_(node, eventName, opt_eventObj) {
 		return false;
 	}
 
-  var matchesSelector = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'FIELDSET'];
-  if (eventName === 'click' && matchesSelector.indexOf(node.tagName) > -1) {
-    return !(node.disabled || parent(node, 'fieldset[disabled]'));
-  }
-  return true;
+	var matchesSelector = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'FIELDSET'];
+	if (eventName === 'click' && matchesSelector.indexOf(node.tagName) > -1) {
+		return !(node.disabled || parent(node, 'fieldset[disabled]'));
+	}
+	return true;
 }
 
 /**
@@ -741,7 +741,7 @@ function toggleClassesWithoutNative_(element, classes) {
 			elementClassName = elementClassName + classes[i] + ' ';
 		} else {
 			elementClassName = elementClassName.substring(0, classIndex) + ' ' +
-				elementClassName.substring(classIndex + className.length);
+			elementClassName.substring(classIndex + className.length);
 		}
 	}
 

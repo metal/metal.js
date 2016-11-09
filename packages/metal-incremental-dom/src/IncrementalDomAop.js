@@ -91,7 +91,9 @@ function getStack() {
 }
 
 function buildHandleCall(name) {
-	var data = {name};
+	var data = {
+		name
+	};
 	var fn = handleCall.bind(data);
 	return fn;
 }

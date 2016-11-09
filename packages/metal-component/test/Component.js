@@ -946,9 +946,11 @@ describe('Component', function() {
 		}
 		assert.ok(Component.isComponentCtor(Component));
 		assert.ok(Component.isComponentCtor(TestComponent));
-		assert.ok(!Component.isComponentCtor(() => {}));
+		assert.ok(!Component.isComponentCtor(() => {
+			}));
 
-		var fn = () => {};
+		var fn = () => {
+		};
 		assert.ok(!Component.isComponentCtor(fn.bind(this)));
 	});
 

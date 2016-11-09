@@ -28,14 +28,6 @@ class EventEmitter extends Disposable {
 		this.listenerHandlers_ = null;
 
 		/**
-		 * The maximum number of listeners allowed for each event type. If the number
-		 * becomes higher than the max, a warning will be issued.
-		 * @type {number}
-		 * @protected
-		 */
-		this.maxListeners_ = 10;
-
-		/**
 		 * Configuration option which determines if an event facade should be sent
 		 * as a param of listeners when emitting events. If set to true, the facade
 		 * will be passed as the first argument of the listener.

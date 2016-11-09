@@ -1,5 +1,7 @@
 'use strict';
 
+import { isDefAndNotNull } from '../core';
+
 class object {
 	/**
 	 * Copies all the members of a source object to a target object.
@@ -8,14 +10,24 @@ class object {
 	 * @return {Object} Returns the target object reference.
 	 */
 	static mixin(target) {
-		var key, source;
-		for (var i = 1; i < arguments.length; i++) {
-			source = arguments[i];
-			for (key in source) {
-				target[key] = source[key];
+		if (!isDefAndNotNull(target)) {
+			throw new TypeError('Cannot convert undefined or null to object');
+		}
+
+		var output = Object(target);
+
+		for (var index = 1; index < arguments.length; index++) {
+			var source = arguments[index];
+
+			if (isDefAndNotNull(source)) {
+				for (var nextKey in source) {
+					if (source.hasOwnProperty(nextKey)) {
+						output[nextKey] = source[nextKey];
+					}
+				}
 			}
 		}
-		return target;
+		return output;
 	}
 
 	/**

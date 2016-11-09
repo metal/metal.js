@@ -700,6 +700,11 @@ class Component extends EventEmitter {
  * @static
  */
 Component.DATA = {
+	/**
+	 * Objects describing children elements that were passed to be rendered inside
+	 * this component.
+	 * @type {!Array<!Object>}
+	 */
 	children: {
 		validator: Array.isArray,
 		value: []

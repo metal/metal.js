@@ -3,8 +3,6 @@
 import { isDefAndNotNull } from 'metal';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
-const childrenCount = [];
-
 /**
  * Renderer that handles JSX.
  */
@@ -32,36 +30,10 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * @protected
 	 */
 	generateKey_(key) {
-		let count = 0;
-		if (childrenCount.length > 0) {
-			count = ++childrenCount[childrenCount.length - 1];
-		}
-
 		if (!isDefAndNotNull(key)) {
-			if (count) {
-				key = JSXRenderer.KEY_PREFIX + count;
-			} else {
-				// If this is the first node being patched, just repeat the key it
-				// used before (if it has been used before).
-				const node = IncrementalDOM.currentPointer();
-				if (node && node.__incrementalDOMData) {
-					key = node.__incrementalDOMData.key;
-				}
-			}
+			key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
 		}
-		childrenCount.push(0);
 		return key;
-	}
-
-	/**
-	 * Called when an element is closed during render via incremental dom.
-	 * @param {!function()} originalFn The original function before interception.
-	 * @param {string} tag
-	 * @protected
-	 */
-	handleInterceptedCloseCall_(tag) {
-		childrenCount.pop();
-		return super.handleInterceptedCloseCall_(tag);
 	}
 
 	/**
@@ -83,6 +55,28 @@ class JSXRenderer extends IncrementalDomRenderer {
 	}
 
 	/**
+	 * Increments the number of children in the current element.
+	 */
+	static incElementCount() {
+		const node = IncrementalDOM.currentElement();
+		node.__metalJsxCount = (node.__metalJsxCount || 0) + 1;
+		return node.__metalJsxCount;
+	}
+
+	/**
+	 * Overrides the original method from `IncrementalDomRenderer` so that the
+	 * count data in the parent of the main element can be reset, since this node
+	 * won't go through the usual `resetNodeData_` flow.
+	 */
+	patch() {
+		const element = this.component_.element;
+		if (element && element.parentNode) {
+			element.parentNode.__metalJsxCount = 0;
+		}
+		super.patch();
+	}
+
+	/**
 	 * Overrides the original method from `IncrementalDomRenderer` to handle the
 	 * case where developers return a child node directly from the "render"
 	 * function.
@@ -97,13 +91,19 @@ class JSXRenderer extends IncrementalDomRenderer {
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	resetNodeData_(node) {
+		super.resetNodeData_(node);
+		node.__metalJsxCount = 0;
+	}
+
+	/**
 	 * Skips the current child in the count (used when a conditional render
 	 * decided not to render anything).
 	 */
 	static skipChild() {
-		if (childrenCount.length > 0) {
-			childrenCount[childrenCount.length - 1]++;
-		}
+		JSXRenderer.incElementCount();
 	}
 }
 

@@ -184,15 +184,17 @@ class IncrementalDomRenderer extends ComponentRenderer {
 
 	/**
 	 * Generates a key for the next element to be rendered.
+	 * @param {?string} The key originally passed to the element.
 	 * @return {?string}
 	 * @protected
 	 */
-	generateKey_() {
+	generateKey_(key) {
 		var currComp = IncrementalDomRenderer.getComponentBeingRendered();
 		var currRenderer = currComp.getRenderer();
 		if (!currRenderer.rootElementReached_ && currRenderer.config_.key) {
 			return currRenderer.config_.key;
 		}
+		return key;
 	}
 
 	/**
@@ -422,20 +424,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
-	 * Handles an intercepted call to the `elementClose` function from incremental
-	 * dom.
-	 * @param {string} tag
-	 * @protected
-	 */
-	handleInterceptedCloseCall_(tag) {
-		var element = IncrementalDomAop.getOriginalFn('elementClose')(tag);
-		if (domData.has(element)) {
-			this.resetData_(domData.get(element).incDomData_);
-		}
-		return element;
-	}
-
-	/**
 	 * Handles an intercepted call to the `elementOpen` function from incremental
 	 * dom.
 	 * @param {string} tag
@@ -480,6 +468,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 
 		var node = IncrementalDomAop.getOriginalFn('elementOpen').apply(null, args);
+		this.resetNodeData_(node);
 		this.attachDecoratedListeners_(node, args);
 		this.updateElementIfNotReached_(node);
 
@@ -533,7 +522,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	intercept_() {
 		IncrementalDomAop.startInterception({
 			attributes: this.handleInterceptedAttributesCall_,
-			elementClose: this.handleInterceptedCloseCall_,
 			elementOpen: this.handleInterceptedOpenCall_
 		}, this);
 	}
@@ -810,6 +798,17 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			data.prevComps = data.currComps;
 			data.currComps = null;
 			data.currCount = null;
+		}
+	}
+
+	/**
+	 * Resets all data stored in the given node.
+	 * @param {!Element} node
+	 * @protected
+	 */
+	resetNodeData_(node) {
+		if (domData.has(node)) {
+			this.resetData_(domData.get(node).incDomData_);
 		}
 	}
 

@@ -357,4 +357,44 @@ describe('JSXComponent', function() {
 			});
 		});
 	});
+
+	describe('SYNC_UPDATES', function() {
+		it('should update parent component with SYNC_UPDATES during child render', function(done) {
+			class ChildComponent extends JSXComponent {
+				attached() {
+					this.props.updateFoo('Child');
+				}
+
+				render() {
+					return <div>Child</div>;
+				}
+			}
+
+			class TestComponent extends JSXComponent {
+				render() {
+					return <div>
+						{this.state.foo}
+						{this.state.show ? <ChildComponent updateFoo={newFoo => this.state.foo += newFoo} /> : null}
+					</div>;
+				}
+			}
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				},
+				show: {
+				}
+			};
+			TestComponent.SYNC_UPDATES = true;
+
+			component = new TestComponent();
+			assert.equal('foo', component.element.textContent);
+
+			component.state.show = true;
+			component.once('stateSynced', function() {
+				assert.equal('fooChild', component.element.childNodes[0].textContent);
+				done();
+			});
+		});
+	});
 });

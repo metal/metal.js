@@ -23,6 +23,7 @@ metal.registerTasks({
 	karma: require('karma'),
 	// TODO: Find a way to lint jsx files (maybe use eslint instead of jshint).
 	lintGlobs: codeGlobs.concat('!packages/metal-jsx/test/**/*.js'),
+	testDepTasks: ['build:cjs'],
 	testNodeSrc: [
 		'env/test/node.js',
 		'packages/metal-events/test/**/*.js',
@@ -90,13 +91,13 @@ gulp.task('soy', function() {
 		.pipe(gulp.dest('packages/metal-soy/test'));
 });
 
+gulp.task('build:cjs', ['soy'], function() {
+	return compileToLib('packages/metal*/src/**/*.js');
+});
+
 var changedJsSrc;
 gulp.task('compile', function() {
-	return gulp.src(changedJsSrc)
-		.pipe(babel({
-			presets: ['es2015']
-		}))
-		.pipe(gulp.dest(calcDestDir(changedJsSrc)));
+	return compileToLib(changedJsSrc);
 });
 
 // We need to override gulp-metal's default test:watch task so that it will
@@ -115,8 +116,8 @@ gulp.task('test:watch', ['soy'], function(done) { // jshint ignore:line
 	).start();
 });
 
-function calcDestDir(src) {
-	var relative = path.relative(path.resolve('packages'), src);
+function calcDestDir(file) {
+	var relative = path.relative(path.resolve('packages'), file.path);
 	var index = relative.indexOf(path.sep);
 	return path.dirname(path.join(
 		path.resolve('packages'),
@@ -124,4 +125,12 @@ function calcDestDir(src) {
 		'lib',
 		relative.substr(index + 5)
 	));
+}
+
+function compileToLib(src) {
+	return gulp.src(src)
+		.pipe(babel({
+			presets: ['es2015']
+		}))
+		.pipe(gulp.dest(calcDestDir));
 }

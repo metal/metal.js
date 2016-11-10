@@ -9,8 +9,6 @@ before_install:
   - lerna bootstrap
 install:
   - npm i
-before_script:
-  - npm run compile
 script: travis_wait gulp test:saucelabs
 env:
   global:

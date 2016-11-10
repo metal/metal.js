@@ -139,7 +139,7 @@ class Component extends EventEmitter {
 		this.dataManager_ = this.constructor.DATA_MANAGER_MERGED;
 		this.dataManager_.setUp(
 			this,
-			object.mixin({}, Component.DATA, this.renderer_.getExtraDataConfig())
+			object.mixin({}, this.renderer_.getExtraDataConfig(), Component.DATA)
 		);
 
 		this.on('stateChanged', this.handleStateChanged_);

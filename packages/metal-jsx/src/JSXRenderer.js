@@ -31,7 +31,14 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 */
 	generateKey_(key) {
 		if (!isDefAndNotNull(key)) {
-			key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
+			const element = this.component_.element;
+			if (this.isPatching_ && IncrementalDOM.currentPointer() === element && element) {
+				if (element.__incrementalDOMData) {
+					key = element.__incrementalDOMData.key;
+				}
+			} else {
+				key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
+			}
 		}
 		return key;
 	}
@@ -61,19 +68,6 @@ class JSXRenderer extends IncrementalDomRenderer {
 		const node = IncrementalDOM.currentElement();
 		node.__metalJsxCount = (node.__metalJsxCount || 0) + 1;
 		return node.__metalJsxCount;
-	}
-
-	/**
-	 * Overrides the original method from `IncrementalDomRenderer` so that the
-	 * count data in the parent of the main element can be reset, since this node
-	 * won't go through the usual `resetNodeData_` flow.
-	 */
-	patch() {
-		const element = this.component_.element;
-		if (element && element.parentNode) {
-			element.parentNode.__metalJsxCount = 0;
-		}
-		super.patch();
 	}
 
 	/**

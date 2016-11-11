@@ -118,6 +118,22 @@ describe('JSXDataManager', function() {
 				done();
 			});
 		});
+
+		it('should now allow changes to a component\'s props cause changes to another\s', function() {
+			class TestComponent extends Component {
+				render() {
+				}
+			}
+			TestComponent.DATA_MANAGER = JSXDataManager;
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			component2 = new TestComponent();
+
+			component.props.foo = 'foo';
+			assert.equal('foo', component.props.foo);
+			assert.notEqual('foo', component2.props.foo);
+		});
 	});
 
 	describe('props', function() {

@@ -1909,6 +1909,41 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('SPAN', childEl.tagName);
 			});
 
+			it('should not add references from child component in its parent', function() {
+				class Wrapper extends Component {
+					render() {
+						IncDom.elementOpen('div');
+						this.children.forEach(IncrementalDomRenderer.renderChild);
+						IncDom.elementClose('div');
+					}
+				}
+				Wrapper.RENDERER = IncrementalDomRenderer;
+
+				class ChildComponent extends Component {
+					render() {
+						IncDom.elementVoid('div', null, null, 'ref', 'el');
+					}
+				}
+				ChildComponent.RENDERER = IncrementalDomRenderer;
+
+				class TestComponent extends Component {
+					render() {
+						IncDom.elementOpen(Wrapper);
+						IncDom.elementOpen('div');
+						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
+						IncDom.elementClose('div');
+						IncDom.elementClose(Wrapper);
+					}
+				}
+				TestComponent.RENDERER = IncrementalDomRenderer;
+
+				component = new TestComponent();
+				const child = component.refs.child;
+				assert.ok(child);
+				assert.ok(child.refs.el);
+				assert.ok(!component.refs.el);
+			});
+
 			it('should render children components with changed props', function() {
 				class TestChildComponent extends Component {
 					render() {

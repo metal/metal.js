@@ -69,9 +69,8 @@ class IncrementalDomChildren {
 			return;
 		}
 
-		currNodeOwner_ = IncrementalDomChildren.getOwner(tree);
+		currNodeOwner_ = null;
 		if (opt_skipNode && opt_skipNode.call(opt_context, tree)) {
-			currNodeOwner_ = null;
 			return;
 		}
 
@@ -81,7 +80,9 @@ class IncrementalDomChildren {
 			IncrementalDOM.text.apply(null, args);
 		} else {
 			let args = IncrementalDomUtils.buildCallFromConfig(tree.tag, tree.props);
+			currNodeOwner_ = IncrementalDomChildren.getOwner(tree);
 			IncrementalDOM.elementOpen.apply(null, args);
+			currNodeOwner_ = null;
 			if (tree.props.children) {
 				for (var i = 0; i < tree.props.children.length; i++) {
 					IncrementalDomChildren.render(
@@ -93,7 +94,6 @@ class IncrementalDomChildren {
 			}
 			IncrementalDOM.elementClose(tree.tag);
 		}
-		currNodeOwner_ = null;
 	}
 }
 

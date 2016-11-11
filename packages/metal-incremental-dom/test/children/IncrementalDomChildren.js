@@ -139,40 +139,48 @@ describe('IncrementalDomChildren', function() {
 		assert.strictEqual('afterSkip', child.childNodes[1].id);
 	});
 
-	it('should get the owner of the child currently being rendered', function() {
-		var element = document.createElement('div');
-
-		const owners = [];
-		function skipNode() {
-			owners.push(IncrementalDomChildren.getCurrentOwner());
-		}
-
-		const tree = {
-			tag: 'span',
-			[IncrementalDomChildren.CHILD_OWNER]: {},
-			props: {
-				children: [
-					{
-						tag: 'span',
-						props: {},
-						[IncrementalDomChildren.CHILD_OWNER]: {}
-					},
-					{
-						tag: 'span',
-						props: {},
-						[IncrementalDomChildren.CHILD_OWNER]: {}
-					}
-				]
-			}
-		};
-		IncrementalDOM.patch(element, () => {
-			IncrementalDomChildren.render(tree, skipNode);
+	describe('getCurrentOwner', function() {
+		afterEach(function() {
+			IncrementalDOM.elementOpen.restore && IncrementalDOM.elementOpen.restore();
 		});
 
-		assert.strictEqual(3, owners.length);
-		assert.strictEqual(IncrementalDomChildren.getOwner(tree), owners[0]);
-		assert.strictEqual(IncrementalDomChildren.getOwner(tree.props.children[0]), owners[1]);
-		assert.strictEqual(IncrementalDomChildren.getOwner(tree.props.children[1]), owners[2]);
+		it('should get the owner of the child currently being rendered', function() {
+			var element = document.createElement('div');
+
+			const owners = [];
+			var orig = IncrementalDOM.elementOpen;
+			sinon.stub(IncrementalDOM, 'elementOpen', () => {
+				owners.push(IncrementalDomChildren.getCurrentOwner());
+				return orig.apply(null, arguments);
+			});
+
+			const tree = {
+				tag: 'span',
+				[IncrementalDomChildren.CHILD_OWNER]: {},
+				props: {
+					children: [
+						{
+							tag: 'span',
+							props: {},
+							[IncrementalDomChildren.CHILD_OWNER]: {}
+						},
+						{
+							tag: 'span',
+							props: {},
+							[IncrementalDomChildren.CHILD_OWNER]: {}
+						}
+					]
+				}
+			};
+			IncrementalDOM.patch(element, () => {
+				IncrementalDomChildren.render(tree);
+			});
+
+			assert.strictEqual(3, owners.length);
+			assert.strictEqual(IncrementalDomChildren.getOwner(tree), owners[0]);
+			assert.strictEqual(IncrementalDomChildren.getOwner(tree.props.children[0]), owners[1]);
+			assert.strictEqual(IncrementalDomChildren.getOwner(tree.props.children[1]), owners[2]);
+		});
 	});
 
 	it('should render text nodes that have been changed after capture', function(done) {

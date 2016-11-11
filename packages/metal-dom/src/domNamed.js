@@ -4,6 +4,7 @@ import { isDef, isDocument, isElement, isObject, isString, object } from 'metal'
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
+import { getKeyboardEventConfig } from './keyboardEvents';
 
 const elementsByTag_ = {};
 const supportCache_ = {};
@@ -228,7 +229,7 @@ export function contains(element1, element2) {
  * @return {!EventHandle} Can be used to remove the listener.
  */
 export function delegate(element, eventName, selectorOrTarget, callback, opt_default) {
-	var customConfig = customEvents[eventName];
+	var customConfig = getCustomEventData(eventName);
 	if (customConfig && customConfig.delegate) {
 		eventName = customConfig.originalEvent;
 		callback = customConfig.handler.bind(customConfig, callback);
@@ -447,6 +448,11 @@ function normalizeDelegateEvent_(event) {
 export function on(element, eventName, callback, opt_capture) {
 	if (isString(element)) {
 		return delegate(document, eventName, element, callback);
+	}
+	var keyConfig = getKeyboardEventConfig(eventName);
+	if (keyConfig) {
+		eventName = keyConfig.originalEvent;
+		callback = keyConfig.handler.bind(keyConfig, callback);
 	}
 	var customConfig = customEvents[eventName];
 	if (customConfig && customConfig.event) {

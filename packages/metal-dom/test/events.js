@@ -2,6 +2,7 @@
 
 import * as dom from '../src/dom';
 import features from '../src/features';
+import * as KEYMAP from '../src/keyConstants';
 import '../src/events';
 
 describe('Custom Events', function() {
@@ -101,5 +102,74 @@ describe('Custom Events', function() {
 		dom.triggerEvent(this.element1, features.checkAnimationEventName().animation);
 		assert.strictEqual(1, listener.callCount);
 		assert.strictEqual('animationend', listener.args[0][0].customType);
+	});
+
+	it('should listen to the keydown keyboard event by keyCode alias', function() {
+		var element = document.createElement('input');
+		dom.enterDocument(element);
+
+		var listener = sinon.stub();
+		var handle = dom.on(element, 'keydown:enter', listener);
+		dom.triggerEvent(element, 'keydown', {keyCode: KEYMAP.ENTER});
+		assert.strictEqual(1, listener.callCount);
+	});
+
+	it('should delegate parameterized keyboard event', function() {
+		var listener = sinon.stub();
+		var inputElement = document.createElement('input');
+		dom.append(this.element1, inputElement);
+		var handle = dom.delegate(this.element1, 'keydown:enter', inputElement, listener);
+		dom.triggerEvent(inputElement, 'keydown', {keyCode: KEYMAP.ENTER});
+		assert.strictEqual(1, listener.callCount);
+	});
+
+	it('should listen to the keypress keyboard event by keyCode alias', function() {
+		var element = document.createElement('input');
+		dom.enterDocument(element);
+		var listener = sinon.stub();
+		var handle = dom.on(element, 'keypress:enter', listener);
+		dom.triggerEvent(element, 'keypress', {keyCode: KEYMAP.ENTER});
+		assert.strictEqual(1, listener.callCount);
+	});
+
+	it('should listen to the keyup keyboard event by keyCode alias', function() {
+		var element = document.createElement('input');
+		dom.enterDocument(element);
+		var listener = sinon.stub();
+		var handle = dom.on(element, 'keyup:enter', listener);
+		dom.triggerEvent(element, 'keyup', {keyCode: KEYMAP.ENTER});
+		assert.strictEqual(1, listener.callCount);
+	});
+
+	it('should listen to keyboard events by multiple key alias', function() {
+		var element = document.createElement('input');
+		element.setAttribute('type', 'text');
+		dom.enterDocument(element);
+		var listener = sinon.stub();
+		var handle = dom.on(element, 'keydown:enter,space,esc,up,down', listener);
+		dom.triggerEvent(element, 'keydown', {keyCode: KEYMAP.ENTER});
+		dom.triggerEvent(element, 'keydown', {keyCode: KEYMAP.SPACE});
+		dom.triggerEvent(element, 'keydown', {keyCode: KEYMAP.ESC});
+		dom.triggerEvent(element, 'keydown', {keyCode: KEYMAP.UP});
+		dom.triggerEvent(element, 'keydown', {keyCode: KEYMAP.DOWN});
+		assert.strictEqual(5, listener.callCount);
+	});
+
+	it('should not trigger the listener to an unmatched key alias', function() {
+		var element = document.createElement('input');
+		dom.enterDocument(element);
+		var listener = sinon.stub();
+		var handle = dom.on(element, 'keyup:enter,', listener);
+		dom.triggerEvent(element, 'keyup', {keyCode: KEYMAP.SPACE});
+		assert.strictEqual(0, listener.callCount);
+	});
+
+	it('should not stop listening to an unparameterized keyboard event', function() {
+		var element = document.createElement('input');
+		dom.enterDocument(element);
+		var listener = sinon.stub();
+		var handle = dom.on(element, 'keyup', listener);
+		dom.triggerEvent(element, 'keyup', {keyCode: KEYMAP.ENTER});
+		assert.strictEqual(1, listener.callCount);
 	});
 });

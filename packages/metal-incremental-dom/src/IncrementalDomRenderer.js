@@ -561,10 +561,12 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @protected
 	 */
 	match_(comp, Ctor, config) {
+		let shouldUpdate = true;
 		if (!this.isMatch_(comp, Ctor)) {
 			comp = new Ctor(config, false);
+			shouldUpdate = false;
 		}
-		if (comp.wasRendered) {
+		if (shouldUpdate) {
 			comp.getRenderer().startSkipUpdates();
 			comp.getDataManager().replaceNonInternal(comp, config);
 			comp.getRenderer().stopSkipUpdates();
@@ -734,6 +736,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	renderInsidePatchDontSkip_() {
 		IncrementalDomRenderer.startedRenderingComponent(this.component_);
+		this.resetData_(this.incDomData_);
 		this.clearChanges_();
 		this.rootElementReached_ = false;
 		if (this.childComponents_) {
@@ -749,7 +752,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		}
 		this.handleRendered_();
 		IncrementalDomRenderer.finishedRenderingComponent();
-		this.resetData_(this.incDomData_);
 	}
 
 	/**

@@ -265,6 +265,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	}
 
 	/**
+	 * Gets the component that triggered the current patch operation.
+	 * @return {Component}
+	 */
+	static getPatchingComponent() {
+		return renderingComponents_[0];
+	}
+
+	/**
 	 * Returns the "ref" to be used for a component. Uses "key" as "ref" when
 	 * compatibility mode is on for the current renderer.
 	 * @param {!Object} config
@@ -580,7 +588,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * done by `renderInsidePatchDontSkip_`.
 	 */
 	patch() {
-		this.isPatching_ = true;
 		if (!this.component_.element && this.parent_) {
 			// If the component has no content but was rendered from another component,
 			// we'll need to patch this parent to make sure that any new content will
@@ -604,7 +611,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			const element = this.component_.element;
 			IncrementalDOM.patchOuter(element, this.renderInsidePatchDontSkip_);
 		}
-		this.isPatching_ = false;
 	}
 
 	/**

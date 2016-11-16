@@ -70,6 +70,106 @@ describe('JSXRenderer', function() {
 		assert.strictEqual('Children Test 2', child.element.textContent);
 	});
 
+	it('should reuse child empty component when it renders content for the first time', function(done) {
+		class Wrapper extends TestJSXComponent {
+			render() {
+				return this.props.children;
+			}
+		}
+
+		const childInstances = [];
+		class Child extends TestJSXComponent {
+			created() {
+				childInstances.push(this);
+			}
+
+			render() {
+				return this.state.show ? <span>Child</span> : null;
+			}
+		}
+		Child.STATE = {
+			show: {
+			}
+		};
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <Wrapper>
+					<div class="root">
+						<Child />
+					</div>
+				</Wrapper>;
+			}
+		}
+
+		const element = document.createElement('div');
+		dom.enterDocument(element);
+		component = new TestComponent({
+			element
+		});
+		assert.strictEqual(1, childInstances.length);
+		const child = childInstances[0];
+
+		child.state.show = true;
+		child.once('stateSynced', function() {
+			assert.strictEqual(1, childInstances.length);
+			assert.ok(!child.isDisposed());
+			assert.equal('Child', child.element.textContent);
+			assert.equal(child.element, component.element.childNodes[0]);
+			done();
+		});
+	});
+
+	it('should reuse child empty component when its parent makes it render content for the first time', function(done) {
+		class Wrapper extends TestJSXComponent {
+			render() {
+				return this.props.children;
+			}
+		}
+
+		const childInstances = [];
+		class Child extends TestJSXComponent {
+			created() {
+				childInstances.push(this);
+			}
+
+			render() {
+				return this.props.show ? <span>Child</span> : null;
+			}
+		}
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <Wrapper>
+					<div class="root">
+						<Child show={this.state.show} />
+					</div>
+				</Wrapper>;
+			}
+		}
+		TestComponent.STATE = {
+			show: {
+			}
+		};
+
+		const element = document.createElement('div');
+		dom.enterDocument(element);
+		component = new TestComponent({
+			element
+		});
+		assert.strictEqual(1, childInstances.length);
+		const child = childInstances[0];
+
+		component.state.show = true;
+		component.once('stateSynced', function() {
+			assert.strictEqual(1, childInstances.length);
+			assert.ok(!child.isDisposed());
+			assert.equal('Child', child.element.textContent);
+			assert.equal(child.element, component.element.childNodes[0]);
+			done();
+		});
+	});
+
 	it('should update if props change', function(done) {
 		class TestComponent extends TestJSXComponent {
 			render() {

@@ -1432,6 +1432,25 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should return the component that started the patch operation', function() {
+			class TestChildComponent extends Component {
+				render() {
+					const patchingComp = IncrementalDomRenderer.getPatchingComponent();
+					assert.ok(patchingComp instanceof TestComponent);
+					IncDom.elementVoid('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid(TestChildComponent);
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			component = new TestComponent();
+		});
+
 		it('should render sub component via elementOpen/elementClose', function() {
 			class TestComponent extends Component {
 				render() {

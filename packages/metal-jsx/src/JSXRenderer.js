@@ -32,10 +32,13 @@ class JSXRenderer extends IncrementalDomRenderer {
 	generateKey_(key) {
 		if (!isDefAndNotNull(key)) {
 			const comp = IncrementalDomRenderer.getPatchingComponent();
-			if (comp.getRenderer().rootElementReached_) {
+			if (comp.getRenderer().rootElementRendered_) {
 				key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
-			} else if (comp.element && comp.element.__incrementalDOMData) {
-				key = comp.element.__incrementalDOMData.key;
+			} else {
+				comp.getRenderer().rootElementRendered_ = true;
+				if (comp.element && comp.element.__incrementalDOMData) {
+					key = comp.element.__incrementalDOMData.key;
+				}
 			}
 		}
 		return key;
@@ -66,6 +69,17 @@ class JSXRenderer extends IncrementalDomRenderer {
 		const node = IncrementalDOM.currentElement();
 		node.__metalJsxCount = (node.__metalJsxCount || 0) + 1;
 		return node.__metalJsxCount;
+	}
+
+	/**
+	 * Overrides the original method from `IncrementalDomRenderer` so we can
+	 * keep track of if the root element of the patched component has already
+	 * been rendered or not.
+	 * @override
+	 */
+	patch() {
+		this.rootElementRendered_ = false;
+		super.patch();
 	}
 
 	/**

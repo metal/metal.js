@@ -356,4 +356,33 @@ describe('JSXRenderer', function() {
 			done();
 		});
 	});
+
+	it('should reuse elements correctly after a child update', function(done) {
+		class ChildComponent extends TestJSXComponent {
+			render() {
+				return <div><span>{this.props.foo}</span></div>;
+			}
+		}
+		ChildComponent.PROPS = {
+			foo: {
+				value: 'initialFoo'
+			}
+		};
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <ChildComponent ref="child" />;
+			}
+		}
+
+		component = new TestComponent();
+		const child = component.refs.child;
+		var spanEl = child.element.childNodes[0];
+
+		component.refs.child.props.foo = 'newFoo';
+		component.refs.child.once('stateSynced', function() {
+			assert.strictEqual(spanEl, child.element.childNodes[0]);
+			done();
+		});
+	});
 });

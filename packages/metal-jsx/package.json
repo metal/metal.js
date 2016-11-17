@@ -1,6 +1,6 @@
 {
   "name": "metal-jsx",
-  "version": "2.5.7",
+  "version": "2.5.8",
   "description": "A JSX templates renderer to be used with Metal.js's Component class",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-jsx",

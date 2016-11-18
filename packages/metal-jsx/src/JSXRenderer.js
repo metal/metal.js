@@ -109,7 +109,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * decided not to render anything).
 	 */
 	static skipChild() {
-		JSXRenderer.incElementCount();
+		IncrementalDOM.elementVoid(JSXRenderer.incElementCount);
 	}
 }
 

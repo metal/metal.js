@@ -31,16 +31,17 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 */
 	generateKey_(key) {
 		key = super.generateKey_(key);
+		const comp = IncrementalDomRenderer.getPatchingComponent();
+		const renderer = comp.getRenderer();
 		if (!isDefAndNotNull(key)) {
-			const comp = IncrementalDomRenderer.getPatchingComponent();
-			if (comp.getRenderer().rootElementRendered_) {
+			if (renderer.rootElementRendered_) {
 				key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
-			} else {
-				comp.getRenderer().rootElementRendered_ = true;
-				if (comp.element && comp.element.__incrementalDOMData) {
-					key = comp.element.__incrementalDOMData.key;
-				}
+			} else if (comp.element && comp.element.__incrementalDOMData) {
+				key = comp.element.__incrementalDOMData.key;
 			}
+		}
+		if (!renderer.rootElementRendered_) {
+			renderer.rootElementRendered_ = true;
 		}
 		return key;
 	}

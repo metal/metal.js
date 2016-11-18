@@ -146,13 +146,15 @@ function handleInterceptedCloseCall_() {
 	if (currentParent_ === tree_) {
 		IncrementalDomAop.stopInterception();
 		isCapturing_ = false;
-		callback_.call(renderer_, tree_);
+		const node = callback_.call(renderer_, tree_);
 		callback_ = null;
 		currentParent_ = null;
 		renderer_ = null;
 		tree_ = null;
+		return node;
 	} else {
 		currentParent_ = currentParent_.parent;
+		return true;
 	}
 }
 

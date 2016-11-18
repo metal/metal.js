@@ -363,7 +363,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		var {props, tag} = this.componentToRender_;
 		props.children = this.buildChildren_(tree.props.children);
 		this.componentToRender_ = null;
-		this.renderFromTag_(tag, props);
+		return this.renderFromTag_(tag, props);
 	}
 
 	/**

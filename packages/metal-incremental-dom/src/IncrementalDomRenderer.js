@@ -269,7 +269,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * @return {Component}
 	 */
 	static getPatchingComponent() {
-		return renderingComponents_[0];
+		return patchingComponents_[patchingComponents_.length - 1];
 	}
 
 	/**
@@ -588,6 +588,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 * done by `renderInsidePatchDontSkip_`.
 	 */
 	patch() {
+		patchingComponents_.push(this.component_);
 		if (!this.component_.element && this.parent_) {
 			// If the component has no content but was rendered from another component,
 			// we'll need to patch this parent to make sure that any new content will
@@ -611,6 +612,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			const element = this.component_.element;
 			IncrementalDOM.patchOuter(element, this.renderInsidePatchDontSkip_);
 		}
+		patchingComponents_.pop();
 	}
 
 	/**
@@ -905,6 +907,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 }
 
 var renderingComponents_ = [];
+var patchingComponents_ = [];
 var emptyChildren_ = [];
 
 

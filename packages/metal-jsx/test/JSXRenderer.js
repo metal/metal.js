@@ -326,6 +326,48 @@ describe('JSXRenderer', function() {
 		});
 	});
 
+	it('should reuse components with keys after moving around', function(done) {
+		const childComps = [];
+		class ChildComponent extends TestJSXComponent {
+			created() {
+				childComps.push(this);
+			}
+			render() {
+				return <div>Child{this.props.key}</div>;
+			}
+		}
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <div>
+					<ChildComponent key={this.props.switch ? 'child2' : 'child1'} />
+					<ChildComponent key={this.props.switch ? 'child1' : 'child2'} />
+				</div>
+			}
+		}
+		TestComponent.PROPS = {
+			switch: {
+			}
+		}
+
+		component = new TestComponent();
+		assert.equal(2, childComps.length);
+		const firstChild = component.element.childNodes[0];
+		const secondChild = component.element.childNodes[1];
+		assert.equal(firstChild, childComps[0].element);
+		assert.equal(secondChild, childComps[1].element);
+
+		component.props.switch = true;
+		component.once('stateSynced', function() {
+			assert.equal(secondChild, component.element.childNodes[0]);
+			assert.equal(firstChild, component.element.childNodes[1]);
+			assert.equal(2, childComps.length);
+			assert.equal(firstChild, childComps[0].element);
+			assert.equal(secondChild, childComps[1].element);
+			done();
+		});
+	});
+
 	it('should rerender sub component correctly after an update', function(done) {
 		class ChildComponent extends TestJSXComponent {
 			render() {

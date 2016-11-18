@@ -30,6 +30,7 @@ class JSXRenderer extends IncrementalDomRenderer {
 	 * @protected
 	 */
 	generateKey_(key) {
+		key = super.generateKey_(key);
 		if (!isDefAndNotNull(key)) {
 			const comp = IncrementalDomRenderer.getPatchingComponent();
 			if (comp.getRenderer().rootElementRendered_) {

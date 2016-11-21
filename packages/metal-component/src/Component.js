@@ -418,12 +418,17 @@ class Component extends EventEmitter {
 		if (!ctor.hasOwnProperty('__METAL_SYNC_FNS__')) {
 			const fns = {};
 			const keys = this.dataManager_.getSyncKeys(this);
+			let shouldCache = true;
 			for (let i = 0; i < keys.length; i++) {
 				const name = 'sync' + keys[i].charAt(0).toUpperCase() + keys[i].slice(1);
-				const fn = ctor.prototype[name];
+				const fn = ctor.prototype[name] || this[name];
 				if (fn) {
 					fns[keys[i]] = fn;
+					shouldCache = shouldCache && ctor.prototype[name];
 				}
+			}
+			if (!shouldCache) {
+				return fns;
 			}
 			ctor.__METAL_SYNC_FNS__ = fns;
 		}

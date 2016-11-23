@@ -249,6 +249,44 @@ describe('JSXRenderer', function() {
 		});
 	});
 
+	it('should reuse elements correctly when child skips update', function(done) {
+		class ChildComponent extends TestJSXComponent {
+			render() {
+					return <span>Child</span>
+			}
+
+			shouldUpdate() {
+				return false;
+			}
+		}
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <div>
+					<ChildComponent />
+					<span>{this.state.foo}</span>
+				</div>;
+			}
+		}
+		TestComponent.STATE = {
+			foo: {
+			}
+		}
+
+		component = new TestComponent();
+		var childNodes = component.element.childNodes;
+		assert.equal(2, childNodes.length);
+
+		component.state.foo = 'foo';
+		component.once('stateChanged', function() {
+			assert.equal(2, component.element.childNodes.length);
+			assert.equal(childNodes[0], component.element.childNodes[0]);
+			assert.equal(childNodes[1], component.element.childNodes[1]);
+			assert.equal('foo', childNodes[1].textContent);
+			done();
+		});
+	});
+
 	it('should reuse component rendered after a conditionally rendered component', function(done) {
 		class ChildComponent extends TestJSXComponent {
 			render() {

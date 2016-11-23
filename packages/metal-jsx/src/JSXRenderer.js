@@ -113,6 +113,14 @@ class JSXRenderer extends IncrementalDomRenderer {
 	static skipChild() {
 		IncrementalDOM.elementVoid(JSXRenderer.incElementCount);
 	}
+
+	/**
+	 * @inheritDoc
+	 */
+	skipRender_() {
+		JSXRenderer.skipChild();
+		super.skipRender_();
+	}
 }
 
 JSXRenderer.KEY_PREFIX = '_metal_jsx_';

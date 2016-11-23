@@ -730,7 +730,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			!this.shouldUpdate() &&
 			IncrementalDOM.currentPointer() === this.component_.element) {
 			if (this.component_.element) {
-				IncrementalDOM.skipNode();
+				this.skipRender_();
 			}
 			return;
 		}
@@ -852,6 +852,14 @@ class IncrementalDomRenderer extends ComponentRenderer {
 	 */
 	skipNextChildrenDisposal() {
 		this.childComponents_ = null;
+	}
+
+	/**
+	 * Skips rendering this component.
+	 * @protected
+	 */
+	skipRender_() {
+		IncrementalDOM.skipNode();
 	}
 
 	/**

@@ -603,6 +603,27 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('handleClick', component.element.getAttribute('data-onclick'));
 		});
 
+		it('should attach listeners from "data-on<event-name>" attributes', function() {
+			dom.registerCustomEvent('test-event', {
+  			delegate: true,
+  			handler: (callback, event) => callback(event),
+  			originalEvent: 'click'
+			});
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div', null, null, 'data-ontest-event', 'handleClick');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent();
+
+			dom.triggerEvent(component.element, 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
 		it('should attach listeners from attributes in existing elements', function() {
 			class TestComponent extends Component {
 				render() {
@@ -775,6 +796,27 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(0, component.handleClick.callCount);
 
 			dom.triggerEvent(component.element.childNodes[0], 'click');
+			assert.strictEqual(1, component.handleClick.callCount);
+		});
+
+		it('should attach listeners from "on<Event-name>" attributes', function() {
+			dom.registerCustomEvent('test-event', {
+  			delegate: true,
+  			handler: (callback, event) => callback(event),
+  			originalEvent: 'click'
+			});
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementVoid('div', null, null, 'onTest-event', 'handleClick');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.prototype.handleClick = sinon.stub();
+
+			component = new TestComponent();
+
+			dom.triggerEvent(component.element, 'click');
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 

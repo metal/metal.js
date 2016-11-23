@@ -1,6 +1,6 @@
 {
   "name": "metal-soy",
-  "version": "2.5.10",
+  "version": "2.5.11",
   "description": "A soy templates renderer to be used with Metal.js's Component class",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-soy",
@@ -26,7 +26,7 @@
     "metal": "^2.5.2",
     "metal-component": "^2.5.10",
     "metal-dom": "^2.5.3",
-    "metal-incremental-dom": "^2.5.10",
+    "metal-incremental-dom": "^2.5.11",
     "metal-soy-bundle": "^2.0.0"
   },
   "devDependencies": {

@@ -920,7 +920,7 @@ var emptyChildren_ = [];
 
 
 // Regex pattern used to find inline listeners.
-IncrementalDomRenderer.LISTENER_REGEX = /^(?:on([A-Z]\w+))|(?:data-on(\w+))$/;
+IncrementalDomRenderer.LISTENER_REGEX = /^(?:on([A-Z].+))|(?:data-on(.+))$/;
 
 // Name of this renderer. Renderers should provide this as a way to identify
 // them via a simple string (when calling enableCompatibilityMode to add

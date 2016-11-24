@@ -102,7 +102,7 @@ gulp.task('compile', function() {
 
 // We need to override gulp-metal's default test:watch task so that it will
 // update lib files when the related src files change.
-gulp.task('test:watch', ['soy'], function(done) { // jshint ignore:line
+gulp.task('test:watch', ['build:cjs'], function(done) { // jshint ignore:line
 	gulp.watch('packages/metal-soy/test/**/*.soy', ['soy']);
 	var jsWatcher = gulp.watch('packages/metal*/src/**/*.js', ['compile']);
 	jsWatcher.on('change', function(event) {
@@ -119,6 +119,7 @@ gulp.task('test:watch', ['soy'], function(done) { // jshint ignore:line
 function calcDestDir(file) {
 	var relative = path.relative(path.resolve('packages'), file.path);
 	var index = relative.indexOf(path.sep);
+	file.base = path.dirname(file.path);
 	return path.dirname(path.join(
 		path.resolve('packages'),
 		relative.substr(0, index),

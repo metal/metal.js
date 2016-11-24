@@ -851,7 +851,7 @@ describe('State', function() {
 			assert.strictEqual(undefined, test.key3);
 		});
 
-		it('should merge STATE variable of given constructor', function() {
+		it('should get STATE property value of given constructor', function() {
 			var Test = createTestClass();
 			Test.STATE = {
 				key1: {
@@ -873,7 +873,6 @@ describe('State', function() {
 				}
 			};
 
-			State.mergeStateStatic(ChildTest);
 			assert.deepEqual({
 				key1: {
 					value: -1
@@ -884,7 +883,7 @@ describe('State', function() {
 				key3: {
 					value: 3
 				}
-			}, ChildTest.STATE_MERGED);
+			}, State.getStateStatic(ChildTest));
 		});
 
 		it('should conflict STATE properties from instance with previous instances', function() {

@@ -32,56 +32,38 @@ describe('core', function() {
 		});
 	});
 
-	describe('Merge Super Classes Property', function() {
-		it('should collect superclass properties', function() {
-			var TestSuperClass = function() {};
-			TestSuperClass.FOO = 1;
-
-			class TestClass extends TestSuperClass {
-				constructor() {
-					super();
-				}
-			}
-			TestClass.FOO = 0;
-
-			assert.deepEqual([0, 1], core.collectSuperClassesProperty(TestClass, 'FOO'));
-		});
-
-		it('should merge properties', function() {
+	describe('getStaticProperty', function() {
+		it('should get inherited static properties from super classes', function() {
 			class Test1 {
 			}
-			Test1.FOO = 1;
 			class Test2 extends Test1 {
 			}
-			Test2.FOO = 2;
+			Test2.FOO = 1;
 			class Test3 extends Test2 {
 			}
-			Test3.FOO = 3;
+			class Test4 extends Test2 {
+			}
+			Test4.FOO = 2;
 
-			core.mergeSuperClassesProperty(Test3, 'FOO');
-			assert.deepEqual([3, 2, 1], Test3.FOO_MERGED);
-			assert.strictEqual(undefined, Test2.FOO_MERGED);
-			assert.strictEqual(undefined, Test1.FOO_MERGED);
-
-			core.mergeSuperClassesProperty(Test2, 'FOO');
-			core.mergeSuperClassesProperty(Test1, 'FOO');
-
-			assert.deepEqual([2, 1], Test2.FOO_MERGED);
-			assert.deepEqual([1], Test1.FOO_MERGED);
+			assert.equal(undefined, core.getStaticProperty(Test1, 'FOO'));
+			assert.equal(1, core.getStaticProperty(Test2, 'FOO'));
+			assert.equal(1, core.getStaticProperty(Test3, 'FOO'));
+			assert.equal(2, core.getStaticProperty(Test4, 'FOO'));
 		});
 
-		it('should reuse existing merged static property', function() {
+		it('should set property with suffix "MERGED" with merged value', function() {
 			class Test1 {
 			}
 			Test1.FOO = 1;
 			class Test2 extends Test1 {
 			}
-			Test2.FOO = 2;
 
-			assert.ok(core.mergeSuperClassesProperty(Test2, 'FOO'));
-			var merged = Test2.FOO_MERGED;
-			assert.ok(!core.mergeSuperClassesProperty(Test2, 'FOO'));
-			assert.strictEqual(merged, Test2.FOO_MERGED);
+			assert.ok(!Test1.hasOwnProperty('FOO_MERGED'));
+			assert.ok(!Test2.hasOwnProperty('FOO_MERGED'));
+
+			core.getStaticProperty(Test2, 'FOO');
+			assert.ok(Test1.hasOwnProperty('FOO_MERGED'));
+			assert.ok(Test2.hasOwnProperty('FOO_MERGED'));
 		});
 
 		it('should call merge function when given', function() {
@@ -95,12 +77,27 @@ describe('core', function() {
 			}
 			Test3.FOO = 3;
 
-			core.mergeSuperClassesProperty(Test3, 'FOO', function(values) {
-				return values.reduce(function(prev, curr) {
-					return Math.max(prev, curr);
-				});
-			});
-			assert.strictEqual(3, Test3.FOO_MERGED);
+			var prop = core.getStaticProperty(Test3, 'FOO', (a, b) => a + b);
+			assert.equal(prop, 6);
+		});
+
+		it('should not recalculate static property after set for the first time', function() {
+			class Test1 {
+			}
+			Test1.FOO = 1;
+			class Test2 extends Test1 {
+			}
+			Test2.FOO = 2;
+			class Test3 extends Test2 {
+			}
+			Test3.FOO = 3;
+
+			const mergeFn = sinon.stub().returns(1);
+			var prop = core.getStaticProperty(Test3, 'FOO', mergeFn);
+			assert.equal(2, mergeFn.callCount);
+
+			assert.equal(prop, core.getStaticProperty(Test3, 'FOO', mergeFn));
+			assert.equal(2, mergeFn.callCount);
 		});
 	});
 

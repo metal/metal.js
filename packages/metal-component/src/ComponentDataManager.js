@@ -24,7 +24,7 @@ const ComponentDataManager = {
 		const state = new State(component.getInitialConfig(), component, component);
 		state.setKeysBlacklist_(this.BLACKLIST);
 		state.configState(
-			object.mixin({}, data, component.constructor.STATE_MERGED)
+			object.mixin({}, data, State.getStateStatic(component.constructor))
 		);
 		this.getManagerData(component).state_ = state;
 	},
@@ -137,7 +137,6 @@ const ComponentDataManager = {
 	 */
 	setUp(component, data) {
 		component.__DATA_MANAGER_DATA__ = {};
-		State.mergeStateStatic(component.constructor);
 		this.createState_(component, data);
 	}
 };

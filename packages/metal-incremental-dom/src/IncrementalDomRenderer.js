@@ -36,7 +36,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		// functions each time.
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
 
-		if (!this.component_.constructor.SYNC_UPDATES_MERGED) {
+		if (!this.hasSyncUpdates()) {
 			// If the component is being updated synchronously we'll just reuse the
 			// `handleRendererStateKeyChanged_` function from `ComponentRenderer`.
 			this.component_.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));

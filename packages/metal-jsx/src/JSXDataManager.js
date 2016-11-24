@@ -1,6 +1,6 @@
 'use strict';
 
-import { mergeSuperClassesProperty, object } from 'metal';
+import { getStaticProperty, object } from 'metal';
 import { ComponentDataManager } from 'metal-component';
 import State from 'metal-state';
 
@@ -40,18 +40,19 @@ object.mixin(JSXDataManager, {
 		comp.state = {};
 		const data = this.getManagerData(comp);
 
-		mergeSuperClassesProperty(ctor, 'PROPS', State.mergeState);
 		data.props_ = new State(comp.getInitialConfig(), comp.props, comp);
-		data.props_.configState(
-			object.mixin({}, config, comp.constructor.PROPS_MERGED)
-		);
+		data.props_.configState(object.mixin(
+			{},
+			config,
+			getStaticProperty(ctor, 'PROPS', State.mergeState)
+		));
 		this.addUnconfiguredProps_(comp, data.props_, comp.getInitialConfig());
 
 		data.state_ = new State({}, comp.state, comp);
 		data.state_.setEventData({
 			type: 'state'
 		});
-		data.state_.configState(ctor.STATE_MERGED);
+		data.state_.configState(State.getStateStatic(ctor));
 	},
 
 	/**

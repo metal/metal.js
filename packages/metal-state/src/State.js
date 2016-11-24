@@ -2,11 +2,11 @@
 
 import {
 	async,
+	getStaticProperty,
 	isDefAndNotNull,
 	isFunction,
 	isObject,
 	isString,
-	mergeSuperClassesProperty,
 	object
 } from 'metal';
 import { EventEmitter } from 'metal-events';
@@ -271,11 +271,11 @@ class State extends EventEmitter {
 		var ctor = this.constructor;
 		if (ctor !== State) {
 			var defineContext;
-			var merged = State.mergeStateStatic(ctor);
 			if (this.obj_ === this) {
-				defineContext = merged ? ctor.prototype : false;
+				defineContext = ctor.hasConfiguredState_ ? false : ctor.prototype;
+				ctor.hasConfiguredState_ = true;
 			}
-			this.configState(ctor.STATE_MERGED, defineContext);
+			this.configState(State.getStateStatic(ctor), defineContext);
 		}
 	}
 
@@ -376,6 +376,16 @@ class State extends EventEmitter {
 	}
 
 	/**
+	 * Merges the STATE static variable for the given constructor function.
+	 * @param  {!Function} ctor Constructor function.
+	 * @return {boolean} Returns true if merge happens, false otherwise.
+	 * @static
+	 */
+	static getStateStatic(ctor) {
+		return getStaticProperty(ctor, 'STATE', State.mergeState);
+	}
+
+	/**
 	 * Checks if the value of the state key with the given name has already been
 	 * set. Note that this doesn't run the key's getter.
 	 * @param {string} name The name of the key.
@@ -448,23 +458,14 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Merges an array of values for the STATE property into a single object.
-	 * @param {!Array} values The values to be merged.
+	 * Merges two values for the STATE property into a single object.
+	 * @param {Object} mergedVal
+	 * @param {Object} currVal
 	 * @return {!Object} The merged value.
 	 * @static
 	 */
-	static mergeState(values) {
-		return object.mixin.apply(null, [{}].concat(values.reverse()));
-	}
-
-	/**
-	 * Merges the STATE static variable for the given constructor function.
-	 * @param  {!Function} ctor Constructor function.
-	 * @return {boolean} Returns true if merge happens, false otherwise.
-	 * @static
-	 */
-	static mergeStateStatic(ctor) {
-		return mergeSuperClassesProperty(ctor, 'STATE', State.mergeState);
+	static mergeState(mergedVal, currVal) {
+		return object.mixin({}, currVal, mergedVal);
 	}
 
 	/**

@@ -1,15 +1,14 @@
 'use strict';
 
 import {
-	array,
 	getFunctionName,
+	getStaticProperty,
 	isBoolean,
 	isDefAndNotNull,
 	isElement,
 	isFunction,
 	isObject,
 	isString,
-	mergeSuperClassesProperty,
 	object
 } from 'metal';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
@@ -127,16 +126,11 @@ class Component extends EventEmitter {
 		 */
 		this.DEFAULT_ELEMENT_PARENT = document.body;
 
-		mergeSuperClassesProperty(this.constructor, 'DATA_MANAGER', array.firstDefinedValue);
-		mergeSuperClassesProperty(this.constructor, 'ELEMENT_CLASSES', this.mergeElementClasses_);
-		mergeSuperClassesProperty(this.constructor, 'RENDERER', array.firstDefinedValue);
-		mergeSuperClassesProperty(this.constructor, 'SYNC_UPDATES', array.firstDefinedValue);
-
 		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;
 
 		this.renderer_ = this.createRenderer();
-		this.dataManager_ = this.constructor.DATA_MANAGER_MERGED;
+		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
 		this.dataManager_.setUp(
 			this,
 			object.mixin({}, this.renderer_.getExtraDataConfig(), Component.DATA)
@@ -242,7 +236,8 @@ class Component extends EventEmitter {
 	 * @return {!ComponentRenderer}
 	 */
 	createRenderer() {
-		return new this.constructor.RENDERER_MERGED(this);
+		const RendererCtor = getStaticProperty(this.constructor, 'RENDERER');
+		return new RendererCtor(this);
 	}
 
 	/**
@@ -486,21 +481,14 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Merges an array of values for the ELEMENT_CLASSES property into a single object.
-	 * @param {!Array.<string>} values The values to be merged.
-	 * @return {!string} The merged value.
+	 * Merges two values for the ELEMENT_CLASSES property into a single one.
+	 * @param {string} val1
+	 * @param {string} val2
+	 * @return {string} The merged value.
 	 * @protected
 	 */
-	mergeElementClasses_(values) {
-		var marked = {};
-		return values.filter(function(val) {
-			if (!val || marked[val]) {
-				return false;
-			} else {
-				marked[val] = true;
-				return true;
-			}
-		}).join(' ');
+	mergeElementClasses_(val1, val2) {
+		return val1 ? val1 + ' ' + (val2 || '') : val2;
 	}
 
 	/**
@@ -641,8 +629,13 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	setterElementClassesFn_(val) {
-		if (this.constructor.ELEMENT_CLASSES_MERGED) {
-			val += ' ' + this.constructor.ELEMENT_CLASSES_MERGED;
+		const elementClasses = getStaticProperty(
+			this.constructor,
+			'ELEMENT_CLASSES',
+			this.mergeElementClasses_
+		);
+		if (elementClasses) {
+			val += ' ' + elementClasses;
 		}
 		return val.trim();
 	}

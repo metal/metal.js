@@ -1,6 +1,6 @@
 'use strict';
 
-import { Disposable } from 'metal';
+import { getStaticProperty, Disposable } from 'metal';
 
 /**
  * Base class that component renderers should extend from. It defines the
@@ -16,7 +16,8 @@ class ComponentRenderer extends Disposable {
 		super();
 		this.component_ = component;
 
-		if (this.component_.constructor.SYNC_UPDATES_MERGED) {
+		this.syncUpdates_ = getStaticProperty(component.constructor, 'SYNC_UPDATES');
+		if (this.hasSyncUpdates()) {
 			this.component_.on(
 				'stateKeyChanged',
 				this.handleRendererStateKeyChanged_.bind(this)
@@ -69,6 +70,14 @@ class ComponentRenderer extends Disposable {
 	}
 
 	/**
+	 * Checks if this component has sync updates enabled.
+	 * @return {boolean}
+	 */
+	hasSyncUpdates() {
+		return this.syncUpdates_;
+	}
+
+	/**
 	 * Renders the component's whole content (including its main element).
 	 */
 	render() {
@@ -94,8 +103,7 @@ class ComponentRenderer extends Disposable {
 	 *     (newVal) and previous (prevVal) values.
 	 */
 	sync(changes) {
-		if (!this.component_.constructor.SYNC_UPDATES_MERGED &&
-			this.shouldRerender_()) {
+		if (!this.hasSyncUpdates() && this.shouldRerender_()) {
 			this.update(changes);
 		}
 	}

@@ -378,6 +378,25 @@ describe('Component', function() {
 				assert.strictEqual(1, comp.listener1.callCount);
 			});
 
+			it('should attach events when "events" state property value changes', function() {
+				var listener1 = sinon.stub();
+				var listener2 = sinon.stub();
+
+				comp = new Component();
+				comp.events = {
+					event1: listener1,
+					event2: listener2
+				};
+
+				comp.emit('event1');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(0, listener2.callCount);
+
+				comp.emit('event2');
+				assert.strictEqual(1, listener1.callCount);
+				assert.strictEqual(1, listener2.callCount);
+			});
+
 			it('should detach unused events when value of the "events" state key is changed', function() {
 				var CustomComponent = createCustomComponentClass();
 				CustomComponent.prototype.listener1 = sinon.stub();

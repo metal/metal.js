@@ -121,7 +121,7 @@ export function getStaticProperty(ctor, propertyName, opt_mergeFn) {
 	var mergedName = propertyName + '_MERGED';
 	if (!ctor.hasOwnProperty(mergedName)) {
 		let merged = ctor.hasOwnProperty(propertyName) ? ctor[propertyName] : null;
-		if (!ctor.__proto__.isPrototypeOf(Function)) {
+		if (ctor.__proto__ && !ctor.__proto__.isPrototypeOf(Function)) {
 			const mergeFn = opt_mergeFn || getFirstTruthy_;
 			merged = mergeFn(
 				merged,

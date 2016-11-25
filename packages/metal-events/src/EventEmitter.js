@@ -105,6 +105,25 @@ class EventEmitter extends Disposable {
 	}
 
 	/**
+	 * Builds facade for the given event.
+	 * @param {string} event
+	 * @return {Object}
+	 * @protected
+	 */
+	buildFacade_(event) {
+		if (this.getShouldUseFacade()) {
+			const facade = {
+				preventDefault: function() {
+					facade.preventedDefault = true;
+				},
+				target: this,
+				type: event
+			};
+			return facade;
+		}
+	}
+
+	/**
 	 * Disposes of this instance's object references.
 	 * @override
 	 */
@@ -119,39 +138,13 @@ class EventEmitter extends Disposable {
 	 * @return {boolean} Returns true if event had listeners, false otherwise.
 	 */
 	emit(event) {
-		var listeners = toArray(this.getRawListeners_(event)).concat();
+		const listeners = toArray(this.getRawListeners_(event)).concat();
 		if (listeners.length === 0) {
 			return false;
 		}
 
-		var args = array.slice(arguments, 1);
-		var facade;
-		if (this.getShouldUseFacade()) {
-			facade = {
-				preventDefault: function() {
-					facade.preventedDefault = true;
-				},
-				target: this,
-				type: event
-			};
-			args.push(facade);
-		}
-
-		var defaultListeners = [];
-		for (var i = 0; i < listeners.length; i++) {
-			const listener = listeners[i].fn || listeners[i];
-			if (listeners[i].default) {
-				defaultListeners.push(listener);
-			} else {
-				listener.apply(this, args);
-			}
-		}
-		if (!facade || !facade.preventedDefault) {
-			for (var j = 0; j < defaultListeners.length; j++) {
-				defaultListeners[j].apply(this, args);
-			}
-		}
-
+		const args = array.slice(arguments, 1);
+		this.runListeners_(listeners, args, this.buildFacade_(event));
 		return true;
 	}
 
@@ -360,6 +353,34 @@ class EventEmitter extends Disposable {
 			handlers = toArray(handlers);
 			for (var i = 0; i < handlers.length; i++) {
 				handlers[i](event);
+			}
+		}
+	}
+
+	/**
+	 * Runs the given listeners.
+	 * @param {!Array} listeners
+	 * @param {!Array} args
+	 * @param (Object) facade
+	 * @protected
+	 */
+	runListeners_(listeners, args, facade) {
+		if (facade) {
+			args.push(facade);
+		}
+
+		const defaultListeners = [];
+		for (let i = 0; i < listeners.length; i++) {
+			const listener = listeners[i].fn || listeners[i];
+			if (listeners[i].default) {
+				defaultListeners.push(listener);
+			} else {
+				listener.apply(this, args);
+			}
+		}
+		if (!facade || !facade.preventedDefault) {
+			for (let j = 0; j < defaultListeners.length; j++) {
+				defaultListeners[j].apply(this, args);
 			}
 		}
 	}

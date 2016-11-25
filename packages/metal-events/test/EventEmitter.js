@@ -154,7 +154,7 @@ describe('EventEmitter', function() {
 
 		this.emitter.on('event', listener1);
 		this.emitter.on('anotherEvent', listener2);
-		this.emitter.on('event', listener3);
+		this.emitter.on('event', listener3, true);
 
 		assert.deepEqual([listener1, listener3], this.emitter.listeners('event'));
 		assert.deepEqual([listener2], this.emitter.listeners('anotherEvent'));
@@ -384,6 +384,10 @@ describe('EventEmitter', function() {
 
 		this.emitter.emit('event3');
 		assert.strictEqual(1, listener3.callCount);
+	});
+
+	it('should not throw error if trying to remove all listeners before any were subscribed', function() {
+		assert.doesNotThrow(() => this.emitter.removeAllListeners());
 	});
 
 	it('should only allow functions as listeners', function() {

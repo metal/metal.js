@@ -323,12 +323,13 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	removeMatchingListenerObjs_(listenerObjs, listener) {
-		for (var i = listenerObjs.length - 1; i >= 0; i--) {
-			if (this.matchesListener_(listenerObjs[i], listener)) {
-				listenerObjs.splice(i, 1);
+		const finalListeners = [];
+		for (var i = 0; i < listenerObjs.length; i++) {
+			if (!this.matchesListener_(listenerObjs[i], listener)) {
+				finalListeners.push(listenerObjs[i]);
 			}
 		}
-		return listenerObjs.length > 0 ? listenerObjs : null;
+		return finalListeners.length > 0 ? finalListeners : null;
 	}
 
 	/**

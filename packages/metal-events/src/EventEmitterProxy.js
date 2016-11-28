@@ -1,6 +1,6 @@
 'use strict';
 
-import { array, Disposable } from 'metal';
+import { Disposable } from 'metal';
 
 /**
  * EventEmitterProxy utility. It's responsible for linking two EventEmitter
@@ -81,16 +81,6 @@ class EventEmitterProxy extends Disposable {
 	}
 
 	/**
-	 * Adds the proxy listener for the given event.
-	 * @param {string} event
-	 * @return {!EventHandle} The listened event's handle.
-	 * @protected
-	 */
-	addListenerForEvent_(event) {
-		return this.addListener_(event, this.emitOnTarget_.bind(this, event));
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	disposeInternal() {
@@ -102,12 +92,10 @@ class EventEmitterProxy extends Disposable {
 
 	/**
 	 * Emits the specified event type on the target emitter.
-	 * @param {string} eventType
 	 * @protected
 	 */
-	emitOnTarget_(eventType) {
-		var args = [eventType].concat(array.slice(arguments, 1));
-		this.targetEmitter_.emit.apply(this.targetEmitter_, args);
+	emitOnTarget_() {
+		this.targetEmitter_.emit.apply(this.targetEmitter_, arguments);
 	}
 
 	/**
@@ -185,7 +173,10 @@ class EventEmitterProxy extends Disposable {
 	tryToAddListener_(event) {
 		if (this.originEmitter_) {
 			this.proxiedEvents_ = this.proxiedEvents_ || {};
-			this.proxiedEvents_[event] = this.addListenerForEvent_(event);
+			this.proxiedEvents_[event] = this.addListener_(
+				event,
+				this.emitOnTarget_.bind(this, event)
+			);
 		} else {
 			this.pendingEvents_ = this.pendingEvents_ || [];
 			this.pendingEvents_.push(event);

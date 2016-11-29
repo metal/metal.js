@@ -655,7 +655,8 @@ function triggerDelegatedListeners_(container, event, defaultFns) {
 	while (currElement && currElement !== limit && !event.stopped) {
 		if (isAbleToInteractWith_(currElement, event.type, event)) {
 			event.delegateTarget = currElement;
-			ret &= triggerMatchedListeners_(container, currElement, event, defaultFns);
+			ret &= triggerElementListeners_(currElement, event, defaultFns);
+			ret &= triggerSelectorListeners_(container, currElement, event, defaultFns);
 		}
 		currElement = currElement.parentNode;
 	}
@@ -745,6 +746,26 @@ function toggleClassesWithoutNative_(element, classes) {
 }
 
 /**
+ * Triggers all listeners for the given event type that are stored in the
+ * specified element.
+ * @param {!Element} element
+ * @param {!Event} event
+ * @param {!Array} defaultFns Array to collect default listeners in, instead
+ *     of running them.
+ * @return {boolean} False if at least one of the triggered callbacks returns
+ *     false, or true otherwise.
+ * @private
+ */
+function triggerElementListeners_(element, event, defaultFns) {
+	const lastContainer = event[LAST_CONTAINER];
+	if (!isDef(lastContainer) || !contains(lastContainer, element)) {
+		const listeners = domData.get(element, 'listeners', {})[event.type];
+		return triggerListeners_(listeners, event, element, defaultFns);
+	}
+	return true;
+}
+
+/**
  * Triggers the specified event on the given element.
  * NOTE: This should mostly be used for testing, not on real code.
  * @param {!Element} element The node that should trigger the event.
@@ -789,8 +810,7 @@ function triggerListeners_(listeners, event, element, defaultFns) {
 }
 
 /**
- * Triggers all listeners for the given event type that are stored in the
- * specified element.
+ * Triggers all selector listeners for the given event.
  * @param {!Element} container
  * @param {!Element} element
  * @param {!Event} event
@@ -800,24 +820,16 @@ function triggerListeners_(listeners, event, element, defaultFns) {
  *     false, or true otherwise.
  * @private
  */
-function triggerMatchedListeners_(container, element, event, defaultFns) {
-	var ret = true;
-
-	const lastContainer = event[LAST_CONTAINER];
-	if (!isDef(lastContainer) || !contains(lastContainer, element)) {
-		const listeners = domData.get(element, 'listeners', {})[event.type];
-		ret &= triggerListeners_(listeners, event, element, defaultFns);
-	}
-
-	const delegatingData = domData.get(container, 'delegating', {});
-	var selectorsMap = delegatingData[event.type].selectors;
-	var selectors = Object.keys(selectorsMap);
-	for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
+function triggerSelectorListeners_(container, element, event, defaultFns) {
+	let ret = true;
+	const data = domData.get(container, 'delegating', {});
+	const map = data[event.type].selectors;
+	const selectors = Object.keys(map);
+	for (let i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
 		if (match(element, selectors[i])) {
-			const listeners = selectorsMap[selectors[i]];
+			const listeners = map[selectors[i]];
 			ret &= triggerListeners_(listeners, event, element, defaultFns);
 		}
 	}
-
 	return ret;
 }

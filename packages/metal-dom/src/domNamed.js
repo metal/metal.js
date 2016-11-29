@@ -9,7 +9,7 @@ const elementsByTag_ = {};
 const supportCache_ = {};
 export const customEvents = {};
 
-const NEXT_TARGET = '__metal_next_target__';
+const LAST_CONTAINER = '__metal_last_container__';
 const USE_CAPTURE = {
 	blur: true,
 	error: true,
@@ -306,19 +306,15 @@ export function exitDocument(node) {
  */
 function handleDelegateEvent_(event) {
 	normalizeDelegateEvent_(event);
-	var currElement = isDef(event[NEXT_TARGET]) ?
-		event[NEXT_TARGET] :
-		event.target;
 	var ret = true;
 	var container = event.currentTarget;
-	var limit = event.currentTarget.parentNode;
 	var defFns = [];
 
-	ret &= triggerDelegatedListeners_(container, currElement, event, limit, defFns);
+	ret &= triggerDelegatedListeners_(container, event, defFns);
 	ret &= triggerDefaultDelegatedListeners_(defFns, event);
 
 	event.delegateTarget = null;
-	event[NEXT_TARGET] = limit;
+	event[LAST_CONTAINER] = container;
 	return ret;
 }
 
@@ -644,17 +640,17 @@ function triggerDefaultDelegatedListeners_(defFns, event) {
  * This triggers all matched delegated listeners of a given event type when its
  * delegated target is able to interact.
  * @param {!Element} container
- * @param {!Element} currElement
  * @param {!Event} event
- * @param {!Element} limit the fartest parent of the given element
  * @param {!Array} defaultFns Array to collect default listeners in, instead
  *     of running them.
  * @return {boolean} False if at least one of the triggered callbacks returns
  *     false, or true otherwise.
  * @private
  */
-function triggerDelegatedListeners_(container, currElement, event, limit, defaultFns) {
+function triggerDelegatedListeners_(container, event, defaultFns) {
 	let ret = true;
+	let currElement = event.target;
+	const limit = container.parentNode;
 
 	while (currElement && currElement !== limit && !event.stopped) {
 		if (isAbleToInteractWith_(currElement, event.type, event)) {
@@ -805,15 +801,20 @@ function triggerListeners_(listeners, event, element, defaultFns) {
  * @private
  */
 function triggerMatchedListeners_(container, element, event, defaultFns) {
-	var listeners = domData.get(element, 'listeners', {})[event.type];
-	var ret = triggerListeners_(listeners, event, element, defaultFns);
+	var ret = true;
+
+	const lastContainer = event[LAST_CONTAINER];
+	if (!isDef(lastContainer) || !contains(lastContainer, element)) {
+		const listeners = domData.get(element, 'listeners', {})[event.type];
+		ret &= triggerListeners_(listeners, event, element, defaultFns);
+	}
 
 	const delegatingData = domData.get(container, 'delegating', {});
 	var selectorsMap = delegatingData[event.type].selectors;
 	var selectors = Object.keys(selectorsMap);
 	for (var i = 0; i < selectors.length && !event.stoppedImmediate; i++) {
 		if (match(element, selectors[i])) {
-			listeners = selectorsMap[selectors[i]];
+			const listeners = selectorsMap[selectors[i]];
 			ret &= triggerListeners_(listeners, event, element, defaultFns);
 		}
 	}

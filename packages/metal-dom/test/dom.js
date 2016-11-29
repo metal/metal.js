@@ -583,6 +583,23 @@ describe('dom', function() {
 				assert.strictEqual(matchedElements[0], listenerTargets[0]);
 			});
 
+			it('should trigger listener twice when two ancestors are delegating', function() {
+				var element = document.createElement('div');
+				element.innerHTML = `<div class="nomatch">
+					<div class="nomatch">
+						<div class="match"></div>
+					</div>
+				</div>`;
+				document.body.appendChild(element);
+
+				var listener = sinon.stub();
+				dom.delegate(element, 'click', '.match', listener);
+				dom.delegate(element.childNodes[0], 'click', '.match', listener);
+
+				dom.triggerEvent(element.querySelector('.match'), 'click');
+				assert.strictEqual(2, listener.callCount);
+			});
+
 			it('should not trigger delegate event for parents of given element', function() {
 				var element = document.createElement('div');
 				element.innerHTML = '<div class="nomatch"></div>';

@@ -645,9 +645,9 @@ describe('State', function() {
 
 		state.on('stateChanged', function(data, facade) {
 			assert.strictEqual(2, Object.keys(data.changes).length);
-			assert.strictEqual(undefined, data.changes.key1.prevVal);
+			assert.strictEqual(1, data.changes.key1.prevVal);
 			assert.strictEqual(12, data.changes.key1.newVal);
-			assert.strictEqual(undefined, data.changes.key2.prevVal);
+			assert.strictEqual(2, data.changes.key2.prevVal);
 			assert.strictEqual(21, data.changes.key2.newVal);
 			assert.strictEqual(state, facade.target);
 			assert.strictEqual('stateChanged', facade.type);

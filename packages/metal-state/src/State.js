@@ -588,12 +588,8 @@ class State extends EventEmitter {
 			return;
 		}
 
-		var info = this.getStateInfo(name);
-		if (!this.hasInitialValue_(name) && info.state === State.KeyStates.UNINITIALIZED) {
-			info.state = State.KeyStates.INITIALIZED;
-		}
-
-		var prevVal = this.get(name);
+		const prevVal = this.get(name);
+		const info = this.getStateInfo(name);
 		info.value = this.callSetter_(name, value, prevVal);
 		this.assertGivenIfRequired_(name);
 		info.written = true;

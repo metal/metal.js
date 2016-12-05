@@ -1,7 +1,6 @@
 'use strict';
 
 import {
-	getFunctionName,
 	getStaticProperty,
 	isBoolean,
 	isDefAndNotNull,
@@ -11,6 +10,7 @@ import {
 	isString,
 	object
 } from 'metal';
+import { addListenersFromObj } from './events/events';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
@@ -165,26 +165,15 @@ class Component extends EventEmitter {
 
 	/**
 	 * Adds the listeners specified in the given object.
-	 * @param {Object} events
+	 * @param {!Object} obj
 	 * @protected
 	 */
-	addListenersFromObj_(events) {
-		var eventNames = Object.keys(events || {});
-		for (var i = 0; i < eventNames.length; i++) {
-			var info = this.extractListenerInfo_(events[eventNames[i]]);
-			if (info.fn) {
-				var handler;
-				if (info.selector) {
-					handler = this.delegate(eventNames[i], info.selector, info.fn);
-				} else {
-					handler = this.on(eventNames[i], info.fn);
-				}
-				if (!this.eventsStateKeyHandler_) {
-					this.eventsStateKeyHandler_ = new EventHandler();
-				}
-				this.eventsStateKeyHandler_.add(handler);
-			}
+	addListenersFromObj_(obj) {
+		if (!this.eventsStateKeyHandler_) {
+			this.eventsStateKeyHandler_ = new EventHandler();
 		}
+		const handles = addListenersFromObj(this, obj);
+		this.eventsStateKeyHandler_.add(...handles);
 	}
 
 	/**
@@ -299,9 +288,8 @@ class Component extends EventEmitter {
 	 * @inheritDoc
 	 */
 	disposeInternal() {
-		this.disposed();
-
 		this.detach();
+		this.disposed();
 
 		this.elementEventProxy_.dispose();
 		this.elementEventProxy_ = null;
@@ -334,26 +322,6 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Extracts listener info from the given value.
-	 * @param {function()|string|{selector:string,fn:function()|string}} value
-	 * @return {!{selector:string,fn:function()}}
-	 * @protected
-	 */
-	extractListenerInfo_(value) {
-		var info = {
-			fn: value
-		};
-		if (isObject(value) && !isFunction(value)) {
-			info.selector = value.selector;
-			info.fn = value.fn;
-		}
-		if (isString(info.fn)) {
-			info.fn = this.getListenerFn(info.fn);
-		}
-		return info;
-	}
-
-	/**
 	 * Gets data about where this component was attached at.
 	 * @return {!Object}
 	 */
@@ -375,24 +343,6 @@ class Component extends EventEmitter {
 	 */
 	getInitialConfig() {
 		return this.initialConfig_;
-	}
-
-	/**
-	 * Gets the listener function from its name. If the name is prefixed with a
-	 * component id, the function will be called on that specified component. Otherwise
-	 * it will be called on this component instead.
-	 * @param {string} fnName
-	 * @return {function()}
-	 */
-	getListenerFn(fnName) {
-		if (isFunction(this[fnName])) {
-			return this[fnName].bind(this);
-		} else {
-			console.error('No function named "' + fnName + '" was found in the ' +
-				'component "' + getFunctionName(this.constructor) + '". Make ' +
-				'sure that you specify valid function names when adding inline listeners.'
-			);
-		}
 	}
 
 	/**

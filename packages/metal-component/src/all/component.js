@@ -7,3 +7,4 @@ import ComponentRenderer from '../ComponentRenderer';
 
 export default Component;
 export { Component, ComponentDataManager, ComponentRegistry, ComponentRenderer };
+export * from '../events/events';

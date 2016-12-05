@@ -11,7 +11,7 @@ import {
 	object
 } from 'metal';
 import { append, delegate, domData, exitDocument } from 'metal-dom';
-import { Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
+import { getComponentFn, Component, ComponentRegistry, ComponentRenderer } from 'metal-component';
 import IncrementalDomAop from './IncrementalDomAop';
 import IncrementalDomChildren from './children/IncrementalDomChildren';
 import IncrementalDomUnusedComponents from './cleanup/IncrementalDomUnusedComponents';
@@ -106,7 +106,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 					// won't cause conflicts.
 					element.setAttribute(key, fn);
 				}
-				fn = this.component_.getListenerFn(fn);
+				fn = getComponentFn(this.component_, fn);
 			}
 			element[handleKey] = delegate(document, eventName, element, fn);
 		} else {

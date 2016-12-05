@@ -780,9 +780,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 				comp
 			);
 		}
-		if (!comp.wasRendered) {
-			comp.renderAsSubComponent();
-		}
 		return comp;
 	}
 

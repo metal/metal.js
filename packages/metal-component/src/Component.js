@@ -145,7 +145,7 @@ class Component extends EventEmitter {
 		this.created();
 		this.componentCreated_ = true;
 		if (opt_parentElement !== false) {
-			this.render_(opt_parentElement);
+			this.renderComponent(opt_parentElement);
 		}
 	}
 
@@ -373,15 +373,23 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Informs that the component has just been rendered, via both a lifecycle
-	 * function and an event. The renderer is the one responsible for calling
-	 * this when appropriate.
+	 * Informs that the component that the rendered has finished rendering it. The
+	 * renderer is the one responsible for calling this when appropriate. This
+	 * will emit events and run the appropriate lifecycle for the first render.
 	 */
 	informRendered() {
 		var firstRender = !this.hasRendererRendered_;
 		this.hasRendererRendered_ = true;
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
+
+		if (firstRender) {
+			this.emit('render');
+			syncState(this);
+			this.attach(this.firstParentElement_);
+			this.firstParentElement_ = null;
+			this.wasRendered = true;
+		}
 	}
 
 	/**
@@ -395,13 +403,13 @@ class Component extends EventEmitter {
 
 	/**
 	 * Merges two values for the ELEMENT_CLASSES property into a single one.
-	 * @param {string} val1
-	 * @param {string} val2
+	 * @param {string} class1
+	 * @param {string} class2
 	 * @return {string} The merged value.
 	 * @protected
 	 */
-	mergeElementClasses_(val1, val2) {
-		return val1 ? val1 + ' ' + (val2 || '') : val2;
+	mergeElementClasses_(class1, class2) {
+		return class1 ? class1 + ' ' + (class2 || '') : class2;
 	}
 
 	/**
@@ -434,46 +442,21 @@ class Component extends EventEmitter {
 			element = opt_configOrElement;
 		}
 		var instance = new Ctor(config, false);
-		instance.render_(element);
+		instance.renderComponent(element);
 		return instance;
 	}
 
 	/**
-	 * Lifecycle. Renders the component into the DOM.
-	 *
-	 * Render Lifecycle:
-	 *   render event - The "render" event is emitted. Renderers act on this step.
-	 *   state synchronization - All synchronization methods are called.
-	 *   attach - Attach Lifecycle is called.
-	 *
+	 * Renders the component into the DOM via its `ComponentRenderer`. Stores the
+	 * given parent element to be used when the renderer is done (`informRendered`).
 	 * @param {(string|Element|boolean)=} opt_parentElement Optional parent element
 	 *     to render the component. If set to `false`, the element won't be
 	 *     attached to any element after rendering. In this case, `attach` should
 	 *     be called manually later to actually attach it to the dom.
-	 * @param {boolean=} opt_skipRender Optional flag indicating that the actual
-	 *     rendering should be skipped. Only the other render lifecycle logic will
-	 *     be run, like syncing state and attaching the element. Should only
-	 *     be set if the component has already been rendered, like sub components.
-	 * @protected
 	 */
-	render_(opt_parentElement, opt_skipRender) {
-		if (!opt_skipRender) {
-			this.getRenderer().render();
-			this.emit('render');
-		}
-		syncState(this);
-		this.attach(opt_parentElement);
-		this.wasRendered = true;
-	}
-
-	/**
-	 * Renders this component as a subcomponent, meaning that no actual rendering is
-	 * needed since it was already rendered by the parent component. This just handles
-	 * other logics from the rendering lifecycle, like calling sync methods for the
-	 * state.
-	 */
-	renderAsSubComponent() {
-		this.render_(null, true);
+	renderComponent(opt_parentElement) {
+		this.firstParentElement_ = opt_parentElement;
+		this.getRenderer().render();
 	}
 
 	/**

@@ -541,20 +541,6 @@ describe('Component', function() {
 			assert.strictEqual(container, comp.element.parentNode);
 		});
 
-		it('should not emit "render" event when renderAsSubComponent is called', function() {
-			comp = new Component(
-				{
-					element: document.createElement('div')
-				},
-				false
-			);
-			var listenerFn = sinon.stub();
-			comp.once('render', listenerFn);
-
-			comp.renderAsSubComponent();
-			assert.strictEqual(0, listenerFn.callCount);
-		});
-
 		it('should attach component on requested parent at specified position', function() {
 			var container = document.createElement('div');
 			var sibling1 = document.createElement('div');

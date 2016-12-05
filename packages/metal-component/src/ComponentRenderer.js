@@ -34,19 +34,6 @@ class ComponentRenderer extends Disposable {
 	}
 
 	/**
-	 * Informs the component that it has just been rendered, via both a lifecycle
-	 * function and an event. Sub classes should make sure to call this when
-	 * appropriate.
-	 * @protected
-	 */
-	informRendered_() {
-		var firstRender = !this.isRendered_;
-		this.isRendered_ = true;
-		this.component_.rendered(firstRender);
-		this.component_.emit('rendered', firstRender);
-	}
-
-	/**
 	 * Renders the whole content (including its main element) and informs the
 	 * component about it. Should be overridden by sub classes.
 	 */
@@ -54,19 +41,7 @@ class ComponentRenderer extends Disposable {
 		if (!this.component_.element) {
 			this.component_.element = document.createElement('div');
 		}
-		this.informRendered_();
-	}
-
-	/**
-	 * Rerenders the component according to the given changes.
-	 * @param {!Object<string, Object>} changes Object containing the names
-	 *     of all changed state keys, each mapped to an object with its new
-	 *     (newVal) and previous (prevVal) values.
-	 */
-	sync(changes) {
-		if (this.isRendered_) {
-			this.update(changes);
-		}
+		this.component_.informRendered();
 	}
 
 	/**

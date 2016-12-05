@@ -474,8 +474,8 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentStateChanged_(event) {
-		if (!this.hasSyncUpdates() && !this.skipUpdates_) {
-			this.getRenderer().sync(event);
+		if (!this.hasSyncUpdates()) {
+			this.updateRenderer_(event);
 		}
 		this.syncStateFromChanges_(event.changes);
 		this.emit('stateSynced', event);
@@ -488,13 +488,11 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentStateKeyChanged_(data) {
-		if (!this.skipUpdates_) {
-			this.getRenderer().sync({
-				changes: {
-					[data.key]: data
-				}
-			});
-		}
+		this.updateRenderer_({
+			changes: {
+				[data.key]: data
+			}
+		});
 	}
 
 	/**
@@ -503,6 +501,18 @@ class Component extends EventEmitter {
 	 */
 	hasSyncUpdates() {
 		return this.syncUpdates_;
+	}
+
+	/**
+	 * Informs that the component has just been rendered, via both a lifecycle
+	 * function and an event. The renderer is the one responsible for calling
+	 * this when appropriate.
+	 */
+	informRendered() {
+		var firstRender = !this.hasRendererRendered_;
+		this.hasRendererRendered_ = true;
+		this.rendered(firstRender);
+		this.emit('rendered', firstRender);
 	}
 
 	/**
@@ -728,6 +738,17 @@ class Component extends EventEmitter {
 	 *     first render.
 	 */
 	rendered() {}
+
+	/**
+	 * Calls "update" on the renderer, passing it the changed data.
+	 * @param {!{changes: !Object}} data
+	 * @protected
+	 */
+	updateRenderer_(data) {
+		if (!this.skipUpdates_ && this.hasRendererRendered_) {
+			this.getRenderer().update(data);
+		}
+	}
 
 	/**
 	 * Validator logic for the `events` state key.

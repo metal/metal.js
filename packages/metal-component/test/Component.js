@@ -660,11 +660,24 @@ describe('Component', function() {
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			const renderer = comp.getRenderer();
-			sinon.spy(renderer, 'sync');
+			sinon.spy(renderer, 'update');
 
 			comp.visible = false;
 			comp.once('stateChanged', function() {
-				assert.strictEqual(1, renderer.sync.callCount);
+				assert.strictEqual(1, renderer.update.callCount);
+				done();
+			});
+		});
+
+		it('should not call renderer\'s update method if state changes before render', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			comp = new CustomComponent({}, false);
+			const renderer = comp.getRenderer();
+			sinon.spy(renderer, 'update');
+
+			comp.visible = false;
+			async.nextTick(function() {
+				assert.strictEqual(0, renderer.update.callCount);
 				done();
 			});
 		});
@@ -673,17 +686,17 @@ describe('Component', function() {
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			const renderer = comp.getRenderer();
-			sinon.spy(renderer, 'sync');
+			sinon.spy(renderer, 'update');
 
 			comp.startSkipUpdates();
 			comp.visible = false;
 			comp.once('stateChanged', function() {
-				assert.strictEqual(0, renderer.sync.callCount);
+				assert.strictEqual(0, renderer.update.callCount);
 
 				comp.stopSkipUpdates();
 				comp.visible = true;
 				comp.once('stateChanged', function() {
-					assert.strictEqual(1, renderer.sync.callCount);
+					assert.strictEqual(1, renderer.update.callCount);
 					done();
 				});
 			});
@@ -696,7 +709,7 @@ describe('Component', function() {
 
 				comp = new CustomComponent();
 				const renderer = comp.getRenderer();
-				sinon.spy(renderer, 'sync');
+				sinon.spy(renderer, 'update');
 
 				comp.visible = false;
 				const expectedData = {
@@ -706,20 +719,20 @@ describe('Component', function() {
 						newVal: false
 					}
 				};
-				assert.strictEqual(1, renderer.sync.callCount);
-				assert.deepEqual(expectedData, renderer.sync.args[0][0].changes);
+				assert.strictEqual(1, renderer.update.callCount);
+				assert.deepEqual(expectedData, renderer.update.args[0][0].changes);
 			});
 
-			it.skip('should not call the renderer\'s update method when state changes before render', function() {
+			it('should not call the renderer\'s update method when state changes before render', function() {
 				const CustomComponent = createCustomComponentClass();
 				CustomComponent.SYNC_UPDATES = true;
 
 				comp = new CustomComponent({}, false);
 				const renderer = comp.getRenderer();
-				sinon.spy(renderer, 'sync');
+				sinon.spy(renderer, 'update');
 
 				comp.visible = false;
-				assert.strictEqual(0, renderer.sync.callCount);
+				assert.strictEqual(0, renderer.update.callCount);
 			});
 		});
 	});

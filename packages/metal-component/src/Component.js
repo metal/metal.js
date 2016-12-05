@@ -136,7 +136,15 @@ class Component extends EventEmitter {
 			object.mixin({}, this.renderer_.getExtraDataConfig(), Component.DATA)
 		);
 
-		this.on('stateChanged', this.handleStateChanged_);
+		this.syncUpdates_ = getStaticProperty(this.constructor, 'SYNC_UPDATES');
+		if (this.hasSyncUpdates()) {
+			this.on(
+				'stateKeyChanged',
+				this.handleComponentStateKeyChanged_.bind(this)
+			);
+		}
+
+		this.on('stateChanged', this.handleComponentStateChanged_);
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
 
@@ -465,10 +473,34 @@ class Component extends EventEmitter {
 	 * @param {Event} event
 	 * @protected
 	 */
-	handleStateChanged_(event) {
-		this.getRenderer().sync(event);
+	handleComponentStateChanged_(event) {
+		if (!this.hasSyncUpdates()) {
+			this.getRenderer().sync(event);
+		}
 		this.syncStateFromChanges_(event.changes);
 		this.emit('stateSynced', event);
+	}
+
+	/**
+	 * Handles a `stateKeyChanged` event. This is only called for components that
+	 * have requested updates to happen synchronously.
+	 * @param {!{key: string, newVal: *, prevVal: *}} data
+	 * @protected
+	 */
+	handleComponentStateKeyChanged_(data) {
+		this.getRenderer().sync({
+			changes: {
+				[data.key]: data
+			}
+		});
+	}
+
+	/**
+	 * Checks if this component has sync updates enabled.
+	 * @return {boolean}
+	 */
+	hasSyncUpdates() {
+		return this.syncUpdates_;
 	}
 
 	/**
@@ -739,6 +771,10 @@ Component.DATA = {
 	}
 };
 
+/**
+ * Name of the flag used to identify component constructors via their prototype.
+ * @type {string}
+ */
 Component.COMPONENT_FLAG = '__metal_component__';
 
 /**

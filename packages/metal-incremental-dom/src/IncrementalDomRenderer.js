@@ -36,11 +36,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		// functions each time.
 		this.renderInsidePatchDontSkip_ = this.renderInsidePatchDontSkip_.bind(this);
 
-		if (!this.hasSyncUpdates()) {
-			// If the component is being updated synchronously we'll just reuse the
-			// `handleRendererStateKeyChanged_` function from `ComponentRenderer`.
-			this.component_.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
-		}
+		this.component_.on('stateKeyChanged', this.handleStateKeyChanged_.bind(this));
 	}
 
 	/**
@@ -444,19 +440,6 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		} else {
 			return this.handleRegularCall_.apply(this, arguments);
 		}
-	}
-
-	/**
-	 * Handles the `dataPropChanged` event. Overrides original method from
-	 * `ComponentRenderer` to guarantee that `IncrementalDomRenderer`'s logic
-	 * will run first.
-	 * @param {!Object} data
-	 * @override
-	 * @protected
-	 */
-	handleRendererStateKeyChanged_(data) {
-		this.handleStateKeyChanged_(data);
-		super.handleRendererStateKeyChanged_(data);
 	}
 
 	/**

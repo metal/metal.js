@@ -1,6 +1,6 @@
 'use strict';
 
-import { getStaticProperty, Disposable } from 'metal';
+import { Disposable } from 'metal';
 
 /**
  * Base class that component renderers should extend from. It defines the
@@ -15,14 +15,6 @@ class ComponentRenderer extends Disposable {
 	constructor(component) {
 		super();
 		this.component_ = component;
-
-		this.syncUpdates_ = getStaticProperty(component.constructor, 'SYNC_UPDATES');
-		if (this.hasSyncUpdates()) {
-			this.component_.on(
-				'stateKeyChanged',
-				this.handleRendererStateKeyChanged_.bind(this)
-			);
-		}
 	}
 
 	/**
@@ -39,31 +31,6 @@ class ComponentRenderer extends Disposable {
 	 */
 	getExtraDataConfig() {
 		return null;
-	}
-
-	/**
-	 * Handles a `dataPropChanged` event from the component's data manager. This
-	 * is similar to `handleRendererStateChanged_`, but only called for
-	 * components that have requested updates to happen synchronously.
-	 * @param {!{key: string, newVal: *, prevVal: *}} data
-	 * @protected
-	 */
-	handleRendererStateKeyChanged_(data) {
-		if (this.shouldRerender_()) {
-			this.update({
-				changes: {
-					[data.key]: data
-				}
-			});
-		}
-	}
-
-	/**
-	 * Checks if this component has sync updates enabled.
-	 * @return {boolean}
-	 */
-	hasSyncUpdates() {
-		return this.syncUpdates_;
 	}
 
 	/**
@@ -106,7 +73,7 @@ class ComponentRenderer extends Disposable {
 	 *     (newVal) and previous (prevVal) values.
 	 */
 	sync(changes) {
-		if (!this.hasSyncUpdates() && this.shouldRerender_()) {
+		if (this.shouldRerender_()) {
 			this.update(changes);
 		}
 	}

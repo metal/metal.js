@@ -154,7 +154,7 @@ class Component extends EventEmitter {
 	 * @return {Element}
 	 */
 	get element() {
-		return this.elementVal_;
+		return this.elementValue_;
 	}
 
 	/**
@@ -337,6 +337,25 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Handles a change in the component's element.
+	 * @param {Element} prevVal
+	 * @param {Element} newVal
+	 * @protected
+	 */
+	handleComponentElementChanged_(prevVal, newVal) {
+		this.elementEventProxy_.setOriginEmitter(newVal);
+		if (this.componentCreated_) {
+			this.emit('elementChanged', {
+				prevVal,
+				newVal
+			});
+			if (newVal && this.wasRendered) {
+				this.syncVisible(this.dataManager_.get(this, 'visible'));
+			}
+		}
+	}
+
+	/**
 	 * Handles state batch changes. Calls any existing `sync` functions that
 	 * match the changed state keys.
 	 * @param {Event} event
@@ -487,22 +506,13 @@ class Component extends EventEmitter {
 		}
 
 		if (val) {
-			val = toElement(val) || this.elementVal_;
+			val = toElement(val) || this.elementValue_;
 		}
 
-		if (this.elementVal_ !== val) {
-			var prev = this.elementVal_;
-			this.elementVal_ = val;
-			this.elementEventProxy_.setOriginEmitter(val);
-			if (this.componentCreated_) {
-				this.emit('elementChanged', {
-					prevVal: prev,
-					newVal: val
-				});
-				if (val && this.wasRendered) {
-					this.syncVisible(this.dataManager_.get(this, 'visible'));
-				}
-			}
+		if (this.elementValue_ !== val) {
+			const prev = this.elementValue_;
+			this.elementValue_ = val;
+			this.handleComponentElementChanged_(prev, val);
 		}
 	}
 

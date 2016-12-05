@@ -12,34 +12,23 @@ describe('ComponentRenderer', function() {
 		};
 	});
 
-	it('should return the component via getComponent()', function() {
-		const renderer = new ComponentRenderer(componentStub);
-		assert.strictEqual(componentStub, renderer.getComponent());
-	});
-
 	it('should set element to simple empty div as the default render implementation', function() {
-		const renderer = new ComponentRenderer(componentStub);
-		renderer.render();
+		ComponentRenderer.render(componentStub);
 		assert.ok(isElement(componentStub.element));
 		assert.strictEqual('DIV', componentStub.element.tagName);
 	});
 
 	it('should call component\'s "informRendered" function after rendered', function() {
-		const renderer = new ComponentRenderer(componentStub);
-		assert.equal(0, componentStub.informRendered.callCount);
-
-		renderer.render();
+		ComponentRenderer.render(componentStub);
 		assert.equal(1, componentStub.informRendered.callCount);
 	});
 
 	it('should return nothing by default from getExtraDataConfig', function() {
-		const renderer = new ComponentRenderer(componentStub);
-		assert.strictEqual(null, renderer.getExtraDataConfig());
+		assert.equal(undefined, ComponentRenderer.getExtraDataConfig(componentStub));
 	});
 
 	it('should have a function called "update"', function() {
-		const renderer = new ComponentRenderer(componentStub);
-		assert.ok(isFunction(renderer.update));
-		assert.doesNotThrow(() => renderer.update());
+		assert.ok(isFunction(ComponentRenderer.update));
+		assert.doesNotThrow(() => ComponentRenderer.update(componentStub));
 	});
 });

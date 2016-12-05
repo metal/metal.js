@@ -20,7 +20,7 @@ import IncrementalDomUtils from './utils/IncrementalDomUtils';
 /**
  * Class responsible for rendering components via incremental dom.
  */
-class IncrementalDomRenderer extends ComponentRenderer {
+class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	/**
 	 * @inheritDoc
 	 */

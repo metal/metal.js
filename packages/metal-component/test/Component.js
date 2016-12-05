@@ -23,8 +23,8 @@ describe('Component', function() {
 			sinon.spy(Component.prototype, 'detached');
 			sinon.spy(Component.prototype, 'disposed');
 
-			sinon.spy(Component.RENDERER.prototype, 'render');
-			sinon.spy(Component.RENDERER.prototype, 'update');
+			sinon.spy(Component.RENDERER, 'render');
+			sinon.spy(Component.RENDERER, 'update');
 		});
 
 		afterEach(function() {
@@ -32,8 +32,8 @@ describe('Component', function() {
 			Component.prototype.detached.restore();
 			Component.prototype.disposed.restore();
 
-			Component.RENDERER.prototype.render.restore();
-			Component.RENDERER.prototype.update.restore();
+			Component.RENDERER.render.restore();
+			Component.RENDERER.update.restore();
 		});
 
 		it('should run component render lifecycle', function() {
@@ -46,11 +46,11 @@ describe('Component', function() {
 			comp = new TestComponent();
 
 			sinon.assert.callOrder(
-				Component.RENDERER.prototype.render,
+				Component.RENDERER.render,
 				renderListener,
 				Component.prototype.attached
 			);
-			sinon.assert.callCount(Component.RENDERER.prototype.render, 1);
+			sinon.assert.callCount(Component.RENDERER.render, 1);
 			sinon.assert.callCount(renderListener, 1);
 			sinon.assert.callCount(Component.prototype.attached, 1);
 			sinon.assert.notCalled(Component.prototype.detached);
@@ -65,7 +65,7 @@ describe('Component', function() {
 			}
 			comp = new TestComponent({}, false);
 
-			sinon.assert.notCalled(Component.RENDERER.prototype.render);
+			sinon.assert.notCalled(Component.RENDERER.render);
 			sinon.assert.notCalled(renderListener);
 			sinon.assert.notCalled(Component.prototype.attached);
 			sinon.assert.notCalled(Component.prototype.detached);
@@ -644,7 +644,8 @@ describe('Component', function() {
 					}
 				};
 				assert.strictEqual(1, renderer.update.callCount);
-				assert.deepEqual(expectedData, renderer.update.args[0][0].changes);
+				assert.strictEqual(comp, renderer.update.args[0][0]);
+				assert.deepEqual(expectedData, renderer.update.args[0][1].changes);
 			});
 
 			it('should not call the renderer\'s update method when state changes before render', function() {
@@ -879,7 +880,7 @@ describe('Component', function() {
 		comp = new TestComponent();
 
 		var renderer = comp.getRenderer();
-		assert.ok(renderer instanceof ComponentRenderer);
+		assert.ok(renderer instanceof ComponentRenderer.constructor);
 	});
 
 	it('should get the data manager', function() {
@@ -908,16 +909,16 @@ describe('Component', function() {
 	}
 
 	function createCustomRenderer(opt_rendererContentOrFn) {
-		class CustomRenderer extends ComponentRenderer {
-			render() {
-				super.render();
+		class CustomRenderer extends ComponentRenderer.constructor {
+			render(component) {
+				super.render(component);
 				if (core.isFunction(opt_rendererContentOrFn)) {
 					opt_rendererContentOrFn();
 				} else {
-					this.component_.element.innerHTML = opt_rendererContentOrFn;
+					component.element.innerHTML = opt_rendererContentOrFn;
 				}
 			}
 		}
-		return CustomRenderer;
+		return new CustomRenderer();
 	}
 });

@@ -123,11 +123,12 @@ class Component extends EventEmitter {
 		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;
 
-		this.renderer_ = this.createRenderer();
+		this.renderer_ = getStaticProperty(this.constructor, 'RENDERER');
+		this.renderer_.setUp(this);
 		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
 		this.dataManager_.setUp(
 			this,
-			object.mixin({}, this.renderer_.getExtraDataConfig(), Component.DATA)
+			object.mixin({}, this.renderer_.getExtraDataConfig(this), Component.DATA)
 		);
 
 		this.syncUpdates_ = getStaticProperty(this.constructor, 'SYNC_UPDATES');
@@ -213,16 +214,6 @@ class Component extends EventEmitter {
 	created() {}
 
 	/**
-	 * Creates the renderer for this component. Sub classes can override this to
-	 * return a custom renderer as needed.
-	 * @return {!ComponentRenderer}
-	 */
-	createRenderer() {
-		const RendererCtor = getStaticProperty(this.constructor, 'RENDERER');
-		return new RendererCtor(this);
-	}
-
-	/**
 	 * Listens to a delegate event on the component's element.
 	 * @param {string} eventName The name of the event to listen to.
 	 * @param {string} selector The selector that matches the child elements that
@@ -282,7 +273,7 @@ class Component extends EventEmitter {
 		this.dataManager_.dispose(this);
 		this.dataManager_ = null;
 
-		this.renderer_.dispose();
+		this.renderer_.dispose(this);
 		this.renderer_ = null;
 
 		super.disposeInternal();
@@ -475,7 +466,7 @@ class Component extends EventEmitter {
 	 */
 	renderComponent(opt_parentElement) {
 		this.firstParentElement_ = opt_parentElement;
-		this.getRenderer().render();
+		this.getRenderer().render(this);
 	}
 
 	/**
@@ -585,7 +576,7 @@ class Component extends EventEmitter {
 	 */
 	updateRenderer_(data) {
 		if (!this.skipUpdates_ && this.hasRendererRendered_) {
-			this.getRenderer().update(data);
+			this.getRenderer().update(this, data);
 		}
 	}
 

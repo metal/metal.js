@@ -1,53 +1,51 @@
 'use strict';
 
-import { Disposable } from 'metal';
-
 /**
  * Base class that component renderers should extend from. It defines the
  * required methods all renderers should have.
  */
-class ComponentRenderer extends Disposable {
-	/**
-	 * Constructor function for `ComponentRenderer`.
-	 * @param {!Component} component The component that this renderer is
-	 *     responsible for.
-	 */
-	constructor(component) {
-		super();
-		this.component_ = component;
-	}
+class ComponentRenderer {
 
 	/**
-	 * Returns this renderer's component.
-	 * @return {!Component}
+	 * Disposes of any data specific to the given component.
+	 * @param {!Component} component
 	 */
-	getComponent() {
-		return this.component_;
-	}
+	dispose() {}
 
 	/**
 	 * Returns extra configuration for data that should be added to the manager.
+	 * Sub classes can override to return `State` config for properties that
+	 * should be added to the component.
+	 * @param {!Component} component The component to setup the renderer for.
 	 * @return {Object}
 	 */
-	getExtraDataConfig() {
-		return null;
-	}
+	getExtraDataConfig() {}
 
 	/**
 	 * Renders the whole content (including its main element) and informs the
 	 * component about it. Should be overridden by sub classes.
+	 * @param {!Component} component
 	 */
-	render() {
-		if (!this.component_.element) {
-			this.component_.element = document.createElement('div');
+	render(component) {
+		if (!component.element) {
+			component.element = document.createElement('div');
 		}
-		this.component_.informRendered();
+		component.informRendered();
 	}
+
+	/**
+	 * Sets up this component to be used by this renderer. Sub classes should
+	 * override as needed for more behavior.
+	 * @param {!Component} component
+	 */
+	setUp() {}
 
 	/**
 	 * Updates the component's element html. This is automatically called when
 	 * the value of at least one of the component's state keys has changed.
-	 * Should be implemented by sub classes.
+	 * Should be implemented by sub classes. Sub classes have to remember to call
+	 * "informRendered" on the component when any update rendering is done.
+	 * @param {!Component} component
 	 * @param {Object.<string, Object>} changes Object containing the names
 	 *     of all changed state keys, each mapped to an object with its new
 	 *     (newVal) and previous (prevVal) values.
@@ -55,4 +53,4 @@ class ComponentRenderer extends Disposable {
 	update() {}
 }
 
-export default ComponentRenderer;
+export default new ComponentRenderer();

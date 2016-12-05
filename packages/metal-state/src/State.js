@@ -555,7 +555,7 @@ class State extends EventEmitter {
 	 * Sets a map of keys that are not valid state keys.
 	 * @param {!Object<string, boolean>}
 	 */
-	setKeysBlacklist_(blacklist) {
+	setKeysBlacklist(blacklist) {
 		this.keysBlacklist_ = blacklist;
 	}
 

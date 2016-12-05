@@ -22,7 +22,7 @@ const ComponentDataManager = {
 	 */
 	createState_(component, data) {
 		const state = new State(component.getInitialConfig(), component, component);
-		state.setKeysBlacklist_(this.BLACKLIST);
+		state.setKeysBlacklist(this.BLACKLIST);
 		state.configState(
 			object.mixin({}, data, State.getStateStatic(component.constructor))
 		);

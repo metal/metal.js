@@ -35,7 +35,7 @@ describe('State', function() {
 		}
 
 		var test = new Test();
-		test.setKeysBlacklist_({
+		test.setKeysBlacklist({
 			invalid: true
 		});
 		assert.throws(function() {

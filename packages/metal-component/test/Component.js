@@ -655,6 +655,75 @@ describe('Component', function() {
 		});
 	});
 
+	describe('Updates', function() {
+		it('should call renderer\'s update method if state changes', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			comp = new CustomComponent();
+			const renderer = comp.getRenderer();
+			sinon.spy(renderer, 'sync');
+
+			comp.visible = false;
+			comp.once('stateChanged', function() {
+				assert.strictEqual(1, renderer.sync.callCount);
+				done();
+			});
+		});
+
+		it('should not call renderer\'s update method if state changes while skipping updates', function(done) {
+			var CustomComponent = createCustomComponentClass();
+			comp = new CustomComponent();
+			const renderer = comp.getRenderer();
+			sinon.spy(renderer, 'sync');
+
+			comp.startSkipUpdates();
+			comp.visible = false;
+			comp.once('stateChanged', function() {
+				assert.strictEqual(0, renderer.sync.callCount);
+
+				comp.stopSkipUpdates();
+				comp.visible = true;
+				comp.once('stateChanged', function() {
+					assert.strictEqual(1, renderer.sync.callCount);
+					done();
+				});
+			});
+		});
+
+		describe('SYNC_UPDATES', function() {
+			it('should call the renderer\'s update method synchronously if state changes', function() {
+				const CustomComponent = createCustomComponentClass();
+				CustomComponent.SYNC_UPDATES = true;
+
+				comp = new CustomComponent();
+				const renderer = comp.getRenderer();
+				sinon.spy(renderer, 'sync');
+
+				comp.visible = false;
+				const expectedData = {
+					visible: {
+						key: 'visible',
+						prevVal: true,
+						newVal: false
+					}
+				};
+				assert.strictEqual(1, renderer.sync.callCount);
+				assert.deepEqual(expectedData, renderer.sync.args[0][0].changes);
+			});
+
+			it.skip('should not call the renderer\'s update method when state changes before render', function() {
+				const CustomComponent = createCustomComponentClass();
+				CustomComponent.SYNC_UPDATES = true;
+
+				comp = new CustomComponent({}, false);
+				const renderer = comp.getRenderer();
+				sinon.spy(renderer, 'sync');
+
+				comp.visible = false;
+				assert.strictEqual(0, renderer.sync.callCount);
+			});
+		});
+	});
+
 	describe('Events', function() {
 		it('should listen to events on the element through Component\'s "on" function', function() {
 			comp = new Component();

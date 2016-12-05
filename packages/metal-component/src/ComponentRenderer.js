@@ -58,38 +58,15 @@ class ComponentRenderer extends Disposable {
 	}
 
 	/**
-	 * Checks if changes should cause a rerender right now.
-	 * @return {boolean}
-	 * @protected
-	 */
-	shouldRerender_() {
-		return this.isRendered_ && !this.skipUpdates_;
-	}
-
-	/**
 	 * Rerenders the component according to the given changes.
 	 * @param {!Object<string, Object>} changes Object containing the names
 	 *     of all changed state keys, each mapped to an object with its new
 	 *     (newVal) and previous (prevVal) values.
 	 */
 	sync(changes) {
-		if (this.shouldRerender_()) {
+		if (this.isRendered_) {
 			this.update(changes);
 		}
-	}
-
-	/**
-	 * Skips updates until `stopSkipUpdates` is called.
-	 */
-	startSkipUpdates() {
-		this.skipUpdates_ = true;
-	}
-
-	/**
-	 * Stops skipping updates.
-	 */
-	stopSkipUpdates() {
-		this.skipUpdates_ = false;
 	}
 
 	/**

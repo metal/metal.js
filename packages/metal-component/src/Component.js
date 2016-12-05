@@ -474,7 +474,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentStateChanged_(event) {
-		if (!this.hasSyncUpdates()) {
+		if (!this.hasSyncUpdates() && !this.skipUpdates_) {
 			this.getRenderer().sync(event);
 		}
 		this.syncStateFromChanges_(event.changes);
@@ -488,11 +488,13 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleComponentStateKeyChanged_(data) {
-		this.getRenderer().sync({
-			changes: {
-				[data.key]: data
-			}
-		});
+		if (!this.skipUpdates_) {
+			this.getRenderer().sync({
+				changes: {
+					[data.key]: data
+				}
+			});
+		}
 	}
 
 	/**
@@ -670,6 +672,20 @@ class Component extends EventEmitter {
 			val += ' ' + elementClasses;
 		}
 		return val.trim();
+	}
+
+	/**
+	 * Skips updates until `stopSkipUpdates` is called.
+	 */
+	startSkipUpdates() {
+		this.skipUpdates_ = true;
+	}
+
+	/**
+	 * Stops skipping updates.
+	 */
+	stopSkipUpdates() {
+		this.skipUpdates_ = false;
 	}
 
 	/**

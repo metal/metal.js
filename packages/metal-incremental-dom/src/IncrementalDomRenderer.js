@@ -558,9 +558,9 @@ class IncrementalDomRenderer extends ComponentRenderer {
 			shouldUpdate = false;
 		}
 		if (shouldUpdate) {
-			comp.getRenderer().startSkipUpdates();
+			comp.startSkipUpdates();
 			comp.getDataManager().replaceNonInternal(comp, config);
-			comp.getRenderer().stopSkipUpdates();
+			comp.stopSkipUpdates();
 		}
 		comp.getRenderer().config_ = config;
 		return comp;

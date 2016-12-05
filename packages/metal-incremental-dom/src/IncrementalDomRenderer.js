@@ -28,6 +28,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		super(comp);
 
 		comp.context = {};
+		comp.components = {};
 		comp.refs = {};
 		this.config_ = comp.getInitialConfig();
 		this.clearChanges_();
@@ -308,7 +309,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		let comp;
 		if (isDef(ref)) {
 			comp = this.match_(owner.components[ref], Ctor, config);
-			owner.addSubComponent(ref, comp);
+			owner.components[ref] = comp;
 			owner.refs[ref] = comp;
 		} else {
 			const data = IncrementalDomRenderer.getCurrentData();

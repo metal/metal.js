@@ -5,7 +5,6 @@ import { dom, features } from 'metal-dom';
 import { validators } from 'metal-state';
 import Component from '../src/Component';
 import ComponentDataManager from '../src/ComponentDataManager';
-import ComponentRegistry from '../src/ComponentRegistry';
 import ComponentRenderer from '../src/ComponentRenderer';
 
 describe('Component', function() {
@@ -875,99 +874,6 @@ describe('Component', function() {
 			handle.removeListener();
 			dom.triggerEvent(newElement.querySelector('.foo'), 'click');
 			assert.strictEqual(0, listener.callCount);
-		});
-	});
-
-	describe('Sub Components', function() {
-		var ChildComponent;
-
-		before(function() {
-			ChildComponent = createCustomComponentClass();
-			ChildComponent.STATE = {
-				foo: {}
-			};
-			ComponentRegistry.register(ChildComponent, 'ChildComponent');
-		});
-
-		it('should add sub components', function() {
-			comp = new Component();
-
-			comp.addSubComponent('child1', new ChildComponent());
-			comp.addSubComponent('child2', new ChildComponent());
-			assert.deepEqual(['child1', 'child2'], Object.keys(comp.components).sort());
-
-			assert.ok(comp.components.child1 instanceof ChildComponent);
-			assert.ok(comp.components.child2 instanceof ChildComponent);
-		});
-
-		it('should replace existing sub components with the same ref', function() {
-			comp = new Component();
-
-			var child = new ChildComponent();
-			comp.addSubComponent('child', child);
-			assert.strictEqual(child, comp.components.child);
-
-			var child2 = new ChildComponent();
-			comp.addSubComponent('child', child2);
-			assert.strictEqual(child2, comp.components.child);
-		});
-
-		it('should dispose sub components when parent component is disposed', function() {
-			comp = new Component();
-			comp.addSubComponent('child1', new ChildComponent());
-			comp.addSubComponent('child2', new ChildComponent());
-
-			var child1 = comp.components.child1;
-			var child2 = comp.components.child2;
-			assert.ok(!child1.isDisposed());
-			assert.ok(!child2.isDisposed());
-
-			comp.dispose();
-			assert.ok(child1.isDisposed());
-			assert.ok(child2.isDisposed());
-		});
-
-		it('should dispose specified sub components', function() {
-			comp = new Component();
-			comp.addSubComponent('child1', new ChildComponent());
-			comp.addSubComponent('child2', new ChildComponent());
-
-			var child1 = comp.components.child1;
-			var child2 = comp.components.child2;
-			assert.ok(!child1.isDisposed());
-			assert.ok(!child2.isDisposed());
-
-			comp.disposeSubComponents(['child1']);
-			assert.ok(child1.isDisposed());
-			assert.ok(!child2.isDisposed());
-		});
-
-		it('should not detach elements from disposed sub components', function() {
-			comp = new Component();
-			comp.addSubComponent('child', new ChildComponent());
-
-			var child = comp.components.child;
-			var parent = document.createElement('div');
-			var element = child.element;
-			dom.append(parent, element);
-
-			comp.disposeSubComponents(['child']);
-			assert.ok(child.isDisposed());
-			assert.strictEqual(parent, element.parentNode);
-		});
-
-		it('should not throw error if calling "disposeSubComponents" with unexisting keys', function() {
-			comp = new Component();
-			assert.ok(!comp.components.child);
-			assert.doesNotThrow(() => comp.disposeSubComponents(['child']));
-		});
-
-		it('should not throw error when disposing after subcomponents have already been disposed', function() {
-			comp = new Component();
-			comp.addSubComponent('child', new ChildComponent());
-
-			comp.components.child.dispose();
-			assert.doesNotThrow(comp.dispose.bind(comp));
 		});
 	});
 

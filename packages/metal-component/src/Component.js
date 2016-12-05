@@ -75,12 +75,6 @@ class Component extends EventEmitter {
 		super();
 
 		/**
-		 * Gets all nested components.
-		 * @type {!Array<!Component>}
-		 */
-		this.components = {};
-
-		/**
 		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
 		 * element to the component itself.
 		 * @type {!DomEventEmitterProxy}
@@ -213,15 +207,6 @@ class Component extends EventEmitter {
 	attached() {}
 
 	/**
-	 * Adds the given sub component, replacing any existing one with the same ref.
-	 * @param {string} ref
-	 * @param {!Component} component
-	 */
-	addSubComponent(ref, component) {
-		this.components[ref] = component;
-	}
-
-	/**
 	 * Lifecycle. This is called when the component has just been created, before
 	 * it's rendered.
 	 */
@@ -294,9 +279,6 @@ class Component extends EventEmitter {
 		this.elementEventProxy_.dispose();
 		this.elementEventProxy_ = null;
 
-		this.disposeSubComponents(Object.keys(this.components));
-		this.components = null;
-
 		this.dataManager_.dispose(this);
 		this.dataManager_ = null;
 
@@ -304,21 +286,6 @@ class Component extends EventEmitter {
 		this.renderer_ = null;
 
 		super.disposeInternal();
-	}
-
-	/**
-	 * Calls `dispose` on all subcomponents.
-	 * @param {!Array<string>} keys
-	 */
-	disposeSubComponents(keys) {
-		for (var i = 0; i < keys.length; i++) {
-			var component = this.components[keys[i]];
-			if (component && !component.isDisposed()) {
-				component.element = null;
-				component.dispose();
-				delete this.components[keys[i]];
-			}
-		}
 	}
 
 	/**

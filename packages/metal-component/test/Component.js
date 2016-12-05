@@ -428,22 +428,6 @@ describe('Component', function() {
 			sinon.assert.callCount(comp.syncBar, 1);
 		});
 
-		it('should fire sync methods that are not defined in the prototype', function() {
-			class TestComponent extends Component {
-				created() {
-					this.syncFoo = sinon.stub();
-				}
-			}
-			TestComponent.STATE = {
-				foo: {
-					value: 0
-				}
-			};
-
-			comp = new TestComponent();
-			sinon.assert.callCount(comp.syncFoo, 1);
-		});
-
 		it('should emit "stateSynced" event after state changes update the component', function(done) {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.STATE = {

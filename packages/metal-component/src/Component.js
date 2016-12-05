@@ -1,16 +1,16 @@
 'use strict';
 
+import { addListenersFromObj } from './events/events';
 import {
 	getStaticProperty,
 	isBoolean,
 	isDefAndNotNull,
 	isElement,
-	isFunction,
 	isObject,
 	isString,
 	object
 } from 'metal';
-import { addListenersFromObj } from './events/events';
+import { syncState } from './sync/sync';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
@@ -329,54 +329,6 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Gets the `sync` methods for this component's state.
-	 * @return {!Object}
-	 * @protected
-	 */
-	getSyncFns_() {
-		const ctor = this.constructor;
-		if (!ctor.hasOwnProperty('__METAL_SYNC_FNS__')) {
-			const fns = {};
-			const keys = this.dataManager_.getSyncKeys(this);
-			let shouldCache = true;
-			for (let i = 0; i < keys.length; i++) {
-				const name = 'sync' + keys[i].charAt(0).toUpperCase() + keys[i].slice(1);
-				const fn = ctor.prototype[name] || this[name];
-				if (fn) {
-					fns[keys[i]] = fn;
-					shouldCache = shouldCache && ctor.prototype[name];
-				}
-			}
-			if (!shouldCache) {
-				return fns;
-			}
-			ctor.__METAL_SYNC_FNS__ = fns;
-		}
-		return ctor.__METAL_SYNC_FNS__;
-	}
-
-	/**
-	 * Calls the synchronization function for the state key.
-	 * @param {string} key
-	 * @param {Object.<string, Object>=} opt_change Object containing newVal and
-	 *     prevVal keys.
-	 * @protected
-	 */
-	fireStateKeyChange_(key, opt_change) {
-		var fn = this.getSyncFns_()[key];
-		if (isFunction(fn)) {
-			if (!opt_change) {
-				var manager = this.getDataManager();
-				opt_change = {
-					newVal: manager.get(this, key),
-					prevVal: undefined
-				};
-			}
-			fn.call(this, opt_change.newVal, opt_change.prevVal);
-		}
-	}
-
-	/**
 	 * Gets the `ComponentRenderer` instance being used.
 	 * @return {!ComponentRenderer}
 	 */
@@ -394,7 +346,7 @@ class Component extends EventEmitter {
 		if (!this.hasSyncUpdates()) {
 			this.updateRenderer_(event);
 		}
-		this.syncStateFromChanges_(event.changes);
+		syncState(this, event.changes);
 		this.emit('stateSynced', event);
 	}
 
@@ -509,7 +461,7 @@ class Component extends EventEmitter {
 			this.getRenderer().render();
 			this.emit('render');
 		}
-		this.syncState_();
+		syncState(this);
 		this.attach(opt_parentElement);
 		this.wasRendered = true;
 	}
@@ -613,29 +565,6 @@ class Component extends EventEmitter {
 	 */
 	stopSkipUpdates() {
 		this.skipUpdates_ = false;
-	}
-
-	/**
-	 * Fires state synchronization functions.
-	 * @protected
-	 */
-	syncState_() {
-		const keys = Object.keys(this.getSyncFns_());
-		for (var i = 0; i < keys.length; i++) {
-			this.fireStateKeyChange_(keys[i]);
-		}
-	}
-
-	/**
-	 * Fires synchronization changes for state keys.
-	 * @param {Object.<string, Object>} changes Object containing the state key
-	 *     name as key and an object with newVal and prevVal as value.
-	 * @protected
-	 */
-	syncStateFromChanges_(changes) {
-		for (var key in changes) {
-			this.fireStateKeyChange_(key, changes[key]);
-		}
 	}
 
 	/**

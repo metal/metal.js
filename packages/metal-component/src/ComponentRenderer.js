@@ -42,17 +42,6 @@ class ComponentRenderer extends Disposable {
 	}
 
 	/**
-	 * Handles the "rendered" event.
-	 * @protected
-	 */
-	handleRendered_() {
-		var firstRender = !this.isRendered_;
-		this.isRendered_ = true;
-		this.component_.rendered(firstRender);
-		this.component_.emit('rendered', firstRender);
-	}
-
-	/**
 	 * Handles a `dataPropChanged` event from the component's data manager. This
 	 * is similar to `handleRendererStateChanged_`, but only called for
 	 * components that have requested updates to happen synchronously.
@@ -78,13 +67,27 @@ class ComponentRenderer extends Disposable {
 	}
 
 	/**
-	 * Renders the component's whole content (including its main element).
+	 * Informs the component that it has just been rendered, via both a lifecycle
+	 * function and an event. Sub classes should make sure to call this when
+	 * appropriate.
+	 * @protected
+	 */
+	informRendered_() {
+		var firstRender = !this.isRendered_;
+		this.isRendered_ = true;
+		this.component_.rendered(firstRender);
+		this.component_.emit('rendered', firstRender);
+	}
+
+	/**
+	 * Renders the whole content (including its main element) and informs the
+	 * component about it. Should be overridden by sub classes.
 	 */
 	render() {
 		if (!this.component_.element) {
 			this.component_.element = document.createElement('div');
 		}
-		this.handleRendered_();
+		this.informRendered_();
 	}
 
 	/**
@@ -125,6 +128,7 @@ class ComponentRenderer extends Disposable {
 	/**
 	 * Updates the component's element html. This is automatically called when
 	 * the value of at least one of the component's state keys has changed.
+	 * Should be implemented by sub classes.
 	 * @param {Object.<string, Object>} changes Object containing the names
 	 *     of all changed state keys, each mapped to an object with its new
 	 *     (newVal) and previous (prevVal) values.

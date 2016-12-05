@@ -758,7 +758,7 @@ class IncrementalDomRenderer extends ComponentRenderer {
 		if (!this.rootElementReached_) {
 			this.component_.element = null;
 		}
-		this.handleRendered_();
+		this.informRendered_();
 		IncrementalDomRenderer.finishedRenderingComponent();
 	}
 

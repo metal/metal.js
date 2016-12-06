@@ -57,6 +57,15 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	}
 
 	/**
+	 * Get the component's config data.
+	 * @param {!Component} component
+	 * @return {!Object}
+	 */
+	getConfig(component) {
+		return getData(component).config;
+	}
+
+	/**
 	 * Gets the component that triggered the current patch operation.
 	 * @return {Component}
 	 */
@@ -149,10 +158,10 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	/**
 	 * Checks if the component should be updated with the current state changes.
 	 * @param {!Component} component
+	 * @param {Object} changes
 	 * @return {boolean}
 	 */
-	shouldUpdate(component) {
-		const changes = getChanges(component);
+	shouldUpdate(component, changes) {
 		if (!changes) {
 			return false;
 		}
@@ -175,7 +184,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * @param {!Component} component
 	 */
 	update(component) {
-		if (this.shouldUpdate(component)) {
+		if (this.shouldUpdate(component, getChanges(component))) {
 			patch(component);
 		}
 	}

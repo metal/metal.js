@@ -13,10 +13,11 @@ var ijData = {};
 class Soy extends IncrementalDomRenderer.constructor {
 	/**
 	 * Adds the template params to the component's state, if they don't exist yet.
-	 * @protected
+	 * @param {!Component} component
+	 * @return {Object}
 	 */
-	getExtraDataConfig() {
-		var elementTemplate = this.component_.constructor.TEMPLATE;
+	getExtraDataConfig(component) {
+		var elementTemplate = component.constructor.TEMPLATE;
 		if (!isFunction(elementTemplate)) {
 			return;
 		}
@@ -25,7 +26,6 @@ class Soy extends IncrementalDomRenderer.constructor {
 		this.soyParamTypes_ = elementTemplate.types || {};
 
 		var keys = elementTemplate.params || [];
-		var component = this.component_;
 		var configs = {};
 		for (var i = 0; i < keys.length; i++) {
 			if (!component[keys[i]]) {
@@ -40,17 +40,17 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * template call's data. The copying needs to be done because, if the component
 	 * itself is passed directly, some problems occur when soy tries to merge it
 	 * with other data, due to property getters and setters. This is safer.
+	 * @param {!Component} component
 	 * @param {!Array<string>} params The params used by this template.
 	 * @return {!Object}
 	 * @protected
 	 */
-	buildTemplateData_(params) {
-		var component = this.component_;
-		var data = object.mixin({}, this.config_);
+	buildTemplateData_(component, params) {
+		var data = object.mixin({}, this.getConfig(component));
 		component.getStateKeys().forEach(key => {
 			var value = component[key];
-			if (this.isHtmlParam_(key)) {
-				value = Soy.toIncDom(value);
+			if (this.isHtmlParam_(component, key)) {
+				value = soyRenderer.toIncDom(value);
 			}
 			data[key] = value;
 		});
@@ -70,7 +70,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {string} templateName The name of the template function.
 	 * @return {!function()}
 	 */
-	static getTemplate(namespace, templateName) {
+	getTemplate(namespace, templateName) {
 		return function(opt_data, opt_ignored, opt_ijData) {
 			if (!goog.loadedModules_[namespace]) {
 				throw new Error(
@@ -90,7 +90,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {Object} data The data the template was called with.
 	 * @protected
 	 */
-	static handleInterceptedCall_(originalFn, opt_data = {}) {
+	handleInterceptedCall_(originalFn, opt_data = {}) {
 		var args = [originalFn.componentCtor, null, []];
 		for (var key in opt_data) {
 			args.push(key, opt_data[key]);
@@ -100,15 +100,18 @@ class Soy extends IncrementalDomRenderer.constructor {
 
 	/**
 	 * Checks if the given param type is html.
+	 * @param {!Component} component
 	 * @param {string} name
 	 * @protected
 	 */
-	isHtmlParam_(name) {
-		var state = this.component_.getDataManager().getStateInstance(this.component_);
+	isHtmlParam_(component, name) {
+		var state = component.getDataManager().getStateInstance(component);
 		if (state.getStateKeyConfig(name).isHtml) {
 			return true;
 		}
-		var type = this.soyParamTypes_[name] || '';
+
+		const elementTemplate = SoyAop.getOriginalFn(component.constructor.TEMPLATE);
+		var type = (elementTemplate.types || {})[name] || '';
 		return type.split('|').indexOf('html') !== -1;
 	}
 
@@ -121,8 +124,8 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {string=} mainTemplate The name of the main template that should be
 	 *     used to render the component. Defaults to "render".
 	 */
-	static register(componentCtor, templates, mainTemplate = 'render') {
-		componentCtor.RENDERER = Soy;
+	register(componentCtor, templates, mainTemplate = 'render') {
+		componentCtor.RENDERER = soyRenderer;
 		componentCtor.TEMPLATE = SoyAop.getOriginalFn(templates[mainTemplate]);
 		componentCtor.TEMPLATE.componentCtor = componentCtor;
 		SoyAop.registerForInterception(templates, mainTemplate);
@@ -132,18 +135,20 @@ class Soy extends IncrementalDomRenderer.constructor {
 	/**
 	 * Overrides the default method from `IncrementalDomRenderer` so the component's
 	 * soy template can be used for rendering.
+	 * @param {!Component} component
 	 * @param {!Object} data Data passed to the component when rendering it.
 	 * @override
 	 */
-	renderIncDom() {
-		var elementTemplate = this.component_.constructor.TEMPLATE;
-		if (isFunction(elementTemplate) && !this.component_.render) {
+	renderIncDom(component) {
+		var elementTemplate = component.constructor.TEMPLATE;
+		if (isFunction(elementTemplate) && !component.render) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
-			SoyAop.startInterception(Soy.handleInterceptedCall_);
-			elementTemplate(this.buildTemplateData_(elementTemplate.params || []), null, ijData);
+			SoyAop.startInterception(this.handleInterceptedCall_);
+			const data = this.buildTemplateData_(component, elementTemplate.params || []);
+			elementTemplate(data, null, ijData);
 			SoyAop.stopInterception();
 		} else {
-			super.renderIncDom();
+			super.renderIncDom(component);
 		}
 	}
 
@@ -151,25 +156,27 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * Sets the injected data object that should be passed to templates.
 	 * @param {Object} data
 	 */
-	static setInjectedData(data) {
+	setInjectedData(data) {
 		ijData = data || {};
 	}
 
 	/**
 	 * Overrides the original `IncrementalDomRenderer` method so that only
 	 * state keys used by the main template can cause updates.
+	 * @param {!Component} component
+	 * @param {Object} changes
 	 * @return {boolean}
 	 */
-	shouldUpdate() {
-		var should = super.shouldUpdate();
-		if (!should || this.component_.shouldUpdate) {
+	shouldUpdate(component, changes) {
+		var should = super.shouldUpdate(component, changes);
+		if (!should || component.shouldUpdate) {
 			return should;
 		}
 
-		var fn = this.component_.constructor.TEMPLATE;
+		var fn = component.constructor.TEMPLATE;
 		var params = fn ? SoyAop.getOriginalFn(fn).params : [];
 		for (var i = 0; i < params.length; i++) {
-			if (this.changes_[params[i]]) {
+			if (changes[params[i]]) {
 				return true;
 			}
 		}
@@ -181,7 +188,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {!function()} incDomFn
 	 * @return {string}
 	 */
-	static toHtmlString(incDomFn) {
+	toHtmlString(incDomFn) {
 		var element = document.createElement('div');
 		IncrementalDOM.patch(element, incDomFn);
 		return element.innerHTML;
@@ -192,7 +199,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {string|{contentKind: string, content: string}} value
 	 * @return {!function()}
 	 */
-	static toIncDom(value) {
+	toIncDom(value) {
 		if (isObject(value) && isString(value.content) && (value.contentKind === 'HTML')) {
 			value = value.content;
 		}
@@ -203,7 +210,8 @@ class Soy extends IncrementalDomRenderer.constructor {
 	}
 }
 
+const soyRenderer = new Soy();
 Soy.RENDERER_NAME = 'soy';
 
-export default Soy;
-export { Soy, SoyAop };
+export default soyRenderer;
+export { soyRenderer as Soy, SoyAop };

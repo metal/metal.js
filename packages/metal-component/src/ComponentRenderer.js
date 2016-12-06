@@ -16,7 +16,7 @@ class ComponentRenderer {
 	 * Returns extra configuration for data that should be added to the manager.
 	 * Sub classes can override to return `State` config for properties that
 	 * should be added to the component.
-	 * @param {!Component} component The component to setup the renderer for.
+	 * @param {!Component} component
 	 * @return {Object}
 	 */
 	getExtraDataConfig() {}

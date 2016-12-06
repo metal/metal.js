@@ -96,7 +96,7 @@ function finishedRenderingComponent_() {
  */
 function generateKey_(component, key) {
 	const data = getData(component);
-	if (!data.rootElementReached_ && data.config.key) {
+	if (!data.rootElementReached && data.config.key) {
 		key = data.config.key;
 	}
 	return component.getRenderer().generateKey(component, key);
@@ -290,6 +290,8 @@ function handleRegularCall_(...args) {
 	if (isDefAndNotNull(ref)) {
 		owner.refs[ref] = node;
 	}
+	owner.getRenderer().handleNodeRendered(node);
+
 	return node;
 }
 
@@ -353,7 +355,7 @@ function match_(comp, Ctor, config, owner) {
 		comp.getDataManager().replaceNonInternal(comp, config);
 		comp.stopSkipUpdates();
 	}
-	comp.getRenderer().config_ = config;
+	getData(comp).config = config;
 	return comp;
 }
 

@@ -78,7 +78,7 @@ export function patch(component) {
 function tryPatchEmptyWithParent_(component) {
 	const data = getData(component);
 	if (!component.element && data.parent) {
-		patch(data.parent);
+		data.parent.getRenderer().patch(data.parent);
 		return true;
 	}
 }

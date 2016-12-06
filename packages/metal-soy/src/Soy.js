@@ -176,7 +176,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 		var fn = component.constructor.TEMPLATE;
 		var params = fn ? SoyAop.getOriginalFn(fn).params : [];
 		for (var i = 0; i < params.length; i++) {
-			if (changes[params[i]]) {
+			if (changes.props[params[i]]) {
 				return true;
 			}
 		}

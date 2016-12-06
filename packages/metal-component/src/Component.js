@@ -124,9 +124,6 @@ class Component extends EventEmitter {
 		this.element = this.initialConfig_.element;
 
 		this.renderer_ = getStaticProperty(this.constructor, 'RENDERER');
-		if (!this.renderer_.setUp) {
-			console.log('setUp', this.constructor, this.renderer_);
-		}
 		this.renderer_.setUp(this);
 		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
 		this.dataManager_.setUp(

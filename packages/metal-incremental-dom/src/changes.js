@@ -18,7 +18,9 @@ export function clearChanges(data) {
  */
 function handleStateKeyChanged_(data, eventData) {
 	data.changes = data.changes || {};
-	data.changes[eventData.key] = eventData;
+	const type = eventData.type || 'props';
+	data.changes[type] = data.changes[type] || {};
+	data.changes[type][eventData.key] = eventData;
 }
 
 /**
@@ -28,9 +30,7 @@ function handleStateKeyChanged_(data, eventData) {
  * @return {Object}
  */
 export function getChanges(component) {
-	const changes = getData(component).changes;
-	const hasChanges = changes && Object.keys(changes).length > 0;
-	return hasChanges ? changes : null;
+	return getData(component).changes;
 }
 
 /**

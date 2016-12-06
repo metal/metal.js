@@ -3,6 +3,10 @@
 import { isDefAndNotNull } from 'metal';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
+const COUNT_PROP = '__metalJsxCount';
+const INC_DOM_DATA = '__incrementalDOMData';
+const KEY_PREFIX = '_metal_jsx_';
+
 /**
  * Renderer that handles JSX.
  */
@@ -10,16 +14,8 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 	/**
 	 * @inheritDoc
 	 */
-	buildShouldUpdateArgs_() {
-		return [this.changes_, this.propChanges_];
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	clearChanges_() {
-		super.clearChanges_();
-		this.propChanges_ = {};
+	buildShouldUpdateArgs(changes) {
+		return [changes.state, changes.props];
 	}
 
 	/**
@@ -27,21 +23,23 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 	 * incremental dom. Adds keys to elements that don't have one yet, according
 	 * to their position in the parent. This helps use cases that use
 	 * conditionally rendered elements, which is very common in JSX.
-	 * @protected
+	 * @param {!Component} component
+	 * @param {string} key
+	 * @return {?string}
 	 */
-	generateKey_(key) {
-		key = super.generateKey_(key);
-		const comp = IncrementalDomRenderer.getPatchingComponent();
-		const renderer = comp.getRenderer();
+	generateKey(component, key) {
+		key = super.generateKey(component, key);
+		const comp = this.getPatchingComponent();
+		const data = comp.getRenderer().getData(comp);
 		if (!isDefAndNotNull(key)) {
-			if (renderer.rootElementRendered_) {
-				key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
-			} else if (comp.element && comp.element.__incrementalDOMData) {
-				key = comp.element.__incrementalDOMData.key;
+			if (data.rootElementRendered) {
+				key = KEY_PREFIX + jsxRenderer_.incElementCount();
+			} else if (comp.element && comp.element[INC_DOM_DATA]) {
+				key = comp.element[INC_DOM_DATA].key;
 			}
 		}
-		if (!renderer.rootElementRendered_) {
-			renderer.rootElementRendered_ = true;
+		if (!data.rootElementRendered) {
+			data.rootElementRendered = true;
 		}
 		return key;
 	}
@@ -49,81 +47,64 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 	/**
 	 * @inheritDoc
 	 */
-	handleStateKeyChanged_(data) {
-		if (data.type === 'state') {
-			super.handleStateKeyChanged_(data);
-		} else {
-			this.propChanges_[data.key] = data;
-		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	hasDataChanged_() {
-		return super.hasDataChanged_() || Object.keys(this.propChanges_).length > 0;
+	handleNodeRendered(node) {
+		node[COUNT_PROP] = 0;
 	}
 
 	/**
 	 * Increments the number of children in the current element.
 	 */
-	static incElementCount() {
+	incElementCount() {
 		const node = IncrementalDOM.currentElement();
-		node.__metalJsxCount = (node.__metalJsxCount || 0) + 1;
-		return node.__metalJsxCount;
+		node[COUNT_PROP] = (node[COUNT_PROP] || 0) + 1;
+		return node[COUNT_PROP];
 	}
 
 	/**
 	 * Overrides the original method from `IncrementalDomRenderer` so we can
 	 * keep track of if the root element of the patched component has already
 	 * been rendered or not.
+	 * @param {!Component} component
 	 * @override
 	 */
-	patch() {
-		this.rootElementRendered_ = false;
-		super.patch();
+	patch(component) {
+		this.getData(component).rootElementRendered = false;
+		super.patch(component);
 	}
 
 	/**
 	 * Overrides the original method from `IncrementalDomRenderer` to handle the
 	 * case where developers return a child node directly from the "render"
 	 * function.
+	 * @param {!Component} component
 	 * @override
 	 */
-	renderIncDom() {
-		if (this.component_.render) {
-			iDOMHelpers.renderArbitrary(this.component_.render());
+	renderIncDom(component) {
+		if (component.render) {
+			iDOMHelpers.renderArbitrary(component.render());
 		} else {
-			super.renderIncDom();
+			super.renderIncDom(component);
 		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	resetNodeData_(node) {
-		super.resetNodeData_(node);
-		node.__metalJsxCount = 0;
 	}
 
 	/**
 	 * Skips the current child in the count (used when a conditional render
 	 * decided not to render anything).
 	 */
-	static skipChild() {
-		IncrementalDOM.elementVoid(JSXRenderer.incElementCount);
+	skipChild() {
+		IncrementalDOM.elementVoid(jsxRenderer_.incElementCount);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	skipRender_() {
-		JSXRenderer.skipChild();
-		super.skipRender_();
+	skipRender() {
+		jsxRenderer_.skipChild();
+		super.skipRender();
 	}
 }
 
-JSXRenderer.KEY_PREFIX = '_metal_jsx_';
-JSXRenderer.RENDERER_NAME = 'jsx';
+const jsxRenderer_ = new JSXRenderer();
+jsxRenderer_.RENDERER_NAME = 'jsx';
 
-export default JSXRenderer;
+export default jsxRenderer_;

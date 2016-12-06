@@ -465,4 +465,39 @@ describe('JSXRenderer', function() {
 			done();
 		});
 	});
+
+	it('should reuse elements correctly after update from previously empty child', function(done) {
+		let child;
+		class ChildComponent extends TestJSXComponent {
+			created() {
+				child = this;
+			}
+
+			render() {
+				return this.state.first ? null : <div>Child</div>;
+			}
+		}
+		ChildComponent.STATE = {
+			first: {
+				value: true
+			}
+		};
+
+		class TestComponent extends TestJSXComponent {
+			render() {
+				return <div>
+					<div>First child element</div>
+					<ChildComponent />
+				</div>;
+			}
+		}
+
+		component = new TestComponent();
+		const firstEl = component.element.childNodes[0];
+		child.state.first = false;
+		child.once('stateSynced', function() {
+			assert.strictEqual(firstEl, component.element.childNodes[0]);
+			done();
+		});
+	});
 });

@@ -1095,6 +1095,9 @@ describe('IncrementalDomRenderer', function() {
 
 			const lastChild = component.components.child.components.child;
 			assert.strictEqual('rootKey', lastChild.element.__incrementalDOMData.key);
+
+			const innerElement = lastChild.element.childNodes[0];
+			assert.notStrictEqual('rootKey', innerElement.__incrementalDOMData.key);
 		});
 
 		it('should attach sub component inline listeners', function() {

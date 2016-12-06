@@ -17,7 +17,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * @return {!Array}
 	 */
 	buildShouldUpdateArgs(changes) {
-		return [changes || {}];
+		return [changes.props];
 	}
 
 	/**
@@ -66,11 +66,27 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	}
 
 	/**
+	 * Get the component's incremental dom renderer data.
+	 * @param {!Component} component
+	 * @return {!Object}
+	 */
+	getData(component) {
+		return getData(component);
+	}
+
+	/**
 	 * Gets the component that triggered the current patch operation.
 	 * @return {Component}
 	 */
 	getPatchingComponent() {
 		return getPatchingComponent();
+	}
+
+	/**
+	 * Handles a node having just been rendered. Sub classes should override this
+	 * for custom behavior.
+	 */
+	handleNodeRendered() {
 	}
 
 	/**
@@ -80,6 +96,14 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	isIncDomNode(node) {
 		return !!getOwner(node);
+	}
+
+	/**
+	 * Calls incremental dom's patch function to render the component.
+	 * @param {!Component} component
+	 */
+	patch(component) {
+		patch(component);
 	}
 
 	/**
@@ -97,7 +121,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	render(component, opt_dataOrElement, opt_parent) {
 		if (component instanceof Component) {
-			patch(component);
+			this.patch(component);
 		} else {
 			return renderFunction(this, component, opt_dataOrElement, opt_parent);
 		}
@@ -132,7 +156,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	renderInsidePatch(component) {
 		const shouldRender = !component.wasRendered ||
-			this.shouldUpdate(component) ||
+			this.shouldUpdate(component, getChanges(component)) ||
 			IncrementalDOM.currentPointer() !== component.element;
 		if (shouldRender) {
 			render(component);
@@ -185,7 +209,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	update(component) {
 		if (this.shouldUpdate(component, getChanges(component))) {
-			patch(component);
+			this.patch(component);
 		}
 	}
 }

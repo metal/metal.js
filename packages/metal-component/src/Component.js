@@ -124,6 +124,9 @@ class Component extends EventEmitter {
 		this.element = this.initialConfig_.element;
 
 		this.renderer_ = getStaticProperty(this.constructor, 'RENDERER');
+		if (!this.renderer_.setUp) {
+			console.log('setUp', this.constructor, this.renderer_);
+		}
 		this.renderer_.setUp(this);
 		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
 		this.dataManager_.setUp(
@@ -186,7 +189,7 @@ class Component extends EventEmitter {
 	 */
 	attach(opt_parentElement, opt_siblingElement) {
 		if (!this.inDocument) {
-			this.renderElement_(opt_parentElement, opt_siblingElement);
+			this.attachElement(opt_parentElement, opt_siblingElement);
 			this.inDocument = true;
 			this.attachData_ = {
 				parent: opt_parentElement,
@@ -206,6 +209,23 @@ class Component extends EventEmitter {
 	 * must be implemented on the detach phase.
 	 */
 	attached() {}
+
+	/**
+	 * Attaches the component element into the DOM.
+	 * @param {(string|Element)=} opt_parentElement Optional parent element
+	 *     to render the component.
+	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
+	 *     to render the component before it. Relevant when the component needs
+	 *     to be rendered before an existing element in the DOM, e.g.
+	 *     `component.attach(null, existingElement)`.
+	 */
+	attachElement(opt_parentElement, opt_siblingElement) {
+		var element = this.element;
+		if (element && (opt_siblingElement || !element.parentNode)) {
+			var parent = toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
+			parent.insertBefore(element, toElement(opt_siblingElement));
+		}
+	}
 
 	/**
 	 * Lifecycle. This is called when the component has just been created, before
@@ -467,24 +487,6 @@ class Component extends EventEmitter {
 	renderComponent(opt_parentElement) {
 		this.firstParentElement_ = opt_parentElement;
 		this.getRenderer().render(this);
-	}
-
-	/**
-	 * Renders the component element into the DOM.
-	 * @param {(string|Element)=} opt_parentElement Optional parent element
-	 *     to render the component.
-	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
-	 *     to render the component before it. Relevant when the component needs
-	 *     to be rendered before an existing element in the DOM, e.g.
-	 *     `component.attach(null, existingElement)`.
-	 * @protected
-	 */
-	renderElement_(opt_parentElement, opt_siblingElement) {
-		var element = this.element;
-		if (element && (opt_siblingElement || !element.parentNode)) {
-			var parent = toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
-			parent.insertBefore(element, toElement(opt_siblingElement));
-		}
 	}
 
 	/**

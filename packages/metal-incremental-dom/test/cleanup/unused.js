@@ -2,9 +2,10 @@
 
 import Component from 'metal-component';
 import IncrementalDomRenderer from '../../src/IncrementalDomRenderer';
-import IncrementalDomUnusedComponents from '../../src/cleanup/IncrementalDomUnusedComponents';
+import { disposeUnused, schedule } from '../../src/cleanup/unused';
+import { getData } from '../../src/data';
 
-describe('IncrementalDomUnusedComponents', function() {
+describe('unused', function() {
 	var comp;
 	var grandchild;
 
@@ -43,8 +44,8 @@ describe('IncrementalDomUnusedComponents', function() {
 
 	it('should dispose scheduled components', function() {
 		var comps = [comp.components.child1, comp.components.child2];
-		IncrementalDomUnusedComponents.schedule(comps);
-		IncrementalDomUnusedComponents.disposeUnused();
+		schedule(comps);
+		disposeUnused();
 
 		assert.ok(comps[0].isDisposed());
 		assert.ok(comps[1].isDisposed());
@@ -52,9 +53,9 @@ describe('IncrementalDomUnusedComponents', function() {
 
 	it('should not dispose scheduled components that have received a new parent', function() {
 		var comps = [comp.components.child1, comp.components.child2];
-		IncrementalDomUnusedComponents.schedule(comps);
-		comps[0].getRenderer().parent_ = comp;
-		IncrementalDomUnusedComponents.disposeUnused();
+		schedule(comps);
+		getData(comps[0]).parent = comp;
+		disposeUnused();
 
 		assert.ok(!comps[0].isDisposed());
 		assert.ok(comps[1].isDisposed());
@@ -63,10 +64,10 @@ describe('IncrementalDomUnusedComponents', function() {
 	it('should not dispose scheduled components that have been disposed before scheduled', function() {
 		var comps = [comp.components.child1, comp.components.child2];
 		comps[0].dispose();
-		IncrementalDomUnusedComponents.schedule(comps);
+		schedule(comps);
 		sinon.spy(comps[0], 'dispose');
 		sinon.spy(comps[1], 'dispose');
-		IncrementalDomUnusedComponents.disposeUnused();
+		disposeUnused();
 
 		assert.strictEqual(0, comps[0].dispose.callCount);
 		assert.strictEqual(1, comps[1].dispose.callCount);
@@ -74,11 +75,11 @@ describe('IncrementalDomUnusedComponents', function() {
 
 	it('should not dispose scheduled components that have been disposed after scheduled', function() {
 		var comps = [comp.components.child1, comp.components.child2];
-		IncrementalDomUnusedComponents.schedule(comps);
+		schedule(comps);
 		comps[0].dispose();
 		sinon.spy(comps[0], 'dispose');
 		sinon.spy(comps[1], 'dispose');
-		IncrementalDomUnusedComponents.disposeUnused();
+		disposeUnused();
 
 		assert.strictEqual(0, comps[0].dispose.callCount);
 		assert.strictEqual(1, comps[1].dispose.callCount);
@@ -86,19 +87,19 @@ describe('IncrementalDomUnusedComponents', function() {
 
 	it('should not throw error when `disposeUnused` is called during another `disposeUnused` call', function() {
 		sinon.stub(comp.components.child1, 'disposed', () => {
-			IncrementalDomUnusedComponents.disposeUnused();
+			disposeUnused();
 		});
 
 		var comps = [comp.components.child1];
-		IncrementalDomUnusedComponents.schedule(comps);
+		schedule(comps);
 
-		assert.doesNotThrow(() => IncrementalDomUnusedComponents.disposeUnused());
+		assert.doesNotThrow(() => disposeUnused());
 		assert.ok(comps[0].isDisposed());
 	});
 
 	it('should not throw error when disposing component that has an owner that was previously disposed', function() {
 		var comps = [comp.components.child2, grandchild];
-		IncrementalDomUnusedComponents.schedule(comps);
-		assert.doesNotThrow(() => IncrementalDomUnusedComponents.disposeUnused());
+		schedule(comps);
+		assert.doesNotThrow(() => disposeUnused());
 	});
 });

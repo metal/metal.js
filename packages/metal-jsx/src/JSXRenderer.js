@@ -6,7 +6,7 @@ import IncrementalDomRenderer from 'metal-incremental-dom';
 /**
  * Renderer that handles JSX.
  */
-class JSXRenderer extends IncrementalDomRenderer {
+class JSXRenderer extends IncrementalDomRenderer.constructor {
 	/**
 	 * @inheritDoc
 	 */

@@ -10,7 +10,7 @@ import SoyAop from './SoyAop';
 // The injected data that will be passed to soy templates.
 var ijData = {};
 
-class Soy extends IncrementalDomRenderer {
+class Soy extends IncrementalDomRenderer.constructor {
 	/**
 	 * Adds the template params to the component's state, if they don't exist yet.
 	 * @protected

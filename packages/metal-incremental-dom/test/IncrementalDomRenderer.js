@@ -3,8 +3,8 @@
 import { async, core, object } from 'metal';
 import dom from 'metal-dom';
 import { sunset } from '../../../test-utils';
+import { CHILD_OWNER } from '../src/children/children';
 import { Component, ComponentRegistry } from 'metal-component';
-import IncrementalDomChildren from '../src/children/IncrementalDomChildren';
 import IncrementalDomRenderer from '../src/IncrementalDomRenderer';
 
 var IncDom = IncrementalDOM;
@@ -32,7 +32,7 @@ describe('IncrementalDomRenderer', function() {
 
 	describe('Custom component render', function() {
 		it('should render content specified by the renderer\'s "renderIncDom" function', function() {
-			class TestRenderer extends IncrementalDomRenderer {
+			class TestRenderer extends IncrementalDomRenderer.constructor {
 				renderIncDom() {
 					IncDom.elementOpen('span', null, null, 'foo', 'foo');
 					IncDom.text('bar');
@@ -42,7 +42,7 @@ describe('IncrementalDomRenderer', function() {
 
 			class TestComponent extends Component {
 			}
-			TestComponent.RENDERER = TestRenderer;
+			TestComponent.RENDERER = new TestRenderer();
 
 			component = new TestComponent();
 			assert.strictEqual('SPAN', component.element.tagName);
@@ -1017,9 +1017,9 @@ describe('IncrementalDomRenderer', function() {
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
 				var child = component.components.child;
-				sinon.spy(child.getRenderer(), 'patch');
+				sinon.spy(child, 'render');
 				child.once('stateSynced', function() {
-					assert.strictEqual(0, child.getRenderer().patch.callCount);
+					assert.strictEqual(0, child.render.callCount);
 					done();
 				});
 			});
@@ -1045,9 +1045,9 @@ describe('IncrementalDomRenderer', function() {
 			component.once('stateSynced', function() {
 				var child = component.components.child;
 				child.foo = 'bar2';
-				sinon.spy(child.getRenderer(), 'patch');
+				sinon.spy(child, 'render');
 				child.once('stateSynced', function() {
-					assert.strictEqual(1, child.getRenderer().patch.callCount);
+					assert.strictEqual(1, child.render.callCount);
 					assert.strictEqual('bar2', child.element.textContent);
 					done();
 				});
@@ -2279,58 +2279,6 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', child.context.foo);
 		});
 
-		describe('Non Incremental DOM sub component', function() {
-			var originalWarnFn = console.warn;
-
-			beforeEach(function() {
-				console.warn = sinon.stub();
-			});
-
-			afterEach(function() {
-				console.warn = originalWarnFn;
-			});
-
-			it('should warn if rendering sub component that doesn\'t use incremental dom', function() {
-				class TestChildComponent extends Component {
-					constructor() {
-						super();
-						this.element = document.createElement('div');
-					}
-				}
-				class TestComponent extends Component {
-					render() {
-						IncDom.elementOpen('div');
-						IncDom.elementVoid(TestChildComponent);
-						IncDom.elementClose('div');
-					}
-				}
-				TestComponent.RENDERER = IncrementalDomRenderer;
-
-				component = new TestComponent();
-				assert.strictEqual(1, console.warn.callCount);
-			});
-
-			it('should use the same element from sub component even if it doesn\'t use incremental dom', function() {
-				class TestChildComponent extends Component {
-					constructor() {
-						super();
-						this.element = document.createElement('div');
-					}
-				}
-
-				class TestComponent extends Component {
-					render() {
-						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child');
-					}
-				}
-				TestComponent.RENDERER = IncrementalDomRenderer;
-				component = new TestComponent();
-
-				var child = component.components.child;
-				assert.strictEqual(child.element, component.element);
-			});
-		});
-
 		describe('Dispose Unused Sub Components', function() {
 			it('should dispose sub components that are unused after an update', function(done) {
 				class TestComponent extends Component {
@@ -2616,35 +2564,6 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not dispose unused sub component if "skipNextChildrenDisposal" is called', function(done) {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementOpen('div');
-					if (this.foo === 'foo') {
-						IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child');
-					}
-					IncDom.elementClose('div');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.STATE = {
-				foo: {
-					value: 'foo'
-				}
-			};
-			component = new TestComponent();
-			var child = component.components.child;
-			sinon.spy(child, 'render');
-
-			component.foo = 'bar';
-			component.getRenderer().skipNextChildrenDisposal();
-			component.once('stateSynced', function() {
-				assert.strictEqual(0, child.render.callCount);
-				assert.ok(!child.isDisposed());
-				done();
-			});
-		});
-
 		describe('Compatibility Mode', function() {
 			afterEach(function() {
 				core.disableCompatibilityMode();
@@ -2692,8 +2611,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 
 			it('should store component references via "key" when renderer is enabled by compatibility mode', function() {
-				class TestRenderer extends IncrementalDomRenderer {
+				class TestRendererClass extends IncrementalDomRenderer.constructor {
 				}
+				const TestRenderer = new TestRendererClass();
 				core.enableCompatibilityMode({
 					renderers: [TestRenderer]
 				});
@@ -2711,8 +2631,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 
 			it('should store component references via "key" when renderer is enabled by compatibility mode via its name', function() {
-				class TestRenderer extends IncrementalDomRenderer {
+				class TestRendererClass extends IncrementalDomRenderer.constructor {
 				}
+				const TestRenderer = new TestRendererClass();
 				TestRenderer.RENDERER_NAME = 'test';
 				core.enableCompatibilityMode({
 					renderers: ['test']
@@ -2731,8 +2652,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 
 			it('should not store component references via "key" when renderer is not enabled by compatibility mode', function() {
-				class TestRenderer extends IncrementalDomRenderer {
+				class TestRendererClass extends IncrementalDomRenderer.constructor {
 				}
+				const TestRenderer = new TestRendererClass();
 				core.enableCompatibilityMode({
 					renderers: [TestRenderer]
 				});
@@ -2768,6 +2690,9 @@ describe('IncrementalDomRenderer', function() {
 	describe('Function - shouldUpdate', function() {
 		it('should only rerender after state change if "shouldUpdate" returns true', function(done) {
 			class TestComponent extends Component {
+				render() {
+				}
+
 				shouldUpdate(changes) {
 					return changes.foo && (changes.foo.prevVal !== changes.foo.newVal);
 				}
@@ -2783,15 +2708,14 @@ describe('IncrementalDomRenderer', function() {
 			};
 
 			component = new TestComponent();
-			var renderer = component.getRenderer();
-			sinon.spy(renderer, 'patch');
+			sinon.spy(component, 'render');
 
 			component.bar = 'bar2';
 			component.once('stateSynced', function() {
-				assert.strictEqual(0, renderer.patch.callCount);
+				assert.strictEqual(0, component.render.callCount);
 				component.foo = 'foo2';
 				component.once('stateSynced', function() {
-					assert.strictEqual(1, renderer.patch.callCount);
+					assert.strictEqual(1, component.render.callCount);
 					done();
 				});
 			});
@@ -3063,7 +2987,7 @@ describe('IncrementalDomRenderer', function() {
 				tag: 'span'
 			}));
 			assert.ok(IncrementalDomRenderer.isIncDomNode({
-				[IncrementalDomChildren.CHILD_OWNER]: true
+				[CHILD_OWNER]: true
 			}));
 		});
 	});

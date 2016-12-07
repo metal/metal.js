@@ -1,6 +1,6 @@
 {
   "name": "metal-events",
-  "version": "2.5.13",
+  "version": "2.5.14",
   "description": "Classes responsible for emitting and listening to events",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-events",

@@ -1,6 +1,6 @@
 {
   "name": "metal-incremental-dom",
-  "version": "2.5.13",
+  "version": "2.5.14",
   "description": "A Component renderer for templates compiled to incremental dom",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-incremental-dom",
@@ -23,8 +23,8 @@
   ],
   "dependencies": {
     "metal": "^2.5.12",
-    "metal-component": "^2.5.13",
-    "metal-dom": "^2.5.13"
+    "metal-component": "^2.5.14",
+    "metal-dom": "^2.5.14"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

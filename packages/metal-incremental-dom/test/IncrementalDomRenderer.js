@@ -2,6 +2,7 @@
 
 import { async, core, object } from 'metal';
 import dom from 'metal-dom';
+import { getData } from '../src/data';
 import { sunset } from '../../../test-utils';
 import { CHILD_OWNER } from '../src/children/children';
 import { Component, ComponentRegistry } from 'metal-component';
@@ -290,90 +291,6 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should uncheck input element when "checked" attribute is removed', function(done) {
-			var input = document.createElement('input');
-			input.type = 'checkbox';
-			input.checked = true;
-
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementOpenStart('input');
-					IncDom.attr('type', 'checkbox');
-					if (this.checked) {
-						IncDom.attr('checked', '');
-					}
-					IncDom.elementOpenEnd('input');
-					IncDom.elementClose('input');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.STATE = {
-				checked: {
-				}
-			};
-
-			component = new TestComponent({
-				checked: true,
-				element: input
-			});
-			assert.ok(input.checked);
-
-			component.checked = false;
-			component.once('stateSynced', function() {
-				assert.ok(!input.checked);
-				done();
-			});
-		});
-
-		it('should add/remove html attributes by using boolean values', function(done) {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementVoid('button', null, [], 'disabled', this.disabled);
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.STATE = {
-				disabled: {
-					value: true
-				}
-			};
-
-			component = new TestComponent();
-			assert.ok(component.element.disabled);
-			assert.strictEqual('', component.element.getAttribute('disabled'));
-
-			component.disabled = false;
-			component.once('stateSynced', function() {
-				assert.ok(!component.element.disabled);
-				assert.ok(!component.element.getAttribute('disabled'));
-				done();
-			});
-		});
-
-		it('should change input value via "value" attribute even after it\'s manually changed', function(done) {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementVoid('input', null, [], 'value', this.value);
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.STATE = {
-				value: {
-					value: 'foo'
-				}
-			};
-
-			component = new TestComponent();
-			assert.strictEqual('foo', component.element.value);
-
-			component.element.value = 'userValue';
-			component.value = 'bar';
-			component.once('stateSynced', function() {
-				assert.strictEqual('bar', component.element.value);
-				done();
-			});
-		});
-
 		it('should add/remove css classes via "elementClasses"', function(done) {
 			class TestComponent extends Component {
 				render() {
@@ -555,20 +472,6 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
-		it('should not set "on<EventName>" string values as dom attributes', function() {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementVoid('div', null, null, 'onClick', 'handleClick');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-
-			component = new TestComponent();
-			assert.ok(!component.element.getAttribute('onclick'));
-			assert.ok(!component.element.getAttribute('onClick'));
-		});
-
 		it('should attach listeners from "data-on<eventname>" attributes', function() {
 			class TestComponent extends Component {
 				render() {
@@ -587,40 +490,6 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(0, component.handleClick.callCount);
 
 			dom.triggerEvent(component.element.childNodes[0], 'click');
-			assert.strictEqual(1, component.handleClick.callCount);
-		});
-
-		it('should set "data-on<eventname>" string values as dom attributes', function() {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-
-			component = new TestComponent();
-			assert.strictEqual('handleClick', component.element.getAttribute('data-onclick'));
-		});
-
-		it('should attach listeners from "data-on<event-name>" attributes', function() {
-			dom.registerCustomEvent('test-event', {
-  			delegate: true,
-  			handler: (callback, event) => callback(event),
-  			originalEvent: 'click'
-			});
-
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementVoid('div', null, null, 'data-ontest-event', 'handleClick');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-
-			component = new TestComponent();
-
-			dom.triggerEvent(component.element, 'click');
 			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
@@ -644,24 +513,6 @@ describe('IncrementalDomRenderer', function() {
 			dom.triggerEvent(component.element, 'click');
 			assert.strictEqual(1, component.handleClick.callCount);
 			assert.strictEqual(component.element, element);
-		});
-
-		it('should attach listeners from root element', function() {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementOpen('div', null, null, 'onClick', 'handleClick');
-					IncDom.elementVoid('div');
-					IncDom.elementClose('div');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-
-			component = new TestComponent();
-			assert.strictEqual(0, component.handleClick.callCount);
-
-			dom.triggerEvent(component.element, 'click');
-			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should attach listeners from elementOpenStart/elementOpenEnd calls', function() {
@@ -776,48 +627,6 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(1, component.handleKeydown.callCount);
 				done();
 			});
-		});
-
-		it('should attach listeners functions passed to "on<EventName>" attributes', function() {
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementOpen('div');
-					IncDom.elementVoid('div', null, null, 'onClick', this.handleClick);
-					IncDom.elementClose('div');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-
-			component = new TestComponent();
-			assert.strictEqual(0, component.handleClick.callCount);
-
-			dom.triggerEvent(component.element, 'click');
-			assert.strictEqual(0, component.handleClick.callCount);
-
-			dom.triggerEvent(component.element.childNodes[0], 'click');
-			assert.strictEqual(1, component.handleClick.callCount);
-		});
-
-		it('should attach listeners from "on<Event-name>" attributes', function() {
-			dom.registerCustomEvent('test-event', {
-  			delegate: true,
-  			handler: (callback, event) => callback(event),
-  			originalEvent: 'click'
-			});
-
-			class TestComponent extends Component {
-				render() {
-					IncDom.elementVoid('div', null, null, 'onTest-event', 'handleClick');
-				}
-			}
-			TestComponent.RENDERER = IncrementalDomRenderer;
-			TestComponent.prototype.handleClick = sinon.stub();
-
-			component = new TestComponent();
-
-			dom.triggerEvent(component.element, 'click');
-			assert.strictEqual(1, component.handleClick.callCount);
 		});
 
 		it('should update inline listeners when dom is updated', function(done) {
@@ -2993,5 +2802,17 @@ describe('IncrementalDomRenderer', function() {
 				[CHILD_OWNER]: true
 			}));
 		});
+	});
+
+	it('should return the component\'s incremental dom renderer object', function() {
+		component = new Component();
+		const data = IncrementalDomRenderer.getData(component);
+		assert.strictEqual(getData(component), data);
+	});
+
+	it('should return the component\'s config object', function() {
+		component = new Component();
+		const config = IncrementalDomRenderer.getConfig(component);
+		assert.strictEqual(getData(component).config, config);
 	});
 });

@@ -447,6 +447,29 @@ describe('Component', function() {
 			});
 		});
 
+		it('should emit "rendered" event with "false" as the first arg when updated by the renderer', function(done) {
+			class CustomRenderer extends ComponentRenderer.constructor {
+				update(component) {
+					component.informRendered();
+				}
+			}
+
+			class TestComponent extends Component {
+			}
+			TestComponent.RENDERER = new CustomRenderer();
+
+			comp = new TestComponent();
+			var listener = sinon.stub();
+			comp.on('rendered', listener);
+
+			comp.visible = false;
+			comp.once('stateChanged', function() {
+				assert.strictEqual(1, listener.callCount);
+				assert.ok(!listener.args[0][0]);
+				done();
+			});
+		});
+
 		it('should not allow defining state key named components', function() {
 			var CustomComponent = createCustomComponentClass();
 			CustomComponent.STATE = {
@@ -646,6 +669,21 @@ describe('Component', function() {
 				assert.strictEqual(1, renderer.update.callCount);
 				assert.strictEqual(comp, renderer.update.args[0][0]);
 				assert.deepEqual(expectedData, renderer.update.args[0][1].changes);
+			});
+
+			it('should not call the renderer\'s update method asynchronously if state changes', function(done) {
+				const CustomComponent = createCustomComponentClass();
+				CustomComponent.SYNC_UPDATES = true;
+
+				comp = new CustomComponent();
+				const renderer = comp.getRenderer();
+
+				comp.visible = false;
+				sinon.spy(renderer, 'update');
+				comp.once('stateSynced', function() {
+					assert.strictEqual(0, renderer.update.callCount);
+					done();
+				});
 			});
 
 			it('should not call the renderer\'s update method when state changes before render', function() {

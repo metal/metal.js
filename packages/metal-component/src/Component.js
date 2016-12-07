@@ -445,9 +445,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	onEventsChanged_(event) {
-		if (this.eventsStateKeyHandler_) {
-			this.eventsStateKeyHandler_.removeAllListeners();
-		}
+		this.eventsStateKeyHandler_.removeAllListeners();
 		this.addListenersFromObj_(event.newVal);
 	}
 

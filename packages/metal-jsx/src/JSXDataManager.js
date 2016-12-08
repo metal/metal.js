@@ -4,12 +4,7 @@ import { getStaticProperty, object } from 'metal';
 import { ComponentDataManager } from 'metal-component';
 import State from 'metal-state';
 
-// TODO: Maybe change this to use regular `class` and `extend`, but export an
-// instance of it instead of the constructor (though we need the constructor
-// as a named export at least so we can extend it in JSXDataManager).
-
-const JSXDataManager = Object.create(ComponentDataManager);
-object.mixin(JSXDataManager, {
+class JSXDataManager extends ComponentDataManager.constructor {
 	/**
 	 * Manually adds props that weren't configured via `PROPS`.
 	 * @param {!Component} component
@@ -24,7 +19,7 @@ object.mixin(JSXDataManager, {
 				component.props[keys[i]] = data[keys[i]];
 			}
 		}
-	},
+	}
 
 	/**
 	 * Overrides the original method so that we can have two separate `State`
@@ -53,7 +48,7 @@ object.mixin(JSXDataManager, {
 			type: 'state'
 		});
 		data.state_.configState(State.getStateStatic(ctor));
-	},
+	}
 
 	/**
 	 * @inheritDoc
@@ -62,7 +57,7 @@ object.mixin(JSXDataManager, {
 		var data = this.getManagerData(component);
 		data.props_.dispose();
 		ComponentDataManager.dispose.call(this, component);
-	},
+	}
 
 	/**
 	 * Overrides the original method so we can get properties from `props` by
@@ -74,7 +69,7 @@ object.mixin(JSXDataManager, {
 	 */
 	get(component, name) {
 		return this.getManagerData(component).props_.get(name);
-	},
+	}
 
 	/**
 	 * Gets the `State` instance being used for "props".
@@ -83,7 +78,7 @@ object.mixin(JSXDataManager, {
 	 */
 	getPropsInstance(component) {
 		return this.getManagerData(component).props_;
-	},
+	}
 
 	/**
 	 * Overrides the original method so we can enable "sync" methods just for
@@ -94,7 +89,7 @@ object.mixin(JSXDataManager, {
 	 */
 	getSyncKeys(component) {
 		return this.getManagerData(component).props_.getStateKeys();
-	},
+	}
 
 	/**
 	 * Overrides the original method so we can replace values in `props`.
@@ -115,6 +110,6 @@ object.mixin(JSXDataManager, {
 			component.propsChanged(prevProps);
 		}
 	}
-});
+}
 
-export default JSXDataManager;
+export default new JSXDataManager();

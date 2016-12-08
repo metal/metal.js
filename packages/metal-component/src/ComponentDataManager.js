@@ -14,7 +14,7 @@ const BLACKLIST = {
 };
 const DATA_MANAGER_DATA = '__DATA_MANAGER_DATA__';
 
-const ComponentDataManager = {
+class ComponentDataManager {
 	/**
 	 * Creates the `State` instance that will handle the main component data.
 	 * @param {!Component} component
@@ -28,7 +28,7 @@ const ComponentDataManager = {
 			object.mixin({}, data, State.getStateStatic(component.constructor))
 		);
 		this.getManagerData(component).state_ = state;
-	},
+	}
 
 	/**
 	 * Disposes of any data being used by the manager in this component.
@@ -40,7 +40,7 @@ const ComponentDataManager = {
 			data.state_.dispose();
 		}
 		component[DATA_MANAGER_DATA] = null;
-	},
+	}
 
 	/**
 	 * Gets the data with the given name.
@@ -50,7 +50,7 @@ const ComponentDataManager = {
 	 */
 	get(component, name) {
 		return this.getManagerData(component).state_.get(name);
-	},
+	}
 
 	/**
 	 * Gets the manager data for the given component.
@@ -59,7 +59,7 @@ const ComponentDataManager = {
 	 */
 	getManagerData(component) {
 		return component[DATA_MANAGER_DATA];
-	},
+	}
 
 	/**
 	 * Gets the keys for state data that can be synced via `sync` functions.
@@ -68,7 +68,7 @@ const ComponentDataManager = {
 	 */
 	getSyncKeys(component) {
 		return this.getManagerData(component).state_.getStateKeys();
-	},
+	}
 
 	/**
 	 * Gets the keys for state data.
@@ -77,7 +77,7 @@ const ComponentDataManager = {
 	 */
 	getStateKeys(component) {
 		return this.getManagerData(component).state_.getStateKeys();
-	},
+	}
 
 	/**
 	 * Gets the whole state data.
@@ -86,7 +86,7 @@ const ComponentDataManager = {
 	 */
 	getState(component) {
 		return this.getManagerData(component).state_.getState();
-	},
+	}
 
 	/**
 	 * Gets the `State` instance being used.
@@ -95,7 +95,7 @@ const ComponentDataManager = {
 	 */
 	getStateInstance(component) {
 		return this.getManagerData(component).state_;
-	},
+	}
 
 	/**
 	 * Updates all non internal data with the given values (or to the default
@@ -117,7 +117,7 @@ const ComponentDataManager = {
 				}
 			}
 		}
-	},
+	}
 
 	/**
 	 * Sets the value of all the specified state keys.
@@ -129,7 +129,7 @@ const ComponentDataManager = {
 	 */
 	setState(component, state, opt_callback) {
 		this.getManagerData(component).state_.setState(state, opt_callback);
-	},
+	}
 
 	/**
 	 * Sets up the specified component's data.
@@ -140,6 +140,6 @@ const ComponentDataManager = {
 		component[DATA_MANAGER_DATA] = {};
 		this.createState_(component, data);
 	}
-};
+}
 
-export default ComponentDataManager;
+export default new ComponentDataManager();

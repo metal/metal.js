@@ -3,19 +3,18 @@
 import { object } from 'metal';
 import State from 'metal-state';
 
+const BLACKLIST = {
+	components: true,
+	context: true,
+	element: true,
+	refs: true,
+	state: true,
+	stateKey: true,
+	wasRendered: true
+};
 const DATA_MANAGER_DATA = '__DATA_MANAGER_DATA__';
 
 const ComponentDataManager = {
-	BLACKLIST: {
-		components: true,
-		context: true,
-		element: true,
-		refs: true,
-		state: true,
-		stateKey: true,
-		wasRendered: true
-	},
-
 	/**
 	 * Creates the `State` instance that will handle the main component data.
 	 * @param {!Component} component
@@ -24,7 +23,7 @@ const ComponentDataManager = {
 	 */
 	createState_(component, data) {
 		const state = new State(component.getInitialConfig(), component, component);
-		state.setKeysBlacklist(this.BLACKLIST);
+		state.setKeysBlacklist(BLACKLIST);
 		state.configState(
 			object.mixin({}, data, State.getStateStatic(component.constructor))
 		);

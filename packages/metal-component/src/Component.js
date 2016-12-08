@@ -33,10 +33,6 @@ import { EventEmitter, EventHandler } from 'metal-events';
  *
  * <code>
  * class CustomComponent extends Component {
- *   constructor(config) {
- *     super(config);
- *   }
- *
  *   created() {
  *   }
  *
@@ -47,6 +43,9 @@ import { EventEmitter, EventHandler } from 'metal-events';
  *   }
  *
  *   detached() {
+ *   }
+ *
+ *   disposed() {
  *   }
  * }
  *
@@ -123,21 +122,9 @@ class Component extends EventEmitter {
 		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;
 
-		this.renderer_ = getStaticProperty(this.constructor, 'RENDERER');
-		this.renderer_.setUp(this);
-		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
-		this.dataManager_.setUp(
-			this,
-			object.mixin({}, this.renderer_.getExtraDataConfig(this), Component.DATA)
-		);
-
-		this.syncUpdates_ = getStaticProperty(this.constructor, 'SYNC_UPDATES');
-		if (this.hasSyncUpdates()) {
-			this.on(
-				'stateKeyChanged',
-				this.handleComponentStateKeyChanged_.bind(this)
-			);
-		}
+		this.setUpRenderer_();
+		this.setUpDataManager_();
+		this.setUpSyncUpdates_();
 
 		this.on('stateChanged', this.handleComponentStateChanged_);
 		this.on('eventsChanged', this.onEventsChanged_);
@@ -535,14 +522,49 @@ class Component extends EventEmitter {
 	}
 
 	/**
-	 * Skips updates until `stopSkipUpdates` is called.
+	 * Sets up the component's data manager.
+	 * @protected
+	 */
+	setUpDataManager_() {
+		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
+		this.dataManager_.setUp(
+			this,
+			object.mixin({}, this.renderer_.getExtraDataConfig(this), Component.DATA)
+		);
+	}
+
+	/**
+	 * Sets up the component's renderer.
+	 * @protected
+	 */
+	setUpRenderer_() {
+		this.renderer_ = getStaticProperty(this.constructor, 'RENDERER');
+		this.renderer_.setUp(this);
+	}
+
+	/**
+	 * Sets up the component to use sync updates when `SYNC_UPDATES` is `true`.
+	 * @protected
+	 */
+	setUpSyncUpdates_() {
+		this.syncUpdates_ = getStaticProperty(this.constructor, 'SYNC_UPDATES');
+		if (this.hasSyncUpdates()) {
+			this.on(
+				'stateKeyChanged',
+				this.handleComponentStateKeyChanged_.bind(this)
+			);
+		}
+	}
+
+	/**
+	 * Skips renderer updates until `stopSkipUpdates` is called.
 	 */
 	startSkipUpdates() {
 		this.skipUpdates_ = true;
 	}
 
 	/**
-	 * Stops skipping updates.
+	 * Stops skipping renderer updates.
 	 */
 	stopSkipUpdates() {
 		this.skipUpdates_ = false;
@@ -615,9 +637,9 @@ Component.DATA = {
 	},
 
 	/**
-	 * Listeners that should be attached to this component. Should be provided as an object,
-	 * where the keys are event names and the values are the listener functions (or function
-	 * names).
+	 * Listeners that should be attached to this component. Should be provided as
+	 * an object, where the keys are event names and the values are the listener
+	 * functions (or function names).
 	 * @type {Object<string, (function()|string|{selector: string, fn: function()|string})>}
 	 */
 	events: {
@@ -645,14 +667,13 @@ Component.COMPONENT_FLAG = '__metal_component__';
  * The `ComponentDataManager` class that should be used. This class will be
  * responsible for handling the component's data. Each component may have its
  * own implementation.
+ * @type {!ComponentDataManager}
  */
 Component.DATA_MANAGER = ComponentDataManager;
 
 /**
  * CSS classes to be applied to the element.
  * @type {string}
- * @protected
- * @static
  */
 Component.ELEMENT_CLASSES = '';
 
@@ -661,7 +682,6 @@ Component.ELEMENT_CLASSES = '';
  * to a subclass of `ComponentRenderer` that has the rendering logic, like
  * `SoyRenderer`.
  * @type {!ComponentRenderer}
- * @static
  */
 Component.RENDERER = ComponentRenderer;
 

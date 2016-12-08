@@ -3,6 +3,8 @@
 import { object } from 'metal';
 import State from 'metal-state';
 
+const DATA_MANAGER_DATA = '__DATA_MANAGER_DATA__';
+
 const ComponentDataManager = {
 	BLACKLIST: {
 		components: true,
@@ -38,7 +40,7 @@ const ComponentDataManager = {
 		if (data.state_) {
 			data.state_.dispose();
 		}
-		component.__DATA_MANAGER_DATA__ = null;
+		component[DATA_MANAGER_DATA] = null;
 	},
 
 	/**
@@ -57,7 +59,7 @@ const ComponentDataManager = {
 	 * @return {Object}
 	 */
 	getManagerData(component) {
-		return component.__DATA_MANAGER_DATA__;
+		return component[DATA_MANAGER_DATA];
 	},
 
 	/**
@@ -136,7 +138,7 @@ const ComponentDataManager = {
 	 * @param {!Object} data
 	 */
 	setUp(component, data) {
-		component.__DATA_MANAGER_DATA__ = {};
+		component[DATA_MANAGER_DATA] = {};
 		this.createState_(component, data);
 	}
 };

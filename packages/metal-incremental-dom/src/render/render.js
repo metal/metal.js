@@ -345,15 +345,12 @@ function isMatch_(comp, Ctor, owner) {
  * @private
  */
 function match_(comp, Ctor, config, owner) {
-	let shouldUpdate = true;
-	if (!isMatch_(comp, Ctor, owner)) {
-		comp = new Ctor(config, false);
-		shouldUpdate = false;
-	}
-	if (shouldUpdate) {
+	if (isMatch_(comp, Ctor, owner)) {
 		comp.startSkipUpdates();
 		comp.getDataManager().replaceNonInternal(comp, config);
 		comp.stopSkipUpdates();
+	} else {
+		comp = new Ctor(config, false);
 	}
 	getData(comp).config = config;
 	return comp;

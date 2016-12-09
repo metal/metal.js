@@ -501,6 +501,9 @@ function renderSubComponent_(tagOrCtor, config, opt_owner) {
 	}
 
 	comp.getRenderer().renderInsidePatch(comp);
+	if (!comp.wasRendered) {
+		comp.renderComponent();
+	}
 	return comp;
 }
 

@@ -396,14 +396,6 @@ class Component extends EventEmitter {
 		this.hasRendererRendered_ = true;
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
-
-		if (firstRender) {
-			this.emit('render');
-			syncState(this);
-			this.attach(this.firstParentElement_);
-			this.firstParentElement_ = null;
-			this.wasRendered = true;
-		}
 	}
 
 	/**
@@ -467,8 +459,13 @@ class Component extends EventEmitter {
 	 *     be called manually later to actually attach it to the dom.
 	 */
 	renderComponent(opt_parentElement) {
-		this.firstParentElement_ = opt_parentElement;
-		this.getRenderer().render(this);
+		if (!this.hasRendererRendered_) {
+			this.getRenderer().render(this);
+		}
+		this.emit('render');
+		syncState(this);
+		this.attach(opt_parentElement);
+		this.wasRendered = true;
 	}
 
 	/**

@@ -196,6 +196,17 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	}
 
 	/**
+	 * Skips the next disposal of children components, by clearing the array as
+	 * if there were no children rendered the last time. This can be useful for
+	 * allowing components to be reused by other parent components in separate
+	 * render update cycles.
+	 * @param {!Component} component
+	 */
+	skipNextChildrenDisposal(component) {
+		getData(component).childComponents = null;
+	}
+
+	/**
 	 * Skips rendering the current node.
 	 */
 	skipRender() {

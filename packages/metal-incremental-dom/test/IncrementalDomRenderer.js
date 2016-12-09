@@ -2376,6 +2376,35 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
+		it('should not dispose unused sub component if "skipNextChildrenDisposal" is called', function(done) {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					if (this.foo === 'foo') {
+						IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child');
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			component = new TestComponent();
+			var child = component.components.child;
+			sinon.spy(child, 'render');
+
+			component.foo = 'bar';
+			component.getRenderer().skipNextChildrenDisposal(component);
+			component.once('stateSynced', function() {
+				assert.strictEqual(0, child.render.callCount);
+				assert.ok(!child.isDisposed());
+				done();
+			});
+		});
+
 		describe('Compatibility Mode', function() {
 			afterEach(function() {
 				core.disableCompatibilityMode();

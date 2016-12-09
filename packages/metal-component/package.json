@@ -1,6 +1,6 @@
 {
   "name": "metal-component",
-  "version": "2.5.14",
+  "version": "2.5.15",
   "description": "A component class for Metal.js",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-component",

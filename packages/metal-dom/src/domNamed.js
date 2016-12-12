@@ -8,6 +8,7 @@ import DomEventHandle from './DomEventHandle';
 const elementsByTag_ = {};
 const supportCache_ = {};
 export const customEvents = {};
+export const customUnamedEvents = [];
 
 const LAST_CONTAINER = '__metal_last_container__';
 const USE_CAPTURE = {
@@ -228,7 +229,7 @@ export function contains(element1, element2) {
  * @return {!EventHandle} Can be used to remove the listener.
  */
 export function delegate(element, eventName, selectorOrTarget, callback, opt_default) {
-	var customConfig = customEvents[eventName];
+	var customConfig = getCustomEventData(eventName);
 	if (customConfig && customConfig.delegate) {
 		eventName = customConfig.originalEvent;
 		callback = customConfig.handler.bind(customConfig, callback);
@@ -293,6 +294,28 @@ export function exitDocument(node) {
 	if (node && node.parentNode) {
 		node.parentNode.removeChild(node);
 	}
+}
+
+/**
+ * Search by a custom event already registered and returns its configuration object.
+ * @param {!string} eventName The custom event name used to find the configuration
+ * object as an object key or by executing a regular expression.
+ * @return {Object} The custom event configuration object or undefined if the given
+ * eventName doesn't match with any custom event name.
+ */
+function getCustomEventData(eventName) {
+	var customConfig = customEvents[eventName];
+	if (!customConfig) {
+		for (let i = 0; customUnamedEvents.length > i; i++) {
+			var customEvent = customUnamedEvents[i];
+			var matchedEvent = customEvent.regex.exec(eventName);
+			if (matchedEvent) {
+				customConfig = customEvent.config(matchedEvent);
+				break;
+			}
+		}
+	};
+	return customConfig;
 }
 
 /**
@@ -444,7 +467,7 @@ export function on(element, eventName, callback, opt_capture) {
 	if (isString(element)) {
 		return delegate(document, eventName, element, callback);
 	}
-	var customConfig = customEvents[eventName];
+	var customConfig = getCustomEventData(eventName);
 	if (customConfig && customConfig.event) {
 		eventName = customConfig.originalEvent;
 		callback = customConfig.handler.bind(customConfig, callback);
@@ -484,12 +507,20 @@ export function parent(element, selector) {
 
 /**
  * Registers a custom event.
- * @param {string} eventName The name of the custom event.
- * @param {!Object} customConfig An object with information about how the event
- *   should be handled.
+ * @param {!RegExp|string} eventName The name of the custom event or a regular
+ * 	expression object.
+ * @param {!Object|function()} customConfig An object or a function that returns
+ *	an object with information about how the event should be handled.
  */
 export function registerCustomEvent(eventName, customConfig) {
-	customEvents[eventName] = customConfig;
+	if (isString(eventName)) {
+		customEvents[eventName] = customConfig;
+	} else {
+		customUnamedEvents.push({
+			regex: eventName,
+			config: customConfig
+		});
+	}
 }
 
 /**

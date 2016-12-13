@@ -63,16 +63,16 @@ function addClassesWithNative_(element, classes) {
  * @private
  */
 function addClassesWithoutNative_(element, classes) {
-	var elementClassName = ' ' + element.className + ' ';
-	var classesToAppend = '';
+	const elementClassName = ` ${element.className} `;
+	let classesToAppend = '';
 
 	classes = classes.split(' ');
 
-	for (var i = 0; i < classes.length; i++) {
-		var className = classes[i];
+	for (let i = 0; i < classes.length; i++) {
+		const className = classes[i];
 
-		if (elementClassName.indexOf(' ' + className + ' ') === -1) {
-			classesToAppend += ' ' + className;
+		if (elementClassName.indexOf(` ${className} `) === -1) {
+			classesToAppend += ` ${className}`;
 		}
 	}
 
@@ -128,7 +128,7 @@ function addToArr_(arr, key, value) {
  * @private
  */
 function attachDelegateEvent_(element, eventName) {
-	var delegatingData = domData.get(element, 'delegating', {});
+	let delegatingData = domData.get(element, 'delegating', {});
 	if (!delegatingData[eventName]) {
 		delegatingData[eventName] = {
 			handle: on(
@@ -169,8 +169,8 @@ export function append(parent, child) {
 		child = buildFragment(child);
 	}
 	if (child instanceof NodeList) {
-		var childArr = Array.prototype.slice.call(child);
-		for (var i = 0; i < childArr.length; i++) {
+		const childArr = Array.prototype.slice.call(child);
+		for (let i = 0; i < childArr.length; i++) {
 			parent.appendChild(childArr[i]);
 		}
 	} else {
@@ -185,11 +185,11 @@ export function append(parent, child) {
  * @return {!Element} The resulting document fragment.
  */
 export function buildFragment(htmlString) {
-	var tempDiv = document.createElement('div');
-	tempDiv.innerHTML = '<br>' + htmlString;
+	const tempDiv = document.createElement('div');
+	tempDiv.innerHTML = `<br>${htmlString}`;
 	tempDiv.removeChild(tempDiv.firstChild);
 
-	var fragment = document.createDocumentFragment();
+	const fragment = document.createDocumentFragment();
 	while (tempDiv.firstChild) {
 		fragment.appendChild(tempDiv.firstChild);
 	}
@@ -228,7 +228,7 @@ export function contains(element1, element2) {
  * @return {!EventHandle} Can be used to remove the listener.
  */
 export function delegate(element, eventName, selectorOrTarget, callback, opt_default) {
-	var customConfig = customEvents[eventName];
+	const customConfig = customEvents[eventName];
 	if (customConfig && customConfig.delegate) {
 		eventName = customConfig.originalEvent;
 		callback = customConfig.handler.bind(customConfig, callback);
@@ -270,11 +270,11 @@ function isAbleToInteractWith_(node, eventName, opt_eventObj) {
 		return false;
 	}
 
-  var matchesSelector = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'FIELDSET'];
-  if (eventName === 'click' && matchesSelector.indexOf(node.tagName) > -1) {
-    return !(node.disabled || parent(node, 'fieldset[disabled]'));
-  }
-  return true;
+	const matchesSelector = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'FIELDSET'];
+	if (eventName === 'click' && matchesSelector.indexOf(node.tagName) > -1) {
+		return !(node.disabled || parent(node, 'fieldset[disabled]'));
+	}
+	return true;
 }
 
 /**
@@ -306,9 +306,9 @@ export function exitDocument(node) {
  */
 function handleDelegateEvent_(event) {
 	normalizeDelegateEvent_(event);
-	var ret = true;
-	var container = event.currentTarget;
-	var defFns = [];
+	let ret = true;
+	const container = event.currentTarget;
+	const defFns = [];
 
 	ret &= triggerDelegatedListeners_(container, event, defFns);
 	ret &= triggerDefaultDelegatedListeners_(defFns, event);
@@ -351,7 +351,7 @@ function hasClassWithNative_(element, className) {
  * @private
  */
 function hasClassWithoutNative_(element, className) {
-	return (' ' + element.className + ' ').indexOf(' ' + className + ' ') >= 0;
+	return (` ${element.className} `).indexOf(` ${className} `) >= 0;
 }
 
 /**
@@ -374,8 +374,8 @@ export function match(element, selector) {
 		return false;
 	}
 
-	var p = Element.prototype;
-	var m = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector;
+	const p = Element.prototype;
+	const m = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector;
 	if (m) {
 		return m.call(element, selector);
 	}
@@ -392,8 +392,8 @@ export function match(element, selector) {
  * @private
  */
 function matchFallback_(element, selector) {
-	var nodes = document.querySelectorAll(selector, element.parentNode);
-	for (var i = 0; i < nodes.length; ++i) {
+	const nodes = document.querySelectorAll(selector, element.parentNode);
+	for (let i = 0; i < nodes.length; ++i) {
 		if (nodes[i] === element) {
 			return true;
 		}
@@ -444,7 +444,7 @@ export function on(element, eventName, callback, opt_capture) {
 	if (isString(element)) {
 		return delegate(document, eventName, element, callback);
 	}
-	var customConfig = customEvents[eventName];
+	const customConfig = customEvents[eventName];
 	if (customConfig && customConfig.event) {
 		eventName = customConfig.originalEvent;
 		callback = customConfig.handler.bind(customConfig, callback);
@@ -464,7 +464,7 @@ export function on(element, eventName, callback, opt_capture) {
  * @return {!DomEventHandle} Can be used to remove the listener.
  */
 export function once(element, eventName, callback) {
-	var domEventHandle = on(element, eventName, function() {
+	const domEventHandle = on(element, eventName, function() {
 		domEventHandle.removeListener();
 		return callback.apply(this, arguments);
 	});
@@ -497,7 +497,7 @@ export function registerCustomEvent(eventName, customConfig) {
  * @param {Element} node Element to remove children from.
  */
 export function removeChildren(node) {
-	var child;
+	let child;
 	while ((child = node.firstChild)) {
 		node.removeChild(child);
 	}
@@ -547,12 +547,12 @@ function removeClassesWithNative_(element, classes) {
  * @private
  */
 function removeClassesWithoutNative_(element, classes) {
-	var elementClassName = ' ' + element.className + ' ';
+	let elementClassName = ` ${element.className} `;
 
 	classes = classes.split(' ');
 
-	for (var i = 0; i < classes.length; i++) {
-		elementClassName = elementClassName.replace(' ' + classes[i] + ' ', ' ');
+	for (let i = 0; i < classes.length; i++) {
+		elementClassName = elementClassName.replace(` ${classes[i]} `, ' ');
 	}
 
 	element.className = elementClassName.trim();
@@ -609,7 +609,7 @@ export function supportsEvent(element, eventName) {
 		element = elementsByTag_[element];
 	}
 
-	var tag = element.tagName;
+	const tag = element.tagName;
 	if (!supportCache_[tag] || !supportCache_[tag].hasOwnProperty(eventName)) {
 		supportCache_[tag] = supportCache_[tag] || {};
 		supportCache_[tag][eventName] = 'on' + eventName in element;
@@ -628,7 +628,7 @@ export function supportsEvent(element, eventName) {
 function triggerDefaultDelegatedListeners_(defFns, event) {
 	let ret = true;
 
-	for (var i = 0; i < defFns.length && !event.defaultPrevented; i++) {
+	for (let i = 0; i < defFns.length && !event.defaultPrevented; i++) {
 		event.delegateTarget = defFns[i].element;
 		ret &= defFns[i].fn(event);
 	}
@@ -726,19 +726,19 @@ function toggleClassesWithNative_(element, classes) {
  * @private
  */
 function toggleClassesWithoutNative_(element, classes) {
-	var elementClassName = ' ' + element.className + ' ';
+	let elementClassName = ` ${element.className} `;
 
 	classes = classes.split(' ');
 
-	for (var i = 0; i < classes.length; i++) {
-		var className = ' ' + classes[i] + ' ';
-		var classIndex = elementClassName.indexOf(className);
+	for (let i = 0; i < classes.length; i++) {
+		const className = ` ${classes[i]} `;
+		const classIndex = elementClassName.indexOf(className);
 
 		if (classIndex === -1) {
-			elementClassName = elementClassName + classes[i] + ' ';
+			elementClassName = `${elementClassName}${classes[i]} `;
 		} else {
-			elementClassName = elementClassName.substring(0, classIndex) + ' ' +
-				elementClassName.substring(classIndex + className.length);
+			elementClassName = `${elementClassName.substring(0, classIndex)}
+			${elementClassName.substring(classIndex + className.length)}`;
 		}
 	}
 
@@ -775,7 +775,7 @@ function triggerElementListeners_(element, event, defaultFns) {
  */
 export function triggerEvent(element, eventName, opt_eventObj) {
 	if (isAbleToInteractWith_(element, eventName, opt_eventObj)) {
-		var eventObj = document.createEvent('HTMLEvents');
+		const eventObj = document.createEvent('HTMLEvents');
 		eventObj.initEvent(eventName, true, true);
 		object.mixin(eventObj, opt_eventObj);
 		element.dispatchEvent(eventObj);
@@ -794,9 +794,9 @@ export function triggerEvent(element, eventName, opt_eventObj) {
  * @private
  */
 function triggerListeners_(listeners, event, element, defaultFns) {
-	var ret = true;
+	let ret = true;
 	listeners = listeners || [];
-	for (var i = 0; i < listeners.length && !event.stoppedImmediate; i++) {
+	for (let i = 0; i < listeners.length && !event.stoppedImmediate; i++) {
 		if (listeners[i].defaultListener_) {
 			defaultFns.push({
 				element,

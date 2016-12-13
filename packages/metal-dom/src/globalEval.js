@@ -15,7 +15,7 @@ class globalEval {
 	 * @return {Element} script
 	 */
 	static run(text, opt_appendFn) {
-		var script = document.createElement('script');
+		const script = document.createElement('script');
 		script.text = text;
 		if (opt_appendFn) {
 			opt_appendFn(script);
@@ -36,10 +36,10 @@ class globalEval {
 	 * @return {Element} script
 	 */
 	static runFile(src, opt_callback, opt_appendFn) {
-		var script = document.createElement('script');
+		const script = document.createElement('script');
 		script.src = src;
 
-		var callback = function() {
+		const callback = function() {
 			exitDocument(script);
 			opt_callback && opt_callback();
 		};
@@ -65,7 +65,7 @@ class globalEval {
 	 * @return {Element} script
 	 */
 	static runScript(script, opt_callback, opt_appendFn) {
-		var callback = function() {
+		const callback = function() {
 			opt_callback && opt_callback();
 		};
 		if (script.type && script.type !== 'text/javascript') {
@@ -90,7 +90,7 @@ class globalEval {
 	 *   into document.
 	 */
 	static runScriptsInElement(element, opt_callback, opt_appendFn) {
-		var scripts = element.querySelectorAll('script');
+		const scripts = element.querySelectorAll('script');
 		if (scripts.length) {
 			globalEval.runScriptsInOrder(scripts, 0, opt_callback, opt_appendFn);
 		} else if (opt_callback) {

@@ -58,9 +58,9 @@ export function getComponentFn(component, fnName) {
 	if (isFunction(component[fnName])) {
 		return component[fnName].bind(component);
 	} else {
-		console.error('No function named "' + fnName + '" was found in the ' +
-			'component "' + getFunctionName(component.constructor) + '". Make ' +
-			'sure that you specify valid function names when adding inline listeners.'
+		console.error(`No function named ${fnName} was founc in the component
+			"${getFunctionName(component.constructor)}". Make sure that you specify
+			valif function names when adding inline listeners`
 		);
 	}
 }

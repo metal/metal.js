@@ -71,7 +71,7 @@ const Config = {
  * @return {!Object} The final object containing the built config.
  */
 function mergeConfig(context, config) {
-	var obj = context;
+	let obj = context;
 	if (obj === Config) {
 		obj = Object.create(Config);
 		obj.config = {};
@@ -81,7 +81,7 @@ function mergeConfig(context, config) {
 }
 
 // Add all validators to `Config`.
-var fnNames = Object.keys(validators);
+const fnNames = Object.keys(validators);
 fnNames.forEach(
 	name => Config[name] = function() {
 		return this.validator(validators[name]);

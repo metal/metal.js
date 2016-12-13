@@ -25,14 +25,14 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	dispose(component) {
 		const data = getData(component);
-		var ref = data.config.ref;
-		var owner = data.owner;
+		const ref = data.config.ref;
+		const owner = data.owner;
 		if (owner && owner.components && owner.components[ref] === component) {
 			delete owner.components[ref];
 		}
 
 		if (data.childComponents) {
-			for (var i = 0; i < data.childComponents.length; i++) {
+			for (let i = 0; i < data.childComponents.length; i++) {
 				const child = data.childComponents[i];
 				if (!child.isDisposed()) {
 					child.element = null;

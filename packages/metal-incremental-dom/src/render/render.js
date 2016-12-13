@@ -24,7 +24,7 @@ const emptyChildren_ = [];
 function addElementClasses_(elementClasses, args) {
 	const config = buildConfigFromCall(args);
 	if (config.class) {
-		config.class += ' ' + elementClasses;
+		config.class += ` ${elementClasses}`;
 		config.class = removeDuplicateClasses_(config.class);
 	} else {
 		config.class = elementClasses;
@@ -45,8 +45,8 @@ function addElementClasses_(elementClasses, args) {
  */
 function attachDecoratedListeners_(component, node, args) {
 	if (!component.wasRendered) {
-		var attrs = (args[2] || []).concat(args.slice(3));
-		for (var i = 0; i < attrs.length; i += 2) {
+		const attrs = (args[2] || []).concat(args.slice(3));
+		for (let i = 0; i < attrs.length; i += 2) {
 			attachFromAttrFirstTime(component, node, attrs[i], attrs[i + 1]);
 		}
 	}
@@ -191,7 +191,7 @@ function getSubComponent_(tagOrCtor, config, owner) {
 			const type = getUid(Ctor, true);
 			data.currCount = data.currCount || {};
 			data.currCount[type] = data.currCount[type] || 0;
-			key = '__METAL_IC__' + type + '_' + data.currCount[type]++;
+			key = `__METAL_IC__${type}_${data.currCount[type]++}`;
 		}
 		comp = match_(data.prevComps ? data.prevComps[key] : null, Ctor, config, owner);
 		data.currComps = data.currComps || {};
@@ -430,7 +430,7 @@ export function renderChild(child) {
  */
 function renderFromTag_(tag, config, opt_owner) {
 	if (isString(tag) || tag.prototype.getRenderer) {
-		var comp = renderSubComponent_(tag, config, opt_owner);
+		const comp = renderSubComponent_(tag, config, opt_owner);
 		updateElementIfNotReached_(getComponentBeingRendered(), comp.element);
 		return comp.element;
 	} else {
@@ -451,7 +451,7 @@ function renderFromTag_(tag, config, opt_owner) {
  */
 export function renderFunction(renderer, fnOrCtor, opt_dataOrElement, opt_parent) {
 	if (!Component.isComponentCtor(fnOrCtor)) {
-		var fn = fnOrCtor;
+		const fn = fnOrCtor;
 		class TempComponent extends Component {
 			created() {
 				const parent = getComponentBeingRendered();
@@ -534,8 +534,8 @@ function resetNodeData_(node) {
  * @protected
  */
 function updateContext_(comp, parent) {
-	var context = comp.context;
-	var childContext = parent.getChildContext ? parent.getChildContext() : null;
+	const context = comp.context;
+	const childContext = parent.getChildContext ? parent.getChildContext() : null;
 	object.mixin(context, parent.context, childContext);
 	comp.context = context;
 }

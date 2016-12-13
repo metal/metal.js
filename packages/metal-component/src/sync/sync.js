@@ -24,7 +24,7 @@ function getSyncFns_(component) {
 	const keys = component.getDataManager().getSyncKeys(component);
 	let canCache = true;
 	for (let i = 0; i < keys.length; i++) {
-		const name = 'sync' + keys[i].charAt(0).toUpperCase() + keys[i].slice(1);
+		const name = `sync${keys[i].charAt(0).toUpperCase()}${keys[i].slice(1)}`;
 		const fn = component[name];
 		if (fn) {
 			fns[keys[i]] = fn;

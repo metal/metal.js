@@ -5,7 +5,7 @@
 
 'use strict';
 
-var async = {};
+const async = {};
 
 
 /**
@@ -59,10 +59,10 @@ async.run.processWorkQueue = function() {
 	// NOTE: additional work queue items may be pushed while processing.
 	while (async.run.workQueue_.length) {
 		// Don't let the work queue grow indefinitely.
-		var workItems = async.run.workQueue_;
+		const workItems = async.run.workQueue_;
 		async.run.workQueue_ = [];
-		for (var i = 0; i < workItems.length; i++) {
-			var workItem = workItems[i];
+		for (let i = 0; i < workItems.length; i++) {
+			const workItem = workItems[i];
 			try {
 				workItem.fn.call(workItem.scope);
 			} catch (e) {
@@ -103,7 +103,7 @@ async.run.WorkItem_ = function(fn, scope) {
  * @template SCOPE
  */
 async.nextTick = function(callback, opt_context) {
-	var cb = callback;
+	let cb = callback;
 	if (opt_context) {
 		cb = callback.bind(opt_context);
 	}
@@ -142,7 +142,7 @@ async.nextTick.setImmediate_ = null;
 async.nextTick.getSetImmediateEmulator_ = function() {
 	// Create a private message channel and use it to postMessage empty messages
 	// to ourselves.
-	var Channel;
+	let Channel;
 
 	// Verify if variable is defined on the current runtime (i.e., node, browser).
 	// Can't use typeof enclosed in a function (such as core.isFunction) or an
@@ -161,18 +161,18 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 		/** @constructor */
 		Channel = function() {
 			// Make an empty, invisible iframe.
-			var iframe = document.createElement('iframe');
+			const iframe = document.createElement('iframe');
 			iframe.style.display = 'none';
 			iframe.src = '';
 			document.documentElement.appendChild(iframe);
-			var win = iframe.contentWindow;
-			var doc = win.document;
+			const win = iframe.contentWindow;
+			const doc = win.document;
 			doc.open();
 			doc.write('');
 			doc.close();
-			var message = 'callImmediate' + Math.random();
-			var origin = win.location.protocol + '//' + win.location.host;
-			var onmessage = function(e) {
+			const message = 'callImmediate' + Math.random();
+			const origin = win.location.protocol + '//' + win.location.host;
+			const onmessage = function(e) {
 				// Validate origin and message to make sure that this message was
 				// intended for us.
 				if (e.origin !== origin && e.data !== message) {
@@ -190,13 +190,13 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 		};
 	}
 	if (typeof Channel !== 'undefined') {
-		var channel = new Channel();
+		const channel = new Channel();
 		// Use a fifo linked list to call callbacks in the right order.
-		var head = {};
-		var tail = head;
+		let head = {};
+		let tail = head;
 		channel.port1.onmessage = function() {
 			head = head.next;
-			var cb = head.cb;
+			const cb = head.cb;
 			head.cb = null;
 			cb();
 		};
@@ -213,7 +213,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	if (typeof document !== 'undefined' && 'onreadystatechange' in
 		document.createElement('script')) {
 		return function(cb) {
-			var script = document.createElement('script');
+			let script = document.createElement('script');
 			script.onreadystatechange = function() {
 				// Clean up and call the callback.
 				script.onreadystatechange = null;

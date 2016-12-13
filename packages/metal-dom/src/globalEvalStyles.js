@@ -15,7 +15,7 @@ class globalEvalStyles {
 	 * @return {Element} style
 	 */
 	static run(text, opt_appendFn) {
-		var style = document.createElement('style');
+		const style = document.createElement('style');
 		style.innerHTML = text;
 		if (opt_appendFn) {
 			opt_appendFn(style);
@@ -35,7 +35,7 @@ class globalEvalStyles {
 	 * @return {Element} style
 	 */
 	static runFile(href, opt_callback, opt_appendFn) {
-		var link = document.createElement('link');
+		const link = document.createElement('link');
 		link.rel = 'stylesheet';
 		link.href = href;
 		globalEvalStyles.runStyle(link, opt_callback, opt_appendFn);
@@ -52,7 +52,7 @@ class globalEvalStyles {
 	 *  @return {Element} style
 	 */
 	static runStyle(style, opt_callback, opt_appendFn) {
-		var callback = function() {
+		const callback = function() {
 			opt_callback && opt_callback();
 		};
 		if (style.rel && style.rel !== 'stylesheet') {
@@ -85,19 +85,19 @@ class globalEvalStyles {
 	 *   into document.
 	 */
 	static runStylesInElement(element, opt_callback, opt_appendFn) {
-		var styles = element.querySelectorAll('style,link');
+		const styles = element.querySelectorAll('style,link');
 		if (styles.length === 0 && opt_callback) {
 			async.nextTick(opt_callback);
 			return;
 		}
 
-		var loadCount = 0;
-		var callback = function() {
+		let loadCount = 0;
+		const callback = function() {
 			if (opt_callback && ++loadCount === styles.length) {
 				async.nextTick(opt_callback);
 			}
 		};
-		for (var i = 0; i < styles.length; i++) {
+		for (let i = 0; i < styles.length; i++) {
 			globalEvalStyles.runStyle(styles[i], callback, opt_appendFn);
 		}
 	}

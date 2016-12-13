@@ -8,8 +8,8 @@ class object {
 	 * @return {Object} Returns the target object reference.
 	 */
 	static mixin(target) {
-		var key, source;
-		for (var i = 1; i < arguments.length; i++) {
+		let key, source;
+		for (let i = 1; i < arguments.length; i++) {
 			source = arguments[i];
 			for (key in source) {
 				target[key] = source[key];
@@ -26,8 +26,8 @@ class object {
 	 * @return {?} The value (object or primitive) or, if not found, undefined.
 	 */
 	static getObjectByName(name, opt_obj) {
-		var scope = opt_obj || window;
-		var parts = name.split('.');
+		const scope = opt_obj || window;
+		const parts = name.split('.');
 		return parts.reduce((part, key) => part[key], scope);
 	}
 
@@ -39,9 +39,9 @@ class object {
 	 * @return {!Object}
 	 */
 	static map(obj, fn) {
-		var mappedObj = {};
-		var keys = Object.keys(obj);
-		for (var i = 0; i < keys.length; i++) {
+		const mappedObj = {};
+		const keys = Object.keys(obj);
+		for (let i = 0; i < keys.length; i++) {
 			mappedObj[keys[i]] = fn(keys[i], obj[keys[i]]);
 		}
 		return mappedObj;
@@ -57,13 +57,13 @@ class object {
 			return true;
 		}
 
-		var keys1 = Object.keys(obj1);
-		var keys2 = Object.keys(obj2);
+		const keys1 = Object.keys(obj1);
+		const keys2 = Object.keys(obj2);
 		if (keys1.length !== keys2.length) {
 			return false;
 		}
 
-		for (var i = 0; i < keys1.length; i++) {
+		for (let i = 0; i < keys1.length; i++) {
 			if (obj1[keys1[i]] !== obj2[keys1[i]]) {
 				return false;
 			}

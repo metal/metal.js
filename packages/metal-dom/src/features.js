@@ -29,15 +29,15 @@ class features {
 	 * @return {string} Browser event name.
 	 */
 	static checkAnimationEventName_(type) {
-		var prefixes = ['Webkit', 'MS', 'O', ''];
-		var typeTitleCase = string.replaceInterval(type, 0, 1, type.substring(0, 1).toUpperCase());
-		var suffixes = [typeTitleCase + 'End', typeTitleCase + 'End', typeTitleCase + 'End', type + 'end'];
-		for (var i = 0; i < prefixes.length; i++) {
+		const prefixes = ['Webkit', 'MS', 'O', ''];
+		const typeTitleCase = string.replaceInterval(type, 0, 1, type.substring(0, 1).toUpperCase());
+		const suffixes = [`${typeTitleCase}End`, `${typeTitleCase}End`, `${typeTitleCase}End`, `${type}end`];
+		for (let i = 0; i < prefixes.length; i++) {
 			if (features.animationElement_.style[prefixes[i] + typeTitleCase] !== undefined) {
 				return prefixes[i].toLowerCase() + suffixes[i];
 			}
 		}
-		return type + 'end';
+		return `${type}end`;
 	}
 
 	/**
@@ -48,8 +48,8 @@ class features {
 	 */
 	static checkAttrOrderChange() {
 		if (features.attrOrderChange_ === undefined) {
-			var originalContent = '<div data-component="" data-ref=""></div>';
-			var element = document.createElement('div');
+			const originalContent = '<div data-component="" data-ref=""></div>';
+			const element = document.createElement('div');
 			append(element, originalContent);
 			features.attrOrderChange_ = originalContent !== element.innerHTML;
 		}

@@ -1,6 +1,6 @@
 'use strict';
 
-var SoyAop = {
+const SoyAop = {
 	/**
 	 * The functions that should be called instead of a template call. The last
 	 * function in the array is the one that is intercepting at the moment. If the
@@ -32,7 +32,7 @@ var SoyAop = {
 	 *     interception.
 	 */
 	handleTemplateCall_: function(originalFn, opt_data, opt_ignored, opt_ijData) {
-		var interceptFn = SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1];
+		const interceptFn = SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1];
 		if (interceptFn) {
 			return interceptFn.call(null, originalFn, opt_data, opt_ignored, opt_ijData);
 		} else {
@@ -47,7 +47,7 @@ var SoyAop = {
 	 * @param {string} name The name of the template function to intercept.
 	 */
 	registerForInterception: function(templates, name) {
-		var originalFn = templates[name];
+		const originalFn = templates[name];
 		if (!originalFn.originalFn) {
 			templates[name] = SoyAop.handleTemplateCall_.bind(null, originalFn);
 			templates[name].originalFn = originalFn;

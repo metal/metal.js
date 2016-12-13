@@ -16,8 +16,8 @@ window.iDOMHelpers.attr = function(value, attrName) {
 };
 
 window.iDOMHelpers.forOwn = function(object, iterator) {
-	var hasOwn = Object.prototype.hasOwnProperty;
-	for (var prop in object) {
+	const hasOwn = Object.prototype.hasOwnProperty;
+	for (let prop in object) {
 		if (hasOwn.call(object, prop)) {
 			iterator(object[prop], prop);
 		}
@@ -25,7 +25,7 @@ window.iDOMHelpers.forOwn = function(object, iterator) {
 };
 
 window.iDOMHelpers.jsxWrapper = function(elementClosure, args) {
-	var wrapper = args ? function() {
+	const wrapper = args ? function() {
 		return elementClosure.apply(this, args);
 	} : elementClosure;
 	wrapper.__jsxDOMWrapper = true;
@@ -33,7 +33,7 @@ window.iDOMHelpers.jsxWrapper = function(elementClosure, args) {
 };
 
 window.iDOMHelpers.renderArbitrary = function(child) {
-	var type = typeof child;
+	const type = typeof child;
 	if (type === 'number' || (type === 'string' || child && child instanceof String)) {
 		IncrementalDOM.text(child);
 	} else if (type === 'function' && child.__jsxDOMWrapper) {

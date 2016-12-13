@@ -20,9 +20,9 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	addListener_(event, listener) {
 		if (this.originEmitter_.addEventListener) {
 			if (this.isDelegateEvent_(event)) {
-				var index = event.indexOf(':', 9);
-				var eventName = event.substring(9, index);
-				var selector = event.substring(index + 1);
+				const index = event.indexOf(':', 9);
+				const eventName = event.substring(9, index);
+				const selector = event.substring(index + 1);
 				return delegate(this.originEmitter_, eventName, selector, listener);
 			} else {
 				return on(this.originEmitter_, event, listener);

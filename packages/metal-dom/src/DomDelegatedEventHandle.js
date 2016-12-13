@@ -28,11 +28,11 @@ class DomDelegatedEventHandle extends EventHandle {
 	 * @inheritDoc
 	 */
 	removeListener() {
-		var delegating = domData.get(this.emitter_, 'delegating', {});
-		var listeners = domData.get(this.emitter_, 'listeners', {});
-		var selector = this.selector_;
-		var arr = isString(selector) ? delegating[this.event_].selectors : listeners;
-		var key = isString(selector) ? selector : this.event_;
+		const delegating = domData.get(this.emitter_, 'delegating', {});
+		const listeners = domData.get(this.emitter_, 'listeners', {});
+		const selector = this.selector_;
+		const arr = isString(selector) ? delegating[this.event_].selectors : listeners;
+		const key = isString(selector) ? selector : this.event_;
 
 		array.remove(arr[key] || [], this.listener_);
 		if (arr[key] && arr[key].length === 0) {

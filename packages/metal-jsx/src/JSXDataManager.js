@@ -54,7 +54,7 @@ class JSXDataManager extends ComponentDataManager.constructor {
 	 * @inheritDoc
 	 */
 	dispose(component) {
-		var data = this.getManagerData(component);
+		const data = this.getManagerData(component);
 		data.props_.dispose();
 		ComponentDataManager.dispose.call(this, component);
 	}
@@ -98,9 +98,9 @@ class JSXDataManager extends ComponentDataManager.constructor {
 	 * @override
 	 */
 	replaceNonInternal(component, data) {
-		var prevProps;
+		let prevProps;
 		if (component.propsChanged) {
-			 prevProps = object.mixin({}, component.props);
+			prevProps = object.mixin({}, component.props);
 		}
 
 		const props = this.getManagerData(component).props_;

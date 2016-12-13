@@ -7,12 +7,12 @@
  * @return {!Object}
  */
 export function buildConfigFromCall(args) {
-	var config = {};
+	const config = {};
 	if (args[1]) {
 		config.key = args[1];
 	}
-	var attrsArr = (args[2] || []).concat(args.slice(3));
-	for (var i = 0; i < attrsArr.length; i += 2) {
+	const attrsArr = (args[2] || []).concat(args.slice(3));
+	for (let i = 0; i < attrsArr.length; i += 2) {
 		config[attrsArr[i]] = attrsArr[i + 1];
 	}
 	return config;
@@ -25,9 +25,9 @@ export function buildConfigFromCall(args) {
  * @return {!Array}
  */
 export function buildCallFromConfig(tag, config) {
-	var call = [tag, config.key, []];
-	var keys = Object.keys(config);
-	for (var i = 0; i < keys.length; i++) {
+	const call = [tag, config.key, []];
+	const keys = Object.keys(config);
+	for (let i = 0; i < keys.length; i++) {
 		if (keys[i] !== 'children') {
 			call.push(keys[i], config[keys[i]]);
 		}

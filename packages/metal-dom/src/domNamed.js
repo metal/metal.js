@@ -737,8 +737,9 @@ function toggleClassesWithoutNative_(element, classes) {
 		if (classIndex === -1) {
 			elementClassName = `${elementClassName}${classes[i]} `;
 		} else {
-			elementClassName = `${elementClassName.substring(0, classIndex)}
-			${elementClassName.substring(classIndex + className.length)}`;
+			const before = elementClassName.substring(0, classIndex);
+			const after = elementClassName.substring(classIndex + className.length);
+			elementClassName = `${before} ${after}`;
 		}
 	}
 

@@ -67,8 +67,7 @@ describe('attributes', function() {
 
 		it('should not set "on<EventName>" string values as dom attributes', function() {
 			class TestComponent extends Component {
-				handleClick() {
-				}
+				handleClick() {}
 			}
 			component = new TestComponent();
 
@@ -95,8 +94,7 @@ describe('attributes', function() {
 
 		it('should set "data-on<eventname>" string values as dom attributes', function() {
 			class TestComponent extends Component {
-				handleClick() {
-				}
+				handleClick() {}
 			}
 			component = new TestComponent();
 
@@ -107,9 +105,9 @@ describe('attributes', function() {
 
 		it('should attach listeners from "data-on<event-name>" attributes with multiple hifens', function() {
 			dom.registerCustomEvent('test-event', {
-  			delegate: true,
-  			handler: (callback, event) => callback(event),
-  			originalEvent: 'click'
+				delegate: true,
+				handler: (callback, event) => callback(event),
+				originalEvent: 'click'
 			});
 
 			class TestComponent extends Component {
@@ -127,9 +125,9 @@ describe('attributes', function() {
 
 		it('should attach listeners from "on<Event-name>" attributes with multiple hifens', function() {
 			dom.registerCustomEvent('test-event', {
-  			delegate: true,
-  			handler: (callback, event) => callback(event),
-  			originalEvent: 'click'
+				delegate: true,
+				handler: (callback, event) => callback(event),
+				originalEvent: 'click'
 			});
 
 			class TestComponent extends Component {

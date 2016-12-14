@@ -31,6 +31,6 @@ describe('data', function() {
 		const obj = {};
 		const data = getData(obj);
 		clearData(obj);
-		assert.notStrictEqual(data,  getData(obj));
+		assert.notStrictEqual(data, getData(obj));
 	});
 });

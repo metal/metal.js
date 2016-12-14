@@ -27,7 +27,7 @@ class EventHandler extends Disposable {
 	 * @param {...(!EventHandle)} var_args
 	 */
 	add() {
-		for (var i = 0; i < arguments.length; i++) {
+		for (let i = 0; i < arguments.length; i++) {
 			this.eventHandles_.push(arguments[i]);
 		}
 	}
@@ -44,7 +44,7 @@ class EventHandler extends Disposable {
 	 * Removes all listeners that have been added through the `add` method.
 	 */
 	removeAllListeners() {
-		for (var i = 0; i < this.eventHandles_.length; i++) {
+		for (let i = 0; i < this.eventHandles_.length; i++) {
 			this.eventHandles_[i].removeListener();
 		}
 

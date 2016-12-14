@@ -9,16 +9,16 @@ class string {
 	 *     "smaller", equal or "bigger" than the second given string.
 	 */
 	static caseInsensitiveCompare(str1, str2) {
-	  var test1 = String(str1).toLowerCase();
-	  var test2 = String(str2).toLowerCase();
+		const test1 = String(str1).toLowerCase();
+		const test2 = String(str2).toLowerCase();
 
-	  if (test1 < test2) {
-	    return -1;
-	  } else if (test1 === test2) {
-	    return 0;
-	  } else {
-	    return 1;
-	  }
+		if (test1 < test2) {
+			return -1;
+		} else if (test1 === test2) {
+			return 0;
+		} else {
+			return 1;
+		}
 	}
 
 	/**
@@ -49,7 +49,7 @@ class string {
 	* @return {string} A random string, e.g. sn1s7vb4gcic.
 	*/
 	static getRandomString() {
-		var x = 2147483648;
+		const x = 2147483648;
 		return Math.floor(Math.random() * x).toString(36) +
 			Math.abs(Math.floor(Math.random() * x) ^ Date.now()).toString(36);
 	}
@@ -64,8 +64,8 @@ class string {
 	 * @return {Number} Returns the string hashcode.
 	 */
 	static hashCode(val) {
-		var hash = 0;
-		for (var i = 0, len = val.length; i < len; i++) {
+		let hash = 0;
+		for (let i = 0, len = val.length; i < len; i++) {
 			hash = 31 * hash + val.charCodeAt(i);
 			hash %= 0x100000000;
 		}

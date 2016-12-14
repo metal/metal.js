@@ -59,7 +59,7 @@ describe('JSXRenderer', function() {
 							<span>Children Test 3</span>
 						</ChildComponent>
 					</div>
-				);
+					);
 			}
 		}
 
@@ -216,8 +216,7 @@ describe('JSXRenderer', function() {
 
 	it('should pass both state and prop changes to shouldUpdate', function(done) {
 		class TestComponent extends TestJSXComponent {
-			shouldUpdate() {
-			}
+			shouldUpdate() {}
 		}
 		TestComponent.PROPS = {
 			bar: {
@@ -252,7 +251,7 @@ describe('JSXRenderer', function() {
 	it('should reuse elements correctly when child skips update', function(done) {
 		class ChildComponent extends TestJSXComponent {
 			render() {
-					return <span>Child</span>
+				return <span>Child</span>
 			}
 
 			shouldUpdate() {

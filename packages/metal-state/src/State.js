@@ -1,14 +1,6 @@
 'use strict';
 
-import {
-	async,
-	getStaticProperty,
-	isDefAndNotNull,
-	isFunction,
-	isObject,
-	isString,
-	object
-} from 'metal';
+import { async, getStaticProperty, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
 import { EventEmitter } from 'metal-events';
 
 /**
@@ -90,16 +82,15 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	assertGivenIfRequired_(name) {
-		var config = this.stateConfigs_[name];
+		const config = this.stateConfigs_[name];
 		if (config.required) {
-			var info = this.getStateInfo(name);
-			var value = info.state === State.KeyStates.INITIALIZED ?
+			const info = this.getStateInfo(name);
+			const value = info.state === State.KeyStates.INITIALIZED ?
 				this.get(name) :
 				this.initialValues_[name];
 			if (!isDefAndNotNull(value)) {
 				console.error(
-					'The property called "' + name + '" is required but didn\'t ' +
-					'receive a value.'
+					`The property called "${name}" is required but didn't receive a value.`
 				);
 			}
 		}
@@ -114,7 +105,9 @@ class State extends EventEmitter {
 	 */
 	assertValidStateKeyName_(name) {
 		if (this.keysBlacklist_ && this.keysBlacklist_[name]) {
-			throw new Error('It\'s not allowed to create a state key with the name "' + name + '".');
+			throw new Error(
+				`It's not allowed to create a state key with the name "${name}".`
+			);
 		}
 	}
 
@@ -163,7 +156,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	callSetter_(name, value, currentValue) {
-		var config = this.stateConfigs_[name];
+		const config = this.stateConfigs_[name];
 		if (config.setter) {
 			value = this.callFunction_(config.setter, [value, currentValue]);
 		}
@@ -179,9 +172,9 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	callValidator_(name, value) {
-		var config = this.stateConfigs_[name];
+		const config = this.stateConfigs_[name];
 		if (config.validator) {
-			var validatorReturn = this.callFunction_(
+			const validatorReturn = this.callFunction_(
 				config.validator,
 				[value, name, this.context_]
 			);
@@ -200,7 +193,7 @@ class State extends EventEmitter {
 	 * @return {boolean}
 	 */
 	canSetState(name) {
-		var info = this.getStateInfo(name);
+		const info = this.getStateInfo(name);
 		return !this.stateConfigs_[name].writeOnce || !info.written;
 	}
 
@@ -268,9 +261,9 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	configStateFromStaticHint_() {
-		var ctor = this.constructor;
+		const ctor = this.constructor;
 		if (ctor !== State) {
-			var defineContext;
+			let defineContext;
 			if (this.obj_ === this) {
 				defineContext = ctor.hasConfiguredState_ ? false : ctor.prototype;
 				ctor.hasConfiguredState_ = true;
@@ -296,7 +289,7 @@ class State extends EventEmitter {
 	 */
 	emitBatchEvent_() {
 		if (!this.isDisposed()) {
-			var data = this.scheduledBatchData_;
+			const data = this.scheduledBatchData_;
 			this.scheduledBatchData_ = null;
 			this.context_.emit('stateChanged', data);
 		}
@@ -321,10 +314,10 @@ class State extends EventEmitter {
 	 * @return {Object.<string, *>}
 	 */
 	getState(opt_names) {
-		var state = {};
-		var names = opt_names || this.getStateKeys();
+		const state = {};
+		const names = opt_names || this.getStateKeys();
 
-		for (var i = 0; i < names.length; i++) {
+		for (let i = 0; i < names.length; i++) {
 			state[names[i]] = this.get(names[i]);
 		}
 
@@ -392,7 +385,7 @@ class State extends EventEmitter {
 	 * @return {boolean}
 	 */
 	hasBeenSet(name) {
-		var info = this.getStateInfo(name);
+		const info = this.getStateInfo(name);
 		return info.state === State.KeyStates.INITIALIZED ||
 			this.hasInitialValue_(name);
 	}
@@ -427,12 +420,12 @@ class State extends EventEmitter {
 	 */
 	informChange_(name, prevVal) {
 		if (this.shouldInformChange_(name, prevVal)) {
-			var data = object.mixin({
+			const data = object.mixin({
 				key: name,
 				newVal: this.get(name),
 				prevVal: prevVal
 			}, this.eventData_);
-			this.context_.emit(name + 'Changed', data);
+			this.context_.emit(`${name}Changed`, data);
 			this.context_.emit('stateKeyChanged', data);
 			this.scheduleBatchEvent_(data);
 		}
@@ -444,7 +437,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	initStateKey_(name) {
-		var info = this.getStateInfo(name);
+		const info = this.getStateInfo(name);
 		if (info.state !== State.KeyStates.UNINITIALIZED) {
 			return;
 		}
@@ -491,8 +484,8 @@ class State extends EventEmitter {
 			}, this.eventData_);
 		}
 
-		var name = changeData.key;
-		var changes = this.scheduledBatchData_.changes;
+		const name = changeData.key;
+		const changes = this.scheduledBatchData_.changes;
 		if (changes[name]) {
 			changes[name].newVal = changeData.newVal;
 		} else {
@@ -521,7 +514,7 @@ class State extends EventEmitter {
 	 * @return {*}
 	 */
 	setDefaultValue(name) {
-		var config = this.stateConfigs_[name];
+		const config = this.stateConfigs_[name];
 
 		if (config.value !== undefined) {
 			this.set(name, config.value);
@@ -609,7 +602,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	shouldInformChange_(name, prevVal) {
-		var info = this.getStateInfo(name);
+		const info = this.getStateInfo(name);
 		return (info.state === State.KeyStates.INITIALIZED) &&
 			(isObject(prevVal) || prevVal !== this.get(name));
 	}
@@ -634,7 +627,7 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateKeyValue_(name, value) {
-		var info = this.getStateInfo(name);
+		const info = this.getStateInfo(name);
 		return info.state === State.KeyStates.INITIALIZING ||
 			this.callValidator_(name, value);
 	}

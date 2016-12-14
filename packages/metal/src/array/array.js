@@ -13,7 +13,7 @@ class array {
 		if (arr1.length !== arr2.length) {
 			return false;
 		}
-		for (var i = 0; i < arr1.length; i++) {
+		for (let i = 0; i < arr1.length; i++) {
 			if (arr1[i] !== arr2[i]) {
 				return false;
 			}
@@ -27,7 +27,7 @@ class array {
 	 * @return {*}
 	 */
 	static firstDefinedValue(arr) {
-		for (var i = 0; i < arr.length; i++) {
+		for (let i = 0; i < arr.length; i++) {
 			if (arr[i] !== undefined) {
 				return arr[i];
 			}
@@ -42,7 +42,7 @@ class array {
 	 */
 	static flatten(arr, opt_output) {
 		var output = opt_output || [];
-		for (var i = 0; i < arr.length; i++) {
+		for (let i = 0; i < arr.length; i++) {
 			if (Array.isArray(arr[i])) {
 				array.flatten(arr[i], output);
 			} else {
@@ -60,8 +60,8 @@ class array {
 	 * @template T
 	 */
 	static remove(arr, obj) {
-		var i = arr.indexOf(obj);
-		var rv;
+		const i = arr.indexOf(obj);
+		let rv;
 		if ( (rv = i >= 0) ) {
 			array.removeAt(arr, i);
 		}
@@ -89,9 +89,9 @@ class array {
 	 * @return {!Array}
 	 */
 	static slice(arr, start, opt_end) {
-		var sliced = [];
-		var end = isDef(opt_end) ? opt_end : arr.length;
-		for (var i = start; i < end; i++) {
+		const sliced = [];
+		const end = isDef(opt_end) ? opt_end : arr.length;
+		for (let i = start; i < end; i++) {
 			sliced.push(arr[i]);
 		}
 		return sliced;

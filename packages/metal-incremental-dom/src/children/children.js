@@ -85,7 +85,7 @@ export function renderChildTree(tree, opt_skipNode) {
 		};
 		IncrementalDOM.elementOpen.apply(null, args);
 		if (tree.props.children) {
-			for (var i = 0; i < tree.props.children.length; i++) {
+			for (let i = 0; i < tree.props.children.length; i++) {
 				renderChildTree(tree.props.children[i], opt_skipNode);
 			}
 		}
@@ -93,12 +93,12 @@ export function renderChildTree(tree, opt_skipNode) {
 	}
 }
 
-var callbackData_;
-var callback_;
-var currentParent_;
-var isCapturing_ = false;
-var owner_;
-var tree_;
+let callbackData_;
+let callback_;
+let currentParent_;
+let isCapturing_ = false;
+let owner_;
+let tree_;
 
 /**
  * Adds a child element to the tree.
@@ -108,7 +108,7 @@ var tree_;
  * @protected
  */
 function addChildCallToTree_(args, opt_isText) {
-	var child = {
+	const child = {
 		parent: currentParent_,
 		[CHILD_OWNER]: owner_
 	};

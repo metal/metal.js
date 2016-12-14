@@ -19,7 +19,7 @@ let uniqueIdCounter_ = 1;
  * @type {String}
  * @protected
  */
-export const UID_PROPERTY = 'core_' + ((Math.random() * 1e9) >>> 0);
+export const UID_PROPERTY = `core_${((Math.random() * 1e9) >>> 0)}`;
 
 /**
  * When defining a class Foo with an abstract method bar(), you can do:
@@ -97,7 +97,7 @@ function getFirstTruthy_(a, b) {
  */
 export function getFunctionName(fn) {
 	if (!fn.name) {
-		var str = fn.toString();
+		const str = fn.toString();
 		fn.name = str.substring(9, str.indexOf('('));
 	}
 	return fn.name;
@@ -118,7 +118,7 @@ export function getFunctionName(fn) {
  *     will be the first truthy value among ancestors.
  */
 export function getStaticProperty(ctor, propertyName, opt_mergeFn) {
-	var mergedName = propertyName + '_MERGED';
+	const mergedName = propertyName + '_MERGED';
 	if (!ctor.hasOwnProperty(mergedName)) {
 		let merged = ctor.hasOwnProperty(propertyName) ? ctor[propertyName] : null;
 		if (ctor.__proto__ && !ctor.__proto__.isPrototypeOf(Function)) {
@@ -146,7 +146,7 @@ export function getStaticProperty(ctor, propertyName, opt_mergeFn) {
  */
 export function getUid(opt_object, opt_noInheritance) {
 	if (opt_object) {
-		var id = opt_object[UID_PROPERTY];
+		let id = opt_object[UID_PROPERTY];
 		if (opt_noInheritance && !opt_object.hasOwnProperty(UID_PROPERTY)) {
 			id = null;
 		}
@@ -252,7 +252,7 @@ export function isWindow(val) {
  * @return {boolean} Whether variable is an object.
  */
 export function isObject(val) {
-	var type = typeof val;
+	const type = typeof val;
 	return type === 'object' && val !== null || type === 'function';
 }
 
@@ -278,4 +278,5 @@ export function isString(val) {
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */
-export function nullFunction() {}
+export function nullFunction() {
+}

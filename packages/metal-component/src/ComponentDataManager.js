@@ -35,7 +35,7 @@ class ComponentDataManager {
 	 * @param {!Component} component
 	 */
 	dispose(component) {
-		var data = this.getManagerData(component);
+		const data = this.getManagerData(component);
 		if (data.state_) {
 			data.state_.dispose();
 		}

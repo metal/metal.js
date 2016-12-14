@@ -16,12 +16,11 @@ class ComponentRegistry {
 	 * @static
 	 */
 	static getConstructor(name) {
-		var constructorFn = ComponentRegistry.components_[name];
+		const constructorFn = ComponentRegistry.components_[name];
 		if (!constructorFn) {
 			console.error(
-				'There\'s no constructor registered for the component ' +
-				'named ' + name + '. Components need to be registered via ' +
-				'ComponentRegistry.register.'
+				`There's no constructor registered for the component named ${name}.
+				Components need to be registered via ComponentRegistry.register.`
 			);
 		}
 		return constructorFn;
@@ -36,7 +35,7 @@ class ComponentRegistry {
 	 * @static
 	 */
 	static register(constructorFn, opt_name) {
-		var name = opt_name;
+		let name = opt_name;
 		if (!name) {
 			if (constructorFn.hasOwnProperty('NAME')) {
 				name = constructorFn.NAME;

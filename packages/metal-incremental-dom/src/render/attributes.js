@@ -16,7 +16,7 @@ const LISTENER_REGEX = /^(?:on([A-Z].+))|(?:data-on(.+))$/;
  * @param {*} value
  */
 export function applyAttribute(component, element, name, value) {
-	var eventName = getEventFromListenerAttr_(name);
+	const eventName = getEventFromListenerAttr_(name);
 	if (eventName) {
 		attachEvent_(component, element, name, eventName, value);
 		return;
@@ -41,7 +41,7 @@ export function applyAttribute(component, element, name, value) {
  * @param {*} value
  */
 export function attachFromAttrFirstTime(component, element, name, value) {
-	var eventName = getEventFromListenerAttr_(name);
+	const eventName = getEventFromListenerAttr_(name);
 	if (eventName && !element[eventName + HANDLE_SUFFIX]) {
 		attachEvent_(component, element, name, eventName, value);
 	}
@@ -105,8 +105,8 @@ function fixCheckedAttr_(name, value) {
  * @private
  */
 function getEventFromListenerAttr_(attr) {
-	var matches = LISTENER_REGEX.exec(attr);
-	var eventName = matches ? (matches[1] ? matches[1] : matches[2]) : null;
+	const matches = LISTENER_REGEX.exec(attr);
+	const eventName = matches ? (matches[1] ? matches[1] : matches[2]) : null;
 	return eventName ? eventName.toLowerCase() : null;
 }
 

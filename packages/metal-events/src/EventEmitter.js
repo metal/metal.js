@@ -72,7 +72,7 @@ class EventEmitter extends Disposable {
 		this.validateListener_(listener);
 
 		const events = this.toEventsArray_(event);
-		for (var i = 0; i < events.length; i++) {
+		for (let i = 0; i < events.length; i++) {
 			this.addSingleListener_(events[i], listener, opt_default);
 		}
 
@@ -192,7 +192,7 @@ class EventEmitter extends Disposable {
 	 */
 	many(event, amount, listener) {
 		const events = this.toEventsArray_(event);
-		for (var i = 0; i < events.length; i++) {
+		for (let i = 0; i < events.length; i++) {
 			this.many_(events[i], amount, listener);
 		}
 
@@ -210,7 +210,7 @@ class EventEmitter extends Disposable {
 	 * @protected
 	 */
 	many_(event, amount, listener) {
-		var self = this;
+		const self = this;
 
 		if (amount <= 0) {
 			return;
@@ -254,7 +254,7 @@ class EventEmitter extends Disposable {
 		}
 
 		const events = this.toEventsArray_(event);
-		for (var i = 0; i < events.length; i++) {
+		for (let i = 0; i < events.length; i++) {
 			this.events_[events[i]] = this.removeMatchingListenerObjs_(
 				toArray(this.events_[events[i]]),
 				listener
@@ -304,8 +304,8 @@ class EventEmitter extends Disposable {
 	removeAllListeners(opt_events) {
 		if (this.events_) {
 			if (opt_events) {
-				var events = this.toEventsArray_(opt_events);
-				for (var i = 0; i < events.length; i++) {
+				const events = this.toEventsArray_(opt_events);
+				for (let i = 0; i < events.length; i++) {
 					this.events_[events[i]] = null;
 				}
 			} else {
@@ -325,7 +325,7 @@ class EventEmitter extends Disposable {
 	 */
 	removeMatchingListenerObjs_(listenerObjs, listener) {
 		const finalListeners = [];
-		for (var i = 0; i < listenerObjs.length; i++) {
+		for (let i = 0; i < listenerObjs.length; i++) {
 			if (!this.matchesListener_(listenerObjs[i], listener)) {
 				finalListeners.push(listenerObjs[i]);
 			}
@@ -353,7 +353,7 @@ class EventEmitter extends Disposable {
 		let handlers = this.listenerHandlers_;
 		if (handlers) {
 			handlers = toArray(handlers);
-			for (var i = 0; i < handlers.length; i++) {
+			for (let i = 0; i < handlers.length; i++) {
 				handlers[i](event);
 			}
 		}

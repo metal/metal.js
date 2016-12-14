@@ -1,15 +1,7 @@
 'use strict';
 
 import { addListenersFromObj } from './events/events';
-import {
-	getStaticProperty,
-	isBoolean,
-	isDefAndNotNull,
-	isElement,
-	isObject,
-	isString,
-	object
-} from 'metal';
+import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isString, object } from 'metal';
 import { syncState } from './sync/sync';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
@@ -204,9 +196,9 @@ class Component extends EventEmitter {
 	 *     `component.attach(null, existingElement)`.
 	 */
 	attachElement(opt_parentElement, opt_siblingElement) {
-		var element = this.element;
+		const element = this.element;
 		if (element && (opt_siblingElement || !element.parentNode)) {
-			var parent = toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
+			const parent = toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 			parent.insertBefore(element, toElement(opt_siblingElement));
 		}
 	}
@@ -227,7 +219,7 @@ class Component extends EventEmitter {
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
 	delegate(eventName, selector, callback) {
-		return this.on('delegate:' + eventName + ':' + selector, callback);
+		return this.on(`delegate:${eventName}:${selector}`, callback);
 	}
 
 	/**
@@ -392,7 +384,7 @@ class Component extends EventEmitter {
 	 * will emit events and run the appropriate lifecycle for the first render.
 	 */
 	informRendered() {
-		var firstRender = !this.hasRendererRendered_;
+		const firstRender = !this.hasRendererRendered_;
 		this.hasRendererRendered_ = true;
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
@@ -439,13 +431,13 @@ class Component extends EventEmitter {
 	 * @return {!Component} The rendered component's instance.
 	 */
 	static render(Ctor, opt_configOrElement, opt_element) {
-		var config = opt_configOrElement;
-		var element = opt_element;
+		let config = opt_configOrElement;
+		let element = opt_element;
 		if (isElement(opt_configOrElement)) {
 			config = null;
 			element = opt_configOrElement;
 		}
-		var instance = new Ctor(config, false);
+		const instance = new Ctor(config, false);
 		instance.renderComponent(element);
 		return instance;
 	}
@@ -513,7 +505,7 @@ class Component extends EventEmitter {
 			this.mergeElementClasses_
 		);
 		if (elementClasses) {
-			val += ' ' + elementClasses;
+			val += ` ${elementClasses}`;
 		}
 		return val.trim();
 	}

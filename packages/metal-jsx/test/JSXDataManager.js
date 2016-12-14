@@ -97,8 +97,7 @@ describe('JSXDataManager', function() {
 
 		it('should run setState\'s callback after component is rerendered', function(done) {
 			class TestComponent extends Component {
-				render() {
-				}
+				render() {}
 			}
 			TestComponent.DATA_MANAGER = JSXDataManager;
 			TestComponent.RENDERER = IncrementalDomRenderer;
@@ -121,8 +120,7 @@ describe('JSXDataManager', function() {
 
 		it('should now allow changes to a component\'s props cause changes to another\s', function() {
 			class TestComponent extends Component {
-				render() {
-				}
+				render() {}
 			}
 			TestComponent.DATA_MANAGER = JSXDataManager;
 			TestComponent.RENDERER = IncrementalDomRenderer;

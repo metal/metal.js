@@ -1,15 +1,7 @@
 'use strict';
 
 import { addListenersFromObj } from './events/events';
-import {
-	getStaticProperty,
-	isBoolean,
-	isDefAndNotNull,
-	isElement,
-	isObject,
-	isString,
-	object
-} from 'metal';
+import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isString, object } from 'metal';
 import { syncState } from './sync/sync';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';

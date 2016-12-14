@@ -86,8 +86,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * Handles a node having just been rendered. Sub classes should override this
 	 * for custom behavior.
 	 */
-	handleNodeRendered() {
-	}
+	handleNodeRendered() {}
 
 	/**
 	 * Checks if the given object is an incremental dom node.

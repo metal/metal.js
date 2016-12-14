@@ -18,28 +18,38 @@ describe('Config', function() {
 		var required = false;
 		var config = Config.required(required);
 		assert.ok(core.isObject(config));
-		assert.deepEqual({required}, config.config);
+		assert.deepEqual({
+			required
+		}, config.config);
 	});
 
 	it('should return config with specified "value"', function() {
 		var value = 10;
 		var config = Config.value(10);
 		assert.ok(core.isObject(config));
-		assert.deepEqual({value}, config.config);
+		assert.deepEqual({
+			value
+		}, config.config);
 	});
 
 	it('should return config with specified "setter"', function() {
-		var setter = () => {};
+		var setter = () => {
+		};
 		var config = Config.setter(setter);
 		assert.ok(core.isObject(config));
-		assert.deepEqual({setter}, config.config);
+		assert.deepEqual({
+			setter
+		}, config.config);
 	});
 
 	it('should return config with specified "validator"', function() {
-		var validator = () => {};
+		var validator = () => {
+		};
 		var config = Config.validator(validator);
 		assert.ok(core.isObject(config));
-		assert.deepEqual({validator}, config.config);
+		assert.deepEqual({
+			validator
+		}, config.config);
 	});
 
 	it('should return config with specific validator from "validators"', function() {
@@ -51,7 +61,8 @@ describe('Config', function() {
 	});
 
 	it('should return config with data from multiple calls', function() {
-		var setter = () => {};
+		var setter = () => {
+		};
 		var config = Config.required(true).number().value(10).setter(setter);
 		assert.ok(core.isObject(config));
 

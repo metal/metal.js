@@ -2,11 +2,7 @@
 
 import core from 'metal';
 import dom from 'metal-dom';
-import {
-	getOriginalFns,
-	startInterception,
-	stopInterception
-} from '../src/intercept';
+import { getOriginalFns, startInterception, stopInterception } from '../src/intercept';
 
 describe('intercept', function() {
 	var element;

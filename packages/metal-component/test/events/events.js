@@ -89,7 +89,7 @@ describe('events', function() {
 			comp = new Component();
 			sinon.spy(comp, 'attach');
 
-			const fn = getComponentFn(comp,  'attach');
+			const fn = getComponentFn(comp, 'attach');
 			assert.equal(0, comp.attach.callCount);
 
 			fn();
@@ -98,7 +98,7 @@ describe('events', function() {
 
 		it('should warn if trying to get unexisting component function', function() {
 			comp = new Component();
-			getComponentFn(comp,  'fn');
+			getComponentFn(comp, 'fn');
 			assert.strictEqual(1, console.error.callCount);
 		});
 	});

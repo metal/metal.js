@@ -1,14 +1,6 @@
 'use strict';
 
-import {
-	async,
-	getStaticProperty,
-	isDefAndNotNull,
-	isFunction,
-	isObject,
-	isString,
-	object
-} from 'metal';
+import { async, getStaticProperty, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
 import { EventEmitter } from 'metal-events';
 
 /**

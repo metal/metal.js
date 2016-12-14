@@ -62,7 +62,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 			}
 		}
 
-		if (component.getTemplateData) {
+		if (isFunction(component.getTemplateData)) {
 			data = component.getTemplateData(data) || data;
 		}
 

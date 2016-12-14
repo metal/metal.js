@@ -33,7 +33,9 @@ const Config = {
 	 * @return {!Object} `State` configuration object.
 	 */
 	required(required = true) {
-		return mergeConfig(this, {required});
+		return mergeConfig(this, {
+			required
+		});
 	},
 
 	/**
@@ -42,7 +44,9 @@ const Config = {
 	 * @return {!Object} `State` configuration object.
 	 */
 	setter(setter) {
-		return mergeConfig(this, {setter});
+		return mergeConfig(this, {
+			setter
+		});
 	},
 
 	/**
@@ -51,7 +55,9 @@ const Config = {
 	 * @return {!Object} `State` configuration object.
 	 */
 	validator(validator) {
-		return mergeConfig(this, {validator});
+		return mergeConfig(this, {
+			validator
+		});
 	},
 
 	/**
@@ -60,7 +66,9 @@ const Config = {
 	 * @return {!Object} `State` configuration object.
 	 */
 	value(value) {
-		return mergeConfig(this, {value});
+		return mergeConfig(this, {
+			value
+		});
 	}
 };
 

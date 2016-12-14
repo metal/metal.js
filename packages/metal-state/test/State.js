@@ -998,7 +998,9 @@ describe('State', function() {
 			var obj = {};
 			var context = {};
 			var key1 = 1;
-			new Test({key1}, obj, context);
+			new Test({
+				key1
+			}, obj, context);
 			assert.strictEqual(1, obj.key1);
 			assert.strictEqual(1, validator.callCount);
 			assert.strictEqual(1, validator.args[0][0]);

@@ -2531,8 +2531,7 @@ describe('IncrementalDomRenderer', function() {
 	describe('Function - shouldUpdate', function() {
 		it('should only rerender after state change if "shouldUpdate" returns true', function(done) {
 			class TestComponent extends Component {
-				render() {
-				}
+				render() {}
 
 				shouldUpdate(changes) {
 					return changes.foo && (changes.foo.prevVal !== changes.foo.newVal);
@@ -2825,8 +2824,8 @@ describe('IncrementalDomRenderer', function() {
 		it('should check if given data is an incremental dom node', function() {
 			assert.ok(!IncrementalDomRenderer.isIncDomNode({}));
 			assert.ok(!IncrementalDomRenderer.isIncDomNode({
-				tag: 'span'
-			}));
+					tag: 'span'
+				}));
 			assert.ok(IncrementalDomRenderer.isIncDomNode({
 				[CHILD_OWNER]: true
 			}));

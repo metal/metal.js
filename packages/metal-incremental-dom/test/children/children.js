@@ -2,12 +2,7 @@
 
 import dom from 'metal-dom';
 import { sunset } from '../../../../test-utils';
-import {
-	captureChildren,
-	getOwner,
-	renderChildTree,
-	CHILD_OWNER
-} from '../../src/children/children';
+import { captureChildren, getOwner, renderChildTree, CHILD_OWNER } from '../../src/children/children';
 
 describe('children', function() {
 	it('should capture children calls to incremental dom', function(done) {

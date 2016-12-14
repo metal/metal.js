@@ -143,9 +143,9 @@ describe('validators', function() {
 		}));
 
 		assert.ok(objectOf({
-			a: '1',
-			b: '2'
-		}) instanceof Error);
+				a: '1',
+				b: '2'
+			}) instanceof Error);
 	});
 
 	it('should validate a shape of an object', function() {
@@ -160,9 +160,9 @@ describe('validators', function() {
 		}));
 
 		assert.ok(shape({
-			a: '1',
-			b: '2'
-		}) instanceof Error);
+				a: '1',
+				b: '2'
+			}) instanceof Error);
 	});
 
 	it('should validate a shape nested within a shape', function() {
@@ -184,14 +184,14 @@ describe('validators', function() {
 		}));
 
 		assert.ok(shape({
-			a: {
-				b: 1
-			}
-		}) instanceof Error);
+				a: {
+					b: 1
+				}
+			}) instanceof Error);
 
 		assert.ok(shape({
-			a: 1
-		}) instanceof Error);
+				a: 1
+			}) instanceof Error);
 	});
 
 	it('should return validator function instead of running it if no arg is passed to type validator', function() {

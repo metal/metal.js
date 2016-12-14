@@ -278,4 +278,5 @@ export function isString(val) {
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */
-export function nullFunction() {}
+export function nullFunction() {
+}

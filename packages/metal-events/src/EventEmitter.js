@@ -138,7 +138,7 @@ class EventEmitter extends Disposable {
 	 * @return {boolean} Returns true if event had listeners, false otherwise.
 	 */
 	emit(event) {
-		const listeners = toArray(this.getRawListeners_(event)).concat();
+		const listeners = this.getRawListeners_(event);
 		if (listeners.length === 0) {
 			return false;
 		}
@@ -151,11 +151,12 @@ class EventEmitter extends Disposable {
 	/**
 	 * Gets the listener objects for the given event, if there are any.
 	 * @param {string} event
-	 * @return {Array}
+	 * @return {!Array}
 	 * @protected
 	 */
 	getRawListeners_(event) {
-		return this.events_ && this.events_[event];
+		const directListeners = toArray(this.events_ && this.events_[event]);
+		return directListeners.concat(toArray(this.events_ && this.events_['*']));
 	}
 
 	/**
@@ -174,7 +175,7 @@ class EventEmitter extends Disposable {
 	 * @return {Array} Array of listeners.
 	 */
 	listeners(event) {
-		return toArray(this.getRawListeners_(event)).map(
+		return this.getRawListeners_(event).map(
 			listener => listener.fn ? listener.fn : listener
 		);
 	}

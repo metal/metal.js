@@ -479,6 +479,20 @@ describe('EventEmitter', function() {
 		assert.strictEqual(1, listener2.callCount);
 	});
 
+	it('should allow listening to all event types via "*"', function() {
+		const listener = sinon.stub();
+		this.emitter.setShouldUseFacade(true);
+		this.emitter.on('*', listener);
+		this.emitter.emit('event1');
+		this.emitter.emit('event2');
+		this.emitter.emit('event3');
+
+		assert.equal(3, listener.callCount);
+		assert.equal('event1', listener.args[0][0].type);
+		assert.equal('event2', listener.args[1][0].type);
+		assert.equal('event3', listener.args[2][0].type);
+	});
+
 	it('should remove all listeners on dispose', function() {
 		var listener = sinon.stub();
 		this.emitter.on('event', listener);

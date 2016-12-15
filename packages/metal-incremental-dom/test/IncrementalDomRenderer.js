@@ -2824,8 +2824,8 @@ describe('IncrementalDomRenderer', function() {
 		it('should check if given data is an incremental dom node', function() {
 			assert.ok(!IncrementalDomRenderer.isIncDomNode({}));
 			assert.ok(!IncrementalDomRenderer.isIncDomNode({
-					tag: 'span'
-				}));
+				tag: 'span'
+			}));
 			assert.ok(IncrementalDomRenderer.isIncDomNode({
 				[CHILD_OWNER]: true
 			}));

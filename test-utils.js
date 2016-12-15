@@ -1,6 +1,6 @@
 'use strict';
 
-const major = parseInt(METAL_VERSION.split('.')[0], 10); // jshint ignore:line
+const major = parseInt(METAL_VERSION.split('.')[0], 10); // eslint-disable-line
 const noop = () => {};
 
 export function sunset(fn) {

@@ -575,7 +575,7 @@ export function replace(element1, element2) {
  * @private
  */
 function stopImmediatePropagation_() {
-	const event = this; // jshint ignore:line
+	const event = this; // eslint-disable-line
 	event.stopped = true;
 	event.stoppedImmediate = true;
 	Event.prototype.stopImmediatePropagation.call(event);
@@ -586,7 +586,7 @@ function stopImmediatePropagation_() {
  * @private
  */
 function stopPropagation_() {
-	const event = this; // jshint ignore:line
+	const event = this; // eslint-disable-line
 	event.stopped = true;
 	Event.prototype.stopPropagation.call(event);
 }

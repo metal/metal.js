@@ -168,7 +168,7 @@ describe('core', function() {
 			assert.ok(!core.isString(undefined));
 
 			assert.ok(core.isString(''));
-			assert.ok(core.isString(new String(''))); // jshint ignore:line
+			assert.ok(core.isString(new String(''))); // eslint-disable-line
 		});
 
 		it('should check if var is boolean', function() {
@@ -200,8 +200,8 @@ describe('core', function() {
 				nodeType: 9
 			}));
 			assert.ok(!core.isDocument({
-					nodeType: 1
-				}));
+				nodeType: 1
+			}));
 			assert.ok(!core.isDocument({}));
 			assert.ok(!core.isDocument(null));
 			assert.ok(!core.isDocument(true));
@@ -214,11 +214,11 @@ describe('core', function() {
 			}
 
 			assert.ok(!core.isWindow({
-					nodeType: 9
-				}));
+				nodeType: 9
+			}));
 			assert.ok(!core.isWindow({
-					nodeType: 1
-				}));
+				nodeType: 1
+			}));
 			assert.ok(core.isWindow(window));
 			assert.ok(!core.isWindow(null));
 			assert.ok(!core.isWindow(true));

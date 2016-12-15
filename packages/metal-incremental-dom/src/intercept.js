@@ -92,7 +92,7 @@ function buildHandleCall(name) {
 }
 
 function handleCall() {
-	const name = this.name; // jshint ignore:line
+	const name = this.name; // eslint-disable-line
 	const stack = getStack();
 	const fn = (stack && stack[name]) || originalFns[name];
 	return fn.apply(null, arguments);

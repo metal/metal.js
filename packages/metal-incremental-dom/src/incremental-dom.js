@@ -1,4 +1,4 @@
-/* jshint ignore:start */
+/*eslint-disable */
 
 /**
  * @license
@@ -1220,4 +1220,4 @@
 
 }));
 
-/* jshint ignore:end */
+/* eslint-enable */

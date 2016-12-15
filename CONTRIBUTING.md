@@ -69,4 +69,4 @@ Collaborators with publish permissions should follow the following steps:
 are passing.
 2. Run `lerna publish`.
 3. Edit the release in [github](https://github.com/metal/metal.js/releases) with
-detailes about what has changed.
+details about what has changed.

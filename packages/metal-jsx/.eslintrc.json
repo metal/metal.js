@@ -1,0 +1,12 @@
+{
+  "globals": {
+    "iDOMHelpers": true,
+    "IncrementalDOM": true
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "react/jsx-uses-vars": [2]
+  }
+}

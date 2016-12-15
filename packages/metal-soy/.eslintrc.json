@@ -4,6 +4,5 @@
     "IncrementalDOM": true,
     "soy": true,
     "soydata": true
-  },
-  "extends": "../../.jshintrc"
+  }
 }

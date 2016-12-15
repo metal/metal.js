@@ -1,7 +1,0 @@
-{
-  "globals": {
-    "iDOMHelpers": true,
-    "IncrementalDOM": true
-  },
-  "extends": "../../.jshintrc"
-}

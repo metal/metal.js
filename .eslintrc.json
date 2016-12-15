@@ -1,0 +1,42 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {},
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+        "jsx": true
+    }
+  },
+  "rules": {
+    "semi": 0,
+    "no-bitwise": 0,
+    "curly": 2,
+    "eqeqeq": 2,
+    "no-eval": 0,
+    "guard-for-in": 0,
+    "wrap-iife": [2, "any"],
+    "indent": [
+      2,
+      "tab",
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "max-depth": 0,
+    "no-multi-str": 0,
+    "new-cap": 2,
+    "no-caller": 2,
+    "quotes": [
+      1,
+      "single",
+      { "allowTemplateLiterals": true }
+    ],
+    "strict": 0,
+    "no-undef": 2,
+    "no-unused-vars": 2
+  }
+}

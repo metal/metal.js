@@ -54,6 +54,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 			}
 			data[key] = value;
 		});
+
 		for (let i = 0; i < params.length; i++) {
 			if (!data[params[i]] && isFunction(component[params[i]])) {
 				data[params[i]] = component[params[i]].bind(component);

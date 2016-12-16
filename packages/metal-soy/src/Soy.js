@@ -40,6 +40,8 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * template call's data. The copying needs to be done because, if the component
 	 * itself is passed directly, some problems occur when soy tries to merge it
 	 * with other data, due to property getters and setters. This is safer.
+	 * Also calls the component's "prepareStateForRender" to let it change the
+	 * data passed to the template.
 	 * @param {!Component} component
 	 * @param {!Array<string>} params The params used by this template.
 	 * @return {!Object}
@@ -60,7 +62,12 @@ class Soy extends IncrementalDomRenderer.constructor {
 				data[params[i]] = component[params[i]].bind(component);
 			}
 		}
-		return data;
+
+		if (isFunction(component.prepareStateForRender)) {
+			return component.prepareStateForRender(data) || data;
+		} else {
+			return data;
+		}
 	}
 
 	/**

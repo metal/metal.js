@@ -19,13 +19,6 @@
     "no-eval": 0,
     "guard-for-in": 0,
     "wrap-iife": [2, "any"],
-    "indent": [
-      2,
-      "tab",
-      {
-        "SwitchCase": 1
-      }
-    ],
     "max-depth": 0,
     "no-multi-str": 0,
     "new-cap": 2,

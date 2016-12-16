@@ -59,7 +59,7 @@ describe('JSXRenderer', function() {
 							<span>Children Test 3</span>
 						</ChildComponent>
 					</div>
-				);
+					);
 			}
 		}
 

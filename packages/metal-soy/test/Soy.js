@@ -11,6 +11,7 @@ import { Events as EventsComponent } from './assets/Events.soy.js';
 // on it.
 // TODO: We should have a better dependency management for soy files so that
 // the order in which they're required doesn't matter.
+import { ComputedData as ComputedDataComponent } from './assets/ComputedData.soy.js';
 import { ExternalTemplate as ExternalTemplateComponent } from './assets/ExternalTemplate.soy.js';
 import { Functions as FunctionsComponent } from './assets/Functions.soy.js';
 import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy.js';
@@ -108,6 +109,27 @@ describe('Soy', function() {
 				comp.foo = 'Bar';
 				comp.once('stateSynced', function() {
 					assert.strictEqual(1, IncrementalDOM.patchOuter.callCount);
+					done();
+				});
+			});
+
+			it('should pass state values to "prepareStateForRender" and use them in the template', function(done) {
+				ComputedDataComponent.prototype.shouldUpdate = function() {
+					return true;
+				};
+
+				ComputedDataComponent.prototype.prepareStateForRender = function(data) {
+					data.name = data.name.split('').reverse().join('');
+				};
+
+				comp = new ComputedDataComponent({ name: 'Foo' });
+
+				assert.strictEqual('ooF', comp.element.textContent);
+
+				comp.name = 'Bar';
+
+				comp.once('stateSynced', function() {
+					assert.strictEqual('raB', comp.element.textContent);
 					done();
 				});
 			});

@@ -11,6 +11,7 @@ var replace = require('gulp-replace');
 var codeGlobs = [
 	'packages/metal*/src/**/*.js',
 	'packages/metal*/test/**/*.js',
+	'!packages/metal*/**/*.soy.js',
 	'!packages/metal-incremental-dom/**/incremental-dom.js',
 	'gulpfile.js',
 	'karma.conf.js',

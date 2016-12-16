@@ -146,7 +146,7 @@ describe('JSXComponent', function() {
 								<span>Children Test 3</span>
 							</ChildComponent>
 						</div>
-					);
+						);
 				}
 			}
 
@@ -175,7 +175,7 @@ describe('JSXComponent', function() {
 								<span foo="foo">Children Test</span>
 							</ChildComponent>
 						</div>
-					);
+						);
 				}
 			}
 

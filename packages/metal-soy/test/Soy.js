@@ -2,19 +2,13 @@
 
 import dom from 'metal-dom';
 import Component from 'metal-component';
-import { HelloWorld as HelloWorldComponent, templates as helloWorldTemplates } from './assets/HelloWorld.soy.js';
-import { IJData as IJDataComponent } from './assets/IJData.soy.js';
 import { Events as EventsComponent } from './assets/Events.soy.js';
-
-// For now we can't follow alphabetical order here, since HelloWorld.soy needs
-// to be imported before ExternalTemplate.soy, since ExternalTemplate depends
-// on it.
-// TODO: We should have a better dependency management for soy files so that
-// the order in which they're required doesn't matter.
 import { ComputedData as ComputedDataComponent } from './assets/ComputedData.soy.js';
 import { ExternalTemplate as ExternalTemplateComponent } from './assets/ExternalTemplate.soy.js';
 import { Functions as FunctionsComponent } from './assets/Functions.soy.js';
+import { HelloWorld as HelloWorldComponent, templates as helloWorldTemplates } from './assets/HelloWorld.soy.js';
 import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy.js';
+import { IJData as IJDataComponent } from './assets/IJData.soy.js';
 import { Nested as NestedComponent } from './assets/Nested.soy.js';
 import { NestedDataAll as NestedDataAllComponent } from './assets/NestedDataAll.soy.js';
 import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy.js';

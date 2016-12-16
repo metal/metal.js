@@ -1,6 +1,6 @@
 'use strict';
 
-import { applyAttribute, attachFromAttrFirstTime } from './attributes';
+import { applyAttribute, convertListenerNamesToFns } from './attributes';
 import { buildConfigFromCall, buildCallFromConfig } from '../callArgs';
 import { captureChildren, getOwner, isChildTag, renderChildTree } from '../children/children';
 import { clearChanges } from '../changes';
@@ -18,37 +18,15 @@ const emptyChildren_ = [];
  * Adds the given css classes to the specified arguments for an incremental
  * dom call, merging with the existing value if there is one.
  * @param {string} elementClasses
- * @param {!Array} args
+ * @param {!Object} config
  * @private
  */
-function addElementClasses_(elementClasses, args) {
-	const config = buildConfigFromCall(args);
+function addElementClasses_(elementClasses, config) {
 	if (config.class) {
 		config.class += ` ${elementClasses}`;
 		config.class = removeDuplicateClasses_(config.class);
 	} else {
 		config.class = elementClasses;
-	}
-	return buildCallFromConfig(args[0], config);
-}
-
-/**
- * Attaches inline listeners found on the first component render, since those
- * may come from existing elements on the page that already have
- * data-on[eventname] attributes set to its final value. This won't trigger
- * `handleInterceptedAttributesCall_`, so we need manual work to guarantee
- * that projects using progressive enhancement like this will still work.
- * @param {!Component} component
- * @param {!Element} node
- * @param {!Array} args
- * @private
- */
-function attachDecoratedListeners_(component, node, args) {
-	if (!component.wasRendered) {
-		const attrs = (args[2] || []).concat(args.slice(3));
-		for (let i = 0; i < attrs.length; i += 2) {
-			attachFromAttrFirstTime(component, node, attrs[i], attrs[i + 1]);
-		}
 	}
 }
 
@@ -264,31 +242,32 @@ function handleInterceptedOpenCall_(tag) {
  * @private
  */
 function handleRegularCall_(...args) {
+	const config = buildConfigFromCall(args);
+	let tag = args[0];
+
 	const comp = getComponentBeingRendered();
 	let owner = comp;
-	if (isChildTag(args[0])) {
-		owner = args[0].owner;
-		args[0] = args[0].tag;
+	if (isChildTag(tag)) {
+		owner = tag.owner;
+		tag = tag.tag;
 	}
-
-
-	args[1] = generateKey_(comp, args[1]);
+	config.key = generateKey_(comp, config.key);
 
 	if (!getData(comp).rootElementReached) {
 		const elementClasses = comp.getDataManager().get(comp, 'elementClasses');
 		if (elementClasses) {
-			args = addElementClasses_(elementClasses, args);
+			addElementClasses_(elementClasses, config);
 		}
 	}
+	convertListenerNamesToFns(comp, config);
 
-	const node = getOriginalFn('elementOpen').apply(null, args);
+	const call = buildCallFromConfig(tag, config);
+	const node = getOriginalFn('elementOpen').apply(null, call);
 	resetNodeData_(node);
-	attachDecoratedListeners_(comp, node, args);
 	updateElementIfNotReached_(comp, node);
 
-	const ref = node.getAttribute('ref');
-	if (isDefAndNotNull(ref)) {
-		owner.refs[ref] = node;
+	if (isDefAndNotNull(config.ref)) {
+		owner.refs[config.ref] = node;
 	}
 	owner.getRenderer().handleNodeRendered(node);
 

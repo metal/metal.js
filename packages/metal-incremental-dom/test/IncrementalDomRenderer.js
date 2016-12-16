@@ -658,6 +658,33 @@ describe('IncrementalDomRenderer', function() {
 				done();
 			});
 		});
+
+		it('should reattach events with same name on same element for different components', function() {
+			class TestComponent extends Component {
+				created() {
+					sinon.stub(this, 'handleClick');
+				}
+
+				handleClick() {
+				}
+
+				render() {
+					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			const element = component.element;
+			component.element = null;
+			component.dispose();
+
+			component = new TestComponent({
+				element
+			});
+			dom.triggerEvent(element, 'click');
+			assert.equal(1, component.handleClick.callCount);
+		});
 	});
 
 	describe('Nested Components', function() {

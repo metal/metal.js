@@ -33,27 +33,12 @@ export function applyAttribute(component, element, name, value) {
 }
 
 /**
- * Uses the given attribute information to attach an event to the component,
- * but only if it hasn't been attached before.
- * @param {!Component} component
- * @param {!Element} element
- * @param {string} name
- * @param {*} value
- */
-export function attachFromAttrFirstTime(component, element, name, value) {
-	const eventName = getEventFromListenerAttr_(name);
-	if (eventName && !element[eventName + HANDLE_SUFFIX]) {
-		attachEvent_(component, element, name, eventName, value);
-	}
-}
-
-/**
  * Listens to the specified event, attached via incremental dom calls.
  * @param {!Component} component
  * @param {!Element} element
  * @param {string} attr
  * @param {string} eventName
- * @param {function()|string} fn
+ * @param {function()} fn
  * @private
  */
 function attachEvent_(component, element, attr, eventName, fn) {
@@ -64,19 +49,57 @@ function attachEvent_(component, element, attr, eventName, fn) {
 	}
 
 	element[attr] = fn;
+	const elementAttrName = `data-on${eventName.toLowerCase()}`;
 	if (fn) {
-		if (isString(fn)) {
-			if (attr[0] === 'd') {
-				// Allow data-on[eventkey] listeners to stay in the dom, as they
-				// won't cause conflicts.
-				element.setAttribute(attr, fn);
-			}
-			fn = getComponentFn(component, fn);
+		if (fn.givenAsName_) {
+			// Listeners given by name should show up in the dom element.
+			element.setAttribute(elementAttrName, fn.givenAsName_);
 		}
 		element[handleKey] = delegate(document, eventName, element, fn);
 	} else {
-		element.removeAttribute(attr);
+		element.removeAttribute(elementAttrName);
 	}
+}
+
+/**
+ * Converts all event listener attributes given as function names to actual
+ * function references. It's important to do this before calling the real
+ * incremental dom `elementOpen` function, otherwise if a component passes a
+ * the same function name that an element was already using for another
+ * component, that event won't be reattached as incremental dom will think that
+ * the value hasn't changed. Passing the function references as the value will
+ * guarantee that different functions will cause events to be reattached,
+ * regardless of their original names.
+ * @param {!Component} component
+ * @param {!Object} config
+ */
+export function convertListenerNamesToFns(component, config) {
+	const keys = Object.keys(config);
+	for (let i = 0; i < keys.length; i++) {
+		const key = keys[i];
+		config[key] = convertListenerNameToFn_(component, key, config[key]);
+	}
+}
+
+/**
+ * Converts the given attribute's value to a function reference, if it's
+ * currently a listener name.
+ * @param {!Component} component
+ * @param {string} name
+ * @param {*} value
+ * @return {*}
+ * @private
+ */
+function convertListenerNameToFn_(component, name, value) {
+	if (isString(value)) {
+		const eventName = getEventFromListenerAttr_(name);
+		if (eventName) {
+			const fn = getComponentFn(component, value);
+			fn.givenAsName_ = name;
+			return fn;
+		}
+	}
+	return value;
 }
 
 /**

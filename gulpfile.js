@@ -80,7 +80,8 @@ metal.registerTasks({
 			platform: 'Linux',
 			version: '5.0'
 		}
-	}
+	},
+	useEslint: true
 });
 
 gulp.task('soy', function() {

@@ -1,6 +1,6 @@
 {
   "name": "metal",
-  "version": "2.5.12",
+  "version": "2.5.17",
   "description": "Core functions from Metal.js, with utilities for dealing with arrays, objects and others.",
   "license": "BSD-3-Clause",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal",

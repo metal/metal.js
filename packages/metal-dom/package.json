@@ -1,6 +1,6 @@
 {
   "name": "metal-dom",
-  "version": "2.5.16",
+  "version": "2.5.17",
   "description": "A collection of utility functions for handling dom elements",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-dom",
@@ -22,8 +22,8 @@
     "metal"
   ],
   "dependencies": {
-    "metal": "^2.5.12",
-    "metal-events": "^2.5.16"
+    "metal": "^2.5.17",
+    "metal-events": "^2.5.17"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

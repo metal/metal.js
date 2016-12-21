@@ -1,5 +1,6 @@
 'use strict';
 
+import { globals } from 'metal';
 import dom from 'metal-dom';
 import Component from 'metal-component';
 import { Events as EventsComponent } from './assets/Events.soy.js';
@@ -426,7 +427,7 @@ describe('Soy', function() {
 			var str = '<div class="toHtmlString">To Convert</div>';
 			var fn = Soy.toIncDom(str);
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			IncrementalDOM.patch(element, fn);
 			assert.strictEqual(str, element.innerHTML);
 		});
@@ -438,7 +439,7 @@ describe('Soy', function() {
 				contentKind: 'HTML'
 			});
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			IncrementalDOM.patch(element, fn);
 			assert.strictEqual(str, element.innerHTML);
 		});

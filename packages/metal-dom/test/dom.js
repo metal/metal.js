@@ -1,14 +1,14 @@
 'use strict';
 
 import dom from '../src/all/dom';
-import { object } from 'metal';
+import { globals, object } from 'metal';
 import UA from 'metal-useragent';
 import DomEventHandle from '../src/DomEventHandle';
 
 describe('dom', function() {
 
 	afterEach(function() {
-		document.body.innerHTML = '';
+		globals.document.body.innerHTML = '';
 	});
 
 	describe('css classes', function() {
@@ -19,7 +19,7 @@ describe('dom', function() {
 				assert.strictEqual('class2', getClassNames(element)[1]);
 			}
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
 			assertClassesAdded();
 		});
@@ -31,11 +31,11 @@ describe('dom', function() {
 				assert.strictEqual('class2', getClassNames(element)[1]);
 			}
 
-			var element1 = document.createElement('div');
-			var element2 = document.createElement('div');
-			dom.append(document.body, element1);
-			dom.append(document.body, element2);
-			var elements = document.querySelectorAll('div');
+			var element1 = globals.document.createElement('div');
+			var element2 = globals.document.createElement('div');
+			dom.append(globals.document.body, element1);
+			dom.append(globals.document.body, element2);
+			var elements = globals.document.querySelectorAll('div');
 
 			dom.addClasses(elements, 'class1 class2');
 
@@ -44,19 +44,19 @@ describe('dom', function() {
 		});
 
 		it('should not throw error if addClasses is called with empty string', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			assert.doesNotThrow(() => dom.addClasses(element, ''));
 		});
 
 		it('should not add css classes twice to the same element', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
 			dom.addClasses(element, 'class1 class2');
 			assert.strictEqual('class1 class2', element.className.trim());
 		});
 
 		it('should check if an element has the requested css class', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
 
 			assert.ok(dom.hasClass(element, 'class1'));
@@ -67,7 +67,7 @@ describe('dom', function() {
 		});
 
 		it('should check if css classes are being removed', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
 
 			dom.removeClasses(element, 'class1');
@@ -81,11 +81,11 @@ describe('dom', function() {
 				assert.ok(dom.hasClass(element, 'class2'));
 			}
 
-			var element1 = document.createElement('div');
-			var element2 = document.createElement('div');
-			dom.append(document.body, element1);
-			dom.append(document.body, element2);
-			var elements = document.querySelectorAll('div');
+			var element1 = globals.document.createElement('div');
+			var element2 = globals.document.createElement('div');
+			dom.append(globals.document.body, element1);
+			dom.append(globals.document.body, element2);
+			var elements = globals.document.querySelectorAll('div');
 			dom.addClasses(elements, 'class1 class2');
 
 			dom.removeClasses(elements, 'class1');
@@ -95,12 +95,12 @@ describe('dom', function() {
 		});
 
 		it('should not throw error if removeClasses is called with empty string', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			assert.doesNotThrow(() => dom.removeClasses(element, ''));
 		});
 
 		it('should do nothing if element or classes are not object and string in add/remove classes', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			assert.doesNotThrow(function() {
 				dom.addClasses(element);
 			});
@@ -112,7 +112,7 @@ describe('dom', function() {
 		});
 
 		it('should do nothing if element or classes are not object and string in toggle classes', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			assert.doesNotThrow(function() {
 				dom.toggleClasses(element);
 			});
@@ -124,7 +124,7 @@ describe('dom', function() {
 		});
 
 		it('should toggle classes in an element', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			element.className = 'lorem';
 			dom.toggleClasses(element, 'lorem');
@@ -154,9 +154,9 @@ describe('dom', function() {
 
 	describe('contains', function() {
 		it('should check if element contains another', function() {
-			var element1 = document.createElement('div');
-			var element2 = document.createElement('div');
-			var element3 = document.createElement('div');
+			var element1 = globals.document.createElement('div');
+			var element2 = globals.document.createElement('div');
+			var element3 = globals.document.createElement('div');
 			dom.append(element1, element2);
 			dom.enterDocument(element3);
 
@@ -172,7 +172,7 @@ describe('dom', function() {
 
 	describe('manipulation', function() {
 		it('should append html string to parent element', function() {
-			var parent = document.createElement('div');
+			var parent = globals.document.createElement('div');
 			var childHtml = '<div class="myChild"></div>';
 
 			dom.append(parent, childHtml);
@@ -181,15 +181,15 @@ describe('dom', function() {
 		});
 
 		it('should append element to parent element', function() {
-			var parent = document.createElement('div');
-			var child = document.createElement('div');
+			var parent = globals.document.createElement('div');
+			var child = globals.document.createElement('div');
 
 			dom.append(parent, child);
 			assert.strictEqual(parent, child.parentNode);
 		});
 
 		it('should append node list to parent element', function() {
-			var parent = document.createElement('div');
+			var parent = globals.document.createElement('div');
 			var childFrag = dom.buildFragment('<div class="myChild"></div><div class="myChild2"></div>');
 
 			dom.append(parent, childFrag.childNodes);
@@ -199,26 +199,26 @@ describe('dom', function() {
 		});
 
 		it('should replace an element with a requested element', function() {
-			var element1 = document.createElement('div');
-			var element2 = document.createElement('div');
-			dom.append(document.body, element1);
+			var element1 = globals.document.createElement('div');
+			var element2 = globals.document.createElement('div');
+			dom.append(globals.document.body, element1);
 
 			dom.replace(element1, element2);
-			assert.strictEqual(element2, document.body.childNodes[0]);
+			assert.strictEqual(element2, globals.document.body.childNodes[0]);
 			assert.ok(!element1.parentNode);
 		});
 
 		it('should not remove element from parent if replacing it with itself', function() {
-			var element = document.createElement('div');
-			dom.append(document.body, element);
+			var element = globals.document.createElement('div');
+			dom.append(globals.document.body, element);
 
 			dom.replace(element, element);
-			assert.strictEqual(element, document.body.childNodes[0]);
+			assert.strictEqual(element, globals.document.body.childNodes[0]);
 		});
 
 		it('should not throw error if trying to replace element that doesn\'t have a parent', function() {
-			var element1 = document.createElement('div');
-			var element2 = document.createElement('div');
+			var element1 = globals.document.createElement('div');
+			var element2 = globals.document.createElement('div');
 
 			assert.doesNotThrow(function() {
 				dom.replace(element1, element2);
@@ -226,8 +226,8 @@ describe('dom', function() {
 		});
 
 		it('should not throw error if null as passed as one of the elements for "replace"', function() {
-			var element = document.createElement('div');
-			dom.append(document.body, element);
+			var element = globals.document.createElement('div');
+			dom.append(globals.document.body, element);
 
 			assert.doesNotThrow(function() {
 				dom.replace(element, null);
@@ -236,9 +236,9 @@ describe('dom', function() {
 		});
 
 		it('should node enter document', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.enterDocument(element);
-			assert.strictEqual(document.body, element.parentNode);
+			assert.strictEqual(globals.document.body, element.parentNode);
 		});
 
 		it('should not throw error if "enterDocument" is called without element', function() {
@@ -248,14 +248,14 @@ describe('dom', function() {
 		});
 
 		it('should node exit document', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.enterDocument(element);
 			dom.exitDocument(element);
 			assert.strictEqual(null, element.parentNode);
 		});
 
 		it('should not throw error if "exitDocument" is called on element without parent', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			assert.doesNotThrow(function() {
 				dom.exitDocument(element);
 			});
@@ -268,7 +268,7 @@ describe('dom', function() {
 		});
 
 		it('should append string as document fragment to parent element', function() {
-			var parent = document.createElement('div');
+			var parent = globals.document.createElement('div');
 			sinon.stub(parent, 'appendChild');
 
 			dom.append(parent, '<div></div>');
@@ -291,7 +291,7 @@ describe('dom', function() {
 		});
 
 		it('should remove children from element', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.innerHTML = '<div>0</div><div>1</div>';
 
 			dom.removeChildren(element);
@@ -301,7 +301,7 @@ describe('dom', function() {
 
 	describe('on', function() {
 		it('should listen to event on requested element', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			var listener = sinon.stub();
 			dom.on(element, 'myEvent', listener);
 			assert.strictEqual(0, listener.callCount);
@@ -311,7 +311,7 @@ describe('dom', function() {
 		});
 
 		it('should be able to remove listener from return value of "on"', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			var listener = sinon.stub();
 
 			var handle = dom.on(element, 'myEvent', listener);
@@ -323,7 +323,7 @@ describe('dom', function() {
 		});
 
 		it('should listen to event on document if selector is passed instead of element', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.className = 'myClass';
 			dom.enterDocument(element);
 
@@ -334,8 +334,8 @@ describe('dom', function() {
 		});
 
 		it('should listen to event on capture phase', function() {
-			var element = document.createElement('div');
-			var parentElement = document.createElement('div');
+			var element = globals.document.createElement('div');
+			var parentElement = globals.document.createElement('div');
 			parentElement.appendChild(element);
 			dom.enterDocument(parentElement);
 
@@ -349,7 +349,7 @@ describe('dom', function() {
 		});
 
 		it('should remove listener that was attached on capture phase', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.enterDocument(element);
 
 			var listener = sinon.stub();
@@ -363,7 +363,7 @@ describe('dom', function() {
 
 	describe('once', function() {
 		it('should listen once to event on requested element', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			var listener = sinon.stub();
 			dom.once(element, 'myEvent', listener);
 			assert.strictEqual(0, listener.callCount);
@@ -374,7 +374,7 @@ describe('dom', function() {
 		});
 
 		it('should be able to remove listener from return value of "once"', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			var listener = sinon.stub();
 
 			var handle = dom.once(element, 'myEvent', listener);
@@ -389,20 +389,20 @@ describe('dom', function() {
 	describe('triggerEvent', function() {
 		it('should trigger dom event', function() {
 			var listener = sinon.stub();
-			var element = document.createElement('div');
-			document.body.appendChild(element);
+			var element = globals.document.createElement('div');
+			globals.document.body.appendChild(element);
 			element.addEventListener('click', listener);
 
 			dom.triggerEvent(element, 'click');
 			assert.strictEqual(1, listener.callCount);
 			assert.strictEqual('click', listener.args[0][0].type);
-			document.body.removeChild(element);
+			globals.document.body.removeChild(element);
 		});
 
 		it('should add specified payload keys to triggered event', function() {
 			var listener = sinon.stub();
-			var element = document.createElement('div');
-			document.body.appendChild(element);
+			var element = globals.document.createElement('div');
+			globals.document.body.appendChild(element);
 			element.addEventListener('click', listener);
 
 			dom.triggerEvent(element, 'click', {
@@ -411,22 +411,22 @@ describe('dom', function() {
 			assert.strictEqual(1, listener.callCount);
 			assert.strictEqual('click', listener.args[0][0].type);
 			assert.strictEqual('test', listener.args[0][0].test);
-			document.body.removeChild(element);
+			globals.document.body.removeChild(element);
 		});
 
 		it('should not trigger dom click event for disabled elements', function() {
-			var input = document.createElement('input');
-			var select = document.createElement('select');
-			var button = document.createElement('button');
-			var textarea = document.createElement('textarea');
+			var input = globals.document.createElement('input');
+			var select = globals.document.createElement('select');
+			var button = globals.document.createElement('button');
+			var textarea = globals.document.createElement('textarea');
 			input.disabled = true;
 			select.disabled = true;
 			button.disabled = true;
 			textarea.disabled = true;
-			document.body.appendChild(input);
-			document.body.appendChild(select);
-			document.body.appendChild(button);
-			document.body.appendChild(textarea);
+			globals.document.body.appendChild(input);
+			globals.document.body.appendChild(select);
+			globals.document.body.appendChild(button);
+			globals.document.body.appendChild(textarea);
 
 			var listener1 = sinon.stub();
 			var listener2 = sinon.stub();
@@ -449,14 +449,14 @@ describe('dom', function() {
 		});
 
 		it('should not trigger dom click event on a form control with a disabled fieldset parent', function() {
-			var parent = document.createElement('fieldset');
+			var parent = globals.document.createElement('fieldset');
 			parent.disabled = true;
-			document.body.appendChild(parent);
+			globals.document.body.appendChild(parent);
 
-			var input = document.createElement('input');
-			var select = document.createElement('select');
-			var button = document.createElement('button');
-			var textarea = document.createElement('textarea');
+			var input = globals.document.createElement('input');
+			var select = globals.document.createElement('select');
+			var button = globals.document.createElement('button');
+			var textarea = globals.document.createElement('textarea');
 			parent.appendChild(input);
 			parent.appendChild(select);
 			parent.appendChild(button);
@@ -482,10 +482,10 @@ describe('dom', function() {
 		});
 
 		it('should trigger click event listeners for non-disabled elements even with its parent being disabled', function() {
-			var element = document.createElement('fieldset');
+			var element = globals.document.createElement('fieldset');
 			element.innerHTML = '<span class="match"></span>';
 			element.disabled = true;
-			document.body.appendChild(element);
+			globals.document.body.appendChild(element);
 
 			var target = element.querySelector('.match');
 
@@ -498,10 +498,10 @@ describe('dom', function() {
 		});
 
 		it('should keep bubling and triggering click event listeners for non-disabled elements', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.innerHTML = '<div class="match"><fieldset disabled>' +
 				'<span class="match"></span></fieldset></div>';
-			document.body.appendChild(element);
+			globals.document.body.appendChild(element);
 
 			var span = element.querySelector('span');
 
@@ -519,13 +519,13 @@ describe('dom', function() {
 	describe('delegate', function() {
 		describe('selector', function() {
 			it('should trigger delegate listener for matched elements', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listenerTargets = [];
@@ -541,13 +541,13 @@ describe('dom', function() {
 			});
 
 			it('should trigger delegate listener for "focus" event', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listenerTargets = [];
@@ -563,13 +563,13 @@ describe('dom', function() {
 			});
 
 			it('should only trigger delegate event starting from initial target', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listenerTargets = [];
@@ -584,13 +584,13 @@ describe('dom', function() {
 			});
 
 			it('should trigger listener twice when two ancestors are delegating', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = `<div class="nomatch">
 					<div class="nomatch">
 						<div class="match"></div>
 					</div>
 				</div>`;
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 
 				var listener = sinon.stub();
 				dom.delegate(element, 'click', '.match', listener);
@@ -601,10 +601,10 @@ describe('dom', function() {
 			});
 
 			it('should not trigger delegate event for parents of given element', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch"></div>';
 				element.className = 'match';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 
 				var childElement = element.childNodes[0];
 				var listener = sinon.stub();
@@ -615,13 +615,13 @@ describe('dom', function() {
 			});
 
 			it('should stop triggering event if stopPropagation is called', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listenerTargets = [];
@@ -637,13 +637,13 @@ describe('dom', function() {
 			});
 
 			it('should stop triggering event if stopImmediatePropagation is called', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listenerTargets = [];
@@ -659,9 +659,9 @@ describe('dom', function() {
 			});
 
 			it('should run default listeners last', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="root"><div class="match"></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 
 				var listener1 = sinon.stub();
 				var listener2 = sinon.stub();
@@ -680,9 +680,9 @@ describe('dom', function() {
 			});
 
 			it('should pass correct delegateTarget to default listener', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="root"><div class="match"></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 
 				var target;
 				var listener = function(event) {
@@ -696,9 +696,9 @@ describe('dom', function() {
 			});
 
 			it('should not run default listener if event is prevented', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div><div class="match"></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 
 				var listener = sinon.stub();
 				dom.delegate(element, 'click', '.match', listener, true);
@@ -709,13 +709,13 @@ describe('dom', function() {
 			});
 
 			it('should cancel listener through returned handle', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listener1 = sinon.stub();
@@ -727,13 +727,13 @@ describe('dom', function() {
 			});
 
 			it('should clear delegateTarget from event object after event is done', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<div class="nomatch">' +
 					'<div class="match">' +
 					'<div class="nomatch">' +
 					'<div class="match">' +
 					'</div></div></div></div>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 				var matchedElements = element.querySelectorAll('.match');
 
 				var listener = sinon.stub();
@@ -744,13 +744,13 @@ describe('dom', function() {
 			});
 
 			it('should not run click event listeners for disabled elements', function() {
-				var parent = document.createElement('div');
-				document.body.appendChild(parent);
+				var parent = globals.document.createElement('div');
+				globals.document.body.appendChild(parent);
 
-				var input = document.createElement('input');
-				var select = document.createElement('select');
-				var button = document.createElement('button');
-				var textarea = document.createElement('textarea');
+				var input = globals.document.createElement('input');
+				var select = globals.document.createElement('select');
+				var button = globals.document.createElement('button');
+				var textarea = globals.document.createElement('textarea');
 				input.disabled = true;
 				select.disabled = true;
 				button.disabled = true;
@@ -781,14 +781,14 @@ describe('dom', function() {
 			});
 
 			it('should not run click event listeners to an element with an disabled valid parent', function() {
-				var parent = document.createElement('fieldset');
+				var parent = globals.document.createElement('fieldset');
 				parent.disabled = true;
-				document.body.appendChild(parent);
+				globals.document.body.appendChild(parent);
 
-				var input = document.createElement('input');
-				var select = document.createElement('select');
-				var button = document.createElement('button');
-				var textarea = document.createElement('textarea');
+				var input = globals.document.createElement('input');
+				var select = globals.document.createElement('select');
+				var button = globals.document.createElement('button');
+				var textarea = globals.document.createElement('textarea');
 				parent.appendChild(input);
 				parent.appendChild(select);
 				parent.appendChild(button);
@@ -815,15 +815,15 @@ describe('dom', function() {
 			});
 
 			it('should run click event listeners to an element that have not the disabled attribute with a disabled parent using "dispatchEvent()"', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				element.innerHTML = '<fieldset class="nomatch" disabled>' +
 					'<span class="match"></span></fieldset>';
-				document.body.appendChild(element);
+				globals.document.body.appendChild(element);
 
 				var listener = sinon.stub();
 				dom.delegate(element, 'click', '.match', listener);
 
-				var eventObj = document.createEvent('HTMLEvents');
+				var eventObj = globals.document.createEvent('HTMLEvents');
 				eventObj.initEvent('click', true, true);
 
 				var target = element.querySelector('.match');
@@ -838,11 +838,11 @@ describe('dom', function() {
 
 		describe('without selector', function() {
 			it('should trigger delegate listener for specified element', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
-				var grandchild = document.createElement('div');
+				var grandchild = globals.document.createElement('div');
 				dom.append(child, grandchild);
 
 				var eventCopy;
@@ -867,11 +867,11 @@ describe('dom', function() {
 			});
 
 			it('should not add listener to container twice for the same event type', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child1 = document.createElement('div');
+				var child1 = globals.document.createElement('div');
 				dom.append(element, child1);
-				var child2 = document.createElement('div');
+				var child2 = globals.document.createElement('div');
 				dom.append(element, child2);
 
 				sinon.spy(element, 'addEventListener');
@@ -881,11 +881,11 @@ describe('dom', function() {
 			});
 
 			it('should trigger all delegated listeners for right element', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child1 = document.createElement('div');
+				var child1 = globals.document.createElement('div');
 				dom.append(element, child1);
-				var child2 = document.createElement('div');
+				var child2 = globals.document.createElement('div');
 				dom.append(element, child2);
 
 				var child1Listener1 = sinon.stub();
@@ -907,13 +907,13 @@ describe('dom', function() {
 			});
 
 			it('should not trigger listener twice when two ancestors are delegating', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
-				var grandchild = document.createElement('div');
+				var grandchild = globals.document.createElement('div');
 				dom.append(child, grandchild);
-				var greatgrandchild = document.createElement('div');
+				var greatgrandchild = globals.document.createElement('div');
 				dom.append(grandchild, greatgrandchild);
 
 				var listener1 = sinon.stub();
@@ -927,11 +927,11 @@ describe('dom', function() {
 			});
 
 			it('should not trigger listeners from ancestors when stopPropagation is called', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
-				var grandchild = document.createElement('div');
+				var grandchild = globals.document.createElement('div');
 				dom.append(child, grandchild);
 
 				var listener1 = sinon.stub();
@@ -948,11 +948,11 @@ describe('dom', function() {
 			});
 
 			it('should not trigger any other listeners when stopImmediatePropagation is called', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
-				var grandchild = document.createElement('div');
+				var grandchild = globals.document.createElement('div');
 				dom.append(child, grandchild);
 
 				var listener1 = sinon.stub();
@@ -969,9 +969,9 @@ describe('dom', function() {
 			});
 
 			it('should not trigger delegate "click" listener for right clicks', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
 
 				var listener = sinon.stub();
@@ -983,11 +983,11 @@ describe('dom', function() {
 			});
 
 			it('should run default listeners last', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
-				var grandchild = document.createElement('div');
+				var grandchild = globals.document.createElement('div');
 				dom.append(child, grandchild);
 
 				var listener1 = sinon.stub();
@@ -1007,9 +1007,9 @@ describe('dom', function() {
 			});
 
 			it('should not run default listener if event is prevented', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
 
 				var listener = sinon.stub();
@@ -1021,9 +1021,9 @@ describe('dom', function() {
 			});
 
 			it('should cancel listener through returned handle', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
 
 				var listener1 = sinon.stub();
@@ -1038,9 +1038,9 @@ describe('dom', function() {
 			});
 
 			it('should cancel default listener through returned handle', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
 
 				var listener = sinon.stub();
@@ -1052,9 +1052,9 @@ describe('dom', function() {
 			});
 
 			it('should clear delegateTarget from event object after event is done', function() {
-				var element = document.createElement('div');
+				var element = globals.document.createElement('div');
 				dom.enterDocument(element);
-				var child = document.createElement('div');
+				var child = globals.document.createElement('div');
 				dom.append(element, child);
 
 				var listener = sinon.stub();
@@ -1088,9 +1088,9 @@ describe('dom', function() {
 		});
 
 		it('should use matches function when available', function() {
-			var matchedElement = document.createElement('div');
+			var matchedElement = globals.document.createElement('div');
 			Element.prototype.matches = sinon.stub().returns(matchedElement);
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.strictEqual(matchedElement, dom.match(element, '.selector'));
 			assert.strictEqual(1, element.matches.callCount);
@@ -1098,10 +1098,10 @@ describe('dom', function() {
 		});
 
 		it('should use webkitMatchesSelector function when available', function() {
-			var matchedElement = document.createElement('div');
+			var matchedElement = globals.document.createElement('div');
 			Element.prototype.matches = null;
 			Element.prototype.webkitMatchesSelector = sinon.stub().returns(matchedElement);
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.strictEqual(matchedElement, dom.match(element, '.selector'));
 			assert.strictEqual(1, element.webkitMatchesSelector.callCount);
@@ -1109,11 +1109,11 @@ describe('dom', function() {
 		});
 
 		it('should use mozMatchesSelector function when available', function() {
-			var matchedElement = document.createElement('div');
+			var matchedElement = globals.document.createElement('div');
 			Element.prototype.matches = null;
 			Element.prototype.webkitMatchesSelector = null;
 			Element.prototype.mozMatchesSelector = sinon.stub().returns(matchedElement);
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.strictEqual(matchedElement, dom.match(element, '.selector'));
 			assert.strictEqual(1, element.mozMatchesSelector.callCount);
@@ -1121,12 +1121,12 @@ describe('dom', function() {
 		});
 
 		it('should use msMatchesSelector function when available', function() {
-			var matchedElement = document.createElement('div');
+			var matchedElement = globals.document.createElement('div');
 			Element.prototype.matches = null;
 			Element.prototype.webkitMatchesSelector = null;
 			Element.prototype.mozMatchesSelector = null;
 			Element.prototype.msMatchesSelector = sinon.stub().returns(matchedElement);
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.strictEqual(matchedElement, dom.match(element, '.selector'));
 			assert.strictEqual(1, element.msMatchesSelector.callCount);
@@ -1134,13 +1134,13 @@ describe('dom', function() {
 		});
 
 		it('should use oMatchesSelector function when available', function() {
-			var matchedElement = document.createElement('div');
+			var matchedElement = globals.document.createElement('div');
 			Element.prototype.matches = null;
 			Element.prototype.webkitMatchesSelector = null;
 			Element.prototype.mozMatchesSelector = null;
 			Element.prototype.msMatchesSelector = null;
 			Element.prototype.oMatchesSelector = sinon.stub().returns(matchedElement);
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.strictEqual(matchedElement, dom.match(element, '.selector'));
 			assert.strictEqual(1, element.oMatchesSelector.callCount);
@@ -1150,18 +1150,18 @@ describe('dom', function() {
 		it('should return false for invalid node type', function() {
 			Element.prototype.matches = sinon.stub();
 
-			var element = document.createDocumentFragment();
+			var element = globals.document.createDocumentFragment();
 			assert.ok(!dom.match(element, 'selector'));
 			assert.strictEqual(0, Element.prototype.matches.callCount);
 		});
 
 		it('should fall back to using querySelectorAll when no others are available', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.className = 'class1';
-			document.body.appendChild(element);
-			var element2 = document.createElement('div');
+			globals.document.body.appendChild(element);
+			var element2 = globals.document.createElement('div');
 			element2.className = 'class2';
-			document.body.appendChild(element2);
+			globals.document.body.appendChild(element2);
 
 			Element.prototype.matches = null;
 			Element.prototype.webkitMatchesSelector = null;
@@ -1221,33 +1221,33 @@ describe('dom', function() {
 
 	describe('toElement', function() {
 		it('should return the element itself if one is given for conversion', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.strictEqual(element, dom.toElement(element));
 			assert.strictEqual(document, dom.toElement(document));
 		});
 
 		it('should return matching element if selector is given', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.className = 'mySelector';
-			document.body.appendChild(element);
+			globals.document.body.appendChild(element);
 
 			assert.strictEqual(element, dom.toElement('.mySelector'));
 		});
 
 		it('should return matching element when selector is id', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.id = 'myId';
-			document.body.appendChild(element);
+			globals.document.body.appendChild(element);
 
 			assert.strictEqual(element, dom.toElement('#myId'));
 		});
 
 		it('should return matching element when selector is inside id', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.id = 'myId';
-			document.body.appendChild(element);
-			var element2 = document.createElement('div');
+			globals.document.body.appendChild(element);
+			var element2 = globals.document.createElement('div');
 			element2.className = 'myClass';
 			dom.append(element, element2);
 
@@ -1264,7 +1264,7 @@ describe('dom', function() {
 
 	describe('supportsEvent', function() {
 		it('should check if element supports event', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 
 			assert.ok(!dom.supportsEvent(element, 'lalala'));
 			assert.ok(dom.supportsEvent(element, 'click'));
@@ -1294,8 +1294,8 @@ describe('dom', function() {
 
 		it('should handle registered custom events', function() {
 			var listener = sinon.stub();
-			var element = document.createElement('div');
-			dom.append(document.body, element);
+			var element = globals.document.createElement('div');
+			dom.append(globals.document.body, element);
 
 			dom.on(element, 'myClick', listener);
 			dom.triggerEvent(element, 'click');
@@ -1307,15 +1307,15 @@ describe('dom', function() {
 		});
 
 		it('should handle delegate for registered custom events', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.addClasses(element, 'mine');
-			dom.append(document.body, element);
+			dom.append(globals.document.body, element);
 
-			var myElement = document.createElement('div');
+			var myElement = globals.document.createElement('div');
 			dom.addClasses(myElement, 'mine foo');
 			dom.append(element, myElement);
 
-			var fooElement = document.createElement('div');
+			var fooElement = globals.document.createElement('div');
 			dom.addClasses(fooElement, 'foo');
 			dom.append(element, fooElement);
 
@@ -1333,14 +1333,14 @@ describe('dom', function() {
 		});
 
 		it('should return true when supportsEvent is called for registered custom event', function() {
-			assert.ok(dom.supportsEvent(document.createElement('div'), 'myClick'));
-			assert.ok(!dom.supportsEvent(document.createElement('div'), 'yourClick'));
+			assert.ok(dom.supportsEvent(globals.document.createElement('div'), 'myClick'));
+			assert.ok(!dom.supportsEvent(globals.document.createElement('div'), 'yourClick'));
 		});
 	});
 
 	describe('Helpers', function() {
 		it('should check if element is empty', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			assert.ok(dom.isEmpty(element));
 
 			element.innerHTML = 'foo';

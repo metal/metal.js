@@ -1,5 +1,6 @@
 'use strict';
 
+import { globals } from 'metal';
 import dom from 'metal-dom';
 import JSXComponent from '../src/JSXComponent';
 
@@ -196,7 +197,7 @@ describe('JSXComponent', function() {
 				}
 			}
 
-			var container = document.createElement('div');
+			var container = globals.document.createElement('div');
 			component = JSXComponent.render(
 				TestComponent,
 				{
@@ -217,7 +218,7 @@ describe('JSXComponent', function() {
 			var fn = props => {
 				return <div class="test">{props.foo}</div>;
 			}
-			var container = document.createElement('div');
+			var container = globals.document.createElement('div');
 			JSXComponent.render(
 				fn,
 				{
@@ -233,7 +234,7 @@ describe('JSXComponent', function() {
 		});
 
 		it('should render jsx element via "JSXComponent.render"', function() {
-			var container = document.createElement('div');
+			var container = globals.document.createElement('div');
 			JSXComponent.render(
 				<div class="test">foo</div>,
 				container

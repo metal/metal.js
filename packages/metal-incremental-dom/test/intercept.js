@@ -1,6 +1,6 @@
 'use strict';
 
-import core from 'metal';
+import {core, globals} from 'metal';
 import dom from 'metal-dom';
 import { getOriginalFns, startInterception, stopInterception } from '../src/intercept';
 
@@ -8,7 +8,7 @@ describe('intercept', function() {
 	var element;
 
 	beforeEach(function() {
-		element = document.createElement('div');
+		element = globals.document.createElement('div');
 		dom.enterDocument(element);
 	});
 
@@ -158,7 +158,7 @@ describe('intercept', function() {
 				attributes: fn
 			});
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			IncrementalDOM.attributes[IncrementalDOM.symbols.default](element, 'name', 'value');
 
 			assert.strictEqual(1, fn.callCount);

@@ -1,7 +1,7 @@
 'use strict';
 
 import { append } from './dom';
-import { string } from 'metal';
+import { globals, string } from 'metal';
 
 /**
  * Class with static methods responsible for doing browser feature checks.
@@ -49,7 +49,7 @@ class features {
 	static checkAttrOrderChange() {
 		if (features.attrOrderChange_ === undefined) {
 			const originalContent = '<div data-component="" data-ref=""></div>';
-			const element = document.createElement('div');
+			const element = globals.document.createElement('div');
 			append(element, originalContent);
 			features.attrOrderChange_ = originalContent !== element.innerHTML;
 		}
@@ -57,7 +57,7 @@ class features {
 	}
 }
 
-features.animationElement_ = document.createElement('div');
+features.animationElement_ = globals.document.createElement('div');
 features.animationEventName_ = undefined;
 features.attrOrderChange_ = undefined;
 

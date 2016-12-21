@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDef, isDocument, isElement, isObject, isString, object } from 'metal';
+import { isDef, isDocument, isElement, isObject, isString, globals, object } from 'metal';
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
@@ -185,11 +185,11 @@ export function append(parent, child) {
  * @return {!Element} The resulting document fragment.
  */
 export function buildFragment(htmlString) {
-	const tempDiv = document.createElement('div');
+	const tempDiv = globals.document.createElement('div');
 	tempDiv.innerHTML = `<br>${htmlString}`;
 	tempDiv.removeChild(tempDiv.firstChild);
 
-	const fragment = document.createDocumentFragment();
+	const fragment = globals.document.createDocumentFragment();
 	while (tempDiv.firstChild) {
 		fragment.appendChild(tempDiv.firstChild);
 	}
@@ -282,7 +282,7 @@ function isAbleToInteractWith_(node, eventName, opt_eventObj) {
  * @param {Element} node Element to remove children from.
  */
 export function enterDocument(node) {
-	node && append(document.body, node);
+	node && append(globals.document.body, node);
 }
 
 /**
@@ -392,7 +392,7 @@ export function match(element, selector) {
  * @private
  */
 function matchFallback_(element, selector) {
-	const nodes = document.querySelectorAll(selector, element.parentNode);
+	const nodes = globals.document.querySelectorAll(selector, element.parentNode);
 	for (let i = 0; i < nodes.length; ++i) {
 		if (nodes[i] === element) {
 			return true;
@@ -442,7 +442,7 @@ function normalizeDelegateEvent_(event) {
  */
 export function on(element, eventName, callback, opt_capture) {
 	if (isString(element)) {
-		return delegate(document, eventName, element, callback);
+		return delegate(globals.document, eventName, element, callback);
 	}
 	const customConfig = customEvents[eventName];
 	if (customConfig && customConfig.event) {
@@ -604,7 +604,7 @@ export function supportsEvent(element, eventName) {
 
 	if (isString(element)) {
 		if (!elementsByTag_[element]) {
-			elementsByTag_[element] = document.createElement(element);
+			elementsByTag_[element] = globals.document.createElement(element);
 		}
 		element = elementsByTag_[element];
 	}
@@ -676,9 +676,9 @@ export function toElement(selectorOrElement) {
 		return selectorOrElement;
 	} else if (isString(selectorOrElement)) {
 		if (selectorOrElement[0] === '#' && selectorOrElement.indexOf(' ') === -1) {
-			return document.getElementById(selectorOrElement.substr(1));
+			return globals.document.getElementById(selectorOrElement.substr(1));
 		} else {
-			return document.querySelector(selectorOrElement);
+			return globals.document.querySelector(selectorOrElement);
 		}
 	} else {
 		return null;
@@ -776,7 +776,7 @@ function triggerElementListeners_(element, event, defaultFns) {
  */
 export function triggerEvent(element, eventName, opt_eventObj) {
 	if (isAbleToInteractWith_(element, eventName, opt_eventObj)) {
-		const eventObj = document.createEvent('HTMLEvents');
+		const eventObj = globals.document.createEvent('HTMLEvents');
 		eventObj.initEvent(eventName, true, true);
 		object.mixin(eventObj, opt_eventObj);
 		element.dispatchEvent(eventObj);

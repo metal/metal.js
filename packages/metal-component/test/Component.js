@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, core } from 'metal';
+import { async, globals, core } from 'metal';
 import { dom, features } from 'metal-dom';
 import { validators } from 'metal-state';
 import Component from '../src/Component';
@@ -11,7 +11,7 @@ describe('Component', function() {
 	var comp;
 
 	afterEach(function() {
-		document.body.innerHTML = '';
+		globals.document.body.innerHTML = '';
 		if (comp) {
 			comp.dispose();
 		}
@@ -175,8 +175,8 @@ describe('Component', function() {
 		});
 
 		it('should set component element', function() {
-			var element = document.createElement('div');
-			document.body.appendChild(element);
+			var element = globals.document.createElement('div');
+			globals.document.body.appendChild(element);
 
 			comp = new Component({
 				element: element
@@ -185,9 +185,9 @@ describe('Component', function() {
 		});
 
 		it('should set component element from selector', function() {
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.className = 'myClass';
-			document.body.appendChild(element);
+			globals.document.body.appendChild(element);
 
 			comp = new Component({
 				element: '.myClass'
@@ -201,7 +201,7 @@ describe('Component', function() {
 			});
 			assert.ok(comp.element);
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			comp.element = element;
 			assert.strictEqual(element, comp.element);
 
@@ -262,7 +262,7 @@ describe('Component', function() {
 			comp = new Component({
 				visible: false
 			});
-			comp.element = document.createElement('div');
+			comp.element = globals.document.createElement('div');
 			assert.strictEqual('none', comp.element.style.display);
 		});
 
@@ -486,11 +486,11 @@ describe('Component', function() {
 		it('should render component on body if no parent is specified', function() {
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
-			assert.strictEqual(document.body, comp.element.parentNode);
+			assert.strictEqual(globals.document.body, comp.element.parentNode);
 		});
 
 		it('should render component on specified default parent if no parent is specified', function() {
-			var defaultParent = document.createElement('div');
+			var defaultParent = globals.document.createElement('div');
 
 			class CustomComponent extends Component {
 				created() {
@@ -502,8 +502,8 @@ describe('Component', function() {
 		});
 
 		it('should render component on requested parent', function() {
-			var container = document.createElement('div');
-			document.body.appendChild(container);
+			var container = globals.document.createElement('div');
+			globals.document.body.appendChild(container);
 
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent({}, container);
@@ -511,9 +511,9 @@ describe('Component', function() {
 		});
 
 		it('should render component on requested parent selector', function() {
-			var container = document.createElement('div');
+			var container = globals.document.createElement('div');
 			container.className = 'myContainer';
-			document.body.appendChild(container);
+			globals.document.body.appendChild(container);
 
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent({}, '.myContainer');
@@ -528,7 +528,7 @@ describe('Component', function() {
 				}
 			}
 
-			var container = document.createElement('div');
+			var container = globals.document.createElement('div');
 			comp = Component.render(
 				CustomComponent,
 				{
@@ -552,7 +552,7 @@ describe('Component', function() {
 				}
 			}
 
-			var container = document.createElement('div');
+			var container = globals.document.createElement('div');
 			comp = Component.render(
 				CustomComponent,
 				container
@@ -565,12 +565,12 @@ describe('Component', function() {
 		});
 
 		it('should attach component on requested parent at specified position', function() {
-			var container = document.createElement('div');
-			var sibling1 = document.createElement('div');
-			var sibling2 = document.createElement('div');
+			var container = globals.document.createElement('div');
+			var sibling1 = globals.document.createElement('div');
+			var sibling2 = globals.document.createElement('div');
 			container.appendChild(sibling1);
 			container.appendChild(sibling2);
-			document.body.appendChild(container);
+			globals.document.body.appendChild(container);
 
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
@@ -583,13 +583,13 @@ describe('Component', function() {
 		});
 
 		it('should attach component according to specified sibling selector', function() {
-			var container = document.createElement('div');
-			var sibling1 = document.createElement('div');
-			var sibling2 = document.createElement('div');
+			var container = globals.document.createElement('div');
+			var sibling1 = globals.document.createElement('div');
+			var sibling2 = globals.document.createElement('div');
 			sibling2.className = 'mySibling';
 			container.appendChild(sibling1);
 			container.appendChild(sibling2);
-			document.body.appendChild(container);
+			globals.document.body.appendChild(container);
 
 			var CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
@@ -750,7 +750,7 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			comp.on('click', listener);
 
-			var newElement = document.createElement('div');
+			var newElement = globals.document.createElement('div');
 			dom.enterDocument(newElement);
 			comp.element = newElement;
 
@@ -773,7 +773,7 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			comp.delegate('click', '.foo', listener);
 
-			var newElement = document.createElement('div');
+			var newElement = globals.document.createElement('div');
 			dom.enterDocument(newElement);
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
@@ -806,7 +806,7 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			comp.on('click', listener);
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.enterDocument(element);
 			comp.element = element;
 			dom.triggerEvent(element, 'click');
@@ -818,7 +818,7 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			comp.delegate('click', '.foo', listener);
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.enterDocument(element);
 			dom.append(element, '<div class="foo"></div>');
 			comp.element = element;
@@ -833,7 +833,7 @@ describe('Component', function() {
 			var handle = comp.on('click', listener);
 			handle.removeListener();
 
-			var newElement = document.createElement('div');
+			var newElement = globals.document.createElement('div');
 			comp.element = newElement;
 
 			dom.triggerEvent(newElement, 'click');
@@ -848,7 +848,7 @@ describe('Component', function() {
 			var handle = comp.delegate('click', '.foo', listener);
 			handle.removeListener();
 
-			var newElement = document.createElement('div');
+			var newElement = globals.document.createElement('div');
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
 
@@ -861,7 +861,7 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			var handle = comp.on('click', listener);
 
-			var newElement = document.createElement('div');
+			var newElement = globals.document.createElement('div');
 			comp.element = newElement;
 
 			handle.removeListener();
@@ -876,7 +876,7 @@ describe('Component', function() {
 			var listener = sinon.stub();
 			var handle = comp.delegate('click', '.foo', listener);
 
-			var newElement = document.createElement('div');
+			var newElement = globals.document.createElement('div');
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
 

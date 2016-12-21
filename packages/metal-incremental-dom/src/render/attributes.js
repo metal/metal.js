@@ -3,7 +3,7 @@
 import { delegate } from 'metal-dom';
 import { getComponentFn } from 'metal-component';
 import { getOriginalFn } from '../intercept';
-import { isBoolean, isDefAndNotNull, isString } from 'metal';
+import { isBoolean, isDefAndNotNull, isString, globals } from 'metal';
 
 const HANDLE_SUFFIX = '__handle__';
 const LISTENER_REGEX = /^(?:on([A-Z].+))|(?:data-on(.+))$/;
@@ -55,7 +55,7 @@ function attachEvent_(component, element, attr, eventName, fn) {
 			// Listeners given by name should show up in the dom element.
 			element.setAttribute(elementAttrName, fn.givenAsName_);
 		}
-		element[handleKey] = delegate(document, eventName, element, fn);
+		element[handleKey] = delegate(globals.document, eventName, element, fn);
 	} else {
 		element.removeAttribute(elementAttrName);
 	}

@@ -3,15 +3,16 @@
 import * as dom from '../src/dom';
 import features from '../src/features';
 import '../src/events';
+import { globals } from 'metal';
 
 describe('Custom Events', function() {
 	beforeEach(function() {
-		var element1 = document.createElement('div');
-		dom.append(document.body, element1);
-		var element2 = document.createElement('div');
+		var element1 = globals.document.createElement('div');
+		dom.append(globals.document.body, element1);
+		var element2 = globals.document.createElement('div');
 		dom.addClasses(element2, 'inner');
 		dom.append(element1, element2);
-		var element3 = document.createElement('div');
+		var element3 = globals.document.createElement('div');
 		dom.append(element2, element3);
 
 		this.element1 = element1;

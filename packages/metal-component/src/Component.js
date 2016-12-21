@@ -1,7 +1,7 @@
 'use strict';
 
 import { addListenersFromObj } from './events/events';
-import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isString, object } from 'metal';
+import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isString, globals, object } from 'metal';
 import { syncState } from './sync/sync';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
@@ -109,7 +109,7 @@ class Component extends EventEmitter {
 		 * `attach`.
 		 * @type {!Element}
 		 */
-		this.DEFAULT_ELEMENT_PARENT = document.body;
+		this.DEFAULT_ELEMENT_PARENT = globals.document.body;
 
 		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;

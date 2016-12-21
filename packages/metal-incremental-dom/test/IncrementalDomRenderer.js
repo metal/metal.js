@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, core, object } from 'metal';
+import { async, core, globals, object } from 'metal';
 import dom from 'metal-dom';
 import { getData } from '../src/data';
 import { sunset } from '../../../test-utils';
@@ -77,7 +77,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('span');
+			var element = globals.document.createElement('span');
 			component = new TestComponent({
 				element: element
 			});
@@ -219,7 +219,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			component = new TestComponent({
 				element: element
 			});
@@ -235,8 +235,8 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
-			var parent = document.createElement('div');
+			var element = globals.document.createElement('div');
+			var parent = globals.document.createElement('div');
 			component = new TestComponent(
 				{
 					element: element
@@ -271,7 +271,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 			};
 
-			var parent = document.createElement('div');
+			var parent = globals.document.createElement('div');
 			component = new TestComponent({}, parent);
 			assert.ok(component.element);
 			assert.strictEqual(parent, component.element.parentNode);
@@ -387,7 +387,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.append(element, '<div class="inner">foo</div>');
 			var innerElement = element.querySelector('.inner');
 			component = new TestComponent({
@@ -411,7 +411,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.append(element, '<span class="inner">foo</span>');
 			var innerElement = element.querySelector('.inner');
 			component = new TestComponent({
@@ -435,7 +435,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.append(element, '<div class="inner2">foo</div>');
 			var innerElement = element.querySelector('.inner2');
 			component = new TestComponent({
@@ -502,7 +502,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			element.setAttribute('data-onclick', 'handleClick');
 			dom.enterDocument(element);
 
@@ -549,7 +549,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			dom.append(element, '<div></div>');
 			var innerElement = element.childNodes[0];
 			component = new TestComponent({
@@ -2088,7 +2088,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestChildComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			var element = globals.document.createElement('div');
 			var tempComp;
 			class TestComponent extends Component {
 				getChildContext() {
@@ -2788,7 +2788,7 @@ describe('IncrementalDomRenderer', function() {
 				IncDom.elementClose('span');
 			};
 
-			var container = document.createElement('span');
+			var container = globals.document.createElement('span');
 			IncrementalDomRenderer.render(
 				fn,
 				{

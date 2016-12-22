@@ -1,5 +1,7 @@
 /*eslint-disable */
 
+import { globals } from 'metal';
+
 /**
  * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
@@ -19,7 +21,7 @@
 
 (function (global, factory) {
   (factory((global.IncrementalDOM = global.IncrementalDOM || {})));
-}(window, function (exports) { 'use strict';
+}(globals.window, function (exports) { 'use strict';
 
   /**
    * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.

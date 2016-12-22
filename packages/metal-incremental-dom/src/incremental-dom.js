@@ -1,7 +1,5 @@
 /*eslint-disable */
 
-import { globals } from 'metal';
-
 /**
  * @license
  * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
@@ -20,8 +18,10 @@ import { globals } from 'metal';
  */
 
 (function (global, factory) {
-  (factory((global.IncrementalDOM = global.IncrementalDOM || {})));
-}(globals.window, function (exports) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global.IncrementalDOM = {})));
+}(this, function (exports) { 'use strict';
 
   /**
    * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.
@@ -666,9 +666,7 @@ import { globals } from 'metal';
    * @param {?Object<string, !Element>} keyMap
    */
   var removeChild = function (node, child, keyMap) {
-    if (child.parentNode === node) {
-      node.removeChild(child);
-    }
+    node.removeChild(child);
     context.markDeleted( /** @type {!Node}*/child);
 
     var key = getData(child).key;

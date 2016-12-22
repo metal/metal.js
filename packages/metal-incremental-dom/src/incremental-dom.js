@@ -666,8 +666,8 @@
    * @param {?Object<string, !Element>} keyMap
    */
   var removeChild = function (node, child, keyMap) {
-  	if (child.parentNode === node) {
-    	node.removeChild(child);
+    if (child.parentNode === node) {
+      node.removeChild(child);
     }
     context.markDeleted( /** @type {!Node}*/child);
 

@@ -1,7 +1,6 @@
 'use strict';
 
 import { applyAttribute } from '../../src/render/attributes';
-import { globals } from 'metal';
 import dom from 'metal-dom';
 import Component from 'metal-component';
 
@@ -15,7 +14,7 @@ describe('attributes', function() {
 	});
 
 	it('should uncheck input element when "checked" attribute is removed', function() {
-		const input = globals.document.createElement('input');
+		const input = document.createElement('input');
 		input.type = 'checkbox';
 		input.checked = true;
 
@@ -28,7 +27,7 @@ describe('attributes', function() {
 	});
 
 	it('should add/remove html attributes by using boolean values', function() {
-		const button = globals.document.createElement('button');
+		const button = document.createElement('button');
 		component = new Component();
 		applyAttribute(component, button, 'disabled', true);
 		assert.ok(button.disabled);
@@ -40,7 +39,7 @@ describe('attributes', function() {
 	});
 
 	it('should change input value via "value" attribute even after it\'s manually changed', function() {
-		const input = globals.document.createElement('input');
+		const input = document.createElement('input');
 		component = new Component();
 		applyAttribute(component, input, 'value', 'foo');
 		assert.strictEqual('foo', input.value);
@@ -56,7 +55,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			applyAttribute(component, element, 'data-onclick', listener);
@@ -71,7 +70,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			applyAttribute(component, element, 'onClick', listener);
@@ -86,7 +85,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 
@@ -106,7 +105,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			listener.givenAsName_ = 'handleClick';
@@ -134,7 +133,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			applyAttribute(component, element, 'data-ontest-event', listener);
@@ -154,7 +153,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			applyAttribute(component, element, 'onTest-event', listener);
@@ -168,7 +167,7 @@ describe('attributes', function() {
 			}
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			applyAttribute(component, element, 'onClick', listener);
@@ -185,7 +184,7 @@ describe('attributes', function() {
 			TestComponent.prototype.handleClick2 = sinon.stub();
 			component = new TestComponent();
 
-			const element = globals.document.createElement('div');
+			const element = document.createElement('div');
 			dom.enterDocument(element);
 			const listener = sinon.stub();
 			const listener2 = sinon.stub();

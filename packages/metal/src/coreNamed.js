@@ -1,7 +1,5 @@
 'use strict';
 
-import globals from "./globals/globals";
-
 /**
  * A collection of core utility functions.
  * @const
@@ -72,8 +70,8 @@ export function enableCompatibilityMode(opt_data = {}) {
 export function getCompatibilityModeData() {
 	// Compatibility mode can be set via the __METAL_COMPATIBILITY__ global var.
 	if (compatibilityModeData_ === undefined) {
-		if (typeof globals.window !== 'undefined' && globals.window.__METAL_COMPATIBILITY__) {
-			enableCompatibilityMode(globals.window.__METAL_COMPATIBILITY__);
+		if (typeof window !== 'undefined' && window.__METAL_COMPATIBILITY__) {
+			enableCompatibilityMode(window.__METAL_COMPATIBILITY__);
 		}
 	}
 	return compatibilityModeData_;

@@ -1,7 +1,6 @@
 'use strict';
 
 import core from '../src/core';
-import globals from '../src/globals/globals';
 
 describe('core', function() {
 	describe('Uid', function() {
@@ -209,7 +208,7 @@ describe('core', function() {
 		});
 
 		it('should check if var is window', function() {
-			if (typeof globals.window === 'undefined') {
+			if (typeof window === 'undefined') {
 				// Skip this test when on node environment.
 				return;
 			}
@@ -220,7 +219,7 @@ describe('core', function() {
 			assert.ok(!core.isWindow({
 					nodeType: 1
 				}));
-			assert.ok(core.isWindow(globals.window));
+			assert.ok(core.isWindow(window));
 			assert.ok(!core.isWindow(null));
 			assert.ok(!core.isWindow(true));
 		});
@@ -266,8 +265,8 @@ describe('core', function() {
 
 	describe('Compatibility Mode', function() {
 		afterEach(function() {
-			if (typeof globals.window !== 'undefined') {
-				delete globals.window.__METAL_COMPATIBILITY__;
+			if (typeof window !== 'undefined') {
+				delete window.__METAL_COMPATIBILITY__;
 			}
 			core.disableCompatibilityMode();
 		});
@@ -283,12 +282,12 @@ describe('core', function() {
 		});
 
 		it('should return the data specified by global var', function() {
-			if (typeof globals.window === 'undefined') {
+			if (typeof window === 'undefined') {
 				// Skip this test in Node.js environment.
 				return;
 			}
 			const data = {};
-			globals.window.__METAL_COMPATIBILITY__ = data;
+			window.__METAL_COMPATIBILITY__ = data;
 			assert.strictEqual(data, core.getCompatibilityModeData());
 		});
 

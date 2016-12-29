@@ -1,8 +1,6 @@
 'use strict';
 
 import object from '../../src/object/object';
-import globals from '../../src/globals/globals';
-
 
 describe('object', function() {
 	it('should mixin object arguments', function() {
@@ -32,11 +30,11 @@ describe('object', function() {
 	});
 
 	it('should get object by name from window', function() {
-		if (typeof globals.window === 'undefined') {
+		if (typeof window === 'undefined') {
 			// Skip this test when on node environment.
 			return;
 		}
-		globals.window.Foo = {
+		window.Foo = {
 			Bar: 1
 		};
 		assert.strictEqual(1, object.getObjectByName('Foo.Bar'));

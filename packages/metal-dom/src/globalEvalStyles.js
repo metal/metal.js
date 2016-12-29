@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, globals } from 'metal';
+import { async } from 'metal';
 import { once } from './dom';
 
 /**
@@ -15,12 +15,12 @@ class globalEvalStyles {
 	 * @return {Element} style
 	 */
 	static run(text, opt_appendFn) {
-		const style = globals.document.createElement('style');
+		const style = document.createElement('style');
 		style.innerHTML = text;
 		if (opt_appendFn) {
 			opt_appendFn(style);
 		} else {
-			globals.document.head.appendChild(style);
+			document.head.appendChild(style);
 		}
 		return style;
 	}
@@ -35,7 +35,7 @@ class globalEvalStyles {
 	 * @return {Element} style
 	 */
 	static runFile(href, opt_callback, opt_appendFn) {
-		const link = globals.document.createElement('link');
+		const link = document.createElement('link');
 		link.rel = 'stylesheet';
 		link.href = href;
 		globalEvalStyles.runStyle(link, opt_callback, opt_appendFn);
@@ -70,7 +70,7 @@ class globalEvalStyles {
 		if (opt_appendFn) {
 			opt_appendFn(style);
 		} else {
-			globals.document.head.appendChild(style);
+			document.head.appendChild(style);
 		}
 
 		return style;

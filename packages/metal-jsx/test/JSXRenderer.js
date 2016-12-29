@@ -1,6 +1,5 @@
 'use strict';
 
-import { globals } from 'metal';
 import dom from 'metal-dom';
 import Component from 'metal-component';
 import JSXRenderer from '../src/JSXRenderer';
@@ -103,7 +102,7 @@ describe('JSXRenderer', function() {
 			}
 		}
 
-		const element = globals.document.createElement('div');
+		const element = document.createElement('div');
 		dom.enterDocument(element);
 		component = new TestComponent({
 			element
@@ -153,7 +152,7 @@ describe('JSXRenderer', function() {
 			}
 		};
 
-		const element = globals.document.createElement('div');
+		const element = document.createElement('div');
 		dom.enterDocument(element);
 		component = new TestComponent({
 			element

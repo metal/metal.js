@@ -1,7 +1,6 @@
 'use strict';
 
 import dom from 'metal-dom';
-import { globals } from 'metal';
 import { sunset } from '../../../../test-utils';
 import { captureChildren, getOwner, renderChildTree, CHILD_OWNER } from '../../src/children/children';
 
@@ -81,7 +80,7 @@ describe('children', function() {
 		});
 
 		it('should render captured children via incremental dom', function() {
-			var element = globals.document.createElement('div');
+			var element = document.createElement('div');
 
 			IncrementalDOM.patch(element, () => {
 				renderChildTree({
@@ -111,7 +110,7 @@ describe('children', function() {
 		});
 
 		it('should skip rendering children node when skipNode function returns true', function() {
-			var element = globals.document.createElement('div');
+			var element = document.createElement('div');
 
 			function skipNode(node) {
 				if (node.props && node.props.id === 'skip') {
@@ -157,7 +156,7 @@ describe('children', function() {
 
 		it('should render text nodes that have been changed after capture', function(done) {
 			captureChildren({}, function(tree) {
-				var element = globals.document.createElement('div');
+				var element = document.createElement('div');
 				tree.props.children[0].text = 'New Text';
 				IncrementalDOM.patch(element, () => {
 					renderChildTree(tree.props.children[0]);

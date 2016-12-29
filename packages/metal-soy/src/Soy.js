@@ -1,7 +1,7 @@
 'use strict';
 
 import 'metal-soy-bundle';
-import { isFunction, isObject, isString, globals, object } from 'metal';
+import { isFunction, isObject, isString, object } from 'metal';
 import { ComponentRegistry } from 'metal-component';
 import HTML2IncDom from 'html2incdom';
 import IncrementalDomRenderer from 'metal-incremental-dom';
@@ -197,7 +197,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @return {string}
 	 */
 	toHtmlString(incDomFn) {
-		const element = globals.document.createElement('div');
+		const element = document.createElement('div');
 		IncrementalDOM.patch(element, incDomFn);
 		return element.innerHTML;
 	}

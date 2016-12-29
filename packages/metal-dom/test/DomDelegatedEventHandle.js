@@ -2,11 +2,10 @@
 
 import domData from '../src/domData';
 import DomDelegatedEventHandle from '../src/DomDelegatedEventHandle';
-import { globals } from 'metal';
 
 describe('DomDelegatedEventHandle', function() {
 	it('should remove listener from the metal data listeners array', function() {
-		var element = globals.document.createElement('div');
+		var element = document.createElement('div');
 		var listeners = domData.get(element, 'listeners', {});
 		listeners.click = [() => {
 		}, () => {
@@ -21,7 +20,7 @@ describe('DomDelegatedEventHandle', function() {
 	});
 
 	it('should not throw error if trying to remove unexisting listener', function() {
-		var element = globals.document.createElement('div');
+		var element = document.createElement('div');
 		var listeners = domData.get(element, 'listeners', {});
 		listeners.click = [() => {
 		}, () => {
@@ -35,7 +34,7 @@ describe('DomDelegatedEventHandle', function() {
 	});
 
 	it('should not throw error if element has no listeners to be removed', function() {
-		var element = globals.document.createElement('div');
+		var element = document.createElement('div');
 		var handle = new DomDelegatedEventHandle(element, 'click', () => {
 		});
 		assert.doesNotThrow(() => handle.removeListener());

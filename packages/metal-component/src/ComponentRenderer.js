@@ -1,7 +1,5 @@
 'use strict';
 
-import { globals } from 'metal';
-
 /**
  * Base class that component renderers should extend from. It defines the
  * required methods all renderers should have.
@@ -30,7 +28,7 @@ class ComponentRenderer {
 	 */
 	render(component) {
 		if (!component.element) {
-			component.element = globals.document.createElement('div');
+			component.element = document.createElement('div');
 		}
 		component.informRendered();
 	}

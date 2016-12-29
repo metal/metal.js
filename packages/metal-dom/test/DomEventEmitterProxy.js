@@ -4,11 +4,10 @@ import dom from '../src/dom';
 import features from '../src/features';
 import DomEventEmitterProxy from '../src/DomEventEmitterProxy';
 import { EventEmitter } from 'metal-events';
-import { globals } from 'metal';
 
 describe('DomEventEmitterProxy', function() {
 	afterEach(function() {
-		globals.document.body.innerHTML = '';
+		document.body.innerHTML = '';
 	});
 
 	it('should proxy event from event emitter origin to target', function() {
@@ -26,8 +25,8 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy event from dom element origin to target', function() {
-		var origin = globals.document.createElement('div');
-		globals.document.body.appendChild(origin);
+		var origin = document.createElement('div');
+		document.body.appendChild(origin);
 
 		var target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
@@ -38,12 +37,12 @@ describe('DomEventEmitterProxy', function() {
 
 		assert.strictEqual(1, listener.callCount);
 		assert.ok(listener.args[0][0]);
-		globals.document.body.removeChild(origin);
+		document.body.removeChild(origin);
 	});
 
 	it('should proxy custom event from dom element origin to target', function() {
-		var origin = globals.document.createElement('div');
-		globals.document.body.appendChild(origin);
+		var origin = document.createElement('div');
+		document.body.appendChild(origin);
 
 		var target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
@@ -56,7 +55,7 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should not proxy unsupported dom event from dom element', function() {
-		var origin = globals.document.createElement('div');
+		var origin = document.createElement('div');
 		origin.addEventListener = sinon.stub();
 
 		var target = new EventEmitter();
@@ -78,9 +77,9 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy delegate event from dom element origin to target', function() {
-		var origin = globals.document.createElement('div');
+		var origin = document.createElement('div');
 		dom.append(origin, '<button class="testButton"></button>');
-		globals.document.body.appendChild(origin);
+		document.body.appendChild(origin);
 
 		var target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
@@ -92,13 +91,13 @@ describe('DomEventEmitterProxy', function() {
 
 		assert.strictEqual(1, listener.callCount);
 		assert.ok(listener.args[0][0]);
-		globals.document.body.removeChild(origin);
+		document.body.removeChild(origin);
 	});
 
 	it('should proxy delegate event that contains ":" in selector', function() {
-		var origin = globals.document.createElement('div');
+		var origin = document.createElement('div');
 		dom.append(origin, '<button data-onclick="test:handleClick"></button>');
-		globals.document.body.appendChild(origin);
+		document.body.appendChild(origin);
 
 		var target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
@@ -109,12 +108,12 @@ describe('DomEventEmitterProxy', function() {
 		dom.triggerEvent(button, 'click');
 
 		assert.strictEqual(1, listener.callCount);
-		globals.document.body.removeChild(origin);
+		document.body.removeChild(origin);
 	});
 
 	it('should try to proxy event with "delegate:" prefix but no selector', function() {
-		var origin = globals.document.createElement('div');
-		globals.document.body.appendChild(origin);
+		var origin = document.createElement('div');
+		document.body.appendChild(origin);
 
 		var target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
@@ -124,12 +123,12 @@ describe('DomEventEmitterProxy', function() {
 		assert.strictEqual(0, dom.delegate.callCount);
 
 		dom.delegate.restore();
-		globals.document.body.removeChild(origin);
+		document.body.removeChild(origin);
 	});
 
 	it('should change the element that events are proxied from', function() {
-		var origin = globals.document.createElement('div');
-		globals.document.body.appendChild(origin);
+		var origin = document.createElement('div');
+		document.body.appendChild(origin);
 
 		var target = new EventEmitter();
 		var proxy = new DomEventEmitterProxy(origin, target);
@@ -137,8 +136,8 @@ describe('DomEventEmitterProxy', function() {
 		var listener = sinon.stub();
 		target.on('click', listener);
 
-		var origin2 = globals.document.createElement('div');
-		globals.document.body.appendChild(origin2);
+		var origin2 = document.createElement('div');
+		document.body.appendChild(origin2);
 		proxy.setOriginEmitter(origin2);
 
 		dom.triggerEvent(origin, 'click');
@@ -148,7 +147,7 @@ describe('DomEventEmitterProxy', function() {
 		assert.strictEqual(1, listener.callCount);
 		assert.ok(listener.args[0][0]);
 
-		globals.document.body.removeChild(origin);
+		document.body.removeChild(origin);
 	});
 
 	it('should not proxy event emitter events after disposed', function() {
@@ -165,7 +164,7 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should not proxy dom events after disposed', function() {
-		var origin = globals.document.createElement('div');
+		var origin = document.createElement('div');
 
 		var target = new EventEmitter();
 		var proxy = new DomEventEmitterProxy(origin, target);

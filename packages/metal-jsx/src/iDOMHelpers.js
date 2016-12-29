@@ -1,6 +1,5 @@
 'use strict';
 
-import { globals } from 'metal';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXRenderer from './JSXRenderer';
 
@@ -10,13 +9,13 @@ import JSXRenderer from './JSXRenderer';
  * https://github.com/jridgewell/babel-plugin-incremental-dom#runtime
  */
 
-globals.window.iDOMHelpers = globals.window.iDOMHelpers || {};
+window.iDOMHelpers = window.iDOMHelpers || {};
 
-globals.window.iDOMHelpers.attr = function(value, attrName) {
+window.iDOMHelpers.attr = function(value, attrName) {
 	IncrementalDOM.attr(attrName, value);
 };
 
-globals.window.iDOMHelpers.forOwn = function(object, iterator) {
+window.iDOMHelpers.forOwn = function(object, iterator) {
 	const hasOwn = Object.prototype.hasOwnProperty;
 	for (let prop in object) {
 		if (hasOwn.call(object, prop)) {
@@ -25,7 +24,7 @@ globals.window.iDOMHelpers.forOwn = function(object, iterator) {
 	}
 };
 
-globals.window.iDOMHelpers.jsxWrapper = function(elementClosure, args) {
+window.iDOMHelpers.jsxWrapper = function(elementClosure, args) {
 	const wrapper = args ? function() {
 		return elementClosure.apply(this, args);
 	} : elementClosure;
@@ -33,24 +32,24 @@ globals.window.iDOMHelpers.jsxWrapper = function(elementClosure, args) {
 	return wrapper;
 };
 
-globals.window.iDOMHelpers.renderArbitrary = function(child) {
+window.iDOMHelpers.renderArbitrary = function(child) {
 	const type = typeof child;
 	if (type === 'number' || (type === 'string' || child && child instanceof String)) {
 		IncrementalDOM.text(child);
 	} else if (type === 'function' && child.__jsxDOMWrapper) {
 		child();
 	} else if (Array.isArray(child)) {
-		child.forEach(globals.window.iDOMHelpers.renderArbitrary);
+		child.forEach(window.iDOMHelpers.renderArbitrary);
 	} else if (String(child) === '[object Object]') {
 		// Renders special incremental dom nodes in a special way :)
 		if (IncrementalDomRenderer.isIncDomNode(child)) {
 			IncrementalDomRenderer.renderChild(child);
 		} else {
-			globals.window.iDOMHelpers.forOwn(child, globals.window.iDOMHelpers.renderArbitrary);
+			window.iDOMHelpers.forOwn(child, window.iDOMHelpers.renderArbitrary);
 		}
 	} else if (!child) {
 		JSXRenderer.skipChild();
 	}
 };
 
-export default globals.window.iDOMHelpers;
+export default window.iDOMHelpers;

@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, globals } from 'metal';
+import { async } from 'metal';
 import { exitDocument, once } from './dom';
 
 /**
@@ -15,12 +15,12 @@ class globalEval {
 	 * @return {Element} script
 	 */
 	static run(text, opt_appendFn) {
-		const script = globals.document.createElement('script');
+		const script = document.createElement('script');
 		script.text = text;
 		if (opt_appendFn) {
 			opt_appendFn(script);
 		} else {
-			globals.document.head.appendChild(script);
+			document.head.appendChild(script);
 		}
 		exitDocument(script);
 		return script;
@@ -36,7 +36,7 @@ class globalEval {
 	 * @return {Element} script
 	 */
 	static runFile(src, opt_callback, opt_appendFn) {
-		const script = globals.document.createElement('script');
+		const script = document.createElement('script');
 		script.src = src;
 
 		const callback = function() {
@@ -49,7 +49,7 @@ class globalEval {
 		if (opt_appendFn) {
 			opt_appendFn(script);
 		} else {
-			globals.document.head.appendChild(script);
+			document.head.appendChild(script);
 		}
 
 		return script;

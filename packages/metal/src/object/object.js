@@ -1,7 +1,5 @@
 'use strict';
 
-import globals from "../globals/globals";
-
 class object {
 	/**
 	 * Copies all the members of a source object to a target object.
@@ -28,7 +26,7 @@ class object {
 	 * @return {?} The value (object or primitive) or, if not found, undefined.
 	 */
 	static getObjectByName(name, opt_obj) {
-		const scope = opt_obj || globals.window;
+		const scope = opt_obj || window;
 		const parts = name.split('.');
 		return parts.reduce((part, key) => part[key], scope);
 	}

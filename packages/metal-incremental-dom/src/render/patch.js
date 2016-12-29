@@ -1,7 +1,6 @@
 'use strict';
 
 import { append, exitDocument } from 'metal-dom';
-import { globals } from 'metal';
 import { getData } from '../data';
 import { render } from './render';
 
@@ -16,7 +15,7 @@ const patchingComponents_ = [];
  */
 function buildParentIfNecessary_(element) {
 	if (!element || !element.parentNode) {
-		const parent = globals.document.createElement('div');
+		const parent = document.createElement('div');
 		if (element) {
 			append(parent, element);
 		}

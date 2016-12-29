@@ -3,7 +3,6 @@
 import { async } from 'metal';
 import * as dom from '../src/dom';
 import globalEvalStyles from '../src/globalEvalStyles';
-import { globals } from 'metal';
 
 describe('globalEvalStyles', function() {
 	before(function() {});
@@ -39,7 +38,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should run code inside style tag in global scope', function() {
-		var style = globals.document.createElement('style');
+		var style = document.createElement('style');
 		style.innerHTML = 'body{background-color:rgb(255, 0, 0);}';
 
 		var newStyle = globalEvalStyles.runStyle(style);
@@ -48,7 +47,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should leave created style element in document after code is evaluated', function(done) {
-		var style = globals.document.createElement('style');
+		var style = document.createElement('style');
 		style.innerHTML = 'body{background-color:rgb(255, 0, 0);}';
 
 		var newStyle = globalEvalStyles.runStyle(style, function() {
@@ -59,7 +58,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should not evaluate style element with tel different from stylesheet', function(done) {
-		var link = globals.document.createElement('link');
+		var link = document.createElement('link');
 		link.innerHTML = 'body{background-color:rgb(255, 0, 0);}';
 		link.rel = 'unknown';
 		dom.enterDocument(link);
@@ -73,7 +72,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should run file referenced by specified style element', function(done) {
-		var link = globals.document.createElement('link');
+		var link = document.createElement('link');
 		link.href = 'fixtures/style.css';
 		link.rel = 'stylesheet';
 
@@ -86,7 +85,7 @@ describe('globalEvalStyles', function() {
 
 	it('should be able to overwrite append function', function() {
 		var appendFn = sinon.stub();
-		var style = globals.document.createElement('style');
+		var style = document.createElement('style');
 		var newStyle = globalEvalStyles.runStyle(style, null, appendFn);
 		assert.strictEqual(1, appendFn.callCount);
 		dom.exitDocument(newStyle);
@@ -137,5 +136,5 @@ describe('globalEvalStyles', function() {
 
 
 function assertComputedStyle(property, value) {
-	assert.strictEqual(value, window.getComputedStyle(globals.document.body, null)[property]);
+	assert.strictEqual(value, window.getComputedStyle(document.body, null)[property]);
 }

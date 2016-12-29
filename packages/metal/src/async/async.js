@@ -5,8 +5,6 @@
 
 'use strict';
 
-import globals from "../globals/globals";
-
 const async = {};
 
 
@@ -158,15 +156,15 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	// an iframe based polyfill in browsers that have postMessage and
 	// document.addEventListener. The latter excludes IE8 because it has a
 	// synchronous postMessage implementation.
-	if (typeof Channel === 'undefined' && typeof globals.window !== 'undefined' &&
-		globals.window.postMessage && globals.window.addEventListener) {
+	if (typeof Channel === 'undefined' && typeof window !== 'undefined' &&
+		window.postMessage && window.addEventListener) {
 		/** @constructor */
 		Channel = function() {
 			// Make an empty, invisible iframe.
-			const iframe = globals.document.createElement('iframe');
+			const iframe = document.createElement('iframe');
 			iframe.style.display = 'none';
 			iframe.src = '';
-			globals.document.documentElement.appendChild(iframe);
+			document.documentElement.appendChild(iframe);
 			const win = iframe.contentWindow;
 			const doc = win.document;
 			doc.open();
@@ -212,10 +210,10 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	}
 	// Implementation for IE6-8: Script elements fire an asynchronous
 	// onreadystatechange event when inserted into the DOM.
-	if (typeof globals.document !== 'undefined' && 'onreadystatechange' in
-		globals.document.createElement('script')) {
+	if (typeof document !== 'undefined' && 'onreadystatechange' in
+		document.createElement('script')) {
 		return function(cb) {
-			let script = globals.document.createElement('script');
+			let script = document.createElement('script');
 			script.onreadystatechange = function() {
 				// Clean up and call the callback.
 				script.onreadystatechange = null;
@@ -224,7 +222,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 				cb();
 				cb = null;
 			};
-			globals.document.documentElement.appendChild(script);
+			document.documentElement.appendChild(script);
 		};
 	}
 	// Fall back to setTimeout with 0. In browsers this creates a delay of 5ms

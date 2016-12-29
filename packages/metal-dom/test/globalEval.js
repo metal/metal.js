@@ -3,20 +3,19 @@
 import { async } from 'metal';
 import * as dom from '../src/dom';
 import globalEval from '../src/globalEval';
-import { globals } from 'metal';
 
 describe('globalEval', function() {
 	before(function() {
-		globals.window.testScript = null;
+		window.testScript = null;
 	});
 
 	afterEach(function() {
-		globals.window.testScript = null;
+		window.testScript = null;
 	});
 
 	it('should evaluate script code in global scope', function() {
 		globalEval.run('var testScript = 2 + 2;');
-		assert.strictEqual(4, globals.window.testScript);
+		assert.strictEqual(4, window.testScript);
 	});
 
 	it('should not leave created script tag in document after code is evaluated', function() {
@@ -28,7 +27,7 @@ describe('globalEval', function() {
 		var newScript = globalEval.runFile('fixtures/script.js');
 
 		dom.on(newScript, 'load', function() {
-			assert.strictEqual(5, globals.window.testScript);
+			assert.strictEqual(5, window.testScript);
 			done();
 		});
 	});
@@ -53,7 +52,7 @@ describe('globalEval', function() {
 
 	it('should call callback function after script file is run', function(done) {
 		var newScript = globalEval.runFile('fixtures/script.js', function() {
-			assert.strictEqual(5, globals.window.testScript);
+			assert.strictEqual(5, window.testScript);
 			assert.ok(!newScript.parentNode);
 			done();
 		});
@@ -74,7 +73,7 @@ describe('globalEval', function() {
 		script.text = 'var testScript = "script with code";';
 
 		globalEval.runScript(script);
-		assert.strictEqual('script with code', globals.window.testScript);
+		assert.strictEqual('script with code', window.testScript);
 	});
 
 	it('should remove script element from the document when it\'s evaluated', function() {
@@ -83,7 +82,7 @@ describe('globalEval', function() {
 		dom.enterDocument(script);
 
 		globalEval.runScript(script);
-		assert.strictEqual('script with code', globals.window.testScript);
+		assert.strictEqual('script with code', window.testScript);
 		assert.ok(!script.parentNode);
 	});
 
@@ -107,7 +106,7 @@ describe('globalEval', function() {
 		dom.enterDocument(script);
 
 		globalEval.runScript(script, function() {
-			assert.strictEqual('script with code', globals.window.testScript);
+			assert.strictEqual('script with code', window.testScript);
 			assert.ok(!script.parentNode);
 			done();
 		});
@@ -120,7 +119,7 @@ describe('globalEval', function() {
 
 		var newScript = globalEval.runScript(script);
 		dom.on(newScript, 'load', function() {
-			assert.strictEqual(5, globals.window.testScript);
+			assert.strictEqual(5, window.testScript);
 			done();
 		});
 	});
@@ -131,7 +130,7 @@ describe('globalEval', function() {
 		dom.enterDocument(script);
 
 		var newScript = globalEval.runScript(script, function() {
-			assert.strictEqual(5, globals.window.testScript);
+			assert.strictEqual(5, window.testScript);
 			assert.ok(!newScript.parentNode);
 			done();
 		});
@@ -142,8 +141,8 @@ describe('globalEval', function() {
 			'<div><script>var testScript = 2 + 2;</script></div><script>var testScript2 = 2 + 3;</script>'
 		);
 		globalEval.runScriptsInElement(element, function() {
-			assert.strictEqual(4, globals.window.testScript);
-			assert.strictEqual(5, globals.window.testScript2);
+			assert.strictEqual(4, window.testScript);
+			assert.strictEqual(5, window.testScript2);
 			assert.ok(!document.head.querySelector('script'));
 			done();
 		});
@@ -155,7 +154,7 @@ describe('globalEval', function() {
 		);
 
 		globalEval.runScriptsInElement(element, function() {
-			assert.strictEqual(4, globals.window.testScript);
+			assert.strictEqual(4, window.testScript);
 			assert.ok(!document.head.querySelector('script'));
 			done();
 		});

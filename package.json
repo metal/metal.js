@@ -21,6 +21,8 @@
     "gulp-babel": "^6.1.2",
     "gulp-metal": "^1.0.0",
     "gulp-replace": "^0.5.4",
+    "jsdom": "^9.9.1",
+    "jsdom-global": "^2.1.1",
     "karma": "^1.1.0",
     "karma-browserify": "^5.0.5",
     "karma-chai": "^0.1.0",

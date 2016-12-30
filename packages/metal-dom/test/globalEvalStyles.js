@@ -5,7 +5,12 @@ import * as dom from '../src/dom';
 import globalEvalStyles from '../src/globalEvalStyles';
 
 describe('globalEvalStyles', function() {
-	before(function() {});
+	before(function() {
+		if (typeof process !== 'undefined') {
+			// Skip this test in Node.js environment.
+			this.skip();
+		}
+	});
 
 	afterEach(function() {});
 

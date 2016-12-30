@@ -17,9 +17,11 @@
  * limitations under the License.
  */
 
+const scope = (typeof exports !== 'undefined' && typeof global !== 'undefined') ? global : window;
+
 (function (global, factory) {
   (factory((global.IncrementalDOM = global.IncrementalDOM || {})));
-}(window, function (exports) { 'use strict';
+}(scope, function (exports) { 'use strict';
 
   /**
    * Copyright 2015 The Incremental DOM Authors. All Rights Reserved.

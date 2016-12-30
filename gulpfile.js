@@ -25,10 +25,20 @@ metal.registerTasks({
 	lintGlobs: codeGlobs,
 	testDepTasks: ['build:cjs'],
 	testNodeSrc: [
+		// Since all files will be added, we need to ensure manually that these
+		// will be added first.
+		'packages/metal-incremental-dom/lib/incremental-dom.js',
+
+		// Test files
 		'env/test/node.js',
+		'packages/metal/test/**/*.js',
+		'packages/metal-component/test/**/*.js',
+		'packages/metal-dom/test/**/*.js',
 		'packages/metal-events/test/**/*.js',
-		'packages/metal-state/test/**/*.js',
-		'packages/metal/test/**/*.js'
+		'packages/metal-incremental-dom/test/**/*.js',
+		'packages/metal-jsx/test/**/*.js',
+		'packages/metal-soy/test/**/*.js',
+		'packages/metal-state/test/**/*.js'
 	],
 	testSaucelabsBrowsers: {
 		sl_chrome: {

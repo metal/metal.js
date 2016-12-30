@@ -6,6 +6,10 @@ import globalEval from '../src/globalEval';
 
 describe('globalEval', function() {
 	before(function() {
+		if (typeof process !== 'undefined') {
+			// Skip this test in Node.js environment.
+			this.skip();
+		}
 		window.testScript = null;
 	});
 

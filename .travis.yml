@@ -3,6 +3,8 @@ jdk:
   - oraclejdk8
 addons:
   sauce_connect: true
+  jwt:
+    secure: R5Ujw12vDWT9RTVZnjqmgoBeG8QgMdwKoShPHOEwnYOXIkxts5Qmg9+eCVoJRSYMZ2YMKk7sXisApKiOIhGv5PsJwIm1qXPlw6eQCWnnLE/OTJtoM0LgeKOcypwO28pJheHuHbd3jtCJ6eEKQiN1YPXSW2HTctYJU4a2ipgo8JY=
 before_install:
   - nvm install 5
   - npm install -g lerna@2.0.0-beta.30

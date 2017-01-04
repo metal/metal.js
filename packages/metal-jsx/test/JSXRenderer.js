@@ -173,14 +173,14 @@ describe('JSXRenderer', function() {
 	it('should update if props change', function(done) {
 		class TestComponent extends TestJSXComponent {
 			render() {
-				return <div>{this.props.foo}</div>
+				return <div>{this.props.foo}</div>;
 			}
 		}
 		TestComponent.PROPS = {
 			foo: {
 				value: 'defaultFoo'
 			}
-		}
+		};
 
 		component = new TestComponent();
 		assert.strictEqual('defaultFoo', component.element.textContent);
@@ -195,14 +195,14 @@ describe('JSXRenderer', function() {
 	it('should update if state changes', function(done) {
 		class TestComponent extends TestJSXComponent {
 			render() {
-				return <div>{this.state.foo}</div>
+				return <div>{this.state.foo}</div>;
 			}
 		}
 		TestComponent.STATE = {
 			foo: {
 				value: 'defaultFoo'
 			}
-		}
+		};
 
 		component = new TestComponent();
 		assert.strictEqual('defaultFoo', component.element.textContent);
@@ -221,11 +221,11 @@ describe('JSXRenderer', function() {
 		TestComponent.PROPS = {
 			bar: {
 			}
-		}
+		};
 		TestComponent.STATE = {
 			foo: {
 			}
-		}
+		};
 
 		component = new TestComponent();
 		sinon.stub(component, 'shouldUpdate');
@@ -251,7 +251,7 @@ describe('JSXRenderer', function() {
 	it('should reuse elements correctly when child skips update', function(done) {
 		class ChildComponent extends TestJSXComponent {
 			render() {
-				return <span>Child</span>
+				return <span>Child</span>;
 			}
 
 			shouldUpdate() {
@@ -270,7 +270,7 @@ describe('JSXRenderer', function() {
 		TestComponent.STATE = {
 			foo: {
 			}
-		}
+		};
 
 		component = new TestComponent();
 		var childNodes = component.element.childNodes;
@@ -301,13 +301,13 @@ describe('JSXRenderer', function() {
 				return <div>
 					{!this.props.hide && <div class="child1"><ChildComponent /></div>}
 					<div class="child1"><ChildComponent2 /></div>
-				</div>
+				</div>;
 			}
 		}
 		TestComponent.PROPS = {
 			hide: {
 			}
-		}
+		};
 
 		class ParentComponent extends TestJSXComponent {
 			render() {
@@ -343,13 +343,13 @@ describe('JSXRenderer', function() {
 				return <div>
 					<span key={this.props.switch ? 'node2' : 'node1'} />
 					<span key={this.props.switch ? 'node1' : 'node2'} />
-				</div>
+				</div>;
 			}
 		}
 		TestComponent.PROPS = {
 			switch: {
 			}
-		}
+		};
 
 		component = new TestComponent();
 		const firstChild = component.element.childNodes[0];
@@ -379,13 +379,13 @@ describe('JSXRenderer', function() {
 				return <div>
 					<ChildComponent key={this.props.switch ? 'child2' : 'child1'} />
 					<ChildComponent key={this.props.switch ? 'child1' : 'child2'} />
-				</div>
+				</div>;
 			}
 		}
 		TestComponent.PROPS = {
 			switch: {
 			}
-		}
+		};
 
 		component = new TestComponent();
 		assert.equal(2, childComps.length);
@@ -422,7 +422,7 @@ describe('JSXRenderer', function() {
 				return <div>
 					<div>Test</div>
 					<ChildComponent ref="child" />
-				</div>
+				</div>;
 			}
 		}
 

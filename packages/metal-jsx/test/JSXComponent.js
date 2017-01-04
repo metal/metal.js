@@ -216,7 +216,7 @@ describe('JSXComponent', function() {
 		it('should render componentless functions via "JSXComponent.render"', function() {
 			var fn = props => {
 				return <div class="test">{props.foo}</div>;
-			}
+			};
 			var container = document.createElement('div');
 			JSXComponent.render(
 				fn,
@@ -254,7 +254,7 @@ describe('JSXComponent', function() {
 				foo: {
 					value: 'defaultFoo'
 				}
-			}
+			};
 
 			component = new TestComponent();
 			assert.strictEqual('defaultFoo', component.props.foo);
@@ -267,7 +267,7 @@ describe('JSXComponent', function() {
 				foo: {
 					value: 'defaultFoo'
 				}
-			}
+			};
 
 			component = new TestComponent();
 			assert.strictEqual('defaultFoo', component.state.foo);
@@ -321,7 +321,7 @@ describe('JSXComponent', function() {
 				foo: {
 					value: 'defaultFoo'
 				}
-			}
+			};
 			component = new TestComponent();
 
 			sinon.stub(component, 'render');
@@ -344,7 +344,7 @@ describe('JSXComponent', function() {
 				foo: {
 					value: 'defaultFoo'
 				}
-			}
+			};
 			component = new TestComponent();
 
 			sinon.stub(component, 'render');

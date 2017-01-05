@@ -79,13 +79,10 @@ metal.registerTasks({
 			version: '13'
 		},
 		sl_android_4: {
-			appiumVersion: '1.5.3',
 			base: 'SauceLabs',
-			browserName: 'Browser',
-			deviceName: 'Android Emulator',
-			deviceOrientation: 'portrait',
-			platformName: 'Android',
-			platformVersion: '4.4'
+			browserName: 'android',
+			platform: 'Linux',
+			version: '4.4'
 		},
 		sl_android_5: {
 			base: 'SauceLabs',

@@ -438,6 +438,11 @@ class Component extends EventEmitter {
 			element = opt_configOrElement;
 		}
 		const instance = new Ctor(config, false);
+
+		if (window.__METAL_DEV_TOOLS_HOOK__) {
+			window.__METAL_DEV_TOOLS_HOOK__(instance);
+		}
+
 		instance.renderComponent(element);
 		return instance;
 	}

@@ -440,7 +440,9 @@ class Component extends EventEmitter {
 		const instance = new Ctor(config, false);
 
 		if (window.__METAL_DEV_TOOLS_HOOK__) {
-			window.__METAL_DEV_TOOLS_HOOK__(instance);
+			const hook = window.__METAL_DEV_TOOLS_HOOK__.addRoot ? window.__METAL_DEV_TOOLS_HOOK__.addRoot : window.__METAL_DEV_TOOLS_HOOK__;
+
+			hook(instance);
 		}
 
 		instance.renderComponent(element);

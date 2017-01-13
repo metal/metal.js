@@ -940,9 +940,12 @@ describe('Component', function() {
 		assert.ok(!Component.isComponentCtor(fn.bind(this)));
 	});
 
-	it('should pass instance of component to __METAL_DEV_TOOLS_HOOK__  in Component.render', function() {
-		var hookStub = sinon.stub();
-		window.__METAL_DEV_TOOLS_HOOK__ = hookStub;
+	it('should pass instance of component to __METAL_DEV_TOOLS_HOOK__.addRoot  in Component.render', function() {
+		var addStub = sinon.stub();
+		var oldValue = window.__METAL_DEV_TOOLS_HOOK__;
+		window.__METAL_DEV_TOOLS_HOOK__ = {
+			addRoot: addStub
+		};
 		class CustomComponent extends Component {
 			constructor(...args) {
 				super(...args);
@@ -955,8 +958,10 @@ describe('Component', function() {
 		assert.ok(comp instanceof CustomComponent);
 		assert.ok(comp.wasRendered);
 		assert.ok(comp.element);
-		sinon.assert.callCount(hookStub, 1);
-		sinon.assert.calledWith(hookStub, comp);
+		sinon.assert.callCount(addStub, 1);
+		sinon.assert.calledWith(addStub, comp);
+
+		window.__METAL_DEV_TOOLS_HOOK__ = oldValue;
 	});
 
 	function createCustomComponentClass(opt_rendererContentOrFn) {

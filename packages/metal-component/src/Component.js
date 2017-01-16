@@ -438,11 +438,6 @@ class Component extends EventEmitter {
 			element = opt_configOrElement;
 		}
 		const instance = new Ctor(config, false);
-
-		if (window.__METAL_DEV_TOOLS_HOOK__) {
-			window.__METAL_DEV_TOOLS_HOOK__(instance);
-		}
-
 		instance.renderComponent(element);
 		return instance;
 	}
@@ -457,6 +452,9 @@ class Component extends EventEmitter {
 	 */
 	renderComponent(opt_parentElement) {
 		if (!this.hasRendererRendered_) {
+			if (window.__METAL_DEV_TOOLS_HOOK__) {
+				window.__METAL_DEV_TOOLS_HOOK__(this);
+			}
 			this.getRenderer().render(this);
 		}
 		this.emit('render');

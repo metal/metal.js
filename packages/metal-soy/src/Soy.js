@@ -52,7 +52,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 		component.getStateKeys().forEach(key => {
 			let value = component[key];
 			if (this.isHtmlParam_(component, key)) {
-				value = soyRenderer.toIncDom(value);
+				value = soyRenderer_.toIncDom(value);
 			}
 			data[key] = value;
 		});
@@ -133,7 +133,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 *     used to render the component. Defaults to "render".
 	 */
 	register(componentCtor, templates, mainTemplate = 'render') {
-		componentCtor.RENDERER = soyRenderer;
+		componentCtor.RENDERER = soyRenderer_;
 		componentCtor.TEMPLATE = SoyAop.getOriginalFn(templates[mainTemplate]);
 		componentCtor.TEMPLATE.componentCtor = componentCtor;
 		SoyAop.registerForInterception(templates, mainTemplate);
@@ -218,8 +218,8 @@ class Soy extends IncrementalDomRenderer.constructor {
 	}
 }
 
-const soyRenderer = new Soy();
-Soy.RENDERER_NAME = 'soy';
+const soyRenderer_ = new Soy();
+soyRenderer_.RENDERER_NAME = 'soy';
 
-export default soyRenderer;
-export { soyRenderer as Soy, SoyAop };
+export default soyRenderer_;
+export { soyRenderer_ as Soy, SoyAop };

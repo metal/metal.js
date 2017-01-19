@@ -148,7 +148,6 @@ describe('Soy', function() {
 			}
 			NoTemplateComponent.RENDERER = Soy;
 
-			comp = new NoTemplateComponent();
 			assert.doesNotThrow(function() {
 				comp = new NoTemplateComponent();
 			});

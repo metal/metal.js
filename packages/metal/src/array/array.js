@@ -10,6 +10,9 @@ class array {
 	 * @return {boolean}
 	 */
 	static equal(arr1, arr2) {
+		if (arr1 === arr2) {
+			return true;
+		}
 		if (arr1.length !== arr2.length) {
 			return false;
 		}

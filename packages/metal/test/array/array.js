@@ -52,6 +52,11 @@ describe('array', function() {
 	});
 
 	describe('equal', function() {
+		it('should return true for arrays pointing to the same reference', function() {
+			const arr = [1, 2];
+			assert.ok(array.equal(arr, arr));
+		});
+
 		it('should return false for arrays with different length', function() {
 			assert.ok(!array.equal([1, 2], [1, 2, 3]));
 		});

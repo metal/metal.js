@@ -201,6 +201,15 @@ export function isDocument(val) {
 }
 
 /**
+ * Returns true if value is a document-fragment.
+ * @param {*} val
+ * @return {boolean}
+ */
+export function isDocumentFragment(val) {
+	return val && typeof val === 'object' && val.nodeType === 11;
+}
+
+/**
  * Returns true if value is a dom element.
  * @param {*} val
  * @return {boolean}

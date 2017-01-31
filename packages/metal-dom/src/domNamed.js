@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDef, isDocument, isElement, isObject, isString, object } from 'metal';
+import { isDef, isDocument, isDocumentFragment, isElement, isObject, isString, object } from 'metal';
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
@@ -672,7 +672,7 @@ function triggerDelegatedListeners_(container, event, defaultFns) {
  * @return {Element} The converted element, or null if none was found.
  */
 export function toElement(selectorOrElement) {
-	if (isElement(selectorOrElement) || isDocument(selectorOrElement)) {
+	if (isElement(selectorOrElement) || isDocument(selectorOrElement) || isDocumentFragment(selectorOrElement)) {
 		return selectorOrElement;
 	} else if (isString(selectorOrElement)) {
 		if (selectorOrElement[0] === '#' && selectorOrElement.indexOf(' ') === -1) {

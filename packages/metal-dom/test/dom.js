@@ -1260,6 +1260,17 @@ describe('dom', function() {
 			assert.strictEqual(null, dom.toElement(1));
 			assert.strictEqual(null, dom.toElement(null));
 		});
+
+		it('should return matching element if selector is document fragment', function () {
+			var frag1 = document.createDocumentFragment();
+			assert.strictEqual(frag1, dom.toElement(frag1));
+
+			var frag2 = document.createDocumentFragment();
+			assert.strictEqual(frag2, dom.toElement(frag2));
+
+			var frag3 = '#document-fragment';
+			assert.notStrictEqual(frag3, dom.toElement(frag3));
+		});
 	});
 
 	describe('supportsEvent', function() {

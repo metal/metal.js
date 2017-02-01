@@ -207,6 +207,13 @@ describe('core', function() {
 			assert.ok(!core.isDocument(true));
 		});
 
+		it('should check if var is document fragment', function () {
+			assert.ok(!core.isDocumentFragment(null));
+			assert.ok(!core.isDocumentFragment({nodeType: 0}));
+			assert.ok(!core.isDocumentFragment({nodeType: 9}));
+			assert.ok(core.isDocumentFragment({nodeType: 11}));
+		});
+
 		it('should check if var is window', function() {
 			if (typeof window === 'undefined') {
 				// Skip this test when on node environment.

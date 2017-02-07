@@ -4,6 +4,25 @@ import core from 'metal';
 import Config from '../src/Config';
 
 describe('Config', function() {
+	it('should return config with "internal" flag set to true by default', function() {
+		var config = Config.internal();
+		assert.ok(core.isObject(config));
+
+		var expected = {
+			internal: true
+		};
+		assert.deepEqual(expected, config.config);
+	});
+
+	it('should return config with "internal" flag set to the given vaue', function() {
+		var internal = false;
+		var config = Config.internal(internal);
+		assert.ok(core.isObject(config));
+		assert.deepEqual({
+			internal
+		}, config.config);
+	});
+
 	it('should return config with "required" flag set to true by default', function() {
 		var config = Config.required();
 		assert.ok(core.isObject(config));

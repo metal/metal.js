@@ -28,6 +28,17 @@ import validators from './validators';
  */
 const Config = {
 	/**
+	 * Adds the `internal` flag to the `State` configuration.
+	 * @param {boolean} required Flag to set "internal" to. True by default.
+	 * @return {!Object} `State` configuration object.
+	 */
+	internal(internal = true) {
+		return mergeConfig(this, {
+			internal
+		});
+	},
+
+	/**
 	 * Adds the `required` flag to the `State` configuration.
 	 * @param {boolean} required Flag to set "required" to. True by default.
 	 * @return {!Object} `State` configuration object.

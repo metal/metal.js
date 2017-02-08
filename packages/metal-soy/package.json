@@ -27,7 +27,8 @@
     "metal-component": "^2.6.2",
     "metal-dom": "^2.6.0",
     "metal-incremental-dom": "^2.6.2",
-    "metal-soy-bundle": "^2.0.0"
+    "metal-soy-bundle": "^2.0.0",
+    "metal-state": "^2.6.0"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

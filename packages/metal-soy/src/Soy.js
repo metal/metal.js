@@ -1,8 +1,9 @@
 'use strict';
 
 import 'metal-soy-bundle';
-import { isFunction, isObject, isString, object } from 'metal';
 import { ComponentRegistry } from 'metal-component';
+import { isFunction, isObject, isString, object } from 'metal';
+import { validators, Config } from 'metal-state';
 import HTML2IncDom from 'html2incdom';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import SoyAop from './SoyAop';
@@ -222,4 +223,9 @@ const soyRenderer_ = new Soy();
 soyRenderer_.RENDERER_NAME = 'soy';
 
 export default soyRenderer_;
-export { soyRenderer_ as Soy, SoyAop };
+export {
+	Config,
+	soyRenderer_ as Soy,
+	SoyAop,
+	validators
+};

@@ -22,7 +22,7 @@ module.exports = function(config) {
 				served: true
 			},
 			{
-				pattern: 'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js',
+				pattern: 'packages/metal-soy-bundle/lib/bundle.js',
 				watched: false,
 				included: true,
 				served: true
@@ -51,7 +51,7 @@ module.exports = function(config) {
 		preprocessors: {
 			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
-			'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': ['browserify'],
+			'packages/metal-soy-bundle/lib/bundle.js': ['browserify'],
 			'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
 			'packages/metal*/test/**/*.js': ['browserify']
 		},

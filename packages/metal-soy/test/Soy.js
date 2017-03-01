@@ -1,5 +1,6 @@
 'use strict';
 
+import { core } from 'metal';
 import dom from 'metal-dom';
 import Component from 'metal-component';
 import { Events as EventsComponent } from './assets/Events.soy.js';
@@ -447,4 +448,70 @@ describe('Soy', function() {
 			assert.strictEqual(fn, Soy.toIncDom(fn));
 		});
 	});
+
+	describe('webcomponents', function() {
+
+		var el;
+
+		afterEach(function() {
+			if (el) {
+				document.body.removeChild(el);
+				el.component.dispose();
+			}
+		});
+
+		it('should not throw when creating a custom element', function() {
+      var tagName = createWebComponent();
+
+			var createEl = () => {
+				el = document.createElement(tagName);
+				return el;
+			};
+			var appendEl = () => document.body.appendChild(createEl());
+
+			assert.doesNotThrow(createEl);
+			assert.doesNotThrow(appendEl);
+		});
+
+		it('should dispatch events when attributes change', function() {
+
+			var tagName = createWebComponent();
+
+			el = document.createElement(tagName);
+			document.body.appendChild(el);
+
+			var fn = sinon.stub();
+
+			el.addEventListener('titleChanged', fn);
+
+			el.setAttribute('title', 'new title');
+			assert.strictEqual(1, fn.callCount);
+
+			el.setAttribute('non-existing', 'test');
+			assert.strictEqual(1, fn.callCount);
+		});
+
+	});
+
+	function createWebComponent() {
+		var tagName = `metal-test-component-${Date.now()}`;
+
+		class WebComponent extends Component { }
+		WebComponent.STATE = {
+			title: {value: 'default title'}
+		};
+
+		Soy.register(WebComponent, {
+			render: () => {
+				IncrementalDOM.elementVoid('div', null, [
+					'title', WebComponent.STATE.title.value
+				]);
+			}
+		});
+
+		core.defineWebComponent(tagName, WebComponent, ['title']);
+
+		return tagName;
+	}
+
 });

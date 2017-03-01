@@ -22,6 +22,7 @@
     "metal"
   ],
   "dependencies": {
+    "@webcomponents/custom-elements": "^1.0.0-alpha.3",
     "html2incdom": "^0.1.1",
     "metal": "^2.6.4",
     "metal-component": "^2.7.0",

@@ -33,6 +33,12 @@ module.exports = function(config) {
 				included: true,
 				served: true
 			},
+			{
+				pattern: 'packages/metal-soy/node_modules/@webcomponents/custom-elements/src/*.js',
+				watched: false,
+				included: true,
+				served: true
+			},
 
 			{
 				pattern: 'packages/metal*/test/**/*.js',
@@ -53,6 +59,7 @@ module.exports = function(config) {
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
 			'packages/metal-soy-bundle/lib/bundle.js': ['browserify'],
 			'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
+			'packages/metal-soy/node_modules/@webcomponents/custom-elements/src/*.js': ['browserify'],
 			'packages/metal*/test/**/*.js': ['browserify']
 		},
 

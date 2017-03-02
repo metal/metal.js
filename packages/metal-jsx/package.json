@@ -1,6 +1,6 @@
 {
   "name": "metal-jsx",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "A JSX templates renderer to be used with Metal.js's Component class",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-jsx",
@@ -23,10 +23,10 @@
   ],
   "dependencies": {
     "metal": "^2.6.4",
-    "metal-component": "^2.6.4",
+    "metal-component": "^2.6.5",
     "metal-dom": "^2.6.4",
-    "metal-incremental-dom": "^2.6.4",
-    "metal-state": "^2.6.4"
+    "metal-incremental-dom": "^2.6.5",
+    "metal-state": "^2.6.5"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

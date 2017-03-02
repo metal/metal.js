@@ -56,6 +56,14 @@ class State extends EventEmitter {
 		this.scheduledBatchData_ = null;
 
 		/**
+		 * Throws exception when validator returns an `Error` instance.
+		 * @type {boolean}
+		 * @default false
+		 * @protected
+		 */
+		this.throwValidationError_ = false;
+
+		/**
 		 * Object that contains information about all this instance's state keys.
 		 * @type {!Object<string, !Object>}
 		 * @protected
@@ -92,6 +100,21 @@ class State extends EventEmitter {
 				console.error(
 					`The property called "${name}" is required but didn't receive a value.`
 				);
+			}
+		}
+	}
+
+	/**
+	 * Logs an error if the `validatorReturn` is instance of `Error`.
+	 * @param {*} validatorReturn
+	 * @protected
+	 */
+	assertValidatorReturnInstanceOfError_(validatorReturn) {
+		if (validatorReturn instanceof Error) {
+			if (this.getThrowValidationError()) {
+				throw validatorReturn;
+			} else {
+				console.error(`Warning: ${validatorReturn}`);
 			}
 		}
 	}
@@ -178,10 +201,7 @@ class State extends EventEmitter {
 				config.validator,
 				[value, name, this.context_]
 			);
-
-			if (validatorReturn instanceof Error) {
-				console.error(`Warning: ${validatorReturn}`);
-			}
+			this.assertValidatorReturnInstanceOfError_(validatorReturn);
 			return validatorReturn;
 		}
 		return true;
@@ -366,6 +386,15 @@ class State extends EventEmitter {
 			this.initStateKey_(name);
 			return this.getStateInfo(name).value;
 		}
+	}
+
+	/**
+	 * Gets the configuration value for whether or not should throw error when
+	 * vaildator functions returns an `Error` instance.
+	 * @return {boolean}
+	 */
+	getThrowValidationError() {
+		return this.throwValidationError_;
 	}
 
 	/**
@@ -605,6 +634,15 @@ class State extends EventEmitter {
 		const info = this.getStateInfo(name);
 		return (info.state === State.KeyStates.INITIALIZED) &&
 			(isObject(prevVal) || prevVal !== this.get(name));
+	}
+
+	/**
+	 * Sets the configuration value for whether or not should throw error when
+	 * vaildator functions returns an `Error` instance.
+	 * @param {boolean} throwValidationError
+	 */
+	setThrowValidationError(throwValidationError) {
+		this.throwValidationError_ = throwValidationError;
 	}
 
 	/**

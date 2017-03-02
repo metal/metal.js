@@ -390,6 +390,39 @@ describe('State', function() {
 		console.error = originalConsoleFn;
 	});
 
+	it('should throw error if validator returns an Error and throwValidationError is enabled', function() {
+		var state = new State();
+		state.setThrowValidationError(true);
+		state.configState(
+			{
+				key1: {
+					validator: function() {
+						return new Error();
+					}
+				}
+			}
+		);
+
+		assert.throws(() => state.key1 = 1);
+	});
+
+	it('should not throw error if validator returns an Error and throwValidationError is disabled', function() {
+		var state = new State();
+		state.setThrowValidationError(false);
+		state.configState(
+			{
+				key1: {
+					validator: function() {
+						return new Error();
+					}
+				}
+			}
+		);
+
+		assert.doesNotThrow(() => state.key1 = 1);
+		assert.strictEqual(1, state.key1);
+	});
+
 	it('should change state new value through setter', function() {
 		var state = new State();
 		state.configState({

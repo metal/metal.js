@@ -583,6 +583,64 @@ describe('State', function() {
 			state.key = undefined;
 			assert.strictEqual(2, console.error.callCount);
 		});
+
+		it('should throw error if required property gets no initial value via configState and throwValidationError is enabled', function() {
+			var state = new State({
+				key2: 'initialValue'
+			});
+			state.setThrowValidationError(true);
+
+			assert.doesNotThrow(() => {
+				state.configState({
+					key1: {}
+				});
+			});
+
+			assert.doesNotThrow(() => {
+				state.configState(
+					{
+						key2: {
+							required: true
+						}
+					}
+				);
+			});
+
+			assert.throws(() => {
+				state.configState({
+					key3: {
+						required: true
+					}
+				});
+			});
+		});
+
+		it('should log error if required property is set to null or undefined and throwValidationError is enabled', function() {
+			var state = new State({
+				key: 'initialValue'
+			});
+			state.setThrowValidationError(true);
+
+			assert.doesNotThrow(() => {
+				state.configState({
+					key: {
+						required: true
+					}
+				});
+			});
+
+			assert.doesNotThrow(() => {
+				state.key = 'value';
+			});
+
+			assert.throws(() => {
+				state.key = null;
+			});
+
+			assert.throws(() => {
+				state.key = undefined;
+			});
+		});
 	});
 
 	it('should emit event when a state key\'s value changes', function() {

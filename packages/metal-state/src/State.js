@@ -97,9 +97,12 @@ class State extends EventEmitter {
 				this.get(name) :
 				this.initialValues_[name];
 			if (!isDefAndNotNull(value)) {
-				console.error(
-					`The property called "${name}" is required but didn't receive a value.`
-				);
+				let errorMessage = `The property called "${name}" is required but didn't receive a value.`;
+				if (this.getThrowValidationError()) {
+					throw new Error(errorMessage);
+				} else {
+					console.error(errorMessage);
+				}
 			}
 		}
 	}

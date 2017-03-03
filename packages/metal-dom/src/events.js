@@ -1,6 +1,6 @@
 'use strict';
 
-import { registerCustomEvent } from './dom';
+import { registerCustomEvent, contains } from './dom';
 import features from './features';
 
 const mouseEventMap = {
@@ -15,7 +15,7 @@ Object.keys(mouseEventMap).forEach(function(eventName) {
 		handler: function(callback, event) {
 			const related = event.relatedTarget;
 			const target = event.delegateTarget;
-			if (!related || (related !== target && !target.contains(related))) {
+			if (!related || (related !== target && !contains(target, related))) {
 				event.customType = eventName;
 				return callback(event);
 			}

@@ -1,0 +1,31 @@
+{
+  "name": "metal-assertions",
+  "version": "2.6.4",
+  "description": "A collection of assertion methods for metal",
+  "license": "BSD-3-Clause",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-assertions",
+  "engines": {
+    "node": ">=0.10.0",
+    "npm": ">=3.0.0"
+  },
+  "jsnext:main": "src/assertions.js",
+  "main": "lib/assertions.js",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run compile"
+  },
+  "keywords": [
+    "metal"
+  ],
+  "dependencies": {
+    "metal": "^2.6.4"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.0.0"
+  }
+}

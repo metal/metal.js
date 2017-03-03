@@ -1,6 +1,6 @@
 {
   "name": "metal-assertions",
-  "version": "2.6.4",
+  "version": "2.8.0",
   "description": "A collection of assertion methods for metal",
   "license": "BSD-3-Clause",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-assertions",

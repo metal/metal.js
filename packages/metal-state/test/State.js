@@ -390,9 +390,13 @@ describe('State', function() {
 		console.error = originalConsoleFn;
 	});
 
-	it('should throw error if validator returns an Error and throwValidationError is enabled', function() {
-		var state = new State();
-		state.setThrowValidationError(true);
+	it('should throw error if validator returns an Error and shouldThrowValidationError is true', function() {
+		class Test extends State {
+			shouldThrowValidationError() {
+				return true;
+			}
+		}
+		var state = new Test();
 		state.configState(
 			{
 				key1: {
@@ -406,9 +410,13 @@ describe('State', function() {
 		assert.throws(() => state.key1 = 1);
 	});
 
-	it('should not throw error if validator returns an Error and throwValidationError is disabled', function() {
-		var state = new State();
-		state.setThrowValidationError(false);
+	it('should not throw error if validator returns an Error and shouldThrowValidationError is false', function() {
+		class Test extends State {
+			shouldThrowValidationError() {
+				return false;
+			}
+		}
+		var state = new Test();
 		state.configState(
 			{
 				key1: {
@@ -584,11 +592,15 @@ describe('State', function() {
 			assert.strictEqual(2, console.error.callCount);
 		});
 
-		it('should throw error if required property gets no initial value via configState and throwValidationError is enabled', function() {
-			var state = new State({
+		it('should throw error if required property gets no initial value via configState and shouldThrowValidationError is true', function() {
+			class Test extends State {
+				shouldThrowValidationError() {
+					return true;
+				}
+			}
+			var state = new Test({
 				key2: 'initialValue'
 			});
-			state.setThrowValidationError(true);
 
 			assert.doesNotThrow(() => {
 				state.configState({
@@ -615,11 +627,15 @@ describe('State', function() {
 			});
 		});
 
-		it('should log error if required property is set to null or undefined and throwValidationError is enabled', function() {
-			var state = new State({
+		it('should throw error if required property is set to null or undefined and shouldThrowValidationError is true', function() {
+			class Test extends State {
+				shouldThrowValidationError() {
+					return true;
+				}
+			}
+			var state = new Test({
 				key: 'initialValue'
 			});
-			state.setThrowValidationError(true);
 
 			assert.doesNotThrow(() => {
 				state.configState({
@@ -639,6 +655,23 @@ describe('State', function() {
 
 			assert.throws(() => {
 				state.key = undefined;
+			});
+		});
+
+		it('should throw error if required property is set to null or undefined and shouldThrowValidationError is true', function() {
+			class Test extends State {
+				shouldThrowValidationError() {
+					return true;
+				}
+			}
+			Test.STATE = {
+				key: {
+					required: true
+				}
+			};
+
+			assert.throws(() => {
+				new Test();
 			});
 		});
 	});

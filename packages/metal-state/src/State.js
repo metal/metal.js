@@ -56,14 +56,6 @@ class State extends EventEmitter {
 		this.scheduledBatchData_ = null;
 
 		/**
-		 * Throws exception when validator returns an `Error` instance.
-		 * @type {boolean}
-		 * @default false
-		 * @protected
-		 */
-		this.throwValidationError_ = false;
-
-		/**
 		 * Object that contains information about all this instance's state keys.
 		 * @type {!Object<string, !Object>}
 		 * @protected
@@ -98,7 +90,7 @@ class State extends EventEmitter {
 				this.initialValues_[name];
 			if (!isDefAndNotNull(value)) {
 				let errorMessage = `The property called "${name}" is required but didn't receive a value.`;
-				if (this.getThrowValidationError()) {
+				if (this.shouldThrowValidationError()) {
 					throw new Error(errorMessage);
 				} else {
 					console.error(errorMessage);
@@ -114,7 +106,7 @@ class State extends EventEmitter {
 	 */
 	assertValidatorReturnInstanceOfError_(validatorReturn) {
 		if (validatorReturn instanceof Error) {
-			if (this.getThrowValidationError()) {
+			if (this.shouldThrowValidationError()) {
 				throw validatorReturn;
 			} else {
 				console.error(`Warning: ${validatorReturn}`);
@@ -392,15 +384,6 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Gets the configuration value for whether or not should throw error when
-	 * vaildator functions returns an `Error` instance.
-	 * @return {boolean}
-	 */
-	getThrowValidationError() {
-		return this.throwValidationError_;
-	}
-
-	/**
 	 * Merges the STATE static variable for the given constructor function.
 	 * @param  {!Function} ctor Constructor function.
 	 * @return {boolean} Returns true if merge happens, false otherwise.
@@ -640,12 +623,12 @@ class State extends EventEmitter {
 	}
 
 	/**
-	 * Sets the configuration value for whether or not should throw error when
+	 * Returns a boolean that determines whether or not should throw error when
 	 * vaildator functions returns an `Error` instance.
-	 * @param {boolean} throwValidationError
+	 * @return {boolean} By default returns false.
 	 */
-	setThrowValidationError(throwValidationError) {
-		this.throwValidationError_ = throwValidationError;
+	shouldThrowValidationError() {
+		return false;
 	}
 
 	/**

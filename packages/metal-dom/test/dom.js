@@ -66,6 +66,13 @@ describe('dom', function() {
 			assert.ok(!dom.hasClass(element, 'class3'));
 		});
 
+		it('should throw an error if white spaces are used in the class name', function() {
+			var element = document.createElement('div');
+			dom.addClasses(element, 'class1 class2');
+
+			assert.throws(() => dom.hasClass(element, 'class1 class2'));
+		});
+
 		it('should check if css classes are being removed', function() {
 			var element = document.createElement('div');
 			dom.addClasses(element, 'class1 class2');

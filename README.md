@@ -37,6 +37,9 @@ Metal.js is a JavaScript library for building UI components in a solid, flexible
   npm test
   ```
 
+## Developer Tools for Metal.js
+* [Chrome Extension](https://chrome.google.com/webstore/detail/metaljs-developer-tools/fagnjmppkokolnbloalifcmcooldhiik)
+
 ## License
 
 [BSD License](https://github.com/metal/metal.js/blob/master/LICENSE.md) © Liferay, Inc.

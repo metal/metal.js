@@ -85,6 +85,66 @@
     return value != null && value.contentKind === contentKind;
   };
 
+	/**
+	 * Content of type {@link goog.soy.data.SanitizedContentKind.HTML}.
+	 *
+	 * The content is a string of HTML that can safely be embedded in a PCDATA
+	 * context in your app.  If you would be surprised to find that an HTML
+	 * sanitizer produced {@code s} (e.g.  it runs code or fetches bad URLs) and
+	 * you wouldn't write a template that produces {@code s} on security or privacy
+	 * grounds, then don't pass {@code s} here. The default content direction is
+	 * unknown, i.e. to be estimated when necessary.
+	 *
+	 * @constructor
+	 * @extends {goog.soy.data.SanitizedHtml}
+	 */
+	soydata.SanitizedHtml = function() {
+		soydata.SanitizedHtml.base(this, 'constructor');  // Throws an exception.
+	};
+	goog.inherits(soydata.SanitizedHtml, goog.soy.data.SanitizedHtml);
+
+	/**
+	 * Returns a SanitizedHtml object for a particular value. The content direction
+	 * is preserved.
+	 *
+	 * This HTML-escapes the value unless it is already SanitizedHtml or SafeHtml.
+	 *
+	 * @param {*} value The value to convert. If it is already a SanitizedHtml
+	 *     object, it is left alone.
+	 * @return {!soydata.SanitizedHtml} A SanitizedHtml object derived from the
+	 *     stringified value. It is escaped unless the input is SanitizedHtml or
+	 *     SafeHtml.
+	 */
+	soydata.SanitizedHtml.from = function(value) {
+		// The check is soydata.isContentKind_() inlined for performance.
+		if (value != null &&
+				value.contentKind === goog.soy.data.SanitizedContentKind.HTML) {
+			goog.asserts.assert(
+					value.constructor === goog.soy.data.SanitizedHtml ||
+					value.constructor === soydata.SanitizedHtml);
+			return /** @type {!soydata.SanitizedHtml} */ (value);
+		}
+		if (value instanceof goog.html.SafeHtml) {
+			return soydata.VERY_UNSAFE.ordainSanitizedHtml(
+					goog.html.SafeHtml.unwrap(value), value.getDirection());
+		}
+		return soydata.VERY_UNSAFE.ordainSanitizedHtml(
+				soy.esc.$$escapeHtmlHelper(String(value)), soydata.getContentDir(value));
+	};
+
+	/**
+	 * Checks if the value could be used as the Soy type {html}.
+	 * @param {*} value
+	 * @return {boolean}
+	 */
+	soydata.SanitizedHtml.isCompatibleWith = function(value) {
+		return goog.isString(value) ||
+				value instanceof goog.soy.data.SanitizedHtml ||
+				value instanceof goog.soy.data.UnsanitizedText ||
+				value instanceof goog.html.SafeHtml;
+	};
+
+
   /**
    * Content of type {@link soydata.SanitizedContentKind.URI}.
    *
@@ -553,26 +613,25 @@
   // -----------------------------------------------------------------------------
   // Assertion methods used by runtime.
 
-  /**
-   * Checks if the type assertion is true if goog.asserts.ENABLE_ASSERTS is
-   * true. Report errors on runtime types if goog.DEBUG is true.
-   * @template T
-   * @param {T} typeCheck An condition for type checks.
-   * @param {string} paramName The Soy name of the parameter.
-   * @param {?Object} param The resolved JS object for the parameter.
-   * @param {!string} jsDocTypeStr JSDoc type str to cast the value to if the
-   *     type test succeeds
-   * @param {...*} var_args The items to substitute into the failure message.
-   * @return {T} The value of the condition.
-   * @throws {goog.asserts.AssertionError} When the condition evaluates to false.
-   */
-  soy.asserts.assertType = function(typeCheck, paramName,
-      param, jsDocTypeStr, var_args) {
+/**
+ * Checks if the type assertion is true if goog.asserts.ENABLE_ASSERTS is
+ * true. Report errors on runtime types if goog.DEBUG is true.
+ * @param {boolean} condition The type check condition.
+ * @param {string} paramName The Soy name of the parameter.
+ * @param {?} param The JS object for the parameter.
+ * @param {!string} jsDocTypeStr SoyDoc type str.
+ * @return {?} the param value
+ * @throws {goog.asserts.AssertionError} When the condition evaluates to false.
+ */
+soy.asserts.assertType = function(condition, paramName, param, jsDocTypeStr) {
+  if (goog.asserts.ENABLE_ASSERTS && !condition) {
     var msg = 'expected param ' + paramName + ' of type ' + jsDocTypeStr +
         (goog.DEBUG ? (', but got ' + goog.debug.runtimeType(param)) : '') +
         '.';
-    return goog.asserts.assert(typeCheck, msg, var_args);
-  };
+    goog.asserts.fail(msg);
+  }
+  return param;
+};
 
 
   // -----------------------------------------------------------------------------
@@ -620,6 +679,47 @@
     }
     return str;
   };
+
+	var incrementaldom = IncrementalDOM;
+	var soyIDOM = {};
+
+	/**
+	 * Calls an expression in case of a function or outputs it as text content.
+	 * @param {string|number|boolean|function()?} expr
+	 */
+	soyIDOM.renderDynamicContent = function(expr) {
+		if (goog.isFunction(expr)) {
+			expr();
+		} else if (expr != null) {
+			incrementaldom.text(expr);
+		}
+	};
+
+	/**
+	 * Prints an expression depending on its type.
+	 * @param {!SanitizedHtml|string|number|boolean|function()} expr
+	 */
+	soyIDOM.print = function(expr) {
+		if (expr instanceof soydata.SanitizedHtml) {
+			// For HTML content we need to insert a custom element where we can place
+			// the content without incremental dom modifying it.
+			var el = incrementaldom.elementOpen('html-blob');
+			var content = expr.toString();
+			if (el.__innerHTML !== content) {
+				soy.renderHtml(el, expr);
+				el.__innerHTML = content;
+			}
+			incrementaldom.skip();
+			incrementaldom.elementClose('html-blob');
+		} else {
+			soyIDOM.renderDynamicContent(expr);
+		}
+	};
+
+	goog.loadModule(function() {
+		goog.module('soy.idom');
+		return soyIDOM;
+	});
 
   // END GENERATED CODE
 

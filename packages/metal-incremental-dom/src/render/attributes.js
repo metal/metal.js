@@ -64,7 +64,7 @@ function attachEvent_(component, element, attr, eventName, fn) {
 /**
  * Converts all event listener attributes given as function names to actual
  * function references. It's important to do this before calling the real
- * incremental dom `elementOpen` function, otherwise if a component passes a
+ * incremental dom `elementOpen` function, otherwise if a component passes
  * the same function name that an element was already using for another
  * component, that event won't be reattached as incremental dom will think that
  * the value hasn't changed. Passing the function references as the value will

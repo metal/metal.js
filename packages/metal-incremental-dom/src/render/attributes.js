@@ -83,7 +83,8 @@ export function convertListenerNamesToFns(component, config) {
 
 /**
  * Converts the given attribute's value to a function reference, if it's
- * currently a listener name.
+ * currently a listener name. It also register the listener name for
+ * further usage.
  * @param {!Component} component
  * @param {string} name
  * @param {*} value
@@ -95,7 +96,7 @@ function convertListenerNameToFn_(component, name, value) {
 		const eventName = getEventFromListenerAttr_(name);
 		if (eventName) {
 			const fn = getComponentFn(component, value);
-			fn.givenAsName_ = name;
+			fn.givenAsName_ = value;
 			return fn;
 		}
 	}

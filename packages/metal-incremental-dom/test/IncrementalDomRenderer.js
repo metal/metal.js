@@ -464,7 +464,7 @@ describe('IncrementalDomRenderer', function() {
 
 			component = new TestComponent();
 			let elementChild = component.element.querySelector('div');
-			assert.strictEqual('handleClick', elementChild.dataset.onclick);
+			assert.strictEqual('handleClick', elementChild.getAttribute('data-onclick'));
 		});
 
 		it('should attach listeners from "on<EventName>" attributes', function() {

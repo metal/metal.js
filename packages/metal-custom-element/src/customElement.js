@@ -29,7 +29,8 @@ export function defineWebComponent(tagName, Ctor) {
 				opts[observedAttrs[i]] = this.getAttribute(observedAttrs[i]);
 			}
 			this.component = new Ctor(opts, shadowRoot);
-			this.component.on('*', this.emit.bind(this));
+			this.componentEventHandler = this.emit.bind(this);
+			this.component.on('*', this.componentEventHandler);
 		}
 
 		attributeChangedCallback(attrName, oldVal, newVal) {
@@ -40,8 +41,8 @@ export function defineWebComponent(tagName, Ctor) {
 
 		disconnectedCallback() {
 			if (this.component) {
-				this.component.off('*', this.emit.bind(this));
-				this.component.detach();
+				this.component.off('*', this.componentEventHandler);
+				this.component.dispose();
 			}
 		}
 

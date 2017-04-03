@@ -64,7 +64,7 @@ function attachEvent_(component, element, attr, eventName, fn) {
 /**
  * Converts all event listener attributes given as function names to actual
  * function references. It's important to do this before calling the real
- * incremental dom `elementOpen` function, otherwise if a component passes a
+ * incremental dom `elementOpen` function, otherwise if a component passes
  * the same function name that an element was already using for another
  * component, that event won't be reattached as incremental dom will think that
  * the value hasn't changed. Passing the function references as the value will
@@ -83,7 +83,8 @@ export function convertListenerNamesToFns(component, config) {
 
 /**
  * Converts the given attribute's value to a function reference, if it's
- * currently a listener name.
+ * currently a listener name. It also register the listener name for
+ * further usage.
  * @param {!Component} component
  * @param {string} name
  * @param {*} value
@@ -95,7 +96,7 @@ function convertListenerNameToFn_(component, name, value) {
 		const eventName = getEventFromListenerAttr_(name);
 		if (eventName) {
 			const fn = getComponentFn(component, value);
-			fn.givenAsName_ = name;
+			fn.givenAsName_ = value;
 			return fn;
 		}
 	}

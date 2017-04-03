@@ -1,6 +1,6 @@
 'use strict';
 
-import { applyAttribute } from '../../src/render/attributes';
+import { applyAttribute, convertListenerNamesToFns } from '../../src/render/attributes';
 import dom from 'metal-dom';
 import Component from 'metal-component';
 
@@ -50,6 +50,20 @@ describe('attributes', function() {
 	});
 
 	describe('listeners', function() {
+		it('should register the method name inside the listener', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.prototype.handleClick = function() {};
+			component = new TestComponent();
+
+			let config = {
+				'data-onclick': 'handleClick'
+			};
+
+			convertListenerNamesToFns(component, config);
+			assert.strictEqual('handleClick', config['data-onclick'].givenAsName_);
+		});
+
 		it('should attach listeners functions passed to "data-on<eventname>" attributes', function() {
 			class TestComponent extends Component {
 			}

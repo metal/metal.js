@@ -451,6 +451,22 @@ describe('IncrementalDomRenderer', function() {
 	});
 
 	describe('Inline Listeners', function() {
+		it('should show the listener name in the dom element', function() {
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid('div', null, null, 'onClick', 'handleClick');
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.prototype.handleClick = function() {};
+
+			component = new TestComponent();
+			let elementChild = component.element.querySelector('div');
+			assert.strictEqual('handleClick', elementChild.getAttribute('data-onclick'));
+		});
+
 		it('should attach listeners from "on<EventName>" attributes', function() {
 			class TestComponent extends Component {
 				render() {

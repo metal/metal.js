@@ -80,6 +80,17 @@ const Config = {
 		return mergeConfig(this, {
 			value
 		});
+	},
+
+	/**
+	 * Adds a valueFn that will return a default value for the `State` configuration.
+	 * @param {!function()} valueFn
+	 * @return {!Object} `State` configuration object.
+	 */
+	valueFn(valueFn) {
+		return mergeConfig(this, {
+			valueFn
+		});
 	}
 };
 

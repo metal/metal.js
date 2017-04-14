@@ -51,6 +51,15 @@ describe('Config', function() {
 		}, config.config);
 	});
 
+	it('should return config with specified "valueFn"', function() {
+		var valueFn = () => {};
+		var config = Config.valueFn(valueFn);
+		assert.ok(core.isObject(config));
+		assert.deepEqual({
+			valueFn
+		}, config.config);
+	});
+
 	it('should return config with specified "setter"', function() {
 		var setter = () => {
 		};

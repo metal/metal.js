@@ -10,13 +10,13 @@ module.exports = function(config) {
 			// Since all files will be added, we need to ensure manually that these
 			// will be added first.
 			{
-				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/custom-elements.min.js',
+				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/src/native-shim.js',
 				watched: false,
 				included: true,
 				served: true
 			},
 			{
-				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/src/native-shim.js',
+				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/custom-elements.min.js',
 				watched: false,
 				included: true,
 				served: true

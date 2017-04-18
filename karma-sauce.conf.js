@@ -10,7 +10,7 @@ module.exports = function(config) {
 			// Since all files will be added, we need to ensure manually that these
 			// will be added first.
 			{
-				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/src/*.js',
+				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/src/native-shim.js',
 				watched: false,
 				included: true,
 				served: true
@@ -54,7 +54,7 @@ module.exports = function(config) {
 		],
 
 		preprocessors: {
-			'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/src/*.js': ['browserify'],
+			'packages/metal-custom-element/node_modules/@webcomponents/custom-elements/src/native-shim.js': ['browserify'],
 			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
 			'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': ['browserify'],

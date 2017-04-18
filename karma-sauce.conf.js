@@ -56,7 +56,7 @@ module.exports = function(config) {
 			'packages/metal*/test/**/*.js': ['browserify']
 		},
 
-		browsers: ['Chrome'],
+		browsers: ['Firefox', 'Chrome'],
 
 		browserify: {
 			debug: true,

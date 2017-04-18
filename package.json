@@ -19,7 +19,7 @@
     "eslint-plugin-react": "^6.8.0",
     "gulp": "^3.8.11",
     "gulp-babel": "^6.1.2",
-    "gulp-metal": "^1.0.0",
+    "gulp-metal": "mairatma/gulp-metal#travis",
     "gulp-replace": "^0.5.4",
     "jsdom": "^9.9.1",
     "jsdom-global": "^2.1.1",

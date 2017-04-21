@@ -148,3 +148,37 @@ goog.soy.data.UnsanitizedText = function() {
 };
 
 goog.inherits(goog.soy.data.UnsanitizedText, goog.soy.data.SanitizedContent);
+
+/**
+ * Content of type {@link goog.soy.data.SanitizedContentKind.HTML}.
+ *
+ * The content is a string of HTML that can safely be embedded in a PCDATA
+ * context in your app.  If you would be surprised to find that an HTML
+ * sanitizer produced {@code s} (e.g.  it runs code or fetches bad URLs) and
+ * you wouldn't write a template that produces {@code s} on security or privacy
+ * grounds, then don't pass {@code s} here. The default content direction is
+ * unknown, i.e. to be estimated when necessary.
+ *
+ * @extends {goog.soy.data.SanitizedContent}
+ * @constructor
+ */
+goog.soy.data.SanitizedHtml = function() {
+  goog.soy.data.SanitizedHtml.base(this, 'constructor');
+};
+goog.inherits(goog.soy.data.SanitizedHtml, goog.soy.data.SanitizedContent);
+
+/** @override */
+goog.soy.data.SanitizedHtml.prototype.contentKind =
+    goog.soy.data.SanitizedContentKind.HTML;
+
+/**
+ * Checks if the value could be used as the Soy type {html}.
+ * @param {*} value
+ * @return {boolean}
+ */
+goog.soy.data.SanitizedHtml.isCompatibleWith = function(value) {
+  return goog.isString(value) ||
+      value instanceof goog.soy.data.SanitizedHtml ||
+      value instanceof goog.soy.data.UnsanitizedText ||
+      value instanceof goog.html.SafeHtml;
+};

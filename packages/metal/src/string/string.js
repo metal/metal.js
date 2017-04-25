@@ -2,6 +2,16 @@
 
 class string {
 	/**
+	 * Checks if a string contains a given string.
+	 * @param {string} str1 String to compare with.
+	 * @param {string} str2 String that should be inside str1.
+	 * @return {boolean} True if it contains false if it does not.
+	 */
+	static contains(str1, str2) {
+		return str1.indexOf(str2) >= 0;
+	}
+
+	/**
 	 * Compares the given strings without taking the case into account.
 	 * @param {string|number} str1
 	 * @param {string|number} str2
@@ -45,6 +55,97 @@ class string {
 	}
 
 	/**
+	 * Unescapes an HTML string.
+	 *
+	 * @param {string} str The string to unescape.
+	 * @return {string} An unescaped copy of {@code str}.
+	 */
+	static unescapeEntities(str) {
+		return string.unescapePureXmlEntities(str);
+	}
+
+	/**
+	 * Unescapes an HTML string using a DOM to resolve non-XML, non-numeric
+	 * entities. This function is XSS-safe and whitespace-preserving.
+	 * @private
+	 * @param {string} str The string to unescape.
+	 * @return {string} The unescaped {@code str} string.
+	 */
+	static unescapeEntitiesUsingDom(str) {
+		if (!string.contains(str, '&')) {
+			return str;
+		}
+
+		let seen = {
+			'&amp;': '&',
+			'&lt;': '<',
+			'&gt;': '>',
+			'&quot;': '"'
+		};
+		let div = document.createElement('div');
+
+		return str.replace(string.HTML_ENTITY_PATTERN_, function(s, entity) {
+			let value = seen[s];
+			if (value) {
+				return value;
+			}
+			value = string.unescapeHexFormat_(entity);
+			if (!value) {
+				// Append a non-entity character to avoid a bug in Webkit that parses
+				// an invalid entity at the end of innerHTML text as the empty string.
+				div.innerHTML = s + ' ';
+				// Then remove the trailing character from the result.
+				value = div.firstChild.nodeValue.slice(0, -1);
+			}
+
+			return seen[s] = value;
+		});
+	};
+
+	/**
+	 * Unescapes an HTML string using a DOM to resolve non-XML, non-numeric
+	 * entities. This function is XSS-safe and whitespace-preserving.
+	 * @private
+	 * @param {string} str The string to unescape.
+	 * @return {string} The unescaped {@code str} string.
+	 */
+	static unescapeHexFormat_(entity) {
+		if (entity.charAt(0) === '#') {
+			// Prefix with 0 so that hex entities (e.g. &#x10) parse as hex.
+			let n = Number('0' + entity.substr(1));
+			if (!isNaN(n)) {
+				return String.fromCharCode(n);
+			}
+		}
+	}
+
+	/**
+	 * Unescapes XML entities.
+	 * @private
+	 * @param {string} str The string to unescape.
+	 * @return {string} An unescaped copy of {@code str}.
+	 */
+	static unescapePureXmlEntities(str) {
+		if (!string.contains(str, '&')) {
+			return str;
+		}
+		return str.replace(/&([^;]+);/g, function(s, entity) {
+			switch (entity) {
+				case 'amp':
+					return '&';
+				case 'lt':
+					return '<';
+				case 'gt':
+					return '>';
+				case 'quot':
+					return '"';
+				default:
+					return string.unescapeHexFormat_(entity) || s;
+			}
+		});
+	}
+
+	/**
 	* Returns a string with at least 64-bits of randomness.
 	* @return {string} A random string, e.g. sn1s7vb4gcic.
 	*/
@@ -85,5 +186,13 @@ class string {
 		return str.substring(0, start) + value + str.substring(end);
 	}
 }
+
+/**
+ * Regular expression that matches an HTML entity.
+ * See also HTML5: Tokenization / Tokenizing character references.
+ * @private
+ * @type {!RegExp}
+ */
+string.HTML_ENTITY_PATTERN_ = /&([^;\s<&]+);?/g;
 
 export default string;

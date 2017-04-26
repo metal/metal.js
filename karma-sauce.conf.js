@@ -33,7 +33,18 @@ module.exports = function(config) {
 				included: true,
 				served: true
 			},
-
+			{
+				pattern: 'packages/metal-custom-element/node_modules/babel-polyfill/dist/polyfill.min.js',
+				watched: false,
+				included: true,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-custom-element/node_modules/webcomponents.js/webcomponents-lite.js',
+				watched: false,
+				included: true,
+				served: true
+			},
 			{
 				pattern: 'packages/metal*/test/**/*.js',
 				watched: false,
@@ -61,8 +72,14 @@ module.exports = function(config) {
 		browserify: {
 			debug: true,
 			transform: [
-				['babelify', {presets: ['es2015']}]
-			],
+				['babelify', {
+					presets: ['es2015'],
+					plugins: [
+						'transform-custom-element-classes',
+						'transform-es2015-classes'
+					]
+				}
+			]],
 			insertGlobalVars: {
 				METAL_VERSION: function() {
 					return '\'' + lernaJson.version + '\'';

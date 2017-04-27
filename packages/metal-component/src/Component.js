@@ -442,6 +442,39 @@ class Component extends EventEmitter {
 		return instance;
 	}
 
+	static renderToString(Ctor, opt_config) {
+		const rendererName = Ctor.RENDERER && Ctor.RENDERER.RENDERER_NAME;
+		switch (rendererName) {
+			case 'jsx':
+			case 'soy':
+			case 'incremental-dom': {
+				if (typeof IncrementalDOM === 'undefined') {
+					throw new Error(`Error. Trying to render incremental dom ` +
+						`based component to string requires IncrementalDOM ` +
+						`implementation to be loaded.`);
+				}
+				// Incremental dom patches for components or nested components are
+				// isolated inside the component element. The following code intercepts
+				// incremental dom patches and collect results into temporary stack in
+				// order to successfully collect the final string of the outermost
+				// component after all nested components stack are rendered.
+				const interceptedComponentStrings = [];
+				const patch = IncrementalDOM.patch;
+				const patchInterceptor = function() {
+					let currentElement = patch.apply(null, arguments);
+					interceptedComponentStrings.push(currentElement.innerHTML);
+					IncrementalDOM.patch = patch;
+				};
+				IncrementalDOM.patch = patchInterceptor;
+				Component.render(Ctor, opt_config);
+				return interceptedComponentStrings[0];
+			}
+			default:
+				throw new Error(`Error. Trying to render non incremental dom ` +
+					`based component to string.`);
+		}
+	};
+
 	/**
 	 * Renders the component into the DOM via its `ComponentRenderer`. Stores the
 	 * given parent element to be used when the renderer is done (`informRendered`).

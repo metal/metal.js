@@ -544,6 +544,14 @@ describe('Component', function() {
 			assert.strictEqual('fooValue', comp.getInitialConfig().foo);
 		});
 
+		it('should throw error when rendering non-incremental-dom component via Component.renderToString', function() {
+			class NotIncrementalDomComponent extends Component {
+			}
+			assert.throws(function() {
+				Component.renderToString(NotIncrementalDomComponent);
+			});
+		});
+
 		it('should render component via Component.render without config', function() {
 			class CustomComponent extends Component {
 				constructor(...args) {

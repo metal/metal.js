@@ -444,11 +444,12 @@ class Component extends EventEmitter {
 
 	/**
 	 * Creates and renders a component for the given constructor function as
-	 * string. This will always make sure that the constructor runs without rendering the
-	 * component, having the `render` step happen only after it has finished.
+	 * string. This will always make sure that the constructor runs without
+	 * rendering the component, having the `render` step happen only after it
+	 * has finished.
 	 * @param {!function()} Ctor The component's constructor function.
-	 * @param {Object|Element=} opt_configOrElement Optional config data or parent
-	 *     for the component.
+	 * @param {Object|Element=} opt_configOrElement Optional config data or
+	 *     parent for the component.
 	 * @return {!String} The rendered component's content as string.
 	 */
 	static renderToString(Ctor, opt_config) {

@@ -1,6 +1,7 @@
 'use strict';
 
 import './incremental-dom';
+import './incremental-dom-string';
 import { getChanges, trackChanges } from './changes';
 import { clearData, getData } from './data';
 import { getOwner } from './children/children';

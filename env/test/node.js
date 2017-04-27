@@ -2,6 +2,7 @@ var assert = require('assert');
 var sinon = require('sinon');
 var lerna = require('../../lerna.json');
 
+process.env.NODE_ENV = 'test';
 global.assert = assert;
 global.sinon = sinon;
 global.METAL_VERSION = lerna.version;

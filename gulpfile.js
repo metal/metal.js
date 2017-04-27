@@ -13,6 +13,7 @@ var codeGlobs = [
 	'packages/metal*/test/**/*.js',
 	'!packages/metal*/**/*.soy.js',
 	'!packages/metal-incremental-dom/**/incremental-dom.js',
+	'!packages/metal-incremental-dom/**/incremental-dom-string.js',
 	'gulpfile.js',
 	'karma.conf.js',
 	'karma-coverage.conf.js'
@@ -28,6 +29,7 @@ metal.registerTasks({
 		// Since all files will be added, we need to ensure manually that these
 		// will be added first.
 		'packages/metal-incremental-dom/lib/incremental-dom.js',
+		'packages/metal-incremental-dom/lib/incremental-dom-string.js',
 
 		// Test files
 		'env/test/node.js',

@@ -1,6 +1,7 @@
 'use strict';
 
 import './incremental-dom';
+import './incremental-dom-string';
 
 /**
  * Gets the original incremental dom functions.

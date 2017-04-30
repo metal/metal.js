@@ -150,6 +150,16 @@ describe('dom', function() {
 			dom.toggleClasses(element, 'adipiscing elit lorem sit consectetur');
 			assert.strictEqual('ipsum dolor amet adipiscing elit consectetur', element.className);
 		});
+
+		it('should return false when checking if a classname with spaces exists', function() {
+			let el = document.createElement('div');
+			dom.addClasses(el, 'foo');
+			dom.addClasses(el, 'bar');
+			assert.strictEqual(dom.hasClass(el, 'foo'), true);
+			assert.strictEqual(dom.hasClass(el, 'bar'), true);
+			assert.strictEqual(dom.hasClass(el, 'foo bar'), false);
+			assert.strictEqual(dom.hasClass(el, 'bar foo'), false);
+		});
 	});
 
 	describe('contains', function() {

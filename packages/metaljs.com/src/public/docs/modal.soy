@@ -62,7 +62,7 @@
 class Modal extends JSXComponent {
 	/**
 	 * Renders the component's content. Note that data can be accessed via the
-	 * `config` property.
+	 * `props` property.
 	 */
 	render() &lbrace;
 		return &lt;div class="modal show"&gt;
@@ -72,10 +72,10 @@ class Modal extends JSXComponent {
 						&lt;button type="button" class="close"&gt;
 							&lt;span&gt;×&lt;/span&gt;
 						&lt;/button&gt;
-						&lt;h4&gt;{this.config.header}&lt;/h4&gt;
+						&lt;h4&gt;{this.props.header}&lt;/h4&gt;
 					&lt;/header&gt;
 					&lt;section class="modal-body"&gt;
-						{this.config.body}
+						{this.props.body}
 					&lt;/section&gt;
 					&lt;footer class="modal-footer"&gt;
 						&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;

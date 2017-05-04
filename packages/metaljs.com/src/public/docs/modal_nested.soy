@@ -81,11 +81,11 @@ export default CloseHeader;{/literal}
 				</textarea>
 				<textarea class="code hidden" data-mode="javascript">
 {literal}render() {
-	return &lt;header class={this.config.cssClass}&gt;
-		&lt;button onClick={this.config.onClick} type="button" class="close"&gt;
+	return &lt;header class={this.props.cssClass}&gt;
+		&lt;button onClick={this.props.onClick} type="button" class="close"&gt;
 			&lt;span&gt;×&lt;/span&gt;
 		&lt;/button&gt;
-		&lt;h4&gt;{this.config.title}&lt;/h4&gt;
+		&lt;h4&gt;{this.props.title}&lt;/h4&gt;
 	&lt;/header&gt;;
 }{/literal}
 				</textarea>
@@ -135,7 +135,7 @@ export default CloseHeader;{/literal}
 				<textarea class="code hidden" data-mode="javascript">
 {literal}render() {
 	var cssClass = 'modal';
-	if (this.shown) {
+	if (this.props.shown) {
 		cssClass += 'show';
 	}
 	return &lt;div class={cssClass}&gt;
@@ -144,10 +144,10 @@ export default CloseHeader;{/literal}
 				&lt;CloseHeader
 					cssClass="modal-header"
 					onClick={this.close.bind(this)}
-					title={this.header}
+					title={this.props.header}
 				/&gt;
 				&lt;section class="modal-body"&gt;
-					{this.body}
+					{this.props.body}
 				&lt;/section&gt;
 				&lt;footer class="modal-footer"&gt;
 					&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;

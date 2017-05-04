@@ -59,11 +59,21 @@ export default MyComponent;{/literal}
 
 class MyComponent extends JSXComponent {
 	render() {
-		return &lt;div class={this.config.cssClass}&gt;
-			Hello {this.name}
-		&lt;/div&gt;;
+		return (
+			&lt;div&gt;
+				Hello {this.state.name}
+				Hello {this.props.location}
+			&lt;/div&gt;;
+		);
 	}
 }
+
+MyComponent.PROPS = {
+	location: {
+		validator: core.isString,
+		value: 'Mars'
+	}
+};
 
 MyComponent.STATE = {
 	name: {
@@ -77,21 +87,21 @@ export default MyComponent;{/literal}
 
 		<p>
 			Note that your component can have two different types of
-			data: <a href="/docs/state.html">state</a> and <a href="/docs/state.html#config">config</a>.
-			The main difference is that config is accessed
-			via <code>this.config</code> and will be the original data received from
-			parent components or the constructor. State is accessed directly
-			from <code>this</code> though, like <code>this.name</code> in the previous
+			data: <a href="/docs/state.html">state</a> and <a href="/docs/state.html#config">props</a>.
+			The main difference is that props is accessed
+			via <code>this.props</code> and will be the original data received from
+			parent components or the constructor. State is accessed
+			from <code>this.state</code> though, like <code>this.state.name</code> in the previous
 			example, and can be configured to use validators, setters, initial values
 			and other features. Check out the guide
 			about <a href="/docs/state.html">state</a> to learn more about this.
 		</p>
 
-		<h2>Children config</h2>
+		<h2>Children props</h2>
 
 		<p>
 			Whenever content is passed inside a component's jsx tag, it will be
-			received through the <code>children</code> config property. That way the
+			received through the <code>children</code> props property. That way the
 			component can decide if this content will be rendered at all, and where
 			exactly it should go.
 		</p>
@@ -110,19 +120,19 @@ export default MyComponent;{/literal}
 		</textarea>
 
 		<p>
-			This could be implemented by using the <code>children</code> config:
+			This could be implemented by using the <code>children</code> props:
 		</p>
 
 		<textarea class="code" data-mode="javascript">
 {literal}class List extends JSXComponent {
   render() {
-    return &lt;ul&gt;{this.config.children}&lt;/ul&gt;
+    return &lt;ul&gt;{this.props.children}&lt;/ul&gt;
   }
 }{/literal}
 		</textarea>
 
 		<p>
-			If you inspect <code>this.config.children</code> you'll notice that it's
+			If you inspect <code>this.props.children</code> you'll notice that it's
 			an array of objects. That gives you a lot of power when handling your
 			component's contents. For example, you can choose to render only part of
 			your children, like this:
@@ -130,17 +140,17 @@ export default MyComponent;{/literal}
 
 		<textarea class="code" data-mode="javascript">
 {literal}// Renders only the second item.
-return &lt;ul&gt;{this.config.children[1]}&lt;/ul&gt;{/literal}
+return &lt;ul&gt;{this.props.children[1]}&lt;/ul&gt;{/literal}
 		</textarea>
 
 		<p>Or even change the data that they should receive before being rendered:</p>
 
 		<textarea class="code" data-mode="javascript">
 {literal}// Forces all items to use the 'my-list-item-class' css class.
-this.config.children.forEach(child => {
+this.props.children.forEach(child => {
   child.class = 'my-list-item-class';
 };
-return &lt;ul&gt;{this.config.children}&lt;/ul&gt;{/literal}
+return &lt;ul&gt;{this.props.children}&lt;/ul&gt;{/literal}
 		</textarea>
 
 		<h2>Functional components</h2>
@@ -173,7 +183,7 @@ var Button = ({ cssClass, label }) => {
 		</p>
 
 		<textarea class="code" data-mode="javascript">
-{literal}&lt;Button cssClass="btn btn-primary" label="OK" /&gt;{/literal}
+{literal}&lt;Button class="btn btn-primary" label="OK" /&gt;{/literal}
 		</textarea>
 
 		<h2>Rendering JSX Components</h2>
@@ -198,7 +208,7 @@ JSXComponent.render(Button, {label: 'OK'}, parent);{/literal}
 		</p>
 
 		<textarea class="code" data-mode="javascript">
-{literal}var Button = config => {
+{literal}var Button = props => {
   // Your render logic
 };
 JSXComponent.render(Button, {label: 'OK'}, parent);{/literal}

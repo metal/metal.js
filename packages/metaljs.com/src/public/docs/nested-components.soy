@@ -41,7 +41,7 @@
 &lt;/div&gt;{/literal}
 				</textarea>
 				<textarea class="code hidden" data-mode="javascript">
-{literal}var buttons = this.config.buttons.map(button => {
+{literal}var buttons = this.props.buttons.map(button => {
   return &lt;Button label={button} /&gt;;
 });
 return &lt;div class="footer"&gt;{buttons}&lt;/div&gt;;{/literal}
@@ -75,7 +75,7 @@ return &lt;div class="footer"&gt;{buttons}&lt;/div&gt;;{/literal}
 &lbrace;/foreach&rbrace;{/literal}
 				</textarea>
 				<textarea class="code hidden" data-mode="javascript">
-{literal}var buttons = this.config.buttons.map((button, index) => {
+{literal}var buttons = this.props.buttons.map((button, index) => {
   return &lt;Button label={button} ref={'button' + index} /&gt;;
 });{/literal}
 				</textarea>
@@ -84,12 +84,12 @@ return &lt;div class="footer"&gt;{buttons}&lt;/div&gt;;{/literal}
 
 		<p>
 			Now you'll be able to access your sub components through
-			your instance's <code>components</code> property, like this:
+			your instance's <code>refs</code> property, like this:
 		</p>
 
 		<textarea class="code" data-mode="javascript">{literal}
-modal.components.button0 // The instance for first button
-modal.components.button1 // The instance for second button{/literal}</textarea>
+modal.refs.button0 // The instance for first button
+modal.refs.button1 // The instance for second button{/literal}</textarea>
 	{/param}
 {/call}
 {/template}

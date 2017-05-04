@@ -87,11 +87,11 @@
 				</textarea>
 				<textarea class="code hidden" data-mode="javascript">
 {literal}/**
- * State properties are accessed directly from `this`.
+ * State properties are accessed from `this.state`.
  */
 render() &lbrace;
 	var cssClass = 'modal';
-	if (this.shown) {
+	if (this.state.shown) {
 		cssClass += 'show';
 	}
 	return &lt;div class={cssClass}&gt;
@@ -109,12 +109,21 @@ render() &lbrace;
 			state property.
 		</p>
 
-		<textarea class="code" data-mode="javascript">
-			{literal}close() {
+		{call codeTabs.main}
+			{param tabs: ['Soy: src/Modal.soy', 'JSX: src/Modal.js'] /}
+			{param content kind="html"}
+				<textarea class="code" data-mode="javascript">
+{literal}close() {
   this.shown = false;
 }{/literal}
-		</textarea>
-
+				</textarea>
+				<textarea class="code hidden" data-mode="javascript">
+{literal}close() {
+  this.state.shown = false;
+}{/literal}
+				</textarea>
+				{/param}
+			{/call}
 		<p>
 			State changes are automatically detected by <code>Metal.js</code>, causing
 			the component to be rerendered. Since <code>Metal.js</code>
@@ -141,7 +150,7 @@ render() &lbrace;
 		</p>
 
 		<p>
-			First let's hold the <code>Modal</code> instance somewhere so we can
+			First let's hold the <code>Modal(jsx)</code> instance somewhere so we can
 			access it:
 		</p>
 
@@ -187,13 +196,16 @@ render() &lbrace;
 			<li>
 				<p>
 					If you're using JSX templates, change the calls
-					to <code>this.config</code> to call directly
-					from <code>this</code> instead, like this:
+					to <code>this.props</code> from <code>this</code>
+					instead. You will also need to change your config from
+					<code>{literal}Modal.STATE = {...}{/literal}</code> to
+					<code>{literal}Modal.PROPS = {...}{/literal}</code>
+					like this:
 				</p>
 				<textarea class="code" data-mode="javascript">
 {literal}render() &lbrace;
 	var cssClass = 'modal';
-	if (this.shown) {
+	if (this.props.shown) {
 		cssClass += 'show';
 	}
 	return &lt;div class={cssClass}&gt;
@@ -203,10 +215,10 @@ render() &lbrace;
 					&lt;button onClick={this.close.bind(this)} type="button" class="close"&gt;
 						&lt;span&gt;×&lt;/span&gt;
 					&lt;/button&gt;
-					&lt;h4&gt;{this.header}&lt;/h4&gt;
+					&lt;h4&gt;{this.props.header}&lt;/h4&gt;
 				&lt;/header&gt;
 				&lt;section class="modal-body"&gt;
-					{this.body}
+					{this.props.body}
 				&lt;/section&gt;
 				&lt;footer class="modal-footer"&gt;
 					&lt;button type="button" class="btn btn-primary"&gt;OK&lt;/button&gt;
@@ -214,13 +226,24 @@ render() &lbrace;
 			&lt;/div&gt;
 		&lt;/div&gt;
 	&lt;/div&gt;;
-}{/literal}
+}
+Modal.PROPS = {
+	body: {
+		value: 'Default body'
+	},
+	header: {
+		value: 'Default header'
+	},
+	shown: {
+		value: true
+	}
+};{/literal}
 				</textarea>
 			</li>
 		</ol>
 
 		<p>
-			Now if you type something like <code>modal.header = 'New Header'</code> on
+			Now if you type something like <code>modal.props.header = 'New Header'</code> on
 			the console, the contents will also be updated automatically.
 		</p>
 

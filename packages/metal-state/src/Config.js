@@ -28,59 +28,77 @@ import validators from './validators';
  */
 const Config = {
 	/**
+	* An object that contains a validator function.
+	* @typedef {!Object} ConfigWithValidator
+	*/
+
+	/**
 	 * Function that creates `State` object with an `any` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	any: setPrimitiveValidators('any'),
 
 	/**
 	 * Function that creates `State` object with an `array` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	array: setPrimitiveValidators('array'),
 
 	/**
 	 * Function that creates `State` object with an `arrayOf` validator.
+	 * @param {ConfigWithValidator} stateConfig `State` configuration object
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	arrayOf: setNestedValidators('arrayOf'),
 
 	/**
 	 * Function that creates `State` object with a `bool` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	bool: setPrimitiveValidators('bool'),
 
 	/**
 	 * Function that creates `State` object with a `func` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	func: setPrimitiveValidators('func'),
 
 	/**
 	 * Function that creates `State` object with an `instanceOf` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	instanceOf: setExplicitValueValidators('instanceOf'),
 
 	/**
 	 * Function that creates `State` object with a `number` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	number: setPrimitiveValidators('number'),
 
 	/**
 	 * Function that creates `State` object with an `object` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	object: setPrimitiveValidators('object'),
 
 	/**
 	 * Function that creates `State` object with an `objectOf` validator.
+	 * @param {ConfigWithValidator} stateConfig `State` configuration object
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	objectOf: setNestedValidators('objectOf'),
 
 	/**
 	 * Function that creates `State` object with an `oneOf` validator.
+	 * @param {!Array} values `State` configuration object
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	oneOf: setExplicitValueValidators('oneOf'),
 
 	/**
 	 * Creates `State` configuration object with an `oneOfType` validator.
-	 * @param {!Array} validatorArray Array of `State` configuration objects.
-	 * @return {!Object} `State` configuration object.
+	 * @param {ConfigWithValidator[]} validatorArray Array of `State` configuration objects.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	oneOfType(validatorArray) {
 		validatorArray = validatorArray.map(
@@ -92,8 +110,8 @@ const Config = {
 
 	/**
 	 * Creates `State` configuration object with a `shapeOf` validator.
-	 * @param {!Object} shapeObj Values being `State` configuration objects.
-	 * @return {!Object} `State` configuration object.
+	 * @param {!Object.<string, ConfigWithValidator>} shapeObj Values being `State` configuration objects.
+	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
 	shapeOf(shapeObj) {
 		shapeObj = destructShapeOfConfigs(shapeObj);
@@ -101,6 +119,10 @@ const Config = {
 		return this.validator(validators.shapeOf(shapeObj));
 	},
 
+	/**
+	 * Function that creates `State` object with an `string` validator.
+	 * @return {ConfigWithValidator} `State` configuration object.
+	 */
 	string: setPrimitiveValidators('string'),
 
 	/**

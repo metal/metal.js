@@ -80,6 +80,22 @@ describe('Config', function() {
 		}, config.config);
 	});
 
+	it('should return config with "any" validator from "validators"', function() {
+		var config = Config.any();
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator(10));
+		assert.ok(config.config.validator('test'));
+	});
+
+	it('should return config with "array" validator from "validators"', function() {
+		var config = Config.array();
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator(['one']));
+		assert.ok(config.config.validator(10) instanceof Error);
+	});
+
 	it('should return config with "arrayOf" validator from "validators"', function() {
 		var config = Config.arrayOf(Config.number());
 		assert.ok(core.isObject(config));
@@ -87,6 +103,22 @@ describe('Config', function() {
 		assert.ok(config.config.validator([1, 2]));
 		assert.ok(config.config.validator([1, 'one']) instanceof Error);
 		assert.ok(config.config.validator(['one']) instanceof Error);
+	});
+
+	it('should return config with "bool" validator from "validators"', function() {
+		var config = Config.bool();
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator(true));
+		assert.ok(config.config.validator(10) instanceof Error);
+	});
+
+	it('should return config with "func" validator from "validators"', function() {
+		var config = Config.func();
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator(function() {}));
+		assert.ok(config.config.validator(10) instanceof Error);
 	});
 
 	it('should return config with "instanceOf" validator from "validators"', function() {
@@ -110,6 +142,22 @@ describe('Config', function() {
 		assert.ok(config.config.validator('test') instanceof Error);
 	});
 
+	it('should return config with "object" validator from "validators"', function() {
+		var config = Config.object();
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator({}));
+		assert.ok(config.config.validator('test') instanceof Error);
+	});
+
+	it('should return config with "objectOf" validator from "validators"', function() {
+		var config = Config.objectOf(Config.number());
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator({foo: 1}));
+		assert.ok(config.config.validator({foo: 'test'}) instanceof Error);
+	});
+
 	it('should return config with "oneOf" validator from "validators"', function() {
 		var config = Config.oneOf([1, 'one']);
 		assert.ok(core.isObject(config));
@@ -117,6 +165,24 @@ describe('Config', function() {
 		assert.ok(config.config.validator(1));
 		assert.ok(config.config.validator('one'));
 		assert.ok(config.config.validator(2) instanceof Error);
+		assert.ok(config.config.validator(false) instanceof Error);
+
+		var config = Config.oneOf([1, 'one']).required();
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator(1));
+		assert.ok(config.config.validator('one'));
+		assert.ok(config.config.validator(2) instanceof Error);
+		assert.ok(config.config.validator(false) instanceof Error);
+	});
+
+	it('should return config with "oneOfType" validator from "validators"', function() {
+		var config = Config.oneOfType([Config.string(), Config.number()]);
+		assert.ok(core.isObject(config));
+		assert.ok(core.isFunction(config.config.validator));
+		assert.ok(config.config.validator(1));
+		assert.ok(config.config.validator('one'));
+		assert.ok(config.config.validator({}) instanceof Error);
 		assert.ok(config.config.validator(false) instanceof Error);
 	});
 

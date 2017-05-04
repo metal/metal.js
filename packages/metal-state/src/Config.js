@@ -110,12 +110,82 @@ function mergeConfig(context, config) {
 	return obj;
 }
 
-// Add all validators to `Config`.
-const fnNames = Object.keys(validators);
-fnNames.forEach(
-	name => Config[name] = function() {
+/**
+ * Adds primitive type validators to the config object.
+ * @param {string} name The name of the validator.
+ */
+function setPrimitiveValidators(name) {
+	Config[name] = function() {
 		return this.validator(validators[name]);
-	}
-);
+	};
+}
+
+setPrimitiveValidators('any');
+setPrimitiveValidators('array');
+setPrimitiveValidators('bool');
+setPrimitiveValidators('func');
+setPrimitiveValidators('number');
+setPrimitiveValidators('object');
+setPrimitiveValidators('string');
+
+/**
+ * Calls validators with a single nested config.
+ * @param {string} name The name of the validator.
+ */
+function setNestedValidators(name) {
+	Config[name] = function(arg) {
+		return this.validator(validators[name](arg.config.validator));
+	};
+}
+
+setNestedValidators('arrayOf');
+setNestedValidators('objectOf');
+
+/**
+ * Calls validators with provided argument.
+ * @param {string} name The name of the validator.
+ */
+function setExplicitValueValidators(name) {
+	Config[name] = function(arg) {
+		return this.validator(validators[name](arg));
+	};
+}
+
+setExplicitValueValidators('instanceOf');
+setExplicitValueValidators('oneOf');
+
+Config.oneOfType = function(validatorArray) {
+	validatorArray = validatorArray.map(
+		item => item.config.validator
+	);
+
+	return this.validator(validators.oneOfType(validatorArray));
+};
+
+/**
+ * Recursively sets validators for shapeOf.
+ * @param {!Object} shape The shape of specific types.
+ */
+function destructShapeOfConfigs(shape) {
+	const keys = Object.keys(shape);
+
+	const retShape = {};
+
+	keys.forEach(
+		key => {
+			const value = shape[key];
+
+			retShape[key] = value.config && value.config.validator ? value.config.validator : destructShapeOfConfigs(value);
+		}
+	);
+
+	return retShape;
+}
+
+Config.shapeOf = function(shapeObj) {
+	shapeObj = destructShapeOfConfigs(shapeObj);
+
+	return this.validator(validators.shapeOf(shapeObj));
+};
 
 export default Config;

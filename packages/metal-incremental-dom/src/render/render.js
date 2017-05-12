@@ -8,7 +8,7 @@ import { domData } from 'metal-dom';
 import { getData } from '../data';
 import { getCompatibilityModeData, getUid, isDef, isDefAndNotNull, isFunction, isString, object } from 'metal';
 import { disposeUnused, schedule } from '../cleanup/unused';
-import { getOriginalFn, startInterception, stopInterception } from '../IncrementalDomAop';
+import { getOriginalFn, startInterception, stopInterception } from '../incremental-dom-aop';
 import { Component, ComponentRegistry } from 'metal-component';
 
 const renderingComponents_ = [];

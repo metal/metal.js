@@ -2,7 +2,7 @@
 
 import { buildCallFromConfig, buildConfigFromCall } from '../callArgs';
 import { isDef } from 'metal';
-import { startInterception, stopInterception } from '../IncrementalDomAop';
+import { startInterception, stopInterception } from '../incremental-dom-aop';
 
 /**
  * Property identifying a specific object as a Metal.js child node, and

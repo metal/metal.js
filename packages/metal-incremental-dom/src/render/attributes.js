@@ -2,7 +2,7 @@
 
 import { delegate } from 'metal-dom';
 import { getComponentFn } from 'metal-component';
-import { getOriginalFn } from '../intercept';
+import { getOriginalFn } from '../IncrementalDomAop';
 import { isBoolean, isDefAndNotNull, isString } from 'metal';
 
 const HANDLE_SUFFIX = '__handle__';

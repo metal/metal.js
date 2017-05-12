@@ -2,9 +2,9 @@
 
 import core from 'metal';
 import dom from 'metal-dom';
-import { getOriginalFns, startInterception, stopInterception } from '../src/IncrementalDomAop';
+import { getOriginalFns, startInterception, stopInterception } from '../src/incremental-dom-aop';
 
-describe('IncrementalDomAop', function() {
+describe('incremental-dom-aop', function() {
 	var element;
 
 	beforeEach(function() {

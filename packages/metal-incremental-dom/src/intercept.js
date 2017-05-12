@@ -3,7 +3,7 @@
  * of the `metal-incremental-dom` package. It is kept for compatibility purposes
  * only in case it is being used from the outside.
  *
- * This module has been moved over to the `IncrementalDomAop` module to prevent
+ * This module has been moved over to the `incremental-dom-aop` module to prevent
  * different blocker extensions such as uBlock Origin from blocking the request.
  *
  * @See https://github.com/metal/metal.js/issues/228 for more information

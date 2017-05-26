@@ -3,6 +3,7 @@
 import './iDOMHelpers';
 import { validators, Config } from 'metal-state';
 import Component from 'metal-component';
+import DangerouslySetHTML from './DangerouslySetHTML';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXDataManager from './JSXDataManager';
 import JSXRenderer from './JSXRenderer';
@@ -38,4 +39,4 @@ JSXComponent.DATA_MANAGER = JSXDataManager;
 JSXComponent.RENDERER = JSXRenderer;
 
 export default JSXComponent;
-export { validators, Config, JSXComponent };
+export { DangerouslySetHTML, validators, Config, JSXComponent };

@@ -306,6 +306,101 @@ describe('JSXComponent', function() {
 				done();
 			});
 		});
+
+		it('component.element and child.element should be the same', function() {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <div class="child"></div>;
+				}
+			}
+
+			class ParentComponent extends JSXComponent {
+				render() {
+					return <ChildComponent ref="child" />;
+				}
+			}
+
+			component = new ParentComponent();
+			var child = component.refs.child;
+			assert.strictEqual(component.element, child.element);
+		});
+
+		it('should receive elementClasses from parent component', function() {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <div class="child"></div>;
+				}
+			}
+
+			class ParentComponent extends JSXComponent {
+				render() {
+					return <ChildComponent />;
+				}
+			}
+
+			component = new ParentComponent({elementClasses: 'foo'});
+			assert.ok(dom.hasClass(component.element, 'child'));
+			assert.ok(dom.hasClass(component.element, 'foo'));
+		});
+
+		it('should not apply undefined class', function() {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <div class="child"></div>;
+				}
+			}
+
+			class ParentComponent extends JSXComponent {
+				render() {
+					return <ChildComponent />;
+				}
+			}
+
+			component = new ParentComponent({elementClasses: undefined});
+			assert.strictEqual(component.element.className, 'child');
+		});
+
+		it('should not create duplicate classes', function() {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <div class="child"></div>;
+				}
+			}
+
+			class ParentComponent extends JSXComponent {
+				render() {
+					return <ChildComponent />;
+				}
+			}
+
+			component = new ParentComponent({elementClasses: 'child'});
+			assert.strictEqual(component.element.className, 'child');
+		});
+
+		it('should pass elementClasses through higher order components', function() {
+			class GrandChildComponent extends JSXComponent {
+				render() {
+					return <div class="grandchild"></div>;
+				}
+			}
+
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <GrandChildComponent elementClasses="child" />;
+				}
+			}
+
+			class ParentComponent extends JSXComponent {
+				render() {
+					return <ChildComponent elementClasses="parent" />;
+				}
+			}
+
+			component = new ParentComponent({elementClasses: 'foo'});
+			assert.ok(dom.hasClass(component.element, 'child'));
+			assert.ok(dom.hasClass(component.element, 'parent'));
+			assert.ok(dom.hasClass(component.element, 'grandchild'));
+		});
 	});
 
 	describe('shouldUpdate', function() {

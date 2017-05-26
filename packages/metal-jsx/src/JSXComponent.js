@@ -1,6 +1,7 @@
 'use strict';
 
 import './iDOMHelpers';
+import { object } from 'metal';
 import { validators, Config } from 'metal-state';
 import Component from 'metal-component';
 import DangerouslySetHTML from './DangerouslySetHTML';
@@ -32,6 +33,26 @@ class JSXComponent extends Component {
 	 */
 	static render(...args) {
 		return IncrementalDomRenderer.render(...args);
+	}
+
+	/**
+	 * Returns props that are not used or declared in the component.
+	 * @return {Object} Object containing props
+	 */
+	otherProps() {
+		const removeKeys = [...this.getDataManager().getPropsInstance(this).getStateKeys(), 'key', 'ref'];
+
+		const retObj = object.mixin({}, this.props);
+
+		for (let i = 0; i < removeKeys.length; i++) {
+			const key = removeKeys[i];
+
+			if (retObj.hasOwnProperty(key)) {
+				delete retObj[key];
+			}
+		}
+
+		return retObj;
 	}
 }
 

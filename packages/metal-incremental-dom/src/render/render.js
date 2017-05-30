@@ -463,6 +463,18 @@ export function renderFunction(renderer, fnOrCtor, opt_dataOrElement, opt_parent
 function renderSubComponent_(tagOrCtor, config, opt_owner) {
 	const parent = getComponentBeingRendered();
 	const owner = opt_owner || parent;
+
+	const parentData = getData(parent);
+	const parentConfig = parentData.config;
+	if (!parentData.rootElementReached && parentConfig && isString(parentConfig.elementClasses)) {
+		let currentClasses = '';
+		if (isString(config.elementClasses)) {
+			currentClasses = `${config.elementClasses} `;
+		}
+
+		config.elementClasses = currentClasses + parentConfig.elementClasses;
+	}
+
 	const comp = getSubComponent_(tagOrCtor, config, owner);
 	updateContext_(comp, parent);
 
@@ -470,7 +482,6 @@ function renderSubComponent_(tagOrCtor, config, opt_owner) {
 	data.parent = parent;
 	data.owner = owner;
 
-	const parentData = getData(parent);
 	getChildComponents_(parentData).push(comp);
 	if (!config.key && !parentData.rootElementReached) {
 		config.key = parentData.config.key;

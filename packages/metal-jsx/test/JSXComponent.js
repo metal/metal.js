@@ -431,4 +431,60 @@ describe('JSXComponent', function() {
 			});
 		});
 	});
+
+	describe('otherProps', function() {
+		var component;
+
+		afterEach(function() {
+			if (component) {
+				component.dispose();
+			}
+		});
+
+		it('should return object', function() {
+			class TestComponent extends JSXComponent {
+				render() {
+					return <div />;
+				}
+			}
+
+			component = new TestComponent();
+
+			assert.deepEqual(component.otherProps(), {});
+		});
+
+		it('should pass through unspecified props', function() {
+			class TestComponent extends JSXComponent {
+				render() {
+					return <div />;
+				}
+			}
+
+			TestComponent.PROPS = {
+				foo: {},
+			};
+
+			component = new TestComponent({baz: 'qux', foo: 'bar'});
+
+			assert.deepEqual(
+				component.otherProps(),
+				{baz: 'qux'}
+			);
+		});
+
+		it('should ignore key and ref', function() {
+			class TestComponent extends JSXComponent {
+				render() {
+					return <div />;
+				}
+			}
+
+			component = new TestComponent({key: 'bar', ref: 'qux'});
+
+			assert.deepEqual(
+				component.otherProps(),
+				{}
+			);
+		});
+	});
 });

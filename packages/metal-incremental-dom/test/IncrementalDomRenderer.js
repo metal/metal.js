@@ -70,7 +70,8 @@ describe('IncrementalDomRenderer', function() {
 		it('should render incremental-dom based components via Component.renderToString', function() {
 			class TestComponent extends Component {
 				render() {
-					IncDom.elementOpen('span', null, null, 'foo', 'foo');
+					IncDom.elementOpenStart('span', 'key');
+					IncDom.elementOpenEnd();
 					IncDom.text(this.attr);
 					IncDom.elementClose('span');
 				}
@@ -81,7 +82,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			let string = Component.renderToString(TestComponent, {attr: 'bar'});
-			assert.strictEqual('<span foo="foo">bar</span>', string);
+			assert.strictEqual('<span>bar</span>', string);
 		});
 
 		it('should render custom content inside given element', function() {

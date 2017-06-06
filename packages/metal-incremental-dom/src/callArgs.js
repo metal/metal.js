@@ -28,7 +28,7 @@ export function buildCallFromConfig(tag, config) {
 	const call = [tag, config.key, []];
 	const keys = Object.keys(config);
 	for (let i = 0; i < keys.length; i++) {
-		if (keys[i] !== 'children') {
+		if (keys[i] !== 'children' && keys[i] !== 'key') {
 			call.push(keys[i], config[keys[i]]);
 		}
 	}

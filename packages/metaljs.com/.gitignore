@@ -1,5 +1,2 @@
-.publish/
-.sass-cache/
-dist/
-node_modules/
-src/public/vendor/
+node_modules
+dist

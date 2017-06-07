@@ -351,6 +351,9 @@ function hasClassWithNative_(element, className) {
  * @private
  */
 function hasClassWithoutNative_(element, className) {
+	if (className.indexOf(' ') >= 0) {
+		throw new Error(`White spaces are not allowed. ('${className}')`);
+	}
 	return (` ${element.className} `).indexOf(` ${className} `) >= 0;
 }
 

@@ -8,8 +8,8 @@
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "jsnext:main": "src/JSXComponent.js",
-  "main": "lib/JSXComponent.js",
+  "jsnext:main": "src/all/jsx.js",
+  "main": "lib/all/jsx.js",
   "files": [
     "lib",
     "src"

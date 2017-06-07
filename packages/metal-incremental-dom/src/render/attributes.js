@@ -47,13 +47,9 @@ function attachEvent_(component, element, attr, eventName, fn) {
 		element[handleKey].removeListener();
 		element[handleKey] = null;
 	}
-
-	element[attr] = fn;
-	const elementAttrName = `data-on${eventName.toLowerCase()}`;
 	if (fn) {
+		element[attr] = fn;
 		element[handleKey] = delegate(document, eventName, element, fn);
-	} else {
-		element.removeAttribute(elementAttrName);
 	}
 }
 

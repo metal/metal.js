@@ -51,10 +51,6 @@ function attachEvent_(component, element, attr, eventName, fn) {
 	element[attr] = fn;
 	const elementAttrName = `data-on${eventName.toLowerCase()}`;
 	if (fn) {
-		if (fn.givenAsName_) {
-			// Listeners given by name should show up in the dom element.
-			element.setAttribute(elementAttrName, fn.givenAsName_);
-		}
 		element[handleKey] = delegate(document, eventName, element, fn);
 	} else {
 		element.removeAttribute(elementAttrName);
@@ -96,8 +92,9 @@ function convertListenerNameToFn_(component, name, value) {
 		const eventName = getEventFromListenerAttr_(name);
 		if (eventName) {
 			const fn = getComponentFn(component, value);
-			fn.givenAsName_ = value;
-			return fn;
+			if (fn) {
+				return fn;
+			}
 		}
 	}
 	return value;

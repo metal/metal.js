@@ -1,5 +1,6 @@
 'use strict';
 
+import {isFunction} from 'metal';
 import { applyAttribute, convertListenerNamesToFns } from '../../src/render/attributes';
 import dom from 'metal-dom';
 import Component from 'metal-component';
@@ -61,7 +62,7 @@ describe('attributes', function() {
 			};
 
 			convertListenerNamesToFns(component, config);
-			assert.strictEqual('handleClick', config['data-onclick'].givenAsName_);
+			assert.ok(isFunction(config['data-onclick']));
 		});
 
 		it('should attach listeners functions passed to "data-on<eventname>" attributes', function() {
@@ -110,28 +111,6 @@ describe('attributes', function() {
 
 			applyAttribute(component, element, 'onClick', listener);
 			assert.ok(!element.hasAttribute('data-onclick'));
-			assert.ok(!element.hasAttribute('onClick'));
-			assert.ok(!element.hasAttribute('onclick'));
-		});
-
-		it('should set attribute for listener references with "givenAsName_" on elements', function() {
-			class TestComponent extends Component {
-			}
-			component = new TestComponent();
-
-			const element = document.createElement('div');
-			dom.enterDocument(element);
-			const listener = sinon.stub();
-			listener.givenAsName_ = 'handleClick';
-
-			applyAttribute(component, element, 'data-onclick', listener);
-			assert.equal('handleClick', element.getAttribute('data-onclick'));
-			assert.ok(!element.hasAttribute('onClick'));
-			assert.ok(!element.hasAttribute('onclick'));
-
-			listener.givenAsName_ = 'handleClick2';
-			applyAttribute(component, element, 'onClick', listener);
-			assert.equal('handleClick2', element.getAttribute('data-onclick'));
 			assert.ok(!element.hasAttribute('onClick'));
 			assert.ok(!element.hasAttribute('onclick'));
 		});

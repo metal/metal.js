@@ -55,7 +55,11 @@ describe('incremental-dom-aop', function() {
 			});
 			stopInterception();
 
-			IncrementalDOM.patch(element, () => IncrementalDOM.elementOpen('div'));
+			IncrementalDOM.patch(element, () => {
+				IncrementalDOM.elementOpen('div');
+				IncrementalDOM.elementClose('div');
+			});
+
 			assert.strictEqual(0, fn.callCount);
 		});
 	});
@@ -121,7 +125,8 @@ describe('incremental-dom-aop', function() {
 
 			IncrementalDOM.patch(element, () => {
 				IncrementalDOM.elementOpenStart('div');
-				IncrementalDOM.elementOpenEnd('div');
+				IncrementalDOM.elementOpenEnd();
+				IncrementalDOM.elementClose('div');
 			});
 			assert.strictEqual(0, fn.callCount);
 		});

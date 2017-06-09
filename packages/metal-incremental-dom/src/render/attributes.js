@@ -17,10 +17,6 @@ const LISTENER_REGEX = /^(?:on([A-Z].+))|(?:data-on(.+))$/;
  * @param {*} value
  */
 export function applyAttribute(component, element, name, value) {
-	if (isServerSide()) {
-		return;
-	}
-
 	const eventName = getEventFromListenerAttr_(name);
 	if (eventName) {
 		attachEvent_(component, element, name, eventName, value);
@@ -47,6 +43,9 @@ export function applyAttribute(component, element, name, value) {
  * @private
  */
 function attachEvent_(component, element, attr, eventName, fn) {
+	if (isServerSide()) {
+		return;
+	}
 	const handleKey = eventName + HANDLE_SUFFIX;
 	if (element[handleKey]) {
 		element[handleKey].removeListener();
@@ -142,6 +141,9 @@ function getEventFromListenerAttr_(attr) {
  * @private
  */
 function setBooleanAttr_(element, name, value) {
+	if (isServerSide()) {
+		return;
+	}
 	element[name] = value;
 	if (value) {
 		element.setAttribute(name, '');
@@ -164,6 +166,9 @@ function setBooleanAttr_(element, name, value) {
  * @private
  */
 function setValueAttrAsProperty_(element, name, value) {
+	if (isServerSide()) {
+		return;
+	}
 	if (name === 'value' && element.value !== value) {
 		element[name] = value;
 	}

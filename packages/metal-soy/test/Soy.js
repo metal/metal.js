@@ -7,6 +7,7 @@ import { ComputedData as ComputedDataComponent } from './assets/ComputedData.soy
 import { ExternalTemplate as ExternalTemplateComponent } from './assets/ExternalTemplate.soy.js';
 import { Functions as FunctionsComponent } from './assets/Functions.soy.js';
 import { HelloWorld as HelloWorldComponent, templates as helloWorldTemplates } from './assets/HelloWorld.soy.js';
+import { HigherOrder as HigherOrderComponent } from './assets/HigherOrder.soy.js';
 import { HtmlContent as HtmlContentComponent } from './assets/HtmlContent.soy.js';
 import { IJData as IJDataComponent } from './assets/IJData.soy.js';
 import { Nested as NestedComponent } from './assets/Nested.soy.js';
@@ -15,6 +16,7 @@ import { NestedLevels as NestedLevelsComponent } from './assets/NestedLevels.soy
 import { NestedMultiple as NestedMultipleComponent } from './assets/NestedMultiple.soy.js';
 import { NestedNoData as NestedNoDataComponent } from './assets/NestedNoData.soy.js';
 import { TemplateData as TemplateDataComponent } from './assets/TemplateData.soy.js';
+
 import Soy from '../src/Soy';
 
 describe('Soy', function() {
@@ -59,6 +61,12 @@ describe('Soy', function() {
 				assert.strictEqual('Hello Bar!', comp.element.textContent);
 				done();
 			});
+		});
+
+		it('should pass elementClasses for higher order components', function() {
+			comp = new HigherOrderComponent({elementClasses: 'parent'});
+			assert.ok(dom.hasClass(comp.element, 'child'));
+			assert.ok(dom.hasClass(comp.element, 'parent'));
 		});
 
 		describe('Should Update', function() {

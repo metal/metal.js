@@ -288,6 +288,26 @@ function handleSubComponentCall_(...args) {
 }
 
 /**
+ * Passes down elementClasses to a child component if the parent component
+ * returns another component at the top level (HOC).
+ * @param {*} parent The parent component
+ * @param {*} config The config of the subcomponent
+ */
+function inheritElementClasses_(parent, config) {
+	const parentData = getData(parent);
+	const parentConfig = parentData.config;
+
+	if (!parentData.rootElementReached && parentConfig && isString(parentConfig.elementClasses)) {
+		let currentClasses = '';
+		if (isString(config.elementClasses)) {
+			currentClasses = `${config.elementClasses} `;
+		}
+
+		config.elementClasses = currentClasses + parentConfig.elementClasses;
+	}
+}
+
+/**
  * Checks if the given tag represents a metal component.
  * @param {string} tag
  * @return {boolean}
@@ -464,16 +484,7 @@ function renderSubComponent_(tagOrCtor, config, opt_owner) {
 	const parent = getComponentBeingRendered();
 	const owner = opt_owner || parent;
 
-	const parentData = getData(parent);
-	const parentConfig = parentData.config;
-	if (!parentData.rootElementReached && parentConfig && isString(parentConfig.elementClasses)) {
-		let currentClasses = '';
-		if (isString(config.elementClasses)) {
-			currentClasses = `${config.elementClasses} `;
-		}
-
-		config.elementClasses = currentClasses + parentConfig.elementClasses;
-	}
+	inheritElementClasses_(parent, config)
 
 	const comp = getSubComponent_(tagOrCtor, config, owner);
 	updateContext_(comp, parent);
@@ -482,6 +493,7 @@ function renderSubComponent_(tagOrCtor, config, opt_owner) {
 	data.parent = parent;
 	data.owner = owner;
 
+	const parentData = getData(parent);
 	getChildComponents_(parentData).push(comp);
 	if (!config.key && !parentData.rootElementReached) {
 		config.key = parentData.config.key;

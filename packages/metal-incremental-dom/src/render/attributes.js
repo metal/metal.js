@@ -1,5 +1,6 @@
 'use strict';
 
+import { isServerSide } from 'metal';
 import { delegate } from 'metal-dom';
 import { getComponentFn } from 'metal-component';
 import { getOriginalFn } from '../incremental-dom-aop';
@@ -16,6 +17,10 @@ const LISTENER_REGEX = /^(?:on([A-Z].+))|(?:data-on(.+))$/;
  * @param {*} value
  */
 export function applyAttribute(component, element, name, value) {
+	if (isServerSide()) {
+		return;
+	}
+
 	const eventName = getEventFromListenerAttr_(name);
 	if (eventName) {
 		attachEvent_(component, element, name, eventName, value);

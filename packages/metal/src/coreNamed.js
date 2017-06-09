@@ -284,6 +284,19 @@ export function isString(val) {
 }
 
 /**
+ * Sets to true if running inside Node.js environment with extra check for
+ * `process.browser` to skip Karma runner environment. Karma environment has
+ * `process` defined even though it runs on the browser.
+ * @return {boolean}
+ */
+export function isServerSide() {
+	return typeof process !== 'undefined' &&
+		typeof process.env !== 'undefined' &&
+		process.env.NODE_ENV !== 'test' &&
+		!process.browser;
+}
+
+/**
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */

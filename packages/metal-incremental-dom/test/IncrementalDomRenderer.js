@@ -557,6 +557,7 @@ describe('IncrementalDomRenderer', function() {
 					IncDom.attr('onClick', 'handleClick');
 					IncDom.elementOpenEnd();
 					IncDom.elementClose('div');
+					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
@@ -2267,6 +2268,7 @@ describe('IncrementalDomRenderer', function() {
 						IncDom.elementOpen('div');
 						if (!this.remove) {
 							IncDom.elementOpen(ChildComponent, null, null, 'ref', 'innerChild');
+							IncDom.elementClose(ChildComponent);
 						}
 						IncDom.elementClose('div');
 					}

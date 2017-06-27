@@ -476,7 +476,7 @@ class Component extends EventEmitter {
 					IncrementalDOM.patch = patch;
 				};
 				IncrementalDOM.patch = patchInterceptor;
-				Component.render(Ctor, opt_config);
+				Component.render(Ctor, opt_config).dispose();
 				return interceptedComponentStrings[0];
 			}
 			default:

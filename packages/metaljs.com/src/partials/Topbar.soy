@@ -5,9 +5,22 @@
  * @param site
  */
 {template .render}
-	<nav class="topbar topbar-light {$elementClasses ? ' ' + $elementClasses : ''}">
+	<nav class="topbar {$elementClasses ? ' ' + $elementClasses : ''}">
 		{call .logo data="all" /}
 		{call .menu data="all" /}
+
+		<ul class="topbar-list">
+			<li class="topbar-item">
+				<a class="topbar-icon" target="_blank" href="https://github.com/metal/metal">
+					<span class="icon-16-github"></span>
+				</a>
+			</li>
+			<li class="topbar-item">
+				<a class="topbar-icon" target="_blank" href="http://metaljs-chat.wedeploy.io/">
+					<span class="icon-16-hash"></span>
+				</a>
+			</li>
+		</ul>
 	</nav>
 {/template}
 
@@ -17,7 +30,7 @@
 {template .logo}
 	<div class="topbar-logo">
 		<a class="topbar-logo-link" href="/">
-			<span class="topbar-logo-icon icon-16-hammer"></span>
+			<img class="topbar-logo-image" src="/images/logo_signature@2x.png" alt="Metal.js Home">
 			<span class="topbar-logo-text">{$site.title}</span>
 		</a>
 	</div>

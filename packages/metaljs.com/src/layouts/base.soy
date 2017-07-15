@@ -12,10 +12,15 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<meta content="minimum-scale=1.0, width=device-width" name="viewport">
+		<meta name="theme-color" content="#9552ef">
+		<meta content="initial-scale=1, minimum-scale=1.0, width=device-width" name="viewport">
 		<meta name="description" content="{$page.description ?: ''}">
 
-		<title>{$page.title} - {$site.title}</title>
+		{if $page.title == $site.title}
+			<title>{$site.title}</title>
+		{else}
+			<title>{$page.title} - {$site.title}</title>
+		{/if}
 
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Roboto+Mono">
 
@@ -25,6 +30,7 @@
 		<!-- inject:js -->
 		<!-- endinject -->
 
+		<link rel="shortcut icon" href="/images/favicon.ico">
 		<link rel="stylesheet" href="/styles/main.css">
 	</head>
 	<body data-senna>

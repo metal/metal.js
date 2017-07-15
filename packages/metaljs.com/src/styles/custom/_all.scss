@@ -1,0 +1,123 @@
+// Topbar
+
+.topbar .topbar-list {
+	@media (min-width: $screen-md-min) {
+		margin-right: 20px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+
+		& + .topbar-list {
+			margin-left: 20px;
+		}
+	}
+}
+
+.topbar .topbar-list .topbar-item:first-child {
+	margin-left: 0;
+}
+
+.topbar, .guide:not(.content) .topbar {
+	background-color: $primary;
+}
+
+.topbar .topbar-logo .topbar-logo-image {
+	height: 28px;
+}
+
+.topbar-link {
+	color: rgba(white, 0.6);
+}
+
+.topbar-link:hover,
+.topbar-link:focus {
+	color: white;
+}
+
+.topbar-icon {
+	@include anim(background-color);
+
+	background-color: $accent;
+	border-radius: 50%;
+	display: block;
+	font-size: 28px;
+	height: 32px;
+	line-height: 37px;
+	margin: auto;
+	text-align: center;
+	width: 32px;
+
+	&, &:hover, &:focus {
+		color: white;
+	}
+
+	&:hover, &:focus {
+		background-color: rgba($accent, 0.8);
+	}
+}
+
+// Header
+
+.header {
+	background-color: $primary;
+	background-image: url(../images/background_header_logo@2x.png);
+	background-position: right -600px top 100px;
+	background-repeat: no-repeat;
+	background-size: 1145px 916px;
+
+	.header-title {
+		color: #FFF;
+		margin-bottom: 35px;
+	}
+
+	.header-subtitle {
+		color: #FFF;
+	}
+}
+
+.header, .about {
+	.btn-default {
+		background: rgba(255, 255, 255, 0.05);
+
+		&, &:hover, &:focus, &:hover:focus {
+			color: #FFF;
+			border: 1px solid rgba(255, 255, 255, 0.6)
+		}
+
+		&:hover, &:focus, &:hover:focus {
+			background-color: transparent;
+		}
+	}
+}
+
+@for $i from 1 through 6 {
+	.docs .guide-content h#{$i} a:not([class]) {
+		border: 0 none;
+		display: block; // HASH
+		line-height: 1em;
+		margin-right: 0.5em;
+		position: relative; // HASH
+		transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+		&::before { // HASH
+			content: "#";
+			font-size: 0.7em;
+			left: 0.2em;
+			opacity: 0;
+			position: absolute;
+			top: 0;
+			transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+			vertical-align: super;
+		}
+
+		&:hover, &:focus { // HASH
+			transform: translateX(0.5em);
+
+			&::before {
+				opacity: 0.6;
+				transform: translateX(-1em);
+			}
+		}
+	}
+}

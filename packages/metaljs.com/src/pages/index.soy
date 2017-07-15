@@ -1,6 +1,6 @@
 ---
-title: "Home"
-description: "Something nice and compelling about the project. Make it short and sweet."
+title: "Metal.js"
+description: "Build UI components in a solid, flexible way."
 ---
 
 {namespace pageIndex}
@@ -12,10 +12,9 @@ description: "Something nice and compelling about the project. Make it short and
 	{call main.render data="all"}
 		{param content kind="html"}
 			{call .header data="all" /}
-			{call .why /}
 			{call .features /}
-			{call .how /}
 			{call .highlights /}
+			{call .why data="all" /}
 			{call .footer /}
 		{/param}
 	{/call}
@@ -27,26 +26,28 @@ description: "Something nice and compelling about the project. Make it short and
 {template .header}
 	<header class="header">
 		<div class="container">
-			<h1 class="header-title">{$site.title}</h1>
+			<h1 class="header-title">{$site.index.title}</h1>
 			<h2 class="header-subtitle">{$site.index.description}</h2>
 			<div class="header-cta">
-				<a href="#" class="btn btn-accent">Main call to action</a>
-				<a href="#" class="btn btn-default">Secondary action</a>
+				<a href="https://github.com/metal/metal.js/archive/v{$site.latestRelease}.zip" class="btn btn-accent">Download Metal.js v{$site.latestRelease}</a>
+				<a href="/docs/getting-started/" class="btn btn-default">Get Started</a>
 			</div>
 		</div>
 	</header>
 {/template}
 
 /**
- *
+ * @param site
  */
 {template .why}
 	<article class="about">
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12 col-md-offset-2">
-					<h3 class="about-title">Start with why</h3>
-					<p class="about-description">Through the WHY, a story will arise, which will create trust and make an idea, a service, or a project unique. As Simon Sinek has said, having loyal users is all about attracting the people who share your fundamental beliefs. Remember: People don't buy what you do. They buy why you do it. I'll say it again: People don't buy what you do. They buy why you do it.</p>
+					<h3 class="about-title">Start building today. Are you ready?</h3>
+					<p class="about-description header-cta">
+						<a href="https://github.com/metal/metal.js/archive/v{$site.latestRelease}.zip" class="btn btn-default">Download Metal.js v{$site.latestRelease}</a>
+						</p>
 				</div>
 			</div>
 		</div>
@@ -62,24 +63,39 @@ description: "Something nice and compelling about the project. Make it short and
 			<div class="row">
 				<section class="feature col-md-4 col-md-offset-2">
 					<div class="feature-graphic">
-						<span class="icon-16-bullhorn"></span>
+						<span class="icon-16-speedometer"></span>
 					</div>
-					<h3 class="feature-title">Heading</h3>
-					<p class="feature-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo.</p>
+					<h3 class="feature-title">Performance First</h3>
+					<p class="feature-description">
+						Built from the ground up with performance in mind, we constantly run tests against the most popular libraries.
+						<br>
+						<br>
+						<a href="/docs/guides/performance.html">Learn More</a>
+					</p>
 				</section>
 				<section class="feature col-md-4">
 					<div class="feature-graphic">
-						<span class="icon-16-lock"></span>
+						<span class="icon-16-hammer"></span>
 					</div>
-					<h3 class="feature-title">Heading</h3>
-					<p class="feature-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo.</p>
+					<h3 class="feature-title">Versatile Build</h3>
+					<p class="feature-description">
+						Focus on what is important. We provide tools to build your code as global objects, AMD or jQuery Plugins.
+						<br>
+						<br>
+						<a href="/docs/guides/building.html">Learn More</a>
+					</p>
 				</section>
 				<section class="feature col-md-4">
 					<div class="feature-graphic">
-						<span class="icon-16-calendar"></span>
+						<span class="icon-16-circle-arrow"></span>
 					</div>
-					<h3 class="feature-title">Heading</h3>
-					<p class="feature-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo.</p>
+					<h3 class="feature-title">Future Ready</h3>
+					<p class="feature-description">
+						By using ES6 we benefit from the best of JavaScript, while maintaining easy-to-read and clean code.
+						<br>
+						<br>
+						<a href="/docs/">Learn More</a>
+					</p>
 				</section>
 			</div>
 		</div>
@@ -89,50 +105,19 @@ description: "Something nice and compelling about the project. Make it short and
 /**
  *
  */
-{template .how}
-	<article class="about">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12 col-md-offset-2">
-					<h3 class="about-title">It's easier than you think</h3>
-					<p class="about-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo ultricies vehicula ut.</p>
-				</div>
-			</div>
-		</div>
-	</article>
-{/template}
-
-/**
- *
- */
 {template .highlights}
 	<div class="highlights">
 		<div class="container">
 			<section class="highlight row">
-				<div class="col-md-6 col-md-offset-2">
-					<h4 class="highlight-title">First highlight. It'll blow your mind.</h4>
-					<p class="highlight-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo ultricies vehicula ut.</p>
-				</div>
-				<div class="col-md-5 col-md-offset-1">
-					<img class="highlight-image" src="http://placehold.it/500x400/e7e8e8/64696d" alt="Placeholder">
-				</div>
-			</section>
-			<section class="highlight row">
-				<div class="col-md-6 col-md-push-9">
-					<h4 class="highlight-title">It's that good. See for yourself.</h4>
-					<p class="highlight-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo ultricies vehicula ut.</p>
-				</div>
-				<div class="col-md-5 col-md-offset-2 col-md-pull-6">
-					<img class="highlight-image" src="http://placehold.it/500x400/e7e8e8/64696d" alt="Placeholder">
-				</div>
-			</section>
-			<section class="highlight row">
-				<div class="col-md-6 col-md-offset-2">
-					<h4 class="highlight-title">And lastly, this one. Checkmate.</h4>
-					<p class="highlight-description">Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros praesent commodo ultricies vehicula ut.</p>
-				</div>
-				<div class="col-md-5 col-md-offset-1">
-					<img class="highlight-image" src="http://placehold.it/500x400/e7e8e8/64696d" alt="Placeholder">
+				<div class="col-md-12 col-md-offset-2">
+					<h4 class="highlight-title">Our Architecture</h4>
+					<img class="architecture-image-primary" src="images/metal_architecture@2x.png" alt="Architecture">
+					<p class="highlight-description">
+						Metal.js' main classes are State and Component. Component actually extends from State, thus containing all its features. The main difference between the two is that Component's extra features are related to rendering. So you could just use State directly if your module doesn't do any rendering. But if your module does need rendering logic, then Component will work better for you.
+					</p>
+					<p class="highlight-description">
+						Many people have their own favorite way of dealing with rendering logic. Some prefer to use template languages that completely separate it from the business logic, while others like to keep both close together in the same file. Metal.js doesn't force developers to go with only one of those. By default it offers integration points with both closure templates from Google and JSX from Facebook, and it's possible to add more options, since the rendering layer is customizable.
+					</p>
 				</div>
 			</section>
 		</div>
@@ -147,7 +132,7 @@ description: "Something nice and compelling about the project. Make it short and
 		<div class="container">
 			<div class="row">
 				<p class="footer-description col-md-6 col-md-offset-2">
-					Copyright © 2017 <a href="https://liferay.com">Liferay, Inc</a>
+					Brought to you by <a href="https://liferay.com">Liferay, Inc.</a> © 2017.
 				</p>
 				<p class="footer-description col-md-6">
 					Powered by <a href="http://wedeploy.com">WeDeploy™</a>

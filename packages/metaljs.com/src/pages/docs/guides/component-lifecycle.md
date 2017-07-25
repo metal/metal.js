@@ -62,6 +62,17 @@ class MyComponent extends Component {
      */
     disposed() {
     }
+
+    /**
+     * Called when the component is about to render.
+     * It takes the component state as an argument
+     * and you can massage the data before it is passed
+     * down to the template.
+     * This is only available for Soy Components.
+     */
+    prepareStateForRender(states) {
+        return Object.assign({}, states);
+    }
 }
 ```
 

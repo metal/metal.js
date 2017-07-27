@@ -68,21 +68,23 @@ all valid options, take a look at **State**'s
 
 </article>
 
-<article id="internalSatates">
+<article id="internal_states">
 
-## [Internal States](#internalSatates)
+## [Internal States](#internal_states)
 
-You can define a state to be used internally in your component only, just
-add an <b>internal</b> attribute in the configuration object. By doing this
-the state will behave exactly as expected, including re-rendering the
-component. The difference is, internal states can not be accessed by parent
-components.
+You can define a state as internal, for use in your component only. Just add the
+attribute `internal` to the configuration object.
 
-This is not necessary for JSX components, since Metal JSX components
-have its own State Manager implementation. For that reason, two static properties
-are used, STATE and PROPS, that behaves pretty closer to React
-<b> state</b> and <b>props</b>. To see exactly how it works
-read [JSX components section](/docs/jsx-components.html).
+By doing this, the state will behave exactly as expected, including re-rendering
+the component. The only difference being, internal states can not be accessed by
+parent components.
+
+This is not necessary for JSX components, since Metal.js JSX components
+have their own State Manager implementation. For that reason, two static
+properties are used, `STATE` and `PROPS`, that behave much closer to React's
+{sp}`state` and `props`.
+
+To see exactly how it works read [JSX components section](/docs/guides/jsx-components.html).
 
 ```javascript
 Calculator.STATE = {

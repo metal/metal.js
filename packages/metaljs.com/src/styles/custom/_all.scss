@@ -38,14 +38,13 @@
 .topbar-icon {
 	@include anim(background-color);
 
+	align-items: center;
 	background-color: $accent;
 	border-radius: 50%;
-	display: block;
-	font-size: 28px;
+	display: flex;
 	height: 32px;
-	line-height: 37px;
+	justify-content: center;
 	margin: auto;
-	text-align: center;
 	width: 32px;
 
 	&, &:hover, &:focus {
@@ -54,6 +53,14 @@
 
 	&:hover, &:focus {
 		background-color: rgba($accent, 0.8);
+	}
+
+	.icon-16-github {
+		font-size: 34px;
+	}
+
+	.icon-16-hash {
+		font-size: 24px;
 	}
 }
 

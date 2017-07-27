@@ -1,7 +1,7 @@
 ---
 title: "Importing a Third Party Component"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 170
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "JSX Components"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 190
 ---
 

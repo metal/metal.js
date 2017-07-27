@@ -5,7 +5,9 @@ layout: "guide"
 weight: 130
 ---
 
-<article>
+<article id="component_lifecycle">
+
+## [Component Lifecycle](#component_lifecycle)
 
 Components built with Metal.js provide lifecycle methods that can be called
 when needed. The following example lists all available lifecycle methods, in

@@ -1,7 +1,7 @@
 ---
 title: "Tutorial: Modal - Updates"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 300
 ---
 

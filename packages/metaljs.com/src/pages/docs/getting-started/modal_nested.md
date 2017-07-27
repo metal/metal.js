@@ -1,7 +1,7 @@
 ---
 title: "Tutorial: Modal - Nested Components"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 400
 ---
 

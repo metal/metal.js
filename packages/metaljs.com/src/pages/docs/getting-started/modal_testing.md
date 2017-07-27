@@ -1,7 +1,7 @@
 ---
 title: "Tutorial: Modal - Testing"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 500
 ---
 

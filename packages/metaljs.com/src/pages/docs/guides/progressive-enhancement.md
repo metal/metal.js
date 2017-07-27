@@ -5,9 +5,11 @@ layout: "guide"
 weight: 200
 ---
 
-<article>
+<article id="progressive_enhancement">
 
-[Progressive enhancement](http://en.wikipedia.org/wiki/Progressive_enhancement)
+## [Progressive Enhancement](#progressive_enhancement)
+
+[Progressive enhancement](http://en.wikipedia.org/wiki/Progressive_enhancement){sp}
 is a feature that is very important for a lot of people. Knowing about this,
 {sp}**Metal.js** is prepared to deal with content that already comes rendered from
 the server. Since Metal.js components use

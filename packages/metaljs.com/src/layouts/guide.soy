@@ -36,7 +36,7 @@
 
 		<div class="container-hybrid">
 			<div class="docs-guide row">
-				<div class="docs-content col-xs-16">
+				<div class="docs-content col-xs-16 col-md-9">
 					<div class="guide-content">
 						{$content}
 					</div>
@@ -45,6 +45,17 @@
 						{call .contribute data="all" /}
 					{/if}
 				</div>
+
+				<nav class="col-xs-16 col-md-offset-2 col-md-5">
+					<div class="docs-nav-container">
+						{call ElectricReadingProgress.render}
+							{param articleSelector: 'article[id]' /}
+							{param elementClasses: 'docs-nav' /}
+							{param offsetTop: 200 /}
+							{param titleSelector: 'h2' /}
+						{/call}
+					</div>
+				</nav>
 			</div>
 		</div>
 	</div>

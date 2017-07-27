@@ -5,7 +5,9 @@ layout: "guide"
 weight: 230
 ---
 
-<article>
+<article id="performance">
+
+## [Performance](#performance)
 
 **Metal.js** was built from the first with performance in mind. We've run
 performance tests to compare it with other libraries and got really good

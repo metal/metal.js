@@ -5,7 +5,9 @@ layout: "guide"
 weight: 210
 ---
 
-<article>
+<article id="yeoman_generator">
+
+## [Yeoman Generator](#yeoman_generator)
 
 You can organize your **Metal.js** project in any way you want, but to start
 out we recommend using the

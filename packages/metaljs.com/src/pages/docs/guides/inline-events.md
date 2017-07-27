@@ -1,7 +1,7 @@
 ---
 title: "Inline Events"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 150
 ---
 

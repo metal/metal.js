@@ -1,7 +1,7 @@
 ---
 title: "Quick Start"
 description: ""
-layout: "progress"
+layout: "guide"
 icon: "flash"
 weight: 1
 ---

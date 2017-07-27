@@ -1,7 +1,7 @@
 ---
 title: "Tutorial: Modal - Events"
 description: ""
-layout: "progress"
+layout: "guide"
 weight: 200
 ---
 

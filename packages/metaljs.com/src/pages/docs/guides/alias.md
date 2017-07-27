@@ -5,7 +5,9 @@ layout: "guide"
 weight: 100
 ---
 
-<article>
+<article id="alias">
+
+## [Alias](#alias)
 
 A straightforward way to import npm dependencies into your module is to use
 their relative paths, like we do for any other code. For example:

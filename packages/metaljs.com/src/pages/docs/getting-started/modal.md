@@ -30,10 +30,11 @@ modal. Let's update the component's template to do that then:
 /**
  * This renders the component's whole content.
  * Note: has to be called ".render".
- * @param body
- * @param header
  */
 &#123;template .render&#125;
+    {@param body: string}
+    {@param header: string}
+
     <div class="modal show">
         <div class="modal-dialog">
             <div class="modal-content">

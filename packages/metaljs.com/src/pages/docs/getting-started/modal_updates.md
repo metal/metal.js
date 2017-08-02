@@ -60,9 +60,10 @@ Now we need to update our template to only show the modal when `shown` is true.
 /**
  * State properties are passed to the "render" template in the same way as
  * config properties.
- * @param shown
  */
 &#123;template .render&#125;
+    {@param shown: bool}
+
     <div class="modal {$shown ? 'show': ''}">
         ...
     </div>

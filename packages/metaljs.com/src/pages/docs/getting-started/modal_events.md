@@ -42,9 +42,10 @@ of just its name) as an inline listener.
  * In the "render" template, Soy params that match a
  * component's function name will be that function
  * (automatically bound to the component instance).
- * @param close
  */
 &#123;template .render&#125;
+    {@param close: any}
+
     // ...
     <button onClick="{$close}" type="button" class="close">
     // ...

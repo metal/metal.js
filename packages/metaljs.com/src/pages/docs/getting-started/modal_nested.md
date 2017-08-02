@@ -58,12 +58,11 @@ Now let's prepare the template to be similar to the one used by **Modal**:
 
 &#123;namespace CloseHeader&#125;
 
-/**
- * @param cssClass
- * @param onClick
- * @param title
- */
 &#123;template .render&#125;
+    {@param cssClass: string}
+    {@param onClick: any}
+    {@param title: string}
+
     <header class="{$cssClass}">
         <button onClick="{$onClick}" type="button" class="close">
             <span>×</span>
@@ -99,13 +98,12 @@ with a call to **CloseHeader**:
 ```soy
 // src/Modal.soy
 
-/**
- * @param body
- * @param close
- * @param header
- * @param shown
- */
 &#123;template .render&#125;
+    {@param body: string}
+    {@param close: string}
+    {@param header: string}
+    {@param shown: bool}
+
     <div class="modal {$shown ? 'show': ''}">
         <div class="modal-dialog">
             <div class="modal-content">

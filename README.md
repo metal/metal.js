@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/travis/metal/metal.js/master.svg?style=flat)](https://travis-ci.org/metal/metal.js)
 [![Slack Channel](http://metaljs-chat.wedeploy.io/badge.svg)](http://metaljs-chat.wedeploy.io/)
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/metal/metal)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/alloyui.svg)](https://travis-ci.org/metal/metal.js)
 
 Metal.js is a JavaScript library for building UI components in a solid, flexible way.
 

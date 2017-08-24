@@ -340,7 +340,8 @@ export function hasClass(element, className) {
  * @private
  */
 function hasClassWithNative_(element, className) {
-	return element.classList.contains(className);
+	return className.indexOf(' ') === -1 &&
+		element.classList.contains(className);
 }
 
 /**
@@ -351,7 +352,8 @@ function hasClassWithNative_(element, className) {
  * @private
  */
 function hasClassWithoutNative_(element, className) {
-	return (` ${element.className} `).indexOf(` ${className} `) >= 0;
+	return (` ${element.className} `).indexOf(` ${className} `) >= 0 &&
+		className.split(' ').length === 1;
 }
 
 /**

@@ -189,6 +189,17 @@ const Config = {
 		return mergeConfig(this, {
 			valueFn
 		});
+	},
+
+	/**
+	 * Adds the `writeOnce` flag to the `State` configuration.
+	 * @param {boolean} writeOnce Flag to set "writeOnce" to. False by default.
+	 * @return {!Object} `State` configuration object.
+	 */
+	writeOnce(writeOnce = false) {
+		return mergeConfig(this, {
+			writeOnce
+		});
 	}
 };
 

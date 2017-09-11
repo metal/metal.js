@@ -60,6 +60,25 @@ describe('Config', function() {
 		}, config.config);
 	});
 
+	it('should return config with "writeOnce" flag set to false by default', function() {
+		var config = Config.writeOnce();
+		assert.ok(core.isObject(config));
+
+		var expected = {
+			writeOnce: false
+		};
+		assert.deepEqual(expected, config.config);
+	});
+
+	it('should return config with "writeOnce" flag set to the given vaue', function() {
+		var writeOnce = true;
+		var config = Config.writeOnce(writeOnce);
+		assert.ok(core.isObject(config));
+		assert.deepEqual({
+			writeOnce
+		}, config.config);
+	});
+
 	it('should return config with specified "setter"', function() {
 		var setter = () => {
 		};

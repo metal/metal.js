@@ -29,7 +29,7 @@ contains a test script that you can use:
 ```
 
 If you're building a project without the generator, you can still get
-{sp}**Metal.js**'s test tools by using [gulp-metal](/docs/guides/gulp_metal.html).
+{sp}**Metal.js**'s test tools by using [gulp-metal](/docs/guides/building.html#gulp-metal).
 
 </article>
 

@@ -2,7 +2,7 @@
 
 import Component from 'metal-component';
 import Soy from 'metal-soy';
-import { defineWebComponent } from '../src/customElement';
+import { defineWebComponent } from '../src/define_web_component';
 
 
 describe('Web components', function() {

@@ -8,7 +8,6 @@ import State from 'metal-state';
  * @return {void} Nothing.
  */
 export function defineWebComponent(tagName, Ctor) {
-
 	if (!('customElements' in window)) {
 		return;
 	}
@@ -16,29 +15,32 @@ export function defineWebComponent(tagName, Ctor) {
 	const observedAttrs = Object.keys(State.getStateStatic(Ctor));
 
 	class CustomElement extends HTMLElement {
-		constructor() {
-			super();
-		}
-
 		static get observedAttributes() {
 			return observedAttrs;
 		}
 
+		attributeChangedCallback(attrName, oldVal, newVal) {
+			this.component[attrName] = newVal;
+		}
+
 		connectedCallback() {
-			let shadowRoot = this.attachShadow({
-				mode: 'open'
-			});
+			const useShadowDOM = this.getAttribute('useShadowDOM') || false;
+			let element = this;
+
+			if (useShadowDOM) {
+				element = this.attachShadow({
+					mode: 'open'
+				});
+			}
+
 			let opts = {};
 			for (let i = 0, l = observedAttrs.length; i < l; i++) {
 				opts[observedAttrs[i]] = this.getAttribute(observedAttrs[i]);
 			}
-			this.component = new Ctor(opts, shadowRoot);
+			this.component = new Ctor(opts, element);
 			this.componentEventHandler = this.emit.bind(this);
-			this.component.on('*', this.componentEventHandler);
-		}
 
-		attributeChangedCallback(attrName, oldVal, newVal) {
-			this.component[attrName] = newVal;
+			this.component.on('*', this.componentEventHandler);
 		}
 
 		disconnectedCallback() {
@@ -47,9 +49,11 @@ export function defineWebComponent(tagName, Ctor) {
 		}
 
 		emit(...data) {
-			const evtData = data.pop();
-			const evt = new CustomEvent(evtData.type, {detail: data});
-			this.dispatchEvent(evt);
+			const eventData = data.pop();
+			const event = new CustomEvent(eventData.type, {
+				detail: data
+			});
+			this.dispatchEvent(event);
 		}
 	}
 
@@ -57,4 +61,3 @@ export function defineWebComponent(tagName, Ctor) {
 };
 
 export default defineWebComponent;
-

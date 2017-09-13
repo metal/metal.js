@@ -4,7 +4,6 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import { defineWebComponent } from '../src/define_web_component';
 
-
 describe('Web components', function() {
 
 	describe('Custom elements', function() {
@@ -14,6 +13,8 @@ describe('Web components', function() {
 			if (el && document.body.contains(el)) {
 				document.body.removeChild(el);
 			}
+
+			document.body.innerHTML = '';
 		});
 
 		it('should not throw when creating or appending a custom element', function() {
@@ -54,6 +55,47 @@ describe('Web components', function() {
 
 			el.setAttribute('non-existing', 'test');
 			assert.strictEqual(1, fn.callCount);
+		});
+
+		it('should have the correct inner html', function() {
+			const tagName = createWebComponent('custom-test-element-04');
+			el = document.createElement(tagName);
+
+			document.body.appendChild(el);
+
+			assert.equal(el.innerHTML, '<div title="default title"></div>');
+		});
+
+		it('should have the correct inner html when useshadowdom is true', function() {
+			const tagName = createWebComponent('custom-test-element-05');
+			el = document.createElement(tagName);
+			el.setAttribute('useshadowdom', true);
+
+			document.body.appendChild(el);
+
+			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+		});
+
+		it('should render custom element via html', function() {
+			const tagName = createWebComponent('custom-test-element-06');
+
+			const innerHTML = '<' + tagName + '></' + tagName + '>';
+
+			document.body.innerHTML = innerHTML;
+
+			assert.equal(document.body.innerHTML, '<metal-test-component-custom-test-element-06><div title="default title"></div></metal-test-component-custom-test-element-06>');
+		});
+
+		it('should render custom element via html when useshadowdom is true', function() {
+			const tagName = createWebComponent('custom-test-element-07');
+
+			const innerHTML = '<' + tagName + ' useshadowdom="true"></' + tagName + '>';
+
+			document.body.innerHTML = innerHTML;
+
+			el = document.querySelector(tagName);
+
+			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
 		});
 	});
 

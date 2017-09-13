@@ -40,7 +40,7 @@ module.exports = function(config) {
 				served: true
 			},
 			{
-				pattern: 'packages/metal-custom-element/node_modules/webcomponents.js/webcomponents-lite.js',
+				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js',
 				watched: false,
 				included: true,
 				served: true

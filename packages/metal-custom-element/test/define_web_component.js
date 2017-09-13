@@ -2,9 +2,16 @@
 
 import Component from 'metal-component';
 import Soy from 'metal-soy';
+import UA from 'metal-useragent';
+
 import { defineWebComponent } from '../src/define_web_component';
 
 describe('Web components', function() {
+	before(function() {
+		if (UA.matchUserAgent('MSIE')) {
+			this.skip();
+		}
+	});
 
 	describe('Custom elements', function() {
 		let el;

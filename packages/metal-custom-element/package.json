@@ -26,7 +26,6 @@
     "metal-state": "2.7.0"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "github:webcomponents/webcomponentsjs",
     "babel-cli": "^6.4.5",
     "babel-plugin-transform-custom-element-classes": "^0.1.0",
     "babel-plugin-transform-es2015-classes": "^6.24.1",

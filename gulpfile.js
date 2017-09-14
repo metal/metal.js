@@ -142,7 +142,11 @@ function calcDestDir(file) {
 function compileToLib(src) {
 	return gulp.src(src)
 		.pipe(babel({
-			presets: ['es2015']
+			presets: ['es2015'],
+			plugins: [
+				'transform-custom-element-classes',
+				'transform-es2015-classes'
+			],
 		}))
 		.pipe(gulp.dest(calcDestDir));
 }

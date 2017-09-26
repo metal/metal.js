@@ -8,7 +8,7 @@ import { defineWebComponent } from '../src/define_web_component';
 
 describe('Web components', function() {
 	before(function() {
-		if (!UA.isSafari && !UA.isChrome) {
+		if (UA.matchUserAgent('MSIE')) {
 			this.skip();
 		}
 	});

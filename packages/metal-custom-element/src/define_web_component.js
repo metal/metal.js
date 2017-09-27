@@ -24,6 +24,10 @@ export function defineWebComponent(tagName, Ctor) {
 	}
 
 	class CustomElement extends HTMLElement {
+		constructor() {
+			super();
+		}
+
 		static get observedAttributes() {
 			return observedAttrs;
 		}

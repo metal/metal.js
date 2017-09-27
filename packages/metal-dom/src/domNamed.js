@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDef, isDocument, isDocumentFragment, isElement, isObject, isString, object } from 'metal';
+import { isArrayLike, isDef, isDocument, isDocumentFragment, isElement, isObject, isString, object } from 'metal';
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
@@ -168,7 +168,7 @@ export function append(parent, child) {
 	if (isString(child)) {
 		child = buildFragment(child);
 	}
-	if (child instanceof NodeList) {
+	if (isArrayLike(child)) {
 		const childArr = Array.prototype.slice.call(child);
 		for (let i = 0; i < childArr.length; i++) {
 			parent.appendChild(childArr[i]);

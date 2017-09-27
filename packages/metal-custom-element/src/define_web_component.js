@@ -1,4 +1,5 @@
-import State from 'metal-state';
+import State, { mergeState } from 'metal-state';
+import { getStaticProperty, isObject } from 'metal';
 
 /**
  * Register a custom element for a given metal component.
@@ -12,7 +13,15 @@ export function defineWebComponent(tagName, Ctor) {
 		return;
 	}
 
-	const observedAttrs = Object.keys(State.getStateStatic(Ctor));
+	let observedAttrs = Object.keys(State.getStateStatic(Ctor));
+
+	const props = getStaticProperty(Ctor, 'PROPS', mergeState);
+
+	const hasProps = isObject(props);
+
+	if (hasProps) {
+		observedAttrs = Object.keys(props);
+	}
 
 	class CustomElement extends HTMLElement {
 		constructor() {
@@ -24,7 +33,11 @@ export function defineWebComponent(tagName, Ctor) {
 		}
 
 		attributeChangedCallback(attrName, oldVal, newVal) {
-			this.component[attrName] = newVal;
+			if (this.componentHasProps) {
+				this.component.props[attrName] = newVal;
+			} else {
+				this.component[attrName] = newVal;
+			}
 		}
 
 		connectedCallback() {
@@ -42,6 +55,7 @@ export function defineWebComponent(tagName, Ctor) {
 				opts[observedAttrs[i]] = this.getAttribute(observedAttrs[i]);
 			}
 			this.component = new Ctor(opts, element);
+			this.componentHasProps = hasProps;
 			this.componentEventHandler = this.emit.bind(this);
 
 			this.component.on('*', this.componentEventHandler);

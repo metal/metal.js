@@ -11,7 +11,7 @@ describe('Web components', function() {
 	let el;
 
 	before(function() {
-		if (UA.matchUserAgent('MSIE')) {
+		if (UA.matchUserAgent('MSIE') || isSafariVersion('8.0')) {
 			this.skip();
 		}
 	});
@@ -202,5 +202,11 @@ describe('Web components', function() {
 		defineWebComponent(tagName, WebComponent);
 
 		return tagName;
+	}
+
+	function isSafariVersion(version) {
+		if (!UA.isSafari) return false;
+		const nav = window && window.navigator || {};
+		return !!(new RegExp('Version\/' + version).exec(nav.userAgent));
 	}
 });

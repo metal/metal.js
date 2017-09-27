@@ -46,12 +46,6 @@ module.exports = function(config) {
 				served: true
 			},
 			{
-				pattern: 'packages/metal-custom-element/webcomponents_polyfill.js',
-				watched: false,
-				included: true,
-				served: true
-			},
-			{
 				pattern: 'packages/metal*/test/**/*.js',
 				watched: false,
 				included: true,
@@ -70,7 +64,6 @@ module.exports = function(config) {
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
 			'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': ['browserify'],
 			'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
-			'packages/metal-custom-element/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js': [],
 			'packages/metal*/test/**/*.js': ['browserify']
 		},
 

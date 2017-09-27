@@ -10,9 +10,12 @@ import { defineWebComponent } from '../src/define_web_component';
 describe('Web components', function() {
 	let el;
 
-	before(function() {
+	before(function(done) {
 		if (UA.matchUserAgent('MSIE') || isSafariVersion('8.0')) {
 			this.skip();
+			done();
+		} else {
+			loadPolyfill(done);
 		}
 	});
 
@@ -208,5 +211,23 @@ describe('Web components', function() {
 		if (!UA.isSafari) return false;
 		const nav = window && window.navigator || {};
 		return !!(new RegExp('Version\/' + version).exec(nav.userAgent));
+	}
+
+	function loadPolyfill(callback) {
+		var src = '/base/packages/metal-custom-element/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js';
+
+		var timestamp = window.__karma__.files[src];
+
+		var script = document.createElement('script');
+
+		script.onload = function() {
+			callback();
+		};
+
+		document.body.appendChild(script);
+
+		script.crossOrigin = 'anonymous';
+		script.src = src + '?' + timestamp;
+		script.type = 'test/javascript';
 	}
 });

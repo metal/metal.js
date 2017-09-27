@@ -45,10 +45,16 @@ metal.registerTasks({
 			base: 'SauceLabs',
 			browserName: 'chrome'
 		},
-		sl_safari: {
+		sl_safari_8: {
 			base: 'SauceLabs',
 			browserName: 'safari',
 			platform: 'OS X 10.10'
+		},
+		sl_safari_10: {
+			base: 'SauceLabs',
+			browserName: 'safari',
+			platform: 'OS X 10.12',
+			version: '10'
 		},
 		sl_firefox: {
 			base: 'SauceLabs',
@@ -72,11 +78,11 @@ metal.registerTasks({
 			platform: 'Windows 8.1',
 			version: '11'
 		},
-		sl_edge_13: {
+		sl_edge_15: {
 			base: 'SauceLabs',
 			browserName: 'microsoftedge',
 			platform: 'Windows 10',
-			version: '13'
+			version: '15'
 		},
 		sl_android_4: {
 			base: 'SauceLabs',
@@ -142,7 +148,11 @@ function calcDestDir(file) {
 function compileToLib(src) {
 	return gulp.src(src)
 		.pipe(babel({
-			presets: ['es2015']
+			presets: ['es2015'],
+			plugins: [
+				'transform-custom-element-classes',
+				'transform-es2015-classes'
+			],
 		}))
 		.pipe(gulp.dest(calcDestDir));
 }

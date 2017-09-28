@@ -42,6 +42,12 @@ module.exports = function(config) {
 			{
 				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js',
 				watched: false,
+				included: false,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-custom-element/webcomponents_polyfill.js',
+				watched: false,
 				included: true,
 				served: true
 			},

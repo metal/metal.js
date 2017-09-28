@@ -13,67 +13,65 @@ export function defineWebComponent(tagName, Ctor) {
 		return;
 	}
 
-	let observedAttrs = Object.keys(State.getStateStatic(Ctor));
+	let observedAttributes = Object.keys(State.getStateStatic(Ctor));
 
 	const props = getStaticProperty(Ctor, 'PROPS', mergeState);
 
 	const hasProps = isObject(props);
 
 	if (hasProps) {
-		observedAttrs = Object.keys(props);
+		observedAttributes = Object.keys(props);
 	}
 
-	class CustomElement extends HTMLElement {
-		constructor() {
-			super();
+	function CustomElement() {
+		return Reflect.construct(HTMLElement, [], CustomElement);
+	}
+
+	CustomElement.observedAttributes = observedAttributes;
+	CustomElement.prototype.__proto__ = HTMLElement.prototype;
+	CustomElement.__proto__ = HTMLElement;
+
+	CustomElement.prototype.attributeChangedCallback = function(attrName, oldVal, newVal) {
+		if (this.componentHasProps) {
+			this.component.props[attrName] = newVal;
+		} else {
+			this.component[attrName] = newVal;
 		}
+	};
 
-		static get observedAttributes() {
-			return observedAttrs;
-		}
+	CustomElement.prototype.connectedCallback = function() {
+		const useShadowDOM = this.getAttribute('useShadowDOM') || false;
+		let element = this;
 
-		attributeChangedCallback(attrName, oldVal, newVal) {
-			if (this.componentHasProps) {
-				this.component.props[attrName] = newVal;
-			} else {
-				this.component[attrName] = newVal;
-			}
-		}
-
-		connectedCallback() {
-			const useShadowDOM = this.getAttribute('useShadowDOM') || false;
-			let element = this;
-
-			if (useShadowDOM) {
-				element = this.attachShadow({
-					mode: 'open'
-				});
-			}
-
-			let opts = {};
-			for (let i = 0, l = observedAttrs.length; i < l; i++) {
-				opts[observedAttrs[i]] = this.getAttribute(observedAttrs[i]);
-			}
-			this.component = new Ctor(opts, element);
-			this.componentHasProps = hasProps;
-			this.componentEventHandler = this.emit.bind(this);
-
-			this.component.on('*', this.componentEventHandler);
-		}
-
-		disconnectedCallback() {
-			this.component.off('*', this.componentEventHandler);
-			this.component.dispose();
-		}
-
-		emit(...data) {
-			const eventData = data.pop();
-			const event = new CustomEvent(eventData.type, {
-				detail: data
+		if (useShadowDOM) {
+			element = this.attachShadow({
+				mode: 'open'
 			});
-			this.dispatchEvent(event);
 		}
-	}
+
+		let opts = {};
+		for (let i = 0, l = observedAttributes.length; i < l; i++) {
+			opts[observedAttributes[i]] = this.getAttribute(observedAttributes[i]);
+		}
+		this.component = new Ctor(opts, element);
+		this.componentHasProps = hasProps;
+		this.componentEventHandler = this.emit.bind(this);
+
+		this.component.on('*', this.componentEventHandler);
+	};
+
+	CustomElement.prototype.disconnectedCallback = function() {
+		this.component.off('*', this.componentEventHandler);
+		this.component.dispose();
+	};
+
+	CustomElement.prototype.emit = function(...data) {
+		const eventData = data.pop();
+		const event = new CustomEvent(eventData.type, {
+			detail: data
+		});
+		this.dispatchEvent(event);
+	};
 
 	window.customElements.define(tagName, CustomElement);
 };

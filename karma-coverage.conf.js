@@ -82,8 +82,6 @@ module.exports = function(config) {
 					'babelify',
 					{
 						plugins: [
-							'transform-custom-element-classes',
-							'transform-es2015-classes',
 							'istanbul'
 						],
 						presets: ['es2015']

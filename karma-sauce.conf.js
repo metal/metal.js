@@ -79,11 +79,7 @@ module.exports = function(config) {
 			debug: true,
 			transform: [
 				['babelify', {
-					presets: ['es2015'],
-					plugins: [
-						'transform-custom-element-classes',
-						'transform-es2015-classes'
-					]
+					presets: ['es2015']
 				}
 			]],
 			insertGlobalVars: {

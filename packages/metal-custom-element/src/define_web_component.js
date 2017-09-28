@@ -28,50 +28,53 @@ export function defineWebComponent(tagName, Ctor) {
 	}
 
 	CustomElement.observedAttributes = observedAttributes;
-	CustomElement.prototype.__proto__ = HTMLElement.prototype;
-	CustomElement.__proto__ = HTMLElement;
 
-	CustomElement.prototype.attributeChangedCallback = function(attrName, oldVal, newVal) {
-		if (this.componentHasProps) {
-			this.component.props[attrName] = newVal;
-		} else {
-			this.component[attrName] = newVal;
-		}
-	};
+	Object.setPrototypeOf(CustomElement.prototype, HTMLElement.prototype);
+	Object.setPrototypeOf(CustomElement, HTMLElement);
 
-	CustomElement.prototype.connectedCallback = function() {
-		const useShadowDOM = this.getAttribute('useShadowDOM') || false;
-		let element = this;
+	Object.assign(CustomElement.prototype, {
+		attributeChangedCallback: function(attrName, oldVal, newVal) {
+			if (this.componentHasProps) {
+				this.component.props[attrName] = newVal;
+			} else {
+				this.component[attrName] = newVal;
+			}
+		},
 
-		if (useShadowDOM) {
-			element = this.attachShadow({
-				mode: 'open'
+		connectedCallback: function() {
+			const useShadowDOM = this.getAttribute('useShadowDOM') || false;
+			let element = this;
+
+			if (useShadowDOM) {
+				element = this.attachShadow({
+					mode: 'open'
+				});
+			}
+
+			let opts = {};
+			for (let i = 0, l = observedAttributes.length; i < l; i++) {
+				opts[observedAttributes[i]] = this.getAttribute(observedAttributes[i]);
+			}
+			this.component = new Ctor(opts, element);
+			this.componentHasProps = hasProps;
+			this.componentEventHandler = this.emit.bind(this);
+
+			this.component.on('*', this.componentEventHandler);
+		},
+
+		disconnectedCallback: function() {
+			this.component.off('*', this.componentEventHandler);
+			this.component.dispose();
+		},
+
+		emit: function(...data) {
+			const eventData = data.pop();
+			const event = new CustomEvent(eventData.type, {
+				detail: data
 			});
+			this.dispatchEvent(event);
 		}
-
-		let opts = {};
-		for (let i = 0, l = observedAttributes.length; i < l; i++) {
-			opts[observedAttributes[i]] = this.getAttribute(observedAttributes[i]);
-		}
-		this.component = new Ctor(opts, element);
-		this.componentHasProps = hasProps;
-		this.componentEventHandler = this.emit.bind(this);
-
-		this.component.on('*', this.componentEventHandler);
-	};
-
-	CustomElement.prototype.disconnectedCallback = function() {
-		this.component.off('*', this.componentEventHandler);
-		this.component.dispose();
-	};
-
-	CustomElement.prototype.emit = function(...data) {
-		const eventData = data.pop();
-		const event = new CustomEvent(eventData.type, {
-			detail: data
-		});
-		this.dispatchEvent(event);
-	};
+	});
 
 	window.customElements.define(tagName, CustomElement);
 };

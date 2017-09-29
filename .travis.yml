@@ -8,7 +8,7 @@ addons:
 before_install:
   - nvm install 7
   - npm install -g gulp
-  - npm install -g lerna@2.0.0-rc.5
+  - npm install -g lerna@2.2.0
 
 install:
   - npm run lerna

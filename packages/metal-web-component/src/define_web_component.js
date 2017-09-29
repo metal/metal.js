@@ -17,7 +17,7 @@ export function defineWebComponent(tagName, Ctor) {
 
 	const props = getStaticProperty(Ctor, 'PROPS', mergeState);
 
-	const hasProps = isObject(props);
+	const hasProps = isObject(props) && Object.keys(props).length;
 
 	if (hasProps) {
 		observedAttributes = Object.keys(props);

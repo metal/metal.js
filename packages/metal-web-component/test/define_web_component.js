@@ -105,6 +105,28 @@ describe('Web components', function() {
 
 			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
 		});
+
+		it('should deserialize attribute if json is passed', function() {
+			const tagName = createWebComponent('custom-test-element-08');
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', '{"key1": "value1", "key2": "value2"}');
+			document.body.appendChild(el);
+
+			let title = el.component.title;
+
+			assert.isObject(title);
+			assert.equal(title.key1, 'value1');
+			assert.equal(title.key2, 'value2');
+
+			el.setAttribute('title', '{"key3": "value3"}');
+
+			title = el.component.title;
+
+			assert.isObject(title);
+			assert.isUndefined(title.key1);
+			assert.equal(title.key3, 'value3');
+		});
 	});
 
 	describe('Define JSX component', function() {

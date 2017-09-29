@@ -38,6 +38,8 @@ export function defineWebComponent(tagName, Ctor) {
 				return;
 			}
 
+			newVal = this.deserializeValue_(newVal);
+
 			if (this.componentHasProps) {
 				this.component.props[attrName] = newVal;
 			} else {
@@ -57,13 +59,25 @@ export function defineWebComponent(tagName, Ctor) {
 
 			let opts = {};
 			for (let i = 0, l = observedAttributes.length; i < l; i++) {
-				opts[observedAttributes[i]] = this.getAttribute(observedAttributes[i]);
+				opts[observedAttributes[i]] = this.deserializeValue_(
+					this.getAttribute(observedAttributes[i])
+				);
 			}
 			this.component = new Ctor(opts, element);
 			this.componentHasProps = hasProps;
 			this.componentEventHandler = this.emit.bind(this);
 
 			this.component.on('*', this.componentEventHandler);
+		},
+
+		deserializeValue_: function(value) {
+			let retVal;
+
+			try {
+				retVal = JSON.parse(value);
+			} catch (e) {}
+
+			return retVal || value;
 		},
 
 		disconnectedCallback: function() {

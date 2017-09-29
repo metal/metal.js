@@ -34,19 +34,19 @@ module.exports = function(config) {
 				served: true
 			},
 			{
-				pattern: 'packages/metal-custom-element/node_modules/babel-polyfill/dist/polyfill.min.js',
+				pattern: 'packages/metal-web-component/node_modules/babel-polyfill/dist/polyfill.min.js',
 				watched: false,
 				included: true,
 				served: true
 			},
 			{
-				pattern: 'packages/metal-custom-element/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js',
+				pattern: 'packages/metal-web-component/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js',
 				watched: false,
 				included: false,
 				served: true
 			},
 			{
-				pattern: 'packages/metal-custom-element/webcomponents_polyfill.js',
+				pattern: 'packages/metal-web-component/webcomponents_polyfill.js',
 				watched: false,
 				included: true,
 				served: true

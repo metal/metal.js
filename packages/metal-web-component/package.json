@@ -1,9 +1,9 @@
 {
-  "name": "metal-custom-element",
-  "version": "2.7.0",
-  "description": "CustomElement registration for Metal.js components.",
+  "name": "metal-web-component",
+  "version": "1.0.0",
+  "description": "Web component (CustomElement) registration for Metal.js components.",
   "license": "BSD-3-Clause",
-  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-custom-element",
+  "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-web-component",
   "engines": {
     "node": ">=0.10.0",
     "npm": ">=3.0.0"
@@ -12,8 +12,8 @@
     "lib",
     "src"
   ],
-  "main": "lib/customElement.js",
-  "jsnext:main": "src/customElement.js",
+  "main": "lib/define_web_component.js",
+  "jsnext:main": "src/define_web_component.js",
   "scripts": {
     "compile": "babel --presets es2015 -d lib/ src/",
     "prepublish": "npm run compile"
@@ -23,6 +23,7 @@
     "library"
   ],
   "dependencies": {
+    "metal": "^2.13.2",
     "metal-state": "2.7.0"
   },
   "devDependencies": {

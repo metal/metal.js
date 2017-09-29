@@ -24,7 +24,7 @@ describe('Web components', function() {
 		document.body.innerHTML = '';
 	});
 
-	describe('Custom elements - Soy', function() {
+	describe('Define Soy component', function() {
 		it('should not throw when creating or appending a custom element', function() {
 			const tagName = createWebComponent('custom-test-element-01');
 
@@ -107,7 +107,7 @@ describe('Web components', function() {
 		});
 	});
 
-	describe('Custom elements - JSX', function() {
+	describe('Define JSX component', function() {
 		it('should not throw when creating or appending a custom element', function() {
 			const tagName = createJSXWebComponent('custom-jsx-test-element-01');
 

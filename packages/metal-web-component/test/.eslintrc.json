@@ -5,6 +5,6 @@
   "globals": {
     "assert": true,
     "sinon": true,
-		"IncrementalDOM": true
+    "IncrementalDOM": true
   }
 }

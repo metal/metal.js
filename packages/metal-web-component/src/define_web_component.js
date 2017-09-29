@@ -34,6 +34,10 @@ export function defineWebComponent(tagName, Ctor) {
 
 	Object.assign(CustomElement.prototype, {
 		attributeChangedCallback: function(attrName, oldVal, newVal) {
+			if (!this.component) {
+				return;
+			}
+
 			if (this.componentHasProps) {
 				this.component.props[attrName] = newVal;
 			} else {

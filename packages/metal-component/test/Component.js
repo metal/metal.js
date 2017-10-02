@@ -94,6 +94,29 @@ describe('Component', function() {
 			assert.ok(comp.inDocument);
 		});
 
+		it('should run "willAttach" lifecycle method when the component about to attach', function() {
+			class TestComponent extends Component {
+			}
+			sinon.spy(TestComponent.prototype, 'willAttach');
+			comp = new TestComponent();
+
+			assert.ok(comp.willAttach.calledBefore(Component.prototype.attached));
+			assert.strictEqual(1, comp.willAttach.callCount);
+		});
+
+		it('should emit "willAttach" lifecycle method when the component about to attach', function() {
+			var listener = sinon.stub();
+			class TestComponent extends Component {
+				created() {
+					this.on('willAttach', listener);
+				}
+			}
+			comp = new TestComponent();
+
+			assert.ok(listener.calledBefore(Component.prototype.attached));
+			assert.strictEqual(1, listener.callCount);
+		});
+
 		it('should emit "attached" event when component is attached', function() {
 			comp = new Component({}, false);
 			var listener = sinon.stub();
@@ -111,6 +134,33 @@ describe('Component', function() {
 			assert.ok(attachData);
 			assert.strictEqual('.parent', attachData.parent);
 			assert.strictEqual('.sibling', attachData.sibling);
+		});
+
+		it('should run "willRender" lifecycle method when the component about to render', function() {
+			class TestComponent extends Component {
+			}
+			sinon.spy(TestComponent.prototype, 'willRender');
+			sinon.spy(TestComponent.prototype, 'rendered');
+			comp = new TestComponent();
+
+			assert.ok(comp.willRender.calledBefore(comp.rendered));
+			assert.strictEqual(1, comp.willRender.callCount);
+			assert.ok(comp.willRender.args[0][0]);
+		});
+
+		it('should emit "willRender" event when the component about to render', function() {
+			var listener = sinon.stub();
+			class TestComponent extends Component {
+				created() {
+					this.on('willRender', listener);
+				}
+			}
+			sinon.spy(TestComponent.prototype, 'rendered');
+			comp = new TestComponent();
+
+			assert.ok(listener.calledBefore(comp.rendered));
+			assert.strictEqual(1, listener.callCount);
+			assert.ok(listener.args[0][0]);
 		});
 
 		it('should run "rendered" lifecycle method when the component is rendered', function() {
@@ -140,6 +190,37 @@ describe('Component', function() {
 			comp = new Component();
 			assert.strictEqual(comp, comp.detach());
 			assert.strictEqual(comp, comp.attach());
+		});
+
+		it('should run "willDetach" lifecycle method when the component about to detach', function() {
+			class TestComponent extends Component {
+			}
+			sinon.spy(TestComponent.prototype, 'willDetach');
+			comp = new TestComponent();
+
+			assert.strictEqual(0, comp.willDetach.callCount);
+
+			comp.detach();
+
+			assert.ok(comp.willDetach.calledBefore(Component.prototype.detached));
+			assert.strictEqual(1, comp.willDetach.callCount);
+		});
+
+		it('should emit "willDetach" lifecycle method when the component about to detach', function() {
+			var listener = sinon.stub();
+			class TestComponent extends Component {
+				created() {
+					this.on('willDetach', listener);
+				}
+			}
+			comp = new TestComponent();
+
+			assert.strictEqual(0, listener.callCount);
+
+			comp.detach();
+
+			assert.ok(listener.calledBefore(Component.prototype.detached));
+			assert.strictEqual(1, listener.callCount);
 		});
 
 		it('should dispose component', function() {

@@ -2,6 +2,7 @@
 
 import { append, exitDocument } from 'metal-dom';
 import { getData } from '../data';
+import { isFunction } from 'metal';
 import { render } from './render';
 
 const patchingComponents_ = [];
@@ -15,7 +16,10 @@ const patchingComponents_ = [];
  */
 function buildParentIfNecessary_(element) {
 	if (!element || !element.parentNode) {
-		const parent = document.createElement('div');
+		let parent = {};
+		if (typeof document !== 'undefined' && isFunction(document.createElement)) {
+			parent = document.createElement('div');
+		}
 		if (element) {
 			append(parent, element);
 		}

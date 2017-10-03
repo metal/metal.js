@@ -1,0 +1,16 @@
+{
+	"name": "metal-isomorphic",
+	"version": "2.13.2",
+	"private": true,
+	"description": "Integration tests for server side rendering.",
+	"license": "BSD",
+	"repository": "https://github.com/metal/metal.js/tree/master/packages/metal-isomorphic",
+	"engines": {
+		"node": ">=0.12.0",
+		"npm": ">=3.0.0"
+	},
+	"dependencies": {
+		"metal-component": "^2.13.2",
+		"metal-soy": "^2.13.2"
+	}
+}

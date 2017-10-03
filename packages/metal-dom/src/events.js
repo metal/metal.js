@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDocument } from 'metal';
+import { isServerSide } from 'metal';
 import { registerCustomEvent, contains } from './dom';
 import features from './features';
 
@@ -47,6 +47,6 @@ function registerEvents() {
 	});
 }
 
-if (typeof window !== 'undefined' && isDocument(window.document)) {
+if (!isServerSide()) {
 	registerEvents();
 }

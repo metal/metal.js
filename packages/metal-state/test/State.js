@@ -764,6 +764,24 @@ describe('State', function() {
 		assert.strictEqual(1, listener.callCount);
 	});
 
+	it('should emit a preemptive batch event with all state changes for the cycle for providing a hook point', function(done) {
+		var state = createStateInstance();
+
+		state.on('stateWillChange', function(data) {
+			state.key2 = 20;
+		});
+
+		state.on('stateChanged', function(data, facade) {
+			assert.strictEqual(1, data.changes.key1.prevVal);
+			assert.strictEqual(10, data.changes.key1.newVal);
+			assert.strictEqual(2, data.changes.key2.prevVal);
+			assert.strictEqual(20, data.changes.key2.newVal);
+			done();
+		});
+
+		state.key1 = 10;
+	});
+
 	it('should emit a batch event with all state changes for the cycle', function(done) {
 		var state = createStateInstance();
 

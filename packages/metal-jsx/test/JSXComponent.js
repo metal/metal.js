@@ -1,5 +1,6 @@
 'use strict';
 
+import { async } from 'metal';
 import dom from 'metal-dom';
 import JSXComponent from '../src/JSXComponent';
 
@@ -303,6 +304,81 @@ describe('JSXComponent', function() {
 				var prevProps = child.propsChanged.args[0][0];
 				assert.strictEqual('foo', prevProps.foo);
 				assert.strictEqual('foo2', child.props.foo);
+				done();
+			});
+		});
+
+		it('should allow changes to state in "willReceiveProps" without triggering multiple renders', function(done) {
+			const renderStub = sinon.stub();
+			let count = 0;
+
+			class TestComponent extends JSXComponent {
+				render() {
+					renderStub();
+
+					return <div class="component">{this.props.bar}:{this.state.foo}</div>;
+				}
+
+				willReceiveProps(data) {
+					this.state.foo = 'foo' + count;
+
+					count++;
+				}
+			}
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+			TestComponent.PROPS = {
+				bar: {
+					value: 'bar'
+				}
+			};
+
+			component = new TestComponent();
+
+			component.props.bar = 'bar2';
+
+			component.once('rendered', function() {
+				assert.equal(component.element.innerHTML, 'bar2:foo0');
+
+				async.nextTick(function() {
+					component.props.bar = 'bar3';
+					component.once('rendered', function() {
+						assert.equal(component.element.innerHTML, 'bar3:foo1');
+						assert.equal(renderStub.callCount, 3);
+
+						done();
+					});
+				});
+			});
+		});
+
+		it('should pass changed props data to "willReceiveProps" method', function(done) {
+			class TestComponent extends JSXComponent {
+			}
+			TestComponent.prototype.willReceiveProps = sinon.stub();
+			TestComponent.PROPS = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+
+			component.props.foo = 'foo2';
+
+			async.nextTick(function() {
+				assert.equal(component.willReceiveProps.callCount, 1);
+				assert.deepEqual(component.willReceiveProps.args[0][0], {
+					foo: {
+						key: 'foo',
+						newVal: 'foo2',
+						prevVal: 'foo'
+					}
+				});
+
 				done();
 			});
 		});

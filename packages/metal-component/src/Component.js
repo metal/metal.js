@@ -141,6 +141,7 @@ class Component extends EventEmitter {
 		this.setUpDataManager_();
 		this.setUpSyncUpdates_();
 
+		this.on('stateWillChange', this.handleStateWillChange_);
 		this.on('stateChanged', this.handleComponentStateChanged_);
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
@@ -407,6 +408,18 @@ class Component extends EventEmitter {
 				[data.key]: data
 			}
 		});
+	}
+
+	/**
+	 * Fires before state batch changes. Provides hook point for modifying
+	 *     state.
+	 * @param {Event} event
+	 * @protected
+	 */
+	handleStateWillChange_(event) {
+		if (this.willReceiveState) {
+			this.willReceiveState(event.changes);
+		}
 	}
 
 	/**

@@ -4,7 +4,7 @@ import { getFunctionName, isDefAndNotNull } from 'metal';
 
 const ERROR_ARRAY_OF_TYPE = 'Expected an array of single type.';
 const ERROR_OBJECT_OF_TYPE = 'Expected object of one type.';
-const ERROR_ONE_OF = 'Expected one of given values.';
+const ERROR_ONE_OF = 'Expected one of the following values:';
 const ERROR_ONE_OF_TYPE = 'Expected one of given types.';
 const ERROR_SHAPE_OF = 'Expected object with a specific shape.';
 
@@ -84,8 +84,9 @@ const validators = {
 				return result;
 			}
 			return arrayOfValues.indexOf(value) === -1 ?
-				composeError(ERROR_ONE_OF, name, context) :
-				true;
+				composeError(
+					composeOneOfErrorMessage(arrayOfValues), name, context
+				) : true;
 		});
 	},
 
@@ -182,6 +183,15 @@ function composeError(error, name, context) {
 		`Warning: Invalid state passed to '${name}'. ` +
 		`${error} Passed to '${compName}'. ${location}`
 	);
+}
+
+/**
+ * Composes an error message for Conifg.oneOf validator.
+ * @param {!Array} arrayOfValues Array of values to check equality against.
+ * @return {!Error}
+ */
+function composeOneOfErrorMessage(arrayOfValues) {
+	return `${ERROR_ONE_OF} ${JSON.stringify(arrayOfValues)}.`;
 }
 
 /**

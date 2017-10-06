@@ -561,6 +561,83 @@ describe('Component', function() {
 				new CustomComponent();
 			});
 		});
+
+		it('should allow changes to state in "willReceiveState" without triggering multiple renders', function(done) {
+			const renderStub = sinon.stub();
+			let count = 0;
+
+			class CustomRenderer extends ComponentRenderer.constructor {
+				update(component) {
+					renderStub();
+
+					component.element.innerHTML = `${component.bar}:${component.foo}`;
+					component.informRendered();
+				}
+			}
+
+			class TestComponent extends Component {
+				willReceiveState(changes) {
+					this.foo = 'foo' + count;
+
+					count++;
+				}
+			}
+			TestComponent.STATE = {
+				bar: {
+					value: 'bar'
+				},
+
+				foo: {
+					value: 'foo'
+				}
+			};
+			TestComponent.RENDERER = new CustomRenderer();
+
+			comp = new TestComponent();
+
+			comp.bar = 'bar2';
+			comp.once('rendered', function() {
+				assert.equal(comp.element.innerHTML, 'bar2:foo0');
+
+				async.nextTick(function() {
+					comp.bar = 'bar3';
+					comp.once('rendered', function() {
+						assert.equal(renderStub.callCount, 2);
+						assert.equal(comp.element.innerHTML, 'bar3:foo1');
+
+						done();
+					});
+				});
+			});
+		});
+
+		it('should pass changed state data to "willReceiveState" method', function(done) {
+			class TestComponent extends Component {
+			}
+			TestComponent.prototype.willReceiveState = sinon.stub();
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			comp = new TestComponent();
+
+			comp.foo = 'foo2';
+
+			async.nextTick(function() {
+				assert.equal(comp.willReceiveState.callCount, 1);
+				assert.deepEqual(comp.willReceiveState.args[0][0], {
+					foo: {
+						key: 'foo',
+						newVal: 'foo2',
+						prevVal: 'foo'
+					}
+				});
+
+				done();
+			});
+		});
 	});
 
 	describe('Render', function() {

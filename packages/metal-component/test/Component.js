@@ -706,6 +706,25 @@ describe('Component', function() {
 				assert.strictEqual(0, renderer.update.callCount);
 			});
 		});
+
+		it('should invoke the "forceUpdate" callback argument after the rerender has completed', function() {
+			var CustomComponent = createCustomComponentClass();
+			comp = new CustomComponent();
+
+			var listener = sinon.stub();
+
+			comp.forceUpdate(listener);
+
+			assert.equal(listener.callCount, 0);
+
+			comp.informRendered();
+
+			assert.equal(listener.callCount, 1);
+
+			comp.informRendered();
+
+			assert.equal(listener.callCount, 1);
+		});
 	});
 
 	describe('Events', function() {

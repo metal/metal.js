@@ -216,9 +216,12 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * Updates the renderer's component when state changes, patching its element
 	 * through incremental dom function calls.
 	 * @param {!Component} component
+	 * @param {Object} data
 	 */
-	update(component) {
-		if (this.shouldUpdate(component, getChanges(component))) {
+	update(component, data) {
+		if (data.forceUpdate ||
+			this.shouldUpdate(component, getChanges(component))) {
+
 			this.patch(component);
 		}
 	}

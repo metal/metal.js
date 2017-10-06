@@ -197,6 +197,50 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', component.element.textContent);
 		});
 
+		it('should rerender when component\'s "forceUpdate" method has been called', function() {
+			let globalVar = 'foo';
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text(globalVar);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+
+			assert.equal(component.element.innerHTML, 'foo');
+
+			globalVar = 'bar';
+
+			component.forceUpdate();
+
+			assert.equal(component.element.innerHTML, 'bar');
+		});
+
+		it('should ignore component\'s "shouldUpdate" method when "forceUpdate" method has been called', function() {
+			let globalVar = 'foo';
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text(globalVar);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			globalVar = 'bar';
+
+			component.shouldUpdate = sinon.stub();
+
+			component.forceUpdate();
+
+			assert.equal(component.element.innerHTML, 'bar');
+			assert.equal(component.shouldUpdate.callCount, 0);
+		});
+
 		it('should run component\'s "rendered" lifecycle method on updates', function(done) {
 			var calledArgs = [];
 			class TestComponent extends Component {

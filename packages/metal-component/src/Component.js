@@ -85,6 +85,13 @@ class Component extends EventEmitter {
 		this.eventsStateKeyHandler_ = null;
 
 		/**
+		 * Stores the pending callback function for when `forceUpdate` is used
+		 * to trigger a rerender.
+		 * @type {?function}
+		 */
+		this.forceUpdateCallback_ = null;
+
+		/**
 		 * Whether the element is in document.
 		 * @type {boolean}
 		 */
@@ -283,6 +290,18 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Forces an update that ignores the `shouldUpdate` lifecycle method for
+	 * components whose render depends on external variables.
+	 */
+	forceUpdate(opt_callback) {
+		this.forceUpdateCallback_ = opt_callback;
+
+		this.updateRenderer_({
+			forceUpdate: true
+		});
+	}
+
+	/**
 	 * Gets data about where this component was attached at.
 	 * @return {!Object}
 	 */
@@ -393,6 +412,12 @@ class Component extends EventEmitter {
 	informRendered() {
 		const firstRender = !this.hasRendererRendered_;
 		this.hasRendererRendered_ = true;
+
+		if (this.forceUpdateCallback_) {
+			this.forceUpdateCallback_();
+			this.forceUpdateCallback_ = null;
+		}
+
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
 	}
@@ -636,6 +661,10 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	updateRenderer_(data) {
+		if (!data.forceUpdate) {
+			this.forceUpdateCallback_ = null;
+		}
+
 		if (!this.skipUpdates_ && this.hasRendererRendered_) {
 			this.getRenderer().update(this, data);
 		}

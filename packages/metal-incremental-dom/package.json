@@ -8,8 +8,8 @@
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "jsnext:main": "src/IncrementalDomRenderer.js",
-  "main": "lib/IncrementalDomRenderer.js",
+  "jsnext:main": "src/all/incremental-dom.js",
+  "main": "lib/all/incremental-dom.js",
   "files": [
     "lib",
     "src"

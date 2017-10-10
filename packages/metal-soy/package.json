@@ -22,7 +22,6 @@
     "metal"
   ],
   "dependencies": {
-    "html2incdom": "^0.1.1",
     "metal": "^2.13.2",
     "metal-component": "^2.13.2",
     "metal-dom": "^2.13.2",

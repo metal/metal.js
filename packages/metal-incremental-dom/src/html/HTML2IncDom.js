@@ -1,6 +1,6 @@
 'use strict';
 
-import './HTMLParser';
+import HTMLParser from './HTMLParser';
 import unescape from './unescape';
 
 var parser_;
@@ -22,7 +22,7 @@ class HTML2IncDom {
 	 * @return {!function()}
 	 */
 	static getParser() {
-		return parser_ || window.HTMLParser;
+		return parser_ || HTMLParser;
 	}
 
 	/**

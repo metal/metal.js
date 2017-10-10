@@ -228,17 +228,6 @@ export function isFunction(val) {
 }
 
 /**
- * Returns true if the specified value is an array or can be iterated over.
- * @param {?} val Variable to test.
- * @return {boolean} Whether variable is an array/iterable.
- */
-export function isArrayLike(val) {
-	return val && Array.isArray(val) ||
-		val && typeof val === 'object' && typeof val.length === 'number' &&
-		(val.length === 0 || 0 in val);
-}
-
-/**
  * Returns true if value is null.
  * @param {*} val
  * @return {boolean}

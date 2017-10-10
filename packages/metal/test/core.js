@@ -113,21 +113,6 @@ describe('core', function() {
 	});
 
 	describe('Type Check', function() {
-		it('should check if var is array like', function() {
-			assert.ok(!core.isArrayLike());
-			assert.ok(!core.isArrayLike(1));
-			assert.ok(!core.isArrayLike(''));
-			assert.ok(!core.isArrayLike({}));
-			assert.ok(!core.isArrayLike(function() {}));
-			assert.ok(!core.isArrayLike(null));
-
-			const fragment = document.createDocumentFragment();
-			fragment.appendChild(document.createElement('div'));
-
-			assert.ok(core.isArrayLike([]));
-			assert.ok(core.isArrayLike(fragment.childNodes));
-		});
-
 		it('should check if var is defined', function() {
 			assert.ok(!core.isDef(undefined));
 

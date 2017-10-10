@@ -79,7 +79,9 @@ module.exports = function(config) {
 						plugins: [
 							'istanbul'
 						],
-						presets: ['es2015']
+						presets: [
+							'env'
+						]
 					}
 				]
 			],

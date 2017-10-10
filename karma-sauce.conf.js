@@ -73,10 +73,15 @@ module.exports = function(config) {
 		browserify: {
 			debug: true,
 			transform: [
-				['babelify', {
-					presets: ['es2015']
-				}
-			]],
+				[
+					'babelify',
+					{
+						presets: [
+							'env'
+						]
+					}
+				]
+			],
 			insertGlobalVars: {
 				METAL_VERSION: function() {
 					return '\'' + lernaJson.version + '\'';

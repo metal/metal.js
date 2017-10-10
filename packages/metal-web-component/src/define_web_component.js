@@ -2,7 +2,7 @@ import State, { mergeState } from 'metal-state';
 import { getStaticProperty, isObject } from 'metal';
 
 /**
- * Register a custom element for a given metal component.
+ * Register a custom element for a given Metal component.
  *
  * @param {String} tagName The tag name to use for this custom element.
  * @param {!function()} Ctor Metal component constructor.
@@ -23,6 +23,12 @@ export function defineWebComponent(tagName, Ctor) {
 		observedAttributes = Object.keys(props);
 	}
 
+	/**
+	 * Custom Element wrapper for Metal components.
+	 *
+	 * @constructor
+	 * @extends HTMLElement
+	 */
 	function CustomElement() {
 		return Reflect.construct(HTMLElement, [], CustomElement);
 	}
@@ -33,6 +39,15 @@ export function defineWebComponent(tagName, Ctor) {
 	Object.setPrototypeOf(CustomElement, HTMLElement);
 
 	Object.assign(CustomElement.prototype, {
+		/**
+		 * Handler for when new attribute values are passed to the custom
+		 * element.
+		 *
+		 * @memberof CustomElement
+		 * @param {!string} attrName name of the changed attribute.
+		 * @param {!string} oldVal previous value of the attribute.
+		 * @param {!string} newVal new value of the attribute
+		 */
 		attributeChangedCallback: function(attrName, oldVal, newVal) {
 			if (!this.component) {
 				return;
@@ -47,6 +62,12 @@ export function defineWebComponent(tagName, Ctor) {
 			}
 		},
 
+		/**
+		 * Handles the initial rendering of the Metal component. Invoked when
+		 * the custom element enters the document.
+		 *
+		 * @memberof CustomElement
+		 */
 		connectedCallback: function() {
 			const useShadowDOM = this.getAttribute('useShadowDOM') || false;
 			let element = this;
@@ -70,6 +91,12 @@ export function defineWebComponent(tagName, Ctor) {
 			this.component.on('*', this.componentEventHandler);
 		},
 
+		/**
+		 * Parses attribute value as JSON in case it is an Array or Object.
+		 *
+		 * @memberof CustomElement
+		 * @param {?} value attribute value that should be parsed.
+		 */
 		deserializeValue_: function(value) {
 			let retVal;
 
@@ -80,11 +107,24 @@ export function defineWebComponent(tagName, Ctor) {
 			return retVal || value;
 		},
 
+		/**
+		 * Disposes the Metal component and detaches event listeners. Invoked
+		 * once the custom element exits the document.
+		 *
+		 * @memberof CustomElement
+		 */
 		disconnectedCallback: function() {
 			this.component.off('*', this.componentEventHandler);
 			this.component.dispose();
 		},
 
+		/**
+		 * Proxy event handler that passes event payloads from Metal component
+		 * events to custom element events.
+		 *
+		 * @memberof CustomElement
+		 * @param {?} data data emitted from Metal component event
+		 */
 		emit: function(...data) {
 			const eventData = data.pop();
 			const event = new CustomEvent(eventData.type, {

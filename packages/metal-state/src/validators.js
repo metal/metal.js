@@ -186,7 +186,7 @@ function composeError(error, name, context) {
 }
 
 /**
- * Composes an error message for Conifg.oneOf validator.
+ * Composes an error message for Config.oneOf validator.
  * @param {!Array} arrayOfValues Array of values to check equality against.
  * @return {!Error}
  */

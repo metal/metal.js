@@ -1,4 +1,4 @@
-/* jshint ignore:start */
+/* eslint-disable */
 
 /*
  * HTML5 Parser By Sam Blowes
@@ -258,4 +258,4 @@ function makeMap(str) {
 
 export default HTMLParser;
 
-/* jshint ignore:end */
+/* eslint-enable */

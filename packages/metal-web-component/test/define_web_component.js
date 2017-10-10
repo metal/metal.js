@@ -178,6 +178,60 @@ describe('Web components', function() {
 
 			assert.equal(el.innerHTML, '<div title="default title"></div>');
 		});
+
+		it('should have the correct inner html when useshadowdom is true', function() {
+			const tagName = createJSXWebComponent('custom-jsx-test-element-05');
+			el = document.createElement(tagName);
+			el.setAttribute('useshadowdom', true);
+
+			document.body.appendChild(el);
+
+			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+		});
+
+		it('should render custom element via html', function() {
+			const tagName = createJSXWebComponent('custom-jsx-test-element-06');
+
+			const innerHTML = '<' + tagName + '></' + tagName + '>';
+
+			document.body.innerHTML = innerHTML;
+
+			assert.equal(document.body.innerHTML, '<metal-test-component-custom-jsx-test-element-06><div title="default title"></div></metal-test-component-custom-jsx-test-element-06>');
+		});
+
+		it('should render custom element via html when useshadowdom is true', function() {
+			const tagName = createJSXWebComponent('custom-jsx-test-element-07');
+
+			const innerHTML = '<' + tagName + ' useshadowdom="true"></' + tagName + '>';
+
+			document.body.innerHTML = innerHTML;
+
+			el = document.querySelector(tagName);
+
+			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+		});
+
+		it('should deserialize attribute if json is passed', function() {
+			const tagName = createJSXWebComponent('custom-jsx-test-element-08');
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', '{"key1": "value1", "key2": "value2"}');
+			document.body.appendChild(el);
+
+			let title = el.component.props.title;
+
+			assert.isObject(title);
+			assert.equal(title.key1, 'value1');
+			assert.equal(title.key2, 'value2');
+
+			el.setAttribute('title', '{"key3": "value3"}');
+
+			title = el.component.props.title;
+
+			assert.isObject(title);
+			assert.isUndefined(title.key1);
+			assert.equal(title.key3, 'value3');
+		});
 	});
 
 	function createJSXWebComponent(name) {

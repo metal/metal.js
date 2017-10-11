@@ -59,6 +59,8 @@ module.exports = function(config) {
 			}
 		],
 
+		exclude: ['packages/metal-isomorphic/**/*.js'],
+
 		preprocessors: {
 			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
@@ -71,10 +73,15 @@ module.exports = function(config) {
 		browserify: {
 			debug: true,
 			transform: [
-				['babelify', {
-					presets: ['es2015']
-				}
-			]],
+				[
+					'babelify',
+					{
+						presets: [
+							'env'
+						]
+					}
+				]
+			],
 			insertGlobalVars: {
 				METAL_VERSION: function() {
 					return '\'' + lernaJson.version + '\'';

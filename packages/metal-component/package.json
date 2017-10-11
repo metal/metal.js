@@ -15,7 +15,7 @@
     "src"
   ],
   "scripts": {
-    "compile": "babel --presets es2015 -d lib/ src/",
+    "compile": "babel --no-babelrc --presets env -d lib/ src/",
     "prepublish": "npm run compile"
   },
   "keywords": [
@@ -29,6 +29,6 @@
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.0.0"
+    "babel-preset-env": "^1.6.0"
   }
 }

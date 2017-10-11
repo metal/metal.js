@@ -59,6 +59,8 @@ module.exports = function(config) {
 			}
 		],
 
+		exclude: ['packages/metal-isomorphic/**/*.js'],
+
 		preprocessors: {
 			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
@@ -77,7 +79,9 @@ module.exports = function(config) {
 						plugins: [
 							'istanbul'
 						],
-						presets: ['es2015']
+						presets: [
+							'env'
+						]
 					}
 				]
 			],

@@ -108,6 +108,12 @@ gulp.task('soy', function() {
 		.pipe(gulp.dest('packages/metal-soy/test'));
 });
 
+gulp.task('soy:isomorphic', function() {
+	return gulp.src('packages/metal-isomorphic/test/**/*.soy')
+		.pipe(compileSoy())
+		.pipe(gulp.dest('packages/metal-isomorphic/test'));
+});
+
 gulp.task('build:cjs', ['soy'], function() {
 	return compileToLib('packages/metal*/src/**/*.js');
 });
@@ -148,7 +154,7 @@ function calcDestDir(file) {
 function compileToLib(src) {
 	return gulp.src(src)
 		.pipe(babel({
-			presets: ['es2015']
+			presets: ['env']
 		}))
 		.pipe(gulp.dest(calcDestDir));
 }

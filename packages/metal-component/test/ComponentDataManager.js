@@ -42,6 +42,19 @@ describe('ComponentDataManager', function() {
 		assert.strictEqual('initialFoo', component.foo);
 	});
 
+	it('should use default state value when "undefined" is passed as initial value', function() {
+		initialConfig = {
+			foo: undefined
+		};
+		ComponentDataManager.setUp(component, {
+			foo: {
+				value: 'defaultFoo'
+			}
+		});
+
+		assert.strictEqual(component.foo, 'defaultFoo');
+	});
+
 	it('should throw error if attempting to add state property named "element"', function() {
 		assert.throws(() => {
 			ComponentDataManager.setUp(component, {

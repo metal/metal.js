@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, getStaticProperty, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
+import { async, getStaticProperty, isDef, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
 import { EventEmitter } from 'metal-events';
 
 /**
@@ -412,7 +412,8 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	hasInitialValue_(name) {
-		return this.initialValues_.hasOwnProperty(name);
+		return this.initialValues_.hasOwnProperty(name) &&
+			isDef(this.initialValues_[name]);
 	}
 
 	/**
@@ -637,7 +638,9 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateInitialValue_(name) {
-		if (this.hasInitialValue_(name) && !this.callValidator_(name, this.initialValues_[name])) {
+		if (this.initialValues_.hasOwnProperty(name) &&
+			!this.callValidator_(name, this.initialValues_[name])) {
+
 			delete this.initialValues_[name];
 		}
 	}

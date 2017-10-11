@@ -307,6 +307,19 @@ describe('State', function() {
 		assert.strictEqual(1, state.key1);
 	});
 
+	it('should not overwrite default value with "undefined" initial value', function() {
+		var state = new State({
+			key1: undefined
+		});
+		state.configState({
+			key1: {
+				value: 'value1'
+			}
+		});
+
+		assert.equal(state.key1, 'value1');
+	});
+
 	it('should allow accessing other state properties in validator', function() {
 		var state = new State({
 			key1: 1

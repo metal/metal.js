@@ -33,7 +33,24 @@ module.exports = function(config) {
 				included: true,
 				served: true
 			},
-
+			{
+				pattern: 'packages/metal-web-component/node_modules/babel-polyfill/dist/polyfill.min.js',
+				watched: false,
+				included: true,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-web-component/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js',
+				watched: false,
+				included: false,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-web-component/webcomponents_polyfill.js',
+				watched: false,
+				included: true,
+				served: true
+			},
 			{
 				pattern: 'packages/metal*/test/**/*.js',
 				watched: false,
@@ -64,7 +81,9 @@ module.exports = function(config) {
 				[
 					'babelify',
 					{
-						plugins: ['istanbul'],
+						plugins: [
+							'istanbul'
+						],
 						presets: ['es2015']
 					}
 				]

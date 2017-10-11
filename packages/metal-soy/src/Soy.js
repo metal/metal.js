@@ -1,5 +1,8 @@
 'use strict';
 
+// Must be imported before `html2incdom`;
+import './dom_shim';
+
 import 'metal-soy-bundle';
 import { ComponentRegistry } from 'metal-component';
 import { isFunction, isObject, isString, object } from 'metal';

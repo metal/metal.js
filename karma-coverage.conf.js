@@ -28,12 +28,29 @@ module.exports = function(config) {
 				served: true
 			},
 			{
-				pattern: 'packages/metal-soy/node_modules/html2incdom/lib/*.js',
+				pattern: 'packages/metal-soy-bundle/build/bundle.js',
+				watched: false,
+				included: false,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-web-component/node_modules/babel-polyfill/dist/polyfill.min.js',
 				watched: false,
 				included: true,
 				served: true
 			},
-
+			{
+				pattern: 'packages/metal-web-component/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js',
+				watched: false,
+				included: false,
+				served: true
+			},
+			{
+				pattern: 'packages/metal-web-component/webcomponents_polyfill.js',
+				watched: false,
+				included: true,
+				served: true
+			},
 			{
 				pattern: 'packages/metal*/test/**/*.js',
 				watched: false,
@@ -48,11 +65,13 @@ module.exports = function(config) {
 			}
 		],
 
+		exclude: ['packages/metal-isomorphic/**/*.js'],
+
 		preprocessors: {
 			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
 			'packages/metal-soy-bundle/lib/bundle.js': ['browserify'],
-			'packages/metal-soy/node_modules/html2incdom/lib/*.js': ['browserify'],
+			'packages/metal-soy-bundle/build/bundle.js': ['browserify'],
 			'packages/metal*/test/**/*.js': ['browserify']
 		},
 
@@ -64,8 +83,12 @@ module.exports = function(config) {
 				[
 					'babelify',
 					{
-						plugins: ['istanbul'],
-						presets: ['es2015']
+						plugins: [
+							'istanbul'
+						],
+						presets: [
+							'env'
+						]
 					}
 				]
 			],

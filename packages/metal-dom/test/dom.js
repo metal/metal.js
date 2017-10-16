@@ -245,6 +245,21 @@ describe('dom', function() {
 			});
 		});
 
+		it('should check if var is NodeList like', function() {
+			assert.ok(!dom.isNodeListLike());
+			assert.ok(!dom.isNodeListLike(1));
+			assert.ok(!dom.isNodeListLike(''));
+			assert.ok(!dom.isNodeListLike({}));
+			assert.ok(!dom.isNodeListLike([]));
+			assert.ok(!dom.isNodeListLike(function() {}));
+			assert.ok(!dom.isNodeListLike(null));
+
+			var html = '<div>Hello World 1</div><div>Hello World 2</div>';
+			var fragment = dom.buildFragment(html);
+
+			assert.ok(dom.isNodeListLike(fragment.childNodes));
+		});
+
 		it('should node enter document', function() {
 			var element = document.createElement('div');
 			dom.enterDocument(element);

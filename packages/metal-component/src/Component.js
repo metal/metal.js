@@ -1,7 +1,7 @@
 'use strict';
 
 import { addListenersFromObj } from './events/events';
-import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isString, object } from 'metal';
+import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isServerSide, isString, object } from 'metal';
 import { syncState } from './sync/sync';
 import { DomEventEmitterProxy, toElement } from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
@@ -107,6 +107,13 @@ class Component extends EventEmitter {
 		this.initialConfig_ = opt_config || {};
 
 		/**
+		 * Whether the current environment is server side.
+		 * @type {boolean}
+		 * @protected
+		 */
+		this.serverSide_ = isServerSide();
+
+		/**
 		 * Whether the element was rendered.
 		 * @type {boolean}
 		 */
@@ -118,7 +125,7 @@ class Component extends EventEmitter {
 		 * `attach`.
 		 * @type {!Element}
 		 */
-		this.DEFAULT_ELEMENT_PARENT = document.body;
+		this.DEFAULT_ELEMENT_PARENT = !this.serverSide_ ? document.body : null;
 
 		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;
@@ -524,7 +531,7 @@ class Component extends EventEmitter {
 		this.emit('willRender', firstRender);
 		this.willRender(firstRender);
 		if (!this.hasRendererRendered_) {
-			if (window.__METAL_DEV_TOOLS_HOOK__) {
+			if (!this.serverSide_ && window.__METAL_DEV_TOOLS_HOOK__) {
 				window.__METAL_DEV_TOOLS_HOOK__(this);
 			}
 			this.getRenderer().render(this);

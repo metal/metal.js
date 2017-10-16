@@ -23,7 +23,13 @@ gulp.task('build', function() {
   return gulp.src(dependencies)
     .pipe(concat('bundle.js'))
     .pipe(replace('var goog = goog || {};', 'var goog = this.goog || {};'))
-    .pipe(header('import \'metal-incremental-dom\';\n\n(function() {\nthis.CLOSURE_NO_DEPS = true;\nthis.goog = this.goog || {};\n\n'))
+    .pipe(header('import \'metal-incremental-dom\';\n\n(function() {\nthis.CLOSURE_NO_DEPS = true;\nthis.goog = this.goog || {};\n\n' +
+      'if (this.__METAL_SOY_BUNDLE_LOADED__) {\n' +
+      '  console.warn(\'Warning: metal-soy-bundle has already been loaded. Dedupe bundle to remove this warning.\');\n' +
+      '  return;\n' +
+      '}\n' +
+      'this.__METAL_SOY_BUNDLE_LOADED__ = true;\n\n'
+    ))
     .pipe(footer('\n\ngoog.loadModule(function() {\n' +
       '  goog.module(\'incrementaldom\');\n' +
       '  return IncrementalDOM;\n' +

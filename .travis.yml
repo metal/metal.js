@@ -18,4 +18,6 @@ jdk:
 
 language: java
 
-script: gulp test:saucelabs
+script:
+  - gulp test:saucelabs
+  - npm run test:isomorphic

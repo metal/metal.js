@@ -28,6 +28,12 @@ module.exports = function(config) {
 				served: true
 			},
 			{
+				pattern: 'packages/metal-soy-bundle/build/bundle.js',
+				watched: false,
+				included: false,
+				served: true
+			},
+			{
 				pattern: 'packages/metal-web-component/node_modules/babel-polyfill/dist/polyfill.min.js',
 				watched: false,
 				included: true,
@@ -65,6 +71,7 @@ module.exports = function(config) {
 			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
 			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
 			'packages/metal-soy-bundle/lib/bundle.js': ['browserify'],
+			'packages/metal-soy-bundle/build/bundle.js': ['browserify'],
 			'packages/metal*/test/**/*.js': ['browserify']
 		},
 

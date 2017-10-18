@@ -32,6 +32,9 @@ class features {
 		const prefixes = ['Webkit', 'MS', 'O', ''];
 		const typeTitleCase = string.replaceInterval(type, 0, 1, type.substring(0, 1).toUpperCase());
 		const suffixes = [`${typeTitleCase}End`, `${typeTitleCase}End`, `${typeTitleCase}End`, `${type}end`];
+		if (!features.animationElement_) {
+			features.animationElement_ = document.createElement('div');
+		}
 		for (let i = 0; i < prefixes.length; i++) {
 			if (features.animationElement_.style[prefixes[i] + typeTitleCase] !== undefined) {
 				return prefixes[i].toLowerCase() + suffixes[i];
@@ -57,7 +60,7 @@ class features {
 	}
 }
 
-features.animationElement_ = document.createElement('div');
+features.animationElement_ = undefined;
 features.animationEventName_ = undefined;
 features.attrOrderChange_ = undefined;
 

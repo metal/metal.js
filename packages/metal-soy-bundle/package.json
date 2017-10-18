@@ -19,13 +19,13 @@
   ],
   "scripts": {
     "build": "gulp",
-    "compile": "babel --presets es2015 -d lib/ build/",
+    "compile": "babel --no-babelrc --presets env -d lib/ build/",
     "lint": "jshint gulpfile.js",
     "prepublish": "npm run build && npm run compile"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-env": "^1.6.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-footer": "^1.0.5",

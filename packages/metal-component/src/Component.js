@@ -28,10 +28,19 @@ import { EventEmitter, EventHandler } from 'metal-events';
  *   created() {
  *   }
  *
+ *   willRender() {
+ *   }
+ *
  *   rendered() {
  *   }
  *
+ *   willAttach() {
+ *   }
+ *
  *   attached() {
+ *   }
+ *
+ *   willDetach() {
  *   }
  *
  *   detached() {
@@ -125,6 +134,7 @@ class Component extends EventEmitter {
 		this.setUpDataManager_();
 		this.setUpSyncUpdates_();
 
+		this.on('stateWillChange', this.handleStateWillChange_);
 		this.on('stateChanged', this.handleComponentStateChanged_);
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
@@ -172,6 +182,8 @@ class Component extends EventEmitter {
 	 */
 	attach(opt_parentElement, opt_siblingElement) {
 		if (!this.inDocument) {
+			this.emit('willAttach');
+			this.willAttach();
 			this.attachElement(opt_parentElement, opt_siblingElement);
 			this.inDocument = true;
 			this.attachData_ = {
@@ -238,6 +250,8 @@ class Component extends EventEmitter {
 	 */
 	detach() {
 		if (this.inDocument) {
+			this.emit('willDetach');
+			this.willDetach();
 			if (this.element && this.element.parentNode) {
 				this.element.parentNode.removeChild(this.element);
 			}
@@ -378,6 +392,18 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Fires before state batch changes. Provides hook point for modifying
+	 *     state.
+	 * @param {Event} event
+	 * @protected
+	 */
+	handleStateWillChange_(event) {
+		if (this.willReceiveState) {
+			this.willReceiveState(event.changes);
+		}
+	}
+
+	/**
 	 * Checks if this component has sync updates enabled.
 	 * @return {boolean}
 	 */
@@ -501,6 +527,9 @@ class Component extends EventEmitter {
 	 *     be called manually later to actually attach it to the dom.
 	 */
 	renderComponent(opt_parentElement) {
+		const firstRender = !this.hasRendererRendered_;
+		this.emit('willRender', firstRender);
+		this.willRender(firstRender);
 		if (!this.hasRendererRendered_) {
 			if (!this.serverSide_ && window.__METAL_DEV_TOOLS_HOOK__) {
 				window.__METAL_DEV_TOOLS_HOOK__(this);
@@ -650,6 +679,23 @@ class Component extends EventEmitter {
 	validatorEventsFn_(val) {
 		return !isDefAndNotNull(val) || isObject(val);
 	}
+
+	/**
+	 * Lifecycle. Fires before the component has been attached to the DOM.
+	 */
+	willAttach() {}
+
+	/**
+	 * Lifecycle. Fires before component is detached from the DOM.
+	 */
+	willDetach() {}
+
+	/**
+	 * Lifecycle. Fires whenever the component is about to render.
+	 * @param {boolean} firstRender Flag indicating if this will be the
+	 *     component's first render.
+	 */
+	willRender() {}
 }
 
 /**

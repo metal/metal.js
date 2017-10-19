@@ -304,6 +304,8 @@ class State extends EventEmitter {
 	 */
 	emitBatchEvent_() {
 		if (!this.isDisposed()) {
+			this.context_.emit('stateWillChange', this.scheduledBatchData_);
+
 			const data = this.scheduledBatchData_;
 			this.scheduledBatchData_ = null;
 			this.context_.emit('stateChanged', data);

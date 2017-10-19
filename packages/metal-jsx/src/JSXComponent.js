@@ -34,6 +34,18 @@ class JSXComponent extends Component {
 	}
 
 	/**
+	 * Fires before state batch changes. Provides hook point for modifying
+	 *     state.
+	 * @param {Event} event
+	 * @protected
+	 */
+	handleStateWillChange_(event) {
+		if (event.type !== 'state' && this.willReceiveProps) {
+			this.willReceiveProps(event.changes);
+		}
+	}
+
+	/**
 	 * Returns props that are not used or declared in the component.
 	 * @return {Object} Object containing props
 	 */

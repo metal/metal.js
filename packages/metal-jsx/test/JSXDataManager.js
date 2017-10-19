@@ -168,6 +168,22 @@ describe('JSXDataManager', function() {
 			assert.strictEqual('foo', component.props.foo);
 		});
 
+		it('should use default prop value when "undefined" is passed as initial value', function() {
+			class TestComponent extends Component {
+			}
+			TestComponent.DATA_MANAGER = JSXDataManager;
+			TestComponent.PROPS = {
+				foo: {
+					value: 'defaultFoo'
+				}
+			};
+
+			component = new TestComponent({
+				foo: undefined
+			});
+			assert.strictEqual('defaultFoo', component.props.foo);
+		});
+
 		it('should include default component data in "props"', function() {
 			class TestComponent extends Component {
 			}

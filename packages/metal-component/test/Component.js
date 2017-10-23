@@ -136,33 +136,6 @@ describe('Component', function() {
 			assert.strictEqual('.sibling', attachData.sibling);
 		});
 
-		it('should run "willRender" lifecycle method when the component about to render', function() {
-			class TestComponent extends Component {
-			}
-			sinon.spy(TestComponent.prototype, 'willRender');
-			sinon.spy(TestComponent.prototype, 'rendered');
-			comp = new TestComponent();
-
-			assert.ok(comp.willRender.calledBefore(comp.rendered));
-			assert.strictEqual(1, comp.willRender.callCount);
-			assert.ok(comp.willRender.args[0][0]);
-		});
-
-		it('should emit "willRender" event when the component about to render', function() {
-			var listener = sinon.stub();
-			class TestComponent extends Component {
-				created() {
-					this.on('willRender', listener);
-				}
-			}
-			sinon.spy(TestComponent.prototype, 'rendered');
-			comp = new TestComponent();
-
-			assert.ok(listener.calledBefore(comp.rendered));
-			assert.strictEqual(1, listener.callCount);
-			assert.ok(listener.args[0][0]);
-		});
-
 		it('should run "rendered" lifecycle method when the component is rendered', function() {
 			class TestComponent extends Component {
 			}

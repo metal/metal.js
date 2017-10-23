@@ -154,10 +154,14 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * @param {!Component} component
 	 */
 	renderInsidePatch(component) {
+		const changes = getChanges(component);
+
 		const shouldRender = !component.wasRendered ||
-			this.shouldUpdate(component, getChanges(component)) ||
+			this.shouldUpdate(component, changes) ||
 			IncrementalDOM.currentPointer() !== component.element;
 		if (shouldRender) {
+			this.willUpdate_(component, changes);
+
 			render(component);
 		} else if (component.element) {
 			this.skipRender();
@@ -219,11 +223,23 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * @param {Object} data
 	 */
 	update(component, data) {
-		if (data.forceUpdate ||
-			this.shouldUpdate(component, getChanges(component))) {
-
+		const changes = getChanges(component);
+		if (data.forceUpdate || this.shouldUpdate(component, changes)) {
+			this.willUpdate_(component, changes);
 			this.patch(component);
 		}
+	}
+
+	/**
+	 * Invokes component's "willUpdate" lifecycle method if applicable.
+	 * @param {!Component} component
+	 * @param {Object} changes
+	 */
+	willUpdate_(component, changes) {
+		if (!component.willUpdate || !component.wasRendered || !changes) {
+			return;
+		}
+		component.willUpdate(...this.buildShouldUpdateArgs(changes));
 	}
 }
 

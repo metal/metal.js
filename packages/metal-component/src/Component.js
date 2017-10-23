@@ -552,9 +552,6 @@ class Component extends EventEmitter {
 	 *     be called manually later to actually attach it to the dom.
 	 */
 	renderComponent(opt_parentElement) {
-		const firstRender = !this.hasRendererRendered_;
-		this.emit('willRender', firstRender);
-		this.willRender(firstRender);
 		if (!this.hasRendererRendered_) {
 			if (!this.serverSide_ && window.__METAL_DEV_TOOLS_HOOK__) {
 				window.__METAL_DEV_TOOLS_HOOK__(this);
@@ -718,13 +715,6 @@ class Component extends EventEmitter {
 	 * Lifecycle. Fires before component is detached from the DOM.
 	 */
 	willDetach() {}
-
-	/**
-	 * Lifecycle. Fires whenever the component is about to render.
-	 * @param {boolean} firstRender Flag indicating if this will be the
-	 *     component's first render.
-	 */
-	willRender() {}
 }
 
 /**

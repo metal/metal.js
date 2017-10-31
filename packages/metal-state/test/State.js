@@ -1041,6 +1041,32 @@ describe('State', function() {
 			assert.strictEqual('foo2', test2.key1);
 			assert.strictEqual('foo1', test1.key1);
 		});
+
+		it('should configure static STATE with multiple levels of class inheritance', function() {
+			var Test = createTestClass();
+			Test.STATE = {
+				key1: {
+				}
+			};
+
+			class Child extends Test {
+			}
+			Child.STATE = {
+				key2: {
+				}
+			};
+
+			var test = new Test({
+				key1: 'foo1'
+			});
+			assert.strictEqual('foo1', test.key1);
+
+			var child = new Child({
+				key2: 'foo2'
+			});
+			assert.strictEqual('foo1', test.key1);
+			assert.strictEqual('foo2', child.key2);
+		});
 	});
 
 	describe('Separate object', function() {

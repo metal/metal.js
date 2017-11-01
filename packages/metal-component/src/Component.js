@@ -28,7 +28,7 @@ import { EventEmitter, EventHandler } from 'metal-events';
  *   created() {
  *   }
  *
- *   willRender() {
+ *   willUpdate() {
  *   }
  *
  *   rendered() {

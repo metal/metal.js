@@ -94,7 +94,7 @@ describe('Component', function() {
 			assert.ok(comp.inDocument);
 		});
 
-		it('should run "willAttach" lifecycle method when the component about to attach', function() {
+		it('should run "willAttach" lifecycle method when the component is about to attach', function() {
 			class TestComponent extends Component {
 			}
 			sinon.spy(TestComponent.prototype, 'willAttach');
@@ -104,7 +104,7 @@ describe('Component', function() {
 			assert.strictEqual(1, comp.willAttach.callCount);
 		});
 
-		it('should emit "willAttach" lifecycle method when the component about to attach', function() {
+		it('should emit "willAttach" lifecycle event when the component is about to attach', function() {
 			var listener = sinon.stub();
 			class TestComponent extends Component {
 				created() {
@@ -165,7 +165,7 @@ describe('Component', function() {
 			assert.strictEqual(comp, comp.attach());
 		});
 
-		it('should run "willDetach" lifecycle method when the component about to detach', function() {
+		it('should run "willDetach" lifecycle method when the component is about to detach', function() {
 			class TestComponent extends Component {
 			}
 			sinon.spy(TestComponent.prototype, 'willDetach');
@@ -179,7 +179,7 @@ describe('Component', function() {
 			assert.strictEqual(1, comp.willDetach.callCount);
 		});
 
-		it('should emit "willDetach" lifecycle method when the component about to detach', function() {
+		it('should emit "willDetach" lifecycle event when the component is about to detach', function() {
 			var listener = sinon.stub();
 			class TestComponent extends Component {
 				created() {

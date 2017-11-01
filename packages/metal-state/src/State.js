@@ -271,8 +271,6 @@ class State extends EventEmitter {
 
 	/**
 	 * Adds state keys from super classes static hint `MyClass.STATE = {};`.
-	 * @param {Object.<string, !Object>=} opt_config An object that maps all the
-	 *     configurations for state keys.
 	 * @protected
 	 */
 	configStateFromStaticHint_() {
@@ -280,8 +278,13 @@ class State extends EventEmitter {
 		if (ctor !== State) {
 			let defineContext;
 			if (this.obj_ === this) {
-				defineContext = ctor.hasConfiguredState_ ? false : ctor.prototype;
-				ctor.hasConfiguredState_ = true;
+				const staticKey = State.STATE_STATIC_HINT_CONFIGURED;
+
+				ctor[staticKey] = ctor[staticKey] || {};
+
+				defineContext = ctor[staticKey][ctor.name] ? false :
+					ctor.prototype;
+				ctor[staticKey][ctor.name] = true;
 			}
 			this.configState(State.getStateStatic(ctor), defineContext);
 		}
@@ -676,7 +679,19 @@ class State extends EventEmitter {
 	}
 }
 
+/**
+ * Constant used as key on State instance for storing property definition.
+ * @type {!string}
+ */
 State.STATE_REF_KEY = '__METAL_STATE_REF_KEY__';
+
+/**
+ * Constant used as key on class constructors that extend from State, stores
+ * which constructors have had their static STATE configured so that
+ * configuration of STATE is not repeated.
+ * @type {!string}
+ */
+State.STATE_STATIC_HINT_CONFIGURED = '__METAL_STATE_STATIC_HINT_CONFIGURED__';
 
 /**
  * Constants that represent the states that a state key can be in.

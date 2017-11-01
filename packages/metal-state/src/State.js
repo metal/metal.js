@@ -271,8 +271,6 @@ class State extends EventEmitter {
 
 	/**
 	 * Adds state keys from super classes static hint `MyClass.STATE = {};`.
-	 * @param {Object.<string, !Object>=} opt_config An object that maps all the
-	 *     configurations for state keys.
 	 * @protected
 	 */
 	configStateFromStaticHint_() {
@@ -688,7 +686,7 @@ class State extends EventEmitter {
 State.STATE_REF_KEY = '__METAL_STATE_REF_KEY__';
 
 /**
- * Constant used as key on class constructors that extend form State, stores
+ * Constant used as key on class constructors that extend from State, stores
  * which constructors have had their static STATE configured so that
  * configuration of STATE is not repeated.
  * @type {!string}

@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDef, isDocument, isDocumentFragment, isElement, isObject, isString, object } from 'metal';
+import { isDef, isDefAndNotNull, isDocument, isDocumentFragment, isElement, isObject, isString, object } from 'metal';
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
@@ -168,7 +168,7 @@ export function append(parent, child) {
 	if (isString(child)) {
 		child = buildFragment(child);
 	}
-	if (child instanceof NodeList) {
+	if (isNodeListLike(child)) {
 		const childArr = Array.prototype.slice.call(child);
 		for (let i = 0; i < childArr.length; i++) {
 			parent.appendChild(childArr[i]);
@@ -275,6 +275,16 @@ function isAbleToInteractWith_(node, eventName, opt_eventObj) {
 		return !(node.disabled || parent(node, 'fieldset[disabled]'));
 	}
 	return true;
+}
+
+/**
+ * Returns true if the specified value is a NodeList or like one.
+ * @param {?} val Variable to test.
+ * @return {boolean} Whether variable is like a NodeList.
+ */
+export function isNodeListLike(val) {
+	return isDefAndNotNull(val) && typeof val.length === 'number' &&
+		typeof val.item === 'function';
 }
 
 /**

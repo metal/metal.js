@@ -4,8 +4,7 @@ import 'metal-soy-bundle';
 import { ComponentRegistry } from 'metal-component';
 import { isFunction, isObject, isString, object } from 'metal';
 import { validators, Config } from 'metal-state';
-import HTML2IncDom from 'html2incdom';
-import IncrementalDomRenderer from 'metal-incremental-dom';
+import IncrementalDomRenderer, { HTML2IncDom } from 'metal-incremental-dom';
 import SoyAop from './SoyAop';
 
 // The injected data that will be passed to soy templates.

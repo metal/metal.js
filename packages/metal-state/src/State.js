@@ -1,6 +1,6 @@
 'use strict';
 
-import { async, getStaticProperty, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
+import { async, getStaticProperty, isDef, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
 import { EventEmitter } from 'metal-events';
 
 /**
@@ -271,8 +271,6 @@ class State extends EventEmitter {
 
 	/**
 	 * Adds state keys from super classes static hint `MyClass.STATE = {};`.
-	 * @param {Object.<string, !Object>=} opt_config An object that maps all the
-	 *     configurations for state keys.
 	 * @protected
 	 */
 	configStateFromStaticHint_() {
@@ -280,8 +278,13 @@ class State extends EventEmitter {
 		if (ctor !== State) {
 			let defineContext;
 			if (this.obj_ === this) {
-				defineContext = ctor.hasConfiguredState_ ? false : ctor.prototype;
-				ctor.hasConfiguredState_ = true;
+				const staticKey = State.STATE_STATIC_HINT_CONFIGURED;
+
+				ctor[staticKey] = ctor[staticKey] || {};
+
+				defineContext = ctor[staticKey][ctor.name] ? false :
+					ctor.prototype;
+				ctor[staticKey][ctor.name] = true;
 			}
 			this.configState(State.getStateStatic(ctor), defineContext);
 		}
@@ -304,6 +307,8 @@ class State extends EventEmitter {
 	 */
 	emitBatchEvent_() {
 		if (!this.isDisposed()) {
+			this.context_.emit('stateWillChange', this.scheduledBatchData_);
+
 			const data = this.scheduledBatchData_;
 			this.scheduledBatchData_ = null;
 			this.context_.emit('stateChanged', data);
@@ -412,7 +417,8 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	hasInitialValue_(name) {
-		return this.initialValues_.hasOwnProperty(name);
+		return this.initialValues_.hasOwnProperty(name) &&
+			isDef(this.initialValues_[name]);
 	}
 
 	/**
@@ -637,7 +643,9 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateInitialValue_(name) {
-		if (this.hasInitialValue_(name) && !this.callValidator_(name, this.initialValues_[name])) {
+		if (this.initialValues_.hasOwnProperty(name) &&
+			!this.callValidator_(name, this.initialValues_[name])) {
+
 			delete this.initialValues_[name];
 		}
 	}
@@ -673,7 +681,19 @@ class State extends EventEmitter {
 	}
 }
 
+/**
+ * Constant used as key on State instance for storing property definition.
+ * @type {!string}
+ */
 State.STATE_REF_KEY = '__METAL_STATE_REF_KEY__';
+
+/**
+ * Constant used as key on class constructors that extend from State, stores
+ * which constructors have had their static STATE configured so that
+ * configuration of STATE is not repeated.
+ * @type {!string}
+ */
+State.STATE_STATIC_HINT_CONFIGURED = '__METAL_STATE_STATIC_HINT_CONFIGURED__';
 
 /**
  * Constants that represent the states that a state key can be in.

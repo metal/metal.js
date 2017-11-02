@@ -197,6 +197,50 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('foo', component.element.textContent);
 		});
 
+		it('should rerender when component\'s "forceUpdate" method has been called', function() {
+			let globalVar = 'foo';
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text(globalVar);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+
+			assert.equal(component.element.innerHTML, 'foo');
+
+			globalVar = 'bar';
+
+			component.forceUpdate();
+
+			assert.equal(component.element.innerHTML, 'bar');
+		});
+
+		it('should ignore component\'s "shouldUpdate" method when "forceUpdate" method has been called', function() {
+			let globalVar = 'foo';
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text(globalVar);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+			globalVar = 'bar';
+
+			component.shouldUpdate = sinon.stub();
+
+			component.forceUpdate();
+
+			assert.equal(component.element.innerHTML, 'bar');
+			assert.equal(component.shouldUpdate.callCount, 0);
+		});
+
 		it('should run component\'s "rendered" lifecycle method on updates', function(done) {
 			var calledArgs = [];
 			class TestComponent extends Component {
@@ -2764,6 +2808,87 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('foo2', component.element.childNodes[0].textContent);
 				assert.ok(!child.element);
 				done();
+			});
+		});
+	});
+
+	describe('Function - willUpdate', function() {
+		it('should run "willUpdate" lifecycle method when the component is about to render', function(done) {
+			class TestComponent extends Component {
+				render() {}
+			}
+			TestComponent.prototype.willUpdate = sinon.stub();
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+
+			async.nextTick(function() {
+				component.foo = 'foo2';
+
+				async.nextTick(function() {
+					sinon.assert.callCount(component.willUpdate, 1);
+					sinon.assert.calledWith(component.willUpdate, {
+						foo: {
+							key: 'foo',
+							newVal: 'foo2',
+							prevVal: 'foo'
+						}
+					});
+
+					done();
+				});
+			});
+		});
+
+		it('should run "willUpdate" lifecycle method of nested component when it is about to render', function(done) {
+			const listener = sinon.stub();
+			class TestChildComponent extends Component {
+				render() {}
+			}
+			TestChildComponent.prototype.willUpdate = sinon.stub();
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+			TestChildComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+
+			const child = component.components.child;
+
+			async.nextTick(function() {
+				component.foo = 'foo2';
+
+				async.nextTick(function() {
+					sinon.assert.callCount(child.willUpdate, 1);
+					assert.deepEqual(child.willUpdate.args[0][0].foo, {
+						key: 'foo',
+						newVal: 'foo2',
+						prevVal: 'foo'
+					});
+
+					done();
+				});
 			});
 		});
 	});

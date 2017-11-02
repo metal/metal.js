@@ -5,13 +5,13 @@ import validators from '../src/validators';
 
 describe('validators', function() {
 	it('should validate an array', function() {
-		assert.ok(validators.array([], null, this));
+		assert.isTrue(validators.array([], null, this));
 
 		assert.ok(validators.array('string', null, this) instanceof Error);
 	});
 
 	it('should validate a boolean', function() {
-		assert.ok(validators.bool(true));
+		assert.isTrue(validators.bool(true));
 
 		assert.ok(validators.bool('true') instanceof Error);
 	});
@@ -21,13 +21,13 @@ describe('validators', function() {
 			return;
 		};
 
-		assert.ok(validators.func(testFn));
+		assert.isTrue(validators.func(testFn));
 
 		assert.ok(validators.func('testFn') instanceof Error);
 	});
 
 	it('should validate a number', function() {
-		assert.ok(validators.number(1));
+		assert.isTrue(validators.number(1));
 
 		assert.ok(validators.number('1') instanceof Error);
 	});
@@ -35,30 +35,30 @@ describe('validators', function() {
 	it('should validate a object', function() {
 		const obj = {};
 
-		assert.ok(validators.object(obj));
+		assert.isTrue(validators.object(obj));
 
 		assert.ok(validators.object('obj') instanceof Error);
 	});
 
 	it('should validate a string', function() {
-		assert.ok(validators.string('testString'));
+		assert.isTrue(validators.string('testString'));
 
 		assert.ok(validators.string(false) instanceof Error);
 	});
 
 	it('should validate any type', function() {
 		const validator = validators.any();
-		assert.ok(validator('testString'));
-		assert.ok(validator(false));
-		assert.ok(validator({}));
-		assert.ok(validator(1));
-		assert.ok(validator(function() {}));
+		assert.isTrue(validator('testString'));
+		assert.isTrue(validator(false));
+		assert.isTrue(validator({}));
+		assert.isTrue(validator(1));
+		assert.isTrue(validator(function() {}));
 	});
 
 	it('should validate an array of a single type', function() {
 		const arrayOfNumbers = validators.arrayOf(validators.number);
 
-		assert.ok(arrayOfNumbers([1, 2, 3, 4]));
+		assert.isTrue(arrayOfNumbers([1, 2, 3, 4]));
 
 		assert.ok(arrayOfNumbers([1, 2, 3, '4']) instanceof Error);
 
@@ -73,20 +73,20 @@ describe('validators', function() {
 
 		const instanceOfFn = validators.instanceOf(TestClass);
 
-		assert.ok(instanceOfFn(new TestClass()));
+		assert.isTrue(instanceOfFn(new TestClass()));
 
 		assert.ok(instanceOfFn(new TestClass2()) instanceof Error);
 	});
 
 	it('should validate a single type or null', function() {
-		assert.ok(validators.number(1));
-		assert.ok(validators.number(null));
-		assert.ok(validators.number(undefined));
+		assert.isTrue(validators.number(1));
+		assert.isTrue(validators.number(null));
+		assert.isTrue(validators.number(undefined));
 		assert.ok(validators.number('1') instanceof Error);
 
-		assert.ok(validators.object({}));
-		assert.ok(validators.object(null));
-		assert.ok(validators.object(undefined));
+		assert.isTrue(validators.object({}));
+		assert.isTrue(validators.object(null));
+		assert.isTrue(validators.object(undefined));
 		assert.ok(validators.object(1) instanceof Error);
 	});
 
@@ -98,8 +98,8 @@ describe('validators', function() {
 			]
 		);
 
-		assert.ok(validator('one'));
-		assert.ok(validator(1));
+		assert.isTrue(validator('one'));
+		assert.isTrue(validator(1));
 
 		assert.ok(validator('1') instanceof Error);
 	});
@@ -117,9 +117,9 @@ describe('validators', function() {
 			]
 		);
 
-		assert.ok(oneOfType('test'));
+		assert.isTrue(oneOfType('test'));
 
-		assert.ok(oneOfType(1));
+		assert.isTrue(oneOfType(1));
 
 		assert.ok(oneOfType({}) instanceof Error);
 	});
@@ -137,7 +137,7 @@ describe('validators', function() {
 	it('should validate an object with certain types of values', function() {
 		const objectOf = validators.objectOf(validators.number);
 
-		assert.ok(objectOf({
+		assert.isTrue(objectOf({
 			a: 1,
 			b: 2
 		}));
@@ -154,7 +154,7 @@ describe('validators', function() {
 			b: validators.number
 		});
 
-		assert.ok(shape({
+		assert.isTrue(shape({
 			a: '1',
 			b: 2
 		}));
@@ -177,7 +177,7 @@ describe('validators', function() {
 			})
 		});
 
-		assert.ok(shape({
+		assert.isTrue(shape({
 			a: {
 				b: 'test'
 			}
@@ -196,8 +196,8 @@ describe('validators', function() {
 
 	it('should return validator function instead of running it if no arg is passed to type validator', function() {
 		var validatorFn = validators.bool();
-		assert.ok(core.isFunction(validatorFn));
-		assert.ok(validatorFn(true));
+		assert.isTrue(core.isFunction(validatorFn));
+		assert.isTrue(validatorFn(true));
 		assert.ok(validatorFn('true') instanceof Error);
 	});
 

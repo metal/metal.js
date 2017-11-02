@@ -11,7 +11,7 @@ weight: 230
 
 Metal components are generally invoked in one of three ways:
 
-1) JavaScript
+- JavaScript
 
 ```javascript
 new metal.MyComponent({
@@ -19,7 +19,7 @@ new metal.MyComponent({
 }, '#element');
 ```
 
-2) Soy
+- Soy
 
 ```soy
 {call MyComponent.render}
@@ -27,7 +27,7 @@ new metal.MyComponent({
 {/call}
 ```
 
-3) JSX
+- JSX
 
 ```jsx
 <MyComponent title="Hello, World" />

@@ -94,6 +94,29 @@ describe('Component', function() {
 			assert.ok(comp.inDocument);
 		});
 
+		it('should run "willAttach" lifecycle method when the component is about to attach', function() {
+			class TestComponent extends Component {
+			}
+			sinon.spy(TestComponent.prototype, 'willAttach');
+			comp = new TestComponent();
+
+			assert.ok(comp.willAttach.calledBefore(Component.prototype.attached));
+			assert.strictEqual(1, comp.willAttach.callCount);
+		});
+
+		it('should emit "willAttach" lifecycle event when the component is about to attach', function() {
+			var listener = sinon.stub();
+			class TestComponent extends Component {
+				created() {
+					this.on('willAttach', listener);
+				}
+			}
+			comp = new TestComponent();
+
+			assert.ok(listener.calledBefore(Component.prototype.attached));
+			assert.strictEqual(1, listener.callCount);
+		});
+
 		it('should emit "attached" event when component is attached', function() {
 			comp = new Component({}, false);
 			var listener = sinon.stub();
@@ -140,6 +163,37 @@ describe('Component', function() {
 			comp = new Component();
 			assert.strictEqual(comp, comp.detach());
 			assert.strictEqual(comp, comp.attach());
+		});
+
+		it('should run "willDetach" lifecycle method when the component is about to detach', function() {
+			class TestComponent extends Component {
+			}
+			sinon.spy(TestComponent.prototype, 'willDetach');
+			comp = new TestComponent();
+
+			assert.strictEqual(0, comp.willDetach.callCount);
+
+			comp.detach();
+
+			assert.ok(comp.willDetach.calledBefore(Component.prototype.detached));
+			assert.strictEqual(1, comp.willDetach.callCount);
+		});
+
+		it('should emit "willDetach" lifecycle event when the component is about to detach', function() {
+			var listener = sinon.stub();
+			class TestComponent extends Component {
+				created() {
+					this.on('willDetach', listener);
+				}
+			}
+			comp = new TestComponent();
+
+			assert.strictEqual(0, listener.callCount);
+
+			comp.detach();
+
+			assert.ok(listener.calledBefore(Component.prototype.detached));
+			assert.strictEqual(1, listener.callCount);
 		});
 
 		it('should dispose component', function() {
@@ -478,6 +532,83 @@ describe('Component', function() {
 
 			assert.throws(function() {
 				new CustomComponent();
+			});
+		});
+
+		it('should allow changes to state in "willReceiveState" without triggering multiple renders', function(done) {
+			const renderStub = sinon.stub();
+			let count = 0;
+
+			class CustomRenderer extends ComponentRenderer.constructor {
+				update(component) {
+					renderStub();
+
+					component.element.innerHTML = `${component.bar}:${component.foo}`;
+					component.informRendered();
+				}
+			}
+
+			class TestComponent extends Component {
+				willReceiveState(changes) {
+					this.foo = 'foo' + count;
+
+					count++;
+				}
+			}
+			TestComponent.STATE = {
+				bar: {
+					value: 'bar'
+				},
+
+				foo: {
+					value: 'foo'
+				}
+			};
+			TestComponent.RENDERER = new CustomRenderer();
+
+			comp = new TestComponent();
+
+			comp.bar = 'bar2';
+			comp.once('rendered', function() {
+				assert.equal(comp.element.innerHTML, 'bar2:foo0');
+
+				async.nextTick(function() {
+					comp.bar = 'bar3';
+					comp.once('rendered', function() {
+						assert.equal(renderStub.callCount, 2);
+						assert.equal(comp.element.innerHTML, 'bar3:foo1');
+
+						done();
+					});
+				});
+			});
+		});
+
+		it('should pass changed state data to "willReceiveState" method', function(done) {
+			class TestComponent extends Component {
+			}
+			TestComponent.prototype.willReceiveState = sinon.stub();
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			comp = new TestComponent();
+
+			comp.foo = 'foo2';
+
+			async.nextTick(function() {
+				assert.equal(comp.willReceiveState.callCount, 1);
+				assert.deepEqual(comp.willReceiveState.args[0][0], {
+					foo: {
+						key: 'foo',
+						newVal: 'foo2',
+						prevVal: 'foo'
+					}
+				});
+
+				done();
 			});
 		});
 	});

@@ -34,6 +34,18 @@ class JSXComponent extends Component {
 	}
 
 	/**
+	 * Fires before state batch changes. Provides hook point for modifying
+	 *     state.
+	 * @param {Event} event
+	 * @protected
+	 */
+	handleStateWillChange_(event) {
+		if (event.type !== 'state') {
+			this.willReceiveProps(event.changes);
+		}
+	}
+
+	/**
 	 * Returns props that are not used or declared in the component.
 	 * @return {Object} Object containing props
 	 */
@@ -52,6 +64,14 @@ class JSXComponent extends Component {
 
 		return retObj;
 	}
+
+	/**
+	 * Lifecycle. Called when the component is about to receive new props.
+	 * Provides a hook point for modifying state that can be used in the next
+	 * rerender.
+	 * @param {Object} changes Changes made to this.props
+	 */
+	willReceiveProps() {}
 }
 
 JSXComponent.DATA_MANAGER = JSXDataManager;

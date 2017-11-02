@@ -2812,6 +2812,87 @@ describe('IncrementalDomRenderer', function() {
 		});
 	});
 
+	describe('Function - willUpdate', function() {
+		it('should run "willUpdate" lifecycle method when the component is about to render', function(done) {
+			class TestComponent extends Component {
+				render() {}
+			}
+			TestComponent.prototype.willUpdate = sinon.stub();
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+
+			async.nextTick(function() {
+				component.foo = 'foo2';
+
+				async.nextTick(function() {
+					sinon.assert.callCount(component.willUpdate, 1);
+					sinon.assert.calledWith(component.willUpdate, {
+						foo: {
+							key: 'foo',
+							newVal: 'foo2',
+							prevVal: 'foo'
+						}
+					});
+
+					done();
+				});
+			});
+		});
+
+		it('should run "willUpdate" lifecycle method of nested component when it is about to render', function(done) {
+			const listener = sinon.stub();
+			class TestChildComponent extends Component {
+				render() {}
+			}
+			TestChildComponent.prototype.willUpdate = sinon.stub();
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+			TestChildComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'foo'
+				}
+			};
+
+			component = new TestComponent();
+
+			const child = component.components.child;
+
+			async.nextTick(function() {
+				component.foo = 'foo2';
+
+				async.nextTick(function() {
+					sinon.assert.callCount(child.willUpdate, 1);
+					assert.deepEqual(child.willUpdate.args[0][0].foo, {
+						key: 'foo',
+						newVal: 'foo2',
+						prevVal: 'foo'
+					});
+
+					done();
+				});
+			});
+		});
+	});
+
 	describe('Componentless function tags', function() {
 		it('should render componentless function passed as incremental dom tag', function() {
 			var TestFunction = ({foo}) => {

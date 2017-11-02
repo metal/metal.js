@@ -248,6 +248,40 @@ describe('JSXRenderer', function() {
 		});
 	});
 
+	it('should pass both state and prop changes to willUpdate', function(done) {
+		class TestComponent extends TestJSXComponent {
+			willUpdate() {}
+		}
+		TestComponent.PROPS = {
+			bar: {
+			}
+		};
+		TestComponent.STATE = {
+			foo: {
+			}
+		};
+
+		component = new TestComponent();
+		sinon.stub(component, 'willUpdate');
+		component.props.bar = 'bar';
+		component.state.foo = 'foo';
+		component.once('stateChanged', function() {
+			assert.strictEqual(1, component.willUpdate.callCount);
+
+			const stateChanges = component.willUpdate.args[0][0];
+			assert.ok(stateChanges.foo);
+			assert.strictEqual('foo', stateChanges.foo.newVal);
+			assert.strictEqual(undefined, stateChanges.foo.prevVal);
+
+			const propChanges = component.willUpdate.args[0][1];
+			assert.ok(propChanges.bar);
+			assert.strictEqual('bar', propChanges.bar.newVal);
+			assert.strictEqual(undefined, propChanges.bar.prevVal);
+
+			done();
+		});
+	});
+
 	it('should reuse elements correctly when child skips update', function(done) {
 		class ChildComponent extends TestJSXComponent {
 			render() {

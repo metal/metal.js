@@ -40,7 +40,7 @@ class JSXComponent extends Component {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
-		if (event.type !== 'state' && this.willReceiveProps) {
+		if (event.type !== 'state') {
 			this.willReceiveProps(event.changes);
 		}
 	}
@@ -64,6 +64,14 @@ class JSXComponent extends Component {
 
 		return retObj;
 	}
+
+	/**
+	 * Lifecycle. Called when the component is about to receive new props.
+	 * Provides a hook point for modifying state that can be used in the next
+	 * rerender.
+	 * @param {Object} changes Changes made to this.props
+	 */
+	willReceiveProps() {}
 }
 
 JSXComponent.DATA_MANAGER = JSXDataManager;

@@ -28,9 +28,6 @@ import { EventEmitter, EventHandler } from 'metal-events';
  *   created() {
  *   }
  *
- *   willUpdate() {
- *   }
- *
  *   rendered() {
  *   }
  *
@@ -38,6 +35,19 @@ import { EventEmitter, EventHandler } from 'metal-events';
  *   }
  *
  *   attached() {
+ *   }
+ *
+ *   willReceiveState() {
+ *   }
+ *
+ *   // willReceiveProps is only available in JSX components
+ *   willReceiveProps() {
+ *   }
+ *
+ *   shouldUpdate() {
+ *   }
+ *
+ *   willUpdate() {
  *   }
  *
  *   willDetach() {
@@ -417,9 +427,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
-		if (this.willReceiveState) {
-			this.willReceiveState(event.changes);
-		}
+		this.willReceiveState(event.changes);
 	}
 
 	/**
@@ -446,6 +454,15 @@ class Component extends EventEmitter {
 
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
+	}
+
+	/**
+	 * Informs the component that the renderer is about to update. Calls the
+	 * component's `willUpdate` lifecycle method.
+	 * @param {Object} changes
+	 */
+	informWillUpdate(...args) {
+		this.willUpdate(...args);
 	}
 
 	/**
@@ -715,6 +732,20 @@ class Component extends EventEmitter {
 	 * Lifecycle. Fires before component is detached from the DOM.
 	 */
 	willDetach() {}
+
+	/**
+	 * Lifecycle. Called when the component is about to receive state changes.
+	 * Provides a hook point for modifying state that can be used in the next
+	 * rerender.
+	 * @param {Object} changes Changes made to this.state
+	 */
+	willReceiveState() {}
+
+	/**
+	 * Lifecycle. Called when the component's renderer is about to update.
+	 * @param {Object} changes
+	 */
+	willUpdate() {}
 }
 
 /**

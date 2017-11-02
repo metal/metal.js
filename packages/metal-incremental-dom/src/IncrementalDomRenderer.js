@@ -236,10 +236,10 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * @param {Object} changes
 	 */
 	willUpdate_(component, changes) {
-		if (!component.willUpdate || !component.wasRendered || !changes) {
+		if (!component.wasRendered || !changes) {
 			return;
 		}
-		component.willUpdate(...this.buildShouldUpdateArgs(changes));
+		component.informWillUpdate(...this.buildShouldUpdateArgs(changes));
 	}
 }
 

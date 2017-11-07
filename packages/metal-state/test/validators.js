@@ -215,7 +215,7 @@ describe('validators', function() {
 		const PARENT_COMPONENT_NAME = 'parentComponent';
 
 		const ERROR_MESSAGE =
-			`Error: Warning: Invalid state passed to '${NAME}'. ` +
+			`Error: Invalid state passed to '${NAME}'. ` +
 			`Expected type 'string', but received type 'number'. ` +
 			`Passed to '${COMPONENT_NAME}'. Check render ` +
 			`method of '${PARENT_COMPONENT_NAME}'.`;

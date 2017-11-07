@@ -280,11 +280,12 @@ class State extends EventEmitter {
 			if (this.obj_ === this) {
 				const staticKey = State.STATE_STATIC_HINT_CONFIGURED;
 
-				ctor[staticKey] = ctor[staticKey] || {};
-
-				defineContext = ctor[staticKey][ctor.name] ? false :
+				defineContext = ctor.STATE && ctor.STATE[staticKey] ? false :
 					ctor.prototype;
-				ctor[staticKey][ctor.name] = true;
+
+				if (ctor.STATE) {
+					ctor.STATE[staticKey] = true;
+				}
 			}
 			this.configState(State.getStateStatic(ctor), defineContext);
 		}

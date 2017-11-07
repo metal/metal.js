@@ -2,7 +2,11 @@
   "private": true,
   "name": "metaljs.com",
   "version": "0.0.0",
+  "scripts": {
+    "start": "electric"
+  },
   "devDependencies": {
+    "electric-cli": "^2.2.0",
     "electric-marble-components": "alpha",
     "marble": "~2.11.2",
     "metal-toggler": "^2.0.0"

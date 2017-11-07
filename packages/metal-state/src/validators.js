@@ -199,8 +199,8 @@ function composeError(error, name, context) {
 		? `Check render method of '${parentName}'.`
 		: '';
 	return new Error(
-		`Warning: Invalid state passed to '${name}'. ` +
-			`${error} Passed to '${compName}'. ${location}`
+		`Invalid state passed to '${name}'.` +
+	    	` ${error} Passed to '${compName}'. ${location}`
 	);
 }
 

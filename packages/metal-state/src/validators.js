@@ -28,6 +28,10 @@ const validators = {
 	 * @return {!function()}
 	 */
 	arrayOf: function(validator) {
+		const argsResult = validators.func(validator);
+		if(isInvalid(argsResult)){
+			return argsResult;
+		}
 		return maybe((value, name, context) => {
 			const result = validators.array(value, name, context);
 			if (isInvalid(result)) {
@@ -59,6 +63,10 @@ const validators = {
 	 * @return {!function()}
 	 */
 	objectOf: function(validator) {
+		const validatorResult = validators.func(validator);
+		if(isInvalid(validatorResult)){
+			return validatorResult;
+		}
 		return maybe((value, name, context) => {
 			for (let key in value) {
 				if (isInvalid(validator(value[key]))) {

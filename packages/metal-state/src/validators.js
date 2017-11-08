@@ -257,7 +257,9 @@ function maybe(typeValidator) {
 function validateArrayItems(validator, value, name, context) {
 	for (let i = 0; i < value.length; i++) {
 		if (isInvalid(validator(value[i], name, context))) {
-			return composeError(ERROR_ARRAY_OF_TYPE, name, context);
+			let itemValidatorError = validator(value[i], name, context);
+			let errorMessage = `Validator for ${name}[${i}] says: "${itemValidatorError}"`;
+			return composeError(errorMessage, name, context);
 		}
 	}
 	return true;

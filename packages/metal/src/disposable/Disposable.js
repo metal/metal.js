@@ -8,6 +8,9 @@
  * @constructor
  */
 class Disposable {
+	/**
+	 * Disposable constructor
+	 */
 	constructor() {
 		/**
 		 * Flag indicating if this instance has already been disposed.

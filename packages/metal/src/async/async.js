@@ -25,18 +25,18 @@ async.throwException = function(exception) {
  * Fires the provided callback just before the current callstack unwinds, or as
  * soon as possible after the current JS execution context.
  * @param {function(this:THIS)} callback
- * @param {THIS=} opt_context Object to use as the "this value" when calling
+ * @param {THIS=} context Object to use as the "this value" when calling
  *     the provided function.
  * @template THIS
  */
-async.run = function(callback, opt_context) {
+async.run = function(callback, context) {
 	if (!async.run.workQueueScheduled_) {
 		// Nothing is currently scheduled, schedule it now.
 		async.nextTick(async.run.processWorkQueue);
 		async.run.workQueueScheduled_ = true;
 	}
 
-	async.run.workQueue_.push(new async.run.WorkItem_(callback, opt_context));
+	async.run.workQueue_.push(new async.run.WorkItem_(callback, context));
 };
 
 /** @private {boolean} */
@@ -92,13 +92,13 @@ async.run.WorkItem_ = function(fn, scope) {
  * reasons.
  * @param {function(this:SCOPE)} callback Callback function to fire as soon as
  *     possible.
- * @param {SCOPE=} opt_context Object in whose scope to call the listener.
+ * @param {SCOPE=} context Object in whose scope to call the listener.
  * @template SCOPE
  */
-async.nextTick = function(callback, opt_context) {
+async.nextTick = function(callback, context) {
 	let cb = callback;
-	if (opt_context) {
-		cb = callback.bind(opt_context);
+	if (context) {
+		cb = callback.bind(context);
 	}
 	cb = async.nextTick.wrapCallback_(cb);
 	// Introduced and currently only supported by IE10.
@@ -112,6 +112,7 @@ async.nextTick = function(callback, opt_context) {
 	}
 	// Look for and cache the custom fallback version of setImmediate.
 	if (!async.nextTick.setImmediate_) {
+		// eslint-disable-next-line
 		async.nextTick.setImmediate_ = async.nextTick.getSetImmediateEmulator_();
 	}
 	async.nextTick.setImmediate_(cb);
@@ -236,8 +237,8 @@ async.nextTick.getSetImmediateEmulator_ = function() {
  * @return {function()} The wrapped callback.
  * @private
  */
-async.nextTick.wrapCallback_ = function(opt_returnValue) {
-	return opt_returnValue;
+async.nextTick.wrapCallback_ = function(callback) {
+	return callback;
 };
 
 export default async;

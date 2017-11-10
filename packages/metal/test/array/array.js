@@ -91,8 +91,8 @@ describe('array', function() {
 		});
 
 		it('should slice arguments object', function() {
-			function sliceArgs() {
-				return array.slice(arguments, 3, 5);
+			function sliceArgs(...args) {
+				return array.slice(args, 3, 5);
 			}
 			assert.deepEqual([3, 4], sliceArgs(0, 1, 2, 3, 4, 5));
 		});

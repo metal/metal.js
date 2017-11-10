@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * Set of utilities for string operations
+ */
 class string {
 	/**
 	 * Compares the given strings without taking the case into account.
@@ -42,8 +45,8 @@ class string {
 	 */
 	static escapeRegex(str) {
 		return String(str)
-			.replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1')
-			.replace(/\x08/g, '\\x08');
+			.replace(/([-()[\]{}+?*.$^|,:#<!\\])/g, '\\$1')
+			.replace(/\x08/g, '\\x08'); // eslint-disable-line
 	}
 
 	/**

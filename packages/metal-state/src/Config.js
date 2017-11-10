@@ -127,7 +127,7 @@ const Config = {
 
 	/**
 	 * Adds the `internal` flag to the `State` configuration.
-	 * @param {boolean} required Flag to set "internal" to. True by default.
+	 * @param {boolean} internal Flag to set "internal" to. True by default.
 	 * @return {!Object} `State` configuration object.
 	 */
 	internal(internal = true) {
@@ -244,7 +244,7 @@ function mergeConfig(context, config) {
 /**
  * Calls validators with provided argument.
  * @param {string} name The name of the validator.
- * @param {!function()}
+ * @return {function()}
  */
 function setExplicitValueValidators(name) {
 	return function(arg) {

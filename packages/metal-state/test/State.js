@@ -763,11 +763,11 @@ describe('State', function() {
 	) {
 		let state = createStateInstance();
 
-		state.on('stateWillChange', function(data) {
+		state.on('stateWillChange', function() {
 			state.key2 = 20;
 		});
 
-		state.on('stateChanged', function(data, facade) {
+		state.on('stateChanged', function(data) {
 			assert.strictEqual(1, data.changes.key1.prevVal);
 			assert.strictEqual(10, data.changes.key1.newVal);
 			assert.strictEqual(2, data.changes.key2.prevVal);

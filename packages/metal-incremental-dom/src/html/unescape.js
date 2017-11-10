@@ -65,4 +65,4 @@ export default unescape;
  * Regular expression that matches an HTML entity.
  * @type {!RegExp}
  */
-var HTML_ENTITY_PATTERN_ = /&([^;\s<&]+);?/g;
+const HTML_ENTITY_PATTERN_ = /&([^;\s<&]+);?/g;

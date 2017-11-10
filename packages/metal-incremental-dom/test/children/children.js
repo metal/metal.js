@@ -59,7 +59,7 @@ describe('children', function() {
 			done();
 		});
 
-		var formatFn = val => val;
+		const formatFn = val => val;
 		IncrementalDOM.text('No args');
 		IncrementalDOM.text('With args', formatFn);
 		IncrementalDOM.elementClose('div');

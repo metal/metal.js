@@ -1,0 +1,9 @@
+{
+  "globals": {
+    "IncrementalDOM": true
+  },
+  "rules": {
+    "prefer-rest-params": 0,
+    "require-jsdoc": 0
+  }
+}

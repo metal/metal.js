@@ -3131,7 +3131,6 @@ describe('IncrementalDomRenderer', function() {
 		it('should run "willUpdate" lifecycle method of nested component when it is about to render', function(
 			done
 		) {
-			const listener = sinon.stub();
 			class TestChildComponent extends Component {
 				render() {}
 			}

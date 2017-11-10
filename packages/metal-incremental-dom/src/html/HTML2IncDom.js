@@ -59,7 +59,7 @@ class HTML2IncDom {
 	 * any function that follows that same api, basically accepting the html
 	 * string and an object with `start`, `end` and `chars` functions to be called
 	 * during the parsing.
-	 * @param {!function(string, !Object} newParser
+	 * @param {!function(string, !Object)} newParser
 	 */
 	static setParser(newParser) {
 		parser_ = newParser;

@@ -206,6 +206,7 @@ function getSubComponent_(tagOrCtor, config, owner) {
  * Handles the event of children having finished being captured.
  * @param {!Object} tree The captured children in tree format.
  * @private
+ * @return {Object}
  */
 function handleChildrenCaptured_(tree, {props, tag}) {
 	props.children = buildChildren_(tree.props.children);
@@ -245,6 +246,7 @@ function handleInterceptedAttributesCall_(element, name, value) {
  * dom.
  * @param {string} tag
  * @private
+ * @return {Object}
  */
 function handleInterceptedOpenCall_(tag) {
 	if (isComponentTag_(tag)) {
@@ -341,7 +343,7 @@ function inheritElementClasses_(parent, config) {
  * @private
  */
 export function isComponentTag_(tag) {
-	return isFunction(tag) || (isString(tag) && tag[0] === tag[0].toUpperCase());
+	return isFunction(tag) || (isString(tag) && tag[0] === tag[0].toUpperCase()); // eslint-disable-line
 }
 
 /**
@@ -451,12 +453,13 @@ export function renderChild(child) {
  * Renders the contents for the given tag.
  * @param {!function()|string} tag
  * @param {!Object} config
- * @param {Component=} opt_owner
+ * @param {Component=} owner
  * @private
+ * @return {Object}
  */
-function renderFromTag_(tag, config, opt_owner) {
+function renderFromTag_(tag, config, owner) {
 	if (isString(tag) || tag.prototype.getRenderer) {
-		const comp = renderSubComponent_(tag, config, opt_owner);
+		const comp = renderSubComponent_(tag, config, owner);
 		updateElementIfNotReached_(getComponentBeingRendered(), comp.element);
 		return comp.element;
 	} else {
@@ -470,17 +473,12 @@ function renderFromTag_(tag, config, opt_owner) {
  * @param {!IncrementalDomRenderer} renderer
  * @param {!function()} fnOrCtor Either a simple incremental dom function or a
  *     component constructor.
- * @param {Object|Element=} opt_dataOrElement Optional config data for the
+ * @param {Object|Element=} dataOrElement Optional config data for the
  *     function or parent for the rendered content.
- * @param {Element=} opt_parent Optional parent for the rendered content.
+ * @param {Element=} parent Optional parent for the rendered content.
  * @return {!Component} The rendered component's instance.
  */
-export function renderFunction(
-	renderer,
-	fnOrCtor,
-	opt_dataOrElement,
-	opt_parent
-) {
+export function renderFunction(renderer, fnOrCtor, dataOrElement, parent) {
 	if (!Component.isComponentCtor(fnOrCtor)) {
 		const fn = fnOrCtor;
 		class TempComponent extends Component {
@@ -498,7 +496,7 @@ export function renderFunction(
 		TempComponent.RENDERER = renderer;
 		fnOrCtor = TempComponent;
 	}
-	return Component.render(fnOrCtor, opt_dataOrElement, opt_parent);
+	return Component.render(fnOrCtor, dataOrElement, parent);
 }
 
 /**
@@ -508,13 +506,13 @@ export function renderFunction(
  * updated instead.
  * @param {string|!function()} tagOrCtor The tag name or constructor function.
  * @param {!Object} config The config object for the sub component.
- * @param {ComponentRenderer=} opt_owner
+ * @param {ComponentRenderer=} owner
  * @return {!Component} The updated sub component.
  * @private
  */
-function renderSubComponent_(tagOrCtor, config, opt_owner) {
+function renderSubComponent_(tagOrCtor, config, owner) {
 	const parent = getComponentBeingRendered();
-	const owner = opt_owner || parent;
+	owner = owner || parent;
 
 	inheritElementClasses_(parent, config);
 
@@ -565,11 +563,12 @@ function resetNodeData_(node) {
  * Updates the given component's context according to the data from the
  * component that is currently being rendered.
  * @param {!Component} comp
+ * @param {!Component} parent
  * @protected
  */
 function updateContext_(comp, parent) {
 	const context = comp.context;
-	const childContext = parent.getChildContext ? parent.getChildContext() : null;
+	const childContext = parent.getChildContext ? parent.getChildContext() : null; // eslint-disable-line
 	object.mixin(context, parent.context, childContext);
 	comp.context = context;
 }

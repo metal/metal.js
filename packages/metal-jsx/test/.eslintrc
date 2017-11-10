@@ -1,4 +1,7 @@
 {
+  "env": {
+    "mocha": true
+  },
   "globals": {
     "assert": true,
     "sinon": true

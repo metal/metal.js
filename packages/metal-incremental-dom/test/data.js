@@ -1,6 +1,6 @@
 'use strict';
 
-import { clearData, getData } from '../src/data';
+import {clearData, getData} from '../src/data';
 
 describe('data', function() {
 	it('should return an empty object on the first "getData" call for an object', function() {

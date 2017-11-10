@@ -1,6 +1,6 @@
 'use strict';
 
-import { isFunction } from 'metal';
+import {isFunction} from 'metal';
 
 const SYNC_FNS_KEY = '__METAL_SYNC_FNS__';
 

@@ -1,6 +1,6 @@
 'use strict';
 
-import { getFunctionName, isDefAndNotNull } from 'metal';
+import {getFunctionName, isDefAndNotNull} from 'metal';
 
 const ERROR_ARRAY_OF_TYPE = 'Expected an array of single type.';
 const ERROR_OBJECT_OF_TYPE = 'Expected object of one type.';
@@ -83,10 +83,9 @@ const validators = {
 			if (isInvalid(result)) {
 				return result;
 			}
-			return arrayOfValues.indexOf(value) === -1 ?
-				composeError(
-					composeOneOfErrorMessage(arrayOfValues), name, context
-				) : true;
+			return arrayOfValues.indexOf(value) === -1
+				? composeError(composeOneOfErrorMessage(arrayOfValues), name, context)
+				: true;
 		});
 	},
 
@@ -133,14 +132,16 @@ const validators = {
 					required = validator.config.required;
 					validator = validator.config.validator;
 				}
-				if ((required && !isDefAndNotNull(value[key])) ||
-					isInvalid(validator(value[key]))) {
+				if (
+					(required && !isDefAndNotNull(value[key])) ||
+					isInvalid(validator(value[key]))
+				) {
 					return composeError(ERROR_SHAPE_OF, name, context);
 				}
 			}
 			return true;
 		});
-	}
+	},
 };
 
 /**
@@ -181,7 +182,7 @@ function composeError(error, name, context) {
 	const location = parentName ? `Check render method of '${parentName}'.` : '';
 	return new Error(
 		`Warning: Invalid state passed to '${name}'. ` +
-		`${error} Passed to '${compName}'. ${location}`
+			`${error} Passed to '${compName}'. ${location}`
 	);
 }
 
@@ -224,7 +225,6 @@ function maybe(typeValidator) {
 		return isDefAndNotNull(value) ? typeValidator(value, name, context) : true;
 	};
 }
-
 
 /**
  * Checks if all the items of the given array pass the given validator.

@@ -1,15 +1,32 @@
 'use strict';
 
-import { applyAttribute, convertListenerNamesToFns } from './attributes';
-import { buildConfigFromCall, buildCallFromConfig } from '../callArgs';
-import { captureChildren, getOwner, isChildTag, renderChildTree } from '../children/children';
-import { clearChanges } from '../changes';
-import { domData } from 'metal-dom';
-import { getData } from '../data';
-import { getCompatibilityModeData, getUid, isDef, isDefAndNotNull, isFunction, isString, object } from 'metal';
-import { disposeUnused, schedule } from '../cleanup/unused';
-import { getOriginalFn, startInterception, stopInterception } from '../incremental-dom-aop';
-import { Component, ComponentRegistry } from 'metal-component';
+import {applyAttribute, convertListenerNamesToFns} from './attributes';
+import {buildConfigFromCall, buildCallFromConfig} from '../callArgs';
+import {
+	captureChildren,
+	getOwner,
+	isChildTag,
+	renderChildTree,
+} from '../children/children';
+import {clearChanges} from '../changes';
+import {domData} from 'metal-dom';
+import {getData} from '../data';
+import {
+	getCompatibilityModeData,
+	getUid,
+	isDef,
+	isDefAndNotNull,
+	isFunction,
+	isString,
+	object,
+} from 'metal';
+import {disposeUnused, schedule} from '../cleanup/unused';
+import {
+	getOriginalFn,
+	startInterception,
+	stopInterception,
+} from '../incremental-dom-aop';
+import {Component, ComponentRegistry} from 'metal-component';
 
 const renderingComponents_ = [];
 const emptyChildren_ = [];
@@ -131,7 +148,8 @@ function getRef_(owner, config) {
 	if (compatData) {
 		const ownerRenderer = owner.getRenderer();
 		const renderers = compatData.renderers;
-		const useKey = !renderers ||
+		const useKey =
+			!renderers ||
 			renderers.indexOf(ownerRenderer) !== -1 ||
 			renderers.indexOf(ownerRenderer.RENDERER_NAME) !== -1;
 		if (useKey && config.key && !config.ref) {
@@ -171,7 +189,12 @@ function getSubComponent_(tagOrCtor, config, owner) {
 			data.currCount[type] = data.currCount[type] || 0;
 			key = `__METAL_IC__${type}_${data.currCount[type]++}`;
 		}
-		comp = match_(data.prevComps ? data.prevComps[key] : null, Ctor, config, owner);
+		comp = match_(
+			data.prevComps ? data.prevComps[key] : null,
+			Ctor,
+			config,
+			owner
+		);
 		data.currComps = data.currComps || {};
 		data.currComps[key] = comp;
 	}
@@ -225,9 +248,9 @@ function handleInterceptedAttributesCall_(element, name, value) {
  */
 function handleInterceptedOpenCall_(tag) {
 	if (isComponentTag_(tag)) {
-		return handleSubComponentCall_.apply(null, arguments);
+		return handleSubComponentCall_(...arguments);
 	} else {
-		return handleRegularCall_.apply(null, arguments);
+		return handleRegularCall_(...arguments);
 	}
 }
 
@@ -262,7 +285,7 @@ function handleRegularCall_(...args) {
 	convertListenerNamesToFns(comp, config);
 
 	const call = buildCallFromConfig(tag, config);
-	const node = getOriginalFn('elementOpen').apply(null, call);
+	const node = getOriginalFn('elementOpen')(...call);
 	resetNodeData_(node);
 	updateElementIfNotReached_(comp, node);
 
@@ -283,7 +306,7 @@ function handleRegularCall_(...args) {
 function handleSubComponentCall_(...args) {
 	captureChildren(getComponentBeingRendered(), handleChildrenCaptured_, {
 		props: buildConfigFromCall(args),
-		tag: args[0]
+		tag: args[0],
 	});
 }
 
@@ -297,7 +320,11 @@ function inheritElementClasses_(parent, config) {
 	const parentData = getData(parent);
 	const parentConfig = parentData.config;
 
-	if (!parentData.rootElementReached && parentConfig && isString(parentConfig.elementClasses)) {
+	if (
+		!parentData.rootElementReached &&
+		parentConfig &&
+		isString(parentConfig.elementClasses)
+	) {
 		let currentClasses = '';
 		if (isString(config.elementClasses)) {
 			currentClasses = `${config.elementClasses} `;
@@ -377,7 +404,7 @@ function prepareRender_(component) {
 
 	startInterception({
 		attributes: handleInterceptedAttributesCall_,
-		elementOpen: handleInterceptedOpenCall_
+		elementOpen: handleInterceptedOpenCall_,
 	});
 }
 
@@ -448,7 +475,12 @@ function renderFromTag_(tag, config, opt_owner) {
  * @param {Element=} opt_parent Optional parent for the rendered content.
  * @return {!Component} The rendered component's instance.
  */
-export function renderFunction(renderer, fnOrCtor, opt_dataOrElement, opt_parent) {
+export function renderFunction(
+	renderer,
+	fnOrCtor,
+	opt_dataOrElement,
+	opt_parent
+) {
 	if (!Component.isComponentCtor(fnOrCtor)) {
 		const fn = fnOrCtor;
 		class TempComponent extends Component {
@@ -484,7 +516,7 @@ function renderSubComponent_(tagOrCtor, config, opt_owner) {
 	const parent = getComponentBeingRendered();
 	const owner = opt_owner || parent;
 
-	inheritElementClasses_(parent, config)
+	inheritElementClasses_(parent, config);
 
 	const comp = getSubComponent_(tagOrCtor, config, owner);
 	updateContext_(comp, parent);

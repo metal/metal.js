@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDef } from '../core';
+import {isDef} from '../core';
 
 class array {
 	/**
@@ -44,7 +44,7 @@ class array {
 	 * @return {Array.<*>} Flat array.
 	 */
 	static flatten(arr, opt_output) {
-		var output = opt_output || [];
+		let output = opt_output || [];
 		for (let i = 0; i < arr.length; i++) {
 			if (Array.isArray(arr[i])) {
 				array.flatten(arr[i], output);
@@ -65,7 +65,7 @@ class array {
 	static remove(arr, obj) {
 		const i = arr.indexOf(obj);
 		let rv;
-		if ( (rv = i >= 0) ) {
+		if ((rv = i >= 0)) {
 			array.removeAt(arr, i);
 		}
 		return rv;

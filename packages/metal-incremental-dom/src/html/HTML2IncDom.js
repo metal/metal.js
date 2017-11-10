@@ -3,7 +3,7 @@
 import HTMLParser from './HTMLParser';
 import unescape from './unescape';
 
-var parser_;
+let parser_;
 
 class HTML2IncDom {
 	/**
@@ -32,16 +32,14 @@ class HTML2IncDom {
 	static run(html) {
 		HTML2IncDom.getParser()(html, {
 			start: function(tag, attrs, unary) {
-				var fn = unary ? IncrementalDOM.elementVoid : IncrementalDOM.elementOpen;
-				var args = [
-					tag,
-					null,
-					[]
-				];
-				for (var i = 0; i < attrs.length; i++) {
+				let fn = unary
+					? IncrementalDOM.elementVoid
+					: IncrementalDOM.elementOpen;
+				let args = [tag, null, []];
+				for (let i = 0; i < attrs.length; i++) {
 					args.push(attrs[i].name, attrs[i].value);
 				}
-				fn.apply(null, args);
+				fn(...args);
 			},
 
 			end: function(tag) {
@@ -50,7 +48,7 @@ class HTML2IncDom {
 
 			chars: function(text) {
 				IncrementalDOM.text(text, unescape);
-			}
+			},
 		});
 	}
 

@@ -7,5 +7,5 @@
 import * as core from './coreNamed';
 
 export default core;
-export { core };
+export {core};
 export * from './coreNamed';

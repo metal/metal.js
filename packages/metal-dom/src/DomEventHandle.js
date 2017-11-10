@@ -1,6 +1,6 @@
 'use strict';
 
-import { EventHandle } from 'metal-events';
+import {EventHandle} from 'metal-events';
 
 /**
  * This is a special EventHandle, that is responsible for dom events, instead
@@ -26,7 +26,11 @@ class DomEventHandle extends EventHandle {
 	 * @inheritDoc
 	 */
 	removeListener() {
-		this.emitter_.removeEventListener(this.event_, this.listener_, this.capture_);
+		this.emitter_.removeEventListener(
+			this.event_,
+			this.listener_,
+			this.capture_
+		);
 	}
 }
 

@@ -1,4 +1,4 @@
-/*!
+/* !
  * Polyfill from Google's Closure Library.
  * Copyright 2013 The Closure Library Authors. All Rights Reserved.
  */
@@ -6,7 +6,6 @@
 'use strict';
 
 const async = {};
-
 
 /**
  * Throw an item without interrupting the current execution context.  For
@@ -21,7 +20,6 @@ async.throwException = function(exception) {
 		throw exception;
 	});
 };
-
 
 /**
  * Fires the provided callback just before the current callstack unwinds, or as
@@ -38,14 +36,11 @@ async.run = function(callback, opt_context) {
 		async.run.workQueueScheduled_ = true;
 	}
 
-	async.run.workQueue_.push(
-		new async.run.WorkItem_(callback, opt_context));
+	async.run.workQueue_.push(new async.run.WorkItem_(callback, opt_context));
 };
-
 
 /** @private {boolean} */
 async.run.workQueueScheduled_ = false;
-
 
 /** @private {!Array.<!async.run.WorkItem_>} */
 async.run.workQueue_ = [];
@@ -75,7 +70,6 @@ async.run.processWorkQueue = function() {
 	async.run.workQueueScheduled_ = false;
 };
 
-
 /**
  * @constructor
  * @final
@@ -91,7 +85,6 @@ async.run.WorkItem_ = function(fn, scope) {
 	/** @const */
 	this.scope = scope;
 };
-
 
 /**
  * Fires the provided callbacks as soon as possible after the current JS
@@ -124,14 +117,12 @@ async.nextTick = function(callback, opt_context) {
 	async.nextTick.setImmediate_(cb);
 };
 
-
 /**
  * Cache for the setImmediate implementation.
  * @type {function(function())}
  * @private
  */
 async.nextTick.setImmediate_ = null;
-
 
 /**
  * Determines the best possible implementation to run a function as soon as
@@ -156,8 +147,12 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	// an iframe based polyfill in browsers that have postMessage and
 	// document.addEventListener. The latter excludes IE8 because it has a
 	// synchronous postMessage implementation.
-	if (typeof Channel === 'undefined' && typeof window !== 'undefined' &&
-		window.postMessage && window.addEventListener) {
+	if (
+		typeof Channel === 'undefined' &&
+		typeof window !== 'undefined' &&
+		window.postMessage &&
+		window.addEventListener
+	) {
 		/** @constructor */
 		Channel = function() {
 			// Make an empty, invisible iframe.
@@ -185,7 +180,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 			this.port2 = {
 				postMessage: function() {
 					win.postMessage(message, origin);
-				}
+				},
 			};
 		};
 	}
@@ -202,7 +197,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 		};
 		return function(cb) {
 			tail.next = {
-				cb: cb
+				cb: cb,
 			};
 			tail = tail.next;
 			channel.port2.postMessage(0);
@@ -210,8 +205,10 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	}
 	// Implementation for IE6-8: Script elements fire an asynchronous
 	// onreadystatechange event when inserted into the DOM.
-	if (typeof document !== 'undefined' && 'onreadystatechange' in
-		document.createElement('script')) {
+	if (
+		typeof document !== 'undefined' &&
+		'onreadystatechange' in document.createElement('script')
+	) {
 		return function(cb) {
 			let script = document.createElement('script');
 			script.onreadystatechange = function() {
@@ -231,7 +228,6 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 		setTimeout(cb, 0);
 	};
 };
-
 
 /**
  * Helper function that is overrided to protect callbacks with entry point

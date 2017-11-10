@@ -21,43 +21,43 @@
  * @param {string} str The string to unescape.
  * @return {string} The unescaped {@code str} string.
  */
- function unescape(str) {
-   /** @type {!Object<string, string>} */
-   var seen = {'&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"'};
-   var div = document.createElement('div');
+function unescape(str) {
+	/** @type {!Object<string, string>} */
+	let seen = {'&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"'};
+	let div = document.createElement('div');
 
-   // Match as many valid entity characters as possible. If the actual entity
-   // happens to be shorter, it will still work as innerHTML will return the
-   // trailing characters unchanged. Since the entity characters do not include
-   // open angle bracket, there is no chance of XSS from the innerHTML use.
-   // Since no whitespace is passed to innerHTML, whitespace is preserved.
-   return str.replace(HTML_ENTITY_PATTERN_, function(s, entity) {
-     // Check for cached entity.
-     var value = seen[s];
-     if (value) {
-       return value;
-     }
-     // Check for numeric entity.
-     if (entity.charAt(0) === '#') {
-       // Prefix with 0 so that hex entities (e.g. &#x10) parse as hex numbers.
-       var n = Number('0' + entity.substr(1));
-       if (!isNaN(n)) {
-         value = String.fromCharCode(n);
-       }
-     }
-     // Fall back to innerHTML otherwise.
-     if (!value) {
-       // Append a non-entity character to avoid a bug in Webkit that parses
-       // an invalid entity at the end of innerHTML text as the empty string.
-       div.innerHTML = s + ' ';
-       // Then remove the trailing character from the result.
-       value = div.firstChild.nodeValue.slice(0, -1);
-     }
-     // Cache and return.
-     seen[s] = value;
-     return value;
-   });
- }
+	// Match as many valid entity characters as possible. If the actual entity
+	// happens to be shorter, it will still work as innerHTML will return the
+	// trailing characters unchanged. Since the entity characters do not include
+	// open angle bracket, there is no chance of XSS from the innerHTML use.
+	// Since no whitespace is passed to innerHTML, whitespace is preserved.
+	return str.replace(HTML_ENTITY_PATTERN_, function(s, entity) {
+		// Check for cached entity.
+		let value = seen[s];
+		if (value) {
+			return value;
+		}
+		// Check for numeric entity.
+		if (entity.charAt(0) === '#') {
+			// Prefix with 0 so that hex entities (e.g. &#x10) parse as hex numbers.
+			let n = Number('0' + entity.substr(1));
+			if (!isNaN(n)) {
+				value = String.fromCharCode(n);
+			}
+		}
+		// Fall back to innerHTML otherwise.
+		if (!value) {
+			// Append a non-entity character to avoid a bug in Webkit that parses
+			// an invalid entity at the end of innerHTML text as the empty string.
+			div.innerHTML = s + ' ';
+			// Then remove the trailing character from the result.
+			value = div.firstChild.nodeValue.slice(0, -1);
+		}
+		// Cache and return.
+		seen[s] = value;
+		return value;
+	});
+}
 
 export default unescape;
 

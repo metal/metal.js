@@ -1,8 +1,8 @@
 'use strict';
 
-import { buildCallFromConfig, buildConfigFromCall } from '../callArgs';
-import { isDef } from 'metal';
-import { startInterception, stopInterception } from '../incremental-dom-aop';
+import {buildCallFromConfig, buildConfigFromCall} from '../callArgs';
+import {isDef} from 'metal';
+import {startInterception, stopInterception} from '../incremental-dom-aop';
 
 /**
  * Property identifying a specific object as a Metal.js child node, and
@@ -24,8 +24,8 @@ export function captureChildren(component, callback, data) {
 	callbackData_ = data;
 	tree_ = {
 		props: {
-			children: []
-		}
+			children: [],
+		},
 	};
 	tree_.config = tree_.props;
 	currentParent_ = tree_;
@@ -33,7 +33,7 @@ export function captureChildren(component, callback, data) {
 	startInterception({
 		elementClose: handleInterceptedCloseCall_,
 		elementOpen: handleInterceptedOpenCall_,
-		text: handleInterceptedTextCall_
+		text: handleInterceptedTextCall_,
 	});
 }
 
@@ -81,7 +81,7 @@ export function renderChildTree(tree, opt_skipNode) {
 		let args = buildCallFromConfig(tree.tag, tree.props);
 		args[0] = {
 			tag: args[0],
-			owner: getOwner(tree)
+			owner: getOwner(tree),
 		};
 		IncrementalDOM.elementOpen.apply(null, args);
 		if (tree.props.children) {
@@ -110,7 +110,7 @@ let tree_;
 function addChildCallToTree_(args, opt_isText) {
 	const child = {
 		parent: currentParent_,
-		[CHILD_OWNER]: owner_
+		[CHILD_OWNER]: owner_,
 	};
 
 	if (opt_isText) {

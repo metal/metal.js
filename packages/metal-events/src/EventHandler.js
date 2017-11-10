@@ -1,6 +1,6 @@
 'use strict';
 
-import { Disposable } from 'metal';
+import {Disposable} from 'metal';
 
 /**
  * EventHandler utility. It's useful for easily removing a group of

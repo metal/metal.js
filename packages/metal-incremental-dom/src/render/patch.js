@@ -1,9 +1,9 @@
 'use strict';
 
-import { append, exitDocument } from 'metal-dom';
-import { getData } from '../data';
-import { isServerSide } from 'metal';
-import { render } from './render';
+import {append, exitDocument} from 'metal-dom';
+import {getData} from '../data';
+import {isServerSide} from 'metal';
+import {render} from './render';
 
 const patchingComponents_ = [];
 

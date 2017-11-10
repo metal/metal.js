@@ -5,7 +5,6 @@
  * required methods all renderers should have.
  */
 class ComponentRenderer {
-
 	/**
 	 * Disposes of any data specific to the given component.
 	 * @param {!Component} component

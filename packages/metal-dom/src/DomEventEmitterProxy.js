@@ -1,7 +1,7 @@
 'use strict';
 
-import { delegate, on, supportsEvent } from './dom';
-import { EventEmitterProxy } from 'metal-events';
+import {delegate, on, supportsEvent} from './dom';
+import {EventEmitterProxy} from 'metal-events';
 
 /**
  * DomEventEmitterProxy utility. It extends `EventEmitterProxy` to also accept
@@ -51,8 +51,10 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 		if (!this.originEmitter_ || !this.originEmitter_.addEventListener) {
 			return true;
 		}
-		return (this.isDelegateEvent_(event) && event.indexOf(':', 9) !== -1) ||
-			supportsEvent(this.originEmitter_, event);
+		return (
+			(this.isDelegateEvent_(event) && event.indexOf(':', 9) !== -1) ||
+			supportsEvent(this.originEmitter_, event)
+		);
 	}
 
 	/**

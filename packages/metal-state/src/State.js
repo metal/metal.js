@@ -1,7 +1,16 @@
 'use strict';
 
-import { async, getStaticProperty, isDef, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
-import { EventEmitter } from 'metal-events';
+import {
+	async,
+	getStaticProperty,
+	isDef,
+	isDefAndNotNull,
+	isFunction,
+	isObject,
+	isString,
+	object,
+} from 'metal';
+import {EventEmitter} from 'metal-events';
 
 /**
  * State adds support for having object properties that can be watched for
@@ -72,7 +81,7 @@ class State extends EventEmitter {
 		Object.defineProperty(this.obj_, State.STATE_REF_KEY, {
 			configurable: true,
 			enumerable: false,
-			value: this
+			value: this,
 		});
 	}
 
@@ -85,11 +94,14 @@ class State extends EventEmitter {
 		const config = this.stateConfigs_[name];
 		if (config.required) {
 			const info = this.getStateInfo(name);
-			const value = info.state === State.KeyStates.INITIALIZED ?
-				this.get(name) :
-				this.initialValues_[name];
+			const value =
+				info.state === State.KeyStates.INITIALIZED
+					? this.get(name)
+					: this.initialValues_[name];
 			if (!isDefAndNotNull(value)) {
-				let errorMessage = `The property called "${name}" is required but didn't receive a value.`;
+				let errorMessage = `The property called "${
+					name
+				}" is required but didn't receive a value.`;
 				if (this.shouldThrowValidationError()) {
 					throw new Error(errorMessage);
 				} else {
@@ -144,7 +156,7 @@ class State extends EventEmitter {
 			},
 			set: function(val) {
 				this[State.STATE_REF_KEY].setStateKeyValue_(name, val);
-			}
+			},
 		};
 	}
 
@@ -192,10 +204,11 @@ class State extends EventEmitter {
 	callValidator_(name, value) {
 		const config = this.stateConfigs_[name];
 		if (config.validator) {
-			const validatorReturn = this.callFunction_(
-				config.validator,
-				[value, name, this.context_]
-			);
+			const validatorReturn = this.callFunction_(config.validator, [
+				value,
+				name,
+				this.context_,
+			]);
 			this.assertValidatorReturnInstanceOfError_(validatorReturn);
 			return validatorReturn;
 		}
@@ -254,16 +267,15 @@ class State extends EventEmitter {
 				this.assertValidStateKeyName_(name);
 				props[name] = this.buildKeyPropertyDef_(name);
 			}
-			Object.defineProperties(
-				opt_context || this.obj_,
-				props
-			);
+			Object.defineProperties(opt_context || this.obj_, props);
 		}
 
 		this.stateConfigs_ = configs;
 		for (let i = 0; i < names.length; i++) {
 			const name = names[i];
-			configs[name] = configs[name].config ? configs[name].config : configs[name];
+			configs[name] = configs[name].config
+				? configs[name].config
+				: configs[name];
 			this.assertGivenIfRequired_(names[i]);
 			this.validateInitialValue_(names[i]);
 		}
@@ -282,8 +294,7 @@ class State extends EventEmitter {
 
 				ctor[staticKey] = ctor[staticKey] || {};
 
-				defineContext = ctor[staticKey][ctor.name] ? false :
-					ctor.prototype;
+				defineContext = ctor[staticKey][ctor.name] ? false : ctor.prototype;
 				ctor[staticKey][ctor.name] = true;
 			}
 			this.configState(State.getStateStatic(ctor), defineContext);
@@ -406,8 +417,9 @@ class State extends EventEmitter {
 	 */
 	hasBeenSet(name) {
 		const info = this.getStateInfo(name);
-		return info.state === State.KeyStates.INITIALIZED ||
-			this.hasInitialValue_(name);
+		return (
+			info.state === State.KeyStates.INITIALIZED || this.hasInitialValue_(name)
+		);
 	}
 
 	/**
@@ -417,8 +429,10 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	hasInitialValue_(name) {
-		return this.initialValues_.hasOwnProperty(name) &&
-			isDef(this.initialValues_[name]);
+		return (
+			this.initialValues_.hasOwnProperty(name) &&
+			isDef(this.initialValues_[name])
+		);
 	}
 
 	/**
@@ -441,11 +455,14 @@ class State extends EventEmitter {
 	 */
 	informChange_(name, prevVal) {
 		if (this.shouldInformChange_(name, prevVal)) {
-			const data = object.mixin({
-				key: name,
-				newVal: this.get(name),
-				prevVal: prevVal
-			}, this.eventData_);
+			const data = object.mixin(
+				{
+					key: name,
+					newVal: this.get(name),
+					prevVal: prevVal,
+				},
+				this.eventData_
+			);
 			this.context_.emit(`${name}Changed`, data);
 			this.context_.emit('stateKeyChanged', data);
 			this.scheduleBatchEvent_(data);
@@ -500,9 +517,12 @@ class State extends EventEmitter {
 	scheduleBatchEvent_(changeData) {
 		if (!this.scheduledBatchData_) {
 			async.nextTick(this.emitBatchEvent_, this);
-			this.scheduledBatchData_ = object.mixin({
-				changes: {}
-			}, this.eventData_);
+			this.scheduledBatchData_ = object.mixin(
+				{
+					changes: {},
+				},
+				this.eventData_
+			);
 		}
 
 		const name = changeData.key;
@@ -596,9 +616,11 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	setStateKeyValue_(name, value) {
-		if (this.warnIfDisposed_(name) ||
+		if (
+			this.warnIfDisposed_(name) ||
 			!this.canSetState(name) ||
-			!this.validateKeyValue_(name, value)) {
+			!this.validateKeyValue_(name, value)
+		) {
 			return;
 		}
 
@@ -624,8 +646,10 @@ class State extends EventEmitter {
 	 */
 	shouldInformChange_(name, prevVal) {
 		const info = this.getStateInfo(name);
-		return (info.state === State.KeyStates.INITIALIZED) &&
-			(isObject(prevVal) || prevVal !== this.get(name));
+		return (
+			info.state === State.KeyStates.INITIALIZED &&
+			(isObject(prevVal) || prevVal !== this.get(name))
+		);
 	}
 
 	/**
@@ -643,9 +667,10 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateInitialValue_(name) {
-		if (this.initialValues_.hasOwnProperty(name) &&
-			!this.callValidator_(name, this.initialValues_[name])) {
-
+		if (
+			this.initialValues_.hasOwnProperty(name) &&
+			!this.callValidator_(name, this.initialValues_[name])
+		) {
 			delete this.initialValues_[name];
 		}
 	}
@@ -660,8 +685,10 @@ class State extends EventEmitter {
 	 */
 	validateKeyValue_(name, value) {
 		const info = this.getStateInfo(name);
-		return info.state === State.KeyStates.INITIALIZING ||
-			this.callValidator_(name, value);
+		return (
+			info.state === State.KeyStates.INITIALIZING ||
+			this.callValidator_(name, value)
+		);
 	}
 
 	/**
@@ -702,7 +729,7 @@ State.STATE_STATIC_HINT_CONFIGURED = '__METAL_STATE_STATIC_HINT_CONFIGURED__';
 State.KeyStates = {
 	UNINITIALIZED: undefined,
 	INITIALIZING: 1,
-	INITIALIZED: 2
+	INITIALIZED: 2,
 };
 
 export default State;

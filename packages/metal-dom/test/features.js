@@ -17,11 +17,11 @@ describe('features', function() {
 
 	describe('Method checkAttrOrderChange', function() {
 		it('should check if current browser changes attribute order', function() {
-			var result = features.checkAttrOrderChange();
+			let result = features.checkAttrOrderChange();
 			assert.strictEqual(1, dom.append.callCount);
 
-			var element = dom.append.args[0][0];
-			var original = dom.append.args[0][1];
+			let element = dom.append.args[0][0];
+			let original = dom.append.args[0][1];
 			assert.strictEqual(result, original !== element.innerHTML);
 		});
 
@@ -45,39 +45,69 @@ describe('features', function() {
 
 		it('should output default event name', function() {
 			features.animationElement_ = {
-				style: {}
+				style: {},
 			};
-			assert.strictEqual('animationend', features.checkAnimationEventName().animation);
-			assert.strictEqual('transitionend', features.checkAnimationEventName().transition);
+			assert.strictEqual(
+				'animationend',
+				features.checkAnimationEventName().animation
+			);
+			assert.strictEqual(
+				'transitionend',
+				features.checkAnimationEventName().transition
+			);
 		});
 
 		it('should check for native browser support', function() {
 			mockAnimationElementStyles('');
-			assert.strictEqual('animationend', features.checkAnimationEventName().animation);
-			assert.strictEqual('transitionend', features.checkAnimationEventName().transition);
+			assert.strictEqual(
+				'animationend',
+				features.checkAnimationEventName().animation
+			);
+			assert.strictEqual(
+				'transitionend',
+				features.checkAnimationEventName().transition
+			);
 		});
 
 		it('should check for Webkit browsers', function() {
 			mockAnimationElementStyles('Webkit');
-			assert.strictEqual('webkitAnimationEnd', features.checkAnimationEventName().animation);
-			assert.strictEqual('webkitTransitionEnd', features.checkAnimationEventName().transition);
+			assert.strictEqual(
+				'webkitAnimationEnd',
+				features.checkAnimationEventName().animation
+			);
+			assert.strictEqual(
+				'webkitTransitionEnd',
+				features.checkAnimationEventName().transition
+			);
 		});
 
 		it('should check for MS browsers', function() {
 			mockAnimationElementStyles('MS');
-			assert.strictEqual('msAnimationEnd', features.checkAnimationEventName().animation);
-			assert.strictEqual('msTransitionEnd', features.checkAnimationEventName().transition);
+			assert.strictEqual(
+				'msAnimationEnd',
+				features.checkAnimationEventName().animation
+			);
+			assert.strictEqual(
+				'msTransitionEnd',
+				features.checkAnimationEventName().transition
+			);
 		});
 
 		it('should check for Opera browsers', function() {
 			mockAnimationElementStyles('O');
-			assert.strictEqual('oAnimationEnd', features.checkAnimationEventName().animation);
-			assert.strictEqual('oTransitionEnd', features.checkAnimationEventName().transition);
+			assert.strictEqual(
+				'oAnimationEnd',
+				features.checkAnimationEventName().animation
+			);
+			assert.strictEqual(
+				'oTransitionEnd',
+				features.checkAnimationEventName().transition
+			);
 		});
 
 		function mockAnimationElementStyles(browserPrefix) {
 			features.animationElement_ = {
-				style: {}
+				style: {},
 			};
 			features.animationElement_.style[browserPrefix + 'animation'] = true;
 			features.animationElement_.style[browserPrefix + 'transition'] = true;

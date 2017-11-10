@@ -1,12 +1,21 @@
 'use strict';
 
-import { addListenersFromObj } from './events/events';
-import { getStaticProperty, isBoolean, isDefAndNotNull, isElement, isObject, isServerSide, isString, object } from 'metal';
-import { syncState } from './sync/sync';
-import { DomEventEmitterProxy, toElement } from 'metal-dom';
+import {addListenersFromObj} from './events/events';
+import {
+	getStaticProperty,
+	isBoolean,
+	isDefAndNotNull,
+	isElement,
+	isObject,
+	isServerSide,
+	isString,
+	object,
+} from 'metal';
+import {syncState} from './sync/sync';
+import {DomEventEmitterProxy, toElement} from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
-import { EventEmitter, EventHandler } from 'metal-events';
+import {EventEmitter, EventHandler} from 'metal-events';
 
 /**
  * Component collects common behaviors to be followed by UI components, such
@@ -205,7 +214,7 @@ class Component extends EventEmitter {
 			this.inDocument = true;
 			this.attachData_ = {
 				parent: opt_parentElement,
-				sibling: opt_siblingElement
+				sibling: opt_siblingElement,
 			};
 			this.emit('attached', this.attachData_);
 			this.attached();
@@ -234,7 +243,8 @@ class Component extends EventEmitter {
 	attachElement(opt_parentElement, opt_siblingElement) {
 		const element = this.element;
 		if (element && (opt_siblingElement || !element.parentNode)) {
-			const parent = toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
+			const parent =
+				toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 			parent.insertBefore(element, toElement(opt_siblingElement));
 		}
 	}
@@ -321,7 +331,7 @@ class Component extends EventEmitter {
 		this.forceUpdateCallback_ = opt_callback;
 
 		this.updateRenderer_({
-			forceUpdate: true
+			forceUpdate: true,
 		});
 	}
 
@@ -384,7 +394,7 @@ class Component extends EventEmitter {
 		if (this.componentCreated_) {
 			this.emit('elementChanged', {
 				prevVal,
-				newVal
+				newVal,
 			});
 			if (newVal && this.wasRendered) {
 				this.syncVisible(this.dataManager_.get(this, 'visible'));
@@ -415,8 +425,8 @@ class Component extends EventEmitter {
 	handleComponentStateKeyChanged_(data) {
 		this.updateRenderer_({
 			changes: {
-				[data.key]: data
-			}
+				[data.key]: data,
+			},
 		});
 	}
 
@@ -530,35 +540,39 @@ class Component extends EventEmitter {
 	static renderToString(Ctor, opt_config) {
 		const rendererName = Ctor.RENDERER && Ctor.RENDERER.RENDERER_NAME;
 		switch (rendererName) {
-			case 'jsx':
-			case 'soy':
-			case 'incremental-dom': {
-				if (typeof IncrementalDOM === 'undefined') {
-					throw new Error(`Error. Trying to render incremental dom ` +
-						`based component to string requires IncrementalDOM ` +
-						`implementation to be loaded.`);
-				}
-				// Incremental dom patches for components or nested components are
-				// isolated inside the component element. The following code intercepts
-				// incremental dom patches and collect results into temporary stack in
-				// order to successfully collect the final string of the outermost
-				// component after all nested components stack rendered.
-				const interceptedComponentStrings = [];
-				const patch = IncrementalDOM.patch;
-				const patchInterceptor = function() {
-					let currentElement = patch.apply(null, arguments);
-					interceptedComponentStrings.push(currentElement.innerHTML);
-					IncrementalDOM.patch = patch;
-				};
-				IncrementalDOM.patch = patchInterceptor;
-				Component.render(Ctor, opt_config).dispose();
-				return interceptedComponentStrings[0];
+		case 'jsx':
+		case 'soy':
+		case 'incremental-dom': {
+			if (typeof IncrementalDOM === 'undefined') {
+				throw new Error(
+					`Error. Trying to render incremental dom ` +
+							`based component to string requires IncrementalDOM ` +
+							`implementation to be loaded.`
+				);
 			}
-			default:
-				throw new Error(`Error. Trying to render non incremental dom ` +
-					`based component to string.`);
+			// Incremental dom patches for components or nested components are
+			// isolated inside the component element. The following code intercepts
+			// incremental dom patches and collect results into temporary stack in
+			// order to successfully collect the final string of the outermost
+			// component after all nested components stack rendered.
+			const interceptedComponentStrings = [];
+			const patch = IncrementalDOM.patch;
+			const patchInterceptor = function() {
+				let currentElement = patch(...arguments);
+				interceptedComponentStrings.push(currentElement.innerHTML);
+				IncrementalDOM.patch = patch;
+			};
+			IncrementalDOM.patch = patchInterceptor;
+			Component.render(Ctor, opt_config).dispose();
+			return interceptedComponentStrings[0];
 		}
-	};
+		default:
+			throw new Error(
+				`Error. Trying to render non incremental dom ` +
+						`based component to string.`
+			);
+		}
+	}
 
 	/**
 	 * Renders the component into the DOM via its `ComponentRenderer`. Stores the
@@ -761,7 +775,7 @@ Component.DATA = {
 	 */
 	children: {
 		validator: Array.isArray,
-		value: []
+		value: [],
 	},
 
 	/**
@@ -771,7 +785,7 @@ Component.DATA = {
 	elementClasses: {
 		setter: 'setterElementClassesFn_',
 		validator: isString,
-		value: ''
+		value: '',
 	},
 
 	/**
@@ -782,7 +796,7 @@ Component.DATA = {
 	 */
 	events: {
 		validator: 'validatorEventsFn_',
-		value: null
+		value: null,
 	},
 
 	/**
@@ -791,8 +805,8 @@ Component.DATA = {
 	 */
 	visible: {
 		validator: isBoolean,
-		value: true
-	}
+		value: true,
+	},
 };
 
 /**
@@ -840,7 +854,7 @@ Component.prototype[Component.COMPONENT_FLAG] = true;
 const proxyBlackList_ = {
 	eventsChanged: true,
 	stateChanged: true,
-	stateKeyChanged: true
+	stateKeyChanged: true,
 };
 
 export default Component;

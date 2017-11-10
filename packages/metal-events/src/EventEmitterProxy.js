@@ -1,6 +1,6 @@
 'use strict';
 
-import { Disposable } from 'metal';
+import {Disposable} from 'metal';
 
 /**
  * EventEmitterProxy utility. It's responsible for linking two EventEmitter
@@ -130,9 +130,10 @@ class EventEmitterProxy extends Disposable {
 	 * @param {!EventEmitter} originEmitter
 	 */
 	setOriginEmitter(originEmitter) {
-		const events = this.originEmitter_ && this.proxiedEvents_ ?
-			Object.keys(this.proxiedEvents_) :
-			this.pendingEvents_;
+		const events =
+			this.originEmitter_ && this.proxiedEvents_
+				? Object.keys(this.proxiedEvents_)
+				: this.pendingEvents_;
 		this.originEmitter_ = originEmitter;
 		if (events) {
 			this.removeListeners_();

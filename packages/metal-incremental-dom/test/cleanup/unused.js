@@ -2,12 +2,12 @@
 
 import Component from 'metal-component';
 import IncrementalDomRenderer from '../../src/IncrementalDomRenderer';
-import { disposeUnused, schedule } from '../../src/cleanup/unused';
-import { getData } from '../../src/data';
+import {disposeUnused, schedule} from '../../src/cleanup/unused';
+import {getData} from '../../src/data';
 
 describe('unused', function() {
-	var comp;
-	var grandchild;
+	let comp;
+	let grandchild;
 
 	beforeEach(function() {
 		class GrandChild extends Component {
@@ -43,7 +43,7 @@ describe('unused', function() {
 	});
 
 	it('should dispose scheduled components', function() {
-		var comps = [comp.components.child1, comp.components.child2];
+		let comps = [comp.components.child1, comp.components.child2];
 		schedule(comps);
 		disposeUnused();
 
@@ -52,7 +52,7 @@ describe('unused', function() {
 	});
 
 	it('should not dispose scheduled components that have received a new parent', function() {
-		var comps = [comp.components.child1, comp.components.child2];
+		let comps = [comp.components.child1, comp.components.child2];
 		schedule(comps);
 		getData(comps[0]).parent = comp;
 		disposeUnused();
@@ -62,7 +62,7 @@ describe('unused', function() {
 	});
 
 	it('should not dispose scheduled components that have been disposed before scheduled', function() {
-		var comps = [comp.components.child1, comp.components.child2];
+		let comps = [comp.components.child1, comp.components.child2];
 		comps[0].dispose();
 		schedule(comps);
 		sinon.spy(comps[0], 'dispose');
@@ -74,7 +74,7 @@ describe('unused', function() {
 	});
 
 	it('should not dispose scheduled components that have been disposed after scheduled', function() {
-		var comps = [comp.components.child1, comp.components.child2];
+		let comps = [comp.components.child1, comp.components.child2];
 		schedule(comps);
 		comps[0].dispose();
 		sinon.spy(comps[0], 'dispose');
@@ -90,7 +90,7 @@ describe('unused', function() {
 			disposeUnused();
 		});
 
-		var comps = [comp.components.child1];
+		let comps = [comp.components.child1];
 		schedule(comps);
 
 		assert.doesNotThrow(() => disposeUnused());
@@ -98,7 +98,7 @@ describe('unused', function() {
 	});
 
 	it('should not throw error when disposing component that has an owner that was previously disposed', function() {
-		var comps = [comp.components.child2, grandchild];
+		let comps = [comp.components.child2, grandchild];
 		schedule(comps);
 		assert.doesNotThrow(() => disposeUnused());
 	});

@@ -5,9 +5,9 @@ import EventEmitter from '../src/EventEmitter';
 
 describe('EventHandle', function() {
 	it('should unsubscribe the listener', function() {
-		var emitter = new EventEmitter();
-		var listener = sinon.stub();
-		var handle = new EventHandle(emitter, 'event', listener);
+		let emitter = new EventEmitter();
+		let listener = sinon.stub();
+		let handle = new EventHandle(emitter, 'event', listener);
 
 		emitter.on('event', listener);
 		emitter.on('event2', listener);
@@ -21,18 +21,18 @@ describe('EventHandle', function() {
 	});
 
 	it('should not throw error when removing listener on disposed emitter', function() {
-		var emitter = new EventEmitter();
-		var listener = sinon.stub();
-		var handle = new EventHandle(emitter, 'event', listener);
+		let emitter = new EventEmitter();
+		let listener = sinon.stub();
+		let handle = new EventHandle(emitter, 'event', listener);
 
 		emitter.dispose();
 		handle.removeListener();
 	});
 
 	it('should remove listeners when disposed', function() {
-		var emitter = new EventEmitter();
-		var listener = sinon.stub();
-		var handle = new EventHandle(emitter, 'event', listener);
+		let emitter = new EventEmitter();
+		let listener = sinon.stub();
+		let handle = new EventHandle(emitter, 'event', listener);
 		emitter.on('event', listener);
 		handle.dispose();
 		emitter.emit('event');

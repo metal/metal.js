@@ -1,5 +1,5 @@
-import State, { mergeState } from 'metal-state';
-import { getStaticProperty, isObject } from 'metal';
+import State, {mergeState} from 'metal-state';
+import {getStaticProperty, isObject} from 'metal';
 
 /**
  * Register a custom element for a given Metal component.
@@ -74,7 +74,7 @@ export function defineWebComponent(tagName, Ctor) {
 
 			if (useShadowDOM) {
 				element = this.attachShadow({
-					mode: 'open'
+					mode: 'open',
 				});
 			}
 
@@ -128,13 +128,13 @@ export function defineWebComponent(tagName, Ctor) {
 		emit: function(...data) {
 			const eventData = data.pop();
 			const event = new CustomEvent(eventData.type, {
-				detail: data
+				detail: data,
 			});
 			this.dispatchEvent(event);
-		}
+		},
 	});
 
 	window.customElements.define(tagName, CustomElement);
-};
+}
 
 export default defineWebComponent;

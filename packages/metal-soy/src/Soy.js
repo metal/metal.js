@@ -1,10 +1,10 @@
 'use strict';
 
 import 'metal-soy-bundle';
-import { ComponentRegistry } from 'metal-component';
-import { isFunction, isObject, isString, object } from 'metal';
-import { validators, Config } from 'metal-state';
-import IncrementalDomRenderer, { HTML2IncDom } from 'metal-incremental-dom';
+import {ComponentRegistry} from 'metal-component';
+import {isFunction, isObject, isString, object} from 'metal';
+import {validators, Config} from 'metal-state';
+import IncrementalDomRenderer, {HTML2IncDom} from 'metal-incremental-dom';
 import SoyAop from './SoyAop';
 
 // The injected data that will be passed to soy templates.
@@ -85,7 +85,11 @@ class Soy extends IncrementalDomRenderer.constructor {
 					`No template with namespace "${namespace}" has been loaded yet.`
 				);
 			}
-			return goog.loadedModules_[namespace][templateName](opt_data, opt_ignored, opt_ijData);
+			return goog.loadedModules_[namespace][templateName](
+				opt_data,
+				opt_ignored,
+				opt_ijData
+			);
 		};
 	}
 
@@ -118,7 +122,9 @@ class Soy extends IncrementalDomRenderer.constructor {
 			return true;
 		}
 
-		const elementTemplate = SoyAop.getOriginalFn(component.constructor.TEMPLATE);
+		const elementTemplate = SoyAop.getOriginalFn(
+			component.constructor.TEMPLATE
+		);
 		const type = (elementTemplate.types || {})[name] || '';
 		return type.split('|').indexOf('html') !== -1;
 	}
@@ -152,7 +158,10 @@ class Soy extends IncrementalDomRenderer.constructor {
 		if (isFunction(elementTemplate) && !component.render) {
 			elementTemplate = SoyAop.getOriginalFn(elementTemplate);
 			SoyAop.startInterception(this.handleInterceptedCall_);
-			const data = this.buildTemplateData_(component, elementTemplate.params || []);
+			const data = this.buildTemplateData_(
+				component,
+				elementTemplate.params || []
+			);
 			elementTemplate(data, null, ijData);
 			SoyAop.stopInterception();
 		} else {
@@ -208,7 +217,11 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @return {!function()}
 	 */
 	toIncDom(value) {
-		if (isObject(value) && isString(value.content) && (value.contentKind === 'HTML')) {
+		if (
+			isObject(value) &&
+			isString(value.content) &&
+			value.contentKind === 'HTML'
+		) {
 			value = value.content;
 		}
 		if (isString(value)) {
@@ -222,9 +235,4 @@ const soyRenderer_ = new Soy();
 soyRenderer_.RENDERER_NAME = 'soy';
 
 export default soyRenderer_;
-export {
-	Config,
-	soyRenderer_ as Soy,
-	SoyAop,
-	validators
-};
+export {Config, soyRenderer_ as Soy, SoyAop, validators};

@@ -29,15 +29,17 @@ class string {
 	 * @return {string} Copy of the string with normalized breaking spaces.
 	 */
 	static collapseBreakingSpaces(str) {
-		return str.replace(/[\t\r\n ]+/g, ' ').replace(/^[\t\r\n ]+|[\t\r\n ]+$/g, '');
+		return str
+			.replace(/[\t\r\n ]+/g, ' ')
+			.replace(/^[\t\r\n ]+|[\t\r\n ]+$/g, '');
 	}
 
 	/**
-	* Escapes characters in the string that are not safe to use in a RegExp.
-	* @param {*} str The string to escape. If not a string, it will be casted
-	*     to one.
-	* @return {string} A RegExp safe, escaped copy of {@code s}.
-	*/
+	 * Escapes characters in the string that are not safe to use in a RegExp.
+	 * @param {*} str The string to escape. If not a string, it will be casted
+	 *     to one.
+	 * @return {string} A RegExp safe, escaped copy of {@code s}.
+	 */
 	static escapeRegex(str) {
 		return String(str)
 			.replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1')
@@ -45,13 +47,15 @@ class string {
 	}
 
 	/**
-	* Returns a string with at least 64-bits of randomness.
-	* @return {string} A random string, e.g. sn1s7vb4gcic.
-	*/
+	 * Returns a string with at least 64-bits of randomness.
+	 * @return {string} A random string, e.g. sn1s7vb4gcic.
+	 */
 	static getRandomString() {
 		const x = 2147483648;
-		return Math.floor(Math.random() * x).toString(36) +
-			Math.abs(Math.floor(Math.random() * x) ^ Date.now()).toString(36);
+		return (
+			Math.floor(Math.random() * x).toString(36) +
+			Math.abs(Math.floor(Math.random() * x) ^ Date.now()).toString(36)
+		);
 	}
 
 	/**

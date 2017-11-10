@@ -1,6 +1,6 @@
 'use strict';
 
-import { isElement, isFunction } from 'metal';
+import {isElement, isFunction} from 'metal';
 import ComponentRenderer from '../src/ComponentRenderer';
 
 describe('ComponentRenderer', function() {
@@ -8,7 +8,7 @@ describe('ComponentRenderer', function() {
 
 	beforeEach(function() {
 		componentStub = {
-			informRendered: sinon.stub()
+			informRendered: sinon.stub(),
 		};
 	});
 
@@ -24,7 +24,10 @@ describe('ComponentRenderer', function() {
 	});
 
 	it('should return nothing by default from getExtraDataConfig', function() {
-		assert.equal(undefined, ComponentRenderer.getExtraDataConfig(componentStub));
+		assert.equal(
+			undefined,
+			ComponentRenderer.getExtraDataConfig(componentStub)
+		);
 	});
 
 	it('should have a function called "update"', function() {

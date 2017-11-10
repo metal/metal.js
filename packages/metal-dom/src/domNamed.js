@@ -1,6 +1,15 @@
 'use strict';
 
-import { isDef, isDefAndNotNull, isDocument, isDocumentFragment, isElement, isObject, isString, object } from 'metal';
+import {
+	isDef,
+	isDefAndNotNull,
+	isDocument,
+	isDocumentFragment,
+	isElement,
+	isObject,
+	isString,
+	object,
+} from 'metal';
 import domData from './domData';
 import DomDelegatedEventHandle from './DomDelegatedEventHandle';
 import DomEventHandle from './DomEventHandle';
@@ -16,7 +25,7 @@ const USE_CAPTURE = {
 	focus: true,
 	invalid: true,
 	load: true,
-	scroll: true
+	scroll: true,
 };
 
 /**
@@ -137,7 +146,7 @@ function attachDelegateEvent_(element, eventName) {
 				handleDelegateEvent_,
 				!!USE_CAPTURE[eventName]
 			),
-			selectors: {}
+			selectors: {},
 		};
 	}
 }
@@ -227,7 +236,13 @@ export function contains(element1, element2) {
  *     `preventDefault`.
  * @return {!EventHandle} Can be used to remove the listener.
  */
-export function delegate(element, eventName, selectorOrTarget, callback, opt_default) {
+export function delegate(
+	element,
+	eventName,
+	selectorOrTarget,
+	callback,
+	opt_default
+) {
 	const customConfig = customEvents[eventName];
 	if (customConfig && customConfig.delegate) {
 		eventName = customConfig.originalEvent;
@@ -283,8 +298,11 @@ function isAbleToInteractWith_(node, eventName, opt_eventObj) {
  * @return {boolean} Whether variable is like a NodeList.
  */
 export function isNodeListLike(val) {
-	return isDefAndNotNull(val) && typeof val.length === 'number' &&
-		typeof val.item === 'function';
+	return (
+		isDefAndNotNull(val) &&
+		typeof val.length === 'number' &&
+		typeof val.item === 'function'
+	);
 }
 
 /**
@@ -350,8 +368,7 @@ export function hasClass(element, className) {
  * @private
  */
 function hasClassWithNative_(element, className) {
-	return className.indexOf(' ') === -1 &&
-		element.classList.contains(className);
+	return className.indexOf(' ') === -1 && element.classList.contains(className);
 }
 
 /**
@@ -362,8 +379,10 @@ function hasClassWithNative_(element, className) {
  * @private
  */
 function hasClassWithoutNative_(element, className) {
-	return (` ${element.className} `).indexOf(` ${className} `) >= 0 &&
-		className.split(' ').length === 1;
+	return (
+		` ${element.className} `.indexOf(` ${className} `) >= 0 &&
+		className.split(' ').length === 1
+	);
 }
 
 /**
@@ -387,7 +406,12 @@ export function match(element, selector) {
 	}
 
 	const p = Element.prototype;
-	const m = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector;
+	const m =
+		p.matches ||
+		p.webkitMatchesSelector ||
+		p.mozMatchesSelector ||
+		p.msMatchesSelector ||
+		p.oMatchesSelector;
 	if (m) {
 		return m.call(element, selector);
 	}
@@ -668,7 +692,12 @@ function triggerDelegatedListeners_(container, event, defaultFns) {
 		if (isAbleToInteractWith_(currElement, event.type, event)) {
 			event.delegateTarget = currElement;
 			ret &= triggerElementListeners_(currElement, event, defaultFns);
-			ret &= triggerSelectorListeners_(container, currElement, event, defaultFns);
+			ret &= triggerSelectorListeners_(
+				container,
+				currElement,
+				event,
+				defaultFns
+			);
 		}
 		currElement = currElement.parentNode;
 	}
@@ -684,7 +713,11 @@ function triggerDelegatedListeners_(container, event, defaultFns) {
  * @return {Element} The converted element, or null if none was found.
  */
 export function toElement(selectorOrElement) {
-	if (isElement(selectorOrElement) || isDocument(selectorOrElement) || isDocumentFragment(selectorOrElement)) {
+	if (
+		isElement(selectorOrElement) ||
+		isDocument(selectorOrElement) ||
+		isDocumentFragment(selectorOrElement)
+	) {
 		return selectorOrElement;
 	} else if (isString(selectorOrElement)) {
 		if (selectorOrElement[0] === '#' && selectorOrElement.indexOf(' ') === -1) {
@@ -813,7 +846,7 @@ function triggerListeners_(listeners, event, element, defaultFns) {
 		if (listeners[i].defaultListener_) {
 			defaultFns.push({
 				element,
-				fn: listeners[i]
+				fn: listeners[i],
 			});
 		} else {
 			ret &= listeners[i](event);

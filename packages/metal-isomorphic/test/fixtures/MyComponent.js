@@ -3,13 +3,12 @@ import Soy from 'metal-soy';
 
 import templates from './MyComponent.soy.js';
 
-class MyComponent extends Component {
-}
+class MyComponent extends Component {}
 
 MyComponent.STATE = {
 	message: {
-		value: ''
-	}
+		value: '',
+	},
 };
 
 Soy.register(MyComponent, templates);

@@ -1,7 +1,7 @@
 'use strict';
 
-import { async } from 'metal';
-import { once } from './dom';
+import {async} from 'metal';
+import {once} from './dom';
 
 /**
  * Utility functions for running styles.

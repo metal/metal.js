@@ -3,9 +3,9 @@
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import UA from 'metal-useragent';
-import { JSXComponent } from 'metal-jsx';
+import {JSXComponent} from 'metal-jsx';
 
-import { defineWebComponent } from '../src/define_web_component';
+import {defineWebComponent} from '../src/define_web_component';
 
 describe('Web components', function() {
 	let el;
@@ -81,7 +81,10 @@ describe('Web components', function() {
 
 			document.body.appendChild(el);
 
-			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+			assert.equal(
+				el.shadowRoot.innerHTML,
+				'<div title="default title"></div>'
+			);
 		});
 
 		it('should render custom element via html', function() {
@@ -91,19 +94,26 @@ describe('Web components', function() {
 
 			document.body.innerHTML = innerHTML;
 
-			assert.equal(document.body.innerHTML, '<metal-test-component-custom-test-element-06><div title="default title"></div></metal-test-component-custom-test-element-06>');
+			assert.equal(
+				document.body.innerHTML,
+				'<metal-test-component-custom-test-element-06><div title="default title"></div></metal-test-component-custom-test-element-06>'
+			);
 		});
 
 		it('should render custom element via html when useshadowdom is true', function() {
 			const tagName = createWebComponent('custom-test-element-07');
 
-			const innerHTML = '<' + tagName + ' useshadowdom="true"></' + tagName + '>';
+			const innerHTML =
+				'<' + tagName + ' useshadowdom="true"></' + tagName + '>';
 
 			document.body.innerHTML = innerHTML;
 
 			el = document.querySelector(tagName);
 
-			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+			assert.equal(
+				el.shadowRoot.innerHTML,
+				'<div title="default title"></div>'
+			);
 		});
 
 		it('should deserialize attribute if json is passed', function() {
@@ -186,7 +196,10 @@ describe('Web components', function() {
 
 			document.body.appendChild(el);
 
-			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+			assert.equal(
+				el.shadowRoot.innerHTML,
+				'<div title="default title"></div>'
+			);
 		});
 
 		it('should render custom element via html', function() {
@@ -196,19 +209,26 @@ describe('Web components', function() {
 
 			document.body.innerHTML = innerHTML;
 
-			assert.equal(document.body.innerHTML, '<metal-test-component-custom-jsx-test-element-06><div title="default title"></div></metal-test-component-custom-jsx-test-element-06>');
+			assert.equal(
+				document.body.innerHTML,
+				'<metal-test-component-custom-jsx-test-element-06><div title="default title"></div></metal-test-component-custom-jsx-test-element-06>'
+			);
 		});
 
 		it('should render custom element via html when useshadowdom is true', function() {
 			const tagName = createJSXWebComponent('custom-jsx-test-element-07');
 
-			const innerHTML = '<' + tagName + ' useshadowdom="true"></' + tagName + '>';
+			const innerHTML =
+				'<' + tagName + ' useshadowdom="true"></' + tagName + '>';
 
 			document.body.innerHTML = innerHTML;
 
 			el = document.querySelector(tagName);
 
-			assert.equal(el.shadowRoot.innerHTML, '<div title="default title"></div>');
+			assert.equal(
+				el.shadowRoot.innerHTML,
+				'<div title="default title"></div>'
+			);
 		});
 
 		it('should deserialize attribute if json is passed', function() {
@@ -240,15 +260,16 @@ describe('Web components', function() {
 		class WebComponent extends JSXComponent {
 			render() {
 				IncrementalDOM.elementVoid('div', null, [
-					'title', WebComponent.PROPS.title.value
+					'title',
+					WebComponent.PROPS.title.value,
 				]);
 			}
 		}
 
 		WebComponent.PROPS = {
 			title: {
-				value: 'default title'
-			}
+				value: 'default title',
+			},
 		};
 
 		defineWebComponent(tagName, WebComponent);
@@ -263,16 +284,17 @@ describe('Web components', function() {
 
 		WebComponent.STATE = {
 			title: {
-				value: 'default title'
-			}
+				value: 'default title',
+			},
 		};
 
 		Soy.register(WebComponent, {
 			render: () => {
 				IncrementalDOM.elementVoid('div', null, [
-					'title', WebComponent.STATE.title.value
+					'title',
+					WebComponent.STATE.title.value,
 				]);
-			}
+			},
 		});
 
 		defineWebComponent(tagName, WebComponent);
@@ -282,7 +304,7 @@ describe('Web components', function() {
 
 	function isSafariVersion(version) {
 		if (!UA.isSafari) return false;
-		const nav = window && window.navigator || {};
-		return !!(new RegExp('Version\/' + version).exec(nav.userAgent));
+		const nav = (window && window.navigator) || {};
+		return !!new RegExp('Version/' + version).exec(nav.userAgent);
 	}
 });

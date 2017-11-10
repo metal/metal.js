@@ -1,7 +1,7 @@
 'use strict';
 
-import { addListenersFromObj, getComponentFn } from '../../src/events/events';
-import { append, triggerEvent } from 'metal-dom';
+import {addListenersFromObj, getComponentFn} from '../../src/events/events';
+import {append, triggerEvent} from 'metal-dom';
 import Component from '../../src/Component';
 
 describe('events', function() {
@@ -22,13 +22,13 @@ describe('events', function() {
 
 	describe('addListenersFromObj', function() {
 		it('should attach events to specified functions', function() {
-			var listener1 = sinon.stub();
-			var listener2 = sinon.stub();
+			let listener1 = sinon.stub();
+			let listener2 = sinon.stub();
 
 			comp = new Component();
 			addListenersFromObj(comp, {
 				event1: listener1,
-				event2: listener2
+				event2: listener2,
 			});
 
 			comp.emit('event1');
@@ -41,13 +41,12 @@ describe('events', function() {
 		});
 
 		it('should attach events to specified function names', function() {
-			class CustomComponent extends Component {
-			}
+			class CustomComponent extends Component {}
 			CustomComponent.prototype.listener = sinon.stub();
 
 			comp = new CustomComponent();
 			addListenersFromObj(comp, {
-				event1: 'listener'
+				event1: 'listener',
 			});
 
 			comp.emit('event1');
@@ -57,15 +56,14 @@ describe('events', function() {
 		it('should warn if trying to attach event to unexisting function name', function() {
 			comp = new Component();
 			addListenersFromObj(comp, {
-				event1: 'listener'
+				event1: 'listener',
 			});
 
 			assert.strictEqual(1, console.error.callCount);
 		});
 
 		it('should attach delegate events with specified selector', function() {
-			class CustomComponent extends Component {
-			}
+			class CustomComponent extends Component {}
 			CustomComponent.prototype.listener = sinon.stub();
 
 			comp = new CustomComponent();
@@ -73,8 +71,8 @@ describe('events', function() {
 			addListenersFromObj(comp, {
 				click: {
 					fn: 'listener',
-					selector: '.testButton'
-				}
+					selector: '.testButton',
+				},
 			});
 
 			triggerEvent(comp.element, 'click');

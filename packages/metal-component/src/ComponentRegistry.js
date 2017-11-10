@@ -1,6 +1,6 @@
 'use strict';
 
-import { getFunctionName } from 'metal';
+import {getFunctionName} from 'metal';
 
 /**
  * The component registry is used to register components, so they can

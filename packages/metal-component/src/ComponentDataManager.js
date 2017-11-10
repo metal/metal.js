@@ -1,6 +1,6 @@
 'use strict';
 
-import { object } from 'metal';
+import {object} from 'metal';
 import State from 'metal-state';
 
 const BLACKLIST = {
@@ -10,7 +10,7 @@ const BLACKLIST = {
 	refs: true,
 	state: true,
 	stateKey: true,
-	wasRendered: true
+	wasRendered: true,
 };
 const DATA_MANAGER_DATA = '__DATA_MANAGER_DATA__';
 

@@ -1,6 +1,6 @@
 'use strict';
 
-import { async } from 'metal';
+import {async} from 'metal';
 import * as dom from '../src/dom';
 import globalEval from '../src/globalEval';
 
@@ -23,12 +23,12 @@ describe('globalEval', function() {
 	});
 
 	it('should not leave created script tag in document after code is evaluated', function() {
-		var newScript = globalEval.run('var testScript = 2 + 2;');
+		let newScript = globalEval.run('var testScript = 2 + 2;');
 		assert.ok(!newScript.parentNode);
 	});
 
 	it('should evaluate script file in global scope', function(done) {
-		var newScript = globalEval.runFile('fixtures/script.js');
+		let newScript = globalEval.runFile('fixtures/script.js');
 
 		dom.on(newScript, 'load', function() {
 			assert.strictEqual(5, window.testScript);
@@ -36,8 +36,10 @@ describe('globalEval', function() {
 		});
 	});
 
-	it('should remove created script tag after evaluated script file is loaded', function(done) {
-		var newScript = globalEval.runFile('fixtures/script.js');
+	it('should remove created script tag after evaluated script file is loaded', function(
+		done
+	) {
+		let newScript = globalEval.runFile('fixtures/script.js');
 
 		dom.on(newScript, 'load', function() {
 			assert.ok(!newScript.parentNode);
@@ -45,8 +47,10 @@ describe('globalEval', function() {
 		});
 	});
 
-	it('should remove created script tag after evaluated script file throws error', function(done) {
-		var newScript = globalEval.runFile('fixtures/unexistingScript.js');
+	it('should remove created script tag after evaluated script file throws error', function(
+		done
+	) {
+		let newScript = globalEval.runFile('fixtures/unexistingScript.js');
 
 		dom.on(newScript, 'error', function() {
 			assert.ok(!newScript.parentNode);
@@ -63,8 +67,8 @@ describe('globalEval', function() {
 	});
 
 	it('should be able to overwrite append function', function() {
-		var appendFn = sinon.stub();
-		var script = document.createElement('script');
+		let appendFn = sinon.stub();
+		let script = document.createElement('script');
 		globalEval.runScript(script, null, appendFn);
 		assert.strictEqual(1, appendFn.callCount);
 		script.src = 'fixtures/script.js';
@@ -73,7 +77,7 @@ describe('globalEval', function() {
 	});
 
 	it('should run code inside script tag in global scope', function() {
-		var script = document.createElement('script');
+		let script = document.createElement('script');
 		script.text = 'var testScript = "script with code";';
 
 		globalEval.runScript(script);
@@ -81,7 +85,7 @@ describe('globalEval', function() {
 	});
 
 	it('should remove script element from the document when it\'s evaluated', function() {
-		var script = document.createElement('script');
+		let script = document.createElement('script');
 		script.text = 'var testScript = "script with code";';
 		dom.enterDocument(script);
 
@@ -90,8 +94,10 @@ describe('globalEval', function() {
 		assert.ok(!script.parentNode);
 	});
 
-	it('should not evaluate script element with type different from javascript', function(done) {
-		var script = document.createElement('script');
+	it('should not evaluate script element with type different from javascript', function(
+		done
+	) {
+		let script = document.createElement('script');
 		script.text = 'Regular text file';
 		script.type = 'text/plain';
 		dom.enterDocument(script);
@@ -104,8 +110,10 @@ describe('globalEval', function() {
 		});
 	});
 
-	it('should call callback function after script tag with inline content is run', function(done) {
-		var script = document.createElement('script');
+	it('should call callback function after script tag with inline content is run', function(
+		done
+	) {
+		let script = document.createElement('script');
 		script.text = 'var testScript = "script with code";';
 		dom.enterDocument(script);
 
@@ -116,20 +124,24 @@ describe('globalEval', function() {
 		});
 	});
 
-	it('should run file referenced by specified script element in global scope', function(done) {
-		var script = document.createElement('script');
+	it('should run file referenced by specified script element in global scope', function(
+		done
+	) {
+		let script = document.createElement('script');
 		script.src = 'fixtures/script.js';
 		dom.enterDocument(script);
 
-		var newScript = globalEval.runScript(script);
+		let newScript = globalEval.runScript(script);
 		dom.on(newScript, 'load', function() {
 			assert.strictEqual(5, window.testScript);
 			done();
 		});
 	});
 
-	it('should call callback function after script tag with file src is run', function(done) {
-		var script = document.createElement('script');
+	it('should call callback function after script tag with file src is run', function(
+		done
+	) {
+		let script = document.createElement('script');
 		script.src = 'fixtures/script.js';
 		dom.enterDocument(script);
 
@@ -141,7 +153,7 @@ describe('globalEval', function() {
 	});
 
 	it('should run all script tags inside given element', function(done) {
-		var element = dom.buildFragment(
+		let element = dom.buildFragment(
 			'<div><script>var testScript = 2 + 2;</script></div><script>var testScript2 = 2 + 3;</script>'
 		);
 		globalEval.runScriptsInElement(element, function() {
@@ -153,7 +165,7 @@ describe('globalEval', function() {
 	});
 
 	it('should run script tags inside given element in order', function(done) {
-		var element = dom.buildFragment(
+		let element = dom.buildFragment(
 			'<script src="fixtures/script.js"></script><div><script>var testScript = 2 + 2;</script></div>'
 		);
 
@@ -164,29 +176,37 @@ describe('globalEval', function() {
 		});
 	});
 
-	it('should be able to overwrite append function from element', function(done) {
-		var element = dom.buildFragment(
+	it('should be able to overwrite append function from element', function(
+		done
+	) {
+		let element = dom.buildFragment(
 			'<script src="fixtures/script.js"></script><div><script>var testScript = 2 + 1;</script>'
 		);
-		var appendFn = sinon.spy(function(script) {
+		let appendFn = sinon.spy(function(script) {
 			document.head.appendChild(script);
 		});
-		globalEval.runScriptsInElement(element, function() {
-			assert.strictEqual(2, appendFn.callCount);
-			done();
-		}, appendFn);
+		globalEval.runScriptsInElement(
+			element,
+			function() {
+				assert.strictEqual(2, appendFn.callCount);
+				done();
+			},
+			appendFn
+		);
 	});
 
 	it('should not throw errors if trying to run scripts on element without any scripts', function() {
-		var element = dom.buildFragment('<div></div>');
+		let element = dom.buildFragment('<div></div>');
 		assert.doesNotThrow(function() {
 			globalEval.runScriptsInElement(element);
 		});
 	});
 
-	it('should call given callback on nextTick if no script tags exist in received element', function(done) {
-		var element = dom.buildFragment('<div></div>');
-		var callback = sinon.stub();
+	it('should call given callback on nextTick if no script tags exist in received element', function(
+		done
+	) {
+		let element = dom.buildFragment('<div></div>');
+		let callback = sinon.stub();
 		globalEval.runScriptsInElement(element, callback);
 		assert.strictEqual(0, callback.callCount);
 		async.nextTick(function() {

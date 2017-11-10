@@ -5,11 +5,11 @@ import EventHandler from '../src/EventHandler';
 
 describe('EventHandler', function() {
 	it('should remove all added listeners', function() {
-		var emitter1 = new EventEmitter();
-		var emitter2 = new EventEmitter();
-		var handler = new EventHandler();
-		var listener1 = sinon.stub();
-		var listener2 = sinon.stub();
+		let emitter1 = new EventEmitter();
+		let emitter2 = new EventEmitter();
+		let handler = new EventHandler();
+		let listener1 = sinon.stub();
+		let listener2 = sinon.stub();
 
 		handler.add(
 			emitter1.on('event1', listener1),
@@ -43,9 +43,9 @@ describe('EventHandler', function() {
 	});
 
 	it('should clear listeners on dispose', function() {
-		var emitter = new EventEmitter();
-		var handler = new EventHandler();
-		var listener = sinon.stub();
+		let emitter = new EventEmitter();
+		let handler = new EventHandler();
+		let listener = sinon.stub();
 
 		handler.add(emitter.on('event', listener));
 		handler.dispose();

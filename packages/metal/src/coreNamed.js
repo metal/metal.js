@@ -19,7 +19,7 @@ let uniqueIdCounter_ = 1;
  * @type {String}
  * @protected
  */
-export const UID_PROPERTY = `core_${((Math.random() * 1e9) >>> 0)}`;
+export const UID_PROPERTY = `core_${(Math.random() * 1e9) >>> 0}`;
 
 /**
  * When defining a class Foo with an abstract method bar(), you can do:
@@ -262,7 +262,7 @@ export function isWindow(val) {
  */
 export function isObject(val) {
 	const type = typeof val;
-	return type === 'object' && val !== null || type === 'function';
+	return (type === 'object' && val !== null) || type === 'function';
 }
 
 /**
@@ -290,15 +290,16 @@ export function isString(val) {
  * @return {boolean}
  */
 export function isServerSide() {
-	return typeof process !== 'undefined' &&
+	return (
+		typeof process !== 'undefined' &&
 		typeof process.env !== 'undefined' &&
 		process.env.NODE_ENV !== 'test' &&
-		!process.browser;
+		!process.browser
+	);
 }
 
 /**
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */
-export function nullFunction() {
-}
+export function nullFunction() {}

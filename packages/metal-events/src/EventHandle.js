@@ -1,6 +1,6 @@
 'use strict';
 
-import { Disposable } from 'metal';
+import {Disposable} from 'metal';
 
 /**
  * EventHandle utility. Holds information about an event subscription, and

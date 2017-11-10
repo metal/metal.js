@@ -1,12 +1,12 @@
 'use strict';
 
 import './incremental-dom';
-import { getChanges, trackChanges } from './changes';
-import { clearData, getData } from './data';
-import { getOwner } from './children/children';
-import { getPatchingComponent, patch } from './render/patch';
-import { render, renderChild, renderFunction } from './render/render';
-import { Component, ComponentRenderer } from 'metal-component';
+import {getChanges, trackChanges} from './changes';
+import {clearData, getData} from './data';
+import {getOwner} from './children/children';
+import {getPatchingComponent, patch} from './render/patch';
+import {render, renderChild, renderFunction} from './render/render';
+import {Component, ComponentRenderer} from 'metal-component';
 
 class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	/**
@@ -156,7 +156,8 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	renderInsidePatch(component) {
 		const changes = getChanges(component);
 
-		const shouldRender = !component.wasRendered ||
+		const shouldRender =
+			!component.wasRendered ||
 			this.shouldUpdate(component, changes) ||
 			IncrementalDOM.currentPointer() !== component.element;
 		if (shouldRender) {

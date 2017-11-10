@@ -19,5 +19,7 @@ jdk:
 language: java
 
 script:
+  - npm run checkFormat
+  - npm run lint
   - gulp test:saucelabs
   - npm run test:isomorphic

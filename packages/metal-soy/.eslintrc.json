@@ -1,8 +1,0 @@
-{
-  "globals": {
-    "goog": true,
-    "IncrementalDOM": true,
-    "soy": true,
-    "soydata": true
-  }
-}

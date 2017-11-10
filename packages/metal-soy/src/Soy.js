@@ -10,6 +10,9 @@ import SoyAop from './SoyAop';
 // The injected data that will be passed to soy templates.
 let ijData = {};
 
+/**
+ * Soy Renderer
+ */
 class Soy extends IncrementalDomRenderer.constructor {
 	/**
 	 * Adds the template params to the component's state, if they don't exist yet.
@@ -79,16 +82,16 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @return {!function()}
 	 */
 	getTemplate(namespace, templateName) {
-		return function(opt_data, opt_ignored, opt_ijData) {
+		return function(data, ignored, ijData) {
 			if (!goog.loadedModules_[namespace]) {
 				throw new Error(
 					`No template with namespace "${namespace}" has been loaded yet.`
 				);
 			}
 			return goog.loadedModules_[namespace][templateName](
-				opt_data,
-				opt_ignored,
-				opt_ijData
+				data,
+				ignored,
+				ijData
 			);
 		};
 	}
@@ -102,10 +105,12 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {Object} data The data the template was called with.
 	 * @protected
 	 */
-	handleInterceptedCall_(originalFn, opt_data = {}) {
+	handleInterceptedCall_(originalFn, data = {}) {
 		const args = [originalFn.componentCtor, null, []];
-		for (let key in opt_data) {
-			args.push(key, opt_data[key]);
+		for (let key in data) {
+			if (Object.prototype.hasOwnProperty.call(data, key)) {
+				args.push(key, data[key]);
+			}
 		}
 		IncrementalDOM.elementVoid.apply(null, args);
 	}
@@ -115,6 +120,7 @@ class Soy extends IncrementalDomRenderer.constructor {
 	 * @param {!Component} component
 	 * @param {string} name
 	 * @protected
+	 * @return {boolean}
 	 */
 	isHtmlParam_(component, name) {
 		const state = component.getDataManager().getStateInstance(component);

@@ -6,6 +6,7 @@
     "format": "npm run prettier -- --write",
     "lerna": "lerna bootstrap -- --no-optional && npm install --no-optional",
     "lint": "eslint 'packages/metal*/{src,test}/**/*.js'",
+    "precommit": "lint-staged",
     "prettier": "prettier-eslint 'packages/metal*/{src,test}/**/*.js'",
     "test": "gulp test && npm run test:isomorphic",
     "test:coverage": "gulp test:coverage",
@@ -28,6 +29,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-metal": "^1.0.0",
     "gulp-replace": "^0.5.4",
+    "husky": "^0.14.3",
     "jsdom": "^9.9.1",
     "jsdom-global": "^2.1.1",
     "karma": "^1.1.0",
@@ -39,12 +41,19 @@
     "karma-sinon": "^1.0.5",
     "karma-source-map-support": "^1.1.0",
     "lerna": "^2.2.0",
+    "lint-staged": "^4.3.0",
     "metal-tools-soy": "^2.4.0",
     "metal-useragent": "^2.1.2",
     "mocha": "^2.5.3",
     "prettier-eslint-cli": "^4.4.0",
     "sinon": "^1.17.4",
     "watchify": "^3.7.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier-eslint --write",
+      "git add"
+    ]
   },
   "nyc": {
     "exclude": [

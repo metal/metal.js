@@ -96,6 +96,7 @@ export function defineWebComponent(tagName, Ctor) {
 		 *
 		 * @memberof CustomElement
 		 * @param {?} value attribute value that should be parsed.
+		 * @return {Object}
 		 */
 		deserializeValue_: function(value) {
 			let retVal;

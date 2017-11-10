@@ -15,13 +15,13 @@ class DomDelegatedEventHandle extends EventHandle {
 	 * @param {!Event} emitter Element the event was subscribed to.
 	 * @param {string} event The name of the event that was subscribed to.
 	 * @param {!Function} listener The listener subscribed to the event.
-	 * @param {string=} opt_selector An optional selector used when delegating
+	 * @param {string=} selector An optional selector used when delegating
 	 *     the event.
 	 * @constructor
 	 */
-	constructor(emitter, event, listener, opt_selector) {
+	constructor(emitter, event, listener, selector) {
 		super(emitter, event, listener);
-		this.selector_ = opt_selector;
+		this.selector_ = selector;
 	}
 
 	/**

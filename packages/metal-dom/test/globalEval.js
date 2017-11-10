@@ -59,7 +59,7 @@ describe('globalEval', function() {
 	});
 
 	it('should call callback function after script file is run', function(done) {
-		var newScript = globalEval.runFile('fixtures/script.js', function() {
+		const newScript = globalEval.runFile('fixtures/script.js', function() {
 			assert.strictEqual(5, window.testScript);
 			assert.ok(!newScript.parentNode);
 			done();
@@ -145,7 +145,7 @@ describe('globalEval', function() {
 		script.src = 'fixtures/script.js';
 		dom.enterDocument(script);
 
-		var newScript = globalEval.runScript(script, function() {
+		const newScript = globalEval.runScript(script, function() {
 			assert.strictEqual(5, window.testScript);
 			assert.ok(!newScript.parentNode);
 			done();

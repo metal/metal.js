@@ -230,7 +230,7 @@ export function contains(element1, element2) {
  *     that should match the event for the listener to be triggered.
  * @param {!function(!Object)} callback Function to be called when the event
  *     is triggered. It will receive the normalized event object.
- * @param {boolean=} opt_default Optional flag indicating if this is a default
+ * @param {boolean=} defaultListener Optional flag indicating if this is a default
  *     listener. That means that it would only be executed after all non
  *     default listeners, and only if the event isn't prevented via
  *     `preventDefault`.
@@ -241,7 +241,7 @@ export function delegate(
 	eventName,
 	selectorOrTarget,
 	callback,
-	opt_default
+	defaultListener
 ) {
 	const customConfig = customEvents[eventName];
 	if (customConfig && customConfig.delegate) {
@@ -249,7 +249,7 @@ export function delegate(
 		callback = customConfig.handler.bind(customConfig, callback);
 	}
 
-	if (opt_default) {
+	if (defaultListener) {
 		// Wrap callback so we don't set property directly on it.
 		callback = callback.bind();
 		callback.defaultListener_ = true;
@@ -275,10 +275,12 @@ export function delegate(
  * simulating browsers behaviour, avoiding event listeners to be called by triggerEvent method.
  * @param {Element} node Element to be checked.
  * @param {string} eventName The event name.
+ * @param {Object=} eventObj
  * @private
+ * @return {boolean}
  */
-function isAbleToInteractWith_(node, eventName, opt_eventObj) {
-	if (opt_eventObj && eventName === 'click' && opt_eventObj.button === 2) {
+function isAbleToInteractWith_(node, eventName, eventObj) {
+	if (eventObj && eventName === 'click' && eventObj.button === 2) {
 		// Firefox triggers "click" events on the document for right clicks. This
 		// causes our delegate logic to trigger it for regular elements too, which
 		// shouldn't happen. Ignoring them here.
@@ -442,6 +444,7 @@ function matchFallback_(element, selector) {
  * selector, or null if there is none.
  * @param {!Element} element
  * @param {?string} selector
+ * @return {Element|null}
  */
 export function next(element, selector) {
 	do {
@@ -472,11 +475,11 @@ function normalizeDelegateEvent_(event) {
  * @param {string} eventName The name of the event to listen to.
  * @param {!function(!Object)} callback Function to be called when the event is
  *   triggered. It will receive the normalized event object.
- * @param {boolean} opt_capture Flag indicating if listener should be triggered
+ * @param {boolean} capture Flag indicating if listener should be triggered
  *   during capture phase, instead of during the bubbling phase. Defaults to false.
  * @return {!DomEventHandle} Can be used to remove the listener.
  */
-export function on(element, eventName, callback, opt_capture) {
+export function on(element, eventName, callback, capture) {
 	if (isString(element)) {
 		return delegate(document, eventName, element, callback);
 	}
@@ -485,8 +488,8 @@ export function on(element, eventName, callback, opt_capture) {
 		eventName = customConfig.originalEvent;
 		callback = customConfig.handler.bind(customConfig, callback);
 	}
-	element.addEventListener(eventName, callback, opt_capture);
-	return new DomEventHandle(element, eventName, callback, opt_capture);
+	element.addEventListener(eventName, callback, capture);
+	return new DomEventHandle(element, eventName, callback, capture);
 }
 
 /**
@@ -502,7 +505,7 @@ export function on(element, eventName, callback, opt_capture) {
 export function once(element, eventName, callback) {
 	const domEventHandle = on(element, eventName, function() {
 		domEventHandle.removeListener();
-		return callback.apply(this, arguments);
+		return callback.apply(this, arguments); // eslint-disable-line
 	});
 	return domEventHandle;
 }
@@ -655,7 +658,7 @@ export function supportsEvent(element, eventName) {
 
 /**
  * This triggers all default matched delegated listeners of a given event type.
- * @param {!Array} defaultFns Array to collect default listeners in, instead
+ * @param {!Array} defFns Array to collect default listeners in, instead
  * @param {!Event} event
  * @return {boolean} False if at least one of the triggered callbacks returns
  *     false, or true otherwise.
@@ -783,7 +786,7 @@ function toggleClassesWithoutNative_(element, classes) {
 			elementClassName = `${elementClassName}${classes[i]} `;
 		} else {
 			const before = elementClassName.substring(0, classIndex);
-			const after = elementClassName.substring(classIndex + className.length);
+			const after = elementClassName.substring(classIndex + className.length); // eslint-disable-line
 			elementClassName = `${before} ${after}`;
 		}
 	}
@@ -816,15 +819,15 @@ function triggerElementListeners_(element, event, defaultFns) {
  * NOTE: This should mostly be used for testing, not on real code.
  * @param {!Element} element The node that should trigger the event.
  * @param {string} eventName The name of the event to be triggred.
- * @param {Object=} opt_eventObj An object with data that should be on the
+ * @param {Object=} eventObj An object with data that should be on the
  *   triggered event's payload.
  */
-export function triggerEvent(element, eventName, opt_eventObj) {
-	if (isAbleToInteractWith_(element, eventName, opt_eventObj)) {
-		const eventObj = document.createEvent('HTMLEvents');
-		eventObj.initEvent(eventName, true, true);
-		object.mixin(eventObj, opt_eventObj);
-		element.dispatchEvent(eventObj);
+export function triggerEvent(element, eventName, eventObj) {
+	if (isAbleToInteractWith_(element, eventName, eventObj)) {
+		const payload = document.createEvent('HTMLEvents');
+		payload.initEvent(eventName, true, true);
+		object.mixin(payload, eventObj);
+		element.dispatchEvent(payload);
 	}
 }
 

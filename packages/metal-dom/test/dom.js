@@ -18,7 +18,7 @@ describe('dom', function() {
 				assert.strictEqual('class2', getClassNames(element)[1]);
 			}
 
-			var element = document.createElement('div');
+			const element = document.createElement('div');
 			dom.addClasses(element, 'class1 class2');
 			assertClassesAdded();
 		});

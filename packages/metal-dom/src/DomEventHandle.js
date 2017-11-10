@@ -13,13 +13,13 @@ class DomEventHandle extends EventHandle {
 	 * @param {!EventEmitter} emitter Emitter the event was subscribed to.
 	 * @param {string} event The name of the event that was subscribed to.
 	 * @param {!Function} listener The listener subscribed to the event.
-	 * @param {boolean} opt_capture Flag indicating if listener should be triggered
+	 * @param {boolean} capture Flag indicating if listener should be triggered
 	 *   during capture phase, instead of during the bubbling phase. Defaults to false.
 	 * @constructor
 	 */
-	constructor(emitter, event, listener, opt_capture) {
+	constructor(emitter, event, listener, capture) {
 		super(emitter, event, listener);
-		this.capture_ = opt_capture;
+		this.capture_ = capture;
 	}
 
 	/**

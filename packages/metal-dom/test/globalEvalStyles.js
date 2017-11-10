@@ -27,7 +27,7 @@ describe('globalEvalStyles', function() {
 	});
 
 	it('should evaluate style file', function(done) {
-		var style = globalEvalStyles.runFile('fixtures/style.css', function() {
+		const style = globalEvalStyles.runFile('fixtures/style.css', function() {
 			assertComputedStyle('backgroundColor', 'rgb(0, 255, 0)');
 			dom.exitDocument(style);
 			done();
@@ -37,7 +37,7 @@ describe('globalEvalStyles', function() {
 	it('should leave created style file in document after code is evaluated', function(
 		done
 	) {
-		var style = globalEvalStyles.runFile('fixtures/style.css', function() {
+		const style = globalEvalStyles.runFile('fixtures/style.css', function() {
 			assert.ok(style.parentNode);
 			dom.exitDocument(style);
 			done();
@@ -59,7 +59,7 @@ describe('globalEvalStyles', function() {
 		let style = document.createElement('style');
 		style.innerHTML = 'body{background-color:rgb(255, 0, 0);}';
 
-		var newStyle = globalEvalStyles.runStyle(style, function() {
+		const newStyle = globalEvalStyles.runStyle(style, function() {
 			assert.ok(newStyle.parentNode);
 			dom.exitDocument(newStyle);
 			done();
@@ -87,7 +87,7 @@ describe('globalEvalStyles', function() {
 		link.href = 'fixtures/style.css';
 		link.rel = 'stylesheet';
 
-		var newStyle = globalEvalStyles.runStyle(link, function() {
+		const newStyle = globalEvalStyles.runStyle(link, function() {
 			assertComputedStyle('backgroundColor', 'rgb(0, 255, 0)');
 			dom.exitDocument(newStyle);
 			done();

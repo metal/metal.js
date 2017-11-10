@@ -556,7 +556,7 @@ describe('Component', function() {
 			}
 
 			class TestComponent extends Component {
-				willReceiveState(changes) {
+				willReceiveState() {
 					this.foo = 'foo' + count;
 
 					count++;
@@ -1110,7 +1110,7 @@ describe('Component', function() {
 		assert.ok(Component.isComponentCtor(TestComponent));
 		assert.ok(!Component.isComponentCtor(() => {}));
 		let fn = () => {};
-		assert.ok(!Component.isComponentCtor(fn.bind(this)));
+		assert.ok(!Component.isComponentCtor(fn.bind(this))); // eslint-disable-line
 	});
 
 	it('should pass instance of component to __METAL_DEV_TOOLS_HOOK__ on first render', function() {
@@ -1137,20 +1137,20 @@ describe('Component', function() {
 		sinon.assert.calledWith(hookStub, comp);
 	});
 
-	function createCustomComponentClass(opt_rendererContentOrFn) {
+	function createCustomComponentClass(rendererContentOrFn) {
 		class CustomComponent extends Component {}
-		CustomComponent.RENDERER = createCustomRenderer(opt_rendererContentOrFn);
+		CustomComponent.RENDERER = createCustomRenderer(rendererContentOrFn);
 		return CustomComponent;
 	}
 
-	function createCustomRenderer(opt_rendererContentOrFn) {
+	function createCustomRenderer(rendererContentOrFn) {
 		class CustomRenderer extends ComponentRenderer.constructor {
 			render(component) {
 				super.render(component);
-				if (core.isFunction(opt_rendererContentOrFn)) {
-					opt_rendererContentOrFn();
+				if (core.isFunction(rendererContentOrFn)) {
+					rendererContentOrFn();
 				} else {
-					component.element.innerHTML = opt_rendererContentOrFn;
+					component.element.innerHTML = rendererContentOrFn;
 				}
 			}
 		}

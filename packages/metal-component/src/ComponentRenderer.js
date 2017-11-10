@@ -16,7 +16,6 @@ class ComponentRenderer {
 	 * Sub classes can override to return `State` config for properties that
 	 * should be added to the component.
 	 * @param {!Component} component
-	 * @return {Object}
 	 */
 	getExtraDataConfig() {}
 

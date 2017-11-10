@@ -29,13 +29,12 @@ class ComponentRegistry {
 	/**
 	 * Registers a component, so it can be found by its name.
 	 * @param {!Function} constructorFn The component's constructor function.
-	 * @param {string=} opt_name Name of the registered component. If none is given
+	 * @param {string=} name Name of the registered component. If none is given
 	 *   the name defined by the NAME static variable will be used instead. If that
 	 *   isn't set as well, the name of the constructor function will be used.
 	 * @static
 	 */
-	static register(constructorFn, opt_name) {
-		let name = opt_name;
+	static register(constructorFn, name) {
 		if (!name) {
 			if (constructorFn.hasOwnProperty('NAME')) {
 				name = constructorFn.NAME;

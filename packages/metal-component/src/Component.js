@@ -82,15 +82,15 @@ import {EventEmitter, EventHandler} from 'metal-events';
 class Component extends EventEmitter {
 	/**
 	 * Constructor function for `Component`.
-	 * @param {Object=} opt_config An object with the initial values for this
+	 * @param {Object=} config An object with the initial values for this
 	 *     component's state.
-	 * @param {boolean|string|Element=} opt_parentElement The element where the
+	 * @param {boolean|string|Element=} parentElement The element where the
 	 *     component should be rendered. Can be given as a selector or an element.
 	 *     If `false` is passed, the component won't be rendered automatically
 	 *     after created.
 	 * @constructor
 	 */
-	constructor(opt_config, opt_parentElement) {
+	constructor(config, parentElement) {
 		super();
 
 		/**
@@ -130,7 +130,7 @@ class Component extends EventEmitter {
 		 * @type {!Object}
 		 * @protected
 		 */
-		this.initialConfig_ = opt_config || {};
+		this.initialConfig_ = config || {};
 
 		/**
 		 * Whether the current environment is server side.
@@ -167,8 +167,8 @@ class Component extends EventEmitter {
 
 		this.created();
 		this.componentCreated_ = true;
-		if (opt_parentElement !== false) {
-			this.renderComponent(opt_parentElement);
+		if (parentElement !== false) {
+			this.renderComponent(parentElement);
 		}
 	}
 
@@ -198,23 +198,24 @@ class Component extends EventEmitter {
 	 * appended to the DOM and any other action to be performed must be
 	 * implemented in this method, such as, binding DOM events. A component can
 	 * be re-attached multiple times.
-	 * @param {(string|Element)=} opt_parentElement Optional parent element
+	 * @param {(string|Element)=} parentElement Optional parent element
 	 *     to render the component.
-	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
+	 * @param {(string|Element)=} siblingElement Optional sibling element
 	 *     to render the component before it. Relevant when the component needs
 	 *     to be rendered before an existing element in the DOM.
 	 * @protected
 	 * @chainable
+	 * @return {Component}
 	 */
-	attach(opt_parentElement, opt_siblingElement) {
+	attach(parentElement, siblingElement) {
 		if (!this.inDocument) {
 			this.emit('willAttach');
 			this.willAttach();
-			this.attachElement(opt_parentElement, opt_siblingElement);
+			this.attachElement(parentElement, siblingElement);
 			this.inDocument = true;
 			this.attachData_ = {
-				parent: opt_parentElement,
-				sibling: opt_siblingElement,
+				parent: parentElement,
+				sibling: siblingElement,
 			};
 			this.emit('attached', this.attachData_);
 			this.attached();
@@ -233,19 +234,18 @@ class Component extends EventEmitter {
 
 	/**
 	 * Attaches the component element into the DOM.
-	 * @param {(string|Element)=} opt_parentElement Optional parent element
+	 * @param {(string|Element)=} parentElement Optional parent element
 	 *     to render the component.
-	 * @param {(string|Element)=} opt_siblingElement Optional sibling element
+	 * @param {(string|Element)=} siblingElement Optional sibling element
 	 *     to render the component before it. Relevant when the component needs
 	 *     to be rendered before an existing element in the DOM, e.g.
 	 *     `component.attach(null, existingElement)`.
 	 */
-	attachElement(opt_parentElement, opt_siblingElement) {
+	attachElement(parentElement, siblingElement) {
 		const element = this.element;
-		if (element && (opt_siblingElement || !element.parentNode)) {
-			const parent =
-				toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
-			parent.insertBefore(element, toElement(opt_siblingElement));
+		if (element && (siblingElement || !element.parentNode)) {
+			const parent = toElement(parentElement) || this.DEFAULT_ELEMENT_PARENT; // eslint-disable-line
+			parent.insertBefore(element, toElement(siblingElement));
 		}
 	}
 
@@ -274,6 +274,7 @@ class Component extends EventEmitter {
 	 * implemented in this method, such as, unbinding DOM events. A component
 	 * can be detached multiple times.
 	 * @chainable
+	 * @return {Component}
 	 */
 	detach() {
 		if (this.inDocument) {
@@ -326,9 +327,10 @@ class Component extends EventEmitter {
 	/**
 	 * Forces an update that ignores the `shouldUpdate` lifecycle method for
 	 * components whose render depends on external variables.
+	 * @param {function()} callback
 	 */
-	forceUpdate(opt_callback) {
-		this.forceUpdateCallback_ = opt_callback;
+	forceUpdate(callback) {
+		this.forceUpdateCallback_ = callback;
 
 		this.updateRenderer_({
 			forceUpdate: true,
@@ -510,17 +512,16 @@ class Component extends EventEmitter {
 	 * will always make sure that the constructor runs without rendering the
 	 * component, having the `render` step happen only after it has finished.
 	 * @param {!function()} Ctor The component's constructor function.
-	 * @param {Object|Element=} opt_configOrElement Optional config data or parent
+	 * @param {Object|Element=} configOrElement Optional config data or parent
 	 *     for the component.
-	 * @param {Element=} opt_element Optional parent for the component.
+	 * @param {Element=} element Optional parent for the component.
 	 * @return {!Component} The rendered component's instance.
 	 */
-	static render(Ctor, opt_configOrElement, opt_element) {
-		let config = opt_configOrElement;
-		let element = opt_element;
-		if (isElement(opt_configOrElement)) {
+	static render(Ctor, configOrElement, element) {
+		let config = configOrElement;
+		if (isElement(configOrElement)) {
 			config = null;
-			element = opt_configOrElement;
+			element = configOrElement;
 		}
 		const instance = new Ctor(config, false);
 		instance.renderComponent(element);
@@ -533,11 +534,11 @@ class Component extends EventEmitter {
 	 * rendering the component, having the `render` step happen only after it
 	 * has finished.
 	 * @param {!function()} Ctor The component's constructor function.
-	 * @param {Object|Element=} opt_configOrElement Optional config data or
+	 * @param {Object|Element=} configOrElement Optional config data or
 	 *     parent for the component.
 	 * @return {!String} The rendered component's content as string.
 	 */
-	static renderToString(Ctor, opt_config) {
+	static renderToString(Ctor, configOrElement) {
 		const rendererName = Ctor.RENDERER && Ctor.RENDERER.RENDERER_NAME;
 		switch (rendererName) {
 		case 'jsx':
@@ -557,13 +558,13 @@ class Component extends EventEmitter {
 			// component after all nested components stack rendered.
 			const interceptedComponentStrings = [];
 			const patch = IncrementalDOM.patch;
-			const patchInterceptor = function() {
-				let currentElement = patch(...arguments);
+			const patchInterceptor = function(...args) {
+				let currentElement = patch(...args);
 				interceptedComponentStrings.push(currentElement.innerHTML);
 				IncrementalDOM.patch = patch;
 			};
 			IncrementalDOM.patch = patchInterceptor;
-			Component.render(Ctor, opt_config).dispose();
+			Component.render(Ctor, configOrElement).dispose();
 			return interceptedComponentStrings[0];
 		}
 		default:
@@ -577,12 +578,12 @@ class Component extends EventEmitter {
 	/**
 	 * Renders the component into the DOM via its `ComponentRenderer`. Stores the
 	 * given parent element to be used when the renderer is done (`informRendered`).
-	 * @param {(string|Element|boolean)=} opt_parentElement Optional parent element
+	 * @param {(string|Element|boolean)=} parentElement Optional parent element
 	 *     to render the component. If set to `false`, the element won't be
 	 *     attached to any element after rendering. In this case, `attach` should
 	 *     be called manually later to actually attach it to the dom.
 	 */
-	renderComponent(opt_parentElement) {
+	renderComponent(parentElement) {
 		if (!this.hasRendererRendered_) {
 			if (!this.serverSide_ && window.__METAL_DEV_TOOLS_HOOK__) {
 				window.__METAL_DEV_TOOLS_HOOK__(this);
@@ -591,7 +592,7 @@ class Component extends EventEmitter {
 		}
 		this.emit('render');
 		syncState(this);
-		this.attach(opt_parentElement);
+		this.attach(parentElement);
 		this.wasRendered = true;
 	}
 
@@ -617,13 +618,13 @@ class Component extends EventEmitter {
 
 	/**
 	 * Sets the value of all the specified state keys.
-	 * @param {!Object.<string,*>} values A map of state keys to the values they
+	 * @param {!Object.<string,*>} state A map of state keys to the values they
 	 *   should be set to.
-	 * @param {function()=} opt_callback An optional function that will be run
+	 * @param {function()=} callback An optional function that will be run
 	 *   after the next batched update is triggered.
 	 */
-	setState(state, opt_callback) {
-		this.dataManager_.setState(this, state, opt_callback);
+	setState(state, callback) {
+		this.dataManager_.setState(this, state, callback);
 	}
 
 	/**
@@ -653,7 +654,7 @@ class Component extends EventEmitter {
 		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
 		this.dataManager_.setUp(
 			this,
-			object.mixin({}, this.renderer_.getExtraDataConfig(this), Component.DATA)
+			object.mixin({}, this.renderer_.getExtraDataConfig(this), Component.DATA) // eslint-disable-line
 		);
 	}
 

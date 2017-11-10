@@ -14,6 +14,9 @@ const BLACKLIST = {
 };
 const DATA_MANAGER_DATA = '__DATA_MANAGER_DATA__';
 
+/**
+ * Class to handle Component Data
+ */
 class ComponentDataManager {
 	/**
 	 * Creates the `State` instance that will handle the main component data.
@@ -22,7 +25,7 @@ class ComponentDataManager {
 	 * @protected
 	 */
 	createState_(component, data) {
-		const state = new State(component.getInitialConfig(), component, component);
+		const state = new State(component.getInitialConfig(), component, component); // eslint-disable-line
 		state.setKeysBlacklist(BLACKLIST);
 		state.configState(
 			object.mixin({}, data, State.getStateStatic(component.constructor))
@@ -102,10 +105,13 @@ class ComponentDataManager {
 	 * value if none is given).
 	 * @param {!Component} component
 	 * @param {!Object} data
-	 * @param {State=} opt_state
+	 * @param {State=} state
 	 */
-	replaceNonInternal(component, data, opt_state) {
-		const state = opt_state || this.getManagerData(component).state_;
+	replaceNonInternal(
+		component,
+		data,
+		state = this.getManagerData(component).state_
+	) {
 		const keys = state.getStateKeys();
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
@@ -122,13 +128,13 @@ class ComponentDataManager {
 	/**
 	 * Sets the value of all the specified state keys.
 	 * @param {!Component} component
-	 * @param {!Object.<string,*>} values A map of state keys to the values they
+	 * @param {!Object.<string,*>} state A map of state keys to the values they
 	 *   should be set to.
-	 * @param {function()=} opt_callback An optional function that will be run
+	 * @param {function()=} callback An optional function that will be run
 	 *   after the next batched update is triggered.
 	 */
-	setState(component, state, opt_callback) {
-		this.getManagerData(component).state_.setState(state, opt_callback);
+	setState(component, state, callback) {
+		this.getManagerData(component).state_.setState(state, callback);
 	}
 
 	/**

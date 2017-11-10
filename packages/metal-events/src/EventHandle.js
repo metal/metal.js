@@ -8,13 +8,15 @@ import {Disposable} from 'metal';
  * EventHandle is a Disposable, but it's important to note that the
  * EventEmitter that created it is not the one responsible for disposing it.
  * That responsibility is for the code that holds a reference to it.
- * @param {!EventEmitter} emitter Emitter the event was subscribed to.
- * @param {string} event The name of the event that was subscribed to.
- * @param {!Function} listener The listener subscribed to the event.
- * @constructor
  * @extends {Disposable}
  */
 class EventHandle extends Disposable {
+	/**
+	 * EventHandle constructor
+	 * @param {!EventEmitter} emitter Emitter the event was subscribed to.
+	 * @param {string} event The name of the event that was subscribed to.
+	 * @param {!Function} listener The listener subscribed to the event.
+	 */
 	constructor(emitter, event, listener) {
 		super();
 

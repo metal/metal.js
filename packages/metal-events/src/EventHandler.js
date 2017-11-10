@@ -5,10 +5,12 @@ import {Disposable} from 'metal';
 /**
  * EventHandler utility. It's useful for easily removing a group of
  * listeners from different EventEmitter instances.
- * @constructor
  * @extends {Disposable}
  */
 class EventHandler extends Disposable {
+	/**
+	 * EventHandler constructor
+	 */
 	constructor() {
 		super();
 
@@ -26,9 +28,9 @@ class EventHandler extends Disposable {
 	 * method.
 	 * @param {...(!EventHandle)} var_args
 	 */
-	add() {
+	add(...args) {
 		for (let i = 0; i < arguments.length; i++) {
-			this.eventHandles_.push(arguments[i]);
+			this.eventHandles_.push(args[i]);
 		}
 	}
 

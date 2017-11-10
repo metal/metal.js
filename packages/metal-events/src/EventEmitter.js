@@ -7,10 +7,12 @@ const singleArray_ = [0];
 
 /**
  * EventEmitter utility.
- * @constructor
  * @extends {Disposable}
  */
 class EventEmitter extends Disposable {
+	/**
+	 * EventEmitter constructor
+	 */
 	constructor() {
 		super();
 
@@ -63,17 +65,17 @@ class EventEmitter extends Disposable {
 	 * Adds a listener to the end of the listeners array for the specified events.
 	 * @param {!(Array|string)} event
 	 * @param {!Function} listener
-	 * @param {boolean} opt_default Flag indicating if this listener is a default
+	 * @param {boolean} defaultListener Flag indicating if this listener is a default
 	 *   action for this event. Default actions are run last, and only if no previous
 	 *   listener call `preventDefault()` on the received event facade.
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
-	addListener(event, listener, opt_default) {
+	addListener(event, listener, defaultListener) {
 		this.validateListener_(listener);
 
 		const events = this.toEventsArray_(event);
 		for (let i = 0; i < events.length; i++) {
-			this.addSingleListener_(events[i], listener, opt_default);
+			this.addSingleListener_(events[i], listener, defaultListener);
 		}
 
 		return new EventHandle(this, event, listener);
@@ -83,21 +85,20 @@ class EventEmitter extends Disposable {
 	 * Adds a listener to the end of the listeners array for a single event.
 	 * @param {string} event
 	 * @param {!Function} listener
-	 * @param {boolean} opt_default Flag indicating if this listener is a default
+	 * @param {boolean} defaultListener Flag indicating if this listener is a default
 	 *   action for this event. Default actions are run last, and only if no previous
 	 *   listener call `preventDefault()` on the received event facade.
-	 * @return {!EventHandle} Can be used to remove the listener.
-	 * @param {Function=} opt_origin The original function that was added as a
+	 * @param {Function=} origin The original function that was added as a
 	 *   listener, if there is any.
 	 * @protected
 	 */
-	addSingleListener_(event, listener, opt_default, opt_origin) {
+	addSingleListener_(event, listener, defaultListener, origin) {
 		this.runListenerHandlers_(event);
-		if (opt_default || opt_origin) {
+		if (defaultListener || origin) {
 			listener = {
-				default: opt_default,
+				default: defaultListener,
 				fn: listener,
-				origin: opt_origin,
+				origin: origin,
 			};
 		}
 		this.events_ = this.events_ || {};
@@ -143,7 +144,7 @@ class EventEmitter extends Disposable {
 			return false;
 		}
 
-		const args = array.slice(arguments, 1);
+		const args = array.slice(arguments, 1); // eslint-disable-line
 		this.runListeners_(listeners, args, this.buildFacade_(event));
 		return true;
 	}
@@ -216,11 +217,14 @@ class EventEmitter extends Disposable {
 			return;
 		}
 
+		/**
+		 *
+		 */
 		function handlerInternal() {
 			if (--amount === 0) {
 				self.removeListener(event, handlerInternal);
 			}
-			listener.apply(self, arguments);
+			listener.apply(self, arguments); // eslint-disable-line
 		}
 
 		self.addSingleListener_(event, handlerInternal, false, listener);
@@ -237,14 +241,14 @@ class EventEmitter extends Disposable {
 	matchesListener_(listenerObj, listener) {
 		const fn = listenerObj.fn || listenerObj;
 		return (
-			fn === listener || (listenerObj.origin && listenerObj.origin === listener)
+			fn === listener || (listenerObj.origin && listenerObj.origin === listener) // eslint-disable-line
 		);
 	}
 
 	/**
 	 * Removes a listener for the specified events.
 	 * Caution: changes array indices in the listener array behind the listener.
-	 * @param {!(Array|string)} events
+	 * @param {!(Array|string)} event
 	 * @param {!Function} listener
 	 * @return {!Object} Returns emitter, so calls can be chained.
 	 */
@@ -272,16 +276,16 @@ class EventEmitter extends Disposable {
 	 * @return {!EventHandle} Can be used to remove the listener.
 	 */
 	on() {
-		return this.addListener.apply(this, arguments);
+		return this.addListener.apply(this, arguments); // eslint-disable-line
 	}
 
 	/**
 	 * Adds handler that gets triggered when an event is listened to on this
 	 * instance.
-	 * @param {!function()}
+	 * @param {!function()} handler
 	 */
 	onListener(handler) {
-		this.listenerHandlers_ = this.addHandler_(this.listenerHandlers_, handler);
+		this.listenerHandlers_ = this.addHandler_(this.listenerHandlers_, handler); // eslint-disable-line
 	}
 
 	/**
@@ -299,13 +303,13 @@ class EventEmitter extends Disposable {
 	 * Removes all listeners, or those of the specified events. It's not a good
 	 * idea to remove listeners that were added elsewhere in the code,
 	 * especially when it's on an emitter that you didn't create.
-	 * @param {(Array|string)=} opt_events
+	 * @param {(Array|string)=} event
 	 * @return {!Object} Returns emitter, so calls can be chained.
 	 */
-	removeAllListeners(opt_events) {
+	removeAllListeners(event) {
 		if (this.events_) {
-			if (opt_events) {
-				const events = this.toEventsArray_(opt_events);
+			if (event) {
+				const events = this.toEventsArray_(event);
 				for (let i = 0; i < events.length; i++) {
 					this.events_[events[i]] = null;
 				}
@@ -342,7 +346,7 @@ class EventEmitter extends Disposable {
 	 * @return {!Object} Returns emitter, so calls can be chained.
 	 */
 	removeListener() {
-		return this.off.apply(this, arguments);
+		return this.off.apply(this, arguments); // eslint-disable-line
 	}
 
 	/**
@@ -364,7 +368,7 @@ class EventEmitter extends Disposable {
 	 * Runs the given listeners.
 	 * @param {!Array} listeners
 	 * @param {!Array} args
-	 * @param (Object) facade
+	 * @param {Object} facade
 	 * @protected
 	 */
 	runListeners_(listeners, args, facade) {
@@ -428,6 +432,11 @@ class EventEmitter extends Disposable {
 	}
 }
 
+/**
+ * Converts to an array
+ * @param {Object} val
+ * @return {Array}
+ */
 function toArray(val) {
 	val = val || [];
 	return Array.isArray(val) ? val : [val];

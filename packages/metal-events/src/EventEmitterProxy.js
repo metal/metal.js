@@ -7,17 +7,19 @@ import {Disposable} from 'metal';
  * instances together, emitting events from the first emitter through the
  * second one. That means that listening to a supported event on the target
  * emitter will mean listening to it on the origin emitter as well.
- * @param {EventEmitter} originEmitter Events originated on this emitter
- *   will be fired for the target emitter's listeners as well.
- * @param {EventEmitter} targetEmitter Event listeners attached to this emitter
- *   will also be triggered when the event is fired by the origin emitter.
- * @param {Object} opt_blacklist Optional blacklist of events that should not be
- *   proxied.
- * @constructor
  * @extends {Disposable}
  */
 class EventEmitterProxy extends Disposable {
-	constructor(originEmitter, targetEmitter, opt_blacklist, opt_whitelist) {
+	/**
+	 * @param {EventEmitter} originEmitter Events originated on this emitter
+	 * will be fired for the target emitter's listeners as well.
+	 * @param {EventEmitter} targetEmitter Event listeners attached to this emitter
+	 * will also be triggered when the event is fired by the origin emitter.
+	 * @param {Object} blacklist Optional blacklist of events that should not be
+	 * proxied.
+	 * @param {Object} whitelist
+	 */
+	constructor(originEmitter, targetEmitter, blacklist, whitelist) {
 		super();
 
 		/**
@@ -25,7 +27,7 @@ class EventEmitterProxy extends Disposable {
 		 * @type {Object}
 		 * @protected
 		 */
-		this.blacklist_ = opt_blacklist;
+		this.blacklist_ = blacklist;
 
 		/**
 		 * The origin emitter. This emitter's events will be proxied through the
@@ -64,7 +66,7 @@ class EventEmitterProxy extends Disposable {
 		 * @type {Object}
 		 * @protected
 		 */
-		this.whitelist_ = opt_whitelist;
+		this.whitelist_ = whitelist;
 
 		this.startProxy_();
 	}
@@ -94,8 +96,8 @@ class EventEmitterProxy extends Disposable {
 	 * Emits the specified event type on the target emitter.
 	 * @protected
 	 */
-	emitOnTarget_() {
-		this.targetEmitter_.emit.apply(this.targetEmitter_, arguments);
+	emitOnTarget_(...args) {
+		this.targetEmitter_.emit(...args);
 	}
 
 	/**

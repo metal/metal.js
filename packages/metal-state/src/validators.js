@@ -157,7 +157,7 @@ const validators = {
 						(required && !isDefAndNotNull(value[key])) ||
 						isInvalid(validator(value[key]))
 					) {
-						return validator(value[key], name + '.' + key, context);
+						return validator(value[key], `${name}.${key}`, context);
 					}
 				}
 			}

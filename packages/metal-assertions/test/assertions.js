@@ -189,5 +189,4 @@ describe('assertions', () => {
 			});
 		});
 	});
-
 });

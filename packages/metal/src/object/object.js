@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * Set of utilities for object operations
+ */
 class object {
 	/**
 	 * Copies all the members of a source object to a target object.
@@ -7,10 +10,14 @@ class object {
 	 * @param {...Object} var_args The objects from which values will be copied.
 	 * @return {Object} Returns the target object reference.
 	 */
-	static mixin(target) {
-		let key, source;
-		for (let i = 1; i < arguments.length; i++) {
-			source = arguments[i];
+	static mixin(target, ...args) {
+		let key;
+		let source;
+		for (let i = 0; i < args.length; i++) {
+			source = args[i];
+			// Possible prototype chain leak, breaks 1 metal-dom and
+			// 1 metal-incremental-dom test if guard-for-in rule is addressed
+			// eslint-disable-next-line
 			for (key in source) {
 				target[key] = source[key];
 			}
@@ -21,12 +28,11 @@ class object {
 	/**
 	 * Returns an object based on its fully qualified external name.
 	 * @param {string} name The fully qualified name.
-	 * @param {object=} opt_obj The object within which to look; default is
+	 * @param {object=} scope The object within which to look; default is
 	 *     <code>window</code>.
 	 * @return {?} The value (object or primitive) or, if not found, undefined.
 	 */
-	static getObjectByName(name, opt_obj) {
-		const scope = opt_obj || window;
+	static getObjectByName(name, scope = window) {
 		const parts = name.split('.');
 		return parts.reduce((part, key) => part[key], scope);
 	}
@@ -50,6 +56,8 @@ class object {
 	/**
 	 * Checks if the two given objects are equal. This is done via a shallow
 	 * check, including only the keys directly contained by the 2 objects.
+	 * @param {Object} obj1
+	 * @param {Object} obj2
 	 * @return {boolean}
 	 */
 	static shallowEqual(obj1, obj2) {

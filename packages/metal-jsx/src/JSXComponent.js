@@ -1,7 +1,7 @@
 'use strict';
 
 import './iDOMHelpers';
-import { object } from 'metal';
+import {object} from 'metal';
 import Component from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXDataManager from './JSXDataManager';
@@ -50,7 +50,13 @@ class JSXComponent extends Component {
 	 * @return {Object} Object containing props
 	 */
 	otherProps() {
-		const removeKeys = [...this.getDataManager().getPropsInstance(this).getStateKeys(), 'key', 'ref'];
+		const removeKeys = [
+			...this.getDataManager()
+				.getPropsInstance(this)
+				.getStateKeys(),
+			'key',
+			'ref',
+		];
 
 		const retObj = object.mixin({}, this.props);
 

@@ -9,7 +9,10 @@ import JSXRenderer from './JSXRenderer';
  * https://github.com/jridgewell/babel-plugin-incremental-dom#runtime
  */
 
-const scope = (typeof exports !== 'undefined' && typeof global !== 'undefined') ? global : window;
+const scope =
+	typeof exports !== 'undefined' && typeof global !== 'undefined'
+		? global
+		: window;
 
 scope.iDOMHelpers = scope.iDOMHelpers || {};
 
@@ -27,16 +30,21 @@ scope.iDOMHelpers.forOwn = function(object, iterator) {
 };
 
 scope.iDOMHelpers.jsxWrapper = function(elementClosure, args) {
-	const wrapper = args ? function() {
-		return elementClosure.apply(this, args);
-	} : elementClosure;
+	const wrapper = args
+		? function() {
+				return elementClosure.apply(this, args); // eslint-disable-line
+		}
+		: elementClosure;
 	wrapper.__jsxDOMWrapper = true;
 	return wrapper;
 };
 
 scope.iDOMHelpers.renderArbitrary = function(child) {
 	const type = typeof child;
-	if (type === 'number' || (type === 'string' || child && child instanceof String)) {
+	if (
+		type === 'number' ||
+		(type === 'string' || (child && child instanceof String))
+	) {
 		IncrementalDOM.text(child);
 	} else if (type === 'function' && child.__jsxDOMWrapper) {
 		child();

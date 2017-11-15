@@ -1,6 +1,6 @@
 'use strict';
 
-import { getData } from '../data';
+import {getData} from '../data';
 
 let comps_ = [];
 let disposing_ = false;

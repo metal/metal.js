@@ -8,5 +8,5 @@ import object from './object/object';
 import string from './string/string';
 
 export * from './core';
-export { array, async, Disposable, object, string };
+export {array, async, Disposable, object, string};
 export default core;

@@ -1,0 +1,23 @@
+{
+  "env": {
+    "mocha": true
+  },
+  "globals": {
+    "assert": true,
+    "sinon": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+        "jsx": true
+    }
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "max-len": 0,
+    "no-invalid-this": 0,
+    "no-unused-vars": 0,
+    "require-jsdoc": 0
+  }
+}

@@ -3,7 +3,7 @@
 import dom from '../src/dom';
 import features from '../src/features';
 import DomEventEmitterProxy from '../src/DomEventEmitterProxy';
-import { EventEmitter } from 'metal-events';
+import {EventEmitter} from 'metal-events';
 
 describe('DomEventEmitterProxy', function() {
 	afterEach(function() {
@@ -11,11 +11,11 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy event from event emitter origin to target', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 		origin.emit('event1', 1, 2);
 
@@ -25,13 +25,13 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy event from dom element origin to target', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		document.body.appendChild(origin);
 
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('click', listener);
 		dom.triggerEvent(origin, 'click');
 
@@ -41,13 +41,13 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy custom event from dom element origin to target', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		document.body.appendChild(origin);
 
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('transitionend', listener);
 		dom.triggerEvent(origin, features.checkAnimationEventName().transition);
 
@@ -55,10 +55,10 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should not proxy unsupported dom event from dom element', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		origin.addEventListener = sinon.stub();
 
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
 		target.on('event1', sinon.stub());
@@ -66,10 +66,10 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy event from document to target', function() {
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(document, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('click', listener);
 		dom.triggerEvent(document, 'click');
 
@@ -77,16 +77,16 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy delegate event from dom element origin to target', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		dom.append(origin, '<button class="testButton"></button>');
 		document.body.appendChild(origin);
 
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('delegate:click:.testButton', listener);
-		var button = origin.querySelector('.testButton');
+		let button = origin.querySelector('.testButton');
 		dom.triggerEvent(button, 'click');
 
 		assert.strictEqual(1, listener.callCount);
@@ -95,16 +95,16 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should proxy delegate event that contains ":" in selector', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		dom.append(origin, '<button data-onclick="test:handleClick"></button>');
 		document.body.appendChild(origin);
 
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('delegate:click:[data-onclick="test:handleClick"]', listener);
-		var button = origin.querySelector('[data-onclick="test:handleClick"]');
+		let button = origin.querySelector('[data-onclick="test:handleClick"]');
 		dom.triggerEvent(button, 'click');
 
 		assert.strictEqual(1, listener.callCount);
@@ -112,10 +112,10 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should try to proxy event with "delegate:" prefix but no selector', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		document.body.appendChild(origin);
 
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(origin, target);
 
 		sinon.spy(dom, 'delegate');
@@ -127,16 +127,16 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should change the element that events are proxied from', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 		document.body.appendChild(origin);
 
-		var target = new EventEmitter();
-		var proxy = new DomEventEmitterProxy(origin, target);
+		let target = new EventEmitter();
+		let proxy = new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('click', listener);
 
-		var origin2 = document.createElement('div');
+		let origin2 = document.createElement('div');
 		document.body.appendChild(origin2);
 		proxy.setOriginEmitter(origin2);
 
@@ -151,11 +151,11 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should not proxy event emitter events after disposed', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		var proxy = new DomEventEmitterProxy(origin, target);
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
+		let proxy = new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
 		proxy.dispose();
@@ -164,12 +164,12 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should not proxy dom events after disposed', function() {
-		var origin = document.createElement('div');
+		let origin = document.createElement('div');
 
-		var target = new EventEmitter();
-		var proxy = new DomEventEmitterProxy(origin, target);
+		let target = new EventEmitter();
+		let proxy = new DomEventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('click', listener);
 
 		proxy.dispose();
@@ -178,10 +178,10 @@ describe('DomEventEmitterProxy', function() {
 	});
 
 	it('should not throw error if origin emitter is null', function() {
-		var target = new EventEmitter();
+		let target = new EventEmitter();
 		new DomEventEmitterProxy(null, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		assert.doesNotThrow(() => target.on('click', listener));
 	});
 });

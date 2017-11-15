@@ -1,7 +1,7 @@
 'use strict';
 
 import Component from '../../src/Component';
-import { syncState } from '../../src/sync/sync';
+import {syncState} from '../../src/sync/sync';
 
 describe('sync', function() {
 	let comp;
@@ -13,15 +13,14 @@ describe('sync', function() {
 	});
 
 	it('should call all "sync" methods on component', function() {
-		class TestComponent extends Component {
-		}
+		class TestComponent extends Component {}
 		TestComponent.STATE = {
 			bar: {
-				value: 'bar'
+				value: 'bar',
 			},
 			foo: {
-				value: 'foo'
-			}
+				value: 'foo',
+			},
 		};
 		TestComponent.prototype.syncBar = sinon.stub();
 		TestComponent.prototype.syncFoo = sinon.stub();
@@ -37,15 +36,14 @@ describe('sync', function() {
 	});
 
 	it('should call "sync" method for properties defined in changes object', function() {
-		class TestComponent extends Component {
-		}
+		class TestComponent extends Component {}
 		TestComponent.STATE = {
 			bar: {
-				value: 'bar'
+				value: 'bar',
 			},
 			foo: {
-				value: 'foo'
-			}
+				value: 'foo',
+			},
 		};
 		TestComponent.prototype.syncBar = sinon.stub();
 		TestComponent.prototype.syncFoo = sinon.stub();
@@ -54,8 +52,8 @@ describe('sync', function() {
 		syncState(comp, {
 			foo: {
 				newVal: 'newFoo',
-				prevVal: 'prevFoo'
-			}
+				prevVal: 'prevFoo',
+			},
 		});
 		assert.equal(0, comp.syncBar.callCount);
 		assert.equal(1, comp.syncFoo.callCount);
@@ -71,8 +69,8 @@ describe('sync', function() {
 		}
 		TestComponent.STATE = {
 			foo: {
-				value: 'foo'
-			}
+				value: 'foo',
+			},
 		};
 
 		comp = new TestComponent({}, false);

@@ -5,11 +5,11 @@ import EventEmitterProxy from '../src/EventEmitterProxy';
 
 describe('EventEmitterProxy', function() {
 	it('should proxy event from origin to target', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
 		new EventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 		origin.emit('event1', 1, 2);
 
@@ -19,13 +19,13 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should not proxy blacklisted event', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
 		new EventEmitterProxy(origin, target, {
-			event1: true
+			event1: true,
 		});
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 		origin.emit('event1', 1, 2);
 
@@ -33,13 +33,13 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should proxy only whitelisted events', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
 		new EventEmitterProxy(origin, target, null, {
-			event1: true
+			event1: true,
 		});
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 		target.on('event2', listener);
 		origin.emit('event1', 1, 2);
@@ -49,15 +49,20 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should not proxy event that is both whitelisted and blacklisted', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		new EventEmitterProxy(origin, target, {
-			event1: true
-		}, {
-			event1: true
-		});
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
+		new EventEmitterProxy(
+			origin,
+			target,
+			{
+				event1: true,
+			},
+			{
+				event1: true,
+			}
+		);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 		target.on('event2', listener);
 		origin.emit('event1', 1, 2);
@@ -67,13 +72,13 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should only emit proxied event once per listener', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
 		new EventEmitterProxy(origin, target);
 
-		var listener1 = sinon.stub();
+		let listener1 = sinon.stub();
 		target.on('event1', listener1);
-		var listener2 = sinon.stub();
+		let listener2 = sinon.stub();
 		target.on('event1', listener2);
 		origin.emit('event1', 1, 2);
 
@@ -82,14 +87,14 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should change the emitter that events are proxied from', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		var proxy = new EventEmitterProxy(origin, target);
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
+		let proxy = new EventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
-		var origin2 = new EventEmitter();
+		let origin2 = new EventEmitter();
 		proxy.setOriginEmitter(origin2);
 
 		origin.emit('event1', 1, 2);
@@ -102,13 +107,13 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should remove listeners after changing the emitter that events were proxied from', function() {
-		var target = new EventEmitter();
-		var proxy = new EventEmitterProxy(new EventEmitter(), target);
+		let target = new EventEmitter();
+		let proxy = new EventEmitterProxy(new EventEmitter(), target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
-		var origin2 = new EventEmitter();
+		let origin2 = new EventEmitter();
 		proxy.setOriginEmitter(origin2);
 		proxy.dispose();
 
@@ -117,27 +122,27 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should not throw error if origin emitter is set to null', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		var proxy = new EventEmitterProxy(origin, target);
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
+		let proxy = new EventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
 		assert.doesNotThrow(() => proxy.setOriginEmitter(null));
 	});
 
 	it('should pass proxied events to new origin emitters, even when no emitter exists for a while', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		var proxy = new EventEmitterProxy(origin, target);
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
+		let proxy = new EventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
 		proxy.setOriginEmitter(null);
 
-		var origin2 = new EventEmitter();
+		let origin2 = new EventEmitter();
 		proxy.setOriginEmitter(origin2);
 
 		origin.emit('event1', 1, 2);
@@ -150,13 +155,13 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should allow manually choosing events to be proxied', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
-		var proxy = new EventEmitterProxy(origin, target);
+		let proxy = new EventEmitterProxy(origin, target);
 		proxy.proxyEvent('event1');
 		origin.emit('event1', 1, 2);
 
@@ -166,11 +171,11 @@ describe('EventEmitterProxy', function() {
 	});
 
 	it('should not proxy events after disposed', function() {
-		var origin = new EventEmitter();
-		var target = new EventEmitter();
-		var proxy = new EventEmitterProxy(origin, target);
+		let origin = new EventEmitter();
+		let target = new EventEmitter();
+		let proxy = new EventEmitterProxy(origin, target);
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		target.on('event1', listener);
 
 		proxy.dispose();

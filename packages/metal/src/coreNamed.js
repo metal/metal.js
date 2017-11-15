@@ -19,7 +19,7 @@ let uniqueIdCounter_ = 1;
  * @type {String}
  * @protected
  */
-export const UID_PROPERTY = `core_${((Math.random() * 1e9) >>> 0)}`;
+export const UID_PROPERTY = `core_${(Math.random() * 1e9) >>> 0}`;
 
 /**
  * When defining a class Foo with an abstract method bar(), you can do:
@@ -50,7 +50,7 @@ export function disableCompatibilityMode() {
  *       using "key" to keep working like before. NOTE: this may cause
  *       problems, since "key" is meant to be used differently. Only use this
  *       if it's not possible to upgrade the code to use "ref" instead.
- * @param {Object=} opt_data Optional object with data to specify more
+ * @param {Object=} data Optional object with data to specify more
  *     details, such as:
  *         - renderers {Array} the template renderers that should be in
  *           compatibility mode, either their constructors or strings
@@ -58,8 +58,8 @@ export function disableCompatibilityMode() {
  *           that extend from IncrementalDomRenderer.
  * @type {Object}
  */
-export function enableCompatibilityMode(opt_data = {}) {
-	compatibilityModeData_ = opt_data;
+export function enableCompatibilityMode(data = {}) {
+	compatibilityModeData_ = data;
 }
 
 /**
@@ -112,17 +112,22 @@ export function getFunctionName(fn) {
  * be recalculated even if this function is called multiple times.
  * @param {!function()} ctor Class constructor.
  * @param {string} propertyName Property name to be merged.
- * @param {function(*, *):*=} opt_mergeFn Function that receives the merged
+ * @param {function(*, *):*=} mergeFn Function that receives the merged
  *     value of the property so far and the next value to be merged to it.
  *     Should return these two merged together. If not passed the final property
  *     will be the first truthy value among ancestors.
+ * @return {Object}
  */
-export function getStaticProperty(ctor, propertyName, opt_mergeFn) {
+export function getStaticProperty(
+	ctor,
+	propertyName,
+	mergeFn = getFirstTruthy_
+) {
 	const mergedName = propertyName + '_MERGED';
 	if (!ctor.hasOwnProperty(mergedName)) {
+		// eslint-disable-next-line
 		let merged = ctor.hasOwnProperty(propertyName) ? ctor[propertyName] : null;
 		if (ctor.__proto__ && !ctor.__proto__.isPrototypeOf(Function)) {
-			const mergeFn = opt_mergeFn || getFirstTruthy_;
 			merged = mergeFn(
 				merged,
 				getStaticProperty(ctor.__proto__, propertyName, mergeFn)
@@ -134,34 +139,35 @@ export function getStaticProperty(ctor, propertyName, opt_mergeFn) {
 }
 
 /**
- * Gets an unique id. If `opt_object` argument is passed, the object is
+ * Gets an unique id. If `object` argument is passed, the object is
  * mutated with an unique id. Consecutive calls with the same object
  * reference won't mutate the object again, instead the current object uid
  * returns. See {@link UID_PROPERTY}.
- * @param {Object=} opt_object Optional object to be mutated with the uid. If
+ * @param {Object=} object Optional object to be mutated with the uid. If
  *     not specified this method only returns the uid.
- * @param {boolean=} opt_noInheritance Optional flag indicating if this
+ * @param {boolean=} noInheritance Optional flag indicating if this
  *     object's uid property can be inherited from parents or not.
  * @throws {Error} when invoked to indicate the method should be overridden.
+ * @return {number}
  */
-export function getUid(opt_object, opt_noInheritance) {
-	if (opt_object) {
-		let id = opt_object[UID_PROPERTY];
-		if (opt_noInheritance && !opt_object.hasOwnProperty(UID_PROPERTY)) {
+export function getUid(object, noInheritance) {
+	if (object) {
+		let id = object[UID_PROPERTY];
+		if (noInheritance && !object.hasOwnProperty(UID_PROPERTY)) {
 			id = null;
 		}
-		return id || (opt_object[UID_PROPERTY] = uniqueIdCounter_++);
+		return id || (object[UID_PROPERTY] = uniqueIdCounter_++);
 	}
 	return uniqueIdCounter_++;
 }
 
 /**
  * The identity function. Returns its first argument.
- * @param {*=} opt_returnValue The single value that will be returned.
+ * @param {*=} returnValue The single value that will be returned.
  * @return {?} The first argument.
  */
-export function identityFunction(opt_returnValue) {
-	return opt_returnValue;
+export function identityFunction(returnValue) {
+	return returnValue;
 }
 
 /**
@@ -262,7 +268,7 @@ export function isWindow(val) {
  */
 export function isObject(val) {
 	const type = typeof val;
-	return type === 'object' && val !== null || type === 'function';
+	return (type === 'object' && val !== null) || type === 'function';
 }
 
 /**
@@ -290,15 +296,16 @@ export function isString(val) {
  * @return {boolean}
  */
 export function isServerSide() {
-	return typeof process !== 'undefined' &&
+	return (
+		typeof process !== 'undefined' &&
 		typeof process.env !== 'undefined' &&
 		process.env.NODE_ENV !== 'test' &&
-		!process.browser;
+		!process.browser
+	);
 }
 
 /**
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */
-export function nullFunction() {
-}
+export function nullFunction() {}

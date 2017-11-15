@@ -1,6 +1,6 @@
 import * as IncrementalDOM from 'incremental-dom';
 import * as IncrementalDOMString from 'incremental-dom-string';
-import { isServerSide } from 'metal';
+import {isServerSide} from 'metal';
 
 if (isServerSide()) {
 	// Overrides global.IncrementalDOM virtual elements with incremental dom
@@ -9,7 +9,10 @@ if (isServerSide()) {
 	// browser.
 	global.IncrementalDOM = IncrementalDOMString;
 } else {
-	var scope = (typeof exports !== 'undefined' && typeof global !== 'undefined') ? global : window;
+	let scope =
+		typeof exports !== 'undefined' && typeof global !== 'undefined'
+			? global
+			: window;
 
-	scope.IncrementalDOM = IncrementalDOM;
+	scope.IncrementalDOM = IncrementalDOM;
 }

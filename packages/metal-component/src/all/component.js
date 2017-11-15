@@ -6,5 +6,10 @@ import ComponentRegistry from '../ComponentRegistry';
 import ComponentRenderer from '../ComponentRenderer';
 
 export default Component;
-export { Component, ComponentDataManager, ComponentRegistry, ComponentRenderer };
+export {
+	Component,
+	ComponentDataManager,
+	ComponentRegistry,
+	ComponentRenderer,
+};
 export * from '../events/events';

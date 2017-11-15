@@ -1,14 +1,14 @@
 'use strict';
 
-import { async, core } from 'metal';
-import { dom, features } from 'metal-dom';
-import { validators } from 'metal-state';
+import {async, core} from 'metal';
+import {dom, features} from 'metal-dom';
+import {validators} from 'metal-state';
 import Component from '../src/Component';
 import ComponentDataManager from '../src/ComponentDataManager';
 import ComponentRenderer from '../src/ComponentRenderer';
 
 describe('Component', function() {
-	var comp;
+	let comp;
 
 	afterEach(function() {
 		document.body.innerHTML = '';
@@ -37,7 +37,7 @@ describe('Component', function() {
 		});
 
 		it('should run component render lifecycle', function() {
-			var renderListener = sinon.stub();
+			let renderListener = sinon.stub();
 			class TestComponent extends Component {
 				created() {
 					this.on('render', renderListener);
@@ -57,7 +57,7 @@ describe('Component', function() {
 		});
 
 		it('should not run component render lifecycle if "false" is passed as second param', function() {
-			var renderListener = sinon.stub();
+			let renderListener = sinon.stub();
 			class TestComponent extends Component {
 				created() {
 					this.on('render', renderListener);
@@ -95,8 +95,7 @@ describe('Component', function() {
 		});
 
 		it('should run "willAttach" lifecycle method when the component is about to attach', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			sinon.spy(TestComponent.prototype, 'willAttach');
 			comp = new TestComponent();
 
@@ -105,7 +104,7 @@ describe('Component', function() {
 		});
 
 		it('should emit "willAttach" lifecycle event when the component is about to attach', function() {
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			class TestComponent extends Component {
 				created() {
 					this.on('willAttach', listener);
@@ -119,7 +118,7 @@ describe('Component', function() {
 
 		it('should emit "attached" event when component is attached', function() {
 			comp = new Component({}, false);
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('attached', listener);
 			comp.attach('.parent', '.sibling');
 			assert.strictEqual(1, listener.callCount);
@@ -130,15 +129,14 @@ describe('Component', function() {
 		it('should return attach data via the `getAttachData` function', function() {
 			comp = new Component({}, false);
 			comp.attach('.parent', '.sibling');
-			var attachData = comp.getAttachData();
+			let attachData = comp.getAttachData();
 			assert.ok(attachData);
 			assert.strictEqual('.parent', attachData.parent);
 			assert.strictEqual('.sibling', attachData.sibling);
 		});
 
 		it('should run "rendered" lifecycle method when the component is rendered', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			sinon.spy(TestComponent.prototype, 'rendered');
 			comp = new TestComponent();
 
@@ -147,7 +145,7 @@ describe('Component', function() {
 		});
 
 		it('should emit "rendered" event when the component is rendered', function() {
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			class TestComponent extends Component {
 				created() {
 					this.on('rendered', listener);
@@ -166,8 +164,7 @@ describe('Component', function() {
 		});
 
 		it('should run "willDetach" lifecycle method when the component is about to detach', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			sinon.spy(TestComponent.prototype, 'willDetach');
 			comp = new TestComponent();
 
@@ -180,7 +177,7 @@ describe('Component', function() {
 		});
 
 		it('should emit "willDetach" lifecycle event when the component is about to detach', function() {
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			class TestComponent extends Component {
 				created() {
 					this.on('willDetach', listener);
@@ -200,7 +197,7 @@ describe('Component', function() {
 			comp = new Component();
 
 			assert.ok(comp.element.parentNode);
-			var element = comp.element;
+			let element = comp.element;
 
 			comp.dispose();
 			assert.ok(!element.parentNode);
@@ -229,33 +226,33 @@ describe('Component', function() {
 		});
 
 		it('should set component element', function() {
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			document.body.appendChild(element);
 
 			comp = new Component({
-				element: element
+				element: element,
 			});
 			assert.strictEqual(element, comp.element);
 		});
 
 		it('should set component element from selector', function() {
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			element.className = 'myClass';
 			document.body.appendChild(element);
 
 			comp = new Component({
-				element: '.myClass'
+				element: '.myClass',
 			});
 			assert.strictEqual(element, comp.element);
 		});
 
 		it('should keep previous element if selector doesn\'t match anything', function() {
 			comp = new Component({
-				element: '.myClass'
+				element: '.myClass',
 			});
 			assert.ok(comp.element);
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			comp.element = element;
 			assert.strictEqual(element, comp.element);
 
@@ -273,18 +270,18 @@ describe('Component', function() {
 
 	describe('State', function() {
 		it('should merge elementClasses with ELEMENT_CLASSES static hint', function() {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			CustomComponent.ELEMENT_CLASSES = 'static';
 
 			comp = new CustomComponent({
-				elementClasses: 'class'
+				elementClasses: 'class',
 			});
 			assert.strictEqual('class static', comp.elementClasses);
 		});
 
 		it('should allow setting element to null', function() {
 			comp = new Component();
-			assert.doesNotThrow(() => comp.element = null);
+			assert.doesNotThrow(() => (comp.element = null));
 			assert.strictEqual(null, comp.element);
 		});
 
@@ -295,7 +292,9 @@ describe('Component', function() {
 			assert.ok(!comp.inDocument);
 		});
 
-		it('should update element display value according to visible state', function(done) {
+		it('should update element display value according to visible state', function(
+			done
+		) {
 			comp = new Component();
 
 			assert.ok(comp.visible);
@@ -314,13 +313,15 @@ describe('Component', function() {
 
 		it('should set display value on new element when changed', function() {
 			comp = new Component({
-				visible: false
+				visible: false,
 			});
 			comp.element = document.createElement('div');
 			assert.strictEqual('none', comp.element.style.display);
 		});
 
-		it('should not throw error when trying to set display value before element is set', function(done) {
+		it('should not throw error when trying to set display value before element is set', function(
+			done
+		) {
 			comp = new Component({}, false);
 			comp.visible = false;
 			comp.once('stateSynced', function() {
@@ -330,26 +331,26 @@ describe('Component', function() {
 		});
 
 		it('should return initial config object received by the constructor', function() {
-			var config = {};
+			let config = {};
 			comp = new Component(config);
 			assert.strictEqual(config, comp.getInitialConfig());
 		});
 
 		it('should return an array with all state property names', function() {
 			comp = new Component();
-			var expected = ['children', 'elementClasses', 'events', 'visible'];
+			let expected = ['children', 'elementClasses', 'events', 'visible'];
 			assert.deepEqual(expected, comp.getStateKeys().sort());
 		});
 
 		it('should return an object with all state properties', function() {
 			comp = new Component({
-				elementClasses: 'myClass'
+				elementClasses: 'myClass',
 			});
-			var expected = {
+			let expected = {
 				children: [],
 				elementClasses: 'myClass',
 				events: null,
-				visible: true
+				visible: true,
 			};
 			assert.deepEqual(expected, comp.getState());
 		});
@@ -358,7 +359,7 @@ describe('Component', function() {
 			comp = new Component();
 			comp.setState({
 				elementClasses: 'myClass',
-				visible: false
+				visible: false,
 			});
 			assert.strictEqual('myClass', comp.elementClasses);
 			assert.ok(!comp.visible);
@@ -366,15 +367,15 @@ describe('Component', function() {
 
 		describe('events state key', function() {
 			it('should attach events to specified functions', function() {
-				var CustomComponent = createCustomComponentClass();
+				let CustomComponent = createCustomComponentClass();
 				CustomComponent.prototype.listener1 = sinon.stub();
 				const listener2 = sinon.stub();
 
 				comp = new CustomComponent({
 					events: {
 						event1: 'listener1',
-						event2: listener2
-					}
+						event2: listener2,
+					},
 				});
 
 				comp.emit('event1');
@@ -387,13 +388,13 @@ describe('Component', function() {
 			});
 
 			it('should attach events when "events" state property value changes', function() {
-				var listener1 = sinon.stub();
-				var listener2 = sinon.stub();
+				let listener1 = sinon.stub();
+				let listener2 = sinon.stub();
 
 				comp = new Component();
 				comp.events = {
 					event1: listener1,
-					event2: listener2
+					event2: listener2,
 				};
 
 				comp.emit('event1');
@@ -406,17 +407,17 @@ describe('Component', function() {
 			});
 
 			it('should detach unused events when value of the "events" state key is changed', function() {
-				var CustomComponent = createCustomComponentClass();
+				let CustomComponent = createCustomComponentClass();
 				CustomComponent.prototype.listener1 = sinon.stub();
 				CustomComponent.prototype.listener2 = sinon.stub();
 
 				comp = new CustomComponent({
 					events: {
-						event1: 'listener1'
-					}
+						event1: 'listener1',
+					},
 				});
 				comp.events = {
-					event2: 'listener2'
+					event2: 'listener2',
 				};
 
 				comp.emit('event1');
@@ -427,18 +428,20 @@ describe('Component', function() {
 			});
 		});
 
-		it('should synchronize state synchronously on render and asynchronously when state value changes', function(done) {
-			var CustomComponent = createCustomComponentClass();
+		it('should synchronize state synchronously on render and asynchronously when state value changes', function(
+			done
+		) {
+			let CustomComponent = createCustomComponentClass();
 			CustomComponent.STATE = {
 				foo: {
-					value: 0
-				}
+					value: 0,
+				},
 			};
 			CustomComponent.prototype.syncUnkown = sinon.spy();
 			CustomComponent.prototype.syncFoo = sinon.spy();
 
 			comp = new CustomComponent({
-				foo: 10
+				foo: 10,
 			});
 			sinon.assert.notCalled(CustomComponent.prototype.syncUnkown);
 			sinon.assert.callCount(CustomComponent.prototype.syncFoo, 1);
@@ -460,21 +463,20 @@ describe('Component', function() {
 		});
 
 		it('should fire sync methods for state keys defined by super classes as well', function() {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			CustomComponent.STATE = {
 				foo: {
-					value: 0
-				}
+					value: 0,
+				},
 			};
 
-			class ChildComponent extends CustomComponent {
-			}
+			class ChildComponent extends CustomComponent {}
 			ChildComponent.prototype.syncFoo = sinon.spy();
 			ChildComponent.prototype.syncBar = sinon.spy();
 			ChildComponent.STATE = {
 				bar: {
-					value: 1
-				}
+					value: 1,
+				},
 			};
 
 			comp = new ChildComponent();
@@ -482,16 +484,18 @@ describe('Component', function() {
 			sinon.assert.callCount(comp.syncBar, 1);
 		});
 
-		it('should emit "stateSynced" event after state changes update the component', function(done) {
-			var CustomComponent = createCustomComponentClass();
+		it('should emit "stateSynced" event after state changes update the component', function(
+			done
+		) {
+			let CustomComponent = createCustomComponentClass();
 			CustomComponent.STATE = {
 				foo: {
-					value: 0
-				}
+					value: 0,
+				},
 			};
 
 			comp = new CustomComponent();
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('stateSynced', listener);
 			comp.foo = 1;
 			comp.once('stateChanged', function(data) {
@@ -501,19 +505,20 @@ describe('Component', function() {
 			});
 		});
 
-		it('should emit "rendered" event with "false" as the first arg when updated by the renderer', function(done) {
+		it('should emit "rendered" event with "false" as the first arg when updated by the renderer', function(
+			done
+		) {
 			class CustomRenderer extends ComponentRenderer.constructor {
 				update(component) {
 					component.informRendered();
 				}
 			}
 
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			TestComponent.RENDERER = new CustomRenderer();
 
 			comp = new TestComponent();
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('rendered', listener);
 
 			comp.visible = false;
@@ -525,9 +530,9 @@ describe('Component', function() {
 		});
 
 		it('should not allow defining state key named components', function() {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			CustomComponent.STATE = {
-				components: {}
+				components: {},
 			};
 
 			assert.throws(function() {
@@ -535,7 +540,9 @@ describe('Component', function() {
 			});
 		});
 
-		it('should allow changes to state in "willReceiveState" without triggering multiple renders', function(done) {
+		it('should allow changes to state in "willReceiveState" without triggering multiple renders', function(
+			done
+		) {
 			const renderStub = sinon.stub();
 			let count = 0;
 
@@ -549,7 +556,7 @@ describe('Component', function() {
 			}
 
 			class TestComponent extends Component {
-				willReceiveState(changes) {
+				willReceiveState() {
 					this.foo = 'foo' + count;
 
 					count++;
@@ -557,12 +564,12 @@ describe('Component', function() {
 			}
 			TestComponent.STATE = {
 				bar: {
-					value: 'bar'
+					value: 'bar',
 				},
 
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			TestComponent.RENDERER = new CustomRenderer();
 
@@ -584,14 +591,15 @@ describe('Component', function() {
 			});
 		});
 
-		it('should pass changed state data to "willReceiveState" method', function(done) {
-			class TestComponent extends Component {
-			}
+		it('should pass changed state data to "willReceiveState" method', function(
+			done
+		) {
+			class TestComponent extends Component {}
 			TestComponent.prototype.willReceiveState = sinon.stub();
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			comp = new TestComponent();
@@ -604,8 +612,8 @@ describe('Component', function() {
 					foo: {
 						key: 'foo',
 						newVal: 'foo2',
-						prevVal: 'foo'
-					}
+						prevVal: 'foo',
+					},
 				});
 
 				done();
@@ -615,13 +623,13 @@ describe('Component', function() {
 
 	describe('Render', function() {
 		it('should render component on body if no parent is specified', function() {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			assert.strictEqual(document.body, comp.element.parentNode);
 		});
 
 		it('should render component on specified default parent if no parent is specified', function() {
-			var defaultParent = document.createElement('div');
+			let defaultParent = document.createElement('div');
 
 			class CustomComponent extends Component {
 				created() {
@@ -633,20 +641,20 @@ describe('Component', function() {
 		});
 
 		it('should render component on requested parent', function() {
-			var container = document.createElement('div');
+			let container = document.createElement('div');
 			document.body.appendChild(container);
 
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent({}, container);
 			assert.strictEqual(container, comp.element.parentNode);
 		});
 
 		it('should render component on requested parent selector', function() {
-			var container = document.createElement('div');
+			let container = document.createElement('div');
 			container.className = 'myContainer';
 			document.body.appendChild(container);
 
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent({}, '.myContainer');
 			assert.strictEqual(container, comp.element.parentNode);
 		});
@@ -659,11 +667,11 @@ describe('Component', function() {
 				}
 			}
 
-			var container = document.createElement('div');
+			let container = document.createElement('div');
 			comp = Component.render(
 				CustomComponent,
 				{
-					foo: 'fooValue'
+					foo: 'fooValue',
 				},
 				container
 			);
@@ -676,8 +684,7 @@ describe('Component', function() {
 		});
 
 		it('should throw error when rendering non-incremental-dom component via Component.renderToString', function() {
-			class NotIncrementalDomComponent extends Component {
-			}
+			class NotIncrementalDomComponent extends Component {}
 			assert.throws(function() {
 				Component.renderToString(NotIncrementalDomComponent);
 			});
@@ -691,11 +698,8 @@ describe('Component', function() {
 				}
 			}
 
-			var container = document.createElement('div');
-			comp = Component.render(
-				CustomComponent,
-				container
-			);
+			let container = document.createElement('div');
+			comp = Component.render(CustomComponent, container);
 
 			assert.ok(comp instanceof CustomComponent);
 			assert.ok(comp.wasRendered);
@@ -704,14 +708,14 @@ describe('Component', function() {
 		});
 
 		it('should attach component on requested parent at specified position', function() {
-			var container = document.createElement('div');
-			var sibling1 = document.createElement('div');
-			var sibling2 = document.createElement('div');
+			let container = document.createElement('div');
+			let sibling1 = document.createElement('div');
+			let sibling2 = document.createElement('div');
 			container.appendChild(sibling1);
 			container.appendChild(sibling2);
 			document.body.appendChild(container);
 
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			comp.detach();
 			comp.attach(container, sibling2);
@@ -722,15 +726,15 @@ describe('Component', function() {
 		});
 
 		it('should attach component according to specified sibling selector', function() {
-			var container = document.createElement('div');
-			var sibling1 = document.createElement('div');
-			var sibling2 = document.createElement('div');
+			let container = document.createElement('div');
+			let sibling1 = document.createElement('div');
+			let sibling2 = document.createElement('div');
 			sibling2.className = 'mySibling';
 			container.appendChild(sibling1);
 			container.appendChild(sibling2);
 			document.body.appendChild(container);
 
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			comp.detach();
 			comp.attach(container, '.mySibling');
@@ -743,7 +747,7 @@ describe('Component', function() {
 
 	describe('Updates', function() {
 		it('should call renderer\'s update method if state changes', function(done) {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			const renderer = comp.getRenderer();
 			sinon.spy(renderer, 'update');
@@ -755,8 +759,10 @@ describe('Component', function() {
 			});
 		});
 
-		it('should not call renderer\'s update method if state changes before render', function(done) {
-			var CustomComponent = createCustomComponentClass();
+		it('should not call renderer\'s update method if state changes before render', function(
+			done
+		) {
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent({}, false);
 			const renderer = comp.getRenderer();
 			sinon.spy(renderer, 'update');
@@ -768,8 +774,10 @@ describe('Component', function() {
 			});
 		});
 
-		it('should not call renderer\'s update method if state changes while skipping updates', function(done) {
-			var CustomComponent = createCustomComponentClass();
+		it('should not call renderer\'s update method if state changes while skipping updates', function(
+			done
+		) {
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 			const renderer = comp.getRenderer();
 			sinon.spy(renderer, 'update');
@@ -802,15 +810,17 @@ describe('Component', function() {
 					visible: {
 						key: 'visible',
 						prevVal: true,
-						newVal: false
-					}
+						newVal: false,
+					},
 				};
 				assert.strictEqual(1, renderer.update.callCount);
 				assert.strictEqual(comp, renderer.update.args[0][0]);
 				assert.deepEqual(expectedData, renderer.update.args[0][1].changes);
 			});
 
-			it('should not call the renderer\'s update method asynchronously if state changes', function(done) {
+			it('should not call the renderer\'s update method asynchronously if state changes', function(
+				done
+			) {
 				const CustomComponent = createCustomComponentClass();
 				CustomComponent.SYNC_UPDATES = true;
 
@@ -839,10 +849,10 @@ describe('Component', function() {
 		});
 
 		it('should invoke the "forceUpdate" callback argument after the rerender has completed', function() {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 
 			comp.forceUpdate(listener);
 
@@ -862,9 +872,9 @@ describe('Component', function() {
 		it('should listen to events on the element through Component\'s "on" function', function() {
 			comp = new Component();
 
-			var element = comp.element;
+			let element = comp.element;
 			element.onclick = null;
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('click', listener);
 
 			dom.triggerEvent(element, 'click');
@@ -876,11 +886,13 @@ describe('Component', function() {
 		});
 
 		it('should listen to delegate events on the element', function() {
-			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			let CustomComponent = createCustomComponentClass(
+				'<div class="foo"></div>'
+			);
 			comp = new CustomComponent();
 
-			var fooElement = comp.element.querySelector('.foo');
-			var listener = sinon.stub();
+			let fooElement = comp.element.querySelector('.foo');
+			let listener = sinon.stub();
 			comp.delegate('click', '.foo', listener);
 
 			dom.triggerEvent(fooElement, 'click');
@@ -892,23 +904,26 @@ describe('Component', function() {
 		});
 
 		it('should listen to custom events on the element', function() {
-			var CustomComponent = createCustomComponentClass();
+			let CustomComponent = createCustomComponentClass();
 			comp = new CustomComponent();
 
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('transitionend', listener);
 
-			dom.triggerEvent(comp.element, features.checkAnimationEventName().transition);
+			dom.triggerEvent(
+				comp.element,
+				features.checkAnimationEventName().transition
+			);
 			assert.strictEqual(1, listener.callCount);
 		});
 
 		it('should transfer events listened through "on" function to new element', function() {
 			comp = new Component();
-			var element = comp.element;
-			var listener = sinon.stub();
+			let element = comp.element;
+			let listener = sinon.stub();
 			comp.on('click', listener);
 
-			var newElement = document.createElement('div');
+			let newElement = document.createElement('div');
 			dom.enterDocument(newElement);
 			comp.element = newElement;
 
@@ -924,14 +939,16 @@ describe('Component', function() {
 		});
 
 		it('should transfer delegate events listened on the component to the new element', function() {
-			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			let CustomComponent = createCustomComponentClass(
+				'<div class="foo"></div>'
+			);
 			comp = new CustomComponent();
 
-			var fooElement = comp.element.querySelector('.foo');
-			var listener = sinon.stub();
+			let fooElement = comp.element.querySelector('.foo');
+			let listener = sinon.stub();
 			comp.delegate('click', '.foo', listener);
 
-			var newElement = document.createElement('div');
+			let newElement = document.createElement('div');
 			dom.enterDocument(newElement);
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
@@ -939,7 +956,7 @@ describe('Component', function() {
 			dom.triggerEvent(fooElement, 'click');
 			assert.strictEqual(0, listener.callCount);
 
-			var newFooElement = newElement.querySelector('.foo');
+			let newFooElement = newElement.querySelector('.foo');
 			dom.triggerEvent(newFooElement, 'click');
 			assert.strictEqual(1, listener.callCount);
 
@@ -950,7 +967,7 @@ describe('Component', function() {
 
 		it('should not reattach element listeners if its set to itself again', function() {
 			comp = new Component();
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('click', listener);
 
 			comp.element.removeEventListener = sinon.stub();
@@ -961,10 +978,10 @@ describe('Component', function() {
 
 		it('should listen to events on the element even before it\'s created', function() {
 			comp = new Component({}, false);
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.on('click', listener);
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			dom.enterDocument(element);
 			comp.element = element;
 			dom.triggerEvent(element, 'click');
@@ -973,10 +990,10 @@ describe('Component', function() {
 
 		it('should listen to delegate events on the element even before it\'s created', function() {
 			comp = new Component({}, false);
-			var listener = sinon.stub();
+			let listener = sinon.stub();
 			comp.delegate('click', '.foo', listener);
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			dom.enterDocument(element);
 			dom.append(element, '<div class="foo"></div>');
 			comp.element = element;
@@ -987,11 +1004,11 @@ describe('Component', function() {
 
 		it('should not reatach element listeners that were detached when element changes', function() {
 			comp = new Component();
-			var listener = sinon.stub();
-			var handle = comp.on('click', listener);
+			let listener = sinon.stub();
+			let handle = comp.on('click', listener);
 			handle.removeListener();
 
-			var newElement = document.createElement('div');
+			let newElement = document.createElement('div');
 			comp.element = newElement;
 
 			dom.triggerEvent(newElement, 'click');
@@ -999,14 +1016,16 @@ describe('Component', function() {
 		});
 
 		it('should not reatach delegate listeners that were detached when element changes', function() {
-			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			let CustomComponent = createCustomComponentClass(
+				'<div class="foo"></div>'
+			);
 			comp = new CustomComponent();
 
-			var listener = sinon.stub();
-			var handle = comp.delegate('click', '.foo', listener);
+			let listener = sinon.stub();
+			let handle = comp.delegate('click', '.foo', listener);
 			handle.removeListener();
 
-			var newElement = document.createElement('div');
+			let newElement = document.createElement('div');
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
 
@@ -1015,11 +1034,11 @@ describe('Component', function() {
 		});
 
 		it('should be able to detach element listener that was attached before element changed', function() {
-			var comp = new Component();
-			var listener = sinon.stub();
-			var handle = comp.on('click', listener);
+			let comp = new Component();
+			let listener = sinon.stub();
+			let handle = comp.on('click', listener);
 
-			var newElement = document.createElement('div');
+			let newElement = document.createElement('div');
 			comp.element = newElement;
 
 			handle.removeListener();
@@ -1028,13 +1047,15 @@ describe('Component', function() {
 		});
 
 		it('should be able to detach delegate listener that was attached before element changed', function() {
-			var CustomComponent = createCustomComponentClass('<div class="foo"></div>');
+			let CustomComponent = createCustomComponentClass(
+				'<div class="foo"></div>'
+			);
 			comp = new CustomComponent();
 
-			var listener = sinon.stub();
-			var handle = comp.delegate('click', '.foo', listener);
+			let listener = sinon.stub();
+			let handle = comp.delegate('click', '.foo', listener);
 
-			var newElement = document.createElement('div');
+			let newElement = document.createElement('div');
 			comp.element = newElement;
 			dom.append(newElement, '<div class="foo"></div>');
 
@@ -1056,50 +1077,44 @@ describe('Component', function() {
 		});
 
 		it('should warn if validator fails on initial value', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			TestComponent.STATE = {
 				foo: {
-					validator: validators.string
-				}
+					validator: validators.string,
+				},
 			};
 			comp = new TestComponent({
-				foo: 10
+				foo: 10,
 			});
 			assert.strictEqual(1, console.error.callCount);
 		});
 	});
 
 	it('should get the renderer instance', function() {
-		class TestComponent extends Component {
-		}
+		class TestComponent extends Component {}
 		comp = new TestComponent();
 
-		var renderer = comp.getRenderer();
+		let renderer = comp.getRenderer();
 		assert.ok(renderer instanceof ComponentRenderer.constructor);
 	});
 
 	it('should get the data manager', function() {
-		class TestComponent extends Component {
-		}
+		class TestComponent extends Component {}
 		comp = new TestComponent();
 		assert.strictEqual(ComponentDataManager, comp.getDataManager());
 	});
 
 	it('should check if the given function is a component constructor', function() {
-		class TestComponent extends Component {
-		}
+		class TestComponent extends Component {}
 		assert.ok(Component.isComponentCtor(Component));
 		assert.ok(Component.isComponentCtor(TestComponent));
-		assert.ok(!Component.isComponentCtor(() => {
-			}));
-		var fn = () => {
-		};
-		assert.ok(!Component.isComponentCtor(fn.bind(this)));
+		assert.ok(!Component.isComponentCtor(() => {}));
+		let fn = () => {};
+		assert.ok(!Component.isComponentCtor(fn.bind(this))); // eslint-disable-line
 	});
 
 	it('should pass instance of component to __METAL_DEV_TOOLS_HOOK__ on first render', function() {
-		var hookStub = sinon.stub();
+		let hookStub = sinon.stub();
 		window.__METAL_DEV_TOOLS_HOOK__ = hookStub;
 		class CustomComponent extends Component {
 			constructor(...args) {
@@ -1122,21 +1137,20 @@ describe('Component', function() {
 		sinon.assert.calledWith(hookStub, comp);
 	});
 
-	function createCustomComponentClass(opt_rendererContentOrFn) {
-		class CustomComponent extends Component {
-		}
-		CustomComponent.RENDERER = createCustomRenderer(opt_rendererContentOrFn);
+	function createCustomComponentClass(rendererContentOrFn) {
+		class CustomComponent extends Component {}
+		CustomComponent.RENDERER = createCustomRenderer(rendererContentOrFn);
 		return CustomComponent;
 	}
 
-	function createCustomRenderer(opt_rendererContentOrFn) {
+	function createCustomRenderer(rendererContentOrFn) {
 		class CustomRenderer extends ComponentRenderer.constructor {
 			render(component) {
 				super.render(component);
-				if (core.isFunction(opt_rendererContentOrFn)) {
-					opt_rendererContentOrFn();
+				if (core.isFunction(rendererContentOrFn)) {
+					rendererContentOrFn();
 				} else {
-					component.element.innerHTML = opt_rendererContentOrFn;
+					component.element.innerHTML = rendererContentOrFn;
 				}
 			}
 		}

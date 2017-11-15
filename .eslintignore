@@ -1,1 +1,3 @@
-packages/metal-soy-bundle/src/**/*.js
+*.soy.js
+packages/metal-isomorphic/**/*.js
+packages/metal-soy-bundle/**/*.js

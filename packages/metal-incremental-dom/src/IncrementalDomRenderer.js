@@ -1,12 +1,12 @@
 'use strict';
 
 import './incremental-dom';
-import { getChanges, trackChanges } from './changes';
-import { clearData, getData } from './data';
-import { getOwner } from './children/children';
-import { getPatchingComponent, patch } from './render/patch';
-import { render, renderChild, renderFunction } from './render/render';
-import { Component, ComponentRenderer } from 'metal-component';
+import {getChanges, trackChanges} from './changes';
+import {clearData, getData} from './data';
+import {getOwner} from './children/children';
+import {getPatchingComponent, patch} from './render/patch';
+import {render, renderChild, renderFunction} from './render/render';
+import {Component, ComponentRenderer} from 'metal-component';
 
 class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	/**
@@ -110,19 +110,18 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * through incremental dom function calls. If the first arg is a function
 	 * instead of a component instance, creates and renders this function, which
 	 * can either be a simple incremental dom function or a component constructor.
-	 * @param {!Component} component
 	 * @param {!Component|function()} component Can be a component instance, a
 	 *     simple incremental dom function or a component constructor.
-	 * @param {Object|Element=} opt_dataOrElement Optional config data for the
+	 * @param {Object|Element=} dataOrElement Optional config data for the
 	 *     function, or parent for the rendered content.
-	 * @param {Element=} opt_parent Optional parent for the rendered content.
+	 * @param {Element=} parent Optional parent for the rendered content.
 	 * @return {!Component} The rendered component's instance.
 	 */
-	render(component, opt_dataOrElement, opt_parent) {
+	render(component, dataOrElement, parent) {
 		if (component instanceof Component) {
 			this.patch(component);
 		} else {
-			return renderFunction(this, component, opt_dataOrElement, opt_parent);
+			return renderFunction(this, component, dataOrElement, parent);
 		}
 	}
 
@@ -156,7 +155,8 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	renderInsidePatch(component) {
 		const changes = getChanges(component);
 
-		const shouldRender = !component.wasRendered ||
+		const shouldRender =
+			!component.wasRendered ||
 			this.shouldUpdate(component, changes) ||
 			IncrementalDOM.currentPointer() !== component.element;
 		if (shouldRender) {
@@ -193,7 +193,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 			return false;
 		}
 		if (component.shouldUpdate) {
-			return component.shouldUpdate(...this.buildShouldUpdateArgs(changes));
+			return component.shouldUpdate(...this.buildShouldUpdateArgs(changes)); // eslint-disable-line
 		}
 		return true;
 	}

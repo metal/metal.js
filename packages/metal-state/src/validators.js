@@ -1,6 +1,6 @@
 'use strict';
 
-import { getFunctionName, isDefAndNotNull } from 'metal';
+import {getFunctionName, isDefAndNotNull} from 'metal';
 
 const ERROR_ARRAY_OF_TYPE = 'Expected an array of single type.';
 const ERROR_OBJECT_OF_TYPE = 'Expected object of one type.';
@@ -83,10 +83,9 @@ const validators = {
 			if (isInvalid(result)) {
 				return result;
 			}
-			return arrayOfValues.indexOf(value) === -1 ?
-				composeError(
-					composeOneOfErrorMessage(arrayOfValues), name, context
-				) : true;
+			return arrayOfValues.indexOf(value) === -1
+				? composeError(composeOneOfErrorMessage(arrayOfValues), name, context) // eslint-disable-line
+				: true;
 		});
 	},
 
@@ -99,12 +98,13 @@ const validators = {
 	 */
 	oneOfType: function(arrayOfTypeValidators) {
 		return maybe((value, name, context) => {
-			const result = validators.array(arrayOfTypeValidators, name, context);
+			const result = validators.array(arrayOfTypeValidators, name, context); // eslint-disable-line
 			if (isInvalid(result)) {
 				return result;
 			}
 
 			for (let i = 0; i < arrayOfTypeValidators.length; i++) {
+				// eslint-disable-next-line
 				if (!isInvalid(arrayOfTypeValidators[i](value, name, context))) {
 					return true;
 				}
@@ -127,20 +127,24 @@ const validators = {
 			}
 
 			for (let key in shape) {
-				let validator = shape[key];
-				let required = false;
-				if (validator.config) {
-					required = validator.config.required;
-					validator = validator.config.validator;
-				}
-				if ((required && !isDefAndNotNull(value[key])) ||
-					isInvalid(validator(value[key]))) {
-					return composeError(ERROR_SHAPE_OF, name, context);
+				if (Object.prototype.hasOwnProperty.call(shape, key)) {
+					let validator = shape[key];
+					let required = false;
+					if (validator.config) {
+						required = validator.config.required;
+						validator = validator.config.validator;
+					}
+					if (
+						(required && !isDefAndNotNull(value[key])) ||
+						isInvalid(validator(value[key]))
+					) {
+						return composeError(ERROR_SHAPE_OF, name, context);
+					}
 				}
 			}
 			return true;
 		});
-	}
+	},
 };
 
 /**
@@ -181,7 +185,7 @@ function composeError(error, name, context) {
 	const location = parentName ? `Check render method of '${parentName}'.` : '';
 	return new Error(
 		`Warning: Invalid state passed to '${name}'. ` +
-		`${error} Passed to '${compName}'. ${location}`
+			`${error} Passed to '${compName}'. ${location}`
 	);
 }
 
@@ -221,10 +225,9 @@ function isInvalid(result) {
  */
 function maybe(typeValidator) {
 	return (value, name, context) => {
-		return isDefAndNotNull(value) ? typeValidator(value, name, context) : true;
+		return isDefAndNotNull(value) ? typeValidator(value, name, context) : true; // eslint-disable-line
 	};
 }
-
 
 /**
  * Checks if all the items of the given array pass the given validator.

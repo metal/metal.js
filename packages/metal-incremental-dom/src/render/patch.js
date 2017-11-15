@@ -2,7 +2,6 @@
 
 import {append, exitDocument} from 'metal-dom';
 import {getData} from '../data';
-import {isServerSide} from 'metal';
 import {render} from './render';
 
 const patchingComponents_ = [];
@@ -18,7 +17,7 @@ const patchingComponents_ = [];
 function buildParentIfNecessary_(element) {
 	if (!element || !element.parentNode) {
 		let parent = {};
-		if (!isServerSide()) {
+		if (typeof document !== 'undefined') {
 			parent = document.createElement('div');
 		}
 		if (element) {

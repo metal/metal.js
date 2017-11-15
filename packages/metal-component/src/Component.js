@@ -133,13 +133,6 @@ class Component extends EventEmitter {
 		this.initialConfig_ = config || {};
 
 		/**
-		 * Whether the current environment is server side.
-		 * @type {boolean}
-		 * @protected
-		 */
-		this.serverSide_ = isServerSide();
-
-		/**
 		 * Whether the element was rendered.
 		 * @type {boolean}
 		 */
@@ -151,7 +144,8 @@ class Component extends EventEmitter {
 		 * `attach`.
 		 * @type {!Element}
 		 */
-		this.DEFAULT_ELEMENT_PARENT = !this.serverSide_ ? document.body : null;
+		this.DEFAULT_ELEMENT_PARENT =
+			typeof document !== 'undefined' ? document.body : null;
 
 		this.setShouldUseFacade(true);
 		this.element = this.initialConfig_.element;
@@ -585,7 +579,7 @@ class Component extends EventEmitter {
 	 */
 	renderComponent(parentElement) {
 		if (!this.hasRendererRendered_) {
-			if (!this.serverSide_ && window.__METAL_DEV_TOOLS_HOOK__) {
+			if (!isServerSide() && window.__METAL_DEV_TOOLS_HOOK__) {
 				window.__METAL_DEV_TOOLS_HOOK__(this);
 			}
 			this.getRenderer().render(this);

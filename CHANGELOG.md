@@ -1,5 +1,14 @@
 # Change Log
 
+## [v2.14.1](https://github.com/metal/metal.js/tree/v2.14.1) (2017-11-15)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.14.0...v2.14.1)
+
+**Merged pull requests:**
+
+- Allow for parent element to be used in server side environments if document is defined as it is when using JSDom [\#298](https://github.com/metal/metal.js/pull/298) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Adds lint-staged configuration [\#293](https://github.com/metal/metal.js/pull/293) ([jbalsas](https://github.com/jbalsas))
+- Update slack channel [\#290](https://github.com/metal/metal.js/pull/290) ([bryceosterhaus](https://github.com/bryceosterhaus))
+
 ## [v2.14.0](https://github.com/metal/metal.js/tree/v2.14.0) (2017-11-02)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.13.2...v2.14.0)
 

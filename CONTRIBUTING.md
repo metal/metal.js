@@ -24,49 +24,132 @@ repo. It's perfect for this use case and it's been used by
 
 The repo is divided into packages, which are:
 * [metal](http://npmjs.com/package/metal)
+* [metal-assertions](http://npmjs.com/package/metal-assertions)
 * [metal-component](http://npmjs.com/package/metal-component)
 * [metal-dom](http://npmjs.com/package/metal-dom)
 * [metal-events](http://npmjs.com/package/metal-events)
 * [metal-incremental-dom](http://npmjs.com/package/metal-incremental-dom)
 * [metal-jsx](http://npmjs.com/package/metal-jsx)
 * [metal-soy](http://npmjs.com/package/metal-soy)
+* [metal-soy-bundle](http://npmjs.com/package/metal-soy-bundle)
 * [metal-state](http://npmjs.com/package/metal-state)
+* [metal-web-component](http://npmjs.com/package/metal-web-component)
 
 Each package has its own package.json and is set up so that it provides two
 types of entry points: one for commonjs usage (**main**) and another for ES6
 modules (**jsnext:main**). Check out metal-dom's
 [package.json](packages/metal-dom/package.json#L11) file as an example.
 
-## Contributing requirements
+## Pull requests & Github issues
 
-### Tests
+* All pull requests should be sent to the `develop` branch, as the `master`
+branch should always reflect the most recent release.
+* Any merged changes will remain in the `develop` branch until the next
+scheduled release.
+* The only exception to this rule is for emergency hot fixes, in which case the
+pull request can be sent to the `master` branch.
+* A Github issue should also be created for any bug fix or feature, this helps
+when generating the CHANGELOG.md file.
+
+## Tests
 
 Any change (be it an improvement, a new feature or a bug fix) needs to include
 a test, and all tests from the repo need to be passing. To run the tests you
-can use our gulp tasks:
+can use our npm script:
 
-* `gulp test` Runs all tests once
-* `gulp test:coverage` Runs all tests once and shows a summary coverage
-report.
-* `gulp test:coverage:open` Runs all tests once and opens a detailed coverage
-report in the browser.
-* `gulp test:watch` Runs all tests and listens for changes, rerunning them
-automatically.
+```
+npm test
+```
 
-### Lint
+## Formatting
 
-Lint errors need to be fixed. To lint the code just run: `gulp lint`.
+Run the format script to automatically format any changes:
 
-### JS Docs
+```
+npm run format
+```
+
+Once it's done formatting, run the lint script:
+
+```
+npm run lint
+```
+
+If there are any linting errors at this point, they must be addressed manually.
+
+If you would like to see a list of our formatting standards check
+out [our docs](https://hosting-liferayfrontendguidelines.wedeploy.io/).
+
+## JS Docs
 
 All methods should be documented, following [google's format](https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler).
 
-## Publishing Metal.js
+# Releasing
 
-Collaborators with publish permissions should follow the following steps:
+Collaborators with publish permissions should follow these steps.
 
-1. Make sure that the [CI tests](https://travis-ci.org/metal/metal.js/builds)
-are passing.
-2. Run `lerna publish`.
-3. Edit the release in [github](https://github.com/metal/metal.js/releases) with
-details about what has changed.
+There are two different workflows for publishing this project, one for scheduled
+releases, and one for emergency hot fixes.
+
+## Scheduled release
+
+1. Create a release branch from the updated `develop` branch
+
+```
+git checkout develop
+git pull upstream develop
+git checkout -b release/vX.X.X
+```
+
+2. Send release PR to `master`
+
+3. Wait to see that all tests pass and then merge with merge commit
+
+4. Checkout and pull `master` locally
+
+```
+git checkout master && git pull upstream master
+```
+
+5. Publish npm modules and push release tags
+
+```
+lerna publish (major/minor/patch accordingly)
+```
+
+6. Generate changelog
+
+github_changelog_generator (https://github.com/skywinder/github-changelog-generator)
+
+7. Commit changelog and push to `master`
+
+```
+git add CHANGELOG.md
+git commit -m "Updates CHANGELOG for vX.X.X"
+git push
+```
+
+8. Sync `develop` with `master`
+
+```
+git checkout develop
+git merge master
+```
+
+9. Do GitHub release using the pushed vX.X.X tag and the appropriate portion of
+CHANGELOG.md
+
+## Hot fix
+
+1. Create a feature branch from `master` (assuming hot fix has already been
+merged)
+
+```
+git checkout master
+git pull upstream master
+git checkout -b feature/fix_foo
+```
+
+2. Send a fix PR to `master`
+
+3. Follow steps 3-9 of a scheduled release

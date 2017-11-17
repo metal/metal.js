@@ -294,6 +294,7 @@ class Component extends EventEmitter {
 	disposeInternal() {
 		this.detach();
 		this.disposed();
+		this.emit('disposed');
 
 		this.elementEventProxy_.dispose();
 		this.elementEventProxy_ = null;

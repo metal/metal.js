@@ -287,7 +287,13 @@ function isAbleToInteractWith_(node, eventName, eventObj) {
 		return false;
 	}
 
-	const matchesSelector = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'FIELDSET'];
+	const matchesSelector = [
+		'BUTTON',
+		'INPUT',
+		'SELECT',
+		'TEXTAREA',
+		'FIELDSET',
+	];
 	if (eventName === 'click' && matchesSelector.indexOf(node.tagName) > -1) {
 		return !(node.disabled || parent(node, 'fieldset[disabled]'));
 	}
@@ -370,7 +376,9 @@ export function hasClass(element, className) {
  * @private
  */
 function hasClassWithNative_(element, className) {
-	return className.indexOf(' ') === -1 && element.classList.contains(className);
+	return (
+		className.indexOf(' ') === -1 && element.classList.contains(className)
+	);
 }
 
 /**
@@ -519,6 +527,28 @@ export function once(element, eventName, callback) {
  */
 export function parent(element, selector) {
 	return closest(element.parentNode, selector);
+}
+
+/**
+ * Inserts a node before first child of the parent. If child is a HTML string
+ * it will be converted to document fragment before prepending it to the parent.
+ * @param {!Element} parent The node to prepend to.
+ * @param {!(Element|NodeList|string)} child The thing who must be prepended
+ * @return {!Element} The prepended child
+ */
+export function prepend(parent, child) {
+	if (isString(child)) {
+		child = buildFragment(child);
+	}
+	if (isNodeListLike(child)) {
+		const childArr = Array.prototype.slice.call(child);
+		for (let i = 0; i < childArr.length; i++) {
+			parent.insertBefore(childArr[i].firstChild, parent);
+		}
+	} else {
+		parent.insertBefore(child, parent.firstChild);
+	}
+	return child;
 }
 
 /**
@@ -723,7 +753,10 @@ export function toElement(selectorOrElement) {
 	) {
 		return selectorOrElement;
 	} else if (isString(selectorOrElement)) {
-		if (selectorOrElement[0] === '#' && selectorOrElement.indexOf(' ') === -1) {
+		if (
+			selectorOrElement[0] === '#' &&
+			selectorOrElement.indexOf(' ') === -1
+		) {
 			return document.getElementById(selectorOrElement.substr(1));
 		} else {
 			return document.querySelector(selectorOrElement);
@@ -786,7 +819,9 @@ function toggleClassesWithoutNative_(element, classes) {
 			elementClassName = `${elementClassName}${classes[i]} `;
 		} else {
 			const before = elementClassName.substring(0, classIndex);
-			const after = elementClassName.substring(classIndex + className.length); // eslint-disable-line
+			const after = elementClassName.substring(
+				classIndex + className.length
+			); // eslint-disable-line
 			elementClassName = `${before} ${after}`;
 		}
 	}

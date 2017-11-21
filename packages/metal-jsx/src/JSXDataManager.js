@@ -109,7 +109,12 @@ class JSXDataManager extends ComponentDataManager.constructor {
 		}
 
 		const props = this.getManagerData(component).props_;
-		ComponentDataManager.replaceNonInternal.call(this, component, data, props); // eslint-disable-line
+		ComponentDataManager.replaceNonInternal.call(
+			this,
+			component,
+			data,
+			props
+		); // eslint-disable-line
 		this.addUnconfiguredProps_(component, props, data);
 		if (component.propsChanged) {
 			component.propsChanged(prevProps);

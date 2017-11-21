@@ -193,7 +193,9 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 			return false;
 		}
 		if (component.shouldUpdate) {
-			return component.shouldUpdate(...this.buildShouldUpdateArgs(changes)); // eslint-disable-line
+			return component.shouldUpdate(
+				...this.buildShouldUpdateArgs(changes)
+			); // eslint-disable-line
 		}
 		return true;
 	}

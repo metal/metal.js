@@ -16,7 +16,11 @@ export function addListenersFromObj(component, events) {
 		if (info.fn) {
 			let handle;
 			if (info.selector) {
-				handle = component.delegate(eventNames[i], info.selector, info.fn); // eslint-disable-line
+				handle = component.delegate(
+					eventNames[i],
+					info.selector,
+					info.fn
+				); // eslint-disable-line
 			} else {
 				handle = component.on(eventNames[i], info.fn);
 			}

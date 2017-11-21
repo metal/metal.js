@@ -47,8 +47,9 @@ class features {
 		}
 		for (let i = 0; i < prefixes.length; i++) {
 			if (
-				features.animationElement_.style[prefixes[i] + typeTitleCase] !== // eslint-disable-line
-				undefined
+				features.animationElement_.style[
+					prefixes[i] + typeTitleCase
+				] !== undefined // eslint-disable-line
 			) {
 				return prefixes[i].toLowerCase() + suffixes[i];
 			}

@@ -136,7 +136,9 @@ class State extends EventEmitter {
 	assertValidStateKeyName_(name) {
 		if (this.keysBlacklist_ && this.keysBlacklist_[name]) {
 			throw new Error(
-				`It's not allowed to create a state key with the name "${name}".`
+				`It's not allowed to create a state key with the name "${
+					name
+				}".`
 			);
 		}
 	}
@@ -294,7 +296,9 @@ class State extends EventEmitter {
 
 				ctor[staticKey] = ctor[staticKey] || {};
 
-				defineContext = ctor[staticKey][ctor.name] ? false : ctor.prototype; // eslint-disable-line
+				defineContext = ctor[staticKey][ctor.name]
+					? false
+					: ctor.prototype; // eslint-disable-line
 				ctor[staticKey][ctor.name] = true;
 			}
 			this.configState(State.getStateStatic(ctor), defineContext);
@@ -417,7 +421,8 @@ class State extends EventEmitter {
 	hasBeenSet(name) {
 		const info = this.getStateInfo(name);
 		return (
-			info.state === State.KeyStates.INITIALIZED || this.hasInitialValue_(name) // eslint-disable-line
+			info.state === State.KeyStates.INITIALIZED ||
+			this.hasInitialValue_(name) // eslint-disable-line
 		);
 	}
 
@@ -697,7 +702,9 @@ class State extends EventEmitter {
 		const disposed = this.isDisposed();
 		if (disposed) {
 			console.warn(
-				`Error. Trying to access property "${name}" on disposed instance`
+				`Error. Trying to access property "${
+					name
+				}" on disposed instance`
 			);
 		}
 		return disposed;

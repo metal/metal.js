@@ -19,7 +19,9 @@ class ComponentRegistry {
 		const constructorFn = ComponentRegistry.components_[name];
 		if (!constructorFn) {
 			console.error(
-				`There's no constructor registered for the component named ${name}.
+				`There's no constructor registered for the component named ${
+					name
+				}.
 				Components need to be registered via ComponentRegistry.register.`
 			);
 		}

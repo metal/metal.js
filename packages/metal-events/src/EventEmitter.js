@@ -157,7 +157,9 @@ class EventEmitter extends Disposable {
 	 */
 	getRawListeners_(event) {
 		const directListeners = toArray(this.events_ && this.events_[event]);
-		return directListeners.concat(toArray(this.events_ && this.events_['*']));
+		return directListeners.concat(
+			toArray(this.events_ && this.events_['*'])
+		);
 	}
 
 	/**
@@ -241,7 +243,8 @@ class EventEmitter extends Disposable {
 	matchesListener_(listenerObj, listener) {
 		const fn = listenerObj.fn || listenerObj;
 		return (
-			fn === listener || (listenerObj.origin && listenerObj.origin === listener) // eslint-disable-line
+			fn === listener ||
+			(listenerObj.origin && listenerObj.origin === listener) // eslint-disable-line
 		);
 	}
 
@@ -285,7 +288,10 @@ class EventEmitter extends Disposable {
 	 * @param {!function()} handler
 	 */
 	onListener(handler) {
-		this.listenerHandlers_ = this.addHandler_(this.listenerHandlers_, handler); // eslint-disable-line
+		this.listenerHandlers_ = this.addHandler_(
+			this.listenerHandlers_,
+			handler
+		); // eslint-disable-line
 	}
 
 	/**

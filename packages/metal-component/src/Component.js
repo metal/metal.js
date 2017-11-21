@@ -238,7 +238,8 @@ class Component extends EventEmitter {
 	attachElement(parentElement, siblingElement) {
 		const element = this.element;
 		if (element && (siblingElement || !element.parentNode)) {
-			const parent = toElement(parentElement) || this.DEFAULT_ELEMENT_PARENT; // eslint-disable-line
+			const parent =
+				toElement(parentElement) || this.DEFAULT_ELEMENT_PARENT; // eslint-disable-line
 			parent.insertBefore(element, toElement(siblingElement));
 		}
 	}
@@ -648,7 +649,11 @@ class Component extends EventEmitter {
 		this.dataManager_ = getStaticProperty(this.constructor, 'DATA_MANAGER');
 		this.dataManager_.setUp(
 			this,
-			object.mixin({}, this.renderer_.getExtraDataConfig(this), Component.DATA) // eslint-disable-line
+			object.mixin(
+				{},
+				this.renderer_.getExtraDataConfig(this),
+				Component.DATA
+			) // eslint-disable-line
 		);
 	}
 

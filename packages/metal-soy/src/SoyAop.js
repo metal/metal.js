@@ -32,7 +32,8 @@ const SoyAop = {
 	 *     interception.
 	 */
 	handleTemplateCall_: function(originalFn, data, ignored, ijData) {
-		const interceptFn = SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1]; // eslint-disable-line
+		const interceptFn =
+			SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1]; // eslint-disable-line
 		if (interceptFn) {
 			return interceptFn.call(null, originalFn, data, ignored, ijData);
 		} else {

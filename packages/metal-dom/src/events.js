@@ -21,7 +21,10 @@ function registerEvents() {
 				const related = event.relatedTarget;
 				const target = event.delegateTarget;
 				// eslint-disable-next-line
-				if (!related || (related !== target && !contains(target, related))) {
+				if (
+					!related ||
+					(related !== target && !contains(target, related))
+				) {
 					event.customType = eventName;
 					return callback(event);
 				}

@@ -137,7 +137,8 @@ var HTMLParser = function(html, handler) {
 				index = html.indexOf('-->');
 
 				if (index >= 0) {
-					if (handler.comment) handler.comment(html.substring(4, index));
+					if (handler.comment)
+						handler.comment(html.substring(4, index));
 					html = html.substring(index + 3);
 					chars = false;
 				}
@@ -203,7 +204,11 @@ var HTMLParser = function(html, handler) {
 			// usually add anything they want to spans, and browsers allow it).
 			// Note: this exception for "span" was added manually (i.e. it's not
 			// present in the original code).
-			while (stack.last() && inline[stack.last()] && stack.last() !== 'span') {
+			while (
+				stack.last() &&
+				inline[stack.last()] &&
+				stack.last() !== 'span'
+			) {
 				parseEndTag('', stack.last());
 			}
 		}
@@ -224,7 +229,9 @@ var HTMLParser = function(html, handler) {
 					? arguments[2]
 					: arguments[3]
 						? arguments[3]
-						: arguments[4] ? arguments[4] : fillAttrs[name] ? name : '';
+						: arguments[4]
+							? arguments[4]
+							: fillAttrs[name] ? name : '';
 
 				attrs.push({
 					name: name,

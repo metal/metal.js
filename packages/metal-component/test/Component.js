@@ -212,6 +212,21 @@ describe('Component', function() {
 			comp.dispose();
 			assert.strictEqual(1, comp.disposed.callCount);
 		});
+
+		it('should emit "disposed" event when component is disposed', function () {
+			var listener = sinon.stub();
+
+			comp = new Component({
+				events: {
+					disposed: listener
+				}
+			});
+
+			assert.strictEqual(0, listener.callCount);
+
+			comp.dispose();
+			assert.strictEqual(1, listener.callCount);
+		});
 	});
 
 	describe('Element', function() {

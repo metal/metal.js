@@ -1239,6 +1239,35 @@ describe('dom', function() {
 		});
 	});
 
+	describe('prepend', function() {
+		it('should prepend an element into a div', function() {
+			let parent = document.createElement('div');
+			let p = document.createElement('p');
+			let span = document.createElement('span');
+			dom.append(parent, p);
+			dom.prepend(parent, span);
+
+			let nativeParent = document.createElement('div');
+			let nativeP = document.createElement('p');
+			let nativeSpan = document.createElement('span');
+			nativeParent.appendChild(nativeSpan);
+			nativeParent.appendChild(nativeP);
+
+			assert.deepEqual(parent, dom.toElement(nativeParent));
+		});
+		it('should prepend a text into a div', function() {
+			let parent = document.createElement('div');
+			dom.append(parent, 'Some text');
+			dom.prepend(parent, 'Headline: ');
+
+			let nativeParent = document.createElement('div');
+			nativeParent.appendChild(dom.buildFragment('Headline: '));
+			nativeParent.appendChild(dom.buildFragment('Some text'));
+
+			assert.deepEqual(parent, dom.toElement(nativeParent));
+		});
+	});
+
 	describe('closest', function() {
 		it('should return the closest element up the tree that matches the given selector', function() {
 			dom.enterDocument(

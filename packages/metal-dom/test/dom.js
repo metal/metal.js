@@ -215,6 +215,26 @@ describe('dom', function() {
 			assert.strictEqual('myChild2', parent.childNodes[1].className);
 		});
 
+		it('should prepend an element into a div', function() {
+			let parent = document.createElement('div');
+			let p = document.createElement('p');
+			let span = document.createElement('span');
+
+			dom.append(parent, p);
+			dom.prepend(parent, span);
+
+			assert.strictEqual(parent.innerHTML, '<span></span><p></p>');
+		});
+
+		it('should prepend a text into a div', function() {
+			let parent = document.createElement('div');
+
+			dom.append(parent, 'Some text');
+			dom.prepend(parent, 'Headline: ');
+
+			assert.strictEqual(parent.innerHTML, 'Headline: Some text');
+		});
+
 		it('should replace an element with a requested element', function() {
 			let element1 = document.createElement('div');
 			let element2 = document.createElement('div');
@@ -1236,35 +1256,6 @@ describe('dom', function() {
 			assert.strictEqual(parent2, dom.parent(element, '.parent1'));
 			assert.strictEqual(parent3, dom.parent(element, '.parent2'));
 			assert.strictEqual(null, dom.parent(element, '.parent3'));
-		});
-	});
-
-	describe('prepend', function() {
-		it('should prepend an element into a div', function() {
-			let parent = document.createElement('div');
-			let p = document.createElement('p');
-			let span = document.createElement('span');
-			dom.append(parent, p);
-			dom.prepend(parent, span);
-
-			let nativeParent = document.createElement('div');
-			let nativeP = document.createElement('p');
-			let nativeSpan = document.createElement('span');
-			nativeParent.appendChild(nativeSpan);
-			nativeParent.appendChild(nativeP);
-
-			assert.deepEqual(parent, dom.toElement(nativeParent));
-		});
-		it('should prepend a text into a div', function() {
-			let parent = document.createElement('div');
-			dom.append(parent, 'Some text');
-			dom.prepend(parent, 'Headline: ');
-
-			let nativeParent = document.createElement('div');
-			nativeParent.appendChild(dom.buildFragment('Headline: '));
-			nativeParent.appendChild(dom.buildFragment('Some text'));
-
-			assert.deepEqual(parent, dom.toElement(nativeParent));
 		});
 	});
 

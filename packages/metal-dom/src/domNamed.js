@@ -526,7 +526,7 @@ export function parent(element, selector) {
  * it will be converted to document fragment before prepending it to the parent.
  * @param {!Element} parent The node to prepend to.
  * @param {!(Element|NodeList|string)} child The thing who must be prepended
- * @return {!Element} The prepended parent
+ * @return {!Element} The prepended child
  */
 export function prepend(parent, child) {
 	if (isString(child)) {
@@ -534,7 +534,7 @@ export function prepend(parent, child) {
 	}
 
 	if (!isNodeListLike(child) && !isDefAndNotNull(parent.firstChild)) {
-		return parent.appendChild(child);
+		return append(parent, child);
 	}
 
 	if (isNodeListLike(child)) {
@@ -546,7 +546,7 @@ export function prepend(parent, child) {
 		parent.insertBefore(child, parent.firstChild);
 	}
 
-	return parent;
+	return child;
 }
 
 /**

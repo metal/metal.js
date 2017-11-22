@@ -126,7 +126,9 @@ export function getStaticProperty(
 	const mergedName = propertyName + '_MERGED';
 	if (!ctor.hasOwnProperty(mergedName)) {
 		// eslint-disable-next-line
-		let merged = ctor.hasOwnProperty(propertyName) ? ctor[propertyName] : null;
+		let merged = ctor.hasOwnProperty(propertyName)
+			? ctor[propertyName]
+			: null;
 		if (ctor.__proto__ && !ctor.__proto__.isPrototypeOf(Function)) {
 			merged = mergeFn(
 				merged,

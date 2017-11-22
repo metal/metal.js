@@ -279,7 +279,9 @@ function handleRegularCall_(...args) {
 	config.key = generateKey_(comp, config.key);
 
 	if (!getData(comp).rootElementReached) {
-		const elementClasses = comp.getDataManager().get(comp, 'elementClasses');
+		const elementClasses = comp
+			.getDataManager()
+			.get(comp, 'elementClasses');
 		if (elementClasses) {
 			addElementClasses_(elementClasses, config);
 		}
@@ -343,7 +345,9 @@ function inheritElementClasses_(parent, config) {
  * @private
  */
 export function isComponentTag_(tag) {
-	return isFunction(tag) || (isString(tag) && tag[0] === tag[0].toUpperCase()); // eslint-disable-line
+	return (
+		isFunction(tag) || (isString(tag) && tag[0] === tag[0].toUpperCase())
+	); // eslint-disable-line
 }
 
 /**
@@ -568,7 +572,9 @@ function resetNodeData_(node) {
  */
 function updateContext_(comp, parent) {
 	const context = comp.context;
-	const childContext = parent.getChildContext ? parent.getChildContext() : null; // eslint-disable-line
+	const childContext = parent.getChildContext
+		? parent.getChildContext()
+		: null; // eslint-disable-line
 	object.mixin(context, parent.context, childContext);
 	comp.context = context;
 }

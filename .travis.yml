@@ -7,7 +7,6 @@ addons:
 
 before_install:
   - nvm install 8
-  - npm install -g gulp
   - npm install -g lerna@2.2.0
 
 install:
@@ -21,5 +20,5 @@ language: java
 script:
   - npm run checkFormat
   - npm run lint
-  - gulp test:saucelabs
+  - npm run test:saucelabs
   - npm run test:isomorphic

@@ -25,7 +25,11 @@ class ComponentDataManager {
 	 * @protected
 	 */
 	createState_(component, data) {
-		const state = new State(component.getInitialConfig(), component, component); // eslint-disable-line
+		const state = new State(
+			component.getInitialConfig(),
+			component,
+			component
+		); // eslint-disable-line
 		state.setKeysBlacklist(BLACKLIST);
 		state.configState(
 			object.mixin({}, data, State.getStateStatic(component.constructor))

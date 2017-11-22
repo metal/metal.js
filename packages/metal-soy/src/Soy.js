@@ -85,7 +85,9 @@ class Soy extends IncrementalDomRenderer.constructor {
 		return function(data, ignored, ijData) {
 			if (!goog.loadedModules_[namespace]) {
 				throw new Error(
-					`No template with namespace "${namespace}" has been loaded yet.`
+					`No template with namespace "${
+						namespace
+					}" has been loaded yet.`
 				);
 			}
 			return goog.loadedModules_[namespace][templateName](

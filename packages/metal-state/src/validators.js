@@ -84,7 +84,11 @@ const validators = {
 				return result;
 			}
 			return arrayOfValues.indexOf(value) === -1
-				? composeError(composeOneOfErrorMessage(arrayOfValues), name, context) // eslint-disable-line
+				? composeError(
+					composeOneOfErrorMessage(arrayOfValues),
+					name,
+					context
+					) // eslint-disable-line
 				: true;
 		});
 	},
@@ -98,14 +102,20 @@ const validators = {
 	 */
 	oneOfType: function(arrayOfTypeValidators) {
 		return maybe((value, name, context) => {
-			const result = validators.array(arrayOfTypeValidators, name, context); // eslint-disable-line
+			const result = validators.array(
+				arrayOfTypeValidators,
+				name,
+				context
+			); // eslint-disable-line
 			if (isInvalid(result)) {
 				return result;
 			}
 
 			for (let i = 0; i < arrayOfTypeValidators.length; i++) {
 				// eslint-disable-next-line
-				if (!isInvalid(arrayOfTypeValidators[i](value, name, context))) {
+				if (
+					!isInvalid(arrayOfTypeValidators[i](value, name, context))
+				) {
 					return true;
 				}
 			}
@@ -182,7 +192,9 @@ function composeError(error, name, context) {
 	const renderer = context && context.getRenderer && context.getRenderer();
 	const parent = renderer && renderer.getParent && renderer.getParent();
 	const parentName = parent ? getFunctionName(parent.constructor) : null;
-	const location = parentName ? `Check render method of '${parentName}'.` : '';
+	const location = parentName
+		? `Check render method of '${parentName}'.`
+		: '';
 	return new Error(
 		`Warning: Invalid state passed to '${name}'. ` +
 			`${error} Passed to '${compName}'. ${location}`
@@ -225,7 +237,9 @@ function isInvalid(result) {
  */
 function maybe(typeValidator) {
 	return (value, name, context) => {
-		return isDefAndNotNull(value) ? typeValidator(value, name, context) : true; // eslint-disable-line
+		return isDefAndNotNull(value)
+			? typeValidator(value, name, context)
+			: true; // eslint-disable-line
 	};
 }
 
@@ -257,7 +271,9 @@ function validateArrayItems(validator, value, name, context) {
 function validateType(expectedType, value, name, context) {
 	const type = getType(value);
 	if (type !== expectedType) {
-		const msg = `Expected type '${expectedType}', but received type '${type}'.`;
+		const msg = `Expected type '${expectedType}', but received type '${
+			type
+		}'.`;
 		return composeError(msg, name, context);
 	}
 	return true;

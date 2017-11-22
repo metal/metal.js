@@ -112,7 +112,12 @@ class globalEval {
 			scripts.item(index),
 			function() {
 				if (index < scripts.length - 1) {
-					globalEval.runScriptsInOrder(scripts, index + 1, defaultFn, appendFn); // eslint-disable-line
+					globalEval.runScriptsInOrder(
+						scripts,
+						index + 1,
+						defaultFn,
+						appendFn
+					); // eslint-disable-line
 				} else if (defaultFn) {
 					async.nextTick(defaultFn);
 				}

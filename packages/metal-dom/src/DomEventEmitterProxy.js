@@ -23,7 +23,12 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 				const index = event.indexOf(':', 9);
 				const eventName = event.substring(9, index);
 				const selector = event.substring(index + 1);
-				return delegate(this.originEmitter_, eventName, selector, listener); // eslint-disable-line
+				return delegate(
+					this.originEmitter_,
+					eventName,
+					selector,
+					listener
+				); // eslint-disable-line
 			} else {
 				return on(this.originEmitter_, event, listener);
 			}
@@ -66,7 +71,9 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 * @override
 	 */
 	shouldProxyEvent_(event) {
-		return super.shouldProxyEvent_(event) && this.isSupportedDomEvent_(event); // eslint-disable-line
+		return (
+			super.shouldProxyEvent_(event) && this.isSupportedDomEvent_(event)
+		); // eslint-disable-line
 	}
 }
 

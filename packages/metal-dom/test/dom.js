@@ -215,6 +215,15 @@ describe('dom', function() {
 			assert.strictEqual('myChild2', parent.childNodes[1].className);
 		});
 
+		it('should prepend an element into a div without first child', function() {
+			let parent = document.createElement('div');
+			let elem = dom.buildFragment('<p>Hello World</p>');
+
+			dom.prepend(parent, elem);
+
+			assert.strictEqual('<p>Hello World</p>', parent.innerHTML);
+		});
+
 		it('should prepend an element into a div', function() {
 			let parent = document.createElement('div');
 			let p = document.createElement('p');
@@ -233,6 +242,37 @@ describe('dom', function() {
 			dom.prepend(parent, 'Headline: ');
 
 			assert.strictEqual(parent.innerHTML, 'Headline: Some text');
+		});
+
+		it('should prepend a node list to parent element', function() {
+			let parent = document.createElement('div');
+
+			let childFrag = dom.buildFragment(
+				'<div class="myChild">el1</div><div class="myChild2">el2</div><div class="myChild3">el3</div>'
+			);
+
+			dom.prepend(parent, childFrag.childNodes);
+
+			assert.strictEqual(3, parent.childNodes.length);
+			assert.strictEqual('myChild', parent.childNodes[0].className);
+			assert.strictEqual('myChild2', parent.childNodes[1].className);
+			assert.strictEqual('myChild3', parent.childNodes[2].className);
+
+			let parent2 = document.createElement('div');
+
+			dom.prepend(
+				parent2,
+				dom.buildFragment(
+					'<div class="myChild"></div><div class="myChild2"></div><div class="myChild3"></div>'
+				).childNodes
+			);
+			dom.prepend(parent2, dom.buildFragment('<div class="container"></div>'));
+
+			assert.strictEqual(4, parent2.childNodes.length);
+			assert.strictEqual('container', parent2.childNodes[0].className);
+			assert.strictEqual('myChild', parent2.childNodes[1].className);
+			assert.strictEqual('myChild2', parent2.childNodes[2].className);
+			assert.strictEqual('myChild3', parent2.childNodes[3].className);
 		});
 
 		it('should replace an element with a requested element', function() {

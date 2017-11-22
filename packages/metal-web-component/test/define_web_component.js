@@ -137,6 +137,15 @@ describe('Web components', function() {
 			assert.isUndefined(title.key1);
 			assert.equal(title.key3, 'value3');
 		});
+
+		it('should have the default state value after rendering', function() {
+			const tagName = createWebComponent('custom-test-element-09');
+			el = document.createElement(tagName);
+
+			document.body.appendChild(el);
+
+			assert.equal(el.component.title, 'default title');
+		});
 	});
 
 	describe('Define JSX component', function() {

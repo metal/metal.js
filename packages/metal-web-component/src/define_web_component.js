@@ -78,11 +78,15 @@ export function defineWebComponent(tagName, Ctor) {
 				});
 			}
 
-			let opts = {};
+			const opts = {};
 			for (let i = 0, l = observedAttributes.length; i < l; i++) {
-				opts[observedAttributes[i]] = this.deserializeValue_(
+				const deserializedValue = this.deserializeValue_(
 					this.getAttribute(observedAttributes[i])
 				);
+
+				if (deserializedValue) {
+					opts[observedAttributes[i]] = deserializedValue;
+				}
 			}
 			this.component = new Ctor(opts, element);
 			this.componentHasProps = hasProps;

@@ -213,13 +213,13 @@ describe('Component', function() {
 			assert.strictEqual(1, comp.disposed.callCount);
 		});
 
-		it('should emit "disposed" event when component is disposed', function () {
-			var listener = sinon.stub();
+		it('should emit "disposed" event when component is disposed', function() {
+			let listener = sinon.stub();
 
 			comp = new Component({
 				events: {
-					disposed: listener
-				}
+					disposed: listener,
+				},
 			});
 
 			assert.strictEqual(0, listener.callCount);

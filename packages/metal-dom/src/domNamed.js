@@ -539,8 +539,8 @@ export function prepend(parent, child) {
 
 	if (isNodeListLike(child)) {
 		const childArr = Array.prototype.slice.call(child);
-		for (let i = 0; i < childArr.length; i++) {
-			parent.appendChild(childArr[i]);
+		for (let i = childArr.length - 1; i >= 0; i--) {
+			parent.insertBefore(childArr[i], parent.firstChild);
 		}
 	} else {
 		parent.insertBefore(child, parent.firstChild);

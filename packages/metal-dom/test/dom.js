@@ -244,7 +244,7 @@ describe('dom', function() {
 			assert.strictEqual(parent.innerHTML, 'Headline: Some text');
 		});
 
-		it('should prepend a node list to parent element', function() {
+		it('should prepend node list to empty parent element', function() {
 			let parent = document.createElement('div');
 
 			let childFrag = dom.buildFragment(
@@ -257,39 +257,25 @@ describe('dom', function() {
 			assert.strictEqual('myChild', parent.childNodes[0].className.trim());
 			assert.strictEqual('myChild2', parent.childNodes[1].className.trim());
 			assert.strictEqual('myChild3', parent.childNodes[2].className.trim());
+		});
 
-			let parent2 = document.createElement('div');
-
-			dom.prepend(
-				parent2,
-				dom.buildFragment(
-					'<div class="myChild"></div><div class="myChild2"></div><div class="myChild3"></div>'
-				).childNodes
-			);
-			dom.prepend(parent2, dom.buildFragment('<div class="container"></div>'));
-
-			assert.strictEqual(4, parent2.childNodes.length);
-			assert.strictEqual('container', parent2.childNodes[0].className.trim());
-			assert.strictEqual('myChild', parent2.childNodes[1].className.trim());
-			assert.strictEqual('myChild2', parent2.childNodes[2].className.trim());
-			assert.strictEqual('myChild3', parent2.childNodes[3].className.trim());
-
-			let parent3 = document.createElement('div');
+		it('should prepend node list to parent element with pre-existing children', function() {
+			let parent = document.createElement('div');
 			let child = document.createElement('div');
 
 			dom.addClasses(child, 'child');
-			dom.append(parent3, child);
+			dom.append(parent, child);
 
-			let childFrag2 = dom.buildFragment(
+			let childFrag = dom.buildFragment(
 				'<div class="myChild">el1</div><div class="myChild2">el2</div><div class="myChild3">el3</div>'
 			);
 
-			dom.prepend(parent3, childFrag2.childNodes);
-			assert.strictEqual(4, parent3.childNodes.length);
-			assert.strictEqual('myChild', parent3.childNodes[0].className.trim());
-			assert.strictEqual('myChild2', parent3.childNodes[1].className.trim());
-			assert.strictEqual('myChild3', parent3.childNodes[2].className.trim());
-			assert.strictEqual('child', parent3.childNodes[3].className.trim());
+			dom.prepend(parent, childFrag.childNodes);
+			assert.strictEqual(4, parent.childNodes.length);
+			assert.strictEqual('myChild', parent.childNodes[0].className.trim());
+			assert.strictEqual('myChild2', parent.childNodes[1].className.trim());
+			assert.strictEqual('myChild3', parent.childNodes[2].className.trim());
+			assert.strictEqual('child', parent.childNodes[3].className.trim());
 		});
 
 		it('should replace an element with a requested element', function() {

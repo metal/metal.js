@@ -273,6 +273,24 @@ describe('dom', function() {
 			assert.strictEqual('myChild', parent2.childNodes[1].className);
 			assert.strictEqual('myChild2', parent2.childNodes[2].className);
 			assert.strictEqual('myChild3', parent2.childNodes[3].className);
+
+			let parent3 = document.createElement('div');
+			let child = document.createElement('div');
+
+			dom.addClasses(child, 'child');
+			dom.append(parent3, child);
+
+			let childFrag2 = dom.buildFragment(
+				'<div class="myChild">el1</div><div class="myChild2">el2</div><div class="myChild3">el3</div>'
+			);
+
+			dom.prepend(parent3, childFrag2.childNodes);
+
+			assert.strictEqual(4, parent3.childNodes.length);
+			assert.strictEqual('myChild', parent3.childNodes[0].className);
+			assert.strictEqual('myChild2', parent3.childNodes[1].className);
+			assert.strictEqual('myChild3', parent3.childNodes[2].className);
+			assert.strictEqual('child', parent3.childNodes[3].className);
 		});
 
 		it('should replace an element with a requested element', function() {

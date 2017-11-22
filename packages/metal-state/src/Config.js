@@ -1,6 +1,5 @@
 'use strict';
 
-import {object} from 'metal';
 import validators from './validators';
 
 /**

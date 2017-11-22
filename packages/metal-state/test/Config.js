@@ -284,4 +284,26 @@ describe('Config', function() {
 		assert.ok(config.config.validator(10));
 		assert.ok(config.config.validator('test') instanceof Error);
 	});
+
+	it('should not mutate config object with subsequent method calls', function() {
+		const config = Config.string();
+		const config2 = config.oneOf(['1', '2']);
+		const config3 = config2.required();
+
+		assert.notDeepEqual(config, config2);
+		assert.notDeepEqual(config, config3);
+		assert.notDeepEqual(config2, config3);
+
+		assert.ok(config.config.validator(1) instanceof Error);
+		assert.ok(config2.config.validator(1) instanceof Error);
+		assert.ok(config3.config.validator(1) instanceof Error);
+
+		assert.ok(config.config.validator('1'));
+		assert.ok(config2.config.validator('1'));
+		assert.ok(config3.config.validator('3') instanceof Error);
+
+		assert.isTrue(config3.config.required);
+		assert.isUndefined(config.config.required);
+		assert.isUndefined(config2.config.required);
+	});
 });

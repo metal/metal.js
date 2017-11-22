@@ -233,11 +233,12 @@ function destructShapeOfConfigs(shape) {
  */
 function mergeConfig(context, config) {
 	let obj = context;
-	if (obj === Config) {
-		obj = Object.create(Config);
-		obj.config = {};
-	}
-	object.mixin(obj.config, config);
+	const objConfig = obj.config || {};
+
+	obj = Object.create(Config);
+	obj.config = {};
+
+	Object.assign(obj.config, objConfig, config);
 	return obj;
 }
 

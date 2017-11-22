@@ -254,9 +254,9 @@ describe('dom', function() {
 			dom.prepend(parent, childFrag.childNodes);
 
 			assert.strictEqual(3, parent.childNodes.length);
-			assert.strictEqual('myChild', parent.childNodes[0].className);
-			assert.strictEqual('myChild2', parent.childNodes[1].className);
-			assert.strictEqual('myChild3', parent.childNodes[2].className);
+			assert.strictEqual('myChild', parent.childNodes[0].className.trim());
+			assert.strictEqual('myChild2', parent.childNodes[1].className.trim());
+			assert.strictEqual('myChild3', parent.childNodes[2].className.trim());
 
 			let parent2 = document.createElement('div');
 
@@ -269,10 +269,10 @@ describe('dom', function() {
 			dom.prepend(parent2, dom.buildFragment('<div class="container"></div>'));
 
 			assert.strictEqual(4, parent2.childNodes.length);
-			assert.strictEqual('container', parent2.childNodes[0].className);
-			assert.strictEqual('myChild', parent2.childNodes[1].className);
-			assert.strictEqual('myChild2', parent2.childNodes[2].className);
-			assert.strictEqual('myChild3', parent2.childNodes[3].className);
+			assert.strictEqual('container', parent2.childNodes[0].className.trim());
+			assert.strictEqual('myChild', parent2.childNodes[1].className.trim());
+			assert.strictEqual('myChild2', parent2.childNodes[2].className.trim());
+			assert.strictEqual('myChild3', parent2.childNodes[3].className.trim());
 
 			let parent3 = document.createElement('div');
 			let child = document.createElement('div');
@@ -285,12 +285,11 @@ describe('dom', function() {
 			);
 
 			dom.prepend(parent3, childFrag2.childNodes);
-
 			assert.strictEqual(4, parent3.childNodes.length);
-			assert.strictEqual('myChild', parent3.childNodes[0].className);
-			assert.strictEqual('myChild2', parent3.childNodes[1].className);
-			assert.strictEqual('myChild3', parent3.childNodes[2].className);
-			assert.strictEqual('child', parent3.childNodes[3].className);
+			assert.strictEqual('myChild', parent3.childNodes[0].className.trim());
+			assert.strictEqual('myChild2', parent3.childNodes[1].className.trim());
+			assert.strictEqual('myChild3', parent3.childNodes[2].className.trim());
+			assert.strictEqual('child', parent3.childNodes[3].className.trim());
 		});
 
 		it('should replace an element with a requested element', function() {

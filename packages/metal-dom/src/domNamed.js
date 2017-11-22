@@ -532,14 +532,20 @@ export function prepend(parent, child) {
 	if (isString(child)) {
 		child = buildFragment(child);
 	}
+
+	if (!isNodeListLike(child) && !isDefAndNotNull(parent.firstChild)) {
+		parent.appendChild(child);
+	}
+
 	if (isNodeListLike(child)) {
 		const childArr = Array.prototype.slice.call(child);
 		for (let i = 0; i < childArr.length; i++) {
-			parent.insertBefore(childArr[i].firstChild, parent);
+			parent.appendChild(childArr[i]);
 		}
 	} else {
 		parent.insertBefore(child, parent.firstChild);
 	}
+
 	return child;
 }
 

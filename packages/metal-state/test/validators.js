@@ -218,7 +218,8 @@ describe('validators', function() {
 
 	it('should fail if an object is not supplied to shape', function() {
 		const validator = validators.shapeOf(1);
-		assert.ok(validator({}) instanceof Error);
+
+		assert.ok(validator instanceof Error);
 	});
 
 	it('should emit warning message', function() {

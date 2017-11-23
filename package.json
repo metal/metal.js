@@ -9,7 +9,7 @@
     "precommit": "lint-staged",
     "prettier": "prettier-eslint 'packages/metal*/{src,test}/**/*.js'",
     "test": "gulp soy && karma start && npm run test:isomorphic",
-    "test:coverage": "gulp soy karma start karma-coverage.conf.js",
+    "test:coverage": "gulp soy && karma start karma-coverage.conf.js",
     "test:isomorphic": "gulp soy:isomorphic && mocha packages/metal-isomorphic/test/isomorphic.js --compilers js:babel-core/register",
     "test:saucelabs": "gulp soy && karma start karma-saucelabs.conf.js"
   },

@@ -29,7 +29,7 @@ const validators = {
 	 */
 	arrayOf: function(validator) {
 		const argsResult = validators.func(validator);
-		if(isInvalid(argsResult)){
+		if (isInvalid(argsResult)) {
 			return argsResult;
 		}
 		return maybe((value, name, context) => {
@@ -64,7 +64,7 @@ const validators = {
 	 */
 	objectOf: function(validator) {
 		const validatorResult = validators.func(validator);
-		if(isInvalid(validatorResult)){
+		if (isInvalid(validatorResult)) {
 			return validatorResult;
 		}
 		return maybe((value, name, context) => {
@@ -136,13 +136,13 @@ const validators = {
 	 * @return {!function()}
 	 */
 	shapeOf: function(shape) {
+		const shapeResult = validators.object(shape);
+		if (isInvalid(shapeResult)) {
+			return shapeResult;
+		}
 		return maybe((value, name, context) => {
-			const shapeResult = validators.object(shape, name, context);
 			const valueResult = validators.object(value, name, context);
-			if (isInvalid(shapeResult)) {
-				return shapeResult;
-			}
-			if(isInvalid(valueResult)) {
+			if (isInvalid(valueResult)) {
 				return valueResult;
 			}
 			for (let key in shape) {
@@ -206,7 +206,7 @@ function composeError(error, name, context) {
 		: '';
 	return new Error(
 		`Invalid state passed to '${name}'.` +
-	    	` ${error} Passed to '${compName}'. ${location}`
+			` ${error} Passed to '${compName}'. ${location}`
 	);
 }
 
@@ -264,7 +264,9 @@ function validateArrayItems(validator, value, name, context) {
 	for (let i = 0; i < value.length; i++) {
 		if (isInvalid(validator(value[i], name, context))) {
 			let itemValidatorError = validator(value[i], name, context);
-			let errorMessage = `Validator for ${name}[${i}] says: "${itemValidatorError}"`;
+			let errorMessage = `Validator for ${name}[${i}] says: "${
+				itemValidatorError
+			}"`;
 			return composeError(errorMessage, name, context);
 		}
 	}

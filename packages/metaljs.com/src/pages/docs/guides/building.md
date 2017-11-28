@@ -17,41 +17,44 @@ projects, which we'll talk about here.
 
 </article>
 
-<article id="gulp_metal">
+<article id="metal-tools-soy">
 
-## [gulp-metal](#gulp_metal)
+## [metal-tools-soy](#metal-tools-soy)
 
-What this package offers is a a bunch of [gulp](http://gulpjs.com/) tasks.
-There are tasks that can handle not only building JavaScript, as well as Soy
-compilation, testing, linting and many other things.
+This tool is required when building Metal.js components that use Soy. It takes
+the `.soy` files in your project and transpiles them to JavaScript that can then
+be imported in your component js files.
 
-The [tutorials](/docs/getting-started/) we've provided are all using it, though
-indirectly, through some npm scripts. To learn how to use **gulp-metal**{sp}
-directly take a look at its [npm page](http://www.npmjs.com/package/gulp-metal).
+It's suggested to run this tool as a CLI, but it can also be run
+programmatically if necessary.
 
-</article>
+Take a look at the project's [documentation](https://www.npmjs.com/package/metal-tools-soy) for
+more information.
 
-<article id="metal_cli">
-
-## [metal-cli](#metal_cli)
-
-If you're not a fan of **gulp** you can still use
-{sp}[metal-cli](http://www.npmjs.com/package/metal-cli), which offers almost
-the same tools, but through the command line.
+If you are using webpack to bundle your Metal.js components, you can optionally
+use the [metal-soy-loader](https://www.npmjs.com/package/metal-soy-loader) which
+conveniently wraps metal-tools-soy for use with webpack.
 
 </article>
 
-<article id="examples_using_other_tools">
+<article id="babel-preset-metal-jsx">
 
-## [Examples Using Other Tools](#examples_using_other_tools)
+## [babel-preset-metal-jsx](#babel-preset-metal-jsx)
 
-As was mentioned before, using **gulp-metal** or **metal-cli** is not required.
-You can use your favorite build tool with **Metal.js** as well.
+When building Metal.js JSX components, it is necessary to transpile the JSX to
+JavaScript. The [babel-preset-metal-jsx](https://www.npmjs.com/package/babel-preset-metal-jsx) package
+takes care of importing the necessary babel plugins that allow for this
+transpilation.
 
-We've created a Github repository full of different examples on how to work
-with **Metal.js**, and among other things it has a bunch of examples showing
-how to use different build tools.
-{sp}[Check it out](http://github.com/metal/metal-examples), and feel free to
-create an issue or send a pull request for other tools that it may be missing.
+</article>
+
+<article id="examples">
+
+## [Examples](#examples)
+
+To see examples of these tools in action, check out
+the [Yeoman Generator](https://www.npmjs.com/package/generator-metal). The
+boilerplate it generates for both Soy and JSX components implement these tools
+out of the box.
 
 </article>

@@ -9,9 +9,9 @@ weight: 130
 
 ## [Component Lifecycle](#component_lifecycle)
 
-Components built with Metal.js provide lifecycle methods that can be called
-when needed. The following example lists all available lifecycle methods, in
-the order in which they're called
+You can take advantage of several lifecycle methods that Metal.js components 
+provide. The example below lists the available lifecycle methods in the order in 
+which they're called:
 
 ```javascript
 class MyComponent extends Component {
@@ -23,24 +23,24 @@ class MyComponent extends Component {
     }
 
     /**
-     * Called whenever the component is rendered.
+     * Called when the component is rendered.
      * @param {boolean} firstRender Flag indicating if
-     * this was the component's first render.
+     * this is the component's first render.
      */
     rendered(firstRender) {
     }
 
     /**
-     * Called before the component is about to attach
-     * to the DOM.
+     * Called just before the component attaches to
+     * the DOM.
      */
     willAttach() {
     }
 
     /**
      * Called when the component is attached to the
-     * DOM. The component will automatically be
-     * attached when first rendered, but can also
+     * DOM. The component automatically attaches
+     * when it is first rendered, but it can also
      * be attached (without rerendering the
      * component) by calling the `attach` method
      * directly. This is a good place to attach event
@@ -51,10 +51,10 @@ class MyComponent extends Component {
     }
 
     /**
-     * Soy components only.
+     * Only applicable for Soy components.
      *
-     * Called when state data is about to be passed
-     * to the component's renderer.
+     * Called just before state data is passed to
+     * the component's renderer.
      * @param {!object} changes object literal with
      * info on state changes.
      */
@@ -62,9 +62,9 @@ class MyComponent extends Component {
     }
 
     /**
-     * JSX components only.
+     * Only applicable for JSX components.
      *
-     * Called when props data is about to be passed to
+     * Called just before props data is passed to
      * the component's renderer.
      * @param {!object} propsChanges object literal
      * with info on props changes.
@@ -73,9 +73,9 @@ class MyComponent extends Component {
     }
 
     /**
-     * Called when the renderer is about to rerender
-     * the component. If it returns false it will not
-     * rerender.
+     * Called just before the renderer is about to
+     * rerender the component. If it returns false
+     * it will not rerender.
      * @param {!object} changes object literal with
      * info on state changes.
      * @param {?object} propsChanges object literal
@@ -88,7 +88,7 @@ class MyComponent extends Component {
     }
 
     /**
-     * Called before the component will rerender.
+     * Called just before the component rerenders.
      * @param {!object} changes object literal with
      * info on state changes.
      * @param {?object} propsChanges object literal
@@ -100,7 +100,7 @@ class MyComponent extends Component {
     }
 
     /**
-     * Called before the component is about to detach
+     * Called just before the component detaches
      * from the DOM.
      */
     willDetach() {
@@ -108,13 +108,12 @@ class MyComponent extends Component {
 
     /**
      * Called when the component is detached from the
-     * DOM. The component will automatically be
-     * detached when disposed, but can also be
-     * detached (without disposing the component)
-     * by calling the `detach` method directly. This
-     * is a good place to detach event listeners,
-     * since the component is not available in the
-     * page anymore.
+     * DOM. The component is automatically detached
+     * when disposed, but it can also be detached
+     * (without disposing the component) by calling
+     * the `detach` method directly. This is a good
+     * place to detach event listeners, since the
+     * component is not available in the page anymore.
      */
     detached() {
     }
@@ -129,11 +128,11 @@ class MyComponent extends Component {
     }
 
     /**
-     * Called when the component is about to render.
-     * It takes the component state as an argument
-     * and you can massage the data before it is passed
-     * down to the template.
-     * This is only available for Soy Components.
+     * Called just before the component renders.
+     * This takes the component state as an argument
+     * and lets you massage the data before it is
+     * passed down to the template.
+     * This is only applicable for Soy Components.
      */
     prepareStateForRender(states) {
         return Object.assign({}, states);
@@ -147,8 +146,8 @@ class MyComponent extends Component {
 
 ## [willReceiveState - Soy](#will_receive_state)
 
-The `willReceiveState` lifecycle method allows for hooking into the state
-lifecycle of Soy components. Let's take the following component for example.
+The `willReceiveState` lifecycle method lets you hook into the Soy component's 
+state lifecycle. See the example component below:
 
 ```javascript
 import Component from 'metal-component';
@@ -159,7 +158,7 @@ import templates from './MySoyComponent.soy';
 class MySoyComponent extends Component {
     willReceiveState(changes) {
         if (changes.foo && changes.foo.newVal !== changes.foo.prevVal) {
-            // This will available in the next render
+            // This is available in the next render
             this.bar = 'bar1';
         }
     }
@@ -193,9 +192,8 @@ export default MySoyComponent;
 ```
 
 If we render this component and change the value of the `foo` state, the
-`willReceiveState` method will be invoked before the component renders allowing
-us to also set the value of other state values that will also be passed to the
-next render.
+`willReceiveState` method fires before the component renders, which lets us 
+set state values to pass to the next render.
 
 ```javascript
 import MySoyComponent from './MySoyComponent';
@@ -217,8 +215,8 @@ component.once('rendered', function() {
 
 ## [willReceiveProps - JSX](#will_receive_props)
 
-The `willReceiveProps` lifecycle method allows for hooking into the props
-lifecycle of JSX components. Let's take the following JSX component for example.
+The `willReceiveProps` lifecycle method lets you hook into the props
+lifecycle of JSX components. Let's take the following JSX component for example:
 
 ```javascript
 import JSXComponent from 'metal-jsx';
@@ -230,7 +228,7 @@ class MyJSXComponent extends JSXComponent {
 
     willReceiveProps(changes) {
         if (changes.foo && changes.foo.newVal !== changes.foo.prevVal) {
-            // This will available in the next render
+            // This is available in the next render
             this.state.bar = 'bar1';
         }
     }
@@ -252,9 +250,8 @@ export default MyJSXComponent;
 ```
 
 If we render this component and change the value of the `foo` prop, the
-`willReceiveProps` method will be invoked before the component renders allowing
-us to also set the value of internal state values that will also be passed to
-the next render.
+`willReceiveProps` method fires before the component renders, which lets us 
+set the value of internal state values to pass to the next render:
 
 ```javascript
 import MyJSXComponent from './MyJSXComponent';

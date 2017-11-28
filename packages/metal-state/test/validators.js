@@ -61,6 +61,23 @@ describe('validators', function() {
 		}, 'Expected type function, but received type number. passed to arrayOf.');
 	});
 
+	it('should return detailed error message when nested validator in arrayOf fails', function() {
+		const arrayOfStrings = validators.arrayOf(validators.string);
+
+		const context = {
+			constructor: {
+				name: 'componentName',
+			},
+		};
+
+		const result = arrayOfStrings(['1', 2], 'arrayName', context);
+
+		assert.equal(
+			result.message,
+			`Invalid state passed to 'arrayName'. Validator for arrayName[1] says: "Error: Invalid state passed to 'arrayName'. Expected type 'string', but received type 'number'. Passed to 'componentName'. " Passed to 'componentName'. `
+		);
+	});
+
 	it('should validate an array of a single type', function() {
 		const arrayOfNumbers = validators.arrayOf(validators.number);
 
@@ -220,6 +237,31 @@ describe('validators', function() {
 		assert.throws(function() {
 			validators.shapeOf(2);
 		}, 'Expected type object, but received type number. passed to shapeOf.');
+	});
+
+	it('should return detailed error message when nested validator in shapeOf fails', function() {
+		const shape = validators.shapeOf({
+			key: validators.string,
+		});
+
+		const context = {
+			constructor: {
+				name: 'componentName',
+			},
+		};
+
+		const result = shape(
+			{
+				key: 2,
+			},
+			'objectName',
+			context
+		);
+
+		assert.equal(
+			result.message,
+			`Invalid state passed to 'objectName.key'. Expected type 'string', but received type 'number'. Passed to 'componentName'. `
+		);
 	});
 
 	it('should emit warning message', function() {

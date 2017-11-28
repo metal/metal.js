@@ -55,6 +55,12 @@ describe('validators', function() {
 		assert.isTrue(validator(function() {}));
 	});
 
+	it('should fail if an argument is not supplied to arrayOf', function() {
+		const wrongArrayOf = validators.arrayOf(2);
+
+		assert.ok(wrongArrayOf instanceof Error);
+	});
+
 	it('should validate an array of a single type', function() {
 		const arrayOfNumbers = validators.arrayOf(validators.number);
 
@@ -121,6 +127,12 @@ describe('validators', function() {
 		});
 
 		assert.ok(validator({}) instanceof Error);
+	});
+
+	it('should fail if an argument is not supplied to objectOf', function() {
+		const wrongObjectOf = validators.objectOf(2);
+
+		assert.ok(wrongObjectOf instanceof Error);
 	});
 
 	it('should validate an object with certain types of values', function() {
@@ -206,7 +218,8 @@ describe('validators', function() {
 
 	it('should fail if an object is not supplied to shape', function() {
 		const validator = validators.shapeOf(1);
-		assert.ok(validator({}) instanceof Error);
+
+		assert.ok(validator instanceof Error);
 	});
 
 	it('should emit warning message', function() {
@@ -215,7 +228,7 @@ describe('validators', function() {
 		const PARENT_COMPONENT_NAME = 'parentComponent';
 
 		const ERROR_MESSAGE =
-			`Error: Warning: Invalid state passed to '${NAME}'. ` +
+			`Error: Invalid state passed to '${NAME}'. ` +
 			`Expected type 'string', but received type 'number'. ` +
 			`Passed to '${COMPONENT_NAME}'. Check render ` +
 			`method of '${PARENT_COMPONENT_NAME}'.`;

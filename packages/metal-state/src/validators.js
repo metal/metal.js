@@ -2,11 +2,9 @@
 
 import {getFunctionName, isDefAndNotNull} from 'metal';
 
-const ERROR_ARRAY_OF_TYPE = 'Expected an array of single type.';
 const ERROR_OBJECT_OF_TYPE = 'Expected object of one type.';
 const ERROR_ONE_OF = 'Expected one of the following values:';
 const ERROR_ONE_OF_TYPE = 'Expected one of given types.';
-const ERROR_SHAPE_OF = 'Expected object with a specific shape.';
 
 /**
  * Provides access to various type validators that will return an
@@ -30,6 +28,10 @@ const validators = {
 	 * @return {!function()}
 	 */
 	arrayOf: function(validator) {
+		const argsResult = validators.func(validator);
+		if (isInvalid(argsResult)) {
+			return argsResult;
+		}
 		return maybe((value, name, context) => {
 			const result = validators.array(value, name, context);
 			if (isInvalid(result)) {
@@ -61,6 +63,10 @@ const validators = {
 	 * @return {!function()}
 	 */
 	objectOf: function(validator) {
+		const validatorResult = validators.func(validator);
+		if (isInvalid(validatorResult)) {
+			return validatorResult;
+		}
 		return maybe((value, name, context) => {
 			for (let key in value) {
 				if (isInvalid(validator(value[key]))) {
@@ -130,12 +136,15 @@ const validators = {
 	 * @return {!function()}
 	 */
 	shapeOf: function(shape) {
+		const shapeResult = validators.object(shape);
+		if (isInvalid(shapeResult)) {
+			return shapeResult;
+		}
 		return maybe((value, name, context) => {
-			const result = validators.object(shape, name, context);
-			if (isInvalid(result)) {
-				return result;
+			const valueResult = validators.object(value, name, context);
+			if (isInvalid(valueResult)) {
+				return valueResult;
 			}
-
 			for (let key in shape) {
 				if (Object.prototype.hasOwnProperty.call(shape, key)) {
 					let validator = shape[key];
@@ -148,7 +157,7 @@ const validators = {
 						(required && !isDefAndNotNull(value[key])) ||
 						isInvalid(validator(value[key]))
 					) {
-						return composeError(ERROR_SHAPE_OF, name, context);
+						return validator(value[key], `${name}.${key}`, context);
 					}
 				}
 			}
@@ -196,8 +205,8 @@ function composeError(error, name, context) {
 		? `Check render method of '${parentName}'.`
 		: '';
 	return new Error(
-		`Warning: Invalid state passed to '${name}'. ` +
-			`${error} Passed to '${compName}'. ${location}`
+		`Invalid state passed to '${name}'.` +
+			` ${error} Passed to '${compName}'. ${location}`
 	);
 }
 
@@ -254,7 +263,11 @@ function maybe(typeValidator) {
 function validateArrayItems(validator, value, name, context) {
 	for (let i = 0; i < value.length; i++) {
 		if (isInvalid(validator(value[i], name, context))) {
-			return composeError(ERROR_ARRAY_OF_TYPE, name, context);
+			let itemValidatorError = validator(value[i], name, context);
+			let errorMessage = `Validator for ${name}[${i}] says: "${
+				itemValidatorError
+			}"`;
+			return composeError(errorMessage, name, context);
 		}
 	}
 	return true;

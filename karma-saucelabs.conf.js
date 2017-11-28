@@ -63,10 +63,9 @@ module.exports = function(config) {
 	if (!sauceLabsAccessKey) {
 		sauceLabsAccessKey = process.env.SAUCE_ACCESS_KEY_ENC;
 		if (sauceLabsAccessKey) {
-			sauceLabsAccessKey = new Buffer(
-				sauceLabsAccessKey,
-				'base64'
-			).toString('binary');
+			sauceLabsAccessKey = new Buffer(sauceLabsAccessKey, 'base64').toString(
+				'binary'
+			);
 		}
 	}
 
@@ -94,7 +93,7 @@ module.exports = function(config) {
 			recordScreenshots: false,
 			recordVideo: false,
 			startConnect: false,
-			testName: 'metal-drag-drop tests',
+			testName: 'metal.js tests',
 			tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
 			username: process.env.SAUCE_USERNAME,
 		},

@@ -55,10 +55,10 @@ describe('validators', function() {
 		assert.isTrue(validator(function() {}));
 	});
 
-	it('should fail if an argument is not supplied to arrayOf', function() {
-		const wrongArrayOf = validators.arrayOf(2);
-
-		assert.ok(wrongArrayOf instanceof Error);
+	it('should throw error if a non-function is passed to arrayOf', function() {
+		assert.throws(function() {
+			validators.arrayOf(2);
+		}, 'Expected type function, but received type number. passed to arrayOf.');
 	});
 
 	it('should validate an array of a single type', function() {
@@ -129,10 +129,10 @@ describe('validators', function() {
 		assert.ok(validator({}) instanceof Error);
 	});
 
-	it('should fail if an argument is not supplied to objectOf', function() {
-		const wrongObjectOf = validators.objectOf(2);
-
-		assert.ok(wrongObjectOf instanceof Error);
+	it('should throw error if a non-function is passed to objectOf', function() {
+		assert.throws(function() {
+			validators.objectOf(2);
+		}, 'Expected type function, but received type number. passed to objectOf.');
 	});
 
 	it('should validate an object with certain types of values', function() {
@@ -216,10 +216,10 @@ describe('validators', function() {
 		assert.ok(validatorFn('true') instanceof Error);
 	});
 
-	it('should fail if an object is not supplied to shape', function() {
-		const validator = validators.shapeOf(1);
-
-		assert.ok(validator instanceof Error);
+	it('should throw error if a non-object is passed to shapeOf', function() {
+		assert.throws(function() {
+			validators.shapeOf(2);
+		}, 'Expected type object, but received type number. passed to shapeOf.');
 	});
 
 	it('should emit warning message', function() {

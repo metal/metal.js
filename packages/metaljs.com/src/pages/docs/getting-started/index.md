@@ -4,6 +4,7 @@ description: ""
 layout: "guide"
 icon: "flash"
 weight: 1
+hidden: true
 ---
 
 <article id="getting_started">
@@ -66,7 +67,7 @@ version 8 or newer (if you don't have it yet).
 <li>
 
 Enter the `1. Hello World/` folder in your terminal and install its npm
-dependencies, by typing: 
+dependencies, by typing:
 
 ```shell
 [sudo] npm install

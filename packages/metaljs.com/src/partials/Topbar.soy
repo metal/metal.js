@@ -9,7 +9,7 @@
 		{call .logo data="all" /}
 		{call .menu data="all" /}
 
-		<ul class="topbar-list">
+		<ul class="topbar-list topbar-list-icons">
 			<li class="topbar-item">
 				<a class="topbar-icon" target="_blank" href="https://github.com/metal/metal">
 					<span class="icon-16-github"></span>
@@ -42,8 +42,10 @@
 {template .menu}
 	{call ElectricNavigation.render}
 		{param depth: 1 /}
-		{param elementClasses: 'topbar-list' /}
+		{param elementClasses: 'topbar-menu' /}
+		{param togglerClasses: 'topbar-toggle' /}
 		{param linkClasses: 'topbar-link' /}
+		{param listClasses: 'topbar-list' /}
 		{param listItemClasses: 'topbar-item' /}
 		{param section: $site.index /}
 	{/call}

@@ -18,12 +18,13 @@
 	margin-left: 0;
 }
 
-.topbar, .guide:not(.content) .topbar {
+.topbar, .guide:not(.content) .topbar, .tutorial .sidebar-offset .topbar {
 	background-color: $primary;
 }
 
 .topbar .topbar-logo .topbar-logo-image {
 	height: 28px;
+	margin: 4px 0;
 }
 
 .topbar-link {
@@ -127,4 +128,25 @@
 			}
 		}
 	}
+}
+
+.tutorial .container img {
+	max-width: 100%;
+}
+
+.tutorial .container .card .nav.nav-tabs.nav-code-tabs {
+	margin: 0;
+	padding: 0 24px;
+
+	li:before {
+		display: none;
+	}
+}
+
+.topbar-list-icons .topbar-item {
+	margin: 0 20px;
+}
+
+.topbar-list-icons .topbar-item:last-child {
+	margin: 0;
 }

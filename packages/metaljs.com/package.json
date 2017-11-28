@@ -7,8 +7,9 @@
   },
   "devDependencies": {
     "electric-cli": "^2.2.0",
-    "electric-marble-components": "alpha",
-    "marble": "~2.11.7",
-    "metal-toggler": "^2.0.0"
+    "electric-marble-components": "^3.0.3",
+    "marble": "^3.1.4",
+    "metal-toggler": "^2.0.0",
+    "moment": "^2.19.2"
   }
 }

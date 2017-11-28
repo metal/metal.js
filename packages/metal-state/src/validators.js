@@ -28,9 +28,8 @@ const validators = {
 	 * @return {!function()}
 	 */
 	arrayOf: function(validator) {
-		const argsResult = validators.func(validator);
-		if (isInvalid(argsResult)) {
-			return argsResult;
+		if (isInvalid(validators.func(validator))) {
+			throwConfigError('function', validator, 'arrayOf');
 		}
 		return maybe((value, name, context) => {
 			const result = validators.array(value, name, context);
@@ -63,9 +62,8 @@ const validators = {
 	 * @return {!function()}
 	 */
 	objectOf: function(validator) {
-		const validatorResult = validators.func(validator);
-		if (isInvalid(validatorResult)) {
-			return validatorResult;
+		if (isInvalid(validators.func(validator))) {
+			throwConfigError('function', validator, 'objectOf');
 		}
 		return maybe((value, name, context) => {
 			for (let key in value) {
@@ -136,9 +134,8 @@ const validators = {
 	 * @return {!function()}
 	 */
 	shapeOf: function(shape) {
-		const shapeResult = validators.object(shape);
-		if (isInvalid(shapeResult)) {
-			return shapeResult;
+		if (isInvalid(validators.object(shape))) {
+			throwConfigError('object', shape, 'shapeOf');
 		}
 		return maybe((value, name, context) => {
 			const valueResult = validators.object(value, name, context);
@@ -250,6 +247,21 @@ function maybe(typeValidator) {
 			? typeValidator(value, name, context)
 			: true; // eslint-disable-line
 	};
+}
+
+/**
+ * Throws error if validator is invoked with incorrect type.
+ * @param {string} expectedType String representing the expected type.
+ * @param {*} value The value to match the type of.
+ * @param {!string} name Name of the function the validator is intended for.
+ */
+function throwConfigError(expectedType, value, name) {
+	const type = getType(value);
+	throw new Error(
+		`Expected type ${expectedType}, but received type ${type}. passed to ${
+			name
+		}.`
+	);
 }
 
 /**

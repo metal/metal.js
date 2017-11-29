@@ -35,6 +35,27 @@ class domData {
 	static has(element) {
 		return !!element[METAL_DATA];
 	}
+
+	/**
+	 * Sets Metal.js's data for the given element.
+	 * @param {!Element} element
+	 * @param {string=} name Optional Property from the data to be returned.
+	 * @param {*=} value Optional value to the set the requested property
+	 *     to if it doesn't exist yet in the data.
+	 * @return {!Object}
+	 */
+	static set(element, name, value) {
+		if (!element[METAL_DATA]) {
+			element[METAL_DATA] = {};
+		}
+		if (!name || !value) {
+			return element[METAL_DATA];
+		}
+		if (!element[METAL_DATA][name] && value) {
+			element[METAL_DATA][name] = value;
+		}
+		return element[METAL_DATA][name];
+	}
 }
 
 export default domData;

@@ -3,8 +3,8 @@
 import domData from '../src/domData';
 
 describe('domData', function() {
-	it('should get data object from element', function() {
-		let data = domData.get(document.createElement('div'));
+	it('should set data object from element', function() {
+		let data = domData.set(document.createElement('div'));
 		assert.ok(data);
 	});
 
@@ -16,6 +16,6 @@ describe('domData', function() {
 	it('should return different data objects for the different elements', function() {
 		let element1 = document.createElement('div');
 		let element2 = document.createElement('div');
-		assert.notStrictEqual(domData.get(element1), domData.get(element2));
+		assert.notStrictEqual(domData.set(element1), domData.set(element2));
 	});
 });

@@ -530,6 +530,34 @@ export function parent(element, selector) {
 }
 
 /**
+ * Inserts a node before first child of the parent. If child is a HTML string
+ * it will be converted to document fragment before prepending it to the parent.
+ * @param {!Element} parent The node to prepend to.
+ * @param {!(Element|NodeList|string)} child The thing to prepend to the parent.
+ * @return {!Element} The prepended child.
+ */
+export function prepend(parent, child) {
+	if (isString(child)) {
+		child = buildFragment(child);
+	}
+
+	if (!isNodeListLike(child) && !isDefAndNotNull(parent.firstChild)) {
+		return append(parent, child);
+	}
+
+	if (isNodeListLike(child)) {
+		const childArr = Array.prototype.slice.call(child);
+		for (let i = childArr.length - 1; i >= 0; i--) {
+			parent.insertBefore(childArr[i], parent.firstChild);
+		}
+	} else {
+		parent.insertBefore(child, parent.firstChild);
+	}
+
+	return child;
+}
+
+/**
  * Registers a custom event.
  * @param {string} eventName The name of the custom event.
  * @param {!Object} customConfig An object with information about how the event

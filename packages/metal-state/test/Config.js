@@ -143,6 +143,34 @@ describe('Config', function() {
 		assert.ok(config.config.validator(['one']) instanceof Error);
 	});
 
+	it('should return config with "arrayOf" validator inheriting "shapeOf" and "oneOf" from "validators"', function() {
+		let shape = {
+			one: Config.bool().value(false),
+			two: Config.string(),
+			three: Config.oneOf(['propOne', 'propTwo', 'propThree']).value('propOne'),
+			four: Config.number().required(),
+		};
+		let configShape = Config.arrayOf(Config.shapeOf(shape));
+		assert.ok(core.isObject(configShape));
+		assert.ok(core.isFunction(configShape.config.validator));
+		assert.ok(
+			configShape.config.validator({
+				one: false,
+				two: 30,
+				three: 'anything',
+			}) instanceof Error
+		);
+		assert.ok(configShape.config.validator([1, 2]) instanceof Error);
+		assert.ok(
+			configShape.config.validator({
+				one: false,
+				two: 'is String!',
+				three: 'propOne',
+				four: 30,
+			})
+		);
+	});
+
 	it('should return config with "bool" validator from "validators"', function() {
 		let config = Config.bool();
 		assert.ok(core.isObject(config));

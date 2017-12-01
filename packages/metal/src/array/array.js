@@ -1,7 +1,8 @@
 'use strict';
 
-import { isDef } from '../core';
-
+/**
+ * Set of utilities for array operations
+ */
 class array {
 	/**
 	 * Checks if the given arrays have the same content.
@@ -40,11 +41,10 @@ class array {
 	/**
 	 * Transforms the input nested array to become flat.
 	 * @param {Array.<*|Array.<*>>} arr Nested array to flatten.
-	 * @param {Array.<*>} opt_output Optional output array.
+	 * @param {Array.<*>=} output Optional output array.
 	 * @return {Array.<*>} Flat array.
 	 */
-	static flatten(arr, opt_output) {
-		var output = opt_output || [];
+	static flatten(arr, output = []) {
 		for (let i = 0; i < arr.length; i++) {
 			if (Array.isArray(arr[i])) {
 				array.flatten(arr[i], output);
@@ -65,7 +65,7 @@ class array {
 	static remove(arr, obj) {
 		const i = arr.indexOf(obj);
 		let rv;
-		if ( (rv = i >= 0) ) {
+		if ((rv = i >= 0)) {
 			array.removeAt(arr, i);
 		}
 		return rv;
@@ -86,14 +86,13 @@ class array {
 	 * is faster and working on all array-like objects (like arguments).
 	 * @param {!Object} arr Array-like object to slice.
 	 * @param {number} start The index that should start the slice.
-	 * @param {number=} opt_end The index where the slice should end, not
+	 * @param {number=} end The index where the slice should end, not
 	 *   included in the final array. If not given, all elements after the
 	 *   start index will be included.
 	 * @return {!Array}
 	 */
-	static slice(arr, start, opt_end) {
+	static slice(arr, start, end = arr.length) {
 		const sliced = [];
-		const end = isDef(opt_end) ? opt_end : arr.length;
 		for (let i = start; i < end; i++) {
 			sliced.push(arr[i]);
 		}

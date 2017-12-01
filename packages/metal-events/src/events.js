@@ -6,4 +6,4 @@ import EventHandle from './EventHandle';
 import EventHandler from './EventHandler';
 
 export default EventEmitter;
-export { EventEmitter, EventEmitterProxy, EventHandle, EventHandler };
+export {EventEmitter, EventEmitterProxy, EventHandle, EventHandler};

@@ -7,5 +7,5 @@
 import * as dom from './domNamed';
 
 export default dom;
-export { dom };
+export {dom};
 export * from './domNamed';

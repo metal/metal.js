@@ -1,0 +1,16 @@
+{
+  "env": {
+    "mocha": true
+  },
+  "globals": {
+    "assert": true,
+    "before": true,
+    "IncrementalDOM": true,
+    "sinon": true
+  },
+  "rules": {
+    "max-len": 0,
+    "no-invalid-this": 0,
+    "require-jsdoc": 0
+  }
+}

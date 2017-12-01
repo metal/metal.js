@@ -12,7 +12,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should emit and listen to events', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.emit('event');
 		assert.strictEqual(0, listener.callCount);
@@ -24,7 +24,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should listen to multiple events on the same call', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.on(['event1', 'event2'], listener);
 
@@ -36,7 +36,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should listen to events through `addListener`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.addListener(['event1', 'event2'], listener);
 
@@ -48,7 +48,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should listen to event a single time through `once`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.once('event', listener);
 		assert.strictEqual(0, listener.callCount);
@@ -61,7 +61,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should listen to multiple events on the same call to `once`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.once(['event', 'event2'], listener);
 		assert.strictEqual(0, listener.callCount);
@@ -80,7 +80,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should listen to event a fixed number of times through `many`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.many('event', 2, listener);
 		assert.strictEqual(0, listener.callCount);
@@ -96,7 +96,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should listen to multiple events on the same call to `many`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.many(['event', 'event2'], 2, listener);
 
@@ -120,7 +120,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should ignore calls to `many` with non positive number', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.many('event', 0, listener);
 		this.emitter.emit('event');
@@ -132,11 +132,11 @@ describe('EventEmitter', function() {
 	});
 
 	it('should run listeners in the order they were added', function() {
-		var order = '';
-		var listener1 = function() {
+		let order = '';
+		let listener1 = function() {
 			order += '1';
 		};
-		var listener2 = function() {
+		let listener2 = function() {
 			order += '2';
 		};
 
@@ -148,9 +148,9 @@ describe('EventEmitter', function() {
 	});
 
 	it('should return all listeners for given event type', function() {
-		var listener1 = sinon.stub();
-		var listener2 = sinon.stub();
-		var listener3 = sinon.stub();
+		let listener1 = sinon.stub();
+		let listener2 = sinon.stub();
+		let listener3 = sinon.stub();
 
 		this.emitter.on('event', listener1);
 		this.emitter.on('anotherEvent', listener2);
@@ -162,8 +162,8 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event', listener);
 		this.emitter.on('event', listener2);
@@ -175,8 +175,8 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach listeners subscribed multiple times to same event', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event', listener);
 		this.emitter.on('event', listener);
@@ -190,11 +190,11 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events via return value', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event', listener);
-		var handle = this.emitter.on('event', listener2);
+		let handle = this.emitter.on('event', listener2);
 
 		handle.removeListener();
 		this.emitter.emit('event');
@@ -203,8 +203,8 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events that were listened together', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on(['event', 'event2'], listener);
 		this.emitter.on(['event', 'event2'], listener2);
@@ -220,8 +220,8 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach multiple events with the same call', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event', listener);
 		this.emitter.on('event2', listener);
@@ -238,11 +238,11 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events that were listened together via return value', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on(['event', 'event2'], listener);
-		var handle = this.emitter.on(['event', 'event2'], listener2);
+		let handle = this.emitter.on(['event', 'event2'], listener2);
 		handle.removeListener();
 
 		this.emitter.emit('event');
@@ -255,7 +255,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events listened through `once`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.once('event', listener);
 		this.emitter.off('event', listener);
@@ -265,9 +265,9 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events listened through `once` via return value', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
-		var handle = this.emitter.once('event', listener);
+		let handle = this.emitter.once('event', listener);
 		handle.removeListener();
 		this.emitter.emit('event');
 
@@ -275,7 +275,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events listened through `many`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.many('event', 2, listener);
 		this.emitter.off('event', listener);
@@ -285,7 +285,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events listened together through `many`', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.many(['event', 'event2'], 2, listener);
 		this.emitter.off(['event', 'event2'], listener);
@@ -296,9 +296,9 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events listened together through `many` via return value', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
-		var handle = this.emitter.many(['event', 'event2'], 2, listener);
+		let handle = this.emitter.many(['event', 'event2'], 2, listener);
 		handle.removeListener();
 
 		this.emitter.emit('event');
@@ -307,9 +307,9 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events listened through `many` via return value', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
-		var handle = this.emitter.many('event', 2, listener);
+		let handle = this.emitter.many('event', 2, listener);
 		handle.removeListener();
 		this.emitter.emit('event');
 
@@ -317,8 +317,8 @@ describe('EventEmitter', function() {
 	});
 
 	it('should detach events through `removeListener`', function() {
-		var listener = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event', listener);
 		this.emitter.on('event', listener2);
@@ -330,15 +330,17 @@ describe('EventEmitter', function() {
 	});
 
 	it('should not throw error when detaching event type that was never used before', function() {
-		var listener = sinon.stub();
-		assert.doesNotThrow(function() {
-			this.emitter.off('event', listener);
-		}.bind(this));
+		let listener = sinon.stub();
+		assert.doesNotThrow(
+			function() {
+				this.emitter.off('event', listener);
+			}.bind(this)
+		);
 	});
 
 	it('should remove all listeners', function() {
-		var listener1 = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener1 = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event1', listener1);
 		this.emitter.on('event2', listener2);
@@ -352,8 +354,8 @@ describe('EventEmitter', function() {
 	});
 
 	it('should remove all listeners of the given type', function() {
-		var listener1 = sinon.stub();
-		var listener2 = sinon.stub();
+		let listener1 = sinon.stub();
+		let listener2 = sinon.stub();
 
 		this.emitter.on('event1', listener1);
 		this.emitter.on('event2', listener2);
@@ -367,9 +369,9 @@ describe('EventEmitter', function() {
 	});
 
 	it('should remove all listeners of the given types', function() {
-		var listener1 = sinon.stub();
-		var listener2 = sinon.stub();
-		var listener3 = sinon.stub();
+		let listener1 = sinon.stub();
+		let listener2 = sinon.stub();
+		let listener3 = sinon.stub();
 
 		this.emitter.on('event1', listener1);
 		this.emitter.on('event2', listener2);
@@ -391,7 +393,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should only allow functions as listeners', function() {
-		var self = this;
+		let self = this;
 
 		assert.throws(function() {
 			self.emitter.addListener('event', {});
@@ -403,7 +405,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should pass requested arguments to listener on emit', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.on('event', listener);
 		this.emitter.emit('event', 'arg1', 2);
@@ -412,7 +414,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should pass facade as last argument when requested', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.setShouldUseFacade(true);
 		this.emitter.on('event', listener);
@@ -425,13 +427,13 @@ describe('EventEmitter', function() {
 			sinon.match({
 				preventDefault: sinon.match.func,
 				target: this.emitter,
-				type: 'event'
+				type: 'event',
 			})
 		);
 	});
 
 	it('should set preventedDefault flag to true on facade when preventDefault is called', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 
 		this.emitter.setShouldUseFacade(true);
 		this.emitter.once('event', function(event) {
@@ -446,9 +448,9 @@ describe('EventEmitter', function() {
 	});
 
 	it('should emit listener marked as default last', function() {
-		var listener1 = sinon.stub();
-		var listener2 = sinon.stub();
-		var listenerDefault = sinon.spy(function() {
+		let listener1 = sinon.stub();
+		let listener2 = sinon.stub();
+		let listenerDefault = sinon.spy(function() {
 			assert.strictEqual(1, listener1.callCount);
 			assert.strictEqual(1, listener2.callCount);
 		});
@@ -462,11 +464,11 @@ describe('EventEmitter', function() {
 	});
 
 	it('should not call default listener if "preventDefault" is called', function() {
-		var listener1 = sinon.spy(function(event) {
+		let listener1 = sinon.spy(function(event) {
 			event.preventDefault();
 		});
-		var listener2 = sinon.stub();
-		var listenerDefault = sinon.stub();
+		let listener2 = sinon.stub();
+		let listenerDefault = sinon.stub();
 
 		this.emitter.setShouldUseFacade(true);
 		this.emitter.on('event', listenerDefault, true);
@@ -494,7 +496,7 @@ describe('EventEmitter', function() {
 	});
 
 	it('should remove all listeners on dispose', function() {
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		this.emitter.on('event', listener);
 
 		this.emitter.dispose();

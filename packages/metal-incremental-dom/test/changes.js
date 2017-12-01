@@ -1,7 +1,7 @@
 'use strict';
 
-import { clearChanges, getChanges, trackChanges } from '../src/changes';
-import { getData } from '../src/data';
+import {clearChanges, getChanges, trackChanges} from '../src/changes';
+import {getData} from '../src/data';
 import Component from 'metal-component';
 
 describe('changes', function() {
@@ -19,15 +19,18 @@ describe('changes', function() {
 
 		component.visible = false;
 		const changes = getChanges(component);
-		assert.deepEqual({
-			props: {
-				visible: {
-					key: 'visible',
-					newVal: false,
-					prevVal: true
-				}
-			}
-		}, changes);
+		assert.deepEqual(
+			{
+				props: {
+					visible: {
+						key: 'visible',
+						newVal: false,
+						prevVal: true,
+					},
+				},
+			},
+			changes
+		);
 	});
 
 	it('should clear changes for a given component', function() {

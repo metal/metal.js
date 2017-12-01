@@ -1,8 +1,8 @@
 'use strict';
 
-import { array, isString } from 'metal';
+import {array, isString} from 'metal';
 import domData from './domData';
-import { EventHandle } from 'metal-events';
+import {EventHandle} from 'metal-events';
 
 /**
  * This is a special EventHandle, that is responsible for dom delegated events
@@ -15,13 +15,13 @@ class DomDelegatedEventHandle extends EventHandle {
 	 * @param {!Event} emitter Element the event was subscribed to.
 	 * @param {string} event The name of the event that was subscribed to.
 	 * @param {!Function} listener The listener subscribed to the event.
-	 * @param {string=} opt_selector An optional selector used when delegating
+	 * @param {string=} selector An optional selector used when delegating
 	 *     the event.
 	 * @constructor
 	 */
-	constructor(emitter, event, listener, opt_selector) {
+	constructor(emitter, event, listener, selector) {
 		super(emitter, event, listener);
-		this.selector_ = opt_selector;
+		this.selector_ = selector;
 	}
 
 	/**
@@ -31,7 +31,9 @@ class DomDelegatedEventHandle extends EventHandle {
 		const delegating = domData.get(this.emitter_, 'delegating', {});
 		const listeners = domData.get(this.emitter_, 'listeners', {});
 		const selector = this.selector_;
-		const arr = isString(selector) ? delegating[this.event_].selectors : listeners;
+		const arr = isString(selector)
+			? delegating[this.event_].selectors
+			: listeners;
 		const key = isString(selector) ? selector : this.event_;
 
 		array.remove(arr[key] || [], this.listener_);

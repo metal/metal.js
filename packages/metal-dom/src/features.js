@@ -1,7 +1,7 @@
 'use strict';
 
-import { append } from './dom';
-import { string } from 'metal';
+import {append} from './dom';
+import {string} from 'metal';
 
 /**
  * Class with static methods responsible for doing browser feature checks.
@@ -17,7 +17,7 @@ class features {
 		if (features.animationEventName_ === undefined) {
 			features.animationEventName_ = {
 				animation: features.checkAnimationEventName_('animation'),
-				transition: features.checkAnimationEventName_('transition')
+				transition: features.checkAnimationEventName_('transition'),
 			};
 		}
 		return features.animationEventName_;
@@ -30,13 +30,27 @@ class features {
 	 */
 	static checkAnimationEventName_(type) {
 		const prefixes = ['Webkit', 'MS', 'O', ''];
-		const typeTitleCase = string.replaceInterval(type, 0, 1, type.substring(0, 1).toUpperCase());
-		const suffixes = [`${typeTitleCase}End`, `${typeTitleCase}End`, `${typeTitleCase}End`, `${type}end`];
+		const typeTitleCase = string.replaceInterval(
+			type,
+			0,
+			1,
+			type.substring(0, 1).toUpperCase()
+		);
+		const suffixes = [
+			`${typeTitleCase}End`,
+			`${typeTitleCase}End`,
+			`${typeTitleCase}End`,
+			`${type}end`,
+		];
 		if (!features.animationElement_) {
 			features.animationElement_ = document.createElement('div');
 		}
 		for (let i = 0; i < prefixes.length; i++) {
-			if (features.animationElement_.style[prefixes[i] + typeTitleCase] !== undefined) {
+			if (
+				features.animationElement_.style[
+					prefixes[i] + typeTitleCase
+				] !== undefined // eslint-disable-line
+			) {
 				return prefixes[i].toLowerCase() + suffixes[i];
 			}
 		}

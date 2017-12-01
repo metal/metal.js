@@ -15,7 +15,10 @@ describe('string', function() {
 	});
 
 	it('should collapse breaking spaces', function() {
-		assert.strictEqual('foo bar', string.collapseBreakingSpaces('   foo   bar   '));
+		assert.strictEqual(
+			'foo bar',
+			string.collapseBreakingSpaces('   foo   bar   ')
+		);
 	});
 
 	it('should generate random strings', function() {
@@ -27,8 +30,8 @@ describe('string', function() {
 	});
 
 	it('should escape regex', function() {
-		var spec = '()[]{}+-?*.$^|,:#<!\\';
-		var escapedSpec = '\\' + spec.split('').join('\\');
+		let spec = '()[]{}+-?*.$^|,:#<!\\';
+		let escapedSpec = '\\' + spec.split('').join('\\');
 		assert.strictEqual(escapedSpec, string.escapeRegex(spec));
 	});
 });

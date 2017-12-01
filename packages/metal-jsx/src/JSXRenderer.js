@@ -1,6 +1,6 @@
 'use strict';
 
-import { isDefAndNotNull } from 'metal';
+import {isDefAndNotNull} from 'metal';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 
 const COUNT_PROP = '__metalJsxCount';
@@ -53,6 +53,7 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 
 	/**
 	 * Increments the number of children in the current element.
+	 * @return {number}
 	 */
 	incElementCount() {
 		const node = IncrementalDOM.currentElement();

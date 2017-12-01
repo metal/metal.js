@@ -4,7 +4,7 @@ import DangerouslySetHTML from '../src/DangerouslySetHTML';
 import JSXComponent from '../src/JSXComponent';
 
 describe('JSXComponent', function() {
-	var component;
+	let component;
 
 	afterEach(function() {
 		if (component) {
@@ -23,14 +23,14 @@ describe('JSXComponent', function() {
 	});
 
 	it('should render with html content', function() {
-		var content = '<h2>hello</h2><div><span>world</span></div>';
+		let content = '<h2>hello</h2><div><span>world</span></div>';
 
 		component = new DangerouslySetHTML({content: content});
 		assert.strictEqual(content, component.element.innerHTML);
 	});
 
 	it('should render inside of another component', function() {
-		var content = '<h2>hello</h2><div><span>world</span></div>';
+		let content = '<h2>hello</h2><div><span>world</span></div>';
 
 		class TestComponent extends JSXComponent {
 			render() {

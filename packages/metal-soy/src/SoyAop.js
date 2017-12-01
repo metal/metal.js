@@ -25,18 +25,19 @@ const SoyAop = {
 	 * is set, or otherwise just calling the original function instead.
 	 * @param {!function()} originalFn The original template function that was
 	 *     intercepted.
-	 * @param {Object} opt_data Template data object.
-	 * @param {*} opt_ignored
-	 * @param {Object} opt_ijData Template injected data object.
+	 * @param {Object=} data Template data object.
+	 * @param {*=} ignored
+	 * @param {Object=} ijData Template injected data object.
 	 * @return {*} The return value of the function that is called to handle this
 	 *     interception.
 	 */
-	handleTemplateCall_: function(originalFn, opt_data, opt_ignored, opt_ijData) {
-		const interceptFn = SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1];
+	handleTemplateCall_: function(originalFn, data, ignored, ijData) {
+		const interceptFn =
+			SoyAop.interceptFns_[SoyAop.interceptFns_.length - 1]; // eslint-disable-line
 		if (interceptFn) {
-			return interceptFn.call(null, originalFn, opt_data, opt_ignored, opt_ijData);
+			return interceptFn.call(null, originalFn, data, ignored, ijData);
 		} else {
-			return originalFn.call(null, opt_data, opt_ignored, opt_ijData);
+			return originalFn.call(null, data, ignored, ijData);
 		}
 	},
 
@@ -75,7 +76,7 @@ const SoyAop = {
 	 */
 	stopInterception: function() {
 		SoyAop.interceptFns_.pop();
-	}
+	},
 };
 
 export default SoyAop;

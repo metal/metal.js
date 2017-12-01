@@ -25,31 +25,30 @@ describe('ComponentDataManager', function() {
 	it('should add the specified properties to the given component', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 		assert.strictEqual('fooValue', component.foo);
 	});
 
 	it('should use component\'s config as initial state values', function() {
 		initialConfig = {
-			foo: 'initialFoo'
+			foo: 'initialFoo',
 		};
 		ComponentDataManager.setUp(component, {
-			foo: {
-			}
+			foo: {},
 		});
 		assert.strictEqual('initialFoo', component.foo);
 	});
 
 	it('should use default state value when "undefined" is passed as initial value', function() {
 		initialConfig = {
-			foo: undefined
+			foo: undefined,
 		};
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'defaultFoo'
-			}
+				value: 'defaultFoo',
+			},
 		});
 
 		assert.strictEqual(component.foo, 'defaultFoo');
@@ -58,8 +57,7 @@ describe('ComponentDataManager', function() {
 	it('should throw error if attempting to add state property named "element"', function() {
 		assert.throws(() => {
 			ComponentDataManager.setUp(component, {
-				element: {
-				}
+				element: {},
 			});
 		});
 	});
@@ -67,8 +65,8 @@ describe('ComponentDataManager', function() {
 	it('should add the state properties defined in STATE to the given component', function() {
 		component.constructor.STATE = {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		};
 		ComponentDataManager.setUp(component, {});
 		assert.strictEqual('fooValue', component.foo);
@@ -78,25 +76,25 @@ describe('ComponentDataManager', function() {
 		component.constructor.STATE = {
 			bar: {
 				internal: true,
-				value: 'initialBar'
+				value: 'initialBar',
 			},
 			foo: {
-				value: 'initialFoo'
+				value: 'initialFoo',
 			},
 			foo2: {
-				value: 'initialFoo2'
-			}
+				value: 'initialFoo2',
+			},
 		};
 
 		initialConfig = {
 			bar: 'bar',
 			foo: 'foo',
-			foo2: 'foo2'
+			foo2: 'foo2',
 		};
 		ComponentDataManager.setUp(component, {});
 
 		ComponentDataManager.replaceNonInternal(component, {
-			foo: 'newFoo'
+			foo: 'newFoo',
 		});
 		assert.strictEqual('newFoo', component.foo);
 		assert.strictEqual('initialFoo2', component.foo2);
@@ -105,18 +103,20 @@ describe('ComponentDataManager', function() {
 
 	it('should return state instance', function() {
 		ComponentDataManager.setUp(component, {});
-		assert.ok(ComponentDataManager.getStateInstance(component) instanceof State);
+		assert.ok(
+			ComponentDataManager.getStateInstance(component) instanceof State
+		);
 	});
 
 	it('should return an object with state properties', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 
-		var expected = {
-			foo: 'fooValue'
+		let expected = {
+			foo: 'fooValue',
 		};
 		assert.deepEqual(expected, ComponentDataManager.getState(component));
 	});
@@ -124,8 +124,8 @@ describe('ComponentDataManager', function() {
 	it('should return list of state keys', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 		assert.deepEqual(['foo'], ComponentDataManager.getStateKeys(component));
 	});
@@ -133,8 +133,8 @@ describe('ComponentDataManager', function() {
 	it('should return list of sync keys', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 		assert.deepEqual(['foo'], ComponentDataManager.getSyncKeys(component));
 	});
@@ -142,8 +142,8 @@ describe('ComponentDataManager', function() {
 	it('should get value from state key', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 		assert.strictEqual('fooValue', ComponentDataManager.get(component, 'foo'));
 	});
@@ -151,12 +151,12 @@ describe('ComponentDataManager', function() {
 	it('should set value for state key', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 
 		ComponentDataManager.setState(component, {
-			foo: 'fooValue2'
+			foo: 'fooValue2',
 		});
 		assert.strictEqual('fooValue2', component.foo);
 	});
@@ -164,11 +164,11 @@ describe('ComponentDataManager', function() {
 	it('should emit events from state on component', function() {
 		ComponentDataManager.setUp(component, {
 			foo: {
-				value: 'fooValue'
-			}
+				value: 'fooValue',
+			},
 		});
 
-		var listener = sinon.stub();
+		let listener = sinon.stub();
 		component.on('fooChanged', listener);
 
 		component.foo = 'fooValue2';

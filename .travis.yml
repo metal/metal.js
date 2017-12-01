@@ -6,8 +6,7 @@ addons:
     secure: rV35O/fLO1NHiINBspiMzvWWtJPBdetUb3bB4mBB2Qrqf0WMRMGJ4Pgkaxl0p9JqAgPMQ/HSQTKLPNKaATc5g6GO46H7N1ykWBLrhsi7YSgopbNwUw95RebaZc42iyfgbnYG1hU8YEmes01UwXLsVup6qNt7X64I+M/KcfM6Cb8=
 
 before_install:
-  - nvm install 7
-  - npm install -g gulp
+  - nvm install 8
   - npm install -g lerna@2.2.0
 
 install:
@@ -19,5 +18,7 @@ jdk:
 language: java
 
 script:
-  - gulp test:saucelabs
+  - npm run checkFormat
+  - npm run lint
+  - npm run test:saucelabs
   - npm run test:isomorphic

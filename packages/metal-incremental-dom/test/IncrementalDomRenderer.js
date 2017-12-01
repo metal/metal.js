@@ -1,17 +1,17 @@
 'use strict';
 
-import { async, core, object } from 'metal';
+import {async, core, object} from 'metal';
 import dom from 'metal-dom';
-import { getData } from '../src/data';
-import { sunset } from '../../../test-utils';
-import { CHILD_OWNER } from '../src/children/children';
-import { Component, ComponentRegistry } from 'metal-component';
+import {getData} from '../src/data';
+import {sunset} from '../../../test-utils';
+import {CHILD_OWNER} from '../src/children/children';
+import {Component, ComponentRegistry} from 'metal-component';
 import IncrementalDomRenderer from '../src/IncrementalDomRenderer';
 
-var IncDom = IncrementalDOM;
+let IncDom = IncrementalDOM;
 
 describe('IncrementalDomRenderer', function() {
-	var component;
+	let component;
 
 	afterEach(function() {
 		if (component) {
@@ -21,8 +21,7 @@ describe('IncrementalDomRenderer', function() {
 
 	describe('Default render', function() {
 		it('should render empty div element by default', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			component = new TestComponent();
@@ -41,8 +40,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 			}
 
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			TestComponent.RENDERER = new TestRenderer();
 
 			component = new TestComponent();
@@ -77,7 +75,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 			}
 			TestComponent.STATE = {
-				attr: {}
+				attr: {},
 			};
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
@@ -95,9 +93,9 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('span');
+			let element = document.createElement('span');
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 			assert.strictEqual(element, component.element);
 			assert.strictEqual('foo', component.element.getAttribute('foo'));
@@ -105,7 +103,7 @@ describe('IncrementalDomRenderer', function() {
 		});
 
 		it('should run component\'s "rendered" lifecycle method on first render', function() {
-			var calledArgs = [];
+			let calledArgs = [];
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('span', null, null, 'foo', 'foo');
@@ -135,8 +133,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
@@ -160,8 +158,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			TestComponent.SYNC_UPDATES = true;
 
@@ -188,8 +186,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				foo: {
-				}
+				foo: {},
 			};
 			TestComponent.SYNC_UPDATES = true;
 
@@ -241,8 +238,10 @@ describe('IncrementalDomRenderer', function() {
 			assert.equal(component.shouldUpdate.callCount, 0);
 		});
 
-		it('should run component\'s "rendered" lifecycle method on updates', function(done) {
-			var calledArgs = [];
+		it('should run component\'s "rendered" lifecycle method on updates', function(
+			done
+		) {
+			let calledArgs = [];
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -257,8 +256,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
@@ -281,9 +280,9 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 			assert.notStrictEqual(element, component.element);
 			assert.strictEqual('SPAN', component.element.tagName);
@@ -297,11 +296,11 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
-			var parent = document.createElement('div');
+			let element = document.createElement('div');
+			let parent = document.createElement('div');
 			component = new TestComponent(
 				{
-					element: element
+					element: element,
 				},
 				parent
 			);
@@ -319,7 +318,9 @@ describe('IncrementalDomRenderer', function() {
 			assert.ok(!component.element);
 		});
 
-		it('should reposition component on requested parent when its content is back after an update', function(done) {
+		it('should reposition component on requested parent when its content is back after an update', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					if (!this.noElement) {
@@ -329,16 +330,15 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				noElement: {
-				}
+				noElement: {},
 			};
 
-			var parent = document.createElement('div');
+			let parent = document.createElement('div');
 			component = new TestComponent({}, parent);
 			assert.ok(component.element);
 			assert.strictEqual(parent, component.element.parentNode);
 
-			var prevElement = component.element;
+			let prevElement = component.element;
 			component.noElement = true;
 			component.once('stateSynced', function() {
 				assert.ok(!component.element);
@@ -362,7 +362,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			component = new TestComponent({
-				elementClasses: 'test'
+				elementClasses: 'test',
 			});
 			assert.ok(dom.hasClass(component.element, 'test'));
 
@@ -374,22 +374,32 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should add/remove css classes by using both "class" and "elementClasses"', function(done) {
+		it('should add/remove css classes by using both "class" and "elementClasses"', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
-					var cssClass = this.foo ? 'foo' : 'bar';
-					IncDom.elementVoid('button', null, [], 'foo', 'foo', 'class', cssClass);
+					let cssClass = this.foo ? 'foo' : 'bar';
+					IncDom.elementVoid(
+						'button',
+						null,
+						[],
+						'foo',
+						'foo',
+						'class',
+						cssClass
+					);
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: true
-				}
+					value: true,
+				},
 			};
 
 			component = new TestComponent({
-				elementClasses: 'test'
+				elementClasses: 'test',
 			});
 			assert.ok(dom.hasClass(component.element, 'foo'));
 			assert.ok(!dom.hasClass(component.element, 'bar'));
@@ -413,9 +423,12 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			component = new TestComponent({
-				elementClasses: 'test2 test3'
+				elementClasses: 'test2 test3',
 			});
-			assert.strictEqual('test1 test2 test3', component.element.getAttribute('class'));
+			assert.strictEqual(
+				'test1 test2 test3',
+				component.element.getAttribute('class')
+			);
 		});
 
 		it('should store references to node elements via "ref"', function() {
@@ -431,8 +444,14 @@ describe('IncrementalDomRenderer', function() {
 
 			component = new TestComponent();
 			assert.strictEqual(component.element, component.refs.root);
-			assert.strictEqual(component.element.childNodes[0], component.refs.child1);
-			assert.strictEqual(component.element.childNodes[1], component.refs.child2);
+			assert.strictEqual(
+				component.element.childNodes[0],
+				component.refs.child1
+			);
+			assert.strictEqual(
+				component.element.childNodes[1],
+				component.refs.child2
+			);
 		});
 	});
 
@@ -449,15 +468,18 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			dom.append(element, '<div class="inner">foo</div>');
-			var innerElement = element.querySelector('.inner');
+			let innerElement = element.querySelector('.inner');
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 
 			assert.strictEqual(element, component.element);
-			assert.strictEqual(innerElement, component.element.querySelector('.inner'));
+			assert.strictEqual(
+				innerElement,
+				component.element.querySelector('.inner')
+			);
 			assert.strictEqual('foo', component.element.textContent);
 		});
 
@@ -473,15 +495,18 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			dom.append(element, '<span class="inner">foo</span>');
-			var innerElement = element.querySelector('.inner');
+			let innerElement = element.querySelector('.inner');
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 
 			assert.strictEqual(element, component.element);
-			assert.notStrictEqual(innerElement, component.element.querySelector('.inner'));
+			assert.notStrictEqual(
+				innerElement,
+				component.element.querySelector('.inner')
+			);
 			assert.strictEqual('foo', component.element.textContent);
 		});
 
@@ -497,15 +522,18 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			dom.append(element, '<div class="inner2">foo</div>');
-			var innerElement = element.querySelector('.inner2');
+			let innerElement = element.querySelector('.inner2');
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 
 			assert.strictEqual(element, component.element);
-			assert.strictEqual(innerElement, component.element.querySelector('.inner'));
+			assert.strictEqual(
+				innerElement,
+				component.element.querySelector('.inner')
+			);
 			assert.strictEqual('foo', component.element.textContent);
 			assert.ok(dom.hasClass(innerElement, 'inner'));
 			assert.ok(!dom.hasClass(innerElement, 'inner2'));
@@ -580,12 +608,12 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			element.setAttribute('data-onclick', 'handleClick');
 			dom.enterDocument(element);
 
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 
 			dom.triggerEvent(component.element, 'click');
@@ -628,11 +656,11 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.prototype.handleClick = sinon.stub();
 
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 			dom.append(element, '<div></div>');
-			var innerElement = element.childNodes[0];
+			let innerElement = element.childNodes[0];
 			component = new TestComponent({
-				element: element
+				element: element,
 			});
 			assert.strictEqual(innerElement, component.element.childNodes[0]);
 
@@ -643,7 +671,13 @@ describe('IncrementalDomRenderer', function() {
 		it('should provide delegateTarget as the element that the listener was attached to', function() {
 			class TestComponent extends Component {
 				render() {
-					IncDom.elementOpen('div', null, null, 'onClick', 'handleElementClick');
+					IncDom.elementOpen(
+						'div',
+						null,
+						null,
+						'onClick',
+						'handleElementClick'
+					);
 					IncDom.elementOpen('div', null, null, 'onClick', 'handleClick');
 					IncDom.elementVoid('div', null, null, 'class', 'inner');
 					IncDom.elementClose('div');
@@ -652,17 +686,17 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
-			var event1;
+			let event1;
 			TestComponent.prototype.handleElementClick = function(event) {
 				event1 = object.mixin({}, event);
 			};
-			var event2;
+			let event2;
 			TestComponent.prototype.handleClick = function(event) {
 				event2 = object.mixin({}, event);
 			};
 
 			component = new TestComponent();
-			var innerElement = component.element.querySelector('.inner');
+			let innerElement = component.element.querySelector('.inner');
 			dom.triggerEvent(innerElement, 'click');
 
 			assert.ok(event1);
@@ -671,10 +705,15 @@ describe('IncrementalDomRenderer', function() {
 
 			assert.ok(event2);
 			assert.strictEqual(innerElement, event2.target);
-			assert.strictEqual(component.element.childNodes[0], event2.delegateTarget);
+			assert.strictEqual(
+				component.element.childNodes[0],
+				event2.delegateTarget
+			);
 		});
 
-		it('should remove unused inline listeners when dom is updated', function(done) {
+		it('should remove unused inline listeners when dom is updated', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -690,8 +729,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				keydown: {
-					value: true
-				}
+					value: true,
+				},
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 			TestComponent.prototype.handleKeydown = sinon.stub();
@@ -712,14 +751,14 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					var fn = this.switch ? this.handleClick2 : this.handleClick;
+					let fn = this.switch ? this.handleClick2 : this.handleClick;
 					IncDom.elementVoid('div', null, null, 'onClick', fn);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				switch: {}
+				switch: {},
 			};
 			TestComponent.prototype.handleClick = sinon.stub();
 			TestComponent.prototype.handleClick2 = sinon.stub();
@@ -744,8 +783,7 @@ describe('IncrementalDomRenderer', function() {
 					sinon.stub(this, 'handleClick');
 				}
 
-				handleClick() {
-				}
+				handleClick() {}
 
 				render() {
 					IncDom.elementVoid('div', null, null, 'data-onclick', 'handleClick');
@@ -759,7 +797,7 @@ describe('IncrementalDomRenderer', function() {
 			component.dispose();
 
 			component = new TestComponent({
-				element
+				element,
 			});
 			dom.triggerEvent(element, 'click');
 			assert.equal(1, component.handleClick.callCount);
@@ -767,7 +805,7 @@ describe('IncrementalDomRenderer', function() {
 	});
 
 	describe('Nested Components', function() {
-		var ChildComponent;
+		let ChildComponent;
 
 		beforeEach(function() {
 			class ChildComponentClass extends Component {
@@ -782,8 +820,8 @@ describe('IncrementalDomRenderer', function() {
 			ChildComponent.RENDERER = IncrementalDomRenderer;
 			ChildComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			ChildComponent.prototype.handleClick = sinon.stub();
 			ComponentRegistry.register(ChildComponent, 'ChildComponent');
@@ -800,7 +838,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.ok(child);
 			assert.ok(child instanceof ChildComponent);
 			assert.strictEqual(child, component.refs.child);
@@ -817,8 +855,11 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
-			assert.strictEqual(child.element, component.element.querySelector('child'));
+			let child = component.components.child;
+			assert.strictEqual(
+				child.element,
+				component.element.querySelector('child')
+			);
 			assert.strictEqual('foo', child.element.textContent);
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
@@ -837,7 +878,7 @@ describe('IncrementalDomRenderer', function() {
 			sinon.spy(ChildComponent.prototype, 'attached');
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual(1, child.rendered.callCount);
 			assert.ok(child.rendered.args[0][0]);
 			assert.strictEqual(1, child.attached.callCount);
@@ -847,14 +888,22 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child', 'foo', 'bar');
+					IncDom.elementVoid(
+						'ChildComponent',
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						'bar'
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual('bar', child.foo);
 			assert.strictEqual('bar', child.element.textContent);
 		});
@@ -863,40 +912,58 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						'ChildComponent',
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			component = new TestComponent();
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
-				var child = component.components.child;
+				let child = component.components.child;
 				assert.strictEqual('bar', child.foo);
 				assert.strictEqual('bar', child.element.textContent);
 				done();
 			});
 		});
 
-		it('should run component\'s lifecycle methods when updated as sub component', function(done) {
+		it('should run component\'s lifecycle methods when updated as sub component', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						'ChildComponent',
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			sinon.spy(ChildComponent.prototype, 'rendered');
@@ -905,7 +972,7 @@ describe('IncrementalDomRenderer', function() {
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
-				var child = component.components.child;
+				let child = component.components.child;
 				assert.strictEqual(2, child.rendered.callCount);
 				assert.ok(!child.rendered.args[1][0]);
 				assert.strictEqual(1, child.attached.callCount);
@@ -913,25 +980,35 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not try to rerender sub component later when state changes during parent rendering', function(done) {
+		it('should not try to rerender sub component later when state changes during parent rendering', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						'ChildComponent',
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			component = new TestComponent();
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
-				var child = component.components.child;
+				let child = component.components.child;
 				sinon.spy(child, 'render');
 				child.once('stateSynced', function() {
 					assert.strictEqual(0, child.render.callCount);
@@ -940,25 +1017,35 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should rerender sub component when state changes after parent rendering', function(done) {
+		it('should rerender sub component when state changes after parent rendering', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid('ChildComponent', null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						'ChildComponent',
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			component = new TestComponent();
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
-				var child = component.components.child;
+				let child = component.components.child;
 				child.foo = 'bar2';
 				sinon.spy(child, 'render');
 				child.once('stateSynced', function() {
@@ -969,7 +1056,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not remove sub component key when this sub component updates itself', function(done) {
+		it('should not remove sub component key when this sub component updates itself', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -980,13 +1069,16 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual('childKey', child.element.__incrementalDOMData.key);
 
 			child.foo = 'bar';
 			child.once('stateSynced', function() {
 				assert.strictEqual('childKey', child.element.__incrementalDOMData.key);
-				assert.strictEqual(child.element, component.element.querySelector('child'));
+				assert.strictEqual(
+					child.element,
+					component.element.querySelector('child')
+				);
 				assert.strictEqual('bar', child.element.textContent);
 				done();
 			});
@@ -1026,16 +1118,18 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual(0, child.handleClick.callCount);
 
-			var button = child.element.querySelector('button');
+			let button = child.element.querySelector('button');
 
 			dom.triggerEvent(button, 'click');
 			assert.strictEqual(1, child.handleClick.callCount);
 		});
 
-		it('should detach unused sub component inline listeners after parent update', function(done) {
+		it('should detach unused sub component inline listeners after parent update', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					if (this.removeEvent) {
@@ -1049,24 +1143,30 @@ describe('IncrementalDomRenderer', function() {
 			TestChildComponent.prototype.handleClick = sinon.stub();
 			TestChildComponent.RENDERER = IncrementalDomRenderer;
 			TestChildComponent.STATE = {
-				removeEvent: {
-				}
+				removeEvent: {},
 			};
 
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child', 'removeEvent', this.removeEvent);
+					IncDom.elementVoid(
+						TestChildComponent,
+						null,
+						null,
+						'ref',
+						'child',
+						'removeEvent',
+						this.removeEvent
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				removeEvent: {
-				}
+				removeEvent: {},
 			};
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 
 			dom.triggerEvent(child.element, 'click');
 			assert.strictEqual(1, child.handleClick.callCount);
@@ -1096,8 +1196,10 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual('bar', component.element.childNodes[0].textContent);
 		});
 
-		it('should reuse sub component even when it receives no ref', function(done) {
-			var creationCount = 0;
+		it('should reuse sub component even when it receives no ref', function(
+			done
+		) {
+			let creationCount = 0;
 			class TestChildComponent extends Component {
 				created() {
 					creationCount++;
@@ -1111,8 +1213,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestChildComponent.RENDERER = IncrementalDomRenderer;
 			TestChildComponent.STATE = {
-				foo: {
-				}
+				foo: {},
 			};
 
 			class TestComponent extends Component {
@@ -1125,8 +1226,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
@@ -1164,11 +1265,10 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				add: {
-				}
+				add: {},
 			};
 
-			var children = [];
+			let children = [];
 			sinon.stub(ChildComponent.prototype, 'created', function() {
 				children.push(this);
 			});
@@ -1192,13 +1292,21 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('foo', component.element.childNodes[1].textContent);
 				assert.strictEqual('CHILD', component.element.childNodes[2].tagName);
 				assert.strictEqual('bar', component.element.childNodes[2].textContent);
-				assert.strictEqual(component.element.childNodes[1], children[0].element);
-				assert.strictEqual(component.element.childNodes[2], children[1].element);
+				assert.strictEqual(
+					component.element.childNodes[1],
+					children[0].element
+				);
+				assert.strictEqual(
+					component.element.childNodes[2],
+					children[1].element
+				);
 				done();
 			});
 		});
 
-		it('should reuse correct children according to their "key" after an update', function(done) {
+		it('should reuse correct children according to their "key" after an update', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -1214,11 +1322,10 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				switch: {
-				}
+				switch: {},
 			};
 
-			var children = [];
+			let children = [];
 			sinon.stub(ChildComponent.prototype, 'created', function() {
 				children.push(this);
 			});
@@ -1233,13 +1340,21 @@ describe('IncrementalDomRenderer', function() {
 			component.once('stateSynced', function() {
 				assert.strictEqual(2, component.element.childNodes.length);
 				assert.strictEqual(2, children.length);
-				assert.strictEqual(component.element.childNodes[0], children[1].element);
-				assert.strictEqual(component.element.childNodes[1], children[0].element);
+				assert.strictEqual(
+					component.element.childNodes[0],
+					children[1].element
+				);
+				assert.strictEqual(
+					component.element.childNodes[1],
+					children[0].element
+				);
 				done();
 			});
 		});
 
-		it('should not reuse component that was created in another parent', function(done) {
+		it('should not reuse component that was created in another parent', function(
+			done
+		) {
 			const grandChildInstances = [];
 			class GrandChildComponent extends Component {
 				created() {
@@ -1262,14 +1377,20 @@ describe('IncrementalDomRenderer', function() {
 
 			class TestComponent extends Component {
 				render() {
-					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child' + this.number);
+					IncDom.elementVoid(
+						TestChildComponent,
+						null,
+						null,
+						'ref',
+						'child' + this.number
+					);
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				number: {
-					value: 1
-				}
+					value: 1,
+				},
 			};
 
 			component = new TestComponent();
@@ -1280,12 +1401,17 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual(2, grandChildInstances.length);
 				assert.ok(grandChildInstances[0].isDisposed());
 				assert.ok(!grandChildInstances[1].isDisposed());
-				assert.strictEqual(grandChildInstances[1].element, component.element.querySelector('span'));
+				assert.strictEqual(
+					grandChildInstances[1].element,
+					component.element.querySelector('span')
+				);
 				done();
 			});
 		});
 
-		it('should not throw error trying to reuse component that was disposed', function(done) {
+		it('should not throw error trying to reuse component that was disposed', function(
+			done
+		) {
 			const childInstances = [];
 			class TestChildComponent extends Component {
 				created() {
@@ -1304,8 +1430,7 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				foo: {
-				}
+				foo: {},
 			};
 
 			component = new TestComponent();
@@ -1322,11 +1447,13 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should reuse previous internal state data on sub component rerender', function(done) {
+		it('should reuse previous internal state data on sub component rerender', function(
+			done
+		) {
 			ChildComponent.STATE = {
 				foo: {
-					internal: true
-				}
+					internal: true,
+				},
 			};
 
 			class TestComponent extends Component {
@@ -1335,19 +1462,26 @@ describe('IncrementalDomRenderer', function() {
 					if (this.noFoo) {
 						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
 					} else {
-						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'foo', 'foo');
+						IncDom.elementVoid(
+							ChildComponent,
+							null,
+							null,
+							'ref',
+							'child',
+							'foo',
+							'foo'
+						);
 					}
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				noFoo: {
-				}
+				noFoo: {},
 			};
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual('foo', child.foo);
 
 			component.noFoo = true;
@@ -1357,11 +1491,13 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not reuse previous non internal state data on sub component rerender', function(done) {
+		it('should not reuse previous non internal state data on sub component rerender', function(
+			done
+		) {
 			ChildComponent.STATE = {
 				foo: {
-					value: 'defaultFoo'
-				}
+					value: 'defaultFoo',
+				},
 			};
 
 			class TestComponent extends Component {
@@ -1370,19 +1506,26 @@ describe('IncrementalDomRenderer', function() {
 					if (this.noFoo) {
 						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
 					} else {
-						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'foo', 'foo');
+						IncDom.elementVoid(
+							ChildComponent,
+							null,
+							null,
+							'ref',
+							'child',
+							'foo',
+							'foo'
+						);
 					}
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				noFoo: {
-				}
+				noFoo: {},
 			};
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual('foo', child.foo);
 
 			component.noFoo = true;
@@ -1423,8 +1566,11 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
-			assert.strictEqual(child.element, component.element.querySelector('child'));
+			let child = component.components.child;
+			assert.strictEqual(
+				child.element,
+				component.element.querySelector('child')
+			);
 			assert.strictEqual('foo', child.element.textContent);
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
@@ -1444,9 +1590,12 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual('bar', child.foo);
-			assert.strictEqual(child.element, component.element.querySelector('child'));
+			assert.strictEqual(
+				child.element,
+				component.element.querySelector('child')
+			);
 			assert.strictEqual('bar', child.element.textContent);
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
@@ -1462,9 +1611,12 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.ok(child instanceof ChildComponent);
-			assert.strictEqual(child.element, component.element.querySelector('child'));
+			assert.strictEqual(
+				child.element,
+				component.element.querySelector('child')
+			);
 			assert.strictEqual('foo', child.element.textContent);
 			assert.ok(child.element.hasAttribute('data-child'));
 		});
@@ -1473,31 +1625,41 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid(ChildComponent, null, [], 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						ChildComponent,
+						null,
+						[],
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				foo: {}
+				foo: {},
 			};
 			component = new TestComponent({
-				foo: 'foo'
+				foo: 'foo',
 			});
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual('foo', child.foo);
 
 			component.foo = 'bar';
 			component.once('stateSynced', function() {
-				var newChild = component.components.child;
+				let newChild = component.components.child;
 				assert.strictEqual(child, newChild);
 				assert.strictEqual('bar', child.foo);
 				done();
 			});
 		});
 
-		it('should not reuse component with same key if constructor is different"', function(done) {
+		it('should not reuse component with same key if constructor is different"', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					IncDom.elementVoid('div');
@@ -1518,19 +1680,18 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				switch: {
-				}
+				switch: {},
 			};
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.ok(child instanceof ChildComponent);
 			assert.strictEqual(child.element, component.element.childNodes[0]);
 			assert.strictEqual('CHILD', child.element.tagName);
 
 			component.switch = true;
 			component.once('stateSynced', function() {
-				var newChild = component.components.child;
+				let newChild = component.components.child;
 				assert.notStrictEqual(child, newChild);
 				assert.ok(newChild instanceof TestChildComponent);
 				assert.strictEqual(newChild.element, component.element.childNodes[0]);
@@ -1541,7 +1702,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should call "detached" lifecycle function and event when sub component is removed', function(done) {
+		it('should call "detached" lifecycle function and event when sub component is removed', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -1553,12 +1716,11 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				remove: {
-				}
+				remove: {},
 			};
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.ok(!child.isDisposed());
 			sinon.spy(child, 'detached');
 
@@ -1611,11 +1773,13 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual(child.element, component.element);
 		});
 
-		it('should position previously empty child component correctly inside parent', function(done) {
+		it('should position previously empty child component correctly inside parent', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					if (!this.empty) {
@@ -1627,8 +1791,8 @@ describe('IncrementalDomRenderer', function() {
 			TestChildComponent.STATE = {
 				empty: {
 					value: true,
-					internal: true
-				}
+					internal: true,
+				},
 			};
 
 			class TestComponent extends Component {
@@ -1641,7 +1805,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.ok(!child.element);
 			assert.strictEqual(0, component.element.childNodes.length);
 
@@ -1654,25 +1818,35 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not render sub component with SYNC_UPDATES twice', function(done) {
+		it('should not render sub component with SYNC_UPDATES twice', function(
+			done
+		) {
 			ChildComponent.SYNC_UPDATES = true;
 
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						ChildComponent,
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			sinon.spy(child, 'render');
 
 			component.foo = 'bar';
@@ -1684,8 +1858,7 @@ describe('IncrementalDomRenderer', function() {
 
 		describe('Children data', function() {
 			it('should pass tree of incremental dom calls as "children"', function() {
-				class TestChildComponent extends Component {
-				}
+				class TestChildComponent extends Component {}
 				TestChildComponent.RENDERER = IncrementalDomRenderer;
 
 				class TestComponent extends Component {
@@ -1702,10 +1875,10 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child = component.components.child;
+				let child = component.components.child;
 				assert.ok(child instanceof TestChildComponent);
 
-				var children = child.children;
+				let children = child.children;
 				assert.ok(children);
 
 				assert.strictEqual(1, children.length);
@@ -1741,11 +1914,14 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child = component.components.child;
+				let child = component.components.child;
 				assert.ok(child instanceof TestChildComponent);
 				assert.strictEqual(1, child.element.childNodes.length);
 				assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
-				assert.strictEqual('Hello World', child.element.childNodes[0].textContent);
+				assert.strictEqual(
+					'Hello World',
+					child.element.childNodes[0].textContent
+				);
 			});
 
 			it('should render empty string children', function() {
@@ -1770,7 +1946,7 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child = component.components.child;
+				let child = component.components.child;
 				assert.strictEqual('foo bar', child.element.textContent);
 			});
 
@@ -1798,7 +1974,7 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child = component.components.child;
+				let child = component.components.child;
 				assert.strictEqual(1, child.element.childNodes.length);
 				assert.strictEqual('SPAN', child.element.childNodes[0].tagName);
 				assert.ok(dom.hasClass(child.element.childNodes[0], 'second'));
@@ -1816,7 +1992,13 @@ describe('IncrementalDomRenderer', function() {
 
 				class TestNestedChildComponent extends Component {
 					render() {
-						IncDom.elementOpen(TestChildComponent, null, null, 'ref', 'nestedChild1');
+						IncDom.elementOpen(
+							TestChildComponent,
+							null,
+							null,
+							'ref',
+							'nestedChild1'
+						);
 						IncDom.elementOpen('div');
 						this.children.forEach(IncrementalDomRenderer.renderChild);
 						IncDom.elementClose('div');
@@ -1828,7 +2010,13 @@ describe('IncrementalDomRenderer', function() {
 				class TestComponent extends Component {
 					render() {
 						IncDom.elementOpen('div');
-						IncDom.elementOpen(TestNestedChildComponent, null, null, 'ref', 'child1');
+						IncDom.elementOpen(
+							TestNestedChildComponent,
+							null,
+							null,
+							'ref',
+							'child1'
+						);
 						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child2');
 						IncDom.elementClose(TestNestedChildComponent);
 						IncDom.elementClose('div');
@@ -1837,8 +2025,8 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child1 = component.components.child1;
-				var child2 = component.components.child2;
+				let child1 = component.components.child1;
+				let child2 = component.components.child2;
 				assert.ok(child1 instanceof TestNestedChildComponent);
 				assert.ok(child2 instanceof TestChildComponent);
 				assert.ok(child1.components.nestedChild1 instanceof TestChildComponent);
@@ -1846,7 +2034,10 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(!child1.components.child2);
 
 				assert.strictEqual(child1.element, component.element.childNodes[0]);
-				assert.strictEqual(child2.element, child1.element.childNodes[0].childNodes[0]);
+				assert.strictEqual(
+					child2.element,
+					child1.element.childNodes[0].childNodes[0]
+				);
 			});
 
 			it('should add dom element references to the component that requested them', function() {
@@ -1882,7 +2073,7 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var childEl = component.refs.childEl;
+				let childEl = component.refs.childEl;
 				assert.ok(childEl);
 				assert.ok(core.isElement(childEl));
 				assert.strictEqual('SPAN', childEl.tagName);
@@ -1928,9 +2119,13 @@ describe('IncrementalDomRenderer', function() {
 					render() {
 						IncrementalDOM.elementOpen('child');
 						if (this.children.length) {
-							this.children[0].props = object.mixin({}, this.children[0].props, {
-								foo: 'changedFoo'
-							});
+							this.children[0].props = object.mixin(
+								{},
+								this.children[0].props,
+								{
+									foo: 'changedFoo',
+								}
+							);
 							this.children.forEach(IncrementalDomRenderer.renderChild);
 						}
 						if (this.foo) {
@@ -1941,8 +2136,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 				TestChildComponent.RENDERER = IncrementalDomRenderer;
 				TestChildComponent.STATE = {
-					foo: {
-					}
+					foo: {},
 				};
 
 				class TestNestedChildComponent extends Component {
@@ -1965,7 +2159,10 @@ describe('IncrementalDomRenderer', function() {
 				component = new TestComponent();
 
 				assert.strictEqual(1, component.element.childNodes.length);
-				assert.strictEqual('changedFoo', component.element.childNodes[0].textContent);
+				assert.strictEqual(
+					'changedFoo',
+					component.element.childNodes[0].textContent
+				);
 			});
 
 			it('should render correctly when recursive children are used', function() {
@@ -1996,9 +2193,9 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child = component.components.child;
-				var child2 = component.components.child2;
-				var child3 = component.components.child3;
+				let child = component.components.child;
+				let child2 = component.components.child2;
+				let child3 = component.components.child3;
 				assert.ok(child instanceof TestChildComponent);
 				assert.ok(child2 instanceof TestChildComponent);
 				assert.ok(child3 instanceof TestChildComponent);
@@ -2011,27 +2208,40 @@ describe('IncrementalDomRenderer', function() {
 				assert.strictEqual('CHILD', child2.element.childNodes[0].tagName);
 				assert.strictEqual(child3.element, child2.element.childNodes[0]);
 				assert.strictEqual(1, child3.element.childNodes.length);
-				assert.strictEqual('Hello World', child2.element.childNodes[0].textContent);
+				assert.strictEqual(
+					'Hello World',
+					child2.element.childNodes[0].textContent
+				);
 			});
 
-			it('should pass same children array when there are no children', function(done) {
+			it('should pass same children array when there are no children', function(
+				done
+			) {
 				class TestComponent extends Component {
 					render() {
 						IncDom.elementOpen('div');
-						IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child', 'foo', this.foo);
+						IncDom.elementVoid(
+							ChildComponent,
+							null,
+							null,
+							'ref',
+							'child',
+							'foo',
+							this.foo
+						);
 						IncDom.elementClose('div');
 					}
 				}
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				TestComponent.STATE = {
 					foo: {
-						value: 'foo'
-					}
+						value: 'foo',
+					},
 				};
 
 				component = new TestComponent();
-				var child = component.components.child;
-				var children = child.children;
+				let child = component.components.child;
+				let children = child.children;
 				assert.ok(children);
 
 				component.foo = 'foo2';
@@ -2061,13 +2271,15 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				component = new TestComponent();
 
-				var child = component.components.child;
-				var child2 = component.components.child2;
+				let child = component.components.child;
+				let child2 = component.components.child2;
 				assert.strictEqual(child.element, child2.element);
 				assert.notStrictEqual(component.element, child.element);
 			});
 
-			it('should reuse children components when rerendered after update', function(done) {
+			it('should reuse children components when rerendered after update', function(
+				done
+			) {
 				class TestChildComponent extends Component {
 					render() {
 						IncrementalDOM.elementOpen('div');
@@ -2079,8 +2291,8 @@ describe('IncrementalDomRenderer', function() {
 				TestChildComponent.RENDERER = IncrementalDomRenderer;
 				TestChildComponent.STATE = {
 					foo: {
-						value: 'foo'
-					}
+						value: 'foo',
+					},
 				};
 
 				class TestComponent extends Component {
@@ -2117,7 +2329,7 @@ describe('IncrementalDomRenderer', function() {
 			class TestChildComponent extends Component {
 				getChildContext() {
 					return {
-						bar: 'bar'
+						bar: 'bar',
 					};
 				}
 
@@ -2132,14 +2344,20 @@ describe('IncrementalDomRenderer', function() {
 			class TestComponent extends Component {
 				getChildContext() {
 					return {
-						foo: 'foo'
+						foo: 'foo',
 					};
 				}
 
 				render() {
 					IncDom.elementOpen('div');
 					IncDom.elementOpen(TestChildComponent, null, null, 'ref', 'child');
-					IncDom.elementVoid(TestGrandChildComponent, null, null, 'ref', 'grandChild');
+					IncDom.elementVoid(
+						TestGrandChildComponent,
+						null,
+						null,
+						'ref',
+						'grandChild'
+					);
 					IncDom.elementClose(TestChildComponent);
 					IncDom.elementClose('div');
 				}
@@ -2147,8 +2365,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
-			var grandChild = component.components.grandChild;
+			let child = component.components.child;
+			let grandChild = component.components.grandChild;
 			assert.ok(child instanceof TestChildComponent);
 			assert.ok(grandChild instanceof TestGrandChildComponent);
 			assert.ok(!component.context.foo);
@@ -2167,12 +2385,12 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestChildComponent.RENDERER = IncrementalDomRenderer;
 
-			var element = document.createElement('div');
-			var tempComp;
+			let element = document.createElement('div');
+			let tempComp;
 			class TestComponent extends Component {
 				getChildContext() {
 					return {
-						foo: 'foo'
+						foo: 'foo',
 					};
 				}
 
@@ -2181,7 +2399,7 @@ describe('IncrementalDomRenderer', function() {
 				}
 
 				rendered() {
-					var fn = () => {
+					let fn = () => {
 						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child');
 					};
 					tempComp = IncrementalDomRenderer.render(fn, element);
@@ -2190,7 +2408,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = tempComp.components.child;
+			let child = tempComp.components.child;
 			assert.ok(child instanceof TestChildComponent);
 			assert.ok(!component.context.foo);
 			assert.ok(!component.context.bar);
@@ -2198,11 +2416,13 @@ describe('IncrementalDomRenderer', function() {
 		});
 
 		describe('Dispose Unused Sub Components', function() {
-			it('should dispose sub components that are unused after an update', function(done) {
+			it('should dispose sub components that are unused after an update', function(
+				done
+			) {
 				class TestComponent extends Component {
 					render() {
 						IncDom.elementOpen('div');
-						for (var i = 1; i <= this.count; i++) {
+						for (let i = 1; i <= this.count; i++) {
 							IncDom.elementVoid('ChildComponent', null, ['ref', 'child' + i]);
 						}
 						IncDom.elementClose('div');
@@ -2211,11 +2431,11 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				TestComponent.STATE = {
 					count: {
-						value: 3
-					}
+						value: 3,
+					},
 				};
 				component = new TestComponent();
-				var subComps = object.mixin({}, component.components);
+				let subComps = object.mixin({}, component.components);
 				assert.strictEqual(3, Object.keys(subComps).length);
 				assert.ok(subComps.child1);
 				assert.ok(subComps.child2);
@@ -2235,7 +2455,9 @@ describe('IncrementalDomRenderer', function() {
 				});
 			});
 
-			it('should dispose unused sub component before triggering update rerender', function(done) {
+			it('should dispose unused sub component before triggering update rerender', function(
+				done
+			) {
 				class TestComponent extends Component {
 					render() {
 						IncDom.elementOpen('div');
@@ -2248,11 +2470,11 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				TestComponent.STATE = {
 					foo: {
-						value: 'foo'
-					}
+						value: 'foo',
+					},
 				};
 				component = new TestComponent();
-				var child = component.components.child;
+				let child = component.components.child;
 				sinon.spy(child, 'render');
 
 				component.foo = 'bar';
@@ -2264,7 +2486,9 @@ describe('IncrementalDomRenderer', function() {
 				});
 			});
 
-			it('should dispose sub components from "children" that are unused after an update', function(done) {
+			it('should dispose sub components from "children" that are unused after an update', function(
+				done
+			) {
 				class TestChildComponent extends Component {
 					render() {
 						IncDom.elementOpen('div');
@@ -2275,8 +2499,8 @@ describe('IncrementalDomRenderer', function() {
 				TestChildComponent.RENDERER = IncrementalDomRenderer;
 				TestChildComponent.STATE = {
 					index: {
-						value: 0
-					}
+						value: 0,
+					},
 				};
 
 				class TestComponent extends Component {
@@ -2290,8 +2514,8 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 
 				component = new TestComponent();
-				var child = component.components.child;
-				var item1 = component.components.item1;
+				let child = component.components.child;
+				let item1 = component.components.item1;
 				assert.ok(item1);
 				assert.ok(!component.components.item2);
 				assert.ok(!item1.isDisposed());
@@ -2306,12 +2530,20 @@ describe('IncrementalDomRenderer', function() {
 				});
 			});
 
-			it('should dispose sub components from sub components that are unused after a parent update', function(done) {
+			it('should dispose sub components from sub components that are unused after a parent update', function(
+				done
+			) {
 				class TestChildComponent extends Component {
 					render() {
 						IncDom.elementOpen('div');
 						if (!this.remove) {
-							IncDom.elementOpen(ChildComponent, null, null, 'ref', 'innerChild');
+							IncDom.elementOpen(
+								ChildComponent,
+								null,
+								null,
+								'ref',
+								'innerChild'
+							);
 							IncDom.elementClose(ChildComponent);
 						}
 						IncDom.elementClose('div');
@@ -2319,24 +2551,30 @@ describe('IncrementalDomRenderer', function() {
 				}
 				TestChildComponent.RENDERER = IncrementalDomRenderer;
 				TestChildComponent.STATE = {
-					remove: {
-					}
+					remove: {},
 				};
 
 				class TestComponent extends Component {
 					render() {
-						IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child', 'remove', this.remove);
+						IncDom.elementVoid(
+							TestChildComponent,
+							null,
+							null,
+							'ref',
+							'child',
+							'remove',
+							this.remove
+						);
 					}
 				}
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				TestComponent.STATE = {
-					remove: {
-					}
+					remove: {},
 				};
 
 				component = new TestComponent();
-				var child = component.components.child;
-				var innerChild = child.components.innerChild;
+				let child = component.components.child;
+				let innerChild = child.components.innerChild;
 				assert.ok(innerChild);
 
 				component.remove = true;
@@ -2350,7 +2588,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not remove reusable element from disposed component', function(done) {
+		it('should not remove reusable element from disposed component', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					IncDom.elementOpen('child');
@@ -2360,37 +2600,53 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestChildComponent.STATE = {
 				index: {
-					value: 0
-				}
+					value: 0,
+				},
 			};
 			TestChildComponent.RENDERER = IncrementalDomRenderer;
 
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen(TestChildComponent, null, null, 'ref', 'child');
-					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo1', 'ref', 'grandchild1');
-					IncDom.elementVoid(ChildComponent, null, null, 'foo', 'foo2', 'ref', 'grandchild2');
+					IncDom.elementVoid(
+						ChildComponent,
+						null,
+						null,
+						'foo',
+						'foo1',
+						'ref',
+						'grandchild1'
+					);
+					IncDom.elementVoid(
+						ChildComponent,
+						null,
+						null,
+						'foo',
+						'foo2',
+						'ref',
+						'grandchild2'
+					);
 					IncDom.elementClose(TestChildComponent);
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			component = new TestComponent();
 
-			var child = component.components.child;
-			var child1 = component.components.grandchild1;
+			let child = component.components.child;
+			let child1 = component.components.grandchild1;
 			assert.ok(child1);
 			assert.strictEqual('foo1', child1.foo);
 			assert.strictEqual(child1.element, child.element.childNodes[0]);
 			assert.ok(!child1.isDisposed());
 			assert.ok(!component.components.foo2);
 
-			var child1Element = child1.element;
+			let child1Element = child1.element;
 			child.index = 1;
 			child.once('stateSynced', function() {
 				assert.ok(!component.components.grandchild1);
 				assert.ok(child1.isDisposed());
 
-				var child2 = component.components.grandchild2;
+				let child2 = component.components.grandchild2;
 				assert.ok(child2);
 				assert.strictEqual('foo2', child2.foo);
 				assert.strictEqual(child2.element, child.element.childNodes[0]);
@@ -2400,7 +2656,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not remove reusable element from disposed component\'s sub components', function(done) {
+		it('should not remove reusable element from disposed component\'s sub components', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					IncDom.elementVoid(ChildComponent, null, null, 'ref', 'child');
@@ -2421,12 +2679,11 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				switch: {
-				}
+				switch: {},
 			};
 			component = new TestComponent();
 
-			var child = component.components.child1;
+			let child = component.components.child1;
 			assert.ok(child instanceof TestChildComponent);
 			assert.strictEqual(child.element, component.element.childNodes[0]);
 
@@ -2443,7 +2700,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not dispose new sub component with same ref as unused sub component', function(done) {
+		it('should not dispose new sub component with same ref as unused sub component', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					IncrementalDOM.elementVoid('child');
@@ -2464,16 +2723,15 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				switch: {
-				}
+				switch: {},
 			};
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.ok(child instanceof ChildComponent);
 
 			component.switch = true;
 			component.once('stateSynced', function() {
-				var newChild = component.components.child;
+				let newChild = component.components.child;
 				assert.ok(newChild instanceof TestChildComponent);
 				assert.notStrictEqual(child, newChild);
 				assert.ok(child.isDisposed());
@@ -2483,7 +2741,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should not dispose unused sub component if "skipNextChildrenDisposal" is called', function(done) {
+		it('should not dispose unused sub component if "skipNextChildrenDisposal" is called', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
@@ -2496,11 +2756,11 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			sinon.spy(child, 'render');
 
 			component.foo = 'bar';
@@ -2547,7 +2807,15 @@ describe('IncrementalDomRenderer', function() {
 				core.enableCompatibilityMode();
 				class TestComponent extends Component {
 					render() {
-						IncDom.elementVoid(ChildComponent, null, null, 'key', 'keyChild', 'ref', 'refChild');
+						IncDom.elementVoid(
+							ChildComponent,
+							null,
+							null,
+							'key',
+							'keyChild',
+							'ref',
+							'refChild'
+						);
 					}
 				}
 				TestComponent.RENDERER = IncrementalDomRenderer;
@@ -2559,11 +2827,10 @@ describe('IncrementalDomRenderer', function() {
 			});
 
 			it('should store component references via "key" when renderer is enabled by compatibility mode', function() {
-				class TestRendererClass extends IncrementalDomRenderer.constructor {
-				}
+				class TestRendererClass extends IncrementalDomRenderer.constructor {}
 				const TestRenderer = new TestRendererClass();
 				core.enableCompatibilityMode({
-					renderers: [TestRenderer]
+					renderers: [TestRenderer],
 				});
 
 				class TestComponent extends Component {
@@ -2579,12 +2846,11 @@ describe('IncrementalDomRenderer', function() {
 			});
 
 			it('should store component references via "key" when renderer is enabled by compatibility mode via its name', function() {
-				class TestRendererClass extends IncrementalDomRenderer.constructor {
-				}
+				class TestRendererClass extends IncrementalDomRenderer.constructor {}
 				const TestRenderer = new TestRendererClass();
 				TestRenderer.RENDERER_NAME = 'test';
 				core.enableCompatibilityMode({
-					renderers: ['test']
+					renderers: ['test'],
 				});
 
 				class TestComponent extends Component {
@@ -2600,11 +2866,10 @@ describe('IncrementalDomRenderer', function() {
 			});
 
 			it('should not store component references via "key" when renderer is not enabled by compatibility mode', function() {
-				class TestRendererClass extends IncrementalDomRenderer.constructor {
-				}
+				class TestRendererClass extends IncrementalDomRenderer.constructor {}
 				const TestRenderer = new TestRendererClass();
 				core.enableCompatibilityMode({
-					renderers: [TestRenderer]
+					renderers: [TestRenderer],
 				});
 
 				class TestComponent extends Component {
@@ -2618,40 +2883,45 @@ describe('IncrementalDomRenderer', function() {
 				assert.ok(!component.components.child);
 			});
 
-			describe('Sunset Tests', sunset(function() {
-				it('should not store component references via "key" on compatibility mode after version 3.x', function() {
-					core.enableCompatibilityMode();
-					class TestComponent extends Component {
-						render() {
-							IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+			describe(
+				'Sunset Tests',
+				sunset(function() {
+					it('should not store component references via "key" on compatibility mode after version 3.x', function() {
+						core.enableCompatibilityMode();
+						class TestComponent extends Component {
+							render() {
+								IncDom.elementVoid(ChildComponent, null, null, 'key', 'child');
+							}
 						}
-					}
-					TestComponent.RENDERER = IncrementalDomRenderer;
+						TestComponent.RENDERER = IncrementalDomRenderer;
 
-					component = new TestComponent();
-					assert.ok(!component.components.child);
-				});
-			}));
+						component = new TestComponent();
+						assert.ok(!component.components.child);
+					});
+				})
+			);
 		});
 	});
 
 	describe('Function - shouldUpdate', function() {
-		it('should only rerender after state change if "shouldUpdate" returns true', function(done) {
+		it('should only rerender after state change if "shouldUpdate" returns true', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {}
 
 				shouldUpdate(changes) {
-					return changes.foo && (changes.foo.prevVal !== changes.foo.newVal);
+					return changes.foo && changes.foo.prevVal !== changes.foo.newVal;
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				bar: {
-					value: 'bar'
+					value: 'bar',
 				},
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
@@ -2677,7 +2947,9 @@ describe('IncrementalDomRenderer', function() {
 				IncrementalDOM.skipNode.restore();
 			});
 
-			it('should not rerender child component if its "shouldUpdate" returns false', function(done) {
+			it('should not rerender child component if its "shouldUpdate" returns false', function(
+				done
+			) {
 				class TestChildComponent extends Component {
 					render() {
 						IncDom.elementOpen('span');
@@ -2702,17 +2974,20 @@ describe('IncrementalDomRenderer', function() {
 				TestComponent.RENDERER = IncrementalDomRenderer;
 				TestComponent.STATE = {
 					foo: {
-						value: 'foo'
-					}
+						value: 'foo',
+					},
 				};
 
 				component = new TestComponent();
-				var child = component.components.child;
+				let child = component.components.child;
 
 				component.foo = 'foo2';
 				component.once('stateSynced', function() {
 					assert.strictEqual(1, IncrementalDOM.skipNode.callCount);
-					assert.strictEqual('foo2', component.element.childNodes[0].textContent);
+					assert.strictEqual(
+						'foo2',
+						component.element.childNodes[0].textContent
+					);
 					assert.strictEqual(child.element, component.element.childNodes[1]);
 					assert.strictEqual('SPAN', child.element.tagName);
 					assert.strictEqual('Child', child.element.textContent);
@@ -2721,7 +2996,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should correctly reposition child component even if its "shouldUpdate" returns false', function(done) {
+		it('should correctly reposition child component even if its "shouldUpdate" returns false', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {
 					IncDom.elementOpen('span');
@@ -2750,12 +3027,11 @@ describe('IncrementalDomRenderer', function() {
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
-				wrap: {
-				}
+				wrap: {},
 			};
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			assert.strictEqual(1, component.element.childNodes.length);
 			assert.strictEqual(child.element, component.element.childNodes[0]);
 			assert.strictEqual('SPAN', child.element.tagName);
@@ -2765,14 +3041,19 @@ describe('IncrementalDomRenderer', function() {
 			component.once('stateSynced', function() {
 				assert.strictEqual(1, component.element.childNodes.length);
 				assert.ok(dom.hasClass(component.element.childNodes[0], 'wrapper'));
-				assert.strictEqual(child.element, component.element.childNodes[0].childNodes[0]);
+				assert.strictEqual(
+					child.element,
+					component.element.childNodes[0].childNodes[0]
+				);
 				assert.strictEqual('SPAN', child.element.tagName);
 				assert.strictEqual('Child', child.element.textContent);
 				done();
 			});
 		});
 
-		it('should skip child update without error if it had no element before', function(done) {
+		it('should skip child update without error if it had no element before', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {}
 
@@ -2793,12 +3074,12 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			sinon.spy(child, 'render');
 
 			component.foo = 'foo2';
@@ -2813,7 +3094,9 @@ describe('IncrementalDomRenderer', function() {
 	});
 
 	describe('Function - willUpdate', function() {
-		it('should run "willUpdate" lifecycle method when the component is about to render', function(done) {
+		it('should run "willUpdate" lifecycle method when the component is about to render', function(
+			done
+		) {
 			class TestComponent extends Component {
 				render() {}
 			}
@@ -2821,8 +3104,8 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
@@ -2836,8 +3119,8 @@ describe('IncrementalDomRenderer', function() {
 						foo: {
 							key: 'foo',
 							newVal: 'foo2',
-							prevVal: 'foo'
-						}
+							prevVal: 'foo',
+						},
 					});
 
 					done();
@@ -2845,8 +3128,9 @@ describe('IncrementalDomRenderer', function() {
 			});
 		});
 
-		it('should run "willUpdate" lifecycle method of nested component when it is about to render', function(done) {
-			const listener = sinon.stub();
+		it('should run "willUpdate" lifecycle method of nested component when it is about to render', function(
+			done
+		) {
 			class TestChildComponent extends Component {
 				render() {}
 			}
@@ -2854,22 +3138,30 @@ describe('IncrementalDomRenderer', function() {
 			TestChildComponent.RENDERER = IncrementalDomRenderer;
 			TestChildComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			class TestComponent extends Component {
 				render() {
 					IncDom.elementOpen('div');
-					IncDom.elementVoid(TestChildComponent, null, null, 'ref', 'child', 'foo', this.foo);
+					IncDom.elementVoid(
+						TestChildComponent,
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo
+					);
 					IncDom.elementClose('div');
 				}
 			}
 			TestComponent.RENDERER = IncrementalDomRenderer;
 			TestComponent.STATE = {
 				foo: {
-					value: 'foo'
-				}
+					value: 'foo',
+				},
 			};
 
 			component = new TestComponent();
@@ -2884,7 +3176,7 @@ describe('IncrementalDomRenderer', function() {
 					assert.deepEqual(child.willUpdate.args[0][0].foo, {
 						key: 'foo',
 						newVal: 'foo2',
-						prevVal: 'foo'
+						prevVal: 'foo',
 					});
 
 					done();
@@ -2895,7 +3187,7 @@ describe('IncrementalDomRenderer', function() {
 
 	describe('Componentless function tags', function() {
 		it('should render componentless function passed as incremental dom tag', function() {
-			var TestFunction = ({foo}) => {
+			let TestFunction = ({foo}) => {
 				IncDom.elementOpen('span');
 				IncDom.text(foo);
 				return IncDom.elementClose('span');
@@ -2918,7 +3210,7 @@ describe('IncrementalDomRenderer', function() {
 		});
 
 		it('should render children from componentless function passed as incremental dom tag', function() {
-			var TestFunction = ({children}) => {
+			let TestFunction = ({children}) => {
 				IncDom.elementOpen('span');
 				children.forEach(IncrementalDomRenderer.renderChild);
 				return IncDom.elementClose('span');
@@ -2939,35 +3231,40 @@ describe('IncrementalDomRenderer', function() {
 			assert.strictEqual(0, Object.keys(component.components).length);
 			assert.strictEqual(1, component.element.childNodes.length);
 			assert.strictEqual('SPAN', component.element.childNodes[0].tagName);
-			assert.strictEqual('children', component.element.childNodes[0].textContent);
+			assert.strictEqual(
+				'children',
+				component.element.childNodes[0].textContent
+			);
 		});
 
 		it('should render componentless function via "IncrementalDomRenderer.render"', function() {
-			var fn = props => {
+			let fn = props => {
 				IncDom.elementOpen('span', null, null, 'foo', props.foo);
 				IncDom.text('bar');
 				IncDom.elementClose('span');
 			};
 
-			var container = document.createElement('span');
+			let container = document.createElement('span');
 			IncrementalDomRenderer.render(
 				fn,
 				{
-					foo: 'fooValue'
+					foo: 'fooValue',
 				},
 				container
 			);
 
 			assert.strictEqual(1, container.childNodes.length);
-			assert.strictEqual('fooValue', container.childNodes[0].getAttribute('foo'));
+			assert.strictEqual(
+				'fooValue',
+				container.childNodes[0].getAttribute('foo')
+			);
 			assert.strictEqual('bar', container.childNodes[0].textContent);
 		});
 	});
 
 	describe('Dispose', function() {
 		it('should remove component with ref from owner', function() {
-			class Child extends Component {
-			}
+			class Child extends Component {}
 			Child.RENDERER = IncrementalDomRenderer;
 
 			class TestComponent extends Component {
@@ -2978,7 +3275,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 
 			child.dispose();
 			assert.ok(child.isDisposed());
@@ -2986,8 +3283,7 @@ describe('IncrementalDomRenderer', function() {
 		});
 
 		it('should not remove different component with same ref from owner', function() {
-			class Child extends Component {
-			}
+			class Child extends Component {}
 			Child.RENDERER = IncrementalDomRenderer;
 
 			class TestComponent extends Component {
@@ -2998,7 +3294,7 @@ describe('IncrementalDomRenderer', function() {
 			TestComponent.RENDERER = IncrementalDomRenderer;
 
 			component = new TestComponent();
-			var child = component.components.child;
+			let child = component.components.child;
 			component.components.child = new Child();
 
 			child.dispose();
@@ -3011,12 +3307,16 @@ describe('IncrementalDomRenderer', function() {
 	describe('IncrementalDomRenderer.isIncDomNode', function() {
 		it('should check if given data is an incremental dom node', function() {
 			assert.ok(!IncrementalDomRenderer.isIncDomNode({}));
-			assert.ok(!IncrementalDomRenderer.isIncDomNode({
-					tag: 'span'
-				}));
-			assert.ok(IncrementalDomRenderer.isIncDomNode({
-				[CHILD_OWNER]: true
-			}));
+			assert.ok(
+				!IncrementalDomRenderer.isIncDomNode({
+					tag: 'span',
+				})
+			);
+			assert.ok(
+				IncrementalDomRenderer.isIncDomNode({
+					[CHILD_OWNER]: true,
+				})
+			);
 		});
 	});
 

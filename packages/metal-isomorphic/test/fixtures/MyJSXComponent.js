@@ -10,8 +10,8 @@ class MyJSXComponent extends JSXComponent {
 
 MyJSXComponent.PROPS = {
 	message: {
-		value: ''
-	}
+		value: '',
+	},
 };
 
 export default MyJSXComponent;

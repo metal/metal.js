@@ -1,12 +1,10 @@
 'use strict';
 
-import { getFunctionName, isDefAndNotNull } from 'metal';
+import {getFunctionName, isDefAndNotNull} from 'metal';
 
-const ERROR_ARRAY_OF_TYPE = 'Expected an array of single type.';
 const ERROR_OBJECT_OF_TYPE = 'Expected object of one type.';
 const ERROR_ONE_OF = 'Expected one of the following values:';
 const ERROR_ONE_OF_TYPE = 'Expected one of given types.';
-const ERROR_SHAPE_OF = 'Expected object with a specific shape.';
 
 /**
  * Provides access to various type validators that will return an
@@ -30,6 +28,9 @@ const validators = {
 	 * @return {!function()}
 	 */
 	arrayOf: function(validator) {
+		if (isInvalid(validators.func(validator))) {
+			throwConfigError('function', validator, 'arrayOf');
+		}
 		return maybe((value, name, context) => {
 			const result = validators.array(value, name, context);
 			if (isInvalid(result)) {
@@ -61,6 +62,9 @@ const validators = {
 	 * @return {!function()}
 	 */
 	objectOf: function(validator) {
+		if (isInvalid(validators.func(validator))) {
+			throwConfigError('function', validator, 'objectOf');
+		}
 		return maybe((value, name, context) => {
 			for (let key in value) {
 				if (isInvalid(validator(value[key]))) {
@@ -83,10 +87,13 @@ const validators = {
 			if (isInvalid(result)) {
 				return result;
 			}
-			return arrayOfValues.indexOf(value) === -1 ?
-				composeError(
-					composeOneOfErrorMessage(arrayOfValues), name, context
-				) : true;
+			return arrayOfValues.indexOf(value) === -1
+				? composeError(
+					composeOneOfErrorMessage(arrayOfValues),
+					name,
+					context
+					) // eslint-disable-line
+				: true;
 		});
 	},
 
@@ -99,13 +106,20 @@ const validators = {
 	 */
 	oneOfType: function(arrayOfTypeValidators) {
 		return maybe((value, name, context) => {
-			const result = validators.array(arrayOfTypeValidators, name, context);
+			const result = validators.array(
+				arrayOfTypeValidators,
+				name,
+				context
+			); // eslint-disable-line
 			if (isInvalid(result)) {
 				return result;
 			}
 
 			for (let i = 0; i < arrayOfTypeValidators.length; i++) {
-				if (!isInvalid(arrayOfTypeValidators[i](value, name, context))) {
+				// eslint-disable-next-line
+				if (
+					!isInvalid(arrayOfTypeValidators[i](value, name, context))
+				) {
 					return true;
 				}
 			}
@@ -120,27 +134,33 @@ const validators = {
 	 * @return {!function()}
 	 */
 	shapeOf: function(shape) {
+		if (isInvalid(validators.object(shape))) {
+			throwConfigError('object', shape, 'shapeOf');
+		}
 		return maybe((value, name, context) => {
-			const result = validators.object(shape, name, context);
-			if (isInvalid(result)) {
-				return result;
+			const valueResult = validators.object(value, name, context);
+			if (isInvalid(valueResult)) {
+				return valueResult;
 			}
-
 			for (let key in shape) {
-				let validator = shape[key];
-				let required = false;
-				if (validator.config) {
-					required = validator.config.required;
-					validator = validator.config.validator;
-				}
-				if ((required && !isDefAndNotNull(value[key])) ||
-					isInvalid(validator(value[key]))) {
-					return composeError(ERROR_SHAPE_OF, name, context);
+				if (Object.prototype.hasOwnProperty.call(shape, key)) {
+					let validator = shape[key];
+					let required = false;
+					if (validator.config) {
+						required = validator.config.required;
+						validator = validator.config.validator;
+					}
+					if (
+						(required && !isDefAndNotNull(value[key])) ||
+						isInvalid(validator(value[key]))
+					) {
+						return validator(value[key], `${name}.${key}`, context);
+					}
 				}
 			}
 			return true;
 		});
-	}
+	},
 };
 
 /**
@@ -178,10 +198,12 @@ function composeError(error, name, context) {
 	const renderer = context && context.getRenderer && context.getRenderer();
 	const parent = renderer && renderer.getParent && renderer.getParent();
 	const parentName = parent ? getFunctionName(parent.constructor) : null;
-	const location = parentName ? `Check render method of '${parentName}'.` : '';
+	const location = parentName
+		? `Check render method of '${parentName}'.`
+		: '';
 	return new Error(
-		`Warning: Invalid state passed to '${name}'. ` +
-		`${error} Passed to '${compName}'. ${location}`
+		`Invalid state passed to '${name}'.` +
+			` ${error} Passed to '${compName}'. ${location}`
 	);
 }
 
@@ -221,10 +243,26 @@ function isInvalid(result) {
  */
 function maybe(typeValidator) {
 	return (value, name, context) => {
-		return isDefAndNotNull(value) ? typeValidator(value, name, context) : true;
+		return isDefAndNotNull(value)
+			? typeValidator(value, name, context)
+			: true; // eslint-disable-line
 	};
 }
 
+/**
+ * Throws error if validator is invoked with incorrect type.
+ * @param {string} expectedType String representing the expected type.
+ * @param {*} value The value to match the type of.
+ * @param {!string} name Name of the function the validator is intended for.
+ */
+function throwConfigError(expectedType, value, name) {
+	const type = getType(value);
+	throw new Error(
+		`Expected type ${expectedType}, but received type ${type}. passed to ${
+			name
+		}.`
+	);
+}
 
 /**
  * Checks if all the items of the given array pass the given validator.
@@ -237,7 +275,11 @@ function maybe(typeValidator) {
 function validateArrayItems(validator, value, name, context) {
 	for (let i = 0; i < value.length; i++) {
 		if (isInvalid(validator(value[i], name, context))) {
-			return composeError(ERROR_ARRAY_OF_TYPE, name, context);
+			let itemValidatorError = validator(value[i], name, context);
+			let errorMessage = `Validator for ${name}[${i}] says: "${
+				itemValidatorError
+			}"`;
+			return composeError(errorMessage, name, context);
 		}
 	}
 	return true;
@@ -254,7 +296,9 @@ function validateArrayItems(validator, value, name, context) {
 function validateType(expectedType, value, name, context) {
 	const type = getType(value);
 	if (type !== expectedType) {
-		const msg = `Expected type '${expectedType}', but received type '${type}'.`;
+		const msg = `Expected type '${expectedType}', but received type '${
+			type
+		}'.`;
 		return composeError(msg, name, context);
 	}
 	return true;

@@ -1,7 +1,10 @@
 'use strict';
 
 import {isFunction} from 'metal';
-import { applyAttribute, convertListenerNamesToFns } from '../../src/render/attributes';
+import {
+	applyAttribute,
+	convertListenerNamesToFns,
+} from '../../src/render/attributes';
 import dom from 'metal-dom';
 import Component from 'metal-component';
 
@@ -52,13 +55,12 @@ describe('attributes', function() {
 
 	describe('listeners', function() {
 		it('should register the method name inside the listener', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			TestComponent.prototype.handleClick = function() {};
 			component = new TestComponent();
 
 			let config = {
-				'data-onclick': 'handleClick'
+				'data-onclick': 'handleClick',
 			};
 
 			convertListenerNamesToFns(component, config);
@@ -66,8 +68,7 @@ describe('attributes', function() {
 		});
 
 		it('should attach listeners functions passed to "data-on<eventname>" attributes', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			component = new TestComponent();
 
 			const element = document.createElement('div');
@@ -81,8 +82,7 @@ describe('attributes', function() {
 		});
 
 		it('should attach listeners functions passed to "on<EventName>" attributes', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			component = new TestComponent();
 
 			const element = document.createElement('div');
@@ -96,8 +96,7 @@ describe('attributes', function() {
 		});
 
 		it('should not set attribute for listener references on elements', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			component = new TestComponent();
 
 			const element = document.createElement('div');
@@ -119,11 +118,10 @@ describe('attributes', function() {
 			dom.registerCustomEvent('test-event', {
 				delegate: true,
 				handler: (callback, event) => callback(event),
-				originalEvent: 'click'
+				originalEvent: 'click',
 			});
 
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			component = new TestComponent();
 
 			const element = document.createElement('div');
@@ -139,11 +137,10 @@ describe('attributes', function() {
 			dom.registerCustomEvent('test-event', {
 				delegate: true,
 				handler: (callback, event) => callback(event),
-				originalEvent: 'click'
+				originalEvent: 'click',
 			});
 
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			component = new TestComponent();
 
 			const element = document.createElement('div');
@@ -156,8 +153,7 @@ describe('attributes', function() {
 		});
 
 		it('should remove unused inline listeners when attributes are removed', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			component = new TestComponent();
 
 			const element = document.createElement('div');
@@ -171,8 +167,7 @@ describe('attributes', function() {
 		});
 
 		it('should replace inline listeners when attributes values change', function() {
-			class TestComponent extends Component {
-			}
+			class TestComponent extends Component {}
 			TestComponent.prototype.handleClick = sinon.stub();
 			TestComponent.prototype.handleClick2 = sinon.stub();
 			component = new TestComponent();

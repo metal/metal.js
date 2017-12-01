@@ -1,5 +1,5 @@
-import State, { mergeState } from 'metal-state';
-import { getStaticProperty, isObject } from 'metal';
+import State, {mergeState} from 'metal-state';
+import {getStaticProperty, isObject} from 'metal';
 
 /**
  * Register a custom element for a given Metal component.
@@ -74,15 +74,19 @@ export function defineWebComponent(tagName, Ctor) {
 
 			if (useShadowDOM) {
 				element = this.attachShadow({
-					mode: 'open'
+					mode: 'open',
 				});
 			}
 
-			let opts = {};
+			const opts = {};
 			for (let i = 0, l = observedAttributes.length; i < l; i++) {
-				opts[observedAttributes[i]] = this.deserializeValue_(
+				const deserializedValue = this.deserializeValue_(
 					this.getAttribute(observedAttributes[i])
 				);
+
+				if (deserializedValue) {
+					opts[observedAttributes[i]] = deserializedValue;
+				}
 			}
 			this.component = new Ctor(opts, element);
 			this.componentHasProps = hasProps;
@@ -96,6 +100,7 @@ export function defineWebComponent(tagName, Ctor) {
 		 *
 		 * @memberof CustomElement
 		 * @param {?} value attribute value that should be parsed.
+		 * @return {Object}
 		 */
 		deserializeValue_: function(value) {
 			let retVal;
@@ -128,13 +133,13 @@ export function defineWebComponent(tagName, Ctor) {
 		emit: function(...data) {
 			const eventData = data.pop();
 			const event = new CustomEvent(eventData.type, {
-				detail: data
+				detail: data,
 			});
 			this.dispatchEvent(event);
-		}
+		},
 	});
 
 	window.customElements.define(tagName, CustomElement);
-};
+}
 
 export default defineWebComponent;

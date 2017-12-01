@@ -66,7 +66,7 @@ const originalFns = {
 	elementOpenEnd: IncrementalDOM.elementOpenEnd,
 	elementOpenStart: IncrementalDOM.elementOpenStart,
 	elementVoid: IncrementalDOM.elementVoid,
-	text: IncrementalDOM.text
+	text: IncrementalDOM.text,
 };
 
 const fnStack = [];
@@ -96,7 +96,7 @@ function getStack() {
 
 function buildHandleCall(name) {
 	const data = {
-		name
+		name,
 	};
 	const fn = handleCall.bind(data);
 	return fn;
@@ -106,7 +106,7 @@ function handleCall() {
 	const name = this.name; // eslint-disable-line
 	const stack = getStack();
 	const fn = (stack && stack[name]) || originalFns[name];
-	return fn.apply(null, arguments);
+	return fn(...arguments);
 }
 
 IncrementalDOM.attr = buildHandleCall('attr');

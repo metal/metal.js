@@ -1,4 +1,4 @@
-/*!
+/* !
  * Polyfill from Google's Closure Library.
  * Copyright 2013 The Closure Library Authors. All Rights Reserved.
  */
@@ -6,7 +6,6 @@
 'use strict';
 
 const async = {};
-
 
 /**
  * Throw an item without interrupting the current execution context.  For
@@ -22,30 +21,26 @@ async.throwException = function(exception) {
 	});
 };
 
-
 /**
  * Fires the provided callback just before the current callstack unwinds, or as
  * soon as possible after the current JS execution context.
  * @param {function(this:THIS)} callback
- * @param {THIS=} opt_context Object to use as the "this value" when calling
+ * @param {THIS=} context Object to use as the "this value" when calling
  *     the provided function.
  * @template THIS
  */
-async.run = function(callback, opt_context) {
+async.run = function(callback, context) {
 	if (!async.run.workQueueScheduled_) {
 		// Nothing is currently scheduled, schedule it now.
 		async.nextTick(async.run.processWorkQueue);
 		async.run.workQueueScheduled_ = true;
 	}
 
-	async.run.workQueue_.push(
-		new async.run.WorkItem_(callback, opt_context));
+	async.run.workQueue_.push(new async.run.WorkItem_(callback, context));
 };
-
 
 /** @private {boolean} */
 async.run.workQueueScheduled_ = false;
-
 
 /** @private {!Array.<!async.run.WorkItem_>} */
 async.run.workQueue_ = [];
@@ -75,7 +70,6 @@ async.run.processWorkQueue = function() {
 	async.run.workQueueScheduled_ = false;
 };
 
-
 /**
  * @constructor
  * @final
@@ -92,20 +86,19 @@ async.run.WorkItem_ = function(fn, scope) {
 	this.scope = scope;
 };
 
-
 /**
  * Fires the provided callbacks as soon as possible after the current JS
  * execution context. setTimeout(…, 0) always takes at least 5ms for legacy
  * reasons.
  * @param {function(this:SCOPE)} callback Callback function to fire as soon as
  *     possible.
- * @param {SCOPE=} opt_context Object in whose scope to call the listener.
+ * @param {SCOPE=} context Object in whose scope to call the listener.
  * @template SCOPE
  */
-async.nextTick = function(callback, opt_context) {
+async.nextTick = function(callback, context) {
 	let cb = callback;
-	if (opt_context) {
-		cb = callback.bind(opt_context);
+	if (context) {
+		cb = callback.bind(context);
 	}
 	cb = async.nextTick.wrapCallback_(cb);
 	// Introduced and currently only supported by IE10.
@@ -119,11 +112,11 @@ async.nextTick = function(callback, opt_context) {
 	}
 	// Look for and cache the custom fallback version of setImmediate.
 	if (!async.nextTick.setImmediate_) {
+		// eslint-disable-next-line
 		async.nextTick.setImmediate_ = async.nextTick.getSetImmediateEmulator_();
 	}
 	async.nextTick.setImmediate_(cb);
 };
-
 
 /**
  * Cache for the setImmediate implementation.
@@ -131,7 +124,6 @@ async.nextTick = function(callback, opt_context) {
  * @private
  */
 async.nextTick.setImmediate_ = null;
-
 
 /**
  * Determines the best possible implementation to run a function as soon as
@@ -156,8 +148,12 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	// an iframe based polyfill in browsers that have postMessage and
 	// document.addEventListener. The latter excludes IE8 because it has a
 	// synchronous postMessage implementation.
-	if (typeof Channel === 'undefined' && typeof window !== 'undefined' &&
-		window.postMessage && window.addEventListener) {
+	if (
+		typeof Channel === 'undefined' &&
+		typeof window !== 'undefined' &&
+		window.postMessage &&
+		window.addEventListener
+	) {
 		/** @constructor */
 		Channel = function() {
 			// Make an empty, invisible iframe.
@@ -185,7 +181,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 			this.port2 = {
 				postMessage: function() {
 					win.postMessage(message, origin);
-				}
+				},
 			};
 		};
 	}
@@ -202,7 +198,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 		};
 		return function(cb) {
 			tail.next = {
-				cb: cb
+				cb: cb,
 			};
 			tail = tail.next;
 			channel.port2.postMessage(0);
@@ -210,8 +206,10 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	}
 	// Implementation for IE6-8: Script elements fire an asynchronous
 	// onreadystatechange event when inserted into the DOM.
-	if (typeof document !== 'undefined' && 'onreadystatechange' in
-		document.createElement('script')) {
+	if (
+		typeof document !== 'undefined' &&
+		'onreadystatechange' in document.createElement('script')
+	) {
 		return function(cb) {
 			let script = document.createElement('script');
 			script.onreadystatechange = function() {
@@ -232,7 +230,6 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 	};
 };
 
-
 /**
  * Helper function that is overrided to protect callbacks with entry point
  * monitor if the application monitors entry points.
@@ -240,8 +237,8 @@ async.nextTick.getSetImmediateEmulator_ = function() {
  * @return {function()} The wrapped callback.
  * @private
  */
-async.nextTick.wrapCallback_ = function(opt_returnValue) {
-	return opt_returnValue;
+async.nextTick.wrapCallback_ = function(callback) {
+	return callback;
 };
 
 export default async;

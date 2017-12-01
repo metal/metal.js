@@ -1,10 +1,10 @@
 'use strict';
 
-import { isServerSide } from 'metal';
-import { delegate } from 'metal-dom';
-import { getComponentFn } from 'metal-component';
-import { getOriginalFn } from '../incremental-dom-aop';
-import { isBoolean, isDefAndNotNull, isString } from 'metal';
+import {isServerSide} from 'metal';
+import {delegate} from 'metal-dom';
+import {getComponentFn} from 'metal-component';
+import {getOriginalFn} from '../incremental-dom-aop';
+import {isBoolean, isDefAndNotNull, isString} from 'metal';
 
 const HANDLE_SUFFIX = '__handle__';
 const LISTENER_REGEX = /^(?:on([A-Z].+))|(?:data-on(.+))$/;

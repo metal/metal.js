@@ -1,6 +1,5 @@
 'use strict';
 
-import { object } from 'metal';
 import validators from './validators';
 
 /**
@@ -28,9 +27,9 @@ import validators from './validators';
  */
 const Config = {
 	/**
-	* An object that contains a validator function.
-	* @typedef {!Object} ConfigWithValidator
-	*/
+	 * An object that contains a validator function.
+	 * @typedef {!Object} ConfigWithValidator
+	 */
 
 	/**
 	 * Function that creates `State` object with an `any` validator.
@@ -127,12 +126,12 @@ const Config = {
 
 	/**
 	 * Adds the `internal` flag to the `State` configuration.
-	 * @param {boolean} required Flag to set "internal" to. True by default.
+	 * @param {boolean} internal Flag to set "internal" to. True by default.
 	 * @return {!Object} `State` configuration object.
 	 */
 	internal(internal = true) {
 		return mergeConfig(this, {
-			internal
+			internal,
 		});
 	},
 
@@ -143,7 +142,7 @@ const Config = {
 	 */
 	required(required = true) {
 		return mergeConfig(this, {
-			required
+			required,
 		});
 	},
 
@@ -154,7 +153,7 @@ const Config = {
 	 */
 	setter(setter) {
 		return mergeConfig(this, {
-			setter
+			setter,
 		});
 	},
 
@@ -165,7 +164,7 @@ const Config = {
 	 */
 	validator(validator) {
 		return mergeConfig(this, {
-			validator
+			validator,
 		});
 	},
 
@@ -176,7 +175,7 @@ const Config = {
 	 */
 	value(value) {
 		return mergeConfig(this, {
-			value
+			value,
 		});
 	},
 
@@ -187,7 +186,7 @@ const Config = {
 	 */
 	valueFn(valueFn) {
 		return mergeConfig(this, {
-			valueFn
+			valueFn,
 		});
 	},
 
@@ -198,9 +197,9 @@ const Config = {
 	 */
 	writeOnce(writeOnce = false) {
 		return mergeConfig(this, {
-			writeOnce
+			writeOnce,
 		});
-	}
+	},
 };
 
 /**
@@ -213,13 +212,14 @@ function destructShapeOfConfigs(shape) {
 
 	const retShape = {};
 
-	keys.forEach(
-		key => {
-			const value = shape[key];
+	keys.forEach(key => {
+		const value = shape[key];
 
-			retShape[key] = value.config && value.config.validator ? value.config.validator : destructShapeOfConfigs(value);
-		}
-	);
+		retShape[key] =
+			value.config && value.config.validator
+				? value.config.validator
+				: destructShapeOfConfigs(value);
+	});
 
 	return retShape;
 }
@@ -232,19 +232,20 @@ function destructShapeOfConfigs(shape) {
  */
 function mergeConfig(context, config) {
 	let obj = context;
-	if (obj === Config) {
-		obj = Object.create(Config);
-		obj.config = {};
-	}
-	object.mixin(obj.config, config);
+	const objConfig = obj.config || {};
+
+	obj = Object.create(Config);
+	obj.config = {};
+
+	Object.assign(obj.config, objConfig, config);
 	return obj;
 }
 
 /**
-* Calls validators with provided argument.
-* @param {string} name The name of the validator.
-* @param {!function()}
-*/
+ * Calls validators with provided argument.
+ * @param {string} name The name of the validator.
+ * @return {function()}
+ */
 function setExplicitValueValidators(name) {
 	return function(arg) {
 		return this.validator(validators[name](arg));
@@ -252,10 +253,10 @@ function setExplicitValueValidators(name) {
 }
 
 /**
-* Calls validators with a single nested config.
-* @param {string} name The name of the validator.
-* @return {!function()}
-*/
+ * Calls validators with a single nested config.
+ * @param {string} name The name of the validator.
+ * @return {!function()}
+ */
 function setNestedValidators(name) {
 	return function(arg) {
 		return this.validator(validators[name](arg.config.validator));
@@ -263,10 +264,10 @@ function setNestedValidators(name) {
 }
 
 /**
-* Adds primitive type validators to the config object.
-* @param {string} name The name of the validator.
-* @return {!function()}
-*/
+ * Adds primitive type validators to the config object.
+ * @param {string} name The name of the validator.
+ * @return {!function()}
+ */
 function setPrimitiveValidators(name) {
 	return function() {
 		return this.validator(validators[name]);

@@ -1,15 +1,20 @@
 'use strict';
 
 import dom from 'metal-dom';
-import { sunset } from '../../../../test-utils';
-import { captureChildren, getOwner, renderChildTree, CHILD_OWNER } from '../../src/children/children';
+import {sunset} from '../../../../test-utils';
+import {
+	captureChildren,
+	getOwner,
+	renderChildTree,
+	CHILD_OWNER,
+} from '../../src/children/children';
 
 describe('children', function() {
 	it('should capture children calls to incremental dom', function(done) {
 		captureChildren({}, function(tree) {
 			assert.strictEqual(1, tree.props.children.length);
 
-			var node = tree.props.children[0];
+			let node = tree.props.children[0];
 			assert.ok(!node.text);
 			assert.strictEqual('span', node.tag);
 			assert.ok(node.props);
@@ -32,10 +37,7 @@ describe('children', function() {
 	it('should return the captured tree\'s given owner object', function(done) {
 		const owner = {};
 		captureChildren(owner, function(tree) {
-			assert.strictEqual(
-				owner,
-				getOwner(tree.props.children[0])
-			);
+			assert.strictEqual(owner, getOwner(tree.props.children[0]));
 			done();
 		});
 
@@ -43,22 +45,21 @@ describe('children', function() {
 		IncrementalDOM.elementClose('div');
 	});
 
-	it('should store args for text nodes when they contain more than just the text', function(done) {
+	it('should store args for text nodes when they contain more than just the text', function(
+		done
+	) {
 		captureChildren({}, function(tree) {
-			var node = tree.props.children[0];
+			let node = tree.props.children[0];
 			assert.strictEqual('No args', node.text);
 			assert.ok(!node.args);
 
 			node = tree.props.children[1];
 			assert.strictEqual('With args', node.text);
-			assert.deepEqual([
-				node.text,
-				formatFn
-			], node.args);
+			assert.deepEqual([node.text, formatFn], node.args);
 			done();
 		});
 
-		var formatFn = val => val;
+		const formatFn = val => val;
 		IncrementalDOM.text('No args');
 		IncrementalDOM.text('With args', formatFn);
 		IncrementalDOM.elementClose('div');
@@ -71,7 +72,7 @@ describe('children', function() {
 			origElementOpen = IncrementalDOM.elementOpen;
 			IncrementalDOM.elementOpen = function(...args) {
 				args[0] = args[0].tag;
-				origElementOpen.apply(null, args);
+				origElementOpen(...args);
 			};
 		});
 
@@ -80,7 +81,7 @@ describe('children', function() {
 		});
 
 		it('should render captured children via incremental dom', function() {
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 
 			IncrementalDOM.patch(element, () => {
 				renderChildTree({
@@ -89,19 +90,19 @@ describe('children', function() {
 						children: [
 							{
 								args: ['Hello World'],
-								text: 'Hello World'
-							}
+								text: 'Hello World',
+							},
 						],
 						class: 'test',
 						foo: 'bar',
-						key: 'key'
-					}
+						key: 'key',
+					},
 				});
 			});
 
 			assert.strictEqual(1, element.childNodes.length);
 
-			var spanElement = element.childNodes[0];
+			let spanElement = element.childNodes[0];
 			assert.strictEqual('SPAN', spanElement.tagName);
 			assert.ok(dom.hasClass(spanElement, 'test'));
 			assert.strictEqual('bar', spanElement.getAttribute('foo'));
@@ -110,7 +111,7 @@ describe('children', function() {
 		});
 
 		it('should skip rendering children node when skipNode function returns true', function() {
-			var element = document.createElement('div');
+			let element = document.createElement('div');
 
 			function skipNode(node) {
 				if (node.props && node.props.id === 'skip') {
@@ -118,52 +119,60 @@ describe('children', function() {
 				}
 			}
 			IncrementalDOM.patch(element, () => {
-				renderChildTree({
-					tag: 'span',
-					props: {
-						children: [
-							{
-								tag: 'span',
-								props: {
-									id: 'beforeSkip'
-								}
-							},
-							{
-								tag: 'span',
-								props: {
-									id: 'skip'
-								}
-							},
-							{
-								tag: 'span',
-								props: {
-									id: 'afterSkip'
-								}
-							}
-						],
-						id: 'parent'
-					}
-				}, skipNode);
+				renderChildTree(
+					{
+						tag: 'span',
+						props: {
+							children: [
+								{
+									tag: 'span',
+									props: {
+										id: 'beforeSkip',
+									},
+								},
+								{
+									tag: 'span',
+									props: {
+										id: 'skip',
+									},
+								},
+								{
+									tag: 'span',
+									props: {
+										id: 'afterSkip',
+									},
+								},
+							],
+							id: 'parent',
+						},
+					},
+					skipNode
+				);
 			});
 
 			assert.strictEqual(1, element.childNodes.length);
 
-			var child = element.childNodes[0];
+			let child = element.childNodes[0];
 			assert.strictEqual(2, child.childNodes.length);
 			assert.strictEqual('beforeSkip', child.childNodes[0].id);
 			assert.strictEqual('afterSkip', child.childNodes[1].id);
 		});
 
-		it('should render text nodes that have been changed after capture', function(done) {
+		it('should render text nodes that have been changed after capture', function(
+			done
+		) {
 			captureChildren({}, function(tree) {
-				var element = document.createElement('div');
+				let element = document.createElement('div');
 				tree.props.children[0].text = 'New Text';
 				IncrementalDOM.patch(element, () => {
 					renderChildTree(tree.props.children[0]);
 				});
 
 				assert.strictEqual(1, element.childNodes.length);
-				assert.strictEqual('New Text Formatted', element.childNodes[0].textContent);
+				assert.strictEqual(
+					'New Text Formatted',
+					element.childNodes[0].textContent
+				);
 				done();
 			});
 
@@ -172,12 +181,14 @@ describe('children', function() {
 		});
 	});
 
-	it('should keep original renderer for children that have been recaptured by another1', function(done) {
-		var renderer1 = {};
-		var renderer2 = {};
+	it('should keep original renderer for children that have been recaptured by another1', function(
+		done
+	) {
+		let renderer1 = {};
+		let renderer2 = {};
 
 		captureChildren(renderer2, function(tree) {
-			var element = tree.props.children[0];
+			let element = tree.props.children[0];
 			assert.strictEqual('div', element.tag);
 			assert.strictEqual(renderer2, getOwner(element));
 			assert.strictEqual(1, element.props.children.length);
@@ -200,28 +211,33 @@ describe('children', function() {
 				children: [
 					{
 						text: 'Hello World',
-						[CHILD_OWNER]: renderer1
+						[CHILD_OWNER]: renderer1,
 					},
-				]
+				],
 			},
-			[CHILD_OWNER]: renderer1
+			[CHILD_OWNER]: renderer1,
 		});
 		IncrementalDOM.elementClose('div');
 		IncrementalDOM.elementClose('div');
 	});
 
-	describe('Sunset Tests', sunset(function() {
-		it('should not have "config" object inside each child after version 3.x', function(done) {
-			captureChildren({}, function(tree) {
-				assert.strictEqual(1, tree.props.children.length);
+	describe(
+		'Sunset Tests',
+		sunset(function() {
+			it('should not have "config" object inside each child after version 3.x', function(
+				done
+			) {
+				captureChildren({}, function(tree) {
+					assert.strictEqual(1, tree.props.children.length);
 
-				var node = tree.props.children[0];
-				assert.ok(!node.config, 'Remove "config" for version 3.x');
-				done();
+					let node = tree.props.children[0];
+					assert.ok(!node.config, 'Remove "config" for version 3.x');
+					done();
+				});
+
+				IncrementalDOM.elementVoid('span', null, null, 'foo', 'bar');
+				IncrementalDOM.elementClose('div');
 			});
-
-			IncrementalDOM.elementVoid('span', null, null, 'foo', 'bar');
-			IncrementalDOM.elementClose('div');
-		});
-	}));
+		})
+	);
 });

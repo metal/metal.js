@@ -1,8 +1,8 @@
 'use strict';
 
-import { buildCallFromConfig, buildConfigFromCall } from '../callArgs';
-import { isDef } from 'metal';
-import { startInterception, stopInterception } from '../incremental-dom-aop';
+import {buildCallFromConfig, buildConfigFromCall} from '../callArgs';
+import {isDef} from 'metal';
+import {startInterception, stopInterception} from '../incremental-dom-aop';
 
 /**
  * Property identifying a specific object as a Metal.js child node, and
@@ -24,8 +24,8 @@ export function captureChildren(component, callback, data) {
 	callbackData_ = data;
 	tree_ = {
 		props: {
-			children: []
-		}
+			children: [],
+		},
 	};
 	tree_.config = tree_.props;
 	currentParent_ = tree_;
@@ -33,7 +33,7 @@ export function captureChildren(component, callback, data) {
 	startInterception({
 		elementClose: handleInterceptedCloseCall_,
 		elementOpen: handleInterceptedOpenCall_,
-		text: handleInterceptedTextCall_
+		text: handleInterceptedTextCall_,
 	});
 }
 
@@ -57,19 +57,19 @@ export function getOwner(node) {
 
 /**
  * Renders a children tree through incremental dom.
- * @param {!{args: Array, children: !Array, isText: ?boolean}}
- * @param {function()=} opt_skipNode Optional function that is called for
+ * @param {!{args: Array, children: !Array, isText: ?boolean}} tree
+ * @param {function()=} skipNode Optional function that is called for
  *     each node to be rendered. If it returns true, the node will be skipped.
  * @protected
  */
-export function renderChildTree(tree, opt_skipNode) {
+export function renderChildTree(tree, skipNode) {
 	if (isCapturing_) {
 		// If capturing, just add the node directly to the captured tree.
 		addChildToTree(tree);
 		return;
 	}
 
-	if (opt_skipNode && opt_skipNode.call(null, tree)) {
+	if (skipNode && skipNode.call(null, tree)) {
 		return;
 	}
 
@@ -81,12 +81,12 @@ export function renderChildTree(tree, opt_skipNode) {
 		let args = buildCallFromConfig(tree.tag, tree.props);
 		args[0] = {
 			tag: args[0],
-			owner: getOwner(tree)
+			owner: getOwner(tree),
 		};
 		IncrementalDOM.elementOpen.apply(null, args);
 		if (tree.props.children) {
 			for (let i = 0; i < tree.props.children.length; i++) {
-				renderChildTree(tree.props.children[i], opt_skipNode);
+				renderChildTree(tree.props.children[i], skipNode);
 			}
 		}
 		IncrementalDOM.elementClose(tree.tag);
@@ -103,17 +103,18 @@ let tree_;
 /**
  * Adds a child element to the tree.
  * @param {!Array} args The arguments passed to the incremental dom call.
- * @param {boolean=} opt_isText Optional flag indicating if the child is a
+ * @param {boolean=} isText Optional flag indicating if the child is a
  *     text element.
  * @protected
+ * @return {Object}
  */
-function addChildCallToTree_(args, opt_isText) {
+function addChildCallToTree_(args, isText = false) {
 	const child = {
 		parent: currentParent_,
-		[CHILD_OWNER]: owner_
+		[CHILD_OWNER]: owner_,
 	};
 
-	if (opt_isText) {
+	if (isText) {
 		child.text = args[0];
 		if (args.length > 1) {
 			child.args = args;
@@ -137,6 +138,7 @@ function addChildToTree(child) {
  * Handles an intercepted call to the `elementClose` function from incremental
  * dom.
  * @protected
+ * @return {Element | boolean}
  */
 function handleInterceptedCloseCall_() {
 	if (currentParent_ === tree_) {

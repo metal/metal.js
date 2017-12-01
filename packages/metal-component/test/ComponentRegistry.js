@@ -3,7 +3,7 @@
 import ComponentRegistry from '../src/ComponentRegistry';
 
 describe('ComponentRegistry', function() {
-	var originalConsoleFn = console.error;
+	let originalConsoleFn = console.error;
 
 	beforeEach(function() {
 		console.error = sinon.stub();
@@ -23,52 +23,60 @@ describe('ComponentRegistry', function() {
 	});
 
 	it('should return constructor of registered components', function() {
-		class MyComponent1 {
-		}
-		class MyComponent2 {
-		}
+		class MyComponent1 {}
+		class MyComponent2 {}
 
 		ComponentRegistry.register(MyComponent1, 'MyComponent1');
 		ComponentRegistry.register(MyComponent2, 'MyComponent2');
 
-		assert.strictEqual(MyComponent1, ComponentRegistry.getConstructor('MyComponent1'));
-		assert.strictEqual(MyComponent2, ComponentRegistry.getConstructor('MyComponent2'));
+		assert.strictEqual(
+			MyComponent1,
+			ComponentRegistry.getConstructor('MyComponent1')
+		);
+		assert.strictEqual(
+			MyComponent2,
+			ComponentRegistry.getConstructor('MyComponent2')
+		);
 	});
 
 	it('should set NAME static property of registered components', function() {
-		class MyComponent {
-		}
+		class MyComponent {}
 		ComponentRegistry.register(MyComponent, 'MyName');
 		assert.strictEqual('MyName', MyComponent.NAME);
 	});
 
 	it('should use NAME static property if no name is passed to ComponentRegistry.register', function() {
-		class MyComponent {
-		}
+		class MyComponent {}
 		MyComponent.NAME = 'StaticName';
 		ComponentRegistry.register(MyComponent);
 
-		assert.strictEqual(MyComponent, ComponentRegistry.getConstructor('StaticName'));
+		assert.strictEqual(
+			MyComponent,
+			ComponentRegistry.getConstructor('StaticName')
+		);
 	});
 
 	it('should use function name if no name is passed to ComponentRegistry.register', function() {
-		class MyComponent {
-		}
+		class MyComponent {}
 		ComponentRegistry.register(MyComponent);
 
 		assert.strictEqual('MyComponent', MyComponent.NAME);
-		assert.strictEqual(MyComponent, ComponentRegistry.getConstructor('MyComponent'));
+		assert.strictEqual(
+			MyComponent,
+			ComponentRegistry.getConstructor('MyComponent')
+		);
 	});
 
 	it('should use function name if NAME is only set on super class and no name is passed to ComponentRegistry.register', function() {
-		class SuperComponent {
-		}
+		class SuperComponent {}
 		SuperComponent.NAME = 'SuperComponent';
-		class MyComponent extends SuperComponent {
-		}
+		class MyComponent extends SuperComponent {}
 		ComponentRegistry.register(MyComponent);
 
 		assert.strictEqual('MyComponent', MyComponent.NAME);
-		assert.strictEqual(MyComponent, ComponentRegistry.getConstructor('MyComponent'));
+		assert.strictEqual(
+			MyComponent,
+			ComponentRegistry.getConstructor('MyComponent')
+		);
 	});
 });

@@ -1,7 +1,7 @@
 'use strict';
 
-import { delegate, on, supportsEvent } from './dom';
-import { EventEmitterProxy } from 'metal-events';
+import {delegate, on, supportsEvent} from './dom';
+import {EventEmitterProxy} from 'metal-events';
 
 /**
  * DomEventEmitterProxy utility. It extends `EventEmitterProxy` to also accept
@@ -23,7 +23,12 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 				const index = event.indexOf(':', 9);
 				const eventName = event.substring(9, index);
 				const selector = event.substring(index + 1);
-				return delegate(this.originEmitter_, eventName, selector, listener);
+				return delegate(
+					this.originEmitter_,
+					eventName,
+					selector,
+					listener
+				); // eslint-disable-line
 			} else {
 				return on(this.originEmitter_, event, listener);
 			}
@@ -46,13 +51,16 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 * Checks if the given event is supported by the origin element.
 	 * @param {string} event
 	 * @protected
+	 * @return {boolean}
 	 */
 	isSupportedDomEvent_(event) {
 		if (!this.originEmitter_ || !this.originEmitter_.addEventListener) {
 			return true;
 		}
-		return (this.isDelegateEvent_(event) && event.indexOf(':', 9) !== -1) ||
-			supportsEvent(this.originEmitter_, event);
+		return (
+			(this.isDelegateEvent_(event) && event.indexOf(':', 9) !== -1) ||
+			supportsEvent(this.originEmitter_, event)
+		);
 	}
 
 	/**
@@ -63,7 +71,9 @@ class DomEventEmitterProxy extends EventEmitterProxy {
 	 * @override
 	 */
 	shouldProxyEvent_(event) {
-		return super.shouldProxyEvent_(event) && this.isSupportedDomEvent_(event);
+		return (
+			super.shouldProxyEvent_(event) && this.isSupportedDomEvent_(event)
+		); // eslint-disable-line
 	}
 }
 

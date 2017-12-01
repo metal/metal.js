@@ -91,27 +91,39 @@ var startTag = /^<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]*(?:\s*=\s*(?:
 	attr = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
 
 // Empty Elements - HTML 5
-var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr");
+var empty = makeMap(
+	'area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr'
+);
 
 // Block Elements - HTML 5
-var block = makeMap("a,address,article,applet,aside,audio,blockquote,button,canvas,center,dd,del,dir,div,dl,dt,fieldset,figcaption,figure,footer,form,frameset,h1,h2,h3,h4,h5,h6,header,hgroup,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,output,p,pre,section,script,table,tbody,td,tfoot,th,thead,tr,ul,video");
+var block = makeMap(
+	'a,address,article,applet,aside,audio,blockquote,button,canvas,center,dd,del,dir,div,dl,dt,fieldset,figcaption,figure,footer,form,frameset,h1,h2,h3,h4,h5,h6,header,hgroup,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,output,p,pre,section,script,table,tbody,td,tfoot,th,thead,tr,ul,video'
+);
 
 // Inline Elements - HTML 5
-var inline = makeMap("abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var");
+var inline = makeMap(
+	'abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var'
+);
 
 // Elements that you can, intentionally, leave open
 // (and which close themselves)
-var closeSelf = makeMap("colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr");
+var closeSelf = makeMap('colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr');
 
 // Attributes that have their values filled in disabled="disabled"
-var fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected");
+var fillAttrs = makeMap(
+	'checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected'
+);
 
 // Special Elements (can contain anything)
-var special = makeMap("script,style");
+var special = makeMap('script,style');
 
-var HTMLParser = function (html, handler) {
-	var index, chars, match, stack = [], last = html;
-	stack.last = function () {
+var HTMLParser = function(html, handler) {
+	var index,
+		chars,
+		match,
+		stack = [],
+		last = html;
+	stack.last = function() {
 		return this[this.length - 1];
 	};
 
@@ -120,10 +132,9 @@ var HTMLParser = function (html, handler) {
 
 		// Make sure we're not in a script or style element
 		if (!stack.last() || !special[stack.last()]) {
-
 			// Comment
-			if (html.indexOf("<!--") == 0) {
-				index = html.indexOf("-->");
+			if (html.indexOf('<!--') == 0) {
+				index = html.indexOf('-->');
 
 				if (index >= 0) {
 					if (handler.comment)
@@ -133,7 +144,7 @@ var HTMLParser = function (html, handler) {
 				}
 
 				// end tag
-			} else if (html.indexOf("</") == 0) {
+			} else if (html.indexOf('</') == 0) {
 				match = html.match(endTag);
 
 				if (match) {
@@ -143,7 +154,7 @@ var HTMLParser = function (html, handler) {
 				}
 
 				// start tag
-			} else if (html.indexOf("<") == 0) {
+			} else if (html.indexOf('<') == 0) {
 				match = html.match(startTag);
 
 				if (match) {
@@ -154,29 +165,31 @@ var HTMLParser = function (html, handler) {
 			}
 
 			if (chars) {
-				index = html.indexOf("<");
+				index = html.indexOf('<');
 
 				var text = index < 0 ? html : html.substring(0, index);
-				html = index < 0 ? "" : html.substring(index);
+				html = index < 0 ? '' : html.substring(index);
 
-				if (handler.chars)
-					handler.chars(text);
+				if (handler.chars) handler.chars(text);
 			}
-
 		} else {
-			html = html.replace(new RegExp("([\\s\\S]*?)<\/" + stack.last() + "[^>]*>"), function (all, text) {
-				text = text.replace(/<!--([\s\S]*?)-->|<!\[CDATA\[([\s\S]*?)]]>/g, "$1$2");
-				if (handler.chars)
-					handler.chars(text);
+			html = html.replace(
+				new RegExp('([\\s\\S]*?)</' + stack.last() + '[^>]*>'),
+				function(all, text) {
+					text = text.replace(
+						/<!--([\s\S]*?)-->|<!\[CDATA\[([\s\S]*?)]]>/g,
+						'$1$2'
+					);
+					if (handler.chars) handler.chars(text);
 
-				return "";
-			});
+					return '';
+				}
+			);
 
-			parseEndTag("", stack.last());
+			parseEndTag('', stack.last());
 		}
 
-		if (html == last)
-			throw "Parse Error: " + html;
+		if (html == last) throw 'Parse Error: ' + html;
 		last = html;
 	}
 
@@ -191,57 +204,58 @@ var HTMLParser = function (html, handler) {
 			// usually add anything they want to spans, and browsers allow it).
 			// Note: this exception for "span" was added manually (i.e. it's not
 			// present in the original code).
-			while (stack.last() && inline[stack.last()] && stack.last() !== 'span') {
-				parseEndTag("", stack.last());
+			while (
+				stack.last() &&
+				inline[stack.last()] &&
+				stack.last() !== 'span'
+			) {
+				parseEndTag('', stack.last());
 			}
 		}
 
 		if (closeSelf[tagName] && stack.last() == tagName) {
-			parseEndTag("", tagName);
+			parseEndTag('', tagName);
 		}
 
 		unary = empty[tagName] || !!unary;
 
-		if (!unary)
-			stack.push(tagName);
+		if (!unary) stack.push(tagName);
 
 		if (handler.start) {
 			var attrs = [];
 
-			rest.replace(attr, function (match, name) {
-				var value = arguments[2] ? arguments[2] :
-					arguments[3] ? arguments[3] :
-					arguments[4] ? arguments[4] :
-					fillAttrs[name] ? name : "";
+			rest.replace(attr, function(match, name) {
+				var value = arguments[2]
+					? arguments[2]
+					: arguments[3]
+						? arguments[3]
+						: arguments[4]
+							? arguments[4]
+							: fillAttrs[name] ? name : '';
 
 				attrs.push({
 					name: name,
 					value: value,
-					escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
+					escaped: value.replace(/(^|[^\\])"/g, '$1\\"') //"
 				});
 			});
 
-			if (handler.start)
-				handler.start(tagName, attrs, unary);
+			if (handler.start) handler.start(tagName, attrs, unary);
 		}
 	}
 
 	function parseEndTag(tag, tagName) {
 		// If no tag name is provided, clean shop
-		if (!tagName)
-			var pos = 0;
-
-			// Find the closest opened tag of the same type
+		if (!tagName) var pos = 0;
 		else
+			// Find the closest opened tag of the same type
 			for (var pos = stack.length - 1; pos >= 0; pos--)
-				if (stack[pos] == tagName)
-					break;
+				if (stack[pos] == tagName) break;
 
 		if (pos >= 0) {
 			// Close all the open elements, up the stack
 			for (var i = stack.length - 1; i >= pos; i--)
-				if (handler.end)
-					handler.end(stack[i]);
+				if (handler.end) handler.end(stack[i]);
 
 			// Remove the open elements from the stack
 			stack.length = pos;
@@ -250,9 +264,9 @@ var HTMLParser = function (html, handler) {
 };
 
 function makeMap(str) {
-	var obj = {}, items = str.split(",");
-	for (var i = 0; i < items.length; i++)
-		obj[items[i]] = true;
+	var obj = {},
+		items = str.split(',');
+	for (var i = 0; i < items.length; i++) obj[items[i]] = true;
 	return obj;
 }
 

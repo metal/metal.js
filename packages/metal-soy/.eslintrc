@@ -1,5 +1,6 @@
 {
   "globals": {
+    "goog": true,
     "IncrementalDOM": true
   }
 }

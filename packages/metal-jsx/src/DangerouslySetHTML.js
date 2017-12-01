@@ -1,7 +1,7 @@
 'use strict';
 
 import Component from './JSXComponent';
-import { Config } from 'metal-state';
+import {Config} from 'metal-state';
 
 /**
  * JSXComponent that renders html passed in.

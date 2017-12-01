@@ -1,7 +1,16 @@
 'use strict';
 
-import { async, getStaticProperty, isDef, isDefAndNotNull, isFunction, isObject, isString, object } from 'metal';
-import { EventEmitter } from 'metal-events';
+import {
+	async,
+	getStaticProperty,
+	isDef,
+	isDefAndNotNull,
+	isFunction,
+	isObject,
+	isString,
+	object,
+} from 'metal';
+import {EventEmitter} from 'metal-events';
 
 /**
  * State adds support for having object properties that can be watched for
@@ -13,15 +22,15 @@ import { EventEmitter } from 'metal-events';
 class State extends EventEmitter {
 	/**
 	 * Constructor function for `State`.
-	 * @param {Object=} opt_config Optional config object with initial values to
+	 * @param {Object=} config Optional config object with initial values to
 	 *     set state properties to.
-	 * @param {Object=} opt_obj Optional object that should hold the state
+	 * @param {Object=} obj Optional object that should hold the state
 	 *     properties. If none is given, they will be added directly to `this`
 	 *     instead.
-	 * @param {Object=} opt_context Optional context to call functions (like
+	 * @param {Object=} context Optional context to call functions (like
 	 *     validators and setters) on. Defaults to `this`.
 	 */
-	constructor(opt_config, opt_obj, opt_context) {
+	constructor(config, obj, context) {
 		super();
 
 		/**
@@ -29,7 +38,7 @@ class State extends EventEmitter {
 		 * @type {!Object}
 		 * @protected
 		 */
-		this.context_ = opt_context || this;
+		this.context_ = context || this;
 
 		/**
 		 * Map of keys that can not be used as state keys.
@@ -43,7 +52,7 @@ class State extends EventEmitter {
 		 * @type {!Object}
 		 * @protected
 		 */
-		this.obj_ = opt_obj || this;
+		this.obj_ = obj || this;
 
 		this.eventData_ = null;
 
@@ -64,7 +73,7 @@ class State extends EventEmitter {
 
 		this.stateConfigs_ = {};
 
-		this.initialValues_ = object.mixin({}, opt_config);
+		this.initialValues_ = object.mixin({}, config);
 
 		this.setShouldUseFacade(true);
 		this.configStateFromStaticHint_();
@@ -72,7 +81,7 @@ class State extends EventEmitter {
 		Object.defineProperty(this.obj_, State.STATE_REF_KEY, {
 			configurable: true,
 			enumerable: false,
-			value: this
+			value: this,
 		});
 	}
 
@@ -85,11 +94,14 @@ class State extends EventEmitter {
 		const config = this.stateConfigs_[name];
 		if (config.required) {
 			const info = this.getStateInfo(name);
-			const value = info.state === State.KeyStates.INITIALIZED ?
-				this.get(name) :
-				this.initialValues_[name];
+			const value =
+				info.state === State.KeyStates.INITIALIZED
+					? this.get(name)
+					: this.initialValues_[name];
 			if (!isDefAndNotNull(value)) {
-				let errorMessage = `The property called "${name}" is required but didn't receive a value.`;
+				let errorMessage = `The property called "${
+					name
+				}" is required but didn't receive a value.`;
 				if (this.shouldThrowValidationError()) {
 					throw new Error(errorMessage);
 				} else {
@@ -124,7 +136,9 @@ class State extends EventEmitter {
 	assertValidStateKeyName_(name) {
 		if (this.keysBlacklist_ && this.keysBlacklist_[name]) {
 			throw new Error(
-				`It's not allowed to create a state key with the name "${name}".`
+				`It's not allowed to create a state key with the name "${
+					name
+				}".`
 			);
 		}
 	}
@@ -144,7 +158,7 @@ class State extends EventEmitter {
 			},
 			set: function(val) {
 				this[State.STATE_REF_KEY].setStateKeyValue_(name, val);
-			}
+			},
 		};
 	}
 
@@ -152,14 +166,14 @@ class State extends EventEmitter {
 	 * Calls the requested function, running the appropriate code for when it's
 	 * passed as an actual function object or just the function's name.
 	 * @param {!Function|string} fn Function, or name of the function to run.
-	 * @param {!Array} An optional array of parameters to be passed to the
+	 * @param {!Array} args optional array of parameters to be passed to the
 	 *   function that will be called.
 	 * @return {*} The return value of the called function.
 	 * @protected
 	 */
 	callFunction_(fn, args) {
 		if (isString(fn)) {
-			return this.context_[fn].apply(this.context_, args);
+			return this.context_[fn].apply(this.context_, args); // eslint-disable-line
 		} else if (isFunction(fn)) {
 			return fn.apply(this.context_, args);
 		}
@@ -192,10 +206,11 @@ class State extends EventEmitter {
 	callValidator_(name, value) {
 		const config = this.stateConfigs_[name];
 		if (config.validator) {
-			const validatorReturn = this.callFunction_(
-				config.validator,
-				[value, name, this.context_]
-			);
+			const validatorReturn = this.callFunction_(config.validator, [
+				value,
+				name,
+				this.context_,
+			]);
 			this.assertValidatorReturnInstanceOfError_(validatorReturn);
 			return validatorReturn;
 		}
@@ -237,33 +252,32 @@ class State extends EventEmitter {
 	 *     first time.
 	 * @param {!Object.<string, !Object>|string} configs An object that maps
 	 *     configuration options for keys to be added to the state.
-	 * @param {boolean|Object|*=} opt_context The context where the added state
+	 * @param {boolean|Object|*=} context The context where the added state
 	 *     keys will be defined (defaults to `this`), or false if they shouldn't
 	 *     be defined at all.
 	 */
-	configState(configs, opt_context) {
+	configState(configs, context) {
 		const names = Object.keys(configs);
 		if (names.length === 0) {
 			return;
 		}
 
-		if (opt_context !== false) {
+		if (context !== false) {
 			const props = {};
 			for (let i = 0; i < names.length; i++) {
 				const name = names[i];
 				this.assertValidStateKeyName_(name);
 				props[name] = this.buildKeyPropertyDef_(name);
 			}
-			Object.defineProperties(
-				opt_context || this.obj_,
-				props
-			);
+			Object.defineProperties(context || this.obj_, props);
 		}
 
 		this.stateConfigs_ = configs;
 		for (let i = 0; i < names.length; i++) {
 			const name = names[i];
-			configs[name] = configs[name].config ? configs[name].config : configs[name];
+			configs[name] = configs[name].config
+				? configs[name].config
+				: configs[name];
 			this.assertGivenIfRequired_(names[i]);
 			this.validateInitialValue_(names[i]);
 		}
@@ -282,8 +296,9 @@ class State extends EventEmitter {
 
 				ctor[staticKey] = ctor[staticKey] || {};
 
-				defineContext = ctor[staticKey][ctor.name] ? false :
-					ctor.prototype;
+				defineContext = ctor[staticKey][ctor.name]
+					? false
+					: ctor.prototype; // eslint-disable-line
 				ctor[staticKey][ctor.name] = true;
 			}
 			this.configState(State.getStateStatic(ctor), defineContext);
@@ -329,13 +344,12 @@ class State extends EventEmitter {
 
 	/**
 	 * Returns an object that maps state keys to their values.
-	 * @param {Array<string>=} opt_names A list of names of the keys that should
+	 * @param {Array<string>=} names A list of names of the keys that should
 	 *   be returned. If none is given, the whole state will be returned.
 	 * @return {Object.<string, *>}
 	 */
-	getState(opt_names) {
+	getState(names = this.getStateKeys()) {
 		const state = {};
-		const names = opt_names || this.getStateKeys();
 
 		for (let i = 0; i < names.length; i++) {
 			state[names[i]] = this.get(names[i]);
@@ -406,8 +420,10 @@ class State extends EventEmitter {
 	 */
 	hasBeenSet(name) {
 		const info = this.getStateInfo(name);
-		return info.state === State.KeyStates.INITIALIZED ||
-			this.hasInitialValue_(name);
+		return (
+			info.state === State.KeyStates.INITIALIZED ||
+			this.hasInitialValue_(name) // eslint-disable-line
+		);
 	}
 
 	/**
@@ -417,8 +433,10 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	hasInitialValue_(name) {
-		return this.initialValues_.hasOwnProperty(name) &&
-			isDef(this.initialValues_[name]);
+		return (
+			this.initialValues_.hasOwnProperty(name) &&
+			isDef(this.initialValues_[name])
+		);
 	}
 
 	/**
@@ -441,11 +459,14 @@ class State extends EventEmitter {
 	 */
 	informChange_(name, prevVal) {
 		if (this.shouldInformChange_(name, prevVal)) {
-			const data = object.mixin({
-				key: name,
-				newVal: this.get(name),
-				prevVal: prevVal
-			}, this.eventData_);
+			const data = object.mixin(
+				{
+					key: name,
+					newVal: this.get(name),
+					prevVal: prevVal,
+				},
+				this.eventData_
+			);
 			this.context_.emit(`${name}Changed`, data);
 			this.context_.emit('stateKeyChanged', data);
 			this.scheduleBatchEvent_(data);
@@ -500,9 +521,12 @@ class State extends EventEmitter {
 	scheduleBatchEvent_(changeData) {
 		if (!this.scheduledBatchData_) {
 			async.nextTick(this.emitBatchEvent_, this);
-			this.scheduledBatchData_ = object.mixin({
-				changes: {}
-			}, this.eventData_);
+			this.scheduledBatchData_ = object.mixin(
+				{
+					changes: {},
+				},
+				this.eventData_
+			);
 		}
 
 		const name = changeData.key;
@@ -521,7 +545,6 @@ class State extends EventEmitter {
 	 * actually needed.
 	 * @param {string} name
 	 * @param {*} value
-	 * @return {*}
 	 */
 	set(name, value) {
 		if (this.hasStateKey(name)) {
@@ -532,7 +555,6 @@ class State extends EventEmitter {
 	/**
 	 * Sets the default value of the requested state key.
 	 * @param {string} name The name of the key.
-	 * @return {*}
 	 */
 	setDefaultValue(name) {
 		const config = this.stateConfigs_[name];
@@ -546,7 +568,7 @@ class State extends EventEmitter {
 
 	/**
 	 * Sets data to be sent with all events emitted from this instance.
-	 * @param {Object}
+	 * @param {Object} data
 	 */
 	setEventData(data) {
 		this.eventData_ = data;
@@ -555,7 +577,6 @@ class State extends EventEmitter {
 	/**
 	 * Sets the initial value of the requested state key.
 	 * @param {string} name The name of the key.
-	 * @return {*}
 	 * @protected
 	 */
 	setInitialValue_(name) {
@@ -567,7 +588,7 @@ class State extends EventEmitter {
 
 	/**
 	 * Sets a map of keys that are not valid state keys.
-	 * @param {!Object<string, boolean>}
+	 * @param {!Object<string, boolean>} blacklist
 	 */
 	setKeysBlacklist(blacklist) {
 		this.keysBlacklist_ = blacklist;
@@ -577,13 +598,13 @@ class State extends EventEmitter {
 	 * Sets the value of all the specified state keys.
 	 * @param {!Object.<string,*>} values A map of state keys to the values they
 	 *   should be set to.
-	 * @param {function()=} opt_callback An optional function that will be run
+	 * @param {function()=} callback An optional function that will be run
 	 *   after the next batched update is triggered.
 	 */
-	setState(values, opt_callback) {
+	setState(values, callback) {
 		Object.keys(values).forEach(name => this.set(name, values[name]));
-		if (opt_callback && this.scheduledBatchData_) {
-			this.context_.once('stateChanged', opt_callback);
+		if (callback && this.scheduledBatchData_) {
+			this.context_.once('stateChanged', callback);
 		}
 	}
 
@@ -596,9 +617,11 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	setStateKeyValue_(name, value) {
-		if (this.warnIfDisposed_(name) ||
+		if (
+			this.warnIfDisposed_(name) ||
 			!this.canSetState(name) ||
-			!this.validateKeyValue_(name, value)) {
+			!this.validateKeyValue_(name, value)
+		) {
 			return;
 		}
 
@@ -624,8 +647,10 @@ class State extends EventEmitter {
 	 */
 	shouldInformChange_(name, prevVal) {
 		const info = this.getStateInfo(name);
-		return (info.state === State.KeyStates.INITIALIZED) &&
-			(isObject(prevVal) || prevVal !== this.get(name));
+		return (
+			info.state === State.KeyStates.INITIALIZED &&
+			(isObject(prevVal) || prevVal !== this.get(name))
+		);
 	}
 
 	/**
@@ -643,9 +668,10 @@ class State extends EventEmitter {
 	 * @protected
 	 */
 	validateInitialValue_(name) {
-		if (this.initialValues_.hasOwnProperty(name) &&
-			!this.callValidator_(name, this.initialValues_[name])) {
-
+		if (
+			this.initialValues_.hasOwnProperty(name) &&
+			!this.callValidator_(name, this.initialValues_[name])
+		) {
 			delete this.initialValues_[name];
 		}
 	}
@@ -660,8 +686,10 @@ class State extends EventEmitter {
 	 */
 	validateKeyValue_(name, value) {
 		const info = this.getStateInfo(name);
-		return info.state === State.KeyStates.INITIALIZING ||
-			this.callValidator_(name, value);
+		return (
+			info.state === State.KeyStates.INITIALIZING ||
+			this.callValidator_(name, value)
+		);
 	}
 
 	/**
@@ -674,7 +702,9 @@ class State extends EventEmitter {
 		const disposed = this.isDisposed();
 		if (disposed) {
 			console.warn(
-				`Error. Trying to access property "${name}" on disposed instance`
+				`Error. Trying to access property "${
+					name
+				}" on disposed instance`
 			);
 		}
 		return disposed;
@@ -702,7 +732,7 @@ State.STATE_STATIC_HINT_CONFIGURED = '__METAL_STATE_STATIC_HINT_CONFIGURED__';
 State.KeyStates = {
 	UNINITIALIZED: undefined,
 	INITIALIZING: 1,
-	INITIALIZED: 2
+	INITIALIZED: 2,
 };
 
 export default State;

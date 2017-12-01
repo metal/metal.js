@@ -10,5 +10,12 @@ import globalEvalStyles from '../globalEvalStyles';
 import '../events';
 
 export * from '../dom';
-export { domData, DomEventEmitterProxy, DomEventHandle, features, globalEval, globalEvalStyles };
+export {
+	domData,
+	DomEventEmitterProxy,
+	DomEventHandle,
+	features,
+	globalEval,
+	globalEvalStyles,
+};
 export default dom;

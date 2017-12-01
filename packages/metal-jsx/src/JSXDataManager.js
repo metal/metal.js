@@ -1,9 +1,12 @@
 'use strict';
 
-import { getStaticProperty, object } from 'metal';
-import { ComponentDataManager } from 'metal-component';
+import {getStaticProperty, object} from 'metal';
+import {ComponentDataManager} from 'metal-component';
 import State from 'metal-state';
 
+/**
+ * DataManager for JSX
+ */
 class JSXDataManager extends ComponentDataManager.constructor {
 	/**
 	 * Manually adds props that weren't configured via `PROPS`.
@@ -36,16 +39,18 @@ class JSXDataManager extends ComponentDataManager.constructor {
 		const data = this.getManagerData(comp);
 
 		data.props_ = new State(comp.getInitialConfig(), comp.props, comp);
-		data.props_.configState(object.mixin(
-			{},
-			config,
-			getStaticProperty(ctor, 'PROPS', State.mergeState)
-		));
+		data.props_.configState(
+			object.mixin(
+				{},
+				config,
+				getStaticProperty(ctor, 'PROPS', State.mergeState)
+			)
+		);
 		this.addUnconfiguredProps_(comp, data.props_, comp.getInitialConfig());
 
 		data.state_ = new State({}, comp.state, comp);
 		data.state_.setEventData({
-			type: 'state'
+			type: 'state',
 		});
 		data.state_.configState(State.getStateStatic(ctor));
 	}
@@ -104,7 +109,12 @@ class JSXDataManager extends ComponentDataManager.constructor {
 		}
 
 		const props = this.getManagerData(component).props_;
-		ComponentDataManager.replaceNonInternal.call(this, component, data, props);
+		ComponentDataManager.replaceNonInternal.call(
+			this,
+			component,
+			data,
+			props
+		); // eslint-disable-line
 		this.addUnconfiguredProps_(component, props, data);
 		if (component.propsChanged) {
 			component.propsChanged(prevProps);

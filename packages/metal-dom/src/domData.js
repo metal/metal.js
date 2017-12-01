@@ -1,5 +1,7 @@
 'use strict';
 
+import {isDef} from 'metal';
+
 const METAL_DATA = '__metal_data__';
 
 /**
@@ -21,7 +23,7 @@ class domData {
 		if (!name) {
 			return element[METAL_DATA];
 		}
-		if (!element[METAL_DATA][name] && initialValue) {
+		if (!isDef(element[METAL_DATA][name]) && isDef(initialValue)) {
 			element[METAL_DATA][name] = initialValue;
 		}
 		return element[METAL_DATA][name];
@@ -34,6 +36,24 @@ class domData {
 	 */
 	static has(element) {
 		return !!element[METAL_DATA];
+	}
+
+	/**
+	 * Sets Metal.js's data for the given element.
+	 * @param {!Element} element
+	 * @param {string=} name Property from the data to be set.
+	 * @param {*=} value Value to be set on the element.
+	 * @return {!Object|*}
+	 */
+	static set(element, name, value) {
+		if (!element[METAL_DATA]) {
+			element[METAL_DATA] = {};
+		}
+		if (!name || !isDef(value)) {
+			return element[METAL_DATA];
+		}
+		element[METAL_DATA][name] = value;
+		return element[METAL_DATA][name];
 	}
 }
 

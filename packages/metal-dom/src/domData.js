@@ -53,6 +53,8 @@ class domData {
 		}
 		if (!element[METAL_DATA][name] && value) {
 			element[METAL_DATA][name] = value;
+		} else if (element[METAL_DATA][name] && value) {
+			element[METAL_DATA][name] = value;
 		}
 		return element[METAL_DATA][name];
 	}

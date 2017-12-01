@@ -1,5 +1,37 @@
 # Change Log
 
+## [v2.15.0](https://github.com/metal/metal.js/tree/v2.15.0) (2017-12-01)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.14.1...v2.15.0)
+
+**Implemented enhancements:**
+
+- domData set [\#295](https://github.com/metal/metal.js/issues/295)
+- Improve error message on validators [\#279](https://github.com/metal/metal.js/issues/279)
+- Provide events for all lifecycle methods on Component [\#300](https://github.com/metal/metal.js/issues/300)
+- metal-dom prepend [\#296](https://github.com/metal/metal.js/issues/296)
+
+**Closed issues:**
+
+- Config.required\(\) is mutating the object [\#310](https://github.com/metal/metal.js/issues/310)
+- \[metal-events\] Document process to emit events [\#308](https://github.com/metal/metal.js/issues/308)
+- Default state values are not set by using WebComponents [\#305](https://github.com/metal/metal.js/issues/305)
+- Updating NestedComponents via refs is not working [\#301](https://github.com/metal/metal.js/issues/301)
+- Gulp watch doesn't working [\#286](https://github.com/metal/metal.js/issues/286)
+
+**Merged pull requests:**
+
+- release/v2.15.0 [\#320](https://github.com/metal/metal.js/pull/320) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Allow falsy values for domData.get [\#319](https://github.com/metal/metal.js/pull/319) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Add links to metaljs.com from package readme files [\#316](https://github.com/metal/metal.js/pull/316) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Add tests for error messages returned by arrayOf and shapeOf [\#315](https://github.com/metal/metal.js/pull/315) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Fixes saucelabs testname [\#314](https://github.com/metal/metal.js/pull/314) ([jbalsas](https://github.com/jbalsas))
+- Fixing test:coverage script [\#313](https://github.com/metal/metal.js/pull/313) ([diegonvs](https://github.com/diegonvs))
+- Split large test up into smaller parts, remove redundant section [\#312](https://github.com/metal/metal.js/pull/312) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Method calls to Config helpers should return new objects to avoid unintended mutation [\#311](https://github.com/metal/metal.js/pull/311) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Default STATE values should be preserved when rendering web components. Fixes \#305 [\#309](https://github.com/metal/metal.js/pull/309) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Run test:saucelabs script on CI [\#307](https://github.com/metal/metal.js/pull/307) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Emit "disposed" event on Component dispose [\#299](https://github.com/metal/metal.js/pull/299) ([p2kmgcl](https://github.com/p2kmgcl))
+
 ## [v2.14.1](https://github.com/metal/metal.js/tree/v2.14.1) (2017-11-15)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.14.0...v2.14.1)
 

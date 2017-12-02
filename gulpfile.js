@@ -8,7 +8,7 @@ gulp.task('soy', function() {
 	return gulp
 		.src('packages/metal-soy/test/**/*.soy')
 		.pipe(compileSoy())
-		.pipe(replace('metal-soy', '../..'))
+		.pipe(replace('metal-soy', '../../src/Soy'))
 		.pipe(replace('metal-component/src/Component', 'metal-component'))
 		.pipe(gulp.dest('packages/metal-soy/test'));
 });

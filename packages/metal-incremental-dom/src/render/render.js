@@ -128,7 +128,11 @@ function getCurrentData() {
 	const element = IncrementalDOM.currentElement();
 	const comp = getComponentBeingRendered();
 	let obj = getData(comp);
-	if (obj.rootElementReached && element !== comp.element.parentNode) {
+	if (
+		obj.rootElementReached &&
+		comp.element &&
+		element !== comp.element.parentNode
+	) {
 		obj = domData.get(element);
 	}
 	obj.icComponentsData = obj.icComponentsData || {};

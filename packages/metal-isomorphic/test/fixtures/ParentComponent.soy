@@ -1,15 +1,12 @@
-{namespace ComponentParent}
+{namespace ParentComponent}
 
 /**
- * @param? error
- * @param? cmd
+ * @param? message
  */
 {template .render}
-  <div>
-		{call InputErrorMessage.render}
-			{param name: 'email' /}
-			{param error: $error /}
-			{param cmd: $cmd /}
+	<div>
+		{call ChildComponent.render}
+			{param message: $message /}
 		{/call}
 	</div>
 {/template}

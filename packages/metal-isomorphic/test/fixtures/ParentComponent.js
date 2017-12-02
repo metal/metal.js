@@ -1,6 +1,6 @@
 import Component from 'metal-component';
 import Soy from 'metal-soy';
-import './InputErrorMessage.soy.js';
+import './ChildComponent.soy.js';
 
 import templates from './ParentComponent.soy.js';
 
@@ -8,8 +8,7 @@ class ParentComponent extends Component {
 }
 
 ParentComponent.STATE = {
-	error: {},
-	cmd: {}
+	message: {}
 };
 
 Soy.register(ParentComponent, templates);

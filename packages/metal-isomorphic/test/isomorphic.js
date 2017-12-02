@@ -28,37 +28,12 @@ describe('Isomorphic Rendering', () => {
 
 	it('should render soy component with subcomponents to string', () => {
 		assert.ok(!global.document);
+
 		const htmlString = Component.renderToString(ParentComponent, {
-			cmd: 'login',
-			error: {
-				"status": 400,
-				"message": "Bad Request",
-				"errors": [
-					{
-						"reason": "invalidParameter",
-						"context": {
-							"param": "email",
-							"value": ""
-						}
-					},
-					{
-						"reason": "requiredParameter",
-						"context": {
-							"param": "email",
-							"value": ""
-						}
-					},
-					{
-						"reason": "requiredParameter",
-						"context": {
-							"param": "password",
-							"value": ""
-						}
-					}
-				]
-			}
+			message: 'Hello, World!'
 		});
-		assert.equal(htmlString, '<div><span>The provided email is not valid.</span><span>The email is required.</span></div>');
+
+		assert.equal(htmlString, '<div><div>Child: Hello, World!</div></div>');
 	});
 
 	describe('JSDom', () => {

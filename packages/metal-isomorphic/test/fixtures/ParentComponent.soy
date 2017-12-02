@@ -1,0 +1,15 @@
+{namespace ComponentParent}
+
+/**
+ * @param? error
+ * @param? cmd
+ */
+{template .render}
+  <div>
+		{call InputErrorMessage.render}
+			{param name: 'email' /}
+			{param error: $error /}
+			{param cmd: $cmd /}
+		{/call}
+	</div>
+{/template}

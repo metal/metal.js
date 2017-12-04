@@ -1,0 +1,12 @@
+{namespace ParentComponent}
+
+/**
+ * @param? message
+ */
+{template .render}
+	<div>
+		{call ChildComponent.render}
+			{param message: $message /}
+		{/call}
+	</div>
+{/template}

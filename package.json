@@ -41,7 +41,7 @@
     "karma-source-map-support": "^1.1.0",
     "lerna": "^2.2.0",
     "lint-staged": "^4.3.0",
-    "metal-tools-soy": "^2.4.0",
+    "metal-tools-soy": "^4.0.0",
     "metal-useragent": "^2.1.2",
     "mocha": "^2.5.3",
     "prettier-eslint-cli": "^4.4.0",

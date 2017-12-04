@@ -1,6 +1,7 @@
 import Component from 'metal-component';
 import MyComponent from './fixtures/MyComponent';
 import MyJSXComponent from './fixtures/MyJSXComponent';
+import ParentComponent from './fixtures/ParentComponent';
 import {assert} from 'chai';
 import jsdomGlobal from 'jsdom-global';
 
@@ -23,6 +24,16 @@ describe('Isomorphic Rendering', () => {
 		});
 
 		assert.equal(htmlString, '<div>Hello, JSX!</div>');
+	});
+
+	it('should render soy component with subcomponents to string', () => {
+		assert.ok(!global.document);
+
+		const htmlString = Component.renderToString(ParentComponent, {
+			message: 'Hello, World!'
+		});
+
+		assert.equal(htmlString, '<div><div>Child: Hello, World!</div></div>');
 	});
 
 	describe('JSDom', () => {

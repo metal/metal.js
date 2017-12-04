@@ -1,13 +1,28 @@
 # Change Log
 
-## [v2.15.0](https://github.com/metal/metal.js/tree/v2.15.0) (2017-12-01)
-[Full Changelog](https://github.com/metal/metal.js/compare/v2.14.1...v2.15.0)
+## [v2.15.1](https://github.com/metal/metal.js/tree/v2.15.1) (2017-12-04)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.15.0...v2.15.1)
 
 **Implemented enhancements:**
 
 - domData set [\#295](https://github.com/metal/metal.js/issues/295)
 - Improve error message on validators [\#279](https://github.com/metal/metal.js/issues/279)
+
+**Closed issues:**
+
+- SSR breaks when `ref` is omitted from child component [\#323](https://github.com/metal/metal.js/issues/323)
 - Provide events for all lifecycle methods on Component [\#300](https://github.com/metal/metal.js/issues/300)
+
+**Merged pull requests:**
+
+- release/v2.15.1 [\#325](https://github.com/metal/metal.js/pull/325) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Simplify isomorphic test fixtures [\#322](https://github.com/metal/metal.js/pull/322) ([Robert-Frampton](https://github.com/Robert-Frampton))
+
+## [v2.15.0](https://github.com/metal/metal.js/tree/v2.15.0) (2017-12-01)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.14.1...v2.15.0)
+
+**Implemented enhancements:**
+
 - metal-dom prepend [\#296](https://github.com/metal/metal.js/issues/296)
 
 **Closed issues:**

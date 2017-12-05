@@ -95,6 +95,12 @@ class Component extends EventEmitter {
 		super();
 
 		/**
+		 * Wheter dom exists.
+		 * @type {boolean}
+		 */
+		this.domExists = isDom();
+
+		/**
 		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
 		 * element to the component itself.
 		 * @type {!DomEventEmitterProxy}
@@ -160,7 +166,7 @@ class Component extends EventEmitter {
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
 
-		if (isDom()) {
+		if (this.domExists) {
 			this.created();
 		}
 
@@ -216,7 +222,7 @@ class Component extends EventEmitter {
 				parent: parentElement,
 				sibling: siblingElement,
 			};
-			if (!isDom()) {
+			if (!this.domExists) {
 				return this;
 			}
 			this.emit('attached', this.attachData_);
@@ -281,7 +287,7 @@ class Component extends EventEmitter {
 	 */
 	detach() {
 		if (this.inDocument) {
-			if (isDom()) {
+			if (this.domExists) {
 				this.emit('willDetach');
 				this.willDetach();
 			}
@@ -289,11 +295,11 @@ class Component extends EventEmitter {
 				this.element.parentNode.removeChild(this.element);
 			}
 			this.inDocument = false;
-			if (isDom()) {
+			if (this.domExists) {
 				this.detached();
 			}
 		}
-		if (isDom()) {
+		if (this.domExists) {
 			this.emit('detached');
 		}
 		return this;
@@ -319,7 +325,7 @@ class Component extends EventEmitter {
 	 */
 	disposeInternal() {
 		this.detach();
-		if (isDom()) {
+		if (this.domExists) {
 			this.disposed();
 			this.emit('disposed');
 		}
@@ -451,7 +457,7 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
-		if (!isDom()) {
+		if (!this.domExists) {
 			return;
 		}
 		this.willReceiveState(event.changes);
@@ -478,7 +484,7 @@ class Component extends EventEmitter {
 			this.forceUpdateCallback_();
 			this.forceUpdateCallback_ = null;
 		}
-		if (!isDom()) {
+		if (!this.domExists) {
 			return;
 		}
 		this.rendered(firstRender);
@@ -491,7 +497,7 @@ class Component extends EventEmitter {
 	 * @param {Object} changes
 	 */
 	informWillUpdate(...args) {
-		if (!isDom()) {
+		if (!this.domExists) {
 			return;
 		}
 		this.willUpdate(...args);

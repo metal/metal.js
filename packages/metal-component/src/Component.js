@@ -222,11 +222,10 @@ class Component extends EventEmitter {
 				parent: parentElement,
 				sibling: siblingElement,
 			};
-			if (!this.domExists) {
-				return this;
+			if (this.domExists) {
+				this.emit('attached', this.attachData_);
+				this.attached();
 			}
-			this.emit('attached', this.attachData_);
-			this.attached();
 		}
 		return this;
 	}

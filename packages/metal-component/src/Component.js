@@ -8,6 +8,7 @@ import {
 	isElement,
 	isObject,
 	isServerSide,
+	isDom,
 	isString,
 	object,
 } from 'metal';
@@ -94,6 +95,12 @@ class Component extends EventEmitter {
 		super();
 
 		/**
+		 * Wheter dom exists.
+		 * @type {boolean}
+		 */
+		this.domExists = isDom();
+
+		/**
 		 * Instance of `DomEventEmitterProxy` which proxies events from the component's
 		 * element to the component itself.
 		 * @type {!DomEventEmitterProxy}
@@ -159,8 +166,12 @@ class Component extends EventEmitter {
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
 
-		this.created();
+		if (this.domExists) {
+			this.created();
+		}
+
 		this.componentCreated_ = true;
+
 		if (parentElement !== false) {
 			this.renderComponent(parentElement);
 		}
@@ -211,8 +222,10 @@ class Component extends EventEmitter {
 				parent: parentElement,
 				sibling: siblingElement,
 			};
-			this.emit('attached', this.attachData_);
-			this.attached();
+			if (this.domExists) {
+				this.emit('attached', this.attachData_);
+				this.attached();
+			}
 		}
 		return this;
 	}
@@ -273,15 +286,21 @@ class Component extends EventEmitter {
 	 */
 	detach() {
 		if (this.inDocument) {
-			this.emit('willDetach');
-			this.willDetach();
+			if (this.domExists) {
+				this.emit('willDetach');
+				this.willDetach();
+			}
 			if (this.element && this.element.parentNode) {
 				this.element.parentNode.removeChild(this.element);
 			}
 			this.inDocument = false;
-			this.detached();
+			if (this.domExists) {
+				this.detached();
+			}
 		}
-		this.emit('detached');
+		if (this.domExists) {
+			this.emit('detached');
+		}
 		return this;
 	}
 
@@ -305,8 +324,10 @@ class Component extends EventEmitter {
 	 */
 	disposeInternal() {
 		this.detach();
-		this.disposed();
-		this.emit('disposed');
+		if (this.domExists) {
+			this.disposed();
+			this.emit('disposed');
+		}
 
 		this.elementEventProxy_.dispose();
 		this.elementEventProxy_ = null;
@@ -435,6 +456,9 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
+		if (!this.domExists) {
+			return;
+		}
 		this.willReceiveState(event.changes);
 	}
 
@@ -459,7 +483,9 @@ class Component extends EventEmitter {
 			this.forceUpdateCallback_();
 			this.forceUpdateCallback_ = null;
 		}
-
+		if (!this.domExists) {
+			return;
+		}
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
 	}
@@ -470,6 +496,9 @@ class Component extends EventEmitter {
 	 * @param {Object} changes
 	 */
 	informWillUpdate(...args) {
+		if (!this.domExists) {
+			return;
+		}
 		this.willUpdate(...args);
 	}
 

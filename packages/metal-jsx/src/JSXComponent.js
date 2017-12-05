@@ -40,6 +40,9 @@ class JSXComponent extends Component {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
+		if (!this.domExists) {
+			return;
+		}
 		if (event.type !== 'state') {
 			this.willReceiveProps(event.changes);
 		}

@@ -1,6 +1,7 @@
 'use strict';
 
 import {append, exitDocument} from 'metal-dom';
+import {isDom} from 'metal';
 import {getData} from '../data';
 import {render} from './render';
 
@@ -17,7 +18,7 @@ const patchingComponents_ = [];
 function buildParentIfNecessary_(element) {
 	if (!element || !element.parentNode) {
 		let parent = {};
-		if (typeof document !== 'undefined') {
+		if (isDom()) {
 			parent = document.createElement('div');
 		}
 		if (element) {

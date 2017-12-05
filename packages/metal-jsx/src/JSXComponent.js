@@ -1,7 +1,7 @@
 'use strict';
 
 import './iDOMHelpers';
-import {object} from 'metal';
+import {object, isDom} from 'metal';
 import Component from 'metal-component';
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXDataManager from './JSXDataManager';
@@ -40,6 +40,9 @@ class JSXComponent extends Component {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
+		if (!isDom()) {
+			return;
+		}
 		if (event.type !== 'state') {
 			this.willReceiveProps(event.changes);
 		}

@@ -307,6 +307,14 @@ export function isServerSide() {
 }
 
 /**
+ * Sets to true if running environment supports DOM.
+ * @return {boolean}
+ */
+export function isDom() {
+	return typeof window !== 'undefined' && typeof document !== 'undefined';
+}
+
+/**
  * Null function used for default values of callbacks, etc.
  * @return {void} Nothing.
  */

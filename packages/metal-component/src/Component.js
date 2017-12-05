@@ -8,6 +8,7 @@ import {
 	isElement,
 	isObject,
 	isServerSide,
+	isDom,
 	isString,
 	object,
 } from 'metal';
@@ -159,8 +160,12 @@ class Component extends EventEmitter {
 		this.on('eventsChanged', this.onEventsChanged_);
 		this.addListenersFromObj_(this.dataManager_.get(this, 'events'));
 
-		this.created();
+		if (isDom()) {
+			this.created();
+		}
+
 		this.componentCreated_ = true;
+
 		if (parentElement !== false) {
 			this.renderComponent(parentElement);
 		}
@@ -211,6 +216,9 @@ class Component extends EventEmitter {
 				parent: parentElement,
 				sibling: siblingElement,
 			};
+			if (!isDom()) {
+				return this;
+			}
 			this.emit('attached', this.attachData_);
 			this.attached();
 		}
@@ -273,15 +281,21 @@ class Component extends EventEmitter {
 	 */
 	detach() {
 		if (this.inDocument) {
-			this.emit('willDetach');
-			this.willDetach();
+			if (isDom()) {
+				this.emit('willDetach');
+				this.willDetach();
+			}
 			if (this.element && this.element.parentNode) {
 				this.element.parentNode.removeChild(this.element);
 			}
 			this.inDocument = false;
-			this.detached();
+			if (isDom()) {
+				this.detached();
+			}
 		}
-		this.emit('detached');
+		if (isDom()) {
+			this.emit('detached');
+		}
 		return this;
 	}
 
@@ -305,8 +319,10 @@ class Component extends EventEmitter {
 	 */
 	disposeInternal() {
 		this.detach();
-		this.disposed();
-		this.emit('disposed');
+		if (isDom()) {
+			this.disposed();
+			this.emit('disposed');
+		}
 
 		this.elementEventProxy_.dispose();
 		this.elementEventProxy_ = null;
@@ -435,6 +451,9 @@ class Component extends EventEmitter {
 	 * @protected
 	 */
 	handleStateWillChange_(event) {
+		if (!isDom()) {
+			return;
+		}
 		this.willReceiveState(event.changes);
 	}
 
@@ -459,7 +478,9 @@ class Component extends EventEmitter {
 			this.forceUpdateCallback_();
 			this.forceUpdateCallback_ = null;
 		}
-
+		if (!isDom()) {
+			return;
+		}
 		this.rendered(firstRender);
 		this.emit('rendered', firstRender);
 	}
@@ -470,6 +491,9 @@ class Component extends EventEmitter {
 	 * @param {Object} changes
 	 */
 	informWillUpdate(...args) {
+		if (!isDom()) {
+			return;
+		}
 		this.willUpdate(...args);
 	}
 

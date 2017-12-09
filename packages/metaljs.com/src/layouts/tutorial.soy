@@ -13,6 +13,7 @@
 				{if $page}
 					{call .sidebar}
 						{param page: $site.index.children.docs.children['tutorials'].children[$page.parentId] /}
+						{param site: $site /}
 					{/call}
 					{call .tutorials data="all"}
 						{param content: $content /}
@@ -70,10 +71,19 @@
 
 /**
  * @param page
+ * @param site
  */
 {template .sidebar}
 	<div class="sidebar-navigation">
 		<nav class="sidebar">
+			<a
+				class="tutorial-back-link"
+				href="{$site.index.children.docs.children['tutorials'].url}"
+			>
+				<span class="icon-12-arrow-left-short"></span>
+				Back to tutorials
+			</a>
+
 			{call ElectricNavigation.render}
 				{param listClasses: 'sidebar-list' /}
 				{param listItemClasses: 'sidebar-item' /}

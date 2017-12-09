@@ -44,7 +44,7 @@ This will run babel + webpack to transpile and bundle the JavaScript into
 something consumable by web browsers.
 
 Everything you'll be writing in this tutorial will be using ES6 syntax, if
-you're unfamiliar with it, take a look at [this guide](#) first.
+you're unfamiliar with it, take a look at [this guide](https://babeljs.io/learn-es2015/) first.
 
 To build the finished product, run the following script:
 

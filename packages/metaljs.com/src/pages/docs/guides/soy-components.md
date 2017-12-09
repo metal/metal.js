@@ -8,7 +8,7 @@ weight: 180
 <article>
 
 For a full tutorial on how to build components using Soy templates, make sure
-to follow the [Modal tutorial](/docs/getting-started/modal.html) section.
+to go through the [Todo App tutorial](/docs/tutorials/tutorial-todo-soy/before-we-start.html).
 
 This guide will explain some details about the integration between **Metal.js**{sp}
 components and [Soy templates](http://developers.google.com/closure/templates/).

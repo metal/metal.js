@@ -43,8 +43,4 @@ After those steps you'll get a directory tree similar to this:
 test your code, as well as many gulp tasks via
 {sp}[gulp-metal](/docs/guides/building.html#gulp_metal).
 
-By the way, the boilerplate zip provided by the
-{sp}[getting started guide](/docs/getting-started/#boilerplate) was created using
-{sp}**generator-metal**.
-
 </article>

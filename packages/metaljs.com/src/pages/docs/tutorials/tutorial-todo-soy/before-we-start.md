@@ -13,6 +13,9 @@ weight: 1
 Before we actually make anything, let's discuss what Metal.js is, and what it's
 intended for.
 
+**Note:** if you're interested in using Metal.js with JSX templates, check out
+the [JSX tutorial](/docs/tutorials/tutorial-todo-jsx/before-we-start.html) instead.
+
 ### Data flow
 
 If you're familiar with React, you'll feel right at home. Metal.js is a

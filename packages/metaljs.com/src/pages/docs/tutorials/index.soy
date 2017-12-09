@@ -1,28 +1,66 @@
 ---
-description: "Learn to create a simple Todo App with Metal.js and JSX."
-hidden: true
-title: "Todo App"
-tutorialTitle: "Learn to create a simple Todo App with Metal.js and JSX"
-url: "/docs/tutorials/tutorial-todo-jsx/before-we-start.html"
+description: "Tutorials for learning Metal.js."
+title: "Tutorials"
+icon: "menu"
+weight: 1
 ---
 
 {namespace pageTutorialTodoIndex}
 
 /**
- *
+ * @param site
  */
 {template .render}
+	<div class="main">
+		<main class="content">
+			<div class="docs">
+				{call Topbar.render data="all"}
+					{param elementClasses: 'topbar-docs' /}
+				{/call}
+				{call Sidebar.render}
+					{param section: $site.index.children['docs'] /}
+				{/call}
+				{call .topics data="all" /}
+			</div>
+		</main>
+	</div>
 {/template}
 
 /**
  * @param page
  */
-{template .soyweb}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="refresh" content="0; URL='{$page.url}'">
-</head>
-</html>
+{template .topics}
+	<div class="sidebar-offset">
+		<div class="docs-home-topics">
+			<div class="container-hybrid">
+				<div class="row">
+					<div class="col-xs-14 col-xs-offset-1 ">
+						<section class="docs-home-middle">
+							<h2 class="docs-home-middle-subtitle">Select the tutorial you would like to begin.</h2>
+						</section>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12 col-md-offset-2 col-xs-16">
+						<div class="row">
+							{foreach $childId in $page.childIds}
+								{let $topic: $page.children[$childId] /}
+
+								{if not $topic.hidden}
+									<div class="col-md-8 col-md-offset-0 col-xs-14 col-xs-offset-1">
+										<a class="topic radial-out" href="{$topic.url}">
+											<div class="topic-icon">
+												<span class="icon-16-{$topic.icon}"></span>
+											</div>
+											<h3 class="topic-title">{$topic.title}</h3>
+										</a>
+									</div>
+								{/if}
+							{/foreach}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {/template}

@@ -8,7 +8,7 @@ weight: 190
 <article>
 
 For a practical tutorial on how to build components using JSX templates, make
-sure to follow the [Modal tutorial](/docs/getting-started/modal.html) section.
+sure to go through the [Todo App tutorial](/docs/tutorials/tutorial-todo-jsx/before-we-start.html).
 
 This guide will explain some details about the integration between
 {sp}**Metal.js** components and [JSX templates](https://facebook.github.io/jsx/).

@@ -10,9 +10,9 @@ weight: 6
 
 ## {$page.title}
 
-So now you should have a static list of todo items, what now? Remember the end
+Now you should have a static list of todo items. What now? Remember the end
 goal is to be able to click the todos to mark them as completed, so let's start
-with adding a click event listener to the list items.
+with adding a click event listener to the list items:
 
 ```text/jsx
 // TodoItem.js
@@ -45,10 +45,8 @@ of the current class.
 
 Now you should see an alert with the title of the clicked todo. Next you must
 notify `TodoApp` that a todo was marked as completed so that it can update
-the data.
-
-This can be done by emitting a custom event with the info needed to make the
-change. In this case we'll use the index value from PROPS.
+the data. This can be done by emitting a custom event with the info needed to 
+make the change. In this case we'll use the index value from PROPS:
 
 ```text/jsx
 // TodoItem.js
@@ -65,7 +63,7 @@ class TodoItem extends JSXComponent {
 ```
 
 Now that the `TodoItem` is emitting an event, you must add a listener from the
-parent component `TodoApp`.
+parent component `TodoApp`:
 
 ```text/jsx
 // TodoApp.js
@@ -97,15 +95,14 @@ class TodoApp extends JSXComponent {
 }
 ```
 
-At this point you should have an event handler that fires every time a todo
-item is clicked on. Next you will use this data to update the state
-in `TodoApp`.
+At this point you should have an event handler that fires every time a todo item 
+is clicked. Next you will use this data to update the state in `TodoApp`.
 
 ### Alternative to custom events
 
-Alternatively, functions can be passed from parents to children to achieve
-similar functionality. In this method a child must declare a PROP that will
-house the function from the parent.
+Alternatively, you can pass functions from parents to children to achieve
+similar functionality. To do this, a child must declare a PROP to house the 
+function from the parent:
 
 ```text/jsx
 class Parent extends JSXComponent {

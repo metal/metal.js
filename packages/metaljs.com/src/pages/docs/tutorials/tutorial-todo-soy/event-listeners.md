@@ -10,9 +10,9 @@ weight: 6
 
 ## {$page.title}
 
-So now you should have a static list of todo items, what now? Remember the end
-goal is to be able to click the todos to mark them as completed, so let's start
-with adding a click event listener to the list items.
+Now you should have a static list of todo items. What now? Remember the end goal
+is to be able to click the todos to mark them as completed, so let's start
+with adding a click event listener to the list items:
 
 ```javascript
 // TodoItem.js
@@ -51,15 +51,13 @@ class TodoItem extends Component {
 &#123;/template&#125;
 ```
 
-Notice that only the method name is being passed to the `data-click` property.
-Metal will automatically check to see if the Component has that method.
+Notice that only the method name is passed to the `data-onclick` property. Metal
+automatically checks to see if the Component has that method.
 
 Now you should see an alert with the title of the clicked todo. Next you must
-notify `TodoApp` that a todo was marked as completed so that it can update
-the data.
-
-This can be done by emitting a custom event with the info needed to make the
-change. In this case we'll use the index value from STATE.
+notify `TodoApp` that a todo was marked as completed so that it can update the
+data. This can be done by emitting a custom event with the info needed to make
+the change. In this case we'll use the index value from STATE:
 
 ```text/javascript
 // TodoItem.js
@@ -118,14 +116,13 @@ class TodoApp extends Component {
 ```
 
 At this point you should have an event handler that fires every time a todo
-item is clicked on. Next you will use this data to update the state
-in `TodoApp`.
+item is clicked. Next you will use this data to update the state in `TodoApp`.
 
 ### Alternative to custom events
 
-Alternatively, functions can be passed from parents to children to achieve
-similar functionality. In this method a child must declare a STATE property that
-will house the function from the parent.
+Alternatively, you can pass functions from parents to children to achieve
+similar functionality. To do this, a child must declare a STATE property to
+house the function from the parent:
 
 ```javascript
 class Parent extends Component {

@@ -10,17 +10,17 @@ weight: 3
 
 ## {$page.title}
 
-In the `metal-tutorial-todo` boilerplate, there are already three components defined
-to help get you started. Each component is defined as an ES6 class that extends
-from Metal's `Component` class.
+In the `metal-tutorial-todo` boilerplate there are already three components 
+defined to help get you started. Each component is defined as an ES6 class that 
+extends from Metal's `Component` class:
 
 ```text/javascript
 class TodoApp extends Component {
 }
 ```
 
-Each component registers a Soy template to be used for rendering the component's
-HTML. This is done by the `Soy.register` method.
+Each component registers a Soy template that renders the component's HTML. This 
+is done with the `Soy.register` method:
 
 ```text/javascript
 import templates from './TodoApp.soy.js';
@@ -38,7 +38,7 @@ the todo data, and the rendering of the other two components.
 
 The `TodoItem` component will render each item in the list of todos.
 
-The `TodoItem` component will render a form for adding new todo items to the
+The `TodoForm` component will render a form for adding new todo items to the
 list. It will consist of a text input and add button.
 
 ### Why more than one?

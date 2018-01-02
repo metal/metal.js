@@ -10,9 +10,9 @@ weight: 3
 
 ## {$page.title}
 
-In the `metal-tutorial-todo` boilerplate, there are already three components defined
-to help get you started. Each component is defined as an ES6 class that extends
-from Metal's `JSXComponent` class.
+In the `metal-tutorial-todo` boilerplate there are already three components 
+defined to help get you started. Each component is defined as an ES6 class that 
+extends from Metal's `JSXComponent` class:
 
 ```text/jsx
 class TodoApp extends JSXComponent {
@@ -20,7 +20,7 @@ class TodoApp extends JSXComponent {
 ```
 
 Each component has a render function where the JSX template is defined. This
-will create the HTML you see in the demo page.
+creates the HTML you see in the demo page:
 
 ```text/jsx
 class TodoApp extends JSXComponent {
@@ -35,7 +35,7 @@ the todo data, and the rendering of the other two components.
 
 The `TodoItem` component will render each item in the list of todos.
 
-The `TodoItem` component will render a form for adding new todo items to the
+The `TodoForm` component will render a form for adding new todo items to the
 list. It will consist of a text input and add button.
 
 ### Why more than one?

@@ -10,8 +10,8 @@ weight: 7
 
 ## {$page.title}
 
-You are now ready to update the state in `TodoApp`. From the last step you added
-an event listener.
+Now you're ready to update the state in `TodoApp`. In the last step, you added
+an event listener:
 
 ```text/javascript
 // TodoApp.js
@@ -25,7 +25,7 @@ class TodoApp extends Component {
 }
 ```
 
-Now all you need to do is update the state so that the template rerenders.
+Now all you need to do is update the state so that the template rerenders:
 
 ```text/javascript
 // TodoApp.js
@@ -48,10 +48,10 @@ class TodoApp extends Component {
 }
 ```
 
-This will toggle the `done` property of the todo that was clicked. Simply
-setting the `this.todos` property to a new array of todos will trigger a
-rerender, passing the data to the child components. Now your markup should look
-something like this.
+This toggles the `done` property of the todo that was clicked. Simply setting 
+the `this.todos` property to a new array of todos triggers a rerender, passing 
+the data to the child components. Your markup should look like this once you've 
+clicked a todo item:
 
 ```text/xml
 <div class="todo-app">

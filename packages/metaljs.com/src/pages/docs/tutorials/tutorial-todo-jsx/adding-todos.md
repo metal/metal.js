@@ -11,10 +11,10 @@ weight: 8
 
 You almost have a fully functioning Todo App! The only missing feature is the
 ability to add new todos to the list. This is where the `TodoForm` component
-will come into play.
+comes into play.
 
-First, go ahead and add a couple of event listeners, one for the form
-submission (onsubmit), and the other for when the input value changes (onkeyup).
+First, go ahead and add a couple of event listeners: one for the form
+submission (onsubmit) and one for when the input value changes (onkeyup):
 
 ```text/jsx
 // TodoForm.js
@@ -47,10 +47,9 @@ class TodoForm extends JSXComponent {
 
 Now you can use the `value` property from STATE to keep track of the changes
 made to the input value. This makes the input a **controlled input**, where the
-value of the input is controlled by the state of the component.
-
-In other words, when the value of the state changes it will automatically change
-the value in the input as well, keeping the two in sync.
+value of the input is controlled by the state of the component. In other words, 
+when the value of the state changes, it automatically changes the value in the 
+input as well, keeping the two in sync.
 
 ```text/jsx
 // TodoForm.js
@@ -83,7 +82,7 @@ class TodoForm extends JSXComponent {
 The value of `this.state.value` will now match the value in the input.
 
 You can also emit a custom event when the form is submitted, similarly to
-what `TodoItem` does to notify the parent component that something happened.
+what `TodoItem` does to notify the parent component that something happened:
 
 ```text/jsx
 // TodoForm.js
@@ -107,7 +106,7 @@ class TodoForm extends JSXComponent {
 ```
 
 Then in the `TodoApp` component, you can listen to this event and add a new
-todo.
+todo:
 
 ```text/jsx
 // TodoApp.js
@@ -144,8 +143,8 @@ class TodoApp extends JSXComponent {
 }
 ```
 
-Now when you add some text to the input and submit the form, a new todo will
-automatically be added to the list.
+Now when you add some text to the input and submit the form, a new todo is 
+automatically added to the list.
 
 That's it! You've successfully created a simple Todo App with Metal.js. Now that
 you are comfortable with the basics, check out the guides for more advanced

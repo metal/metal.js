@@ -10,8 +10,8 @@ weight: 5
 
 ## {$page.title}
 
-First let's prepare the `TodoItem` for consuming the data being passed
-from `TodoApp`.
+First, let's prepare the `TodoItem` for consuming the data passed from 
+`TodoApp`:
 
 ```soy
 &#123;namespace TodoItem&#125;
@@ -39,9 +39,9 @@ from `TodoApp`.
 &#123;/template&#125;
 ```
 
-Now that you have some data that needs rendering, and the `TodoItem` is ready to
+Now that you have some data that needs rendering and the `TodoItem` is ready to
 consume it, you need to iterate over the todos and pass them to the child
-components.
+components:
 
 ```soy
 &#123;namespace TodoApp&#125;
@@ -65,7 +65,7 @@ components.
 &#123;/template&#125;
 ```
 
-This will result in the following markup.
+This results in the following markup:
 
 ```text/xml
 <div class="todo-app">

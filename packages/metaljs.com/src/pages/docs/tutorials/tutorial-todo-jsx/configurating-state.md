@@ -11,8 +11,8 @@ weight: 4
 ## {$page.title}
 
 As previously mentioned, Metal components automatically respond to the data
-passed to them and rerender. However, in order for a component to take advantage
-of this behavior, it needs to be told what data to respond to. This is where
+passed to them and rerender. For a component to take advantage of this behavior, 
+however, it needs to be told what data to respond to. This is where
 state comes in.
 
 JSX components have two state managers, one for internal state (STATE), and one
@@ -24,7 +24,7 @@ both internal and external properties (STATE).
 ### Storing The Todos
 
 Let's configure the `TodoApp` component to store an array of todos with a
-default value.
+default value:
 
 ```text/javascript
 // TodoApp.js
@@ -51,7 +51,7 @@ TodoApp.STATE = {
 ```
 
 Now that there is a default value set, you can access the value in the render
-function using `this.state`.
+function using `this.state`:
 
 ```text/javascript
 // TodoApp.js
@@ -65,19 +65,19 @@ class TodoApp extends JSXComponent {
 }
 ```
 
-Which would result in the following markup.
+Which results in the following markup:
 
 ```text/xml
 <div>Todo: Todo 1</div>
 ```
 
-Obviously this markup isn't very useful, we'll get to rendering the entire list
+Obviously, this markup isn't very useful. We'll get to rendering the entire list
 in a minute.
 
 ### Item
 
-The `TodoItem` component will need two PROPS, one for keeping track of it's
-index inside the list, and one for containing the todo data itself.
+The `TodoItem` component will need two PROPS: one for keeping track of it's
+index inside the list and one for containing the todo data itself:
 
 ```text/jsx
 // TodoItem.js
@@ -104,7 +104,7 @@ the `TodoItem` component.
 ### Form
 
 The `TodoForm` only needs one property that will only ever be set internally,
-therefore it's set on `STATE`.
+therefore it's set on `STATE`:
 
 ```text/jsx
 // TodoForm.js

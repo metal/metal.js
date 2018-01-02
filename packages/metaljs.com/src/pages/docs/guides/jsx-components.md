@@ -214,3 +214,99 @@ provide a [babel preset](http://npmjs.com/package/babel-preset-metal-jsx) that
 you can use instead.
 
 </article>
+
+<article id="helpers">
+
+## [Helpers](#helpers)
+
+There are a few additional helpers we also provide for JSX.
+
+#### `this.otherProps()`
+
+Used for passing non-named props directly through to the child component.
+
+```javascript
+import JSXComponent, {Config} from 'metal-jsx';
+
+class MyComponent extends JSXComponent {
+    render() {
+        return (
+            <div>
+                <ChildComponent {...this.otherProps()} />
+            </div>
+        )
+    }
+}
+
+MyComponent.PROPS = {
+    foo: Config.string()
+}
+
+// baz will be passed directly to ChildComponent
+<MyComponent foo="bar" baz="qux" />
+```
+
+#### `<DangerouslySetHTML />`
+
+Component used for rendering a string as HTML.
+
+```javascript
+import JSXComponent, {DangerouslySetHTML} from 'metal-jsx';
+
+class MyComponent extends JSXComponent {
+    render() {
+        return (
+            <DangerouslySetHTML
+                content="<h1>Hello World</h1>"
+                tag="div"
+            />
+        )
+    }
+}
+
+// renders
+<div>
+    <h1>
+        Hello World
+    </h1>
+</div>
+```
+
+#### `<Fragment />`
+
+Component used to return an array of elements.
+
+```javascript
+import JSXComponent, {Fragment} from 'metal-jsx';
+
+class MyComponent extends JSXComponent {
+    render() {
+        return (
+            <form>
+                {['foo', 'bar', 'baz'].map(
+                    name => (
+                        <Fragment key={name}>
+                            <label for={name}>Input {name}</label>
+                            <input name={name} />
+                        </Fragment>
+                    )
+                )}
+            </form>
+        )
+    }
+}
+
+// renders
+<form>
+    <label for="foo">Input foo</label>
+    <input name="foo" />
+
+    <label for="bar">Input bar</label>
+    <input name="bar" />
+
+    <label for="baz">Input baz</label>
+    <input name="baz" />
+</form>
+```
+
+</article>

@@ -133,6 +133,13 @@ class Component extends EventEmitter {
 		this.initialConfig_ = config || {};
 
 		/**
+		 * Indicates whether the component should be rendered as a Portal, outside
+		 * of the parent component.
+		 * @type {string|Element|boolean}
+		 */
+		this.portalElement = null;
+
+		/**
 		 * Whether the element was rendered.
 		 * @type {boolean}
 		 */
@@ -153,6 +160,8 @@ class Component extends EventEmitter {
 		this.setUpRenderer_();
 		this.setUpDataManager_();
 		this.setUpSyncUpdates_();
+
+		this.setUpPortal_(this.initialConfig_.portalElement);
 
 		this.on('stateWillChange', this.handleStateWillChange_);
 		this.on('stateChanged', this.handleComponentStateChanged_);
@@ -656,6 +665,37 @@ class Component extends EventEmitter {
 				Component.DATA
 			) // eslint-disable-line
 		);
+	}
+
+	/**
+	 * Overwrites element property if portalElement is passed. Creates
+	 * a nested placeholder so that portalElement is not removed from the
+	 * DOM when component first renders. When portalElement is equal to true,
+	 * component is appeneded to the body.
+	 *
+	 * @param {string|Element|boolean} portalElement
+	 */
+	setUpPortal_(portalElement) {
+		if (
+			!isElement(portalElement) &&
+			!isString(portalElement) &&
+			!isBoolean(portalElement)
+		) {
+			return;
+		} else if (isBoolean(portalElement) && portalElement) {
+			portalElement = 'body';
+		}
+
+		portalElement = toElement(portalElement);
+
+		if (portalElement) {
+			const placeholder = document.createElement('div');
+
+			portalElement.appendChild(placeholder);
+
+			this.element = placeholder;
+			this.portalElement = portalElement;
+		}
 	}
 
 	/**

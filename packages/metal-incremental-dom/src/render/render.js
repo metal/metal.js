@@ -537,7 +537,10 @@ function renderSubComponent_(tagOrCtor, config, owner) {
 		config.key = parentData.config.key;
 	}
 
-	comp.getRenderer().renderInsidePatch(comp);
+	if (!comp.portalElement) {
+		comp.getRenderer().renderInsidePatch(comp);
+	}
+
 	if (!comp.wasRendered) {
 		comp.renderComponent();
 	}

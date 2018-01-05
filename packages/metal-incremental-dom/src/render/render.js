@@ -17,6 +17,7 @@ import {
 	isDef,
 	isDefAndNotNull,
 	isFunction,
+	isServerSide,
 	isString,
 	object,
 } from 'metal';
@@ -535,6 +536,10 @@ function renderSubComponent_(tagOrCtor, config, owner) {
 	getChildComponents_(parentData).push(comp);
 	if (!config.key && !parentData.rootElementReached) {
 		config.key = parentData.config.key;
+	}
+
+	if (comp.portalElement && isServerSide()) {
+		return comp;
 	}
 
 	if (!comp.portalElement) {

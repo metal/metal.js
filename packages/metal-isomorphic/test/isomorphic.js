@@ -2,8 +2,9 @@ import Component from 'metal-component';
 import MyComponent from './fixtures/MyComponent';
 import MyJSXComponent from './fixtures/MyJSXComponent';
 import ParentComponent from './fixtures/ParentComponent';
-import {assert} from 'chai';
+import PortalParent from './fixtures/PortalParent';
 import jsdomGlobal from 'jsdom-global';
+import {assert} from 'chai';
 
 describe('Isomorphic Rendering', () => {
 	it('should render soy component to string', () => {
@@ -34,6 +35,16 @@ describe('Isomorphic Rendering', () => {
 		});
 
 		assert.equal(htmlString, '<div><div>Child: Hello, World!</div></div>');
+	});
+
+	it('should skip subcomponents that have portalElement defined', () => {
+		assert.ok(!global.document);
+
+		const htmlString = Component.renderToString(PortalParent, {
+			message: 'Hello, World!'
+		});
+
+		assert.equal(htmlString, '<div class="portal-parent">Parent: Hello, World!</div>');
 	});
 
 	describe('JSDom', () => {

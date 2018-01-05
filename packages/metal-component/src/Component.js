@@ -686,6 +686,11 @@ class Component extends EventEmitter {
 			portalElement = 'body';
 		}
 
+		if (isServerSide()) {
+			this.portalElement = true;
+			return;
+		}
+
 		portalElement = toElement(portalElement);
 
 		if (portalElement) {

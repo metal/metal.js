@@ -1,0 +1,15 @@
+{namespace PortalParent}
+
+/**
+ * @param? message
+ */
+{template .render}
+	<div class="portal-parent">
+		Parent: {$message}
+
+		{call Portal.render}
+			{param message: $message /}
+			{param portalElement: true /}
+		{/call}
+	</div>
+{/template}

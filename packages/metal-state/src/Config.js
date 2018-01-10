@@ -63,6 +63,16 @@ const Config = {
 	func: setPrimitiveValidators('func'),
 
 	/**
+	 * Creates `State` configuration object with a `rangeOf` validator.
+	 * @param {!Number} min The minimum value allowed.
+	 * @param {!Number} max The maximum value allowed.
+	 * @return {ConfigWithValidator} `State` configuration object.
+	 */
+	inRange(min, max) {
+		return this.validator(validators.inRange(min, max));
+	},
+
+	/**
 	 * Function that creates `State` object with an `instanceOf` validator.
 	 * @return {ConfigWithValidator} `State` configuration object.
 	 */
@@ -105,16 +115,6 @@ const Config = {
 		);
 
 		return this.validator(validators.oneOfType(validatorArray));
-	},
-
-	/**
-	 * Creates `State` configuration object with a `rangeOf` validator.
-	 * @param {!Number} min The minimum value allowed.
-	 * @param {!Number} max The maximum value allowed.
-	 * @return {ConfigWithValidator} `State` configuration object.
-	 */
-	rangeOf(min, max) {
-		return this.validator(validators.rangeOf(min, max));
 	},
 
 	/**

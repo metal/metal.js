@@ -336,7 +336,7 @@ describe('Config', function() {
 	});
 
 	it('should validate ranges', function() {
-		const config = Config.rangeOf(0, 100);
+		const config = Config.inRange(0, 100);
 		assert.ok(core.isObject(config));
 		assert.ok(config.config.validator(10));
 		assert.isFalse(config.config.validator(101));

@@ -128,6 +128,30 @@ const validators = {
 	},
 
 	/**
+	 * Creates a validator that checks for a value within a range.
+	 * @param {!Number} min The minimum value allowed.
+	 * @param {!Number} max The maximum value allowed.
+	 * @return {!function()}
+	 */
+	rangeOf: function(min, max) {
+		const minResult = validators.number(min);
+		const maxResult = validators.number(max);
+		if (isInvalid(minResult)) {
+			return minResult;
+		}
+		if (isInvalid(maxResult)) {
+			return maxResult;
+		}
+		return maybe(value => {
+			const valueResult = validators.number(value);
+			if (isInvalid(valueResult)) {
+				return valueResult;
+			}
+			return value >= min && value <= max;
+		});
+	},
+
+	/**
 	 * Creates a validator that checks if the received value is an object, and
 	 * that its contents match the given shape.
 	 * @param {!Object} shape An object containing validators for each key.

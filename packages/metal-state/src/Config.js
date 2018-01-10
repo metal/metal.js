@@ -108,6 +108,16 @@ const Config = {
 	},
 
 	/**
+	 * Creates `State` configuration object with a `rangeOf` validator.
+	 * @param {!Number} min The minimum value allowed.
+	 * @param {!Number} max The maximum value allowed.
+	 * @return {ConfigWithValidator} `State` configuration object.
+	 */
+	rangeOf(min, max) {
+		return this.validator(validators.rangeOf(min, max));
+	},
+
+	/**
 	 * Creates `State` configuration object with a `shapeOf` validator.
 	 * @param {!Object.<string, ConfigWithValidator>} shapeObj Values being `State` configuration objects.
 	 * @return {ConfigWithValidator} `State` configuration object.

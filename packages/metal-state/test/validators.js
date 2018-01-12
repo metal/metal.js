@@ -296,4 +296,22 @@ describe('validators', function() {
 
 		assert.equal(resultError, ERROR_MESSAGE);
 	});
+
+	it('should validate a range', function() {
+		const range1 = validators.inRange(0, 100);
+		assert.isTrue(range1(1));
+		assert.isFalse(range1(-1));
+
+		const range2 = validators.inRange('foo', null);
+		assert.ok(range2 instanceof Error);
+
+		const range3 = validators.inRange(1, 'bar');
+		assert.ok(range3 instanceof Error);
+
+		const range4 = validators.inRange(1, 10);
+		assert.isFalse(range4(-1));
+		assert.isFalse(range4(11));
+		assert.ok(range4('foo') instanceof Error);
+		assert.ok(range4({}) instanceof Error);
+	});
 });

@@ -334,4 +334,12 @@ describe('Config', function() {
 		assert.isUndefined(config.config.required);
 		assert.isUndefined(config2.config.required);
 	});
+
+	it('should validate ranges', function() {
+		const config = Config.inRange(0, 100);
+		assert.ok(core.isObject(config));
+		assert.ok(config.config.validator(10));
+		assert.isFalse(config.config.validator(101));
+		assert.ok(config.config.validator('3') instanceof Error);
+	});
 });

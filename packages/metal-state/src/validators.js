@@ -41,6 +41,30 @@ const validators = {
 	},
 
 	/**
+	 * Creates a validator that checks for a value within a range.
+	 * @param {!Number} min The minimum value allowed.
+	 * @param {!Number} max The maximum value allowed.
+	 * @return {!function()}
+	 */
+	inRange: function(min, max) {
+		const minResult = validators.number(min);
+		const maxResult = validators.number(max);
+		if (isInvalid(minResult)) {
+			return minResult;
+		}
+		if (isInvalid(maxResult)) {
+			return maxResult;
+		}
+		return maybe(value => {
+			const valueResult = validators.number(value);
+			if (isInvalid(valueResult)) {
+				return valueResult;
+			}
+			return value >= min && value <= max;
+		});
+	},
+
+	/**
 	 * Creates a validator that checks if a value is an instance of a given class.
 	 * @param {!function()} expectedClass Class to check value against.
 	 * @return {!function()}

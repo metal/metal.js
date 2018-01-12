@@ -1,5 +1,27 @@
 # Change Log
 
+## [v2.16.0](https://github.com/metal/metal.js/tree/v2.16.0) (2018-01-12)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.15.1...v2.16.0)
+
+**Implemented enhancements:**
+
+- Add support for Portals [\#330](https://github.com/metal/metal.js/issues/330)
+
+**Closed issues:**
+
+- Add .editorconfig [\#327](https://github.com/metal/metal.js/issues/327)
+
+**Merged pull requests:**
+
+- Updates CHANGELOG for v2.15.1 [\#336](https://github.com/metal/metal.js/pull/336) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- No longer use global setImmediate function due to performance issues [\#335](https://github.com/metal/metal.js/pull/335) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Adding credit to saucelabs in README [\#334](https://github.com/metal/metal.js/pull/334) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Adds a range validator [\#333](https://github.com/metal/metal.js/pull/333) ([julien](https://github.com/julien))
+- Updating copyright year [\#332](https://github.com/metal/metal.js/pull/332) ([diegonvs](https://github.com/diegonvs))
+- Skip portal rendering during SSR [\#331](https://github.com/metal/metal.js/pull/331) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Adds Fragment component [\#329](https://github.com/metal/metal.js/pull/329) ([bryceosterhaus](https://github.com/bryceosterhaus))
+- Adds .editorconfig to the project [\#328](https://github.com/metal/metal.js/pull/328) ([pragmaticivan](https://github.com/pragmaticivan))
+
 ## [v2.15.1](https://github.com/metal/metal.js/tree/v2.15.1) (2017-12-04)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.15.0...v2.15.1)
 

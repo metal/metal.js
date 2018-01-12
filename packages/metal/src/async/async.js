@@ -101,15 +101,6 @@ async.nextTick = function(callback, context) {
 		cb = callback.bind(context);
 	}
 	cb = async.nextTick.wrapCallback_(cb);
-	// Introduced and currently only supported by IE10.
-	// Verify if variable is defined on the current runtime (i.e., node, browser).
-	// Can't use typeof enclosed in a function (such as core.isFunction) or an
-	// exception will be thrown when the function is called on an environment
-	// where the variable is undefined.
-	if (typeof setImmediate === 'function') {
-		setImmediate(cb);
-		return;
-	}
 	// Look for and cache the custom fallback version of setImmediate.
 	if (!async.nextTick.setImmediate_) {
 		// eslint-disable-next-line

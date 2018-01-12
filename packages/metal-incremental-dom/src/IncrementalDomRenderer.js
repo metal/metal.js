@@ -35,7 +35,9 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 			for (let i = 0; i < data.childComponents.length; i++) {
 				const child = data.childComponents[i];
 				if (!child.isDisposed()) {
-					child.element = null;
+					if (!child.portalElement) {
+						child.element = null;
+					}
 					child.dispose();
 				}
 			}

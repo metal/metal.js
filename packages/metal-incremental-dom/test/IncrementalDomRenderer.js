@@ -3331,4 +3331,217 @@ describe('IncrementalDomRenderer', function() {
 		const config = IncrementalDomRenderer.getConfig(component);
 		assert.strictEqual(getData(component).config, config);
 	});
+
+	describe('Portals', function() {
+		beforeEach(function() {
+			document.body.innerHTML = '';
+		});
+
+		it('should render sub components to defined portalElement', function() {
+			const portalElement = createPortalElement();
+
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Child');
+					IncDom.elementClose('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Parent');
+					IncDom.elementOpen(
+						TestChildComponent,
+						null,
+						null,
+						'ref',
+						'child',
+						'portalElement',
+						portalElement
+					);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+
+			assert.strictEqual(
+				document.body.innerHTML,
+				'<div id="host"><div>Child</div></div><div>Parent</div>'
+			);
+		});
+
+		it('should update sub components that have a defined portalElement', function(
+			done
+		) {
+			const portalElement = createPortalElement();
+
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Child: ' + this.foo);
+					IncDom.elementClose('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+			TestChildComponent.STATE = {
+				foo: {},
+			};
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Parent: ' + this.foo);
+					IncDom.elementOpen(
+						TestChildComponent,
+						null,
+						null,
+						'ref',
+						'child',
+						'foo',
+						this.foo,
+						'portalElement',
+						portalElement
+					);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				foo: {
+					value: 'bar',
+				},
+			};
+
+			component = new TestComponent();
+
+			assert.strictEqual(
+				document.body.innerHTML,
+				'<div id="host"><div>Child: bar</div></div><div>Parent: bar</div>'
+			);
+
+			component.foo = 'baz';
+			component.refs.child.once('stateSynced', function() {
+				assert.strictEqual(
+					document.body.innerHTML,
+					'<div id="host"><div>Child: baz</div></div><div>Parent: baz</div>'
+				);
+				done();
+			});
+		});
+
+		it('should dispose sub components with a portalElement when parent is disposed', function() {
+			const portalElement = createPortalElement();
+
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Child');
+					IncDom.elementClose('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Parent');
+					IncDom.elementOpen(
+						TestChildComponent,
+						null,
+						null,
+						'ref',
+						'child',
+						'portalElement',
+						portalElement
+					);
+					IncDom.elementClose(TestChildComponent);
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+
+			component = new TestComponent();
+
+			assert.strictEqual(
+				document.body.innerHTML,
+				'<div id="host"><div>Child</div></div><div>Parent</div>'
+			);
+
+			component.dispose();
+
+			assert.strictEqual(document.body.innerHTML, '<div id="host"></div>');
+		});
+
+		it('should dispose sub components with portalElement when removed by parent component', function(
+			done
+		) {
+			const portalElement = createPortalElement();
+
+			class TestChildComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Child');
+					IncDom.elementClose('div');
+				}
+			}
+			TestChildComponent.RENDERER = IncrementalDomRenderer;
+
+			class TestComponent extends Component {
+				render() {
+					IncDom.elementOpen('div');
+					IncDom.text('Parent');
+					if (!this.remove) {
+						IncDom.elementVoid(
+							TestChildComponent,
+							null,
+							null,
+							'ref',
+							'child',
+							'portalElement',
+							portalElement
+						);
+					}
+					IncDom.elementClose('div');
+				}
+			}
+			TestComponent.RENDERER = IncrementalDomRenderer;
+			TestComponent.STATE = {
+				remove: {
+					value: false,
+				},
+			};
+
+			component = new TestComponent();
+
+			assert.strictEqual(
+				document.body.innerHTML,
+				'<div id="host"><div>Child</div></div><div>Parent</div>'
+			);
+
+			component.remove = true;
+
+			component.refs.child.once('disposed', function() {
+				assert.strictEqual(
+					document.body.innerHTML,
+					'<div id="host"></div><div>Parent</div>'
+				);
+
+				done();
+			});
+		});
+	});
 });
+
+function createPortalElement() {
+	const portalElement = document.createElement('div');
+	portalElement.setAttribute('id', 'host');
+	document.body.appendChild(portalElement);
+	return portalElement;
+}

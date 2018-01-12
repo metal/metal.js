@@ -1152,6 +1152,60 @@ describe('Component', function() {
 		sinon.assert.calledWith(hookStub, comp);
 	});
 
+	it('should render component to portalElement', function() {
+		const portalElement = document.createElement('span');
+
+		comp = Component.render(Component, {
+			portalElement,
+		});
+
+		assert.strictEqual(comp.element.parentNode, portalElement);
+		assert.strictEqual(comp.portalElement, portalElement);
+	});
+
+	it('should set portalElement from selector', function() {
+		const portalElement = document.createElement('div');
+		portalElement.setAttribute('id', 'foo');
+
+		document.body.appendChild(portalElement);
+
+		comp = Component.render(Component, {
+			portalElement: '#foo',
+		});
+
+		assert.strictEqual(comp.element.parentNode, portalElement);
+	});
+
+	it('should set portalElement to body when set to true', function() {
+		const parentElement = document.createElement('span');
+
+		document.body.appendChild(parentElement);
+
+		comp = Component.render(
+			Component,
+			{
+				portalElement: true,
+			},
+			parentElement
+		);
+
+		assert.strictEqual(comp.element.parentNode, document.body);
+	});
+
+	it('should detach component from DOM when portalElement is passed', function() {
+		const portalElement = document.createElement('span');
+
+		comp = Component.render(Component, {
+			portalElement,
+		});
+
+		assert.ok(comp.inDocument);
+
+		comp.dispose();
+
+		assert.ok(!comp.inDocument);
+	});
+
 	function createCustomComponentClass(rendererContentOrFn) {
 		class CustomComponent extends Component {}
 		CustomComponent.RENDERER = createCustomRenderer(rendererContentOrFn);

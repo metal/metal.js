@@ -20,7 +20,9 @@ export function disposeUnused() {
 		if (!comp.isDisposed() && !getData(comp).parent) {
 			// Don't let disposing cause the element to be removed, since it may
 			// be currently being reused by another component.
-			comp.element = null;
+			if (!comp.portalElement) {
+				comp.element = null;
+			}
 			comp.dispose();
 		}
 	}

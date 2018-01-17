@@ -1,5 +1,13 @@
 # Change Log
 
+## [v2.16.1](https://github.com/metal/metal.js/tree/v2.16.1) (2018-01-17)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.0...v2.16.1)
+
+**Merged pull requests:**
+
+- Updates CHANGELOG for v2.16.0 [\#338](https://github.com/metal/metal.js/pull/338) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Use globally defined setImmediate on server side for test suites like jest that have mock timers [\#337](https://github.com/metal/metal.js/pull/337) ([Robert-Frampton](https://github.com/Robert-Frampton))
+
 ## [v2.16.0](https://github.com/metal/metal.js/tree/v2.16.0) (2018-01-12)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.15.1...v2.16.0)
 

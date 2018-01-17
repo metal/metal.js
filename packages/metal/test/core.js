@@ -257,6 +257,51 @@ describe('core', function() {
 		});
 	});
 
+	describe('isServerSide', function() {
+		const originalBrowser = process.browser;
+		const originalEnv = process.env;
+
+		beforeEach(function() {
+			process.env = {
+				NODE_ENV: '',
+			};
+			process.browser = true;
+		});
+
+		afterEach(function() {
+			process.env = originalEnv;
+			process.browser = originalBrowser;
+		});
+
+		it('should return false when process global exists and browser property is true', function() {
+			assert.ok(!core.isServerSide());
+		});
+
+		it('should return true when process global exists and browser property is false', function() {
+			process.browser = false;
+
+			assert.ok(core.isServerSide());
+		});
+
+		it('should return false when NODE_ENV is set to "test"', function() {
+			process.browser = false;
+			process.env.NODE_ENV = 'test';
+
+			assert.ok(!core.isServerSide());
+		});
+
+		it('should skip NODE_ENV check when options.checkEnv is set to false', function() {
+			process.browser = false;
+			process.env.NODE_ENV = 'test';
+
+			assert.ok(
+				core.isServerSide({
+					checkEnv: false,
+				})
+			);
+		});
+	});
+
 	describe('Null Function', function() {
 		it('should not return anything', function() {
 			assert.strictEqual(undefined, core.nullFunction());

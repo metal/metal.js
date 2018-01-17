@@ -5,6 +5,8 @@
 
 'use strict';
 
+import {isServerSide} from 'metal';
+
 const async = {};
 
 /**
@@ -103,8 +105,15 @@ async.nextTick = function(callback, context) {
 	cb = async.nextTick.wrapCallback_(cb);
 	// Look for and cache the custom fallback version of setImmediate.
 	if (!async.nextTick.setImmediate_) {
-		// eslint-disable-next-line
-		async.nextTick.setImmediate_ = async.nextTick.getSetImmediateEmulator_();
+		if (
+			typeof setImmediate === 'function' &&
+			isServerSide({checkEnv: false})
+		) {
+			async.nextTick.setImmediate_ = setImmediate;
+		} else {
+			// eslint-disable-next-line
+			async.nextTick.setImmediate_ = async.nextTick.getSetImmediateEmulator_();
+		}
 	}
 	async.nextTick.setImmediate_(cb);
 };

@@ -5,6 +5,8 @@
 
 'use strict';
 
+import {isServerSide} from 'metal';
+
 const async = {};
 
 /**
@@ -105,8 +107,7 @@ async.nextTick = function(callback, context) {
 	if (!async.nextTick.setImmediate_) {
 		if (
 			typeof setImmediate === 'function' &&
-			typeof process !== 'undefined' &&
-			!process.browser
+			isServerSide({checkEnv: false})
 		) {
 			async.nextTick.setImmediate_ = setImmediate;
 		} else {

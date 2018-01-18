@@ -5,7 +5,7 @@
 
 'use strict';
 
-import {isServerSide} from 'metal';
+import {isServerSide} from '../coreNamed';
 
 const async = {};
 

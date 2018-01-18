@@ -1,5 +1,14 @@
 # Change Log
 
+## [v2.16.2](https://github.com/metal/metal.js/tree/v2.16.2) (2018-01-18)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.1...v2.16.2)
+
+**Merged pull requests:**
+
+- Import should be relative [\#343](https://github.com/metal/metal.js/pull/343) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Import should be relative [\#342](https://github.com/metal/metal.js/pull/342) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Merge pull request \#91 from Robert-Frampton/portal [\#339](https://github.com/metal/metal.js/pull/339) ([jbalsas](https://github.com/jbalsas))
+
 ## [v2.16.1](https://github.com/metal/metal.js/tree/v2.16.1) (2018-01-17)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.16.0...v2.16.1)
 

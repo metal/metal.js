@@ -1,0 +1,165 @@
+---
+title: "Metal.js"
+description: "Build UI components in a solid, flexible way."
+---
+
+{namespace pageIndex}
+
+/**
+ * @param site
+ */
+{template .render}
+	{call main.render data="all"}
+		{param content kind="html"}
+			{call .header data="all" /}
+			{call .features /}
+			{call .highlights /}
+			{call .why data="all" /}
+			{call .footer /}
+		{/param}
+	{/call}
+{/template}
+
+/**
+ * @param site
+ */
+{template .header}
+	<header class="header">
+		<div class="container">
+			<h1 class="header-title">{$site.index.title}</h1>
+			<h2 class="header-subtitle">{$site.index.description}</h2>
+			<div class="header-cta">
+				<a href="https://github.com/metal/metal.js/archive/master.zip" class="btn btn-accent">Download Now</a>
+				<a href="/docs/tutorials/tutorial-todo-jsx/before-we-start.html" class="btn btn-default">Get Started</a>
+			</div>
+		</div>
+	</header>
+{/template}
+
+/**
+ *
+ */
+{template .why}
+	<article class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-2">
+					<h3 class="about-title">Start building today. Are you ready?</h3>
+					<p class="about-description header-cta">
+						<a href="https://github.com/metal/metal.js/archive/master.zip" class="btn btn-default">Download Now</a>
+						</p>
+				</div>
+			</div>
+		</div>
+	</article>
+{/template}
+
+/**
+ *
+ */
+{template .features}
+	<div class="features">
+		<div class="container">
+			<div class="row">
+				<section class="feature col-md-4 col-md-offset-2">
+					<div class="feature-graphic">
+						<span class="icon-16-hammer"></span>
+					</div>
+					<h3 class="feature-title">Foundational</h3>
+					<p class="feature-description">
+						Metal.js is not a library of components, but a foundation for creating the components you need.
+						<br>
+						<br>
+						<a href="/docs/tutorials/tutorial-todo-jsx/before-we-start.html">Learn More</a>
+					</p>
+				</section>
+				<section class="feature col-md-4">
+					<div class="feature-graphic">
+						<span class="icon-16-cloud"></span>
+					</div>
+					<h3 class="feature-title">Stable</h3>
+					<p class="feature-description">
+						Used in numerous production environments already, Metal.js is the backbone of many frontend projects.
+						<br>
+						<br>
+						<a href="https://www.npmjs.com/browse/depended/metal" target="_blank">Learn More</a>
+					</p>
+				</section>
+				<section class="feature col-md-4">
+					<div class="feature-graphic">
+						<span class="icon-16-circle-arrow"></span>
+					</div>
+					<h3 class="feature-title">Future Ready</h3>
+					<p class="feature-description">
+						By using ES6 we benefit from the best of JavaScript, while maintaining easy-to-read and clean code.
+						<br>
+						<br>
+						<a href="/docs/">Learn More</a>
+					</p>
+				</section>
+			</div>
+		</div>
+	</div>
+{/template}
+
+/**
+ *
+ */
+{template .highlights}
+	<div class="highlights">
+		<div class="container">
+			<section class="highlight row">
+				<div class="col-md-12 col-md-offset-2">
+					<h4 class="highlight-title">Our Architecture</h4>
+					<img class="architecture-image-primary" src="images/metal_architecture@2x.png" alt="Architecture">
+
+					<p class="highlight-description">
+						Metal.js components can be written in two templating languages, Soy (Google Closure), and JSX (React). Both are compiled to incremental dom which is used to progressively update DOM elements when component state updates. Therefore, you can spend less time doing manual DOM manipulation, and more time on what matters.
+					</p>
+
+					<h2>JSX</h2>
+
+					<p class="highlight-description">
+						JSX is a preprocessor step that adds XML syntax to JavaScript, it allows you to
+						write your component markup directly in your Metal.js component class. Keeping
+						your logic and view close together.
+
+						<p>
+							<a href="/docs/guides/jsx-components.html">Learn More</a>
+						</p>
+					</p>
+
+					<h2>Soy</h2>
+
+					<p class="highlight-description">
+						Soy is an isomorphic templating language that can be rendered in multiple development
+						environments, and allows for advanced progressive ehancement. The template exists in its own file,
+						seperate from your component's JavaScript.
+
+						<p>
+							<a href="/docs/guides/soy-components.html">Learn More</a>
+						</p>
+					</p>
+				</div>
+			</section>
+		</div>
+	</div>
+{/template}
+
+/**
+ *
+ */
+{template .footer}
+	<footer class="footer">
+		<div class="container">
+			<div class="row">
+				<p class="footer-description col-md-6 col-md-offset-2">
+					Brought to you by <a href="https://liferay.com">Liferay, Inc.</a> © 2017.
+				</p>
+				<p class="footer-description col-md-6">
+					Powered by <a href="http://wedeploy.com">WeDeploy™</a>
+				</p>
+			</div>
+		</div>
+	</footer>
+{/template}

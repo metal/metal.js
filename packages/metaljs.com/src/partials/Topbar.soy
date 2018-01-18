@@ -1,0 +1,52 @@
+{namespace Topbar}
+
+/**
+ * @param? elementClasses
+ * @param site
+ */
+{template .render}
+	<nav class="topbar {$elementClasses ? ' ' + $elementClasses : ''}">
+		{call .logo data="all" /}
+		{call .menu data="all" /}
+
+		<ul class="topbar-list topbar-list-icons">
+			<li class="topbar-item">
+				<a class="topbar-icon" target="_blank" href="https://github.com/metal/metal">
+					<span class="icon-16-github"></span>
+				</a>
+			</li>
+			<li class="topbar-item">
+				<a class="topbar-icon" target="_blank" href="https://community-chat.liferay.com/">
+					<span class="icon-16-hash"></span>
+				</a>
+			</li>
+		</ul>
+	</nav>
+{/template}
+
+/**
+ * @param site
+ */
+{template .logo}
+	<div class="topbar-logo">
+		<a class="topbar-logo-link" href="/">
+			<img class="topbar-logo-image" src="/images/logo_signature@2x.png" alt="Metal.js Home">
+			<span class="topbar-logo-text">{$site.title}</span>
+		</a>
+	</div>
+{/template}
+
+/**
+ * @param site
+ */
+{template .menu}
+	{call ElectricNavigation.render}
+		{param depth: 1 /}
+		{param elementClasses: 'topbar-menu' /}
+		{param togglerClasses: 'topbar-toggle' /}
+		{param linkClasses: 'topbar-link' /}
+		{param listClasses: 'topbar-list' /}
+		{param listItemClasses: 'topbar-item' /}
+		{param section: $site.index /}
+	{/call}
+{/template}

@@ -1,0 +1,36 @@
+// Features
+
+.feature .feature-graphic [class^="icon-16-"], .feature .feature-graphic [class*="icon-16-"] {
+	box-shadow: none;
+	font-size: 72px;
+}
+
+.highlight {
+	margin: 125px 0;
+}
+
+.highlights {
+	background: rgba(35, 50, 64, 0.05);
+}
+
+.highlight-title {
+	text-align: center;
+}
+
+.architecture-image-primary {
+	display: block;
+	margin: 2em auto;
+	max-width: 75%;
+
+	@media (min-width: $screen-md-min) {
+		display: inline;
+		float: right;
+		margin: 1em 0 3em $grid-gutter-width;
+		max-width: 50%;
+	}
+}
+
+.about {
+	background-color: $accent;
+	padding: 125px 0;
+}

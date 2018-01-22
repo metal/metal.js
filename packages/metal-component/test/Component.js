@@ -1206,6 +1206,34 @@ describe('Component', function() {
 		assert.ok(!comp.inDocument);
 	});
 
+	it('should create portal element if id is passed and element is not found', function() {
+		assert.ok(!document.getElementById('portal_test'));
+
+		comp = Component.render(Component, {
+			portalElement: '#portal_test',
+		});
+
+		const portalElement = document.getElementById('portal_test');
+
+		assert.ok(portalElement);
+		assert.strictEqual(comp.element.parentNode, portalElement);
+		assert.strictEqual(comp.portalElement, portalElement);
+	});
+
+	it('should not create a portal element if a valid id is not passed', function() {
+		comp = Component.render(Component, {
+			portalElement: '#portal_test .class-selector',
+		});
+
+		assert.ok(!comp.portalElement);
+
+		comp = Component.render(Component, {
+			portalElement: '.class-selector',
+		});
+
+		assert.ok(!comp.portalElement);
+	});
+
 	function createCustomComponentClass(rendererContentOrFn) {
 		class CustomComponent extends Component {}
 		CustomComponent.RENDERER = createCustomRenderer(rendererContentOrFn);

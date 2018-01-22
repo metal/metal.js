@@ -35,13 +35,15 @@ module.exports = function(config) {
 			// Since all files will be added, we need to ensure manually that these
 			// will be added first.
 			{
-				pattern: 'packages/metal-incremental-dom/src/incremental-dom.js',
+				pattern:
+					'packages/metal-incremental-dom/src/incremental-dom.js',
 				watched: false,
 				included: true,
 				served: true,
 			},
 			{
-				pattern: 'packages/metal-incremental-dom/lib/incremental-dom.js',
+				pattern:
+					'packages/metal-incremental-dom/lib/incremental-dom.js',
 				watched: false,
 				included: true,
 				served: true,
@@ -68,7 +70,8 @@ module.exports = function(config) {
 				served: true,
 			},
 			{
-				pattern: 'packages/metal-web-component/webcomponents_polyfill.js',
+				pattern:
+					'packages/metal-web-component/webcomponents_polyfill.js',
 				watched: false,
 				included: true,
 				served: true,
@@ -87,21 +90,30 @@ module.exports = function(config) {
 			},
 		],
 
-		frameworks: ['browserify', 'mocha', 'chai', 'sinon', 'source-map-support'],
+		frameworks: [
+			'browserify',
+			'mocha',
+			'chai',
+			'sinon',
+			'source-map-support',
+		],
 
 		plugins: [
 			'karma-browserify',
 			'karma-chai',
 			'karma-chrome-launcher',
 			'karma-mocha',
-			'karma-mocha',
 			'karma-sinon',
 			'karma-source-map-support',
 		],
 
 		preprocessors: {
-			'packages/metal-incremental-dom/src/incremental-dom.js': ['browserify'],
-			'packages/metal-incremental-dom/lib/incremental-dom.js': ['browserify'],
+			'packages/metal-incremental-dom/src/incremental-dom.js': [
+				'browserify',
+			],
+			'packages/metal-incremental-dom/lib/incremental-dom.js': [
+				'browserify',
+			],
 			'packages/metal-soy/node_modules/metal-soy-bundle/lib/bundle.js': [
 				'browserify',
 			],

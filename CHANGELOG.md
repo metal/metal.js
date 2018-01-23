@@ -1,5 +1,19 @@
 # Change Log
 
+## [Unreleased](https://github.com/metal/metal.js/tree/HEAD)
+
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.2...HEAD)
+
+**Closed issues:**
+
+- Use gh-pages for `demos` for metal-\* components [\#133](https://github.com/metal/metal.js/issues/133)
+
+**Merged pull requests:**
+
+- release/v2.16.3 [\#344](https://github.com/metal/metal.js/pull/344) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- If a valid id is passed to portalElement and the element is not found, create an element with that id [\#341](https://github.com/metal/metal.js/pull/341) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Removing unecessary karma-mocha repetition on karma.conf.js [\#340](https://github.com/metal/metal.js/pull/340) ([diegonvs](https://github.com/diegonvs))
+
 ## [v2.16.2](https://github.com/metal/metal.js/tree/v2.16.2) (2018-01-18)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.16.1...v2.16.2)
 

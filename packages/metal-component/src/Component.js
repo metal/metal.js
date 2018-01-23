@@ -12,7 +12,7 @@ import {
 	object,
 } from 'metal';
 import {syncState} from './sync/sync';
-import {DomEventEmitterProxy, toElement} from 'metal-dom';
+import {DomEventEmitterProxy, enterDocument, toElement} from 'metal-dom';
 import ComponentDataManager from './ComponentDataManager';
 import ComponentRenderer from './ComponentRenderer';
 import {EventEmitter, EventHandler} from 'metal-events';
@@ -367,6 +367,33 @@ class Component extends EventEmitter {
 	}
 
 	/**
+	 * Gets portalElement based on selector. If an id is passed and the element
+	 * does not exist, the element is created with that id and appended to the body.
+	 *
+	 * @param {string|Element} portalElementSelector
+	 * @return {?Element}
+	 */
+	getPortalElement_(portalElementSelector) {
+		let portalElement = toElement(portalElementSelector);
+
+		if (portalElement) {
+			return portalElement;
+		}
+
+		if (
+			portalElementSelector.indexOf('#') === 0 &&
+			portalElementSelector.indexOf(' ') === -1
+		) {
+			portalElement = document.createElement('div');
+			portalElement.setAttribute('id', portalElementSelector.slice(1));
+
+			enterDocument(portalElement);
+		}
+
+		return portalElement;
+	}
+
+	/**
 	 * Gets state data for this component.
 	 * @return {!Object}
 	 */
@@ -677,9 +704,10 @@ class Component extends EventEmitter {
 	 */
 	setUpPortal_(portalElement) {
 		if (
-			!isElement(portalElement) &&
-			!isString(portalElement) &&
-			!isBoolean(portalElement)
+			!portalElement ||
+			(!isElement(portalElement) &&
+				!isString(portalElement) &&
+				!isBoolean(portalElement))
 		) {
 			return;
 		} else if (isBoolean(portalElement) && portalElement) {
@@ -691,7 +719,7 @@ class Component extends EventEmitter {
 			return;
 		}
 
-		portalElement = toElement(portalElement);
+		portalElement = this.getPortalElement_(portalElement);
 
 		if (portalElement) {
 			const placeholder = document.createElement('div');

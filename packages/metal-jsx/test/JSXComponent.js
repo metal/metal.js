@@ -487,6 +487,55 @@ describe('JSXComponent', function() {
 			assert.ok(dom.hasClass(component.element, 'parent'));
 			assert.ok(dom.hasClass(component.element, 'grandchild'));
 		});
+
+		it('should use default prop value when "undefined" is passed as a value on update', function(
+			done
+		) {
+			class ChildComponent extends JSXComponent {
+				render() {
+					return <div />;
+				}
+			}
+			ChildComponent.PROPS = {
+				childFoo: {
+					value: 'foo',
+				},
+				childBar: {
+					value: 'bar',
+				},
+			};
+
+			class ParentComponent extends JSXComponent {
+				render() {
+					return (
+						<ChildComponent
+							childBar={this.state.bar}
+							childFoo={this.state.foo}
+							ref="childComponent"
+						/>
+					);
+				}
+			}
+			ParentComponent.STATE = {
+				bar: {
+					value: 'bar',
+				},
+				foo: {},
+			};
+
+			component = new ParentComponent();
+
+			component.state.bar = 'newBar';
+
+			component.once('stateChanged', function() {
+				assert.strictEqual(
+					component.refs.childComponent.props.childBar,
+					'newBar'
+				);
+				assert.strictEqual(component.refs.childComponent.props.childFoo, 'foo');
+				done();
+			});
+		});
 	});
 
 	describe('shouldUpdate', function() {

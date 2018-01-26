@@ -2,6 +2,7 @@
 
 import dom from 'metal-dom';
 import Component from 'metal-component';
+import {Anchor as AnchorComponent} from './assets/Anchor.soy.js';
 import {Events as EventsComponent} from './assets/Events.soy.js';
 import {ComputedData as ComputedDataComponent} from './assets/ComputedData.soy.js';
 import {ExternalTemplate as ExternalTemplateComponent} from './assets/ExternalTemplate.soy.js';
@@ -18,6 +19,8 @@ import {NestedDataAll as NestedDataAllComponent} from './assets/NestedDataAll.so
 import {NestedLevels as NestedLevelsComponent} from './assets/NestedLevels.soy.js';
 import {NestedMultiple as NestedMultipleComponent} from './assets/NestedMultiple.soy.js';
 import {NestedNoData as NestedNoDataComponent} from './assets/NestedNoData.soy.js';
+import {Script as ScriptComponent} from './assets/Script.soy.js';
+import {Style as StyleComponent} from './assets/Style.soy.js';
 import {TemplateData as TemplateDataComponent} from './assets/TemplateData.soy.js';
 
 import Soy from '../src/Soy';
@@ -470,6 +473,45 @@ describe('Soy', function() {
 		it('should not try to convert param that is not a string or a sanitized html object', function() {
 			let fn = sinon.stub();
 			assert.strictEqual(fn, Soy.toIncDom(fn));
+		});
+	});
+
+	describe('SanitizedCss', function() {
+		it('should accept `css` param type', function() {
+			comp = new StyleComponent({
+				css: 'body { color: #123456; }',
+			});
+
+			assert.equal(
+				comp.element.outerHTML,
+				'<div><style>body { color: #123456; }</style></div>'
+			);
+		});
+	});
+
+	describe('SanitizedJs', function() {
+		it('should accept `js` param type', function() {
+			comp = new ScriptComponent({
+				js: 'var foo = "bar";',
+			});
+
+			assert.equal(
+				comp.element.outerHTML,
+				'<div><script>var foo = "bar";</script></div>'
+			);
+		});
+	});
+
+	describe('SanitizedUri', function() {
+		it('should accept `uri` param type', function() {
+			comp = new AnchorComponent({
+				uri: 'http://foo/bar:8080',
+			});
+
+			assert.equal(
+				comp.element.outerHTML,
+				'<div><a href="http://foo/bar:8080"></a></div>'
+			);
 		});
 	});
 });

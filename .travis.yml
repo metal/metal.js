@@ -9,6 +9,10 @@ before_install:
   - nvm install 8
   - npm install -g lerna@2.2.0
 
+branches:
+  except:
+    - wedeploy
+
 install:
   - npm run lerna
 

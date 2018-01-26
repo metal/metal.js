@@ -2,7 +2,22 @@
 
 ## [Unreleased](https://github.com/metal/metal.js/tree/HEAD)
 
-[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.2...HEAD)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.3...HEAD)
+
+**Closed issues:**
+
+- IncrementalDOMRenderer render function can fall when a component created from a different version is passed [\#349](https://github.com/metal/metal.js/issues/349)
+- goog.soy.data.SanitizedCss is not included in soy-bundle [\#324](https://github.com/metal/metal.js/issues/324)
+
+**Merged pull requests:**
+
+- Updates CHANGELOG for v2.16.3 [\#354](https://github.com/metal/metal.js/pull/354) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Update google-closure soy/data.js \(f7e0f45\) | Fixes \#324 [\#353](https://github.com/metal/metal.js/pull/353) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Excludes wedeploy branch from travis [\#352](https://github.com/metal/metal.js/pull/352) ([jbalsas](https://github.com/jbalsas))
+- Replace instanceof check with check for COMPONENT\_FLAG | Fixes \#349 [\#350](https://github.com/metal/metal.js/pull/350) ([Robert-Frampton](https://github.com/Robert-Frampton))
+
+## [v2.16.3](https://github.com/metal/metal.js/tree/v2.16.3) (2018-01-23)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.2...v2.16.3)
 
 **Closed issues:**
 

@@ -120,7 +120,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 * @return {!Component} The rendered component's instance.
 	 */
 	render(component, dataOrElement, parent) {
-		if (component instanceof Component) {
+		if (component[Component.COMPONENT_FLAG]) {
 			this.patch(component);
 		} else {
 			return renderFunction(this, component, dataOrElement, parent);

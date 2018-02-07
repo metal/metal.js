@@ -160,6 +160,7 @@ async.nextTick.getSetImmediateEmulator_ = function() {
 			const iframe = document.createElement('iframe');
 			iframe.style.display = 'none';
 			iframe.src = '';
+			iframe.title = '';
 			document.documentElement.appendChild(iframe);
 			const win = iframe.contentWindow;
 			const doc = win.document;

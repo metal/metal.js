@@ -1,6 +1,6 @@
 'use strict';
 
-import {object} from 'metal';
+import {isDef, object} from 'metal';
 import State from 'metal-state';
 
 const BLACKLIST = {
@@ -120,7 +120,7 @@ class ComponentDataManager {
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
 			if (!state.getStateKeyConfig(key).internal) {
-				if (data.hasOwnProperty(key)) {
+				if (data.hasOwnProperty(key) && isDef(data[key])) {
 					state.set(key, data[key]);
 				} else {
 					state.setDefaultValue(key);

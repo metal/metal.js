@@ -101,6 +101,27 @@ describe('ComponentDataManager', function() {
 		assert.strictEqual('bar', component.bar);
 	});
 
+	it('should not favor undefined values over default values when replacing all non internal data', function() {
+		component.constructor.STATE = {
+			bar: {
+				value: 'initialBar',
+			},
+			foo: {
+				value: 'initialFoo',
+			},
+		};
+
+		initialConfig = {};
+		ComponentDataManager.setUp(component, {});
+
+		ComponentDataManager.replaceNonInternal(component, {
+			bar: undefined,
+			foo: 'newFoo',
+		});
+		assert.strictEqual('newFoo', component.foo);
+		assert.strictEqual('initialBar', component.bar);
+	});
+
 	it('should return state instance', function() {
 		ComponentDataManager.setUp(component, {});
 		assert.ok(

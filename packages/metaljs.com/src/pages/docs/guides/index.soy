@@ -3,6 +3,7 @@ title: "Guides"
 url: "/docs/guides/alias.html"
 icon: "streams"
 weight: 2
+layout: false
 ---
 
 {namespace pageDocsGuidesIndex}
@@ -11,17 +12,12 @@ weight: 2
  *
  */
 {template .render}
-{/template}
+	{@param page: ?}
 
-/**
- * @param page
- */
-{template .soyweb}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="refresh" content="0; URL='{$page.url}'">
-</head>
-</html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta http-equiv="refresh" content="0; URL='{$page.url}'">
+		</head>
+	</html>
 {/template}

@@ -853,6 +853,15 @@ Component.DATA = {
 	},
 
 	/**
+	 * Indicates if the component is controlled or not.
+	 * @type {boolean}
+	 */
+	controlled: {
+		validator: isBoolean,
+		value: false,
+	},
+
+	/**
 	 * CSS classes to be applied to the element.
 	 * @type {string}
 	 */

@@ -353,7 +353,13 @@ describe('Component', function() {
 
 		it('should return an array with all state property names', function() {
 			comp = new Component();
-			let expected = ['children', 'elementClasses', 'events', 'visible'];
+			let expected = [
+				'children',
+				'controlled',
+				'elementClasses',
+				'events',
+				'visible',
+			];
 			assert.deepEqual(expected, comp.getStateKeys().sort());
 		});
 
@@ -363,6 +369,7 @@ describe('Component', function() {
 			});
 			let expected = {
 				children: [],
+				controlled: false,
 				elementClasses: 'myClass',
 				events: null,
 				visible: true,

@@ -269,7 +269,14 @@ describe('JSXDataManager', function() {
 
 			component = new TestComponent();
 			let manager = component.getDataManager();
-			let expected = ['children', 'elementClasses', 'events', 'foo', 'visible'];
+			let expected = [
+				'children',
+				'controlled',
+				'elementClasses',
+				'events',
+				'foo',
+				'visible',
+			];
 			assert.deepEqual(expected, manager.getSyncKeys(component).sort());
 		});
 	});

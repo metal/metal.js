@@ -530,6 +530,41 @@ describe('State', function() {
 		assert.strictEqual(1, state.key1);
 	});
 
+	it('should not allow changing a state value if controlled value initial value is true after it has been written', function() {
+		let state = new State({
+			controlled: true,
+		});
+		state.configState({
+			controlled: {
+				value: false,
+			},
+			key1: {
+				value: 1,
+			},
+		});
+
+		assert.strictEqual(1, state.key1);
+		state.key1 = 2;
+		assert.strictEqual(1, state.key1);
+	});
+
+	it('should not allow changing a state value if controlled value is true after it has been written', function() {
+		let state = new State();
+		state.configState({
+			controlled: {
+				value: false,
+			},
+			key1: {
+				value: 1,
+			},
+		});
+
+		assert.strictEqual(1, state.key1);
+		state.controlled = true;
+		state.key1 = 2;
+		assert.strictEqual(1, state.key1);
+	});
+
 	describe('required', function() {
 		let originalConsoleFn;
 

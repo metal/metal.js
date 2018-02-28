@@ -223,8 +223,14 @@ class State extends EventEmitter {
 	 * @return {boolean}
 	 */
 	canSetState(name) {
+		const controlled =
+			this.getStateInfo('controlled').value ||
+			this.initialValues_.controlled;
 		const info = this.getStateInfo(name);
-		return !this.stateConfigs_[name].writeOnce || !info.written;
+		return (
+			(!controlled && !this.stateConfigs_[name].writeOnce) ||
+			!info.written
+		);
 	}
 
 	/**

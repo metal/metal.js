@@ -24,9 +24,11 @@ creates the HTML you see in the demo page:
 
 ```text/jsx
 class TodoApp extends JSXComponent {
-	return (
-		<div>Hello, World</div>
-	);
+	render() {
+		return (
+			<div>Hello, World</div>
+		);
+	}
 }
 ```
 

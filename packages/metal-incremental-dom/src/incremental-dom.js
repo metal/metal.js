@@ -14,5 +14,7 @@ if (isServerSide()) {
 			? global
 			: window;
 
-	scope.IncrementalDOM = IncrementalDOM;
+	if (!scope.IncrementalDOM) {
+		scope.IncrementalDOM = IncrementalDOM;
+	}
 }

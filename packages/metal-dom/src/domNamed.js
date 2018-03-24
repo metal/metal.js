@@ -438,12 +438,18 @@ export function match(element, selector) {
  * @private
  */
 function matchFallback_(element, selector) {
-	const nodes = document.querySelectorAll(selector, element.parentNode);
-	for (let i = 0; i < nodes.length; ++i) {
-		if (nodes[i] === element) {
-			return true;
+	const parentNode = element.parentNode;
+
+	if (parentNode) {
+		const nodes = parentNode.querySelectorAll(selector);
+
+		for (let i = 0; i < nodes.length; ++i) {
+			if (nodes[i] === element) {
+				return true;
+			}
 		}
 	}
+
 	return false;
 }
 

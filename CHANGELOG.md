@@ -1,20 +1,26 @@
 # Change Log
 
-## [Unreleased](https://github.com/metal/metal.js/tree/HEAD)
-
-[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.3...HEAD)
+## [v2.16.5](https://github.com/metal/metal.js/tree/v2.16.5) (2018-03-25)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.3...v2.16.5)
 
 **Closed issues:**
 
 - IncrementalDOMRenderer render function can fall when a component created from a different version is passed [\#349](https://github.com/metal/metal.js/issues/349)
+- Default values are being overwritten by undefined prop values if state of parent component is updated \[metal-jsx\] [\#345](https://github.com/metal/metal.js/issues/345)
 - goog.soy.data.SanitizedCss is not included in soy-bundle [\#324](https://github.com/metal/metal.js/issues/324)
 
 **Merged pull requests:**
 
-- Updates CHANGELOG for v2.16.3 [\#354](https://github.com/metal/metal.js/pull/354) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Update google-closure soy/data.js \(f7e0f45\) | Fixes \#324 [\#353](https://github.com/metal/metal.js/pull/353) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- v2.16.5 [\#366](https://github.com/metal/metal.js/pull/366) ([jbalsas](https://github.com/jbalsas))
+- Prevents Closure Library \(goog\) and IncrementalDOM from being evaluated more than once in the same page [\#365](https://github.com/metal/metal.js/pull/365) ([jbalsas](https://github.com/jbalsas))
+- Fix syntax error in tutorial components page [\#363](https://github.com/metal/metal.js/pull/363) ([renatorib](https://github.com/renatorib))
+- Do not favor undefined over default values when updating data manager [\#357](https://github.com/metal/metal.js/pull/357) ([robframpton](https://github.com/robframpton))
+- Fix the accessibility issue when using iframe [\#356](https://github.com/metal/metal.js/pull/356) ([matuzalemsteles](https://github.com/matuzalemsteles))
+- Validation for Fragment should only occur if a value exists [\#355](https://github.com/metal/metal.js/pull/355) ([bryceosterhaus](https://github.com/bryceosterhaus))
+- Updates CHANGELOG for v2.16.3 [\#354](https://github.com/metal/metal.js/pull/354) ([robframpton](https://github.com/robframpton))
+- Update google-closure soy/data.js \(f7e0f45\) | Fixes \#324 [\#353](https://github.com/metal/metal.js/pull/353) ([robframpton](https://github.com/robframpton))
 - Excludes wedeploy branch from travis [\#352](https://github.com/metal/metal.js/pull/352) ([jbalsas](https://github.com/jbalsas))
-- Replace instanceof check with check for COMPONENT\_FLAG | Fixes \#349 [\#350](https://github.com/metal/metal.js/pull/350) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Replace instanceof check with check for COMPONENT\_FLAG | Fixes \#349 [\#350](https://github.com/metal/metal.js/pull/350) ([robframpton](https://github.com/robframpton))
 
 ## [v2.16.3](https://github.com/metal/metal.js/tree/v2.16.3) (2018-01-23)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.16.2...v2.16.3)
@@ -25,8 +31,8 @@
 
 **Merged pull requests:**
 
-- release/v2.16.3 [\#344](https://github.com/metal/metal.js/pull/344) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- If a valid id is passed to portalElement and the element is not found, create an element with that id [\#341](https://github.com/metal/metal.js/pull/341) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- release/v2.16.3 [\#344](https://github.com/metal/metal.js/pull/344) ([robframpton](https://github.com/robframpton))
+- If a valid id is passed to portalElement and the element is not found, create an element with that id [\#341](https://github.com/metal/metal.js/pull/341) ([robframpton](https://github.com/robframpton))
 - Removing unecessary karma-mocha repetition on karma.conf.js [\#340](https://github.com/metal/metal.js/pull/340) ([diegonvs](https://github.com/diegonvs))
 
 ## [v2.16.2](https://github.com/metal/metal.js/tree/v2.16.2) (2018-01-18)
@@ -34,8 +40,8 @@
 
 **Merged pull requests:**
 
-- Import should be relative [\#343](https://github.com/metal/metal.js/pull/343) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Import should be relative [\#342](https://github.com/metal/metal.js/pull/342) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Import should be relative [\#343](https://github.com/metal/metal.js/pull/343) ([robframpton](https://github.com/robframpton))
+- Import should be relative [\#342](https://github.com/metal/metal.js/pull/342) ([robframpton](https://github.com/robframpton))
 - Merge pull request \#91 from Robert-Frampton/portal [\#339](https://github.com/metal/metal.js/pull/339) ([jbalsas](https://github.com/jbalsas))
 
 ## [v2.16.1](https://github.com/metal/metal.js/tree/v2.16.1) (2018-01-17)
@@ -43,8 +49,8 @@
 
 **Merged pull requests:**
 
-- Updates CHANGELOG for v2.16.0 [\#338](https://github.com/metal/metal.js/pull/338) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Use globally defined setImmediate on server side for test suites like jest that have mock timers [\#337](https://github.com/metal/metal.js/pull/337) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Updates CHANGELOG for v2.16.0 [\#338](https://github.com/metal/metal.js/pull/338) ([robframpton](https://github.com/robframpton))
+- Use globally defined setImmediate on server side for test suites like jest that have mock timers [\#337](https://github.com/metal/metal.js/pull/337) ([robframpton](https://github.com/robframpton))
 
 ## [v2.16.0](https://github.com/metal/metal.js/tree/v2.16.0) (2018-01-12)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.15.1...v2.16.0)
@@ -59,12 +65,12 @@
 
 **Merged pull requests:**
 
-- Updates CHANGELOG for v2.15.1 [\#336](https://github.com/metal/metal.js/pull/336) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- No longer use global setImmediate function due to performance issues [\#335](https://github.com/metal/metal.js/pull/335) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Adding credit to saucelabs in README [\#334](https://github.com/metal/metal.js/pull/334) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Updates CHANGELOG for v2.15.1 [\#336](https://github.com/metal/metal.js/pull/336) ([robframpton](https://github.com/robframpton))
+- No longer use global setImmediate function due to performance issues [\#335](https://github.com/metal/metal.js/pull/335) ([robframpton](https://github.com/robframpton))
+- Adding credit to saucelabs in README [\#334](https://github.com/metal/metal.js/pull/334) ([robframpton](https://github.com/robframpton))
 - Adds a range validator [\#333](https://github.com/metal/metal.js/pull/333) ([julien](https://github.com/julien))
 - Updating copyright year [\#332](https://github.com/metal/metal.js/pull/332) ([diegonvs](https://github.com/diegonvs))
-- Skip portal rendering during SSR [\#331](https://github.com/metal/metal.js/pull/331) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Skip portal rendering during SSR [\#331](https://github.com/metal/metal.js/pull/331) ([robframpton](https://github.com/robframpton))
 - Adds Fragment component [\#329](https://github.com/metal/metal.js/pull/329) ([bryceosterhaus](https://github.com/bryceosterhaus))
 - Adds .editorconfig to the project [\#328](https://github.com/metal/metal.js/pull/328) ([pragmaticivan](https://github.com/pragmaticivan))
 
@@ -83,8 +89,8 @@
 
 **Merged pull requests:**
 
-- release/v2.15.1 [\#325](https://github.com/metal/metal.js/pull/325) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Simplify isomorphic test fixtures [\#322](https://github.com/metal/metal.js/pull/322) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- release/v2.15.1 [\#325](https://github.com/metal/metal.js/pull/325) ([robframpton](https://github.com/robframpton))
+- Simplify isomorphic test fixtures [\#322](https://github.com/metal/metal.js/pull/322) ([robframpton](https://github.com/robframpton))
 
 ## [v2.15.0](https://github.com/metal/metal.js/tree/v2.15.0) (2017-12-01)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.14.1...v2.15.0)
@@ -103,16 +109,16 @@
 
 **Merged pull requests:**
 
-- release/v2.15.0 [\#320](https://github.com/metal/metal.js/pull/320) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Allow falsy values for domData.get [\#319](https://github.com/metal/metal.js/pull/319) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Add links to metaljs.com from package readme files [\#316](https://github.com/metal/metal.js/pull/316) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Add tests for error messages returned by arrayOf and shapeOf [\#315](https://github.com/metal/metal.js/pull/315) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- release/v2.15.0 [\#320](https://github.com/metal/metal.js/pull/320) ([robframpton](https://github.com/robframpton))
+- Allow falsy values for domData.get [\#319](https://github.com/metal/metal.js/pull/319) ([robframpton](https://github.com/robframpton))
+- Add links to metaljs.com from package readme files [\#316](https://github.com/metal/metal.js/pull/316) ([robframpton](https://github.com/robframpton))
+- Add tests for error messages returned by arrayOf and shapeOf [\#315](https://github.com/metal/metal.js/pull/315) ([robframpton](https://github.com/robframpton))
 - Fixes saucelabs testname [\#314](https://github.com/metal/metal.js/pull/314) ([jbalsas](https://github.com/jbalsas))
 - Fixing test:coverage script [\#313](https://github.com/metal/metal.js/pull/313) ([diegonvs](https://github.com/diegonvs))
-- Split large test up into smaller parts, remove redundant section [\#312](https://github.com/metal/metal.js/pull/312) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Method calls to Config helpers should return new objects to avoid unintended mutation [\#311](https://github.com/metal/metal.js/pull/311) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Default STATE values should be preserved when rendering web components. Fixes \#305 [\#309](https://github.com/metal/metal.js/pull/309) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Run test:saucelabs script on CI [\#307](https://github.com/metal/metal.js/pull/307) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Split large test up into smaller parts, remove redundant section [\#312](https://github.com/metal/metal.js/pull/312) ([robframpton](https://github.com/robframpton))
+- Method calls to Config helpers should return new objects to avoid unintended mutation [\#311](https://github.com/metal/metal.js/pull/311) ([robframpton](https://github.com/robframpton))
+- Default STATE values should be preserved when rendering web components. Fixes \#305 [\#309](https://github.com/metal/metal.js/pull/309) ([robframpton](https://github.com/robframpton))
+- Run test:saucelabs script on CI [\#307](https://github.com/metal/metal.js/pull/307) ([robframpton](https://github.com/robframpton))
 - Emit "disposed" event on Component dispose [\#299](https://github.com/metal/metal.js/pull/299) ([p2kmgcl](https://github.com/p2kmgcl))
 
 ## [v2.14.1](https://github.com/metal/metal.js/tree/v2.14.1) (2017-11-15)
@@ -120,7 +126,7 @@
 
 **Merged pull requests:**
 
-- Allow for parent element to be used in server side environments if document is defined as it is when using JSDom [\#298](https://github.com/metal/metal.js/pull/298) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Allow for parent element to be used in server side environments if document is defined as it is when using JSDom [\#298](https://github.com/metal/metal.js/pull/298) ([robframpton](https://github.com/robframpton))
 - Adds lint-staged configuration [\#293](https://github.com/metal/metal.js/pull/293) ([jbalsas](https://github.com/jbalsas))
 - Update slack channel [\#290](https://github.com/metal/metal.js/pull/290) ([bryceosterhaus](https://github.com/bryceosterhaus))
 
@@ -150,21 +156,21 @@
 **Merged pull requests:**
 
 - Adds auto-generated initial CHANGELOG.md using https://github.com/skywinder/github-changelog-generator [\#289](https://github.com/metal/metal.js/pull/289) ([jbalsas](https://github.com/jbalsas))
-- Ensure that STATE configuration from static hints are properly configured with multiple levels of class inheritance [\#288](https://github.com/metal/metal.js/pull/288) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Rename willRender to willUpdate since it's related to shouldUpdate and move implementation to renderer [\#285](https://github.com/metal/metal.js/pull/285) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Ensure that STATE configuration from static hints are properly configured with multiple levels of class inheritance [\#288](https://github.com/metal/metal.js/pull/288) ([robframpton](https://github.com/robframpton))
+- Rename willRender to willUpdate since it's related to shouldUpdate and move implementation to renderer [\#285](https://github.com/metal/metal.js/pull/285) ([robframpton](https://github.com/robframpton))
 - Revert "Merge pull request \#275 from Robert-Frampton/metal-soy-bundle" [\#280](https://github.com/metal/metal.js/pull/280) ([jbalsas](https://github.com/jbalsas))
 - Updating tests on validators using assert.isTrue\(\) to verify correct cases [\#278](https://github.com/metal/metal.js/pull/278) ([diegonvs](https://github.com/diegonvs))
-- hasInitialValue\_ should return false if value is undefined, but validators should run regardless. Fixes \#259 [\#276](https://github.com/metal/metal.js/pull/276) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Check to see if bundle has been loaded already. Fixes \#273 [\#275](https://github.com/metal/metal.js/pull/275) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Export HTMLParser rather than attaching to window [\#274](https://github.com/metal/metal.js/pull/274) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Improve error message when using `oneOf` validation. Fixes \#254 [\#272](https://github.com/metal/metal.js/pull/272) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Add forceUpdate method to Component [\#271](https://github.com/metal/metal.js/pull/271) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Add tests for server side rendering of Soy and JSX components [\#269](https://github.com/metal/metal.js/pull/269) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Don't attempt to create element in Node.js environment [\#266](https://github.com/metal/metal.js/pull/266) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- importing metal-dom shouldn't immediately throw errors when running in Node.js environment [\#264](https://github.com/metal/metal.js/pull/264) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Update lerna to v2.2.0 [\#263](https://github.com/metal/metal.js/pull/263) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- metal-web-component [\#261](https://github.com/metal/metal.js/pull/261) ([Robert-Frampton](https://github.com/Robert-Frampton))
-- Adds `writeOnce` method to state Config utils [\#256](https://github.com/metal/metal.js/pull/256) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- hasInitialValue\_ should return false if value is undefined, but validators should run regardless. Fixes \#259 [\#276](https://github.com/metal/metal.js/pull/276) ([robframpton](https://github.com/robframpton))
+- Check to see if bundle has been loaded already. Fixes \#273 [\#275](https://github.com/metal/metal.js/pull/275) ([robframpton](https://github.com/robframpton))
+- Export HTMLParser rather than attaching to window [\#274](https://github.com/metal/metal.js/pull/274) ([robframpton](https://github.com/robframpton))
+- Improve error message when using `oneOf` validation. Fixes \#254 [\#272](https://github.com/metal/metal.js/pull/272) ([robframpton](https://github.com/robframpton))
+- Add forceUpdate method to Component [\#271](https://github.com/metal/metal.js/pull/271) ([robframpton](https://github.com/robframpton))
+- Add tests for server side rendering of Soy and JSX components [\#269](https://github.com/metal/metal.js/pull/269) ([robframpton](https://github.com/robframpton))
+- Don't attempt to create element in Node.js environment [\#266](https://github.com/metal/metal.js/pull/266) ([robframpton](https://github.com/robframpton))
+- importing metal-dom shouldn't immediately throw errors when running in Node.js environment [\#264](https://github.com/metal/metal.js/pull/264) ([robframpton](https://github.com/robframpton))
+- Update lerna to v2.2.0 [\#263](https://github.com/metal/metal.js/pull/263) ([robframpton](https://github.com/robframpton))
+- metal-web-component [\#261](https://github.com/metal/metal.js/pull/261) ([robframpton](https://github.com/robframpton))
+- Adds `writeOnce` method to state Config utils [\#256](https://github.com/metal/metal.js/pull/256) ([robframpton](https://github.com/robframpton))
 - Fix travis-ci url in readme [\#252](https://github.com/metal/metal.js/pull/252) ([renatorib](https://github.com/renatorib))
 - Issue/209 [\#231](https://github.com/metal/metal.js/pull/231) ([p2kmgcl](https://github.com/p2kmgcl))
 
@@ -224,7 +230,7 @@
 **Merged pull requests:**
 
 - Add otherProps util and DangerouslySetHTML component [\#242](https://github.com/metal/metal.js/pull/242) ([bryceosterhaus](https://github.com/bryceosterhaus))
-- Rename IncrementalDomAop.js to incremental-dom-aop.js [\#237](https://github.com/metal/metal.js/pull/237) ([Robert-Frampton](https://github.com/Robert-Frampton))
+- Rename IncrementalDomAop.js to incremental-dom-aop.js [\#237](https://github.com/metal/metal.js/pull/237) ([robframpton](https://github.com/robframpton))
 - Rename intercept.js [\#236](https://github.com/metal/metal.js/pull/236) ([jbalsas](https://github.com/jbalsas))
 - Refactors for issue \#227 and pr https://github.com/metal/metal.js/pull/233 [\#234](https://github.com/metal/metal.js/pull/234) ([bryceosterhaus](https://github.com/bryceosterhaus))
 - Fix for \#227 [\#233](https://github.com/metal/metal.js/pull/233) ([bryceosterhaus](https://github.com/bryceosterhaus))

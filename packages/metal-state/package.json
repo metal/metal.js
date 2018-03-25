@@ -1,6 +1,6 @@
 {
   "name": "metal-state",
-  "version": "2.16.2",
+  "version": "2.16.5",
   "description": "A class that adds support for watchable, configurable state",
   "license": "BSD",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-state",
@@ -22,8 +22,8 @@
     "metal"
   ],
   "dependencies": {
-    "metal": "^2.16.2",
-    "metal-events": "^2.16.2"
+    "metal": "^2.16.5",
+    "metal-events": "^2.16.5"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

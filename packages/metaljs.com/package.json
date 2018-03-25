@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "metaljs.com",
-  "version": "2.16.2",
+  "version": "2.16.5",
   "scripts": {
     "start": "electric"
   },

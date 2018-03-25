@@ -1,6 +1,6 @@
 {
   "name": "metal-assertions",
-  "version": "2.16.2",
+  "version": "2.16.5",
   "description": "A collection of assertion methods for metal",
   "license": "BSD-3-Clause",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-assertions",
@@ -22,7 +22,7 @@
     "metal"
   ],
   "dependencies": {
-    "metal": "^2.16.2"
+    "metal": "^2.16.5"
   },
   "devDependencies": {
     "babel-cli": "^6.4.5",

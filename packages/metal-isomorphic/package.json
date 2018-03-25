@@ -1,6 +1,6 @@
 {
 	"name": "metal-isomorphic",
-	"version": "2.16.4",
+	"version": "2.16.5",
 	"private": true,
 	"description": "Integration tests for server side rendering.",
 	"license": "BSD",
@@ -10,8 +10,8 @@
 		"npm": ">=3.0.0"
 	},
 	"dependencies": {
-		"metal-component": "^2.16.3",
-		"metal-jsx": "^2.16.4",
-		"metal-soy": "^2.16.4"
+		"metal-component": "^2.16.5",
+		"metal-jsx": "^2.16.5",
+		"metal-soy": "^2.16.5"
 	}
 }

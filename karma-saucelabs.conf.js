@@ -27,18 +27,6 @@ module.exports = function(config) {
 			base: 'SauceLabs',
 			browserName: 'firefox',
 		},
-		sl_ie_9: {
-			base: 'SauceLabs',
-			browserName: 'internet explorer',
-			platform: 'Windows 7',
-			version: '9',
-		},
-		sl_ie_10: {
-			base: 'SauceLabs',
-			browserName: 'internet explorer',
-			platform: 'Windows 7',
-			version: '10',
-		},
 		sl_ie_11: {
 			base: 'SauceLabs',
 			browserName: 'internet explorer',
@@ -63,9 +51,10 @@ module.exports = function(config) {
 	if (!sauceLabsAccessKey) {
 		sauceLabsAccessKey = process.env.SAUCE_ACCESS_KEY_ENC;
 		if (sauceLabsAccessKey) {
-			sauceLabsAccessKey = new Buffer(sauceLabsAccessKey, 'base64').toString(
-				'binary'
-			);
+			sauceLabsAccessKey = new Buffer(
+				sauceLabsAccessKey,
+				'base64'
+			).toString('binary');
 		}
 	}
 

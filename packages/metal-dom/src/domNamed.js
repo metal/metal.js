@@ -209,15 +209,11 @@ export function buildFragment(htmlString) {
  * Checks if the first element contains the second one.
  * @param {!Element} element1
  * @param {!Element} element2
+ * @deprecated Use element1.contains(element2) directly instead of this method
  * @return {boolean}
  */
 export function contains(element1, element2) {
-	if (isDocument(element1)) {
-		// document.contains is not defined on IE9, so call it on documentElement instead.
-		return element1.documentElement.contains(element2);
-	} else {
-		return element1.contains(element2);
-	}
+	return element1.contains(element2);
 }
 
 /**

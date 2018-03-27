@@ -1,0 +1,34 @@
+{namespace Footer}
+
+/**
+ *
+ */
+{template .render}
+	{@param year: ?}
+	{@param? haveSidebar: ?}
+
+	{let $footer kind="html"}
+		<footer class="footer">
+			<div class="container">
+				<div class="row">
+					<p class="footer-description col-md-6 col-md-offset-2">
+						Copyright © {$year} <a href="https://liferay.com">Liferay, Inc</a>
+					</p>
+					<p class="footer-description col-md-6">
+						Powered by <a href="http://wedeploy.com">WeDeploy™</a>
+					</p>
+				</div>
+			</div>
+		</footer>
+	{/let}
+
+	{if $haveSidebar}
+		<div class="sidebar-offset">
+			{$footer}
+		</div>
+	{else}
+		{$footer}
+	{/if}
+
+
+{/template}

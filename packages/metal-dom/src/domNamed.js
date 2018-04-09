@@ -644,14 +644,17 @@ function removeClassesWithoutNative_(element, classes) {
 
 /**
  * Replaces the first element with the second.
+ * @deprecated Use element1.parentNode.replaceChild(element2, element1)
+ * directly instead of this method
  * @param {Element} element1
  * @param {Element} element2
  */
 export function replace(element1, element2) {
 	if (element1 && element2 && element1 !== element2 && element1.parentNode) {
-		element1.parentNode.insertBefore(element2, element1);
-		element1.parentNode.removeChild(element1);
+		element1.parentNode.replaceChild(element2, element1);
 	}
+
+	return;
 }
 
 /**

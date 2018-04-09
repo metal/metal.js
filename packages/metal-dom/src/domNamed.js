@@ -207,9 +207,9 @@ export function buildFragment(htmlString) {
 
 /**
  * Checks if the first element contains the second one.
+ * @deprecated Use element1.contains(element2) directly instead of this method
  * @param {!Element} element1
  * @param {!Element} element2
- * @deprecated Use element1.contains(element2) directly instead of this method
  * @return {boolean}
  */
 export function contains(element1, element2) {

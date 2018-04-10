@@ -4,7 +4,7 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import Toggler from 'metal-toggler';
 
-import templates from './Sidebar.soy';
+import templates from './Sidebar.soy.js';
 import {isServerSide} from 'metal';
 
 class Sidebar extends Component {

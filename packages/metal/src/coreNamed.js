@@ -90,7 +90,7 @@ function getFirstTruthy_(a, b) {
 
 /**
  * Gets the name of the given function. If the current browser doesn't
- * support the `name` property, this will calculate it from the function's
+ * support the `name` property, like IE11, this will calculate it from the function's
  * content string.
  * @param {!function()} fn
  * @return {string}

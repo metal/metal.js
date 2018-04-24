@@ -17,6 +17,49 @@ describe('HTML2IncDom', function() {
 		assert.strictEqual(htmlStr, element.innerHTML);
 	});
 
+	it('should render a link element with inline elements inside via incremental dom', function() {
+		let element = document.createElement('div');
+		let htmlStr = '<a href="http://foo.com"><strong><b>Foo</b></strong></a>';
+		IncrementalDOM.patch(element, () => HTML2IncDom.run(htmlStr));
+
+		assert.strictEqual(htmlStr, element.innerHTML);
+	});
+
+	it('should render a link element within inline elements via incremental dom', function() {
+		let element = document.createElement('div');
+		let htmlStr = '<strong><b><a href="http://foo.com">Foo</a></b></strong>';
+		IncrementalDOM.patch(element, () => HTML2IncDom.run(htmlStr));
+
+		assert.strictEqual(htmlStr, element.innerHTML);
+	});
+
+	it('should render a link element inside inline and block elements via incremental dom', function() {
+		let element = document.createElement('div');
+		let htmlStr =
+			'<p><strong><b><a href="http://foo.com">Foo</a></b></strong></p>';
+		IncrementalDOM.patch(element, () => HTML2IncDom.run(htmlStr));
+
+		assert.strictEqual(htmlStr, element.innerHTML);
+	});
+
+	it('should render a link element with inline elements inside and inside a block element via incremental dom', function() {
+		let element = document.createElement('div');
+		let htmlStr =
+			'<div><a href="http://foo.com"><strong><b>Foo</b></strong></a></div>';
+		IncrementalDOM.patch(element, () => HTML2IncDom.run(htmlStr));
+
+		assert.strictEqual(htmlStr, element.innerHTML);
+	});
+
+	it('should render a link element with block elements inside via incremental dom', function() {
+		let element = document.createElement('div');
+		let htmlStr =
+			'<a href="http://foo.com"><div><strong><b>Foo</b></strong></div></a>';
+		IncrementalDOM.patch(element, () => HTML2IncDom.run(htmlStr));
+
+		assert.strictEqual(htmlStr, element.innerHTML);
+	});
+
 	it('should render escaped html inside element via incremental dom', function() {
 		let element = document.createElement('div');
 		IncrementalDOM.patch(element, () => HTML2IncDom.run('&#39;Foo&#39;'));

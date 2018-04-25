@@ -417,7 +417,7 @@ describe('Web components', function() {
 		});
 	});
 
-	function createJSXWebComponent(name, validator = val => true) {
+	function createJSXWebComponent(name, validator = () => true) {
 		const tagName = `metal-test-component-${name}`;
 
 		class WebComponent extends JSXComponent {
@@ -441,7 +441,7 @@ describe('Web components', function() {
 		return tagName;
 	}
 
-	function createWebComponent(name, validator = val => true) {
+	function createWebComponent(name, validator = () => true) {
 		const tagName = `metal-test-component-${name}`;
 
 		class WebComponent extends Component {}

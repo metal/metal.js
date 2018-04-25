@@ -103,13 +103,11 @@ export function defineWebComponent(tagName, Ctor) {
 		 * @return {Object}
 		 */
 		deserializeValue_: function(value) {
-			let retVal;
-
 			try {
-				retVal = JSON.parse(value);
+				value = JSON.parse(value);
 			} catch (e) {}
 
-			return retVal || value;
+			return value;
 		},
 
 		/**

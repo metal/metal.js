@@ -16,7 +16,7 @@ class JSXDataManager extends ComponentDataManager.constructor {
 	 * @protected
 	 */
 	addUnconfiguredProps_(component, props, data) {
-		let keys = Object.keys(data);
+		let keys = Object.keys(data).concat(Object.keys(component.props));
 		for (let i = 0; i < keys.length; i++) {
 			if (!props.hasStateKey(keys[i])) {
 				component.props[keys[i]] = data[keys[i]];

@@ -8,10 +8,11 @@
     "lint": "eslint 'packages/metal*/{src,test}/**/*.js'",
     "precommit": "lint-staged",
     "prettier": "prettier-eslint 'packages/metal*/{src,test}/**/*.js'",
+    "saucelabs": "karma start karma-saucelabs.conf.js",
     "test": "gulp soy && karma start && npm run test:isomorphic",
     "test:coverage": "gulp soy && karma start karma-coverage.conf.js",
     "test:isomorphic": "gulp soy:isomorphic && mocha packages/metal-isomorphic/test/isomorphic.js --compilers js:babel-core/register",
-    "test:saucelabs": "gulp soy && karma start karma-saucelabs.conf.js"
+    "test:saucelabs": "gulp soy && npm run saucelabs -- 0 && npm run saucelabs -- 1 && npm run saucelabs -- 2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

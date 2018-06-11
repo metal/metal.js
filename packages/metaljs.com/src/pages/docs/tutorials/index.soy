@@ -21,6 +21,9 @@ weight: 1
 					{param section: $site.index.children['docs'] /}
 				{/call}
 				{call .topics data="all" /}
+				{call Footer.render data="all"}
+					{param haveSidebar: true /}
+				{/call}
 			</div>
 		</main>
 	</div>

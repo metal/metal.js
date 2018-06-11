@@ -15,9 +15,11 @@ description: "Build UI components in a solid, flexible way."
 			{call .features /}
 			{call .highlights /}
 			{call .why data="all" /}
-			{call .footer /}
 		{/param}
 	{/call}
+	{call Footer.render data="all"}
+    	{param haveSidebar: false /}
+  	{/call}
 {/template}
 
 /**
@@ -144,22 +146,4 @@ description: "Build UI components in a solid, flexible way."
 			</section>
 		</div>
 	</div>
-{/template}
-
-/**
- *
- */
-{template .footer}
-	<footer class="footer">
-		<div class="container">
-			<div class="row">
-				<p class="footer-description col-md-6 col-md-offset-2">
-					Brought to you by <a href="https://liferay.com">Liferay, Inc.</a> © 2017.
-				</p>
-				<p class="footer-description col-md-6">
-					Powered by <a href="http://wedeploy.com">WeDeploy™</a>
-				</p>
-			</div>
-		</div>
-	</footer>
 {/template}

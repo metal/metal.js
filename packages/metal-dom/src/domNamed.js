@@ -769,14 +769,7 @@ export function toElement(selectorOrElement) {
 	) {
 		return selectorOrElement;
 	} else if (isString(selectorOrElement)) {
-		if (
-			selectorOrElement[0] === '#' &&
-			selectorOrElement.indexOf(' ') === -1
-		) {
-			return document.getElementById(selectorOrElement.substr(1));
-		} else {
-			return document.querySelector(selectorOrElement);
-		}
+		return document.querySelector(selectorOrElement);
 	} else {
 		return null;
 	}

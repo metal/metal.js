@@ -37,7 +37,7 @@ class HTML2IncDom {
 					: IncrementalDOM.elementOpen;
 				let args = [tag, null, []];
 				for (let i = 0; i < attrs.length; i++) {
-					args.push(attrs[i].name, attrs[i].value);
+					args.push(attrs[i].name, unescape(attrs[i].value));
 				}
 				fn(...args);
 			},

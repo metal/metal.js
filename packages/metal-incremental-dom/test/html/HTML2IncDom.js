@@ -40,6 +40,14 @@ describe('HTML2IncDom', function() {
 		assert.strictEqual(htmlStr, element.innerHTML);
 	});
 
+	it('should unescape html entities inside element attributes', function() {
+		let element = document.createElement('div');
+		let htmlStr =
+			'<form action="actionurl?foo=&quot;&lt;2&quot;&amp;bar=&gt;bar"></form>';
+		IncrementalDOM.patch(element, () => HTML2IncDom.run(htmlStr));
+		assert.strictEqual(htmlStr, element.innerHTML);
+	});
+
 	describe('setParser', function() {
 		afterEach(function() {
 			HTML2IncDom.setParser(null);

@@ -1,6 +1,6 @@
 'use strict';
 
-import {array, getStaticProperty, object} from 'metal';
+import {getStaticProperty, object} from 'metal';
 import {ComponentDataManager} from 'metal-component';
 import State from 'metal-state';
 
@@ -16,14 +16,16 @@ class JSXDataManager extends ComponentDataManager.constructor {
 	 * @protected
 	 */
 	addUnconfiguredProps_(component, props, data) {
-		let keys = array.dedupe(
-			Object.keys(data).concat(Object.keys(component.props))
-		);
-		for (let i = 0; i < keys.length; i++) {
-			if (!props.hasStateKey(keys[i])) {
-				component.props[keys[i]] = data[keys[i]];
+		let keys = new Set([
+			...Object.keys(data),
+			...Object.keys(component.props),
+		]);
+
+		keys.forEach(key => {
+			if (!props.hasStateKey(key)) {
+				component.props[key] = data[key];
 			}
-		}
+		});
 	}
 
 	/**

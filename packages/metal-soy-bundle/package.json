@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "gulp",
-    "compile": "babel --no-babelrc --presets env -d lib/ build/",
+    "compile": "babel --no-babelrc --presets env -d lib/ build/ -s",
     "lint": "jshint gulpfile.js",
     "prepublish": "npm run build && npm run compile"
   },

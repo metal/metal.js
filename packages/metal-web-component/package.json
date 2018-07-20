@@ -27,7 +27,7 @@
     "metal-state": "2.7.0"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "github:webcomponents/webcomponentsjs",
+    "@webcomponents/webcomponentsjs": "latest",
     "babel-cli": "^6.4.5",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.6.0",

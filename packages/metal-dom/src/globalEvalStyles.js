@@ -77,6 +77,34 @@ class globalEvalStyles {
 	}
 
 	/**
+	 * Runs the given styles elements in the order that they appear.
+	 * @param {!NodeList} styles NodeList of Link and Style that will be evaluated and executed.
+	 * @param {number} index Position where the counter will start the ascending iterate.
+	 * @param {function()=} defaultFn Optional function to be called when the
+	 *   style has been run.
+	 * @param {function()=} appendFn Optional function to append the node
+	 *   into document.
+	 */
+	static runStylesinOrder(styles, index, defaultFn, appendFn) {
+		globalEvalStyles.runStyle(
+			styles.item(index),
+			function() {
+				if (index < styles.length - 1) {
+					globalEvalStyles.runStylesinOrder(
+						styles,
+						index + 1,
+						defaultFn,
+						appendFn
+					);
+				} else if (defaultFn) {
+					async.nextTick(defaultFn);
+				}
+			},
+			appendFn
+		);
+	}
+
+	/**
 	 * Evaluates any style present in the given element.
 	 * @param {!Element} element
 	 * @param {function()=} defaultFn Optional function to be called when the
@@ -86,19 +114,10 @@ class globalEvalStyles {
 	 */
 	static runStylesInElement(element, defaultFn, appendFn) {
 		const styles = element.querySelectorAll('style,link');
-		if (styles.length === 0 && defaultFn) {
+		if (styles.length) {
+			globalEvalStyles.runStylesinOrder(styles, 0, defaultFn, appendFn);
+		} else if (defaultFn) {
 			async.nextTick(defaultFn);
-			return;
-		}
-
-		let loadCount = 0;
-		const callback = function() {
-			if (defaultFn && ++loadCount === styles.length) {
-				async.nextTick(defaultFn);
-			}
-		};
-		for (let i = 0; i < styles.length; i++) {
-			globalEvalStyles.runStyle(styles[i], callback, appendFn);
 		}
 	}
 }

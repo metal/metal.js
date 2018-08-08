@@ -1,7 +1,7 @@
 # Metal.js
 
 [![Build Status](https://img.shields.io/travis/metal/metal.js/master.svg?style=flat)](https://travis-ci.org/metal/metal.js)
-Join #metal on our [Slack Channel](liferay-community.slack.com)
+Join #metal on our [Slack Channel](https://community.liferay.com/chat)
 
 [![Build Status](https://saucelabs.com/browser-matrix/metal-js.svg)](https://saucelabs.com/beta/builds/a0b06f2845e541c78db25576f2ddc501)
 

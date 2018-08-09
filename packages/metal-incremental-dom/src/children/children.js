@@ -85,8 +85,14 @@ export function renderChildTree(tree, skipNode) {
 		};
 		IncrementalDOM.elementOpen.apply(null, args);
 		if (tree.props.children) {
-			for (let i = 0; i < tree.props.children.length; i++) {
-				renderChildTree(tree.props.children[i], skipNode);
+			if (typeof tree.props.children[Symbol.iterator] === 'function') {
+				for (let item of tree.props.children) {
+					renderChildTree(item, skipNode);
+				}
+			} else {
+				for (let i = 0; i < tree.props.children.length; i++) {
+					renderChildTree(tree.props.children[i], skipNode);
+				}
 			}
 		}
 		IncrementalDOM.elementClose(tree.tag);

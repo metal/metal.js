@@ -100,6 +100,49 @@ describe('children', function() {
 				});
 			});
 
+			// console.log(element.childNodes);
+
+			assert.strictEqual(1, element.childNodes.length);
+
+			let spanElement = element.childNodes[0];
+			assert.strictEqual('SPAN', spanElement.tagName);
+			assert.ok(dom.hasClass(spanElement, 'test'));
+			assert.strictEqual('bar', spanElement.getAttribute('foo'));
+			assert.strictEqual(1, spanElement.childNodes.length);
+			assert.strictEqual('Hello World', spanElement.childNodes[0].textContent);
+		});
+
+		it('should render captured iterable children via incremental dom', function() {
+			let element = document.createElement('div');
+			let iterableChildren = {
+				[Symbol.iterator]: () => ({
+					items: [
+						{
+							args: ['Hello World'],
+							text: 'Hello World',
+						},
+					],
+					next: function next() {
+						return {
+							done: this.items.length === 0,
+							value: this.items.shift(),
+						};
+					},
+				}),
+			};
+
+			IncrementalDOM.patch(element, () => {
+				renderChildTree({
+					tag: 'span',
+					props: {
+						children: iterableChildren,
+						class: 'test',
+						foo: 'bar',
+						key: 'key',
+					},
+				});
+			});
+
 			assert.strictEqual(1, element.childNodes.length);
 
 			let spanElement = element.childNodes[0];

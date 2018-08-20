@@ -58,7 +58,7 @@ class features {
 	}
 
 	/**
-	 * Some browsers (like IE9) change the order of element attributes, when html
+	 * Some browsers (like IE11, Edge) change the order of element attributes, when html
 	 * is rendered. This method can be used to check if this behavior happens on
 	 * the current browser.
 	 * @return {boolean}

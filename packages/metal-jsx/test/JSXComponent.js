@@ -411,6 +411,83 @@ describe('JSXComponent', function() {
 			assert.strictEqual(component.element, child.element);
 		});
 
+		it('should not overwrite unconfigured props if a new undefined value is not passed', function(
+			done
+		) {
+			class GrandChildComponent extends JSXComponent {
+				render() {
+					return (
+						<div>
+							{this.props.one}
+							<br />
+							{this.props.two}
+						</div>
+					);
+				}
+			}
+
+			GrandChildComponent.PROPS = {
+				one: {
+					value: 'Default One',
+				},
+				two: {
+					value: 'Default Two',
+				},
+			};
+
+			class ChildComponent extends JSXComponent {
+				render() {
+					return (
+						<div>
+							<GrandChildComponent {...this.otherProps()} />
+						</div>
+					);
+				}
+			}
+
+			class TestComponent extends JSXComponent {
+				render() {
+					const props = this.state.active
+						? {one: 'foo'}
+						: {one: 'bar', two: 'baz'};
+					return (
+						<div>
+							<ChildComponent {...props} />
+						</div>
+					);
+				}
+			}
+			TestComponent.STATE = {
+				active: {
+					value: true,
+				},
+			};
+
+			component = new TestComponent();
+
+			assert.equal(
+				component.element.innerHTML,
+				'<div><div>foo<br>Default Two</div></div>'
+			);
+
+			component.state.active = false;
+
+			component.once('stateChanged', function() {
+				assert.equal(
+					component.element.innerHTML,
+					'<div><div>bar<br>baz</div></div>'
+				);
+				component.state.active = true;
+				component.once('stateChanged', function() {
+					assert.equal(
+						component.element.innerHTML,
+						'<div><div>foo<br>Default Two</div></div>'
+					);
+					done();
+				});
+			});
+		});
+
 		it('should receive elementClasses from parent component', function() {
 			class ChildComponent extends JSXComponent {
 				render() {

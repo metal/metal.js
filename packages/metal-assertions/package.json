@@ -15,7 +15,7 @@
     "src"
   ],
   "scripts": {
-    "compile": "babel --no-babelrc --presets env -d lib/ src/",
+    "compile": "babel --no-babelrc --presets env -d lib/ src/ -s",
     "prepublish": "npm run compile"
   },
   "keywords": [

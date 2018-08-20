@@ -2,6 +2,19 @@
 
 const lernaJson = require('./lerna.json');
 
+let localLaunchers = {
+	ChromeNoSandboxHeadless: {
+		base: 'Chrome',
+		flags: [
+			'--no-sandbox',
+			'--headless',
+			'--disable-gpu',
+			// Without a remote debugging port, Google Chrome exits immediately.
+			'--remote-debugging-port=9333',
+		],
+	},
+};
+
 module.exports = function(config) {
 	config.set({
 		browserify: {
@@ -21,13 +34,15 @@ module.exports = function(config) {
 			},
 		},
 
-		browsers: ['Chrome'],
+		browsers: Object.keys(localLaunchers),
 
 		client: {
 			mocha: {
 				timeout: 4000,
 			},
 		},
+
+		customLaunchers: localLaunchers,
 
 		exclude: ['packages/metal-isomorphic/**/*.js'],
 

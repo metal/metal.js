@@ -1,7 +1,7 @@
 'use strict';
 
 import {isServerSide} from 'metal';
-import {registerCustomEvent, contains} from './dom';
+import {registerCustomEvent} from './dom';
 import features from './features';
 
 /**
@@ -23,7 +23,7 @@ function registerEvents() {
 				// eslint-disable-next-line
 				if (
 					!related ||
-					(related !== target && !contains(target, related))
+					(related !== target && !target.contains(related))
 				) {
 					event.customType = eventName;
 					return callback(event);

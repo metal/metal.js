@@ -1,6 +1,6 @@
 {
   "name": "metal-web-component",
-  "version": "2.16.5",
+  "version": "2.16.6",
   "description": "Web component (CustomElement) registration for Metal.js components.",
   "license": "BSD-3-Clause",
   "repository": "https://github.com/metal/metal.js/tree/master/packages/metal-web-component",
@@ -23,7 +23,7 @@
     "library"
   ],
   "dependencies": {
-    "metal": "^2.16.5",
+    "metal": "^2.16.6",
     "metal-state": "2.7.0"
   },
   "devDependencies": {
@@ -31,11 +31,11 @@
     "babel-cli": "^6.4.5",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.6.0",
-    "metal-component": "^2.16.5",
-    "metal-incremental-dom": "^2.16.5",
-    "metal-jsx": "^2.16.5",
-    "metal-soy": "^2.16.5",
-    "metal-soy-bundle": "^2.16.5",
+    "metal-component": "^2.16.6",
+    "metal-incremental-dom": "^2.16.6",
+    "metal-jsx": "^2.16.6",
+    "metal-soy": "^2.16.6",
+    "metal-soy-bundle": "^2.16.6",
     "metal-useragent": "^2.1.3"
   }
 }

@@ -32,11 +32,9 @@ Metal.js is template agnostic and comes with out-of-the-box support for two
 templating languages: Soy (Google Closure) and JSX (React).
 
 When the data being passed to your component changes, your component's template
-rerenders just the parts of your component that need to be updated. Therefore, 
-you don't need to worry about manual DOM manipulation.
+rerenders just the parts of your component that need to be updated. Therefore, you don't need to worry about manual DOM manipulation.
 
-Behind the scenes Metal.js is using Google's [Incremental DOM](https://google.github.io/incremental-dom) 
-for updating DOM elements.
+Behind the scenes Metal.js is using Google's [Incremental DOM](https://google.github.io/incremental-dom) for updating DOM elements.
 
 ### What are we making?
 

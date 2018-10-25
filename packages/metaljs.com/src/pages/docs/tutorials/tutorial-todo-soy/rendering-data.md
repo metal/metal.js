@@ -10,8 +10,7 @@ weight: 5
 
 ## {$page.title}
 
-First, let's prepare the `TodoItem` for consuming the data passed from 
-`TodoApp`:
+First, let's prepare the `TodoItem` for consuming the data passed from `TodoApp`:
 
 ```soy
 &#123;namespace TodoItem&#125;

@@ -48,10 +48,7 @@ class TodoApp extends JSXComponent {
 }
 ```
 
-This toggles the `done` property of the todo that was clicked. Simply setting 
-the `this.state.todos` property to a new array of todos triggers a rerender, 
-passing the data to the child components. Your markup should look like this once 
-you've clicked a todo item:
+This toggles the `done` property of the todo that was clicked. Simply setting the `this.state.todos` property to a new array of todos triggers a rerender, passing the data to the child components. Your markup should look like this once you've clicked a todo item:
 
 ```text/xml
 <div class="todo-app">

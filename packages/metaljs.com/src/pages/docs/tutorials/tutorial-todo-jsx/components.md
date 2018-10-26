@@ -10,9 +10,7 @@ weight: 3
 
 ## {$page.title}
 
-In the `metal-tutorial-todo` boilerplate there are already three components 
-defined to help get you started. Each component is defined as an ES6 class that 
-extends from Metal's `JSXComponent` class:
+In the `metal-tutorial-todo` boilerplate there are already three components defined to help get you started. Each component is defined as an ES6 class that extends from Metal's `JSXComponent` class:
 
 ```text/jsx
 class TodoApp extends JSXComponent {

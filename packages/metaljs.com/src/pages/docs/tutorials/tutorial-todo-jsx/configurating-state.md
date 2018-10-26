@@ -11,8 +11,7 @@ weight: 4
 ## {$page.title}
 
 As previously mentioned, Metal components automatically respond to the data
-passed to them and rerender. For a component to take advantage of this behavior, 
-however, it needs to be told what data to respond to. This is where
+passed to them and rerender. For a component to take advantage of this behavior, however, it needs to be told what data to respond to. This is where
 state comes in.
 
 JSX components have two state managers, one for internal state (STATE), and one

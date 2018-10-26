@@ -45,8 +45,7 @@ of the current class.
 
 Now you should see an alert with the title of the clicked todo. Next you must
 notify `TodoApp` that a todo was marked as completed so that it can update
-the data. This can be done by emitting a custom event with the info needed to 
-make the change. In this case we'll use the index value from PROPS:
+the data. This can be done by emitting a custom event with the info needed to make the change. In this case we'll use the index value from PROPS:
 
 ```text/jsx
 // TodoItem.js
@@ -95,13 +94,13 @@ class TodoApp extends JSXComponent {
 }
 ```
 
-At this point you should have an event handler that fires every time a todo item 
+At this point you should have an event handler that fires every time a todo item
 is clicked. Next you will use this data to update the state in `TodoApp`.
 
 ### Alternative to custom events
 
 Alternatively, you can pass functions from parents to children to achieve
-similar functionality. To do this, a child must declare a PROP to house the 
+similar functionality. To do this, a child must declare a PROP to house the
 function from the parent:
 
 ```text/jsx

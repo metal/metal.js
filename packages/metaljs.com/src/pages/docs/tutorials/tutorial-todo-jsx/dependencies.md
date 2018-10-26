@@ -28,23 +28,19 @@ npm dependencies:
 cd metal-tutorial-todo && npm install
 ```
 
-The boilerplate that you'll build on is located in the **src/jsx** directory. 
-You can also view the finished product in the **src/jsx/final** directory.
+The boilerplate that you'll build on is located in the **src/jsx** directory. You can also view the finished product in the **src/jsx/final** directory.
 
 ### Building
 
-To test drive the boilerplate located in the **src/jsx** directory, run the 
-build script shown below:
+To test drive the boilerplate located in the **src/jsx** directory, run the build script shown below:
 
 ```text/x-sh
 npm run build:jsx
 ```
 
-This runs babel + webpack to transpile and bundle the JavaScript into something 
-consumable by web browsers.
+This runs babel + webpack to transpile and bundle the JavaScript into something consumable by web browsers.
 
-This tutorial uses ES6 syntax; if you're unfamiliar with it, check out 
-[this guide](https://babeljs.io/learn-es2015/) first.
+This tutorial uses ES6 syntax; if you're unfamiliar with it, check out [this guide](https://babeljs.io/learn-es2015/) first.
 
 To build the finished product, run the following script:
 
@@ -54,8 +50,7 @@ npm run build:jsx:final
 
 ### Demo
 
-Now that you've built the project, go ahead and open the demo page located at 
-`demos/index.html`.
+Now that you've built the project, go ahead and open the demo page located at `demos/index.html`.
 
 If you check the file you'll see that the component is already being invoked:
 

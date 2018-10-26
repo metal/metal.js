@@ -47,9 +47,7 @@ class TodoForm extends JSXComponent {
 
 Now you can use the `value` property from STATE to keep track of the changes
 made to the input value. This makes the input a **controlled input**, where the
-value of the input is controlled by the state of the component. In other words, 
-when the value of the state changes, it automatically changes the value in the 
-input as well, keeping the two in sync.
+value of the input is controlled by the state of the component. In other words, when the value of the state changes, it automatically changes the value in the input as well, keeping the two in sync.
 
 ```text/jsx
 // TodoForm.js
@@ -143,8 +141,7 @@ class TodoApp extends JSXComponent {
 }
 ```
 
-Now when you add some text to the input and submit the form, a new todo is 
-automatically added to the list.
+Now when you add some text to the input and submit the form, a new todo is automatically added to the list.
 
 That's it! You've successfully created a simple Todo App with Metal.js. Now that
 you are comfortable with the basics, check out the guides for more advanced

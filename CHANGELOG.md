@@ -1,5 +1,31 @@
 # Change Log
 
+## [v2.16.6](https://github.com/metal/metal.js/tree/v2.16.6) (2018-09-25)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.5...v2.16.6)
+
+**Closed issues:**
+
+- \[metal-incremental-dom\] Update incremental-dom-string dependency to 0.0.3 [\#395](https://github.com/metal/metal.js/issues/395)
+- Add source maps to compile scripts [\#385](https://github.com/metal/metal.js/issues/385)
+- \[metal-useragent\] User Agent is not being detected since v2.2.0 [\#382](https://github.com/metal/metal.js/issues/382)
+- \[JSX\] Unconfigured props will not be overwritten if a new undefined value is not passed in [\#374](https://github.com/metal/metal.js/issues/374)
+- Namespace "goog.string" already declared. [\#370](https://github.com/metal/metal.js/issues/370)
+- Remove IE9 and IE10 Support [\#367](https://github.com/metal/metal.js/issues/367)
+- Migrate site to Electric 3 [\#360](https://github.com/metal/metal.js/issues/360)
+
+**Merged pull requests:**
+
+- Updates CHANGELOG to v2.16.5 [\#397](https://github.com/metal/metal.js/pull/397) ([jbalsas](https://github.com/jbalsas))
+- Fixes \#395 | Updates incremental-dom-string to v0.0.3 [\#396](https://github.com/metal/metal.js/pull/396) ([jbalsas](https://github.com/jbalsas))
+- Fix community slack invite link [\#390](https://github.com/metal/metal.js/pull/390) ([diegonvs](https://github.com/diegonvs))
+- Adds source maps to `compile` npm scripts | Fixes \#385 [\#386](https://github.com/metal/metal.js/pull/386) ([julien](https://github.com/julien))
+- Escapes html entities inside element attributes [\#384](https://github.com/metal/metal.js/pull/384) ([jbalsas](https://github.com/jbalsas))
+- fix for 🐛 \#378 [\#379](https://github.com/metal/metal.js/pull/379) ([gcmznt](https://github.com/gcmznt))
+- Some enhancements in tests tooling [\#377](https://github.com/metal/metal.js/pull/377) ([diegonvs](https://github.com/diegonvs))
+- Unconfigured props will be overwritten if a new undefined value is not passed in [\#376](https://github.com/metal/metal.js/pull/376) ([diegonvs](https://github.com/diegonvs))
+- Remove elementClasses warning from Fragment [\#375](https://github.com/metal/metal.js/pull/375) ([bryceosterhaus](https://github.com/bryceosterhaus))
+- Removing IE9 and IE10 support [\#368](https://github.com/metal/metal.js/pull/368) ([diegonvs](https://github.com/diegonvs))
+
 ## [v2.16.5](https://github.com/metal/metal.js/tree/v2.16.5) (2018-03-25)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.16.3...v2.16.5)
 

@@ -175,13 +175,13 @@ describe('dom', function() {
 			dom.append(element1, element2);
 			dom.enterDocument(element3);
 
-			assert.ok(dom.contains(element1, element2));
-			assert.ok(dom.contains(document, element3));
+			assert.isTrue(dom.contains(element1, element2));
+			assert.isTrue(dom.contains(document, element3));
 
-			assert.ok(!dom.contains(element1, element3));
-			assert.ok(!dom.contains(element2, element1));
-			assert.ok(!dom.contains(document, element1));
-			assert.ok(!dom.contains(document, element2));
+			assert.isFalse(dom.contains(element1, element3));
+			assert.isFalse(dom.contains(element2, element1));
+			assert.isFalse(dom.contains(document, element1));
+			assert.isFalse(dom.contains(document, element2));
 		});
 	});
 

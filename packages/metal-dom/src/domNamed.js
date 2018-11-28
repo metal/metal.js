@@ -216,7 +216,12 @@ export function buildFragment(htmlString) {
  * @return {boolean}
  */
 export function contains(element1, element2) {
-	return element1.contains(element2);
+	if (isDocument(element1)) {
+		// document.contains is not defined on IE9, so call it on documentElement instead.
+		return element1.documentElement.contains(element2);
+	} else {
+		return element1.contains(element2);
+	}
 }
 
 /**

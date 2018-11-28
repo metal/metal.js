@@ -1,5 +1,19 @@
 # Change Log
 
+## [v2.16.7](https://github.com/metal/metal.js/tree/v2.16.7) (2018-11-28)
+[Full Changelog](https://github.com/metal/metal.js/compare/v2.16.6...v2.16.7)
+
+**Closed issues:**
+
+- \[metal-dom\] domNamed.contains isn't working on IE11 when I pass document as first argument [\#401](https://github.com/metal/metal.js/issues/401)
+- Typo on tutorials [\#399](https://github.com/metal/metal.js/issues/399)
+
+**Merged pull requests:**
+
+- v2.16.7 [\#403](https://github.com/metal/metal.js/pull/403) ([jbalsas](https://github.com/jbalsas))
+- Fixes \#401 | Revert deprecation of contains function [\#402](https://github.com/metal/metal.js/pull/402) ([diegonvs](https://github.com/diegonvs))
+- Fix typos \#399 [\#400](https://github.com/metal/metal.js/pull/400) ([jonmak08](https://github.com/jonmak08))
+
 ## [v2.16.6](https://github.com/metal/metal.js/tree/v2.16.6) (2018-09-25)
 [Full Changelog](https://github.com/metal/metal.js/compare/v2.16.5...v2.16.6)
 

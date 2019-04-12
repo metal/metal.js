@@ -1,5 +1,5 @@
 import State, {mergeState} from 'metal-state';
-import {getStaticProperty, isObject} from 'metal';
+import {getStaticProperty, isObject, object} from 'metal';
 
 /**
  * Register a custom element for a given Metal component.
@@ -38,7 +38,7 @@ export function defineWebComponent(tagName, Ctor) {
 	Object.setPrototypeOf(CustomElement.prototype, HTMLElement.prototype);
 	Object.setPrototypeOf(CustomElement, HTMLElement);
 
-	Object.assign(CustomElement.prototype, {
+	object.mixin(CustomElement.prototype, {
 		/**
 		 * Handler for when new attribute values are passed to the custom
 		 * element.

@@ -1,5 +1,6 @@
 'use strict';
 
+import {object} from 'metal';
 import validators from './validators';
 
 /**
@@ -247,7 +248,7 @@ function mergeConfig(context, config) {
 	obj = Object.create(Config);
 	obj.config = {};
 
-	Object.assign(obj.config, objConfig, config);
+	object.mixin(obj.config, objConfig, config);
 	return obj;
 }
 

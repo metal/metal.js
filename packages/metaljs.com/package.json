@@ -3,7 +3,8 @@
   "name": "metaljs.com",
   "version": "2.16.8",
   "scripts": {
-    "start": "electric"
+    "start": "electric",
+    "deploy": "electric deploy"
   },
   "devDependencies": {
     "electric-cli": "^2.2.0",

@@ -55,12 +55,21 @@ class globalEvalStyles {
 		const callback = function() {
 			defaultFn && defaultFn();
 		};
-		if (style.rel && style.rel !== 'stylesheet') {
+		if (
+			style.rel &&
+			style.rel !== 'stylesheet' &&
+			style.rel !== 'canonical' &&
+			style.rel !== 'alternate'
+		) {
 			async.nextTick(callback);
 			return;
 		}
 
-		if (style.tagName === 'STYLE') {
+		if (
+			style.tagName === 'STYLE' ||
+			style.rel === 'canonical' ||
+			style.rel === 'alternate'
+		) {
 			async.nextTick(callback);
 		} else {
 			once(style, 'load', callback);

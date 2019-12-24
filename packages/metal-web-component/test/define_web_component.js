@@ -1,6 +1,7 @@
 'use strict';
 
 import Component from 'metal-component';
+import core from 'metal';
 import Soy from 'metal-soy';
 import UA from 'metal-useragent';
 import {JSXComponent} from 'metal-jsx';
@@ -138,6 +139,78 @@ describe('Web components', function() {
 			assert.equal(title.key3, 'value3');
 		});
 
+		it('should deserialize the attribute if a number is passed', function() {
+			const validator = val => {
+				return core.isNumber(val);
+			};
+
+			const tagName = createWebComponent('custom-test-element-10', validator);
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', 10);
+			document.body.appendChild(el);
+
+			let title = el.component.title;
+
+			assert.isNumber(title);
+			assert.equal(title, 10);
+
+			el.setAttribute('title', 100);
+
+			title = el.component.title;
+
+			assert.isNumber(title);
+			assert.equal(title, 100);
+		});
+
+		it('should deserialize the attribute if a number is passed as a string', function() {
+			const validator = val => {
+				return core.isString(val);
+			};
+
+			const tagName = createWebComponent('custom-test-element-11', validator);
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', '"10"');
+			document.body.appendChild(el);
+
+			let title = el.component.title;
+
+			assert.isString(title);
+			assert.equal(title, '10');
+
+			el.setAttribute('title', '"100"');
+
+			title = el.component.title;
+
+			assert.isString(title);
+			assert.equal(title, '100');
+		});
+
+		it('should deserialize the attribute if a boolean is passed', function() {
+			const validator = val => {
+				return core.isBoolean(val);
+			};
+
+			const tagName = createWebComponent('custom-test-element-12', validator);
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', true);
+			document.body.appendChild(el);
+
+			let title = el.component.title;
+
+			assert.isBoolean(title);
+			assert.equal(title, true);
+
+			el.setAttribute('title', false);
+
+			title = el.component.title;
+
+			assert.isBoolean(title);
+			assert.equal(title, false);
+		});
+
 		it('should have the default state value after rendering', function() {
 			const tagName = createWebComponent('custom-test-element-09');
 			el = document.createElement(tagName);
@@ -261,9 +334,90 @@ describe('Web components', function() {
 			assert.isUndefined(title.key1);
 			assert.equal(title.key3, 'value3');
 		});
+
+		it('should deserialize the attribute if a number is passed', function() {
+			const validator = val => {
+				return core.isNumber(val);
+			};
+
+			const tagName = createJSXWebComponent(
+				'custom-jsx-test-element-09',
+				validator
+			);
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', 10);
+			document.body.appendChild(el);
+
+			let title = el.component.props.title;
+
+			assert.isNumber(title);
+			assert.equal(title, 10);
+
+			el.setAttribute('title', 100);
+
+			title = el.component.props.title;
+
+			assert.isNumber(title);
+			assert.equal(title, 100);
+		});
+
+		it('should deserialize the attribute if a number is passed as a string', function() {
+			const validator = val => {
+				return core.isString(val);
+			};
+
+			const tagName = createJSXWebComponent(
+				'custom-jsx-test-element-10',
+				validator
+			);
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', '"10"');
+			document.body.appendChild(el);
+
+			let title = el.component.props.title;
+
+			assert.isString(title);
+			assert.equal(title, '10');
+
+			el.setAttribute('title', '"100"');
+
+			title = el.component.props.title;
+
+			assert.isString(title);
+			assert.equal(title, '100');
+		});
+
+		it('should deserialize the attribute if a boolean is passed', function() {
+			const validator = val => {
+				return core.isBoolean(val);
+			};
+
+			const tagName = createJSXWebComponent(
+				'custom-jsx-test-element-11',
+				validator
+			);
+			el = document.createElement(tagName);
+
+			el.setAttribute('title', true);
+			document.body.appendChild(el);
+
+			let title = el.component.props.title;
+
+			assert.isBoolean(title);
+			assert.equal(title, true);
+
+			el.setAttribute('title', false);
+
+			title = el.component.props.title;
+
+			assert.isBoolean(title);
+			assert.equal(title, false);
+		});
 	});
 
-	function createJSXWebComponent(name) {
+	function createJSXWebComponent(name, validator = () => true) {
 		const tagName = `metal-test-component-${name}`;
 
 		class WebComponent extends JSXComponent {
@@ -278,6 +432,7 @@ describe('Web components', function() {
 		WebComponent.PROPS = {
 			title: {
 				value: 'default title',
+				validator: validator,
 			},
 		};
 
@@ -286,7 +441,7 @@ describe('Web components', function() {
 		return tagName;
 	}
 
-	function createWebComponent(name) {
+	function createWebComponent(name, validator = () => true) {
 		const tagName = `metal-test-component-${name}`;
 
 		class WebComponent extends Component {}
@@ -294,6 +449,7 @@ describe('Web components', function() {
 		WebComponent.STATE = {
 			title: {
 				value: 'default title',
+				validator: validator,
 			},
 		};
 

@@ -1,13 +1,12 @@
 # Metal.js
 
-[![Build Status](https://img.shields.io/travis/metal/metal.js/master.svg?style=flat)](https://travis-ci.org/metal/metal.js)
-Join #metal on our [Slack Channel](https://community.liferay.com/chat)
-
-[![Build Status](https://saucelabs.com/browser-matrix/metal-js.svg)](https://saucelabs.com/beta/builds/a0b06f2845e541c78db25576f2ddc501)
+[![Travis CI build status](https://img.shields.io/travis/metal/metal.js/develop.svg?style=flat)](https://travis-ci.org/metal/metal.js)
+[![Sauce Labs build status](https://app.saucelabs.com/buildstatus/metal-js)](https://app.saucelabs.com/open_sauce/user/metal-js/builds)
 
 Metal.js is a JavaScript library for building UI components in a solid, flexible way.
 
 * [Official website](http://metaljs.com)
+* Join the `#p-metal` channel on our [Slack community](https://community.liferay.com/chat)
 
 ## Setup
 

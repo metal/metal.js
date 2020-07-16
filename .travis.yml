@@ -1,3 +1,6 @@
+os: linux
+dist: bionic
+
 addons:
   sauce_connect:
     username: metal-js
@@ -17,7 +20,7 @@ install:
   - npm run lerna
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 language: java
 

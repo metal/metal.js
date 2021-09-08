@@ -9,6 +9,22 @@ Metal.js is a JavaScript library for building UI components in a solid, flexible
 
 * [Official website](http://metaljs.com)
 
+## Support and Project status
+
+Metal.js is widely used and well maintained internally at Liferay but
+does not currently have staffing to support the open source release. As such
+this project is mostly _internal_ and support is _minimal_. For certain
+issues, like build integration we are in an especially bad position to offer
+support.
+
+To get assistance you can use any of the following forums
+
+1. Look through the [documentation](https://metaljs.com/).
+2. File an [issue on GitHub](https://github.com/metal/metal.js/issues)
+
+We will try our best, but keep in mind that given our support staffing, we may
+not be able to help.
+
 ## Setup
 
 1. Install NodeJS >= [v0.12.0](http://nodejs.org/dist/v0.12.0/), if you don't have it yet.

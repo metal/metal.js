@@ -29,7 +29,7 @@
     "gulp": "^3.8.11",
     "gulp-replace": "^0.5.4",
     "husky": "^0.14.3",
-    "jsdom": "^9.9.1",
+    "jsdom": "^16.5.0",
     "jsdom-global": "^2.1.1",
     "karma": "^1.1.0",
     "karma-babel-preprocessor": "^7.0.0",

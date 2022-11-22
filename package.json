@@ -31,7 +31,7 @@
     "husky": "^0.14.3",
     "jsdom": "^9.9.1",
     "jsdom-global": "^2.1.1",
-    "karma": "^1.1.0",
+    "karma": "^6.4.1",
     "karma-babel-preprocessor": "^7.0.0",
     "karma-browserify": "^5.1.2",
     "karma-chai": "^0.1.0",

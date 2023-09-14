@@ -300,7 +300,10 @@ export function isString(val) {
  * @return {boolean}
  */
 export function isServerSide(options = {checkEnv: true}) {
-	let serverSide = typeof process !== 'undefined' && !process.browser;
+	let serverSide =
+		typeof process !== 'undefined' &&
+		!process.browser &&
+		String(process) === '[object process]';
 	if (serverSide && options.checkEnv) {
 		serverSide =
 			typeof process.env !== 'undefined' &&

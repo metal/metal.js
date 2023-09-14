@@ -260,20 +260,29 @@ describe('core', function() {
 	describe('isServerSide', function() {
 		const originalBrowser = process.browser;
 		const originalEnv = process.env;
+		const originalToString = Object.getPrototypeOf(process).toString;
 
 		beforeEach(function() {
 			process.env = {
 				NODE_ENV: '',
 			};
 			process.browser = true;
+			Object.getPrototypeOf(process).toString = function() {
+				return '[object process]';
+			};
 		});
 
 		afterEach(function() {
 			process.env = originalEnv;
 			process.browser = originalBrowser;
+			Object.getPrototypeOf(process).toString = originalToString;
 		});
 
 		it('should return false when process global exists and browser property is true', function() {
+			Object.getPrototypeOf(process).toString = function() {
+				return '[object Object]';
+			};
+
 			assert.ok(!core.isServerSide());
 		});
 
